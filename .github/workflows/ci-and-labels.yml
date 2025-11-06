@@ -1,0 +1,49 @@
+name: CI + Labels Setup
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  labels:
+    name: Initialize GitHub Labels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Ensure script is executable
+        run: |
+          chmod +x scripts/gh-labels-creator.sh
+
+      - name: Run label initialization
+        run: |
+          ./scripts/gh-labels-creator.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  ci:
+    name: Run CI (tests + static checks)
+    runs-on: ubuntu-latest
+    needs: labels
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        run: |
+          # (language-specific setup – e.g., install dependencies)
+          echo "Placeholder: install dependencies"
+
+      - name: Run tests
+        run: |
+          echo "Placeholder: run tests"
+
+      - name: Static analysis / linting
+        run: |
+          echo "Placeholder: run linters or code-quality checks"
