@@ -17,5 +17,5 @@
       "copy_file"
     ]
   },
-  "description": "Gemini Search Plugin Configuration - Only allows google_web_search tool for grounded web searches"
+  "description": "Gemini Search Configuration - Only allows google_web_search tool for grounded web searches"
 }
