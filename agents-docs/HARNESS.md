@@ -22,9 +22,10 @@ Throw away what does not help - more config is not always better.
 
 ## Skills (Single Canonical Source)
 
-All skills live in `.agents/skills/`. CLI-specific folders (`.claude/skills/`,
-`.opencode/agent/`, `.gemini/skills/`) contain only symlinks.
-Run `./scripts/setup-skills.sh` to create them. See `agents-docs/SKILLS.md`.
+All skills live in `.agents/skills/`. Claude Code and Gemini CLI use symlinks
+(`.claude/skills/`, `.gemini/skills/`) created by `./scripts/setup-skills.sh`.
+OpenCode reads skills directly from `.agents/skills/` - no symlinks needed.
+See `agents-docs/SKILLS.md`.
 
 ## MCP Servers
 

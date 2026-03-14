@@ -393,8 +393,11 @@ my-project/
 │   └── pre-commit-hook.sh
 ├── .agents/               # ← New
 │   └── skills/
-└── .claude/               # ← New
-    └── skills/ → ../.agents/skills/
+├── .claude/               # ← New
+│   └── skills/ → ../.agents/skills/
+└── .opencode/             # ← New (reads from .agents/skills/ directly)
+    ├── agents/
+    └── commands/
 ```
 
 ### After (Level 4)
@@ -416,6 +419,9 @@ my-project/
 │   ├── commands/          # ← New
 │   ├── hooks/             # ← New
 │   └── skills/
+├── .opencode/             # ← New (reads from .agents/skills/ directly)
+│   ├── agents/
+│   └── commands/
 └── agents-docs/           # ← New
     ├── HARNESS.md
     ├── SKILLS.md

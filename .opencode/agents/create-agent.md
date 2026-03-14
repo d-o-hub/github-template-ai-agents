@@ -26,7 +26,7 @@ Create well-designed, properly formatted opencode agents that:
 ### File Format
 
 ```
-.opencode/agent/
+.opencode/agents/
 └── agent-name.md
 ```
 
@@ -334,7 +334,7 @@ Selected tools: [comma-separated list]
 
 ```bash
 # Create agent file
-cat > .opencode/agent/agent-name.md << 'EOF'
+cat > .opencode/agents/agent-name.md << 'EOF'
 ---description: Your detailed description heremode: subagenttools:  write: true  edit: true  read: true---
 # Agent Name
 
@@ -678,18 +678,18 @@ After creating an agent, validate:
 
 ```bash
 # Check file exists
-test -f .opencode/agent/agent-name.md && echo "✓ File exists"
+test -f .opencode/agents/agent-name.md && echo "✓ File exists"
 
 # Validate YAML frontmatter
-head -n 5 .opencode/agent/agent-name.md | grep "^description:" && echo "✓ Has description"
-head -n 5 .opencode/agent/agent-name.md | grep "^mode:" && echo "✓ Has mode"
+head -n 5 .opencode/agents/agent-name.md | grep "^description:" && echo "✓ Has description"
+head -n 5 .opencode/agents/agent-name.md | grep "^mode:" && echo "✓ Has mode"
 
 # Check name format
-name=$(grep "^name:" .opencode/agent/agent-name.md | cut -d' ' -f2)
+name=$(grep "^name:" .opencode/agents/agent-name.md | cut -d' ' -f2)
 [[ "$name" =~ ^[a-z0-9-]+$ ]] && echo "✓ Name format correct"
 
 # Check description length
-desc=$(grep "^description:" .opencode/agent/agent-name.md | cut -d' ' -f2-)
+desc=$(grep "^description:" .opencode/agents/agent-name.md | cut -d' ' -f2-)
 [[ ${#desc} -le 1024 ]] && echo "✓ Description length OK"
 ```
 

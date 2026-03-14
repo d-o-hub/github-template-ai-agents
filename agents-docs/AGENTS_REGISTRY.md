@@ -80,7 +80,7 @@ Research topics using web search and documentation |
 
 ## Adding New Agents
 
-1. Create agent file in `.claude/agents/<agent-name>.md` (Claude Code) or `.opencode/agent/<agent-name>.md` (OpenCode)
+1. Create agent file in `.claude/agents/<agent-name>.md` (Claude Code) or `.opencode/agents/<agent-name>.md` (OpenCode)
 2. Include YAML frontmatter with `name`, `description`, and `tools`
 3. Run `./scripts/update-agents-registry.sh` to update this registry
 
@@ -133,7 +133,7 @@ Add to `.vscode/settings.json`:
   },
   "files.watcherInclude": [
     ".claude/agents/**/*.md",
-    ".opencode/agent/**/*.md",
+    ".opencode/agents/**/*.md",
     ".agents/skills/**/SKILL.md"
   ]
 }
@@ -147,7 +147,7 @@ Then use a task to run the update script on file changes.
 npm install -g chokidar-cli
 
 # Watch for changes and update registry
-chokidar ".claude/agents/*.md" ".opencode/agent/*.md" ".agents/skills/*/SKILL.md" \
+chokidar ".claude/agents/*.md" ".opencode/agents/*.md" ".agents/skills/*/SKILL.md" \
   -c "./scripts/update-agents-registry.sh && git add AGENTS_REGISTRY.md"
 ```
 

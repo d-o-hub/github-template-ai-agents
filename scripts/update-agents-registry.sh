@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Auto-update AGENTS_REGISTRY.md by scanning .claude/agents/ and .opencode/agent/ directories
+# Auto-update AGENTS_REGISTRY.md by scanning .claude/agents/ and .opencode/agents/ directories
 # Run manually or set up as a file watcher
 # Usage: ./scripts/update-agents-registry.sh
+# Note: OpenCode agents live in .opencode/agents/ (real files, not symlinks)
 
 set -euo pipefail
 
@@ -70,11 +71,11 @@ if [ -d "$REPO_ROOT/.claude/agents" ]; then
     done
 fi
 
-# Scan .opencode/agent/ directory
-if [ -d "$REPO_ROOT/.opencode/agent" ]; then
-    echo "  Found .opencode/agent/"
-    
-    for agent_file in "$REPO_ROOT/.opencode/agent"/*.md; do
+# Scan .opencode/agents/ directory
+if [ -d "$REPO_ROOT/.opencode/agents" ]; then
+    echo "  Found .opencode/agents/"
+
+    for agent_file in "$REPO_ROOT/.opencode/agents"/*.md; do
         [ -f "$agent_file" ] || continue
         # Skip symlinks to .agents/skills
         [ -L "$agent_file" ] && continue
@@ -125,7 +126,7 @@ cat >> "$TEMP_FILE" << 'FOOTER'
 
 ## Adding New Agents
 
-1. Create agent file in `.claude/agents/<agent-name>.md` (Claude Code) or `.opencode/agent/<agent-name>.md` (OpenCode)
+1. Create agent file in `.claude/agents/<agent-name>.md` (Claude Code) or `.opencode/agents/<agent-name>.md` (OpenCode)
 2. Include YAML frontmatter with `name`, `description`, and `tools`
 3. Run `./scripts/update-agents-registry.sh` to update this registry
 
@@ -178,7 +179,7 @@ Add to `.vscode/settings.json`:
   },
   "files.watcherInclude": [
     ".claude/agents/**/*.md",
-    ".opencode/agent/**/*.md",
+    ".opencode/agents/**/*.md",
     ".agents/skills/**/SKILL.md"
   ]
 }
@@ -192,7 +193,7 @@ Then use a task to run the update script on file changes.
 npm install -g chokidar-cli
 
 # Watch for changes and update registry
-chokidar ".claude/agents/*.md" ".opencode/agent/*.md" ".agents/skills/*/SKILL.md" \
+chokidar ".claude/agents/*.md" ".opencode/agents/*.md" ".agents/skills/*/SKILL.md" \
   -c "./scripts/update-agents-registry.sh && git add AGENTS_REGISTRY.md"
 ```
 
@@ -223,7 +224,7 @@ echo "  Timestamp: $TIMESTAMP"
 echo ""
 echo "Agents found:"
 echo "  - Claude Code: $(find .claude/agents -name '*.md' 2>/dev/null | wc -l | tr -d ' ')"
-echo "  - OpenCode: $(find .opencode/agent -name '*.md' ! -type l 2>/dev/null | wc -l | tr -d ' ')"
+echo "  - OpenCode: $(find .opencode/agents -name '*.md' ! -type l 2>/dev/null | wc -l | tr -d ' ')"
 echo "  - Skills: $(find .agents/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')"
 echo ""
 echo "To commit changes:"

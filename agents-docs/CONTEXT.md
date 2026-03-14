@@ -42,8 +42,9 @@ AGENTS.md (concise, universal)
 ```
 
 All skills are canonical in `.agents/skills/`.
-CLI folders (`.claude/skills/`, `.opencode/agent/`, `.gemini/skills/`) contain
-only symlinks - run `./scripts/setup-skills.sh` to create them.
+Claude Code and Gemini CLI use symlinks (`.claude/skills/`, `.gemini/skills/`);
+OpenCode reads directly from `.agents/skills/`.
+Run `./scripts/setup-skills.sh` to create symlinks for Claude Code and Gemini CLI.
 
 ## Anti-Patterns
 

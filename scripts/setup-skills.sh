@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 # Creates symlinks from CLI-specific folders -> .agents/skills/ (canonical source)
 # Run once after cloning: ./scripts/setup-skills.sh
+# Note: OpenCode reads skills directly from .agents/skills/ - no symlinks needed.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
 SKILLS_SRC="$REPO_ROOT/.agents/skills"
 
 # CLI folders that should contain symlinks to canonical skills
+# (OpenCode reads directly from .agents/skills/ - not included here)
 CLI_SKILL_DIRS=(
   ".claude/skills"
-  ".opencode/agent"
   ".gemini/skills"
 )
 
