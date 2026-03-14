@@ -8,8 +8,8 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-REGISTRY_FILE="$REPO_ROOT/AGENTS_REGISTRY.md"
-TEMP_FILE="$REPO_ROOT/.agents_registry_temp.md"
+REGISTRY_FILE="$REPO_ROOT/agents-docs/AGENTS_REGISTRY.md"
+TEMP_FILE="$REPO_ROOT/agents-docs/.agents_registry_temp.md"
 
 echo "Scanning for agent definitions..."
 
@@ -218,7 +218,7 @@ sed -i "s/TIMESTAMP/$TIMESTAMP/" "$TEMP_FILE"
 mv "$TEMP_FILE" "$REGISTRY_FILE"
 
 echo ""
-echo "✓ AGENTS_REGISTRY.md updated successfully"
+echo "✓ agents-docs/AGENTS_REGISTRY.md updated successfully"
 echo "  Timestamp: $TIMESTAMP"
 echo ""
 echo "Agents found:"
@@ -227,5 +227,5 @@ echo "  - OpenCode: $(find .opencode/agent -name '*.md' ! -type l 2>/dev/null | 
 echo "  - Skills: $(find .agents/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')"
 echo ""
 echo "To commit changes:"
-echo "  git add AGENTS_REGISTRY.md"
+echo "  git add agents-docs/AGENTS_REGISTRY.md"
 echo "  git commit -m 'docs: update agents registry'"

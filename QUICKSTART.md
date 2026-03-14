@@ -166,7 +166,7 @@ claude "Refactor the authentication module to improve readability"
 | Creating sub-agents | [`agents-docs/SUB-AGENTS.md`](agents-docs/SUB-AGENTS.md) |
 | Configuring hooks | [`agents-docs/HOOKS.md`](agents-docs/HOOKS.md) |
 | Context management | [`agents-docs/CONTEXT.md`](agents-docs/CONTEXT.md) |
-| Available agents | [`AGENTS_REGISTRY.md`](AGENTS_REGISTRY.md) |
+| Available agents | [`agents-docs/AGENTS_REGISTRY.md`](agents-docs/AGENTS_REGISTRY.md) |
 
 ## Troubleshooting
 
