@@ -165,12 +165,6 @@ We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for:
 
 This project is licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
 
-## Acknowledgments
-
-This template incorporates patterns from:
-- [rust-self-learning-memory](https://github.com/d-o-hub/rust-self-learning-memory) - Episodic memory, GOAP patterns, quality gates
-- [web-doc-resolver](https://github.com/d-oit/web-doc-resolver) - Cascade resolution, progressive disclosure
-
 ---
 
 **Built with AI agents. Maintained by humans.**
