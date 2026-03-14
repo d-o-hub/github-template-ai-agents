@@ -32,8 +32,15 @@ Validate symlinks are intact:
 
 ## Skills in This Repository
 
-<!-- TODO: List your skills here as they are added -->
-<!-- Example:
-- `agent-coordination/` - Multi-agent orchestration patterns
-- `shell-script-quality/` - Shell script best practices
--->
+| Skill | Description |
+|---|---|
+| [`agent-coordination/`](agent-coordination/) | Multi-agent orchestration patterns (hybrid, iterative, parallel, sequential, swarm) |
+| [`github-readme/`](github-readme/) | Create human-focused GitHub README.md files with 2026 best practices |
+| [`goap-agent/`](goap-agent/) | Goal-Oriented Action Planning agent execution strategies |
+| [`iterative-refinement/`](iterative-refinement/) | Iterative code improvement patterns |
+| [`parallel-execution/`](parallel-execution/) | Parallel task execution patterns |
+| [`shell-script-quality/`](shell-script-quality/) | Shell script linting (ShellCheck) and testing (BATS) |
+| [`skill-creator/`](skill-creator/) | Create new skills with proper structure and best practices |
+| [`task-decomposition/`](task-decomposition/) | Break complex tasks into manageable steps |
+| [`web-doc-resolver/`](web-doc-resolver/) | Resolve and fetch web documentation |
+| [`web-search-researcher/`](web-search-researcher/) | Research topics using web search with systematic methodology |
