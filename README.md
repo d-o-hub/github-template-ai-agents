@@ -1,281 +1,171 @@
-# github-template-ai-agents
+# GitHub Template AI Agents
 
-> **A production-ready template for AI agent-powered development**  
-> Supports: Claude Code, Gemini CLI, OpenCode, Windsurf, Cursor, Copilot Chat, and more
+> Production-ready template for AI agent-powered development with Claude Code, Gemini CLI, OpenCode, and more.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Template Version](https://img.shields.io/badge/version-0.1.0-blue)](VERSION)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-A comprehensive template repository for building AI agent-powered software projects. Provides a unified harness for multiple CLI coding agents with progressive disclosure, context isolation, and quality gates.
+**Quick Links**: [Quick Start](#-quick-start) · [Documentation](#-documentation) · [Contributing](#-contributing)
 
-## ✨ Features
+---
 
-### Multi-Agent Support
-| Agent | Status | Config |
-|-------|--------|--------|
-| **Claude Code** | ✅ Full support | `.claude/` |
-| **Gemini CLI** | ✅ Full support | `.gemini/` |
-| **OpenCode** | ✅ Full support | `.opencode/` |
-| **Windsurf** | 🔶 Symlinks ready | `.windsurf/` |
-| **Cursor** | 🔶 Symlinks ready | `.cursor/` |
-| **Copilot Chat** | 🔶 Via MCP | `.copilot/` |
+## What Is This?
 
-### Core Capabilities
+A unified harness for AI coding agents that provides consistent workflows across Claude Code, Gemini CLI, OpenCode, Windsurf, Cursor, and Copilot Chat. Built for teams who want to scale AI-assisted development with quality gates, skills, and sub-agent patterns.
 
-- **📚 Skills System** - Progressive disclosure with canonical source in `.agents/skills/`
-- **🤖 Sub-Agent Patterns** - Context isolation for complex multi-step tasks
-- **🔗 MCP Integration** - Model Context Protocol support for tools and resources
-- **✅ Quality Gates** - Automated validation before commits (lint, test, format)
-- **🪝 Lifecycle Hooks** - Stop hooks, pre-tool approval, post-tool notifications
-- **📊 Context Engineering** - Back-pressure mechanisms to prevent context rot
-- **🔄 Iterative Refinement** - Loop patterns for progressive improvement
+**Key Features**:
+- ✓ **Multi-Agent Support**: Works with 6+ AI coding tools simultaneously
+- ✓ **Skills System**: Reusable knowledge modules in canonical location
+- ✓ **Quality Gates**: Automatic lint, test, format before commits
+- ✓ **Context Discipline**: Prevents context rot with sub-agents and hooks
 
-## 🚀 Quick Start
+## Quick Start (2 Minutes)
 
-### 1. Use This Template
+### Prerequisites
+
+- One or more AI coding CLI tools ([Claude Code](https://claude.ai/code), [Gemini CLI](https://gemini.google.com), [OpenCode](https://opencode.ai))
+- Git 2.30+ ([install](https://git-scm.com))
+
+### Installation
 
 ```bash
-# Click "Use this template" on GitHub, or clone directly
+# Use this template on GitHub, then clone
 git clone https://github.com/your-org/your-project.git
 cd your-project
 ```
 
-### 2. Setup (5 minutes)
+### Setup
 
 ```bash
-# Create skill symlinks for all CLI tools
+# Create skill symlinks (run once)
 ./scripts/setup-skills.sh
 
 # Install git pre-commit hook
 cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+```
 
-# Validate setup
+### Verify
+
+```bash
 ./scripts/validate-skills.sh
 ```
 
-### 3. Configure for Your Project
+Expected output:
+```
+✓ All skill symlinks intact
+✓ SKILL.md files valid
+```
 
-Edit `AGENTS.md` to add:
-- Project overview (replace TODO section)
-- Your tech stack setup commands
-- Language-specific code style rules
-- Project-specific quality gates
+## Core Concepts
 
-### 4. Start Coding with AI
+### Single Source of Truth
+
+All agents read from `AGENTS.md` - CLI-specific files (`.claude.md`, `.gemini.md`) contain only overrides.
+
+```
+AGENTS.md → Single source of truth
+├── CLAUDE.md → Overrides only (@AGENTS.md)
+├── GEMINI.md → Overrides only (@AGENTS.md)
+└── opencode.json → Configuration
+```
+
+### Skills with Progressive Disclosure
+
+Skills live canonically in `.agents/skills/` with symlinks for each CLI tool:
+
+```
+.agents/skills/           # Canonical source (single location)
+├── task-decomposition/
+├── shell-script-quality/
+└── github-readme/
+
+.claude/skills/           # Symlinks → ../../.agents/skills/
+.gemini/skills/           # Symlinks → ../../.agents/skills/
+.opencode/agents/         # Symlinks → ../../.agents/skills/
+```
+
+### Sub-Agent Patterns
+
+Delegate isolated tasks to sub-agents for context isolation:
+
+```mermaid
+graph LR
+    A[Main Agent] --> B[Sub-Agent 1]
+    A --> C[Sub-Agent 2]
+    B --> D[Task Complete]
+    C --> E[Task Complete]
+    D --> F[Synthesize]
+    E --> F
+```
+
+## Usage Examples
+
+### Basic: Run with Claude Code
 
 ```bash
-# Claude Code
-claude "Implement feature X"
-
-# Gemini CLI
-gemini "Refactor module Y"
-
-# OpenCode
-opencode "Fix bug in Z"
+claude "Implement user authentication with OAuth2"
 ```
 
-## 📁 Repository Structure
-
-```
-your-project/
-├── AGENTS.md                 # Single source of truth for all agents
-├── CLAUDE.md                 # Claude Code overrides (references AGENTS.md)
-├── GEMINI.md                 # Gemini CLI overrides (references AGENTS.md)
-├── opencode.json             # OpenCode configuration
-├── README.md                 # This file
-├── VERSION                   # Semantic version of template
-├──
-├── .agents/
-│   └── skills/               # CANONICAL skill source (all agents read here)
-│       ├── task-decomposition/
-│       ├── code-quality/
-│       ├── test-runner/
-│       └── ...
-├──
-├── .claude/
-│   ├── agents/               # Claude Code sub-agents
-│   ├── commands/             # Custom slash commands
-│   └── skills/               # Symlinks → ../../.agents/skills/
-├── .gemini/
-│   └── skills/               # Symlinks → ../../.agents/skills/
-├── .opencode/
-│   ├── agent/                # Symlinks → ../../.agents/skills/
-│   └── command/
-├──
-├── agents-docs/              # Detailed reference docs (loaded on demand)
-│   ├── HARNESS.md            # MCP, skills, sub-agents overview
-│   ├── SKILLS.md             # Skill authoring guide
-│   ├── SUB-AGENTS.md         # Context isolation patterns
-│   ├── HOOKS.md              # Hook configuration
-│   └── CONTEXT.md            # Context engineering & back-pressure
-├──
-├── scripts/
-│   ├── setup-skills.sh       # Creates symlinks (run on clone)
-│   ├── validate-skills.sh    # Validates symlinks + SKILL.md files
-│   ├── quality_gate.sh       # Full quality gate (auto-detects language)
-│   ├── pre-commit-hook.sh    # Git hook entry point
-│   └── gh-labels-creator.sh  # Initialize GitHub labels
-└──
-└── .github/workflows/
-    ├── ci-and-labels.yml     # CI pipeline + label initialization
-    └── yaml-lint.yml         # YAML validation
-```
-
-## 🎯 Available Skills
-
-Generic skills included in this template:
-
-| Skill | Description | When to Use |
-|-------|-------------|-------------|
-| `task-decomposition` | Break complex tasks into atomic goals | Multi-step projects |
-| `code-quality` | Code review and quality checks | Before commits, PRs |
-| `test-runner` | Execute and manage tests | Validation loops |
-| `shell-script-quality` | Lint/test shell scripts (ShellCheck + BATS) | Bash/sh development |
-| `parallel-execution` | Coordinate parallel agent execution | Independent subtasks |
-| `iterative-refinement` | Progressive improvement loops | Quality refinement |
-| `agent-coordination` | Multi-agent orchestration | Complex workflows |
-| `goap-agent` | Goal-oriented action planning | Intelligent task decomposition |
-| `web-search-researcher` | Web research and synthesis | Documentation lookup |
-
-### Adding Skills
+### Advanced: Multi-Agent Coordination
 
 ```bash
-# 1. Create skill folder in canonical location
-mkdir -p .agents/skills/your-skill
-
-# 2. Add SKILL.md (≤250 lines)
-# 3. Run setup to create symlinks
-./scripts/setup-skills.sh
+# Main agent decomposes task, delegates to sub-agents
+claude "/task-decomposition Implement the new API endpoint"
 ```
 
-See `agents-docs/SKILLS.md` for detailed authoring guide.
-
-## 🤖 Available Sub-Agents
-
-Sub-agents provide isolated context for complex tasks:
-
-| Agent | Purpose | Tools | Model |
-|-------|---------|-------|-------|
-| `goap-agent` | Complex planning & coordination | Task, Read, Glob, Grep | sonnet |
-| `loop-agent` | Iterative refinement workflows | Task, Read, TodoWrite | sonnet |
-| `analysis-swarm` | Multi-perspective code analysis | Read, Grep, Glob | opus |
-| `agent-creator` | Scaffold new sub-agent definitions | Write, Read, Glob | sonnet |
-
-See `.claude/agents/` for full definitions.
-
-## 🔧 Quality Gates
-
-The template includes automatic quality validation:
-
-### Auto-Detected Languages
-
-| Language | Detection | Checks |
-|----------|-----------|--------|
-| **Rust** | `Cargo.toml` | fmt, clippy, test, audit |
-| **TypeScript** | `package.json` | lint, typecheck, test |
-| **Python** | `requirements.txt`, `pyproject.toml` | ruff, black, pytest |
-| **Go** | `go.mod` | fmt, vet, test |
-| **Shell** | `*.sh` files | shellcheck, bats |
-
-### Running Quality Gates
+### Quality Gate (Automatic)
 
 ```bash
-# Manual run
+# Pre-commit hook runs automatically
+git commit -m "feat: add user registration"
+
+# Or run manually
 ./scripts/quality_gate.sh
-
-# Pre-commit (automatic)
-git commit -m "feat: add feature"
-# → Runs quality_gate.sh automatically
 ```
 
-### Exit Codes
+## Documentation
 
-| Code | Meaning |
-|------|---------|
-| `0` | All checks passed (silent) |
-| `2` | Errors surfaced to agent (remediate before commit) |
+- 📚 **[AGENTS.md](AGENTS.md)** - Main agent instructions (single source of truth)
+- 📖 **[Quick Start](QUICKSTART.md)** - 5-minute setup guide
+- 🏗️ **[Harness Overview](agents-docs/HARNESS.md)** - Architecture and patterns
+- 🪝 **[Skills Guide](agents-docs/SKILLS.md)** - Creating reusable skills
+- 🤖 **[Sub-Agents](agents-docs/SUB-AGENTS.md)** - Context isolation patterns
+- 🔧 **[Hooks](agents-docs/HOOKS.md)** - Pre/post tool hooks
+- 📊 **[Context](agents-docs/CONTEXT.md)** - Back-pressure mechanisms
+- 🔄 **[Migration](MIGRATION.md)** - Adopting in existing projects
 
-## 🪝 Hooks
+## Available Skills
 
-Hooks enforce deterministic control flow:
+| Skill | Description |
+|---|---|
+| [`task-decomposition`](.agents/skills/task-decomposition/) | Break complex tasks into atomic goals |
+| [`shell-script-quality`](.agents/skills/shell-script-quality/) | Lint/test shell scripts (ShellCheck + BATS) |
+| [`github-readme`](.agents/skills/github-readme/) | Create human-focused README.md files |
+| [`parallel-execution`](.agents/skills/parallel-execution/) | Coordinate parallel agent execution |
+| [`iterative-refinement`](.agents/skills/iterative-refinement/) | Progressive improvement loops |
+| [`agent-coordination`](.agents/skills/agent-coordination/) | Multi-agent orchestration patterns |
+| [`goap-agent`](.agents/skills/goap-agent/) | Goal-oriented action planning |
+| [`web-search-researcher`](.agents/skills/web-search-researcher/) | Web research and synthesis |
 
-### Stop Hook (Example)
+## Contributing
 
-```bash
-#!/bin/bash
-# .claude/hooks/stop.sh
-cd "$CLAUDE_PROJECT_DIR"
+We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for:
+- Development environment setup
+- Good first issues
+- Code style and testing requirements
+- Pull request process
 
-# Run typecheck + lint
-OUTPUT=$(cargo check && cargo clippy -- -D warnings 2>&1)
+## Community
 
-if [ $? -ne 0 ]; then
-  echo "$OUTPUT" >&2
-  exit 2  # Surface errors to agent
-fi
+- 🐛 [Issue Tracker](https://github.com/d-o-hub/github-template-ai-agents/issues) - Report bugs
+- 📝 [Discussions](https://github.com/d-o-hub/github-template-ai-agents/discussions) - Ask questions
 
-# Success: exit 0 silently
-exit 0
-```
+## License
 
-### Hook Types
+This project is licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
 
-| Type | Trigger | Use Case |
-|------|---------|----------|
-| **Stop Hook** | Agent stops | Typecheck, lint, format |
-| **Pre-Tool** | Before tool call | Approve/deny destructive ops |
-| **Post-Tool** | After tool call | Notifications, PR creation |
-
-See `agents-docs/HOOKS.md` for configuration.
-
-## 📚 Documentation
-
-| Doc | Description |
-|-----|-------------|
-| [`AGENTS.md`](AGENTS.md) | Main agent instructions (single source of truth) |
-| [`agents-docs/HARNESS.md`](agents-docs/HARNESS.md) | Harness engineering overview |
-| [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) | Skill authoring guide |
-| [`agents-docs/SUB-AGENTS.md`](agents-docs/SUB-AGENTS.md) | Context isolation patterns |
-| [`agents-docs/HOOKS.md`](agents-docs/HOOKS.md) | Hook configuration |
-| [`agents-docs/CONTEXT.md`](agents-docs/CONTEXT.md) | Context engineering & back-pressure |
-| [`QUICKSTART.md`](QUICKSTART.md) | 5-minute setup guide |
-| [`MIGRATION.md`](MIGRATION.md) | Adopting in existing projects |
-
-## 🏷️ GitHub Labels
-
-This template includes automatic label initialization:
-
-```bash
-# Run once to create standard labels
-./scripts/gh-labels-creator.sh
-```
-
-Standard labels:
-- `priority: critical`, `priority: high`, `priority: medium`, `priority: low`
-- `type: feat`, `type: fix`, `type: docs`, `type: refactor`, `type: test`, `type: chore`
-- `status: blocked`, `status: in-progress`, `status: review`, `status: done`
-
-## 🔒 Security
-
-- **No secrets in repo** - Use environment variables or `.env` (gitignored)
-- **MCP server trust** - Only connect trusted servers (tool descriptions inject into system prompt)
-- **Report vulnerabilities** - Use GitHub private security advisories
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`feature/your-feature`)
-3. Write descriptive commit messages (Conventional Commits)
-4. Ensure quality gates pass
-5. Submit a pull request
-
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for details.
-
-## 📄 License
-
-MIT License - see [`LICENSE`](LICENSE) for details.
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 This template incorporates patterns from:
 - [rust-self-learning-memory](https://github.com/d-o-hub/rust-self-learning-memory) - Episodic memory, GOAP patterns, quality gates
