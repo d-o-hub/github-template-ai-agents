@@ -5,16 +5,15 @@
 ## Canonical Location
 
 All skills live in `.agents/skills/` (the canonical source).
-CLI-specific folders contain only symlinks:
+Claude Code and Gemini CLI use symlinks; OpenCode reads directly from `.agents/skills/`:
 
 ```
-.agents/skills/<name>/          <- CANONICAL
+.agents/skills/<name>/          <- CANONICAL (all agents read from here)
 .claude/skills/<name>           -> symlink -> ../../.agents/skills/<name>
-.opencode/agent/<name>          -> symlink -> ../../.agents/skills/<name>
 .gemini/skills/<name>           -> symlink -> ../../.agents/skills/<name>
 ```
 
-Run `./scripts/setup-skills.sh` after cloning to create all symlinks.
+Run `./scripts/setup-skills.sh` after cloning to create symlinks for Claude Code and Gemini CLI.
 Run `./scripts/validate-skills.sh` to verify integrity.
 
 ## Why .agents/ as Canonical?

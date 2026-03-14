@@ -2,11 +2,10 @@
 
 This is the **single canonical location** for all skills in this repository.
 
-CLI-specific folders contain only symlinks pointing here:
+Claude Code and Gemini CLI use symlinks; OpenCode reads directly from `.agents/skills/`:
 
 ```
 .claude/skills/<name>      -> ../../.agents/skills/<name>
-.opencode/agent/<name>     -> ../../.agents/skills/<name>
 .gemini/skills/<name>      -> ../../.agents/skills/<name>
 ```
 

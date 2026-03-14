@@ -96,8 +96,8 @@ Always run the full quality gate before committing. Fix all errors before finish
 │   ├── commands/          # Custom slash commands
 │   └── skills/            # Symlinks -> ../../.agents/skills/<name>
 ├── .opencode/
-│   ├── agent/             # Symlinks -> ../../.agents/skills/<name>
-│   └── command/
+│   ├── agents/            # OpenCode-specific agents (real files, not symlinks)
+│   └── commands/
 ├── .gemini/
 │   └── skills/            # Symlinks -> ../../.agents/skills/<name>
 ├── scripts/
@@ -136,9 +136,10 @@ For non-trivial tasks: produce a written plan first, pause, and wait for confirm
 before writing code.
 
 ### Skills: Single Source in .agents/skills/
-All skills live canonically in `.agents/skills/`. CLI-specific folders contain only
-symlinks pointing back to `.agents/skills/`. Run `./scripts/setup-skills.sh` after
-cloning to create all symlinks. See `agents-docs/SKILLS.md`.
+All skills live canonically in `.agents/skills/`. Claude Code and Gemini CLI use
+symlinks pointing back to `.agents/skills/`. OpenCode reads skills directly from
+`.agents/skills/` - no symlinks needed. Run `./scripts/setup-skills.sh` after
+cloning to create symlinks for Claude Code and Gemini CLI. See `agents-docs/SKILLS.md`.
 
 ### Context Discipline
 - Delegate isolated research and analysis to sub-agents
