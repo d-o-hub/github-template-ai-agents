@@ -1,0 +1,55 @@
+# Context Engineering and Back-Pressure
+
+> Reference doc - not loaded by default.
+
+Context engineering = systematically managing what enters the context window
+to maximize reliability and minimize cost.
+
+## The Instruction Budget
+
+Every item (tool descriptions, instructions, file contents, messages) consumes budget.
+Performance degrades as context grows - longer is not better.
+
+## Back-Pressure Priority Order
+
+Implement from top down:
+
+1. **Typechecks / build** - fast, deterministic, catches structural errors instantly
+2. **Unit tests** - validates logic
+3. **Integration tests** - validates system behavior
+4. **Lint / format** - enforces style
+5. **Coverage reporting** - surface drops via hook
+6. **UI/browser testing** - Playwright, agent-browser
+
+**Critical:** All verification must be context-efficient.
+Swallow passing output - surface only failures.
+
+## Context Hygiene
+
+- `/clear` between unrelated tasks
+- `Glob`/`Grep` instead of reading whole files
+- Sub-agents for research (noise stays in their window)
+- Load skills progressively - not at session start
+- Prefer CLI tools over MCP servers for well-known services
+
+## Skills Architecture (Progressive Disclosure)
+
+```
+AGENTS.md (concise, universal)
+  +-- agents-docs/ (detailed reference, loaded on demand)
+       +-- Skills with SKILL.md (loaded when agent needs them)
+            +-- reference/ within each skill (read only what is needed)
+```
+
+All skills are canonical in `.agents/skills/`.
+CLI folders (`.claude/skills/`, `.opencode/agent/`, `.gemini/skills/`) contain
+only symlinks - run `./scripts/setup-skills.sh` to create them.
+
+## Anti-Patterns
+
+- Running the full test suite after every change
+- Reading large file trees into context
+- Installing many MCP servers just in case
+- One very long session for a multi-day project
+- Using larger context windows as a substitute for context isolation
+- Auto-generating AGENTS.md (hurts performance; always human-written)
