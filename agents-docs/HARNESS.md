@@ -16,14 +16,14 @@ Throw away what does not help - more config is not always better.
 
 ## AGENTS.md Guidelines
 
-- Keep under ~100 lines; human-written (never auto-generated - LLM-generated files hurt quality)
+- Keep under ~150 lines; human-written (never auto-generated - LLM-generated files hurt quality)
 - Concise and universally applicable - every instruction costs tokens
 - Use progressive disclosure: detailed docs in `agents-docs/`, not the root file
 
 ## Skills (Single Canonical Source)
 
-All skills live in `.agents/skills/`. Claude Code and Gemini CLI use symlinks
-(`.claude/skills/`, `.gemini/skills/`) created by `./scripts/setup-skills.sh`.
+All skills live in `.agents/skills/`. Claude Code, Gemini CLI, and Qwen Code use symlinks
+(`.claude/skills/`, `.gemini/skills/`, `.qwen/skills/`) created by `./scripts/setup-skills.sh`.
 OpenCode reads skills directly from `.agents/skills/` - no symlinks needed.
 See `agents-docs/SKILLS.md`.
 
@@ -34,6 +34,15 @@ See `agents-docs/SKILLS.md`.
 - Prefer well-known CLIs (GitHub, Docker, databases) over MCP
 - Write thin CLI wrappers with concise output rather than verbose MCP responses
 - Never connect to untrusted MCP servers - they are a prompt injection vector
+
+## Supported AI Agents
+
+| Agent | Skills Location | Sub-agents |
+|-------|-----------------|------------|
+| Claude Code | `.claude/skills/` (symlinks) | `.claude/agents/` |
+| Gemini CLI | `.gemini/skills/` (symlinks) | - |
+| OpenCode | `.agents/skills/` (direct) | `.opencode/agents/` |
+| Qwen Code | `.qwen/skills/` (symlinks) | - |
 
 ## Further Reading
 

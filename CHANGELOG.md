@@ -15,15 +15,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ci-and-labels.yml using deprecated actions-rust-lang action
 - gh-labels-creator.sh interactive prompt blocking CI execution
 - Inconsistent branch references between workflow files
+- Documentation inconsistencies across multiple files
 
 ### Changed
 - Standardized action versions to stable releases (checkout@v4, setup-python@v5)
 - Replaced deprecated rust-toolchain action with dtolnay/rust-toolchain@stable
 - Added --ci flag support to gh-labels-creator.sh for non-interactive CI runs
 - Updated README.md version badge to 0.2.0
+- Updated all documentation to reference Qwen Code support
+- Improved CONTRIBUTING.md with comprehensive guide
+- Cleaned up AGENTS_REGISTRY.md formatting
 
 ### Added
 - develop branch support in ci-and-labels.yml workflow
+- .qwen/skills/ symlinks for Qwen Code support
+- .github/dependabot.yml with 2026 best practices:
+  - GitHub Actions weekly updates (grouped)
+  - Docker weekly updates (exclude pre-releases)
+  - Terraform monthly updates (grouped providers)
+  - Docker Compose and pre-commit monthly updates
+- Dependabot security updates auto-merge support
+- OpenCode agent format documentation in SUB-AGENTS.md
+- Supported AI Agents table in HARNESS.md
 
 ## [0.1.0] - 2026-03-14
 

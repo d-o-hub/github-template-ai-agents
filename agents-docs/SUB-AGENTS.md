@@ -40,6 +40,21 @@ model: sonnet
 [Agent system prompt here]
 ```
 
+## OpenCode Format (.opencode/agents/<name>.md)
+
+```yaml
+---
+description: What this agent does.
+mode: subagent
+tools:
+  read: true
+  glob: true
+  grep: true
+---
+
+[Agent system prompt here]
+```
+
 ## Naming Convention
 
 - Lowercase, hyphens only, max 64 chars

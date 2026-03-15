@@ -1,6 +1,6 @@
 # GitHub Template AI Agents
 
-> Production-ready template for AI agent-powered development with Claude Code, Gemini CLI, OpenCode, and more.
+> Production-ready template for AI agent-powered development with Claude Code, Gemini CLI, OpenCode, Qwen Code, and more.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Template Version](https://img.shields.io/badge/version-0.2.0-blue)](VERSION)
@@ -12,19 +12,20 @@
 
 ## What Is This?
 
-A unified harness for AI coding agents that provides consistent workflows across Claude Code, Gemini CLI, OpenCode, Windsurf, Cursor, and Copilot Chat. Built for teams who want to scale AI-assisted development with quality gates, skills, and sub-agent patterns.
+A unified harness for AI coding agents that provides consistent workflows across Claude Code, Gemini CLI, OpenCode, Qwen Code, Windsurf, Cursor, and Copilot Chat. Built for teams who want to scale AI-assisted development with quality gates, skills, and sub-agent patterns.
 
 **Key Features**:
 - ✓ **Multi-Agent Support**: Works with 6+ AI coding tools simultaneously
 - ✓ **Skills System**: Reusable knowledge modules in canonical location
 - ✓ **Quality Gates**: Automatic lint, test, format before commits
 - ✓ **Context Discipline**: Prevents context rot with sub-agents and hooks
+- ✓ **Dependabot Integration**: Automated security and version updates
 
 ## Quick Start (2 Minutes)
 
 ### Prerequisites
 
-- One or more AI coding CLI tools ([Claude Code](https://claude.ai/code), [Gemini CLI](https://gemini.google.com), [OpenCode](https://opencode.ai))
+- One or more AI coding CLI tools ([Claude Code](https://claude.ai/code), [Gemini CLI](https://gemini.google.com), [OpenCode](https://opencode.ai), [Qwen Code](https://github.com/QwenLM/Qwen-Coder))
 - Git 2.30+ ([install](https://git-scm.com))
 
 ### Installation
@@ -72,7 +73,7 @@ AGENTS.md → Single source of truth
 
 ### Skills with Progressive Disclosure
 
-Skills live canonically in `.agents/skills/`. Claude Code and Gemini CLI use
+Skills live canonically in `.agents/skills/`. Claude Code, Gemini CLI, and Qwen Code use
 symlinks; OpenCode reads directly from `.agents/skills/`:
 
 ```
@@ -83,6 +84,7 @@ symlinks; OpenCode reads directly from `.agents/skills/`:
 
 .claude/skills/           # Symlinks → ../../.agents/skills/
 .gemini/skills/           # Symlinks → ../../.agents/skills/
+.qwen/skills/             # Symlinks → ../../.agents/skills/
 ```
 
 ### Sub-Agent Patterns
