@@ -8,32 +8,42 @@ if ! command -v gh &> /dev/null || ! command -v jq &> /dev/null; then
     exit 1
 fi
 
-# Prompt for confirmation to delete all existing labels
-read -p "Delete ALL existing labels? (y/N) " confirm
+# Check if running in CI mode
+CI_MODE="${1:-}"
 
-# More robust confirmation check
-if [[ "$confirm" == "y" ]] || [[ "$confirm" == "Y" ]] || [[ "$confirm" == "yes" ]] || [[ "$confirm" == "YES" ]]; then
-    echo "Deleting all existing labels..."
-    
-    # Get all label names and delete them
-    label_names=$(gh label list --json name --jq '.[].name')
-    
-    if [[ -n "$label_names" ]]; then
-        echo "$label_names" | while IFS= read -r label; do
-            if [[ -n "$label" ]]; then
-                echo "Deleting label: $label"
-                gh label delete "$label" --yes || echo "Failed to delete: $label"
-            fi
-        done
-        echo "Label deletion completed."
-    else
-        echo "No labels found to delete."
-    fi
+if [ "$CI_MODE" == "--ci" ]; then
+    echo "Running in CI mode - skipping interactive prompts"
+    # In CI, we don't delete existing labels to avoid race conditions
+    # Labels should be managed separately or initialized once
+    echo "Skipping label deletion in CI mode."
 else
-    echo "Skipping label deletion."
+    # Interactive mode - prompt for confirmation
+    read -p "Delete ALL existing labels? (y/N) " confirm
+
+    # More robust confirmation check
+    if [[ "$confirm" == "y" ]] || [[ "$confirm" == "Y" ]] || [[ "$confirm" == "yes" ]] || [[ "$confirm" == "YES" ]]; then
+        echo "Deleting all existing labels..."
+
+        # Get all label names and delete them
+        label_names=$(gh label list --json name --jq '.[].name')
+
+        if [[ -n "$label_names" ]]; then
+            echo "$label_names" | while IFS= read -r label; do
+                if [[ -n "$label" ]]; then
+                    echo "Deleting label: $label"
+                    gh label delete "$label" --yes || echo "Failed to delete: $label"
+                fi
+            done
+            echo "Label deletion completed."
+        else
+            echo "No labels found to delete."
+        fi
+    else
+        echo "Skipping label deletion."
+    fi
 fi
 
-# Create new labels
+# Create new labels (use --force to avoid errors if label already exists)
 echo "Creating labels..."
 
 gh label create "bug" --color d73a4a --description "Something isn't working" --force

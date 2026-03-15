@@ -1,15 +1,19 @@
 ---
 name: YAML Lint
 
-"on":
+on:
   push:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
     paths:
       - '**.yml'
       - '**.yaml'
       - '.github/workflows/**'
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
     paths:
       - '**.yml'
       - '**.yaml'
@@ -23,10 +27,10 @@ jobs:
     name: YAML Syntax Validation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -43,10 +47,10 @@ jobs:
     name: GitHub Actions Workflow Validation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       - name: Run actionlint
-        uses: reviewdog/action-actionlint@v1.68.0
+        uses: reviewdog/action-actionlint@v1
         with:
           fail_level: error
           filter_mode: nofilter

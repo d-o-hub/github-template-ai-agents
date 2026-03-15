@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - main
+      - develop
       - 'release/**'
   pull_request:
     branches:
       - main
+      - develop
 
 jobs:
   labels:
@@ -21,7 +23,7 @@ jobs:
         run: chmod +x scripts/gh-labels-creator.sh
 
       - name: Run label initialization
-        run: ./scripts/gh-labels-creator.sh
+        run: ./scripts/gh-labels-creator.sh --ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -53,7 +55,7 @@ jobs:
         if: hashFiles('package.json') != ''
 
       - name: Setup Rust (if Cargo.toml exists)
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
         if: hashFiles('Cargo.toml') != ''
@@ -99,7 +101,7 @@ jobs:
         if: hashFiles('package.json') != ''
 
       - name: Setup Rust (if Cargo.toml exists)
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         if: hashFiles('Cargo.toml') != ''
 
       - name: Setup Python (if requirements.txt or pyproject.toml exists)

@@ -6,18 +6,12 @@
 
 ## Project Overview
 
-<!-- TODO: Replace with 2-3 sentences describing this project, its purpose, and primary tech stack. -->
-This is a generic template repository. Replace this section with your project overview.
+Production-ready template for AI agent-powered development with Claude Code, Gemini CLI, OpenCode, and more.
+Primary stack: Bash scripts, Markdown documentation, GitHub Actions CI/CD.
 
 ## Setup
 
 ```bash
-# Install dependencies
-# TODO: pnpm install | cargo build | pip install -r requirements.txt
-
-# Start dev server / run project
-# TODO: pnpm dev | cargo run | python main.py
-
 # Create skill symlinks after cloning (single source: .agents/skills/)
 ./scripts/setup-skills.sh
 
@@ -28,13 +22,7 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 ## Run Tests
 
 ```bash
-# Unit tests
-# TODO: cargo test --lib | pnpm test:unit | pytest tests/unit
-
-# Integration tests
-# TODO: cargo test --test '*' | pnpm test:integration | pytest tests/integration
-
-# Full quality gate (run before every commit)
+# Run quality gate (run before every commit)
 ./scripts/quality_gate.sh
 ```
 
@@ -47,28 +35,8 @@ Always run the full quality gate before committing. Fix all errors before finish
 - All public APIs must be documented
 - No hardcoded magic numbers - use named constants or config
 - Render architecture diagrams as fenced ```mermaid``` blocks, never raw ASCII art
-
-<!-- TODO: Uncomment the language block(s) relevant to your project -->
-
-<!--
-#### Rust
-- Edition 2021, stable toolchain; `cargo fmt` + `cargo clippy -- -D warnings` must pass
-- Errors via `thiserror`; propagation via `anyhow` or `?`
-- Async I/O via Tokio; CPU parallelism via Rayon
-- All fallible public APIs return `Result<T, Error>`
-- See agents-docs/RUST.md for patterns and anti-patterns
--->
-
-<!--
-#### TypeScript / JavaScript
-- Strict mode; ESModules only; no implicit `any`
-- Functional patterns preferred; single quotes, no semicolons
--->
-
-<!--
-#### Python
-- Python 3.10+, async/await; `ruff` + `black`; type hints on all public functions
--->
+- Shell scripts: Use `shellcheck` for linting, `bats` for testing
+- Markdown: Use `markdownlint` for consistency
 
 ## Repository Structure
 

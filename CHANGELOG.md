@@ -7,22 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Auto-update script for AGENTS_REGISTRY.md (`scripts/update-agents-registry.sh`)
-- Skill rules configuration (`.agents/skills/skill-rules.json`)
-- Web documentation resolver skill (`.agents/skills/web-doc-resolver/`)
-- Multi-language auto-detection in quality gate
-- Enhanced skill validation (line count, frontmatter checks)
+## [0.2.0] - 2026-03-15
+
+### Fixed
+- GitHub Actions workflows using non-existent action versions (checkout@v5, setup-python@v6)
+- yaml-lint.yml using unstable actionlint version tag
+- ci-and-labels.yml using deprecated actions-rust-lang action
+- gh-labels-creator.sh interactive prompt blocking CI execution
+- Inconsistent branch references between workflow files
 
 ### Changed
-- Comprehensive README.md with feature matrix and usage examples
-- Quality gate with auto-detection for Rust, TypeScript, Python, Go, Shell
-- validate-skills.sh now validates SKILL.md format and line limits
+- Standardized action versions to stable releases (checkout@v4, setup-python@v5)
+- Replaced deprecated rust-toolchain action with dtolnay/rust-toolchain@stable
+- Added --ci flag support to gh-labels-creator.sh for non-interactive CI runs
+- Updated README.md version badge to 0.2.0
 
-### Documentation
-- QUICKSTART.md - 5-minute setup guide
-- MIGRATION.md - Adoption guide for existing projects
-- AGENTS_REGISTRY.md - Auto-generated agent/skill registry
+### Added
+- develop branch support in ci-and-labels.yml workflow
 
 ## [0.1.0] - 2026-03-14
 
