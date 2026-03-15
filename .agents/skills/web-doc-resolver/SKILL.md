@@ -40,8 +40,6 @@ Activate this skill when you need to:
 4. Firecrawl API (paid)
    ↓ if fails
 5. Mistral Browser (paid)
-   ↓ if fails
-6. Return error with suggestions
 ```
 
 ### For Query Inputs
@@ -54,8 +52,6 @@ Activate this skill when you need to:
 3. Tavily API (paid)
    ↓ if fails
 4. Exa SDK (paid)
-   ↓ if fails
-5. Return error with suggestions
 ```
 
 ## Platform Tool Mapping
@@ -97,9 +93,6 @@ python scripts/resolve.py "query" --skip exa_mcp --skip exa
 
 # Use specific provider directly
 python scripts/resolve.py "https://example.com" --provider jina
-
-# Custom provider order
-python scripts/resolve.py "query" --providers-order "duckduckgo,exa_mcp"
 ```
 
 ## Best Practices
@@ -114,7 +107,7 @@ python scripts/resolve.py "query" --providers-order "duckduckgo,exa_mcp"
 ### DON'T:
 ✗ Use paid APIs when free sources available
 ✗ Fetch entire websites - be targeted
-✗ Ignore rate limits - respect API
+✗ Ignore rate limits - respect API quotas
 
 ## Rate Limit Handling
 
@@ -144,7 +137,7 @@ python scripts/resolve.py "query" --providers-order "duckduckgo,exa_mcp"
 def resolve_with_fallback(url):
     providers = [llms_txt, direct_fetch, jina, firecrawl]
     last_error = None
-    
+
     for provider in providers:
         try:
             result = provider.fetch(url)
@@ -152,9 +145,8 @@ def resolve_with_fallback(url):
                 return result
         except (RateLimitError, QuotaExceededError) as e:
             last_error = e
-            log_cooldown(provider)
             continue
-    
+
     raise ResolutionError(f"All providers failed: {last_error}")
 ```
 
@@ -171,92 +163,6 @@ Return results in this format:
 
 ---
 *Resolved using web-doc-resolver cascade*
-```
-
-## Implementation Reference
-
-### Python Script Structure
-
-```python
-#!/usr/bin/env python3
-"""
-Web Documentation Resolver
-Resolve queries/URLs into LLM-ready markdown via cascade.
-"""
-
-import sys
-import argparse
-from enum import Enum
-
-class ProviderType(Enum):
-    # URL providers
-    LLMS_TXT = "llms_txt"
-    DIRECT_FETCH = "direct_fetch"
-    JINA = "jina"
-    FIRECRAWL = "firecrawl"
-    
-    # Query providers
-    DUCKDUCKGO = "duckduckgo"
-    EXA_MCP = "exa_mcp"
-    TAVILY = "tavily"
-    EXA = "exa"
-
-def resolve(input_str, skip_providers=None, provider_order=None):
-    """Resolve URL or query using cascade."""
-    is_url = input_str.startswith(("http://", "https://"))
-    
-    if is_url:
-        return resolve_url(input_str, skip_providers, provider_order)
-    else:
-        return resolve_query(input_str, skip_providers, provider_order)
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("input", help="URL or query to resolve")
-    parser.add_argument("--skip", nargs="+", help="Providers to skip")
-    parser.add_argument("--provider", help="Use specific provider")
-    parser.add_argument("--json", action="store_true", help="JSON output")
-    args = parser.parse_args()
-    
-    result = resolve(args.input, skip_providers=args.skip)
-    
-    if args.json:
-        print(result.to_json())
-    else:
-        print(result.markdown)
-```
-
-## Integration with AI Agents
-
-### Claude Code Integration
-
-```markdown
-# In .claude/agents/researcher.md
----
-name: researcher
-description: Research topics using web search and documentation
-tools: WebFetch, WebSearch
----
-
-Use web-doc-resolver skill for all research tasks.
-Follow cascade: free sources first, paid APIs only when necessary.
-```
-
-### Skill Trigger Rules
-
-Add to `skill-rules.json`:
-
-```json
-{
-  "skill": "web-doc-resolver",
-  "triggers": {
-    "keywords": ["fetch", "documentation", "web", "search", "url", "markdown"],
-    "patterns": ["docs\\..*", "readme", "tutorial", "guide"],
-    "files": []
-  },
-  "priority": "medium",
-  "autoActivate": false
-}
 ```
 
 ## Environment Variables
@@ -285,13 +191,50 @@ python scripts/resolve.py "query" --skip exa_mcp --skip exa
 python scripts/resolve.py "query" --json | jq .
 ```
 
-## References
+## Integration with AI Agents
 
-- [web-doc-resolver](https://github.com/d-oit/web-doc-resolver) - Original implementation
-- [agentskills.io](https://agentskills.io) - Skill registry
-- [llms.txt](https://llms.txt) - Structured documentation format
+### Claude Code Integration
 
+```markdown
+# In .claude/agents/researcher.md
+---
+name: researcher
+description: Research topics using web search and documentation
+tools: WebFetch, WebSearch
 ---
 
-*This skill uses progressive disclosure: free sources first, paid APIs only when necessary.*
-*Works with zero API keys using DuckDuckGo, llms.txt, and direct HTTP fetch.*
+Use web-doc-resolver skill for all research tasks.
+Follow cascade: free sources first, paid APIs only when necessary.
+```
+
+## Troubleshooting
+
+### All Providers Fail
+- Check network connectivity
+- Verify URL is accessible
+- Wait for rate limits to reset
+
+### Poor Quality Results
+- Make query more specific
+- Add year filter (e.g., "2026")
+- Use site: operator for official docs
+
+### Slow Resolution
+- Skip slow providers with --skip flag
+- Use direct provider specification
+- Cache frequently accessed content
+
+## Summary
+
+The web-doc-resolver skill provides efficient, cost-effective web resolution:
+1. **Progressive cascade**: Free sources first, paid APIs last
+2. **Platform agnostic**: Works with Claude Code, OpenCode, Gemini, Python
+3. **Rate limit aware**: Respects provider limits with cooldowns
+4. **Error resilient**: Graceful fallback between providers
+5. **Flexible output**: Markdown or JSON format
+
+This skill enables AI agents to fetch current, accurate information from the web while minimizing costs.
+
+## Reference Files
+
+- **[reference/guide.md](reference/guide.md)** - Complete cascade resolution strategy, platform tool mapping, detailed best practices, rate limit handling, error handling patterns, output formats, Python implementation reference, AI agent integration guide, environment configuration, testing examples, and advanced topics including caching and batch resolution
