@@ -48,11 +48,12 @@ extract_agent_info() {
     # Extract tools from frontmatter
     local tools
     tools=$(grep "^tools:" "$file" 2>/dev/null | sed 's/^tools: *//' | tr -d '"' || echo "Inherited")
-    
+
     # Extract model from frontmatter (optional)
+    # shellcheck disable=SC2034
     local model
     model=$(grep "^model:" "$file" 2>/dev/null | sed 's/^model: *//' | tr -d '"' || echo "Default")
-    
+
     if [ -n "$name" ]; then
         # Clean up description - remove "Invoke when..." for brevity
         description=$(echo "$description" | sed 's/\. Invoke when.*//g' | sed 's/Invoke when.*//g')
@@ -79,6 +80,7 @@ if [ -d "$REPO_ROOT/.opencode/agents" ]; then
         [ -f "$agent_file" ] || continue
         # Skip symlinks to .agents/skills
         [ -L "$agent_file" ] && continue
+        # shellcheck disable=SC2034
         agent_name=$(basename "$agent_file" .md)
         extract_agent_info "$agent_file" "OpenCode" >> "$TEMP_FILE"
     done
