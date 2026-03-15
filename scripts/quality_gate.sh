@@ -83,7 +83,7 @@ echo ""
 # --- Run language-specific checks ---
 
 # Rust checks
-if [[ " ${DETECTED_LANGUAGES[@]} " =~ " rust " ]]; then
+if [[ " ${DETECTED_LANGUAGES[*]} " =~ " rust " ]]; then
     echo -e "${BLUE}Running Rust checks...${NC}"
     
     if command -v cargo &> /dev/null; then
@@ -124,7 +124,7 @@ if [[ " ${DETECTED_LANGUAGES[@]} " =~ " rust " ]]; then
 fi
 
 # TypeScript / JavaScript checks
-if [[ " ${DETECTED_LANGUAGES[@]} " =~ " typescript " ]]; then
+if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
     echo -e "${BLUE}Running TypeScript/JavaScript checks...${NC}"
     
     if command -v pnpm &> /dev/null; then
@@ -190,7 +190,7 @@ if [[ " ${DETECTED_LANGUAGES[@]} " =~ " typescript " ]]; then
 fi
 
 # Python checks
-if [[ " ${DETECTED_LANGUAGES[@]} " =~ " python " ]]; then
+if [[ " ${DETECTED_LANGUAGES[*]} " =~ " python " ]]; then
     echo -e "${BLUE}Running Python checks...${NC}"
     
     if command -v ruff &> /dev/null; then
@@ -234,7 +234,7 @@ if [[ " ${DETECTED_LANGUAGES[@]} " =~ " python " ]]; then
 fi
 
 # Go checks
-if [[ " ${DETECTED_LANGUAGES[@]} " =~ " go " ]]; then
+if [[ " ${DETECTED_LANGUAGES[*]} " =~ " go " ]]; then
     echo -e "${BLUE}Running Go checks...${NC}"
     
     if command -v go &> /dev/null; then
@@ -273,7 +273,7 @@ if [[ " ${DETECTED_LANGUAGES[@]} " =~ " go " ]]; then
 fi
 
 # Shell script checks
-if [[ " ${DETECTED_LANGUAGES[@]} " =~ " shell " ]]; then
+if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
     echo -e "${BLUE}Running Shell script checks...${NC}"
     
     if command -v shellcheck &> /dev/null; then
@@ -310,7 +310,7 @@ if [[ " ${DETECTED_LANGUAGES[@]} " =~ " shell " ]]; then
 fi
 
 # Markdown checks (if markdownlint is available)
-if [[ " ${DETECTED_LANGUAGES[@]} " =~ " markdown " ]]; then
+if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
     echo -e "${BLUE}Running Markdown checks...${NC}"
     
     if command -v markdownlint &> /dev/null; then
