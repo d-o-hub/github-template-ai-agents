@@ -2,6 +2,9 @@
 
 > Get started with AI agent-powered development in 5 minutes.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Template Version](https://img.shields.io/badge/version-0.2.0-blue)](VERSION)
+
 ## Prerequisites
 
 - Git installed
@@ -9,6 +12,7 @@
   - [Claude Code](https://claude.ai/code) (recommended)
   - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
   - [OpenCode](https://opencode.ai/)
+  - [Qwen Code](https://github.com/QwenLM/Qwen-Coder)
   - Or any agent that supports the AGENTS.md format
 
 ## Step 1: Use This Template

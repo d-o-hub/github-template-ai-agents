@@ -1,90 +1,62 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-03-14 15:31 UTC
+> Last updated: 2026-03-15
 
-This file provides a centralized discovery mechanism for all available sub-agents.
+This file provides centralized discovery for all available sub-agents.
 Agents are organized by CLI tool and purpose.
 
 ---
 
 ## Quick Reference
 
-| Agent | CLI | Purpose | Tools |
-|-------|-----|---------|-------|
-| `description: Coordinate [type of workflow]. Invoke when you need to orchestrate [complex scenarios].` | Claude Code | Create new Claude Code agents with proper format, YAML front
-Clear description of when to invoke this agent and what it d
-Execute tests and diagnose failures in Rust projects. Invoke
-Review code for quality, standards compliance, and performan
-Helps with testing
-A specialized testing agent
-[What agent does]
-Your detailed description here
-Execute [specific tasks]
-Analyze [specific domain]
-Coordinate [type of workflow] | Write, Read, Glob, Grep, Edit
-Tool1, Tool2, Tool3  # Optional - omit to inherit all tools
-Read, Grep, Glob
-Read, Write, Edit, Bash, Glob, Grep
-Task, Read, TodoWrite, Glob, Grep
-Tool1, Tool2, Tool3
-Bash, Read, Grep, Edit
-Read, Grep, Glob
-Task, Read, TodoWrite, Glob, Grep |
-| `description: Multi-persona code analysis orchestrator using RYAN (methodical analyst), FLASH (rapid innovator), and SOCRATES (questioning facilitator) for balanced decision-making. Invoke for complex architectural decisions, trade-off analysis, comprehensive code reviews, or when avoiding single-perspective blind spots is critical.` | Claude Code | Multi-persona code analysis orchestrator using RYAN (methodi | Read, Glob, Grep, Bash |
-| `description: Invoke for complex multi-step tasks requiring intelligent planning and multi-agent coordination. Use when tasks need decomposition, dependency mapping, parallel/sequential/swarm/iterative execution strategies, or coordination of multiple specialized agents with quality gates and dynamic optimization.` | Claude Code | Invoke for complex multi-step tasks requiring intelligent pl | Task, Read, Glob, Grep, TodoWrite |
-| `description: Execute workflow agents iteratively for refinement and progressive improvement. Invoke when you need repetitive refinement, multi-iteration tasks (code review loops, incremental improvements), progressive optimization, or feedback loops until quality criteria are met or max iterations reached.` | Claude Code | Execute workflow agents iteratively for refinement and progr | Task, Read, TodoWrite, Glob, Grep |
-| `description: Clear description of when to invoke this agent and what it does (max 1024 chars)` | OpenCode | Create new opencode agents with proper format, YAML frontmat
-Clear description of when to invoke this agent and what it d
-Execute tests and diagnose failures in Rust projects. Invoke
-Review code for quality, standards compliance, and performan
-Helps with testing
-A specialized testing agent
-[What agent does] |  |
-| `description: Manage git worktrees for efficient multi-branch development. Invoke when creating worktrees for feature branches, organizing worktree directories, cleaning up unused worktrees, or implementing worktree-based workflows.` | OpenCode | Manage git worktrees for efficient multi-branch development. |  |
-| `description: Edit and create GitHub Actions workflows and composite actions. Invoke when you need to create new CI/CD pipelines, modify existing workflows, ensure syntax correctness, or incorporate current best practices for GitHub Actions.` | OpenCode | Edit and create GitHub Actions workflows and composite actio |  |
+### Claude Code Agents
+
+| Agent | Purpose | Tools |
+|-------|---------|-------|
+| [`agent-creator`](../.claude/agents/agent-creator.md) | Create new sub-agents with proper format | Write, Read, Glob, Grep, Edit |
+| [`analysis-swarm`](../.claude/agents/analysis-swarm.md) | Multi-persona code analysis (RYAN, FLASH, SOCRATES) | Read, Glob, Grep, Bash |
+| [`goap-agent`](../.claude/agents/goap-agent.md) | Goal-oriented action planning & coordination | Task, Read, Glob, Grep, TodoWrite |
+| [`loop-agent`](../.claude/agents/loop-agent.md) | Iterative workflow execution & refinement | Task, Read, TodoWrite, Glob, Grep |
+
+### OpenCode Agents
+
+| Agent | Purpose | Mode |
+|-------|---------|------|
+| [`analysis-swarm`](../.opencode/agents/analysis-swarm.md) | Multi-persona code analysis | subagent |
+| [`goap-agent`](../.opencode/agents/goap-agent.md) | GOAP planning & coordination | all |
+| [`git-worktree-manager`](../.opencode/agents/git-worktree-manager.md) | Git worktree management | - |
+| [`github-action-editor`](../.opencode/agents/github-action-editor.md) | GitHub Actions workflow editing | - |
+| [`perplexity-researcher-pro`](../.opencode/agents/perplexity-researcher-pro.md) | Web research via Perplexity | - |
+| [`perplexity-researcher-reasoning-pro`](../.opencode/agents/perplexity-researcher-reasoning-pro.md) | Enhanced reasoning research | - |
 
 ---
 
 ## Available Skills
 
 Skills are reusable knowledge modules with progressive disclosure.
-See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
+See [`agents-docs/SKILLS.md`](SKILLS.md) for authoring guide.
 
 | Skill | Location | Description |
 |-------|----------|-------------|
-| `agent-coordination` | `.agents/skills/agent-coordination` | Coordinate multiple agents for software development across a |
-| `goap-agent` | `.agents/skills/goap-agent` | Invoke for complex multi-step tasks requiring intelligent pl |
-| `iterative-refinement` | `.agents/skills/iterative-refinement` | Execute iterative refinement workflows with validation loops |
-| `parallel-execution` | `.agents/skills/parallel-execution` | Execute multiple independent tasks simultaneously using para |
-| `shell-script-quality` | `.agents/skills/shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use w |
-| `skill-creator
-skill-name
-skill-name
-$SKILL_NAME` | `.agents/skills/skill-creator` | Create new Claude Code skills with proper directory structur
-Clear description of what this skill does and when to use it
-Debug and fix failing tests in Rust projects. Use this skill
-Implement new features systematically with proper testing an
-Helps with testing
-Provides guidance on building APIs
-[Action] [what it does]. Use this when [specific scenarios].
-Your description here
-$DESCRIPTION |
-| `task-decomposition` | `.agents/skills/task-decomposition` | Break down complex tasks into atomic, actionable goals with  |
-| `web-doc-resolver
-researcher` | `.agents/skills/web-doc-resolver` | Resolve queries or URLs into compact, LLM-ready markdown usi
-Research topics using web search and documentation |
-| `web-search-researcher` | `.agents/skills/web-search-researcher` | Research topics using web search and content fetching to fin |
+| [`agent-coordination`](../.agents/skills/agent-coordination/) | `.agents/skills/` | Multi-agent orchestration patterns (hybrid, iterative, parallel, sequential, swarm) |
+| [`github-readme`](../.agents/skills/github-readme/) | `.agents/skills/` | Create human-focused README.md files with 2026 best practices |
+| [`goap-agent`](../.agents/skills/goap-agent/) | `.agents/skills/` | Goal-Oriented Action Planning execution strategies |
+| [`iterative-refinement`](../.agents/skills/iterative-refinement/) | `.agents/skills/` | Iterative code improvement patterns with validation loops |
+| [`parallel-execution`](../.agents/skills/parallel-execution/) | `.agents/skills/` | Parallel task execution patterns |
+| [`shell-script-quality`](../.agents/skills/shell-script-quality/) | `.agents/skills/` | Shell script linting (ShellCheck) and testing (BATS) |
+| [`skill-creator`](../.agents/skills/skill-creator/) | `.agents/skills/` | Create new skills with proper structure |
+| [`task-decomposition`](../.agents/skills/task-decomposition/) | `.agents/skills/` | Break complex tasks into manageable steps |
+| [`web-doc-resolver`](../.agents/skills/web-doc-resolver/) | `.agents/skills/` | Resolve and fetch web documentation |
+| [`web-search-researcher`](../.agents/skills/web-search-researcher/) | `.agents/skills/` | Research topics using web search |
 
 ---
 
 ## Adding New Agents
 
-1. Create agent file in `.claude/agents/<agent-name>.md` (Claude Code) or `.opencode/agents/<agent-name>.md` (OpenCode)
-2. Include YAML frontmatter with `name`, `description`, and `tools`
-3. Run `./scripts/update-agents-registry.sh` to update this registry
+### Claude Code Format
 
-### Agent File Template
+Create `.claude/agents/<agent-name>.md`:
 
 ```markdown
 ---
@@ -98,24 +70,55 @@ tools: Read, Grep, Glob, Bash
 System prompt for the agent...
 ```
 
+### OpenCode Format
+
+Create `.opencode/agents/<agent-name>.md`:
+
+```markdown
+---
+description: What this agent does.
+mode: subagent
+tools:
+  read: true
+  glob: true
+---
+
+# Agent Name
+
+System prompt...
+```
+
+### After Creating
+
+1. Run `./scripts/update-agents-registry.sh` to update this file
+2. Update `README.md` agents table if needed
+
+---
+
 ## Adding New Skills
 
-1. Create skill folder in `.agents/skills/<skill-name>/`
-2. Add `SKILL.md` with frontmatter (≤250 lines)
+1. Create `.agents/skills/<skill-name>/SKILL.md` (≤250 lines)
+2. Add `reference/` folder for detailed docs if needed
 3. Run `./scripts/setup-skills.sh` to create symlinks
-4. Run `./scripts/update-agents-registry.sh` to update this registry
+4. Run `./scripts/update-agents-registry.sh` to update this file
 
-### Skill File Template
+### Skill Template
 
 ```markdown
 ---
 name: skill-name
-description: What this skill does. Use when [specific scenarios].
+description: What this skill does. Use when [scenarios].
 ---
 
 # Skill Name
 
 Skill instructions...
+
+## When to Use
+Activate when: [specific triggers]
+
+## Instructions
+[Concise, universally applicable instructions]
 ```
 
 ---
@@ -139,8 +142,6 @@ Add to `.vscode/settings.json`:
 }
 ```
 
-Then use a task to run the update script on file changes.
-
 ### npm-based Watcher
 
 ```bash
@@ -148,7 +149,7 @@ npm install -g chokidar-cli
 
 # Watch for changes and update registry
 chokidar ".claude/agents/*.md" ".opencode/agents/*.md" ".agents/skills/*/SKILL.md" \
-  -c "./scripts/update-agents-registry.sh && git add AGENTS_REGISTRY.md"
+  -c "./scripts/update-agents-registry.sh && git add agents-docs/AGENTS_REGISTRY.md"
 ```
 
 ### Git Hook (Post-Merge)
@@ -158,7 +159,7 @@ Add to `.git/hooks/post-merge`:
 ```bash
 #!/bin/bash
 ./scripts/update-agents-registry.sh
-git add AGENTS_REGISTRY.md
+git add agents-docs/AGENTS_REGISTRY.md
 ```
 
 ---
