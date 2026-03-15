@@ -18,7 +18,7 @@ if [ "$CI_MODE" == "--ci" ]; then
     echo "Skipping label deletion in CI mode."
 else
     # Interactive mode - prompt for confirmation
-    read -p "Delete ALL existing labels? (y/N) " confirm
+    read -r -p "Delete ALL existing labels? (y/N) " confirm
 
     # More robust confirmation check
     if [[ "$confirm" == "y" ]] || [[ "$confirm" == "Y" ]] || [[ "$confirm" == "yes" ]] || [[ "$confirm" == "YES" ]]; then
