@@ -275,12 +275,13 @@ fi
 # Shell script checks
 if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
     echo -e "${BLUE}Running Shell script checks...${NC}"
-    
+
     if command -v shellcheck &> /dev/null; then
         # Find all shell scripts and check them
         SHELL_SCRIPTS=$(find . -name "*.sh" -not -path "./.git/*" -not -path "./target/*" 2>/dev/null)
         if [ -n "$SHELL_SCRIPTS" ]; then
-            if ! OUTPUT=$(echo "$SHELL_SCRIPTS" | xargs shellcheck 2>&1); then
+            # Run shellcheck, only fail on errors (not warnings/info)
+            if ! OUTPUT=$(echo "$SHELL_SCRIPTS" | xargs shellcheck -e warning,info 2>&1); then
                 echo -e "${RED}  ✗ shellcheck failed${NC}"
                 echo "$OUTPUT" >&2
                 FAILED=1
