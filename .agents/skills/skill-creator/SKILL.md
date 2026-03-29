@@ -1,11 +1,11 @@
 ---
 name: skill-creator
-description: Create new Claude Code skills with proper directory structure, SKILL.md file, and YAML frontmatter. Use this skill when you need to create a new reusable knowledge module for Claude Code.
+description: Create new agent skills with proper directory structure, SKILL.md file, and YAML frontmatter. Use this skill when you need to create a new reusable knowledge module.
 ---
 
 # Skill Creator
 
-Create new Claude Code skills following the official format and best practices.
+Create new agent skills following the official format and best practices.
 
 ## Quick Reference
 
@@ -16,7 +16,7 @@ Create new Claude Code skills following the official format and best practices.
 
 - Creating a new reusable knowledge module
 - Adding specialized guidance for specific tasks
-- Building domain-specific expertise into Claude Code
+- Building domain-specific expertise
 
 ## Skill Structure
 
