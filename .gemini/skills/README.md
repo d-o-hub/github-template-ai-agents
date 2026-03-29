@@ -1,1 +1,1 @@
-.agents/skills/README.md
+../../.agents/skills/README.md
