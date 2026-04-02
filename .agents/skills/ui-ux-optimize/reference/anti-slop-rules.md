@@ -13,6 +13,8 @@
 | "bold" | large display type, high contrast, thick borders |
 | "premium" | elevation tokens, serif display, gold/dark palette |
 | "not corporate" | no Inter, no blue, no neutral gray defaults |
+| "generic" | exclusion list (no default fonts, no default palette, no default grid) + reference specific precedent product |
+| "boring" | spring animations for completion, human-voiced empty states, one display font with character, celebration micro-interactions |
 
 ## Banned UX Phrases
 

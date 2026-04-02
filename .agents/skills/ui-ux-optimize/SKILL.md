@@ -52,9 +52,12 @@ RESEARCH SCOUT → TOKEN ARCHITECT → LAYOUT ENGINEER → VARIANT GENERATOR →
 Inspired by pi-autoresearch: try → measure → keep/revert → repeat until score stabilizes.
 
 1. Run full swarm pipeline
-2. Quality Auditor scores (0–66) with confidence (MAD-based)
-3. Score ≥ 60 AND confidence ≥ 2.0× → **KEEP**
-4. Score < 60 OR confidence < 1.0× → **REVISE** (re-run weak agent downstream)
+2. Quality Auditor scores with confidence (MAD-based)
+   - Game products: 0–66 (all 10 sections), threshold 60
+   - Non-game products: 0–57 (9 sections, game-specific N/A), threshold 52
+   - Use **effective percentage** (score/max_applicable) for keep decision
+3. Effective ≥ 91% AND confidence ≥ 2.0× → **KEEP**
+4. Effective < 91% OR confidence < 1.0× → **REVISE** (re-run weak agent downstream)
 5. Score regresses → **REVERT** (discard, try different approach)
 6. Max 5 iterations per session
 
@@ -92,7 +95,7 @@ Run every step. Swarm coordinates handoffs.
 
 **Step 6 — Layout Engineer: Safety Audit.** Overlap, wrapping, truncation at all breakpoints.
 
-**Step 6a — Browser Verifier: Screenshots** *(when HTML available).* Playwright at 375/768/1024/1440px. See → `reference/browser-verification.md`
+**Step 6a — Browser Verifier: Screenshots** *(when HTML available).* Playwright at 375/768/1024/1440px. If no HTML prototype exists, **SKIP** with a `browser_verification.status: "SKIPPED"` note describing what would be verified. See → `reference/browser-verification.md`
 
 ### Phase 4: Audit & Learn
 
