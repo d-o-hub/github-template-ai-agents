@@ -205,4 +205,4 @@ jobs:
 | Authentication guide | `references/AUTH.md` |
 | Pagination & rate limits | `references/PAGINATION.md` |
 | Forgejo Actions (CI/CD) | `references/FORGEJO_ACTIONS.md` |
-| Eval test cases | `evals/evals.json` |
+| Eval test cases | `evals/evals.json` (pending) |
