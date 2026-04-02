@@ -64,6 +64,16 @@
       "autoActivate": false
     },
     {
+      "skill": "ui-ux-optimize",
+      "triggers": {
+        "keywords": ["UI", "UX", "design", "interface", "layout", "responsive", "dashboard", "game UI", "navigation", "design tokens", "wireframe", "prototype", "redesign", "mobile design", "web design"],
+        "patterns": ["design.*interface", "UI.*UX", "responsive.*layout", "design.*system", "optimize.*prompt"],
+        "files": []
+      },
+      "priority": "high",
+      "autoActivate": true
+    },
+    {
       "skill": "web-search-researcher",
       "triggers": {
         "keywords": ["search", "research", "find information", "look up", "documentation"],
