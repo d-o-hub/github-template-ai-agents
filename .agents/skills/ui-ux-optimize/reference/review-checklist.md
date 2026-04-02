@@ -1,6 +1,6 @@
 # Review Checklist Reference
 
-## Scoring (0–66)
+## Scoring
 
 | Section | Max | Checks |
 |---|---|---|
@@ -15,4 +15,17 @@
 | Implementation Readiness | 7 | Specific enough, deliverables listed, tokens included |
 | Game-Specific | 9 | Play context, HUD positions, safe zones, overlay discipline |
 
-**Pass threshold:** 60/66 (91%) | **Perfect:** 66/66
+## Effective Scoring
+
+The **Game-Specific** section applies only to game products. For non-game products, score the remaining 9 sections.
+
+| Product Type | Max Score | Sections | Pass Threshold (91%) | Perfect |
+|---|---|---|---|---|
+| Game | 66 | All 10 | 60 | 66 |
+| Non-game | 57 | 9 (skip Game-Specific) | 52 | 57 |
+
+**Always report both `score` and `max_applicable`.** Use effective percentage for keep/revert decisions:
+```
+effective = score / max_applicable
+keep if effective ≥ 0.91 AND confidence ≥ 2.0×
+```

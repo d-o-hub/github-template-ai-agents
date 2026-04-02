@@ -115,9 +115,11 @@ agent: quality_auditor
 input: [all_agent_outputs]
 output_contract:
   quality_score:
-    total: number  # 0-66
-    sections: object[section → score]
-    confidence: number  # MAD-based
+    score: number          # actual score
+    max_applicable: number # 57 (non-game) or 66 (game)
+    effective_pct: number  # score/max_applicable * 100
+    sections: object[section → {score, max}]
+    confidence: number     # MAD-based
     decision: "KEEP | REVISE | REVERT"
   lessons_learned: {run_id, what_improved, what_caused_confusion, improvement_rules}
 handoff_to: coordinator (loop decision)
