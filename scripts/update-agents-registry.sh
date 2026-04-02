@@ -37,22 +37,21 @@ extract_agent_info() {
     local file="$1"
     local cli_type="$2"
     
+    # Extract frontmatter (between first and second ---)
+    local frontmatter
+    frontmatter=$(sed -n '/^---$/,/^---$/p' "$file" | sed '1d;$d')
+
     # Extract name from frontmatter
     local name
-    name=$(grep -A1 "^name:" "$file" 2>/dev/null | tail -1 | sed 's/^name: *//' | tr -d '"' || echo "")
+    name=$(echo "$frontmatter" | grep "^name:" | head -1 | sed 's/^name: *//' | tr -d '"' || echo "")
     
     # Extract description from frontmatter
     local description
-    description=$(grep "^description:" "$file" 2>/dev/null | sed 's/^description: *//' | tr -d '"' | cut -c1-60 || echo "No description")
+    description=$(echo "$frontmatter" | grep "^description:" | head -1 | sed 's/^description: *//' | tr -d '"' | cut -c1-60 || echo "No description")
     
     # Extract tools from frontmatter
     local tools
-    tools=$(grep "^tools:" "$file" 2>/dev/null | sed 's/^tools: *//' | tr -d '"' || echo "Inherited")
-
-    # Extract model from frontmatter (optional)
-    # shellcheck disable=SC2034
-    local model
-    model=$(grep "^model:" "$file" 2>/dev/null | sed 's/^model: *//' | tr -d '"' || echo "Default")
+    tools=$(echo "$frontmatter" | grep "^tools:" | head -1 | sed 's/^tools: *//' | tr -d '"' || echo "Inherited")
 
     if [ -n "$name" ]; then
         # Clean up description - remove "Invoke when..." for brevity
@@ -111,11 +110,11 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
         # Skip if no SKILL.md exists
         [ -f "$skill_dir/SKILL.md" ] || continue
         
-        # Extract description from frontmatter
-        description=$(grep "^description:" "$skill_dir/SKILL.md" 2>/dev/null | sed 's/^description: *//' | tr -d '"' | cut -c1-60 || echo "No description")
+        # Extract description from frontmatter (handling block scalars like >- or |)
+        description=$(sed -n '/^description:/,/^[a-z-]*:/p' "$skill_dir/SKILL.md" | sed '1s/^description: *//;$d' | tr -d '\n' | sed 's/^[>-]* *//;s/  */ /g' | cut -c1-60 || echo "No description")
         
         # Extract name from frontmatter if available
-        skill_display_name=$(grep "^name:" "$skill_dir/SKILL.md" 2>/dev/null | sed 's/^name: *//' | tr -d '"' || echo "$skill_name")
+        skill_display_name=$(grep "^name:" "$skill_dir/SKILL.md" | head -1 | sed 's/^name: *//' | tr -d '"' || echo "$skill_name")
         
         echo "| \`${skill_display_name}\` | \`.agents/skills/$skill_name\` | $description |" >> "$TEMP_FILE"
     done
