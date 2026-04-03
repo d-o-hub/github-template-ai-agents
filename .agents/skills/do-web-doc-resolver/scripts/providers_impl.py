@@ -120,9 +120,9 @@ def resolve_with_exa(query: str, max_chars: int = MAX_CHARS) -> ResolvedResult |
             return None
         content = "\n\n---\n\n".join(
             [
-                r.highlight or r.text
+                (r.highlight if hasattr(r, "highlight") and r.highlight else r.text)
                 for r in res.results
-                if hasattr(r, "highlight") and r.highlight or hasattr(r, "text") and r.text
+                if (hasattr(r, "highlight") and r.highlight) or (hasattr(r, "text") and r.text)
             ]
         )
         result = ResolvedResult(source="exa", content=content[:max_chars], query=query)

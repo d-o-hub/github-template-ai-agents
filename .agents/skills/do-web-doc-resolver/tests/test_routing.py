@@ -2,8 +2,6 @@
 Tests for routing memory module.
 """
 
-import pytest
-
 from scripts.routing_memory import RoutingMemory
 
 
@@ -49,7 +47,7 @@ class TestRoutingMemoryRecord:
         assert stats["avg_latency_ms"] == 2000.0
         assert stats["avg_quality"] == 0.0
 
-    def record_multiple_updates_average(self):
+    def test_record_multiple_updates_average(self):
         """Multiple records should update averages correctly."""
         rm = RoutingMemory()
         # First record
@@ -61,7 +59,7 @@ class TestRoutingMemoryRecord:
         # Average latency: (100 + 200) / 2 = 150
         assert stats["avg_latency_ms"] == 150.0
         # Average quality: (0.8 + 0.9) / 2 = 0.85
-        assert stats["avg_quality"] == 0.85
+        assert abs(stats["avg_quality"] - 0.85) < 1e-9
 
     def test_record_mixed_success_failure(self):
         """Mixed success/failure should track both counts."""
