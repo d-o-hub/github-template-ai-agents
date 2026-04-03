@@ -31,6 +31,7 @@ log_warn() {
     echo -e "${YELLOW}[WARN]${NC} $1"
 }
 
+# shellcheck disable=SC2329
 log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
@@ -116,10 +117,12 @@ if echo "$CHANGED_FILES" | grep -q '.agents/skills/'; then
     
     # Generate simple index
     INDEX_FILE="${AGENTS_DIR}/SKILL_INDEX.md"
-    echo "# Skill Index" > "$INDEX_FILE"
-    echo "" >> "$INDEX_FILE"
-    echo "Auto-generated on $(date)" >> "$INDEX_FILE"
-    echo "" >> "$INDEX_FILE"
+    {
+        echo "# Skill Index"
+        echo ""
+        echo "Auto-generated on $(date)"
+        echo ""
+    } > "$INDEX_FILE"
     
     for skill_dir in .agents/skills/*/; do
         if [ -f "${skill_dir}/SKILL.md" ]; then

@@ -83,6 +83,7 @@ check_link() {
 }
 
 # Function to process a single SKILL.md file
+# shellcheck disable=SC2094
 process_skill_file() {
     local skill_file="$1"
     local skill_dir
@@ -99,7 +100,6 @@ process_skill_file() {
         # Find all markdown links in this line
         # Using grep to find matches, then processing each
         while [[ "$line" =~ $LINK_REGEX ]]; do
-            local link_text="${BASH_REMATCH[1]}"
             local link_path="${BASH_REMATCH[2]}"
 
             LINKS_CHECKED=$((LINKS_CHECKED + 1))
@@ -108,6 +108,7 @@ process_skill_file() {
             line="${line#*"${BASH_REMATCH[0]}"}"
 
             # Check this link
+            # shellcheck disable=SC2094
             if ! check_link "$skill_dir" "$link_path" "$skill_file" "$line_num"; then
                 BROKEN_COUNT=$((BROKEN_COUNT + 1))
                 file_broken=1

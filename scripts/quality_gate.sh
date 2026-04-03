@@ -7,7 +7,7 @@ set +e
 set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$REPO_ROOT"
+cd "$REPO_ROOT" || exit 1
 
 # Colors for output (disabled in CI via TTY check, or via FORCE_COLOR=0)
 if [[ -t 1 ]] && [[ "${FORCE_COLOR:-}" != "0" ]]; then

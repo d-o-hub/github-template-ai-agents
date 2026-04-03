@@ -18,9 +18,12 @@
 set -euo pipefail
 
 # Script metadata
-readonly SCRIPT_NAME="$(basename "$0")"
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+SCRIPT_NAME="$(basename "$0")"
+readonly SCRIPT_NAME
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+readonly REPO_ROOT
 
 # Exit codes
 readonly EXIT_SUCCESS=0
@@ -48,7 +51,6 @@ if [[ -t 1 ]] && [[ "${FORCE_COLOR:-}" != "0" ]]; then
     readonly YELLOW='\033[1;33m'
     readonly BLUE='\033[0;34m'
     readonly CYAN='\033[0;36m'
-    readonly MAGENTA='\033[0;35m'
     readonly BOLD='\033[1m'
     readonly DIM='\033[2m'
     readonly NC='\033[0m'
@@ -58,7 +60,6 @@ else
     readonly YELLOW=''
     readonly BLUE=''
     readonly CYAN=''
-    readonly MAGENTA=''
     readonly BOLD=''
     readonly DIM=''
     readonly NC=''
@@ -106,6 +107,7 @@ clear_progress() {
 }
 
 # Error handler
+# shellcheck disable=SC2329
 error_handler() {
     local line=$1
     log_error "Unexpected error in ${SCRIPT_NAME} at line ${line}"

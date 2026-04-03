@@ -91,7 +91,7 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
         fi
         
         # Clean up description
-        description=$(echo "$description" | sed 's/ *$//')
+        description=${description%% }
         
         echo "| \`${skill_name}\` | ${description} | ${category} |" >> "$TEMP_FILE"
     done
@@ -99,8 +99,8 @@ fi
 
 # Sort the table rows (excluding header) alphabetically by skill name
 temp_table="$REPO_ROOT/.temp_table.md"
-head -n $(($SKILLS_SECTION_LINE + 3)) "$TEMP_FILE" > "$temp_table"
-tail -n +$(($SKILLS_SECTION_LINE + 4)) "$TEMP_FILE" | sort >> "$temp_table"
+head -n $((SKILLS_SECTION_LINE + 3)) "$TEMP_FILE" > "$temp_table"
+tail -n +$((SKILLS_SECTION_LINE + 4)) "$TEMP_FILE" | sort >> "$temp_table"
 mv "$temp_table" "$TEMP_FILE"
 
 # Add empty line before next section
