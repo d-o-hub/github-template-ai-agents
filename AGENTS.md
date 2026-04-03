@@ -45,13 +45,15 @@ Always run the full quality gate before committing. Fix all errors before finish
 ├── AGENTS.md              # This file - agent instructions (single source of truth)
 ├── CLAUDE.md              # Claude Code-specific overrides only (@AGENTS.md)
 ├── GEMINI.md              # Gemini CLI-specific overrides only (@AGENTS.md)
+├── QWEN.md                # Qwen Code-specific overrides only (@AGENTS.md)
 ├── agents-docs/           # Detailed reference docs (loaded on demand, not by default)
 │   ├── HARNESS.md         # MCP, skills, sub-agents, hooks overview
 │   ├── SKILLS.md          # Skill authoring and progressive disclosure
 │   ├── SUB-AGENTS.md      # Context isolation patterns
 │   ├── HOOKS.md           # Hook configuration and verification
 │   ├── CONTEXT.md         # Context engineering and back-pressure
-│   └── RUST.md            # Rust-specific patterns (remove if not Rust)
+│   ├── RUST.md            # Rust-specific patterns (remove if not Rust)
+│   └── AGENTS_REGISTRY.md # Auto-generated registry of all sub-agents
 ├── .agents/
 │   └── skills/            # CANONICAL skill source - all agents read from here
 │       └── <skill-name>/
@@ -68,11 +70,15 @@ Always run the full quality gate before committing. Fix all errors before finish
 │   └── commands/
 ├── .gemini/
 │   └── skills/            # Symlinks -> ../../.agents/skills/<name>
+├── .qwen/
+│   └── skills/            # Symlinks -> ../../.agents/skills/<name>
 ├── scripts/
 │   ├── setup-skills.sh    # Creates all symlinks (run on clone)
 │   ├── validate-skills.sh # Validates all symlinks are intact
 │   ├── quality_gate.sh    # Full pre-commit quality gate
-│   └── pre-commit-hook.sh # Git hook entry point
+│   ├── pre-commit-hook.sh # Git hook entry point
+│   ├── gh-labels-creator.sh # GitHub label initialization
+│   └── update-agents-registry.sh # Regenerates AGENTS_REGISTRY.md
 ├── README.md
 └── .github/workflows/
 ```
