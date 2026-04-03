@@ -39,8 +39,11 @@ jobs:
       - name: Setup skills
         run: ./scripts/setup-skills.sh
 
-      - name: Validate skills
+      - name: Validate skill symlinks
         run: ./scripts/validate-skills.sh
+
+      - name: Validate skill format
+        run: ./scripts/validate-skill-format.sh
 
   quality-gate:
     name: Quality Gate
