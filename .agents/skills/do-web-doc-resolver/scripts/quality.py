@@ -4,6 +4,8 @@ Heuristics for scoring the quality of resolved content.
 
 from dataclasses import dataclass
 
+from scripts.docs_validation import DocsValidationResult
+
 
 @dataclass
 class QualityScore:
@@ -13,6 +15,7 @@ class QualityScore:
     duplicate_heavy: bool
     noisy: bool
     acceptable: bool
+    docs_validation: DocsValidationResult | None = None
 
 
 def score_content(markdown: str, links: list[str] | None = None) -> QualityScore:

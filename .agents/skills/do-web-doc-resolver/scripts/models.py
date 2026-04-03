@@ -139,6 +139,30 @@ class ResolveMetrics:
 
 
 @dataclass
+class ProviderMeta:
+    """Metadata about a single provider call."""
+
+    tool: str
+    duration_ms: int
+    cache_hit: bool = False
+    quality_score: float = 0.0
+    error_type: str | None = None
+
+
+@dataclass
+class ProviderResult:
+    """Structured envelope for provider results."""
+
+    ok: bool
+    content: str | None = None
+    error: str | None = None
+    meta: ProviderMeta | None = None
+    url: str | None = None
+    query: str | None = None
+    source: str = "unknown"
+
+
+@dataclass
 class ResolvedResult:
     """Result of a successful resolution."""
 
@@ -150,7 +174,49 @@ class ResolvedResult:
     validated_links: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
     metrics: ResolveMetrics | None = None
+    meta: ProviderMeta | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return asdict(self)
+
+
+@dataclass
+class TraceStep:
+    """A single step in the resolution trace."""
+
+    tool: str
+    duration_ms: int
+    success: bool
+    cache_hit: bool = False
+    quality_score: float = 0.0
+    error: str | None = None
+    content_length: int = 0
+
+
+@dataclass
+class ResolutionTrace:
+    """Full trace of a resolution request."""
+
+    trace_id: str
+    input: str
+    is_url: bool
+    profile: str
+    steps: list[TraceStep] = field(default_factory=list)
+    total_latency_ms: int = 0
+    final_source: str = "none"
+    final_score: float = 0.0
+    success: bool = False
+
+    def to_dict(self) -> dict:
+        return {
+            "trace_id": self.trace_id,
+            "input": self.input,
+            "is_url": self.is_url,
+            "profile": self.profile,
+            "steps": [s.__dict__ for s in self.steps],
+            "total_latency_ms": self.total_latency_ms,
+            "final_source": self.final_source,
+            "final_score": self.final_score,
+            "success": self.success,
+        }

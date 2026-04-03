@@ -10,6 +10,7 @@ import json
 import logging
 import os
 import time
+import uuid
 from collections.abc import Generator
 from typing import Any
 
@@ -24,9 +25,12 @@ from . import (
 from .models import (
     ErrorType,
     Profile,
+    ProviderResult,
     ProviderType,
+    ResolutionTrace,
     ResolvedResult,
     ResolveMetrics,
+    TraceStep,
     ValidationResult,
 )
 from .providers_impl import (
@@ -157,7 +161,8 @@ def resolve_url(
 
 
 def resolve_url_stream(
-    url: str, max_chars: int = MAX_CHARS, profile: Profile = Profile.BALANCED
+    url: str, max_chars: int = MAX_CHARS, profile: Profile = Profile.BALANCED,
+    trace: ResolutionTrace | None = None,
 ) -> Generator[dict[str, Any], None, None]:
     logger.info(f"Resolving URL: {url}")
     metrics = ResolveMetrics()
@@ -168,18 +173,53 @@ def resolve_url_stream(
         max_total_latency_ms=budget_data["max_total_latency_ms"],
         allow_paid=bool(budget_data["allow_paid"]),
     )
+    start_time = time.time()
 
     if any(url.lower().endswith(ext) for ext in [".pdf", ".docx", ".pptx"]):
         res = resolve_with_docling(url, max_chars)
-        if res:
-            res.metrics = metrics
-            yield res.to_dict()
+        if res.ok:
+            result = ResolvedResult(source=res.source, content=res.content or "", url=res.url)
+            result.meta = res.meta
+            result.metrics = metrics
+            result_dict = result.to_dict()
+            if trace:
+                step = TraceStep(
+                    tool="docling",
+                    duration_ms=int((time.time() - start_time) * 1000),
+                    success=True,
+                    quality_score=res.meta.quality_score if res.meta else 0.0,
+                    content_length=len(res.content or ""),
+                )
+                trace.steps.append(step)
+                trace.total_latency_ms = int((time.time() - start_time) * 1000)
+                trace.final_source = "docling"
+                trace.final_score = res.meta.quality_score if res.meta else 0.0
+                trace.success = True
+                result_dict["trace"] = trace.to_dict()
+            yield result_dict
             return
     if any(url.lower().endswith(ext) for ext in [".png", ".jpg", ".jpeg"]):
         res = resolve_with_ocr(url, max_chars)
-        if res:
-            res.metrics = metrics
-            yield res.to_dict()
+        if res.ok:
+            result = ResolvedResult(source=res.source, content=res.content or "", url=res.url)
+            result.meta = res.meta
+            result.metrics = metrics
+            result_dict = result.to_dict()
+            if trace:
+                step = TraceStep(
+                    tool="ocr",
+                    duration_ms=int((time.time() - start_time) * 1000),
+                    success=True,
+                    quality_score=res.meta.quality_score if res.meta else 0.0,
+                    content_length=len(res.content or ""),
+                )
+                trace.steps.append(step)
+                trace.total_latency_ms = int((time.time() - start_time) * 1000)
+                trace.final_source = "ocr"
+                trace.final_score = res.meta.quality_score if res.meta else 0.0
+                trace.success = True
+                result_dict["trace"] = trace.to_dict()
+            yield result_dict
             return
 
     provider_names = routing.plan_provider_order(
@@ -252,10 +292,33 @@ def resolve_url_stream(
                         err_type = _detect_error_type(e)
                         if err_type not in (ErrorType.AUTH_ERROR, ErrorType.SSRF_BLOCKED):
                             _circuit_breakers.record_failure(p_name_done)
+                        if trace:
+                            step = TraceStep(
+                                tool=p_name_done,
+                                duration_ms=latency,
+                                success=False,
+                                error=str(e),
+                            )
+                            trace.steps.append(step)
                         metrics.record_provider(pt_done, latency, False)
                         continue
                     if res_or_content:
-                        if isinstance(res_or_content, ResolvedResult):
+                        if isinstance(res_or_content, ProviderResult):
+                            if res_or_content.ok:
+                                content = res_or_content.content or ""
+                            else:
+                                _circuit_breakers.record_failure(p_name_done)
+                                metrics.record_provider(pt_done, latency, False)
+                                if trace:
+                                    step = TraceStep(
+                                        tool=p_name_done,
+                                        duration_ms=latency,
+                                        success=False,
+                                        error=res_or_content.error,
+                                    )
+                                    trace.steps.append(step)
+                                continue
+                        elif isinstance(res_or_content, ResolvedResult):
                             content = res_or_content.content
                         else:
                             content = str(res_or_content)
@@ -269,20 +332,30 @@ def resolve_url_stream(
                                     domain, p_name_done, True, latency, q_score.score
                                 )
 
-                            found_acceptable = True
+                            if trace:
+                                trace.total_latency_ms = int((time.time() - start_time) * 1000)
+                                trace.final_source = p_name_done
+                                trace.final_score = q_score.score
+                                trace.success = True
                             if pt_done == ProviderType.LLMS_TXT:
-                                yield {
+                                out = {
                                     "source": "llms.txt",
                                     "url": url,
                                     "content": compact_content(content, max_chars),
                                     "metrics": metrics,
                                 }
+                                if trace:
+                                    out["trace"] = trace.to_dict()
+                                yield out
                             elif isinstance(res_or_content, ResolvedResult):
                                 res_or_content.metrics, res_or_content.score = (
                                     metrics,
                                     q_score.score,
                                 )
-                                yield res_or_content.to_dict()
+                                out = res_or_content.to_dict()
+                                if trace:
+                                    out["trace"] = trace.to_dict()
+                                yield out
                             break
                         else:
                             cache_negative.write_negative_cache(
@@ -305,11 +378,17 @@ def resolve_url_stream(
     finally:
         executor.shutdown(wait=False, cancel_futures=True)
 
+    if trace:
+        trace.total_latency_ms = int((time.time() - start_time) * 1000)
+        trace.final_source = "none"
+        trace.success = False
+
     yield {
         "source": "none",
         "url": url,
         "content": "Failed",
         "error": f"No resolution method available. Stop reason: {budget.stop_reason}",
+        **({"trace": trace.to_dict()} if trace else {}),
     }
 
 
@@ -330,6 +409,7 @@ def resolve_query_stream(
     max_chars: int = MAX_CHARS,
     skip_providers: set[str] | None = None,
     profile: Profile = Profile.BALANCED,
+    trace: ResolutionTrace | None = None,
 ) -> Generator[dict[str, Any], None, None]:
     skip = skip_providers or set()
     metrics = ResolveMetrics()
@@ -340,6 +420,7 @@ def resolve_query_stream(
         max_total_latency_ms=budget_data["max_total_latency_ms"],
         allow_paid=bool(budget_data["allow_paid"]),
     )
+    start_time = time.time()
     provider_names = routing.plan_provider_order(
         target=query, is_url=False, skip_providers=skip, routing_memory=_routing_memory
     )
@@ -393,10 +474,34 @@ def resolve_query_stream(
                         err_type = _detect_error_type(e)
                         if err_type not in (ErrorType.AUTH_ERROR, ErrorType.SSRF_BLOCKED):
                             _circuit_breakers.record_failure(p_name_done)
+                        if trace:
+                            step = TraceStep(
+                                tool=p_name_done,
+                                duration_ms=latency,
+                                success=False,
+                                error=str(e),
+                            )
+                            trace.steps.append(step)
                         metrics.record_provider(pt_done, latency, False)
                         continue
                     if res:
-                        q_score = quality.score_content(res.content)
+                        if isinstance(res, ProviderResult):
+                            if not res.ok:
+                                _circuit_breakers.record_failure(p_name_done)
+                                if trace:
+                                    step = TraceStep(
+                                        tool=p_name_done,
+                                        duration_ms=latency,
+                                        success=False,
+                                        error=res.error,
+                                    )
+                                    trace.steps.append(step)
+                                metrics.record_provider(pt_done, latency, False)
+                                continue
+                            content = res.content or ""
+                        else:
+                            content = res.content
+                        q_score = quality.score_content(content)
                         if q_score.acceptable:
                             _circuit_breakers.record_success(p_name_done)
                             metrics.record_provider(pt_done, latency, True)
@@ -405,8 +510,26 @@ def resolve_query_stream(
                             )
 
                             found_acceptable = True
-                            res.metrics, res.score = metrics, q_score.score
-                            yield res.to_dict()
+                            if isinstance(res, ProviderResult):
+                                result = ResolvedResult(
+                                    source=res.source,
+                                    content=res.content or "",
+                                    url=res.url,
+                                    query=res.query,
+                                )
+                                result.meta = res.meta
+                                result.metrics, result.score = metrics, q_score.score
+                                out = result.to_dict()
+                            else:
+                                res.metrics, res.score = metrics, q_score.score
+                                out = res.to_dict()
+                            if trace:
+                                trace.total_latency_ms = int((time.time() - start_time) * 1000)
+                                trace.final_source = p_name_done
+                                trace.final_score = q_score.score
+                                trace.success = True
+                                out["trace"] = trace.to_dict()
+                            yield out
                             break
                         else:
                             cache_negative.write_negative_cache(
@@ -428,11 +551,17 @@ def resolve_query_stream(
     finally:
         executor.shutdown(wait=False, cancel_futures=True)
 
+    if trace:
+        trace.total_latency_ms = int((time.time() - start_time) * 1000)
+        trace.final_source = "none"
+        trace.success = False
+
     yield {
         "source": "none",
         "query": query,
         "content": "Failed",
         "error": f"No resolution method available. Stop reason: {budget.stop_reason}",
+        **({"trace": trace.to_dict()} if trace else {}),
     }
 
 
@@ -462,6 +591,17 @@ def resolve_direct(
     }
     if provider in funcs:
         res = funcs[provider](input_str, max_chars)
+        if isinstance(res, ProviderResult):
+            if res.ok:
+                result = ResolvedResult(
+                    source=res.source,
+                    content=res.content or "",
+                    url=res.url,
+                    query=res.query,
+                )
+                result.meta = res.meta
+                return result.to_dict()
+            return {"source": "none", "error": res.error or "Provider failed"}
         return res.to_dict() if res else {"source": "none", "error": "Provider failed"}
     return {"source": "none", "error": "Unknown provider"}
 
@@ -500,22 +640,32 @@ def main():
     parser.add_argument("--provider", type=str)
     parser.add_argument("--providers-order", type=str)
     parser.add_argument("--log-level", default="INFO")
+    parser.add_argument("--trace", action="store_true")
     args = parser.parse_args()
     logging.basicConfig(level=getattr(logging, args.log_level))
     if not args.input:
         parser.error("Input required")
     profile = Profile(args.profile)
     skip = set(args.skip) if args.skip else None
+    is_url_input = is_url(args.input)
+    trace = None
+    if args.trace:
+        trace = ResolutionTrace(
+            trace_id=str(uuid.uuid4()),
+            input=args.input,
+            is_url=is_url_input,
+            profile=args.profile,
+        )
     if args.provider:
         results = [resolve_direct(args.input, ProviderType(args.provider), args.max_chars)]
     elif args.providers_order:
         order = [ProviderType(p.strip()) for p in args.providers_order.split(",")]
         results = [resolve_with_order(args.input, order, args.max_chars)]
     else:
-        if is_url(args.input):
-            results = resolve_url_stream(args.input, args.max_chars, profile)
+        if is_url_input:
+            results = resolve_url_stream(args.input, args.max_chars, profile, trace=trace)
         else:
-            results = resolve_query_stream(args.input, args.max_chars, skip, profile)
+            results = resolve_query_stream(args.input, args.max_chars, skip, profile, trace=trace)
     final_result = None
     for res in results:
         if not args.json and res.get("source") != "partial":
@@ -534,6 +684,9 @@ def main():
         print("\n=== FINAL RESULT ===")
         if final_result:
             print(final_result.get("content", ""))
+        if args.trace and final_result and "trace" in final_result:
+            print("\n=== TRACE ===")
+            print(json.dumps(final_result["trace"], indent=2))
 
 
 if __name__ == "__main__":
