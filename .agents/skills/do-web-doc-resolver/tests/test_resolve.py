@@ -4,7 +4,7 @@ Tests for main resolve module.
 
 import pytest
 
-from ..scripts.resolve import is_url, resolve, MAX_CHARS, MIN_CHARS
+from scripts.resolve import is_url, resolve, MAX_CHARS, MIN_CHARS
 
 
 class TestIsUrl:
@@ -161,19 +161,22 @@ class TestResolveEdgeCases:
     """Tests for edge cases in resolve function."""
 
     def test_resolve_empty_input(self, max_chars):
-        """Empty input should raise or return error."""
-        with pytest.raises((ValueError, TypeError)):
-            resolve("", max_chars=max_chars)
+        """Empty input should return a failure dict."""
+        result = resolve("", max_chars=max_chars)
+        assert isinstance(result, dict)
+        assert result.get("source") == "none"
 
     def test_resolve_whitespace_input(self, max_chars):
-        """Whitespace-only input should raise or return error."""
-        with pytest.raises((ValueError, TypeError)):
-            resolve("   ", max_chars=max_chars)
+        """Whitespace-only input should return a failure dict."""
+        result = resolve("   ", max_chars=max_chars)
+        assert isinstance(result, dict)
+        assert result.get("source") == "none"
 
     def test_resolve_none_input(self, max_chars):
-        """None input should raise TypeError."""
-        with pytest.raises((TypeError, AttributeError)):
-            resolve(None, max_chars=max_chars)
+        """None input should return a failure dict."""
+        result = resolve(None, max_chars=max_chars)
+        assert isinstance(result, dict)
+        assert result.get("source") == "none"
 
 
 class TestResolveQuality:

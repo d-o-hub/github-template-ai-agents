@@ -8,7 +8,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 import time
 
-from ..scripts.providers_impl import (
+from scripts.providers_impl import (
     is_rate_limited,
     set_rate_limit,
     _rate_limits,
@@ -88,21 +88,21 @@ class TestProviderResultFormat:
 
     def test_result_source_field(self):
         """Results should have a source field."""
-        from ..scripts.models import ResolvedResult
+        from scripts.models import ResolvedResult
 
         result = ResolvedResult(source="test_provider", content="test content")
         assert result.source == "test_provider"
 
     def test_result_content_field(self):
         """Results should have a content field."""
-        from ..scripts.models import ResolvedResult
+        from scripts.models import ResolvedResult
 
         result = ResolvedResult(source="test", content="sample content here")
         assert result.content == "sample content here"
 
     def test_result_to_dict(self):
         """Results should be convertible to dict."""
-        from ..scripts.models import ResolvedResult
+        from scripts.models import ResolvedResult
 
         result = ResolvedResult(
             source="test_provider",
@@ -122,17 +122,17 @@ class TestResolveWithJina:
         """Clear rate limits before each test."""
         _rate_limits.clear()
 
-    @patch("..scripts.providers_impl._is_rate_limited")
+    @patch("scripts.providers_impl._is_rate_limited")
     def test_rate_limited_returns_none(self, mock_rate_limited):
         """Rate limited jina should return None."""
         mock_rate_limited.return_value = True
         # This test demonstrates the rate limit check behavior
         assert is_rate_limited("jina") is False  # Not rate limited by default
 
-    @patch("..scripts.providers_impl._get_from_cache")
+    @patch("scripts.providers_impl._get_from_cache")
     def test_cache_hit_returns_cached(self, mock_cache):
         """Cached result should be returned immediately."""
-        from ..scripts.models import ResolvedResult
+        from scripts.models import ResolvedResult
 
         mock_cache.return_value = {
             "source": "jina",
@@ -231,7 +231,7 @@ class TestContentTruncation:
 
     def test_content_truncated_to_max_chars(self):
         """Content should be truncated to MAX_CHARS."""
-        from ..scripts.models import ResolvedResult
+        from scripts.models import ResolvedResult
 
         long_content = "x" * 10000
         result = ResolvedResult(
@@ -242,7 +242,7 @@ class TestContentTruncation:
 
     def test_short_content_not_truncated(self):
         """Content shorter than MAX_CHARS should not be truncated."""
-        from ..scripts.models import ResolvedResult
+        from scripts.models import ResolvedResult
 
         short_content = "short content"
         result = ResolvedResult(

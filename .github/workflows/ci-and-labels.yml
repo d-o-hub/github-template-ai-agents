@@ -64,7 +64,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-        if: hashFiles('requirements.txt') != '' || hashFiles('pyproject.toml') != ''
+        if: hashFiles('requirements.txt') != '' || hashFiles('pyproject.toml') != '' || hashFiles('.agents/skills/*/requirements.txt') != '' || hashFiles('.agents/skills/*/pyproject.toml') != ''
 
       - name: Setup Go (if go.mod exists)
         uses: actions/setup-go@v5
@@ -79,7 +79,7 @@ jobs:
       - name: Install dependencies (Python)
         run: |
           pip install ruff black pytest
-        if: hashFiles('requirements.txt') != '' || hashFiles('pyproject.toml') != ''
+        if: hashFiles('requirements.txt') != '' || hashFiles('pyproject.toml') != '' || hashFiles('.agents/skills/*/requirements.txt') != '' || hashFiles('.agents/skills/*/pyproject.toml') != ''
 
       - name: Run quality gate
         run: ./scripts/quality_gate.sh
@@ -108,7 +108,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-        if: hashFiles('requirements.txt') != '' || hashFiles('pyproject.toml') != ''
+        if: hashFiles('requirements.txt') != '' || hashFiles('pyproject.toml') != '' || hashFiles('.agents/skills/*/requirements.txt') != '' || hashFiles('.agents/skills/*/pyproject.toml') != ''
 
       - name: Setup Go (if go.mod exists)
         uses: actions/setup-go@v5
@@ -120,9 +120,19 @@ jobs:
         run: npm ci
         if: hashFiles('package.json') != ''
 
-      - name: Install dependencies (Python)
+      - name: Install dependencies (Python root)
         run: pip install -r requirements.txt
         if: hashFiles('requirements.txt') != ''
+
+      - name: Install dependencies (Python skills)
+        run: |
+          for dir in .agents/skills/*/; do
+            if [ -f "$dir/requirements.txt" ]; then
+              echo "Installing dependencies for $dir..."
+              pip install -r "$dir/requirements.txt"
+            fi
+          done
+        if: hashFiles('.agents/skills/*/requirements.txt') != ''
 
       - name: Run tests (Node)
         run: npm test
@@ -132,9 +142,19 @@ jobs:
         run: cargo test --lib
         if: hashFiles('Cargo.toml') != ''
 
-      - name: Run tests (Python)
+      - name: Run tests (Python root)
         run: pytest tests/ -v
-        if: hashFiles('requirements.txt') != '' || hashFiles('pyproject.toml') != ''
+        if: hashFiles('requirements.txt') != ''
+
+      - name: Run tests (Python skills)
+        run: |
+          for dir in .agents/skills/*/; do
+            if [ -f "$dir/pyproject.toml" ]; then
+              echo "Running tests for $dir..."
+              (cd "$dir" && python -m pytest tests/ -v -m "not live")
+            fi
+          done
+        if: hashFiles('.agents/skills/*/pyproject.toml') != ''
 
       - name: Run tests (Go)
         run: go test ./...

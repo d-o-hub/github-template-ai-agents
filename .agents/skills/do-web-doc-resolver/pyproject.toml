@@ -51,6 +51,7 @@ warn_unused_configs = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
 markers = [
     "live: tests requiring live API keys (deselect with '-m \"not live\"')",
 ]
