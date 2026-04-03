@@ -128,27 +128,33 @@ cloning to create symlinks for Claude Code and Gemini CLI. See `agents-docs/SKIL
 
 | Skill | Description | Category |
 |-------|-------------|----------|
-| `agent-coordination` | Multi-agent orchestration (parallel, sequential, swarm) | Coordination |
-| `anti-ai-slop` | UI/UX audit to avoid generic AI aesthetic | UI/UX |
-| `api-design-first` | REST/GraphQL API design with OpenAPI specs | API Development |
-| `architecture-diagram` | Generate SVG architecture diagrams | Documentation |
-| `codeberg-api` | Interact with Codeberg/Forgejo repos | DevOps |
-| `do-web-doc-resolver` | Resolve web URLs to LLM-ready markdown | Research |
-| `docs-hook` | Git hook for docs sync | Documentation |
-| `github-readme` | Create human-focused READMEs | Documentation |
-| `goap-agent` | Goal-Oriented Action Planning execution | Coordination |
-| `intent-classifier` | Intelligent skill routing | Coordination |
-| `iterative-refinement` | Iterative improvement with validation loops | Quality |
-| `parallel-execution` | Parallel task execution | Coordination |
-| `privacy-first` | Prevent personal data in codebase | Security |
-| `security-code-auditor` | Security auditing and vulnerability detection | Security |
-| `shell-script-quality` | ShellCheck and BATS testing | Code Quality |
-| `skill-creator` | Create and optimize skills | Meta |
-| `skill-evaluator` | Evaluate skill structure and performance | Meta |
-| `task-decomposition` | Break down complex tasks | Planning |
-| `triz-solver` | TRIZ problem-solving methodology | Innovation |
-| `ui-ux-optimize` | UI/UX prompt optimizer with swarm | UI/UX |
-| `web-search-researcher` | Web search for current information | Research |
+| `accessibility-auditor` | Audit web applications for WCAG 2.2 compliance, screen reade | Security |
+| `agent-coordination` | Coordinate multiple agents for software development across a | Coordination |
+| `anti-ai-slop` | Apply this skill whenever the user wants to audit, fix, rede | UI/UX |
+| `api-design-first` | Design and document RESTful APIs using design-first principl | APIDevelopment |
+| `architecture-diagram` | Generate or update a project architecture SVG diagram by sca | Documentation |
+| `cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, Gi | DevOps |
+| `code-review-assistant` | Automated code review with PR analysis, change summaries, an | General |
+| `codeberg-api` | - Interact with Forgejo/Codeberg repositories via the REST A | DevOps |
+| `database-devops` | Database design, migration, and DevOps automation with safet | DevOps |
+| `do-web-doc-resolver` | Python resolver for URLs and queries into compact, LLM-ready | Research |
+| `docs-hook` | Lightweight git hook integration for updating agents-docs wi | Documentation |
+| `github-readme` | Create human-focused GitHub README.md files with 2026 best p | Documentation |
+| `goap-agent` | Invoke for complex multi-step tasks requiring intelligent pl | Coordination |
+| `intent-classifier` | Classify user intents and route to appropriate skills, comma | Coordination |
+| `iterative-refinement` | Execute iterative refinement workflows with validation loops | Quality |
+| `migration-refactoring` | Automate complex code migrations and refactorings with safet | Migration |
+| `parallel-execution` | Execute multiple independent tasks simultaneously using para | Coordination |
+| `privacy-first` | Prevent email addresses and personal data from entering the | Security |
+| `security-code-auditor` | Perform security audits on code to identify vulnerabilities, | Security |
+| `shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use w | CodeQuality |
+| `skill-creator` | Create new skills, modify and improve existing skills, and m | Meta |
+| `skill-evaluator` | "Reusable skill for evaluating other skills with structure c | Meta |
+| `task-decomposition` | Break down complex tasks into atomic, actionable goals with | Planning |
+| `testing-strategy` | Design comprehensive testing strategies with modern techniqu | Quality |
+| `triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive P | Innovation |
+| `ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research agen | UI/UX |
+| `web-search-researcher` | Research topics using web search to find accurate, current i | Research |
 
 ### Context Discipline
 - Delegate isolated research and analysis to sub-agents

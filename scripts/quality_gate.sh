@@ -283,10 +283,10 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
         SHELL_SCRIPTS=$(find . -name "*.sh" -not -path "./.git/*" -not -path "./target/*" 2>/dev/null || true)
         if [ -n "$SHELL_SCRIPTS" ]; then
             # Run shellcheck with proper error handling
-            local sc_failed=0
+            sc_failed=0
             while IFS= read -r script; do
                 [ -n "$script" ] || continue
-                if ! shellcheck -e SC2034 "$script" 2>/dev/null; then
+                if ! shellcheck "$script" 2>/dev/null; then
                     echo -e "${RED}  ✗ shellcheck failed: $script${NC}"
                     sc_failed=1
                 fi
