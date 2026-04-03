@@ -2,9 +2,7 @@
 Tests for quality scoring module.
 """
 
-import pytest
-
-from scripts.quality import score_content, QualityScore
+from scripts.quality import score_content
 
 
 class TestScoreContent:

@@ -2,10 +2,9 @@
 Tests for circuit breaker module.
 """
 
-import pytest
 from datetime import datetime, timedelta, timezone
 
-from scripts.circuit_breaker import CircuitBreakerState, CircuitBreakerRegistry
+from scripts.circuit_breaker import CircuitBreakerRegistry, CircuitBreakerState
 
 
 class TestCircuitBreakerState:

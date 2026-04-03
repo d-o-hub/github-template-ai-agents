@@ -4,7 +4,7 @@ Tests for main resolve module.
 
 import pytest
 
-from scripts.resolve import is_url, resolve, MAX_CHARS, MIN_CHARS
+from scripts.resolve import MAX_CHARS, MIN_CHARS, is_url, resolve
 
 
 class TestIsUrl:
@@ -197,10 +197,5 @@ class TestResolveQuality:
         if result and "content" in result and len(result["content"]) > 100:
             content = result["content"]
             # Should have some structure (headers, lists, etc.)
-            has_structure = (
-                "#" in content
-                or "-" in content
-                or "*" in content
-                or "\n\n" in content
-            )
+            has_structure = "#" in content or "-" in content or "*" in content or "\n\n" in content
             assert has_structure or len(content) > 200  # Or just substantial content

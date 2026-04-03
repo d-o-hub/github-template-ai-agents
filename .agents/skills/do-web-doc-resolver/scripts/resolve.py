@@ -13,14 +13,14 @@ import time
 from collections.abc import Generator
 from typing import Any
 
-from . import cache_negative
-from . import circuit_breaker
-from . import providers_impl
-from . import quality
-from . import routing
-from . import routing_memory
-from . import synthesis
-from . import utils
+from . import (
+    cache_negative,
+    circuit_breaker,
+    quality,
+    routing,
+    routing_memory,
+    synthesis,
+)
 from .models import (
     ErrorType,
     Profile,
@@ -161,9 +161,7 @@ def resolve_url_stream(
 ) -> Generator[dict[str, Any], None, None]:
     logger.info(f"Resolving URL: {url}")
     metrics = ResolveMetrics()
-    budget_data = routing.PROFILE_BUDGETS.get(
-        profile.value, routing.PROFILE_BUDGETS["balanced"]
-    )
+    budget_data = routing.PROFILE_BUDGETS.get(profile.value, routing.PROFILE_BUDGETS["balanced"])
     budget = routing.ResolutionBudget(
         max_provider_attempts=budget_data["max_provider_attempts"],
         max_paid_attempts=budget_data["max_paid_attempts"],
@@ -335,9 +333,7 @@ def resolve_query_stream(
 ) -> Generator[dict[str, Any], None, None]:
     skip = skip_providers or set()
     metrics = ResolveMetrics()
-    budget_data = routing.PROFILE_BUDGETS.get(
-        profile.value, routing.PROFILE_BUDGETS["balanced"]
-    )
+    budget_data = routing.PROFILE_BUDGETS.get(profile.value, routing.PROFILE_BUDGETS["balanced"])
     budget = routing.ResolutionBudget(
         max_provider_attempts=budget_data["max_provider_attempts"],
         max_paid_attempts=budget_data["max_paid_attempts"],

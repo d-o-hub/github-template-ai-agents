@@ -4,17 +4,16 @@ Tests for provider implementations.
 These tests use mocks to avoid actual network calls and API key requirements.
 """
 
-import pytest
-from unittest.mock import patch, MagicMock
 import time
+from unittest.mock import patch
 
 from scripts.providers_impl import (
-    is_rate_limited,
-    set_rate_limit,
-    _rate_limits,
+    DEFAULT_TIMEOUT,
     MAX_CHARS,
     MIN_CHARS,
-    DEFAULT_TIMEOUT,
+    _rate_limits,
+    is_rate_limited,
+    set_rate_limit,
 )
 
 
@@ -132,7 +131,6 @@ class TestResolveWithJina:
     @patch("scripts.providers_impl._get_from_cache")
     def test_cache_hit_returns_cached(self, mock_cache):
         """Cached result should be returned immediately."""
-        from scripts.models import ResolvedResult
 
         mock_cache.return_value = {
             "source": "jina",
