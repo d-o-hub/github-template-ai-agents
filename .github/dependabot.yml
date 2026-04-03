@@ -39,10 +39,6 @@ updates:
       prefix: "chore"
     ignore:
       - dependency-name: "*"
-        versions:
-          - "*-alpha"
-          - "*-beta"
-          - "*-rc*"
 
   # Terraform (if used)
   - package-ecosystem: "terraform"
