@@ -1,5 +1,5 @@
 {
-  "skill": "accessibility-auditor",
+  "skill_name": "accessibility-auditor",
   "version": "1.0.0",
   "evals": [
     {

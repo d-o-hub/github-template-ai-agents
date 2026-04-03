@@ -49,7 +49,7 @@ One-sentence tagline explaining what this does and why it matters.
 
 [Visual: Badge | Screenshot | Diagram]
 
-Quick links: [Docs](link) | [Examples](link) | [Issues](link)
+Quick links: [Docs](https://example.com/docs) | [Examples](https://example.com/examples) | [Issues](https://github.com/user/repo/issues)
 ```
 
 ### 3. Progressive Disclosure
@@ -78,7 +78,7 @@ Requirements:
 
 [Visual: Badges, screenshot, or architecture diagram]
 
-**Quick Links**: [Documentation](link) · [Examples](link) · [API Reference](link) · [Issues](link)
+**Quick Links**: [Documentation](https://example.com/docs) · [Examples](https://example.com/examples) · [API Reference](https://example.com/api) · [Issues](https://github.com/user/repo/issues)
 
 ---
 
@@ -116,17 +116,17 @@ project-name --help
 
 ## Documentation
 
-- 📚 **[Full Documentation](link)** - Complete guides
-- 📖 **[API Reference](link)** - API documentation
-- 🧪 **[Examples](link)** - Working code examples
+- 📚 **[Full Documentation](https://example.com/docs)** - Complete guides
+- 📖 **[API Reference](https://example.com/api)** - API documentation
+- 🧪 **[Examples](https://example.com/examples)** - Working code examples
 
 ## Contributing
 
-We welcome contributions! See [Contributing Guide](CONTRIBUTING.md).
+We welcome contributions! See [Contributing Guide](https://github.com/user/repo/blob/main/CONTRIBUTING.md).
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](https://github.com/user/repo/blob/main/LICENSE).
 ```
 
 ## Writing Style Guidelines

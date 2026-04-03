@@ -70,18 +70,35 @@ Primary stack: [frameworks, libraries, tools]
 
 ### 2. Update Setup Commands
 
-```markdown
-## Setup
+Replace the commands below with your project's actual setup steps:
 
+**Node.js / TypeScript projects:**
 ```bash
 # Install dependencies
-# TODO: Replace with your commands
-pnpm install | cargo build | pip install -r requirements.txt
+pnpm install
 
 # Start dev server
-# TODO: Replace with your commands
-pnpm dev | cargo run | python main.py
+pnpm dev
 ```
+
+**Rust projects:**
+```bash
+# Build the project
+cargo build
+
+# Run the application
+cargo run
+```
+
+**Python projects:**
+```bash
+# Install dependencies (virtual environment recommended)
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# Run the application
+python main.py
 ```
 
 ### 3. Add Language-Specific Style

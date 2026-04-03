@@ -5,7 +5,6 @@
       "id": 1,
       "prompt": "Check my bash script scripts/deploy.sh for errors",
       "expected_output": "The agent runs shellcheck on the script, reports any warnings or errors, and suggests fixes for common issues like SC2086 (unquoted variables), SC2155 (declare and assign separately), SC2181 (check exit code directly).",
-      "files": ["scripts/deploy.sh"],
       "assertions": [
         "The agent runs shellcheck on the script",
         "The agent reports specific warning codes and explanations",

@@ -4,6 +4,25 @@
 > Supported by: Claude Code, Windsurf, Gemini CLI, Codex, Copilot, OpenCode, Devin, Amp, Zed, Warp, RooCode, Jules or reference with @AGENTS.md in cli .md
 > See the open spec: https://agents.md
 
+## Named Constants
+
+```bash
+# File size limits (lines)
+readonly MAX_LINES_PER_SOURCE_FILE=500
+readonly MAX_LINES_PER_SKILL_MD=250
+
+# Retry and polling configuration
+readonly DEFAULT_MAX_RETRIES=3
+readonly DEFAULT_RETRY_DELAY_SECONDS=5
+readonly DEFAULT_POLL_INTERVAL_SECONDS=5
+readonly DEFAULT_MAX_POLL_ATTEMPTS=12
+readonly DEFAULT_TIMEOUT_SECONDS=1800
+
+# Git/PR configuration
+readonly MAX_COMMIT_SUBJECT_LENGTH=72
+readonly MAX_PR_TITLE_LENGTH=72
+```
+
 ## Project Overview
 
 Production-ready template for AI agent-powered development with Claude Code, Gemini CLI, OpenCode, and more.
@@ -33,14 +52,14 @@ Always run the full quality gate before committing. Fix all errors before finish
 
 ## Code Style
 
-- **Max 500 lines per source file** - split into focused sub-modules if exceeded
-- **Max 250 lines per SKILL.md** - move detailed content to `references/` folder
+- **Max `${MAX_LINES_PER_SOURCE_FILE}` lines per source file** - split into focused sub-modules if exceeded
+- **Max `${MAX_LINES_PER_SKILL_MD}` lines per SKILL.md** - move detailed content to `references/` folder
 - **SKILL.md must start with frontmatter** (--- on line 1, no content before)
 - **Required frontmatter fields**: `name`, `description`
 - **Recommended frontmatter fields**: `license`
 - Conventional Commits: `feat:`, `fix:`, `docs:`, `ci:`, `test:`, `refactor:`
 - All public APIs must be documented
-- No hardcoded magic numbers - use named constants or config
+- **No hardcoded magic numbers** - use named constants (see Named Constants section above) or config
 - Render architecture diagrams as fenced ```mermaid``` blocks, never raw ASCII art
 - Shell scripts: Use `shellcheck` for linting, `bats` for testing
 - Markdown: Use `markdownlint` for consistency
@@ -64,7 +83,7 @@ Always run the full quality gate before committing. Fix all errors before finish
 ├── .agents/
 │   └── skills/            # CANONICAL skill source - all agents read from here
 │       └── <skill-name>/
-│           ├── SKILL.md   # <= 250 lines, frontmatter required
+│           ├── SKILL.md   # <= ${MAX_LINES_PER_SKILL_MD} lines, frontmatter required
 │           ├── evals/     # Test cases (evals.json)
 │           ├── reference/ # Detailed docs linked from SKILL.md
 │           ├── scripts/   # Executable scripts
@@ -101,7 +120,7 @@ Always run the full quality gate before committing. Fix all errors before finish
 
 ## PR Instructions
 
-- Title format: `[type(scope)] short description`
+- Title format: `[type(scope)] short description` (max `${MAX_PR_TITLE_LENGTH}` chars)
 - Always run lint and tests before committing
 - Create a new branch per feature/fix - never commit directly to `main`
 - Keep PRs focused; one concern per PR
@@ -117,6 +136,46 @@ Always run the full quality gate before committing. Fix all errors before finish
 ### Plan Before Executing
 For non-trivial tasks: produce a written plan first, pause, and wait for confirmation
 before writing code.
+
+### Atomic Commit Policy (REQUIRED)
+**ALL changes MUST be committed using the atomic commit workflow.** Never use manual `git commit` or `git push` directly.
+
+```bash
+# 1. Create and checkout a feature branch
+git checkout -b feat/your-feature-name
+
+# 2. Make your changes
+
+# 3. Run atomic commit (validates, commits, pushes, creates PR, verifies)
+./scripts/atomic-commit/run.sh
+
+# 4. If checks fail, fix issues and retry
+```
+
+**The atomic commit workflow:**
+1. Validates code (quality gate)
+2. Creates conventional commit
+3. Pushes to remote
+4. Creates PR automatically
+5. Watches CI checks
+6. **Rolls back on failure** (zero-tolerance policy)
+
+### Pre-Existing Issue Policy (REQUIRED)
+**ALL pre-existing issues MUST be fixed before completing a task.** This includes:
+
+- **Lint warnings** (shellcheck, markdownlint, etc.)
+- **Test failures** (even if unrelated to your changes)
+- **Security warnings** (dependency vulnerabilities, secrets detection)
+- **Documentation gaps** (broken links, missing files)
+- **Code style violations** (magic numbers, formatting issues)
+
+**Process:**
+1. Run quality gate before starting: `./scripts/quality_gate.sh`
+2. Note all failures (even in files you won't modify)
+3. Fix ALL issues as part of your task
+4. Run quality gate again to confirm zero issues
+
+**Rationale:** Pre-existing issues compound over time. The "not my code" mentality creates technical debt. Every agent fixes the repo state before leaving.
 
 ### Skills: Single Source in .agents/skills/
 All skills live canonically in `.agents/skills/`. Claude Code and Gemini CLI use
