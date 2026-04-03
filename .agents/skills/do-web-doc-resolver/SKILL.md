@@ -6,7 +6,7 @@ compatibility: Python 3.10+, async/await
 allowed-tools: Bash(python:*|do-wdr:*) Read
 metadata:
   author: d-oit
-  version: "0.2.0"
+  version: "0.2.1"
   source: https://github.com/d-oit/do-web-doc-resolver
 ---
 
