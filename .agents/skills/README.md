@@ -44,4 +44,5 @@ Validate symlinks are intact:
 | [`skill-creator/`](skill-creator/) | Create new skills with proper structure and best practices |
 | [`task-decomposition/`](task-decomposition/) | Break complex tasks into manageable steps |
 | [`do-web-doc-resolver/`](do-web-doc-resolver/) | Intelligent web doc resolver with Python/Rust CLI, semantic cache, and multi-provider cascade |
+| [`ui-ux-optimize/`](ui-ux-optimize/) | Swarm-powered UI/UX prompt optimizer with auto-research, handoff coordination, and autoresearch loops |
 | [`web-search-researcher/`](web-search-researcher/) | Research topics using web search with systematic methodology |
