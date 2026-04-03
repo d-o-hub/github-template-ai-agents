@@ -67,23 +67,25 @@ jobs:
           if [ ! -s shellcheck-results.sarif ] || \
              [ "$(wc -l < shellcheck-results.sarif)" -lt 5 ]; then
             # Build empty SARIF JSON line by line
-            echo '{' > shellcheck-results.sarif
-            echo '  "\$schema": "https://raw.githubusercontent.com' \
-                 '/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",' \
-                 >> shellcheck-results.sarif
-            echo '  "version": "2.1.0",' >> shellcheck-results.sarif
-            echo '  "runs": [' >> shellcheck-results.sarif
-            echo '    {' >> shellcheck-results.sarif
-            echo '      "tool": {' >> shellcheck-results.sarif
-            echo '        "driver": {' >> shellcheck-results.sarif
-            echo '          "name": "shellcheck",' >> shellcheck-results.sarif
-            echo '          "informationUri": "https://www.shellcheck.net/"' >> shellcheck-results.sarif
-            echo '        }' >> shellcheck-results.sarif
-            echo '      },' >> shellcheck-results.sarif
-            echo '      "results": []' >> shellcheck-results.sarif
-            echo '    }' >> shellcheck-results.sarif
-            echo '  ]' >> shellcheck-results.sarif
-            echo '}' >> shellcheck-results.sarif
+            # shellcheck disable=SC2129
+            {
+              echo '{'
+              echo '  "\$schema": "https://raw.githubusercontent.com' \
+                   '/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",'
+              echo '  "version": "2.1.0",'
+              echo '  "runs": ['
+              echo '    {'
+              echo '      "tool": {'
+              echo '        "driver": {'
+              echo '          "name": "shellcheck",'
+              echo '          "informationUri": "https://www.shellcheck.net/"'
+              echo '        }'
+              echo '      },'
+              echo '      "results": []'
+              echo '    }'
+              echo '  ]'
+              echo '}'
+            } > shellcheck-results.sarif
           fi
 
       - name: Upload ShellCheck SARIF
