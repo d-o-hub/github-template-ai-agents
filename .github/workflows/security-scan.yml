@@ -65,7 +65,10 @@ jobs:
           fi
           # Ensure valid SARIF file exists (even if empty)
           if [ ! -s shellcheck-results.sarif ]; then
-            echo '{"$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","version":"2.1.0","runs":[]}' > shellcheck-results.sarif
+            # Create empty valid SARIF
+            echo '{"$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec' \
+              '/master/Schemata/sarif-schema-2.1.0.json","version":"2.1.0","runs":[]}' \
+              > shellcheck-results.sarif
           fi
 
       - name: Upload ShellCheck SARIF
@@ -268,7 +271,7 @@ jobs:
           trivy_result="${{ needs.trivy-fs.result }}"
           secret_result="${{ needs.secret-detection.result }}"
           codeql_result="${{ needs.codeql.result }}"
-          
+
           # Normalize results (skipped is OK)
           if [[ "$shellcheck_result" == "failure" ]] || \
              [[ "$trivy_result" == "failure" ]] || \
