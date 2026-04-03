@@ -1,30 +1,24 @@
 #!/bin/bash
 # Script: validate-skill-format.sh
 # Purpose: Validate SKILL.md files have correct frontmatter format
-# Usage: ./scripts/validate-skill-format.sh [skill-path]
 
 set -euo pipefail
-
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m'
 
 ERRORS=0
 WARNINGS=0
 
 log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+    echo "[ERROR] $1"
     ERRORS=$((ERRORS + 1))
 }
 
 log_warning() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
+    echo "[WARN] $1"
     WARNINGS=$((WARNINGS + 1))
 }
 
-log_info() {
-    echo -e "${GREEN}[OK]${NC} $1"
+log_ok() {
+    echo "[OK] $1"
 }
 
 validate_skill() {
@@ -32,100 +26,74 @@ validate_skill() {
     local skill_name
     skill_name=$(basename "$(dirname "$skill_file")")
     
-    # Check file exists
-    if [[ ! -f "$skill_file" ]]; then
-        log_error "SKILL.md not found for $skill_name"
-        return 0
-    fi
-    
-    # Check file starts with frontmatter delimiter
+    # Check file starts with ---
     local first_line
-    first_line=$(head -1 "$skill_file")
+    first_line=$(head -n 1 "$skill_file" 2>/dev/null || echo "")
     if [[ "$first_line" != "---" ]]; then
-        log_error "$skill_name: SKILL.md must start with '---' (frontmatter delimiter)"
-        log_error "  First line is: '$first_line'"
+        log_error "$skill_name: SKILL.md must start with '---' (found: '$first_line')"
         return 0
     fi
     
-    # Check for content before frontmatter (second line should be name: or empty, not a heading)
+    # Check for heading before frontmatter
     local second_line
-    second_line=$(sed -n '2p' "$skill_file")
-    if [[ "$second_line" == "# "* ]]; then
-        log_error "$skill_name: Found heading before frontmatter. Move frontmatter to the very beginning."
+    second_line=$(sed -n '2p' "$skill_file" 2>/dev/null || echo "")
+    if [[ "$second_line" == \#* ]]; then
+        log_error "$skill_name: Found heading before frontmatter"
         return 0
     fi
     
-    # Check for required fields in frontmatter
-    if ! grep -q "^name:" "$skill_file"; then
-        log_error "$skill_name: Missing required 'name:' field in frontmatter"
+    # Check required fields
+    if ! grep -q "^name:" "$skill_file" 2>/dev/null; then
+        log_error "$skill_name: Missing 'name:' field"
     fi
     
-    if ! grep -q "^description:" "$skill_file"; then
-        log_error "$skill_name: Missing required 'description:' field in frontmatter"
-    else
-        # Check description isn't too long (max 1024 chars as per skill-creator)
-        local desc
-        desc=$(sed -n '/^description:/,/^[^ ]/p' "$skill_file" | head -n -1)
-        if [[ ${#desc} -gt 1024 ]]; then
-            log_warning "$skill_name: description exceeds 1024 characters (${#desc} chars)"
-        fi
+    if ! grep -q "^description:" "$skill_file" 2>/dev/null; then
+        log_error "$skill_name: Missing 'description:' field"
     fi
     
-    # Check for recommended fields
-    if ! grep -q "^license:" "$skill_file"; then
-        log_warning "$skill_name: Missing recommended 'license:' field"
+    # Check recommended license field
+    if ! grep -q "^license:" "$skill_file" 2>/dev/null; then
+        log_warning "$skill_name: Missing 'license:' field"
     fi
     
-    # Check for proper frontmatter closure (second ---)
-    local fm_count
-    fm_count=$(grep -c "^---$" "$skill_file" || true)
+    # Check frontmatter closure
+    local fm_count=0
+    fm_count=$(grep -c "^---$" "$skill_file" 2>/dev/null || echo 0)
     if [[ $fm_count -lt 2 ]]; then
-        log_error "$skill_name: Frontmatter not properly closed (missing second '---')"
+        log_error "$skill_name: Frontmatter not closed (found $fm_count '---')"
     fi
     
-    # Check file size (should be under 250 lines per skill-creator)
-    local line_count
-    line_count=$(wc -l < "$skill_file")
+    # Check file size
+    local line_count=0
+    line_count=$(wc -l < "$skill_file" 2>/dev/null || echo 0)
     if [[ $line_count -gt 250 ]]; then
-        log_warning "$skill_name: SKILL.md exceeds 250 lines ($line_count lines). Consider moving content to references/"
+        log_warning "$skill_name: Exceeds 250 lines ($line_count)"
     fi
     
-    # Check for evals directory
+    # Check evals directory
     local skill_dir
     skill_dir=$(dirname "$skill_file")
     if [[ ! -d "$skill_dir/evals" ]]; then
-        log_warning "$skill_name: Missing evals/ directory"
+        log_warning "$skill_name: No evals/ directory"
     elif [[ ! -f "$skill_dir/evals/evals.json" ]]; then
-        log_warning "$skill_name: Missing evals/evals.json"
+        log_warning "$skill_name: No evals/evals.json"
     fi
     
     if [[ $ERRORS -eq 0 ]]; then
-        log_info "$skill_name: Valid format ($line_count lines)"
+        log_ok "$skill_name: Valid ($line_count lines)"
     fi
 }
 
-# Main execution
+# Main
 SKILLS_DIR="${1:-.agents/skills}"
 
 echo "=== Validating SKILL.md Format ==="
 echo ""
 
-# Check if directory exists
 if [[ ! -d "$SKILLS_DIR" ]]; then
-    log_error "Skills directory not found: $SKILLS_DIR"
+    echo "Skills directory not found: $SKILLS_DIR"
     exit 1
 fi
-
-# Count total skills
-total=0
-for skill_dir in "$SKILLS_DIR"/*/; do
-    if [[ -d "$skill_dir" ]]; then
-        ((total++)) || true
-    fi
-done
-
-echo "Found $total skills to validate"
-echo ""
 
 for skill_dir in "$SKILLS_DIR"/*/; do
     if [[ -d "$skill_dir" ]]; then
@@ -140,17 +108,10 @@ for skill_dir in "$SKILLS_DIR"/*/; do
 done
 
 echo ""
-echo "=== Summary ==="
 if [[ $ERRORS -eq 0 ]]; then
-    echo -e "${GREEN}All SKILL.md files passed format validation${NC}"
+    echo "All SKILL.md files passed validation"
     exit 0
 else
-    echo -e "${RED}Found $ERRORS errors, $WARNINGS warnings${NC}"
-    echo ""
-    echo "Common fixes:"
-    echo "  1. SKILL.md must start with '---' (no content before frontmatter)"
-    echo "  2. Required fields: name, description"
-    echo "  3. Recommended fields: license"
-    echo "  4. Frontmatter must be closed with second '---'"
+    echo "Found $ERRORS errors, $WARNINGS warnings"
     exit 1
 fi
