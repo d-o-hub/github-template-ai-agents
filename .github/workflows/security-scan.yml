@@ -1,0 +1,254 @@
+---
+name: Security Scan
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # Run every Sunday at 00:00 UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  # ============================================================================
+  # SHELL SCRIPT SECURITY SCAN
+  # Scan all bash/shell scripts for security vulnerabilities using shellcheck
+  # ============================================================================
+  shellcheck-security:
+    name: Shell Script Security Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run ShellCheck with Security Focus
+        uses: ludeeus/action-shellcheck@master
+        with:
+          severity: warning
+          format: tty
+          check_together: 'yes'
+          scandir: './scripts'
+        env:
+          # Enable additional security checks
+          SHELLCHECK_OPTS: >-
+            --shell=bash
+            --enable=add-default-case,avoid-nullary-conditions,deprecate-which
+            --enable=check-unassigned-uppercase,quote-safe-variables
+
+      - name: ShellCheck SARIF Output
+        if: always()
+        run: |
+          # Run shellcheck again to generate SARIF for GitHub Security tab
+          docker run --rm -v "${PWD}:/src" \
+            koalaman/shellcheck:stable \
+            -f sarif \
+            -s bash \
+            -S warning \
+            /src/scripts/*.sh \
+            /src/.agents/skills/*/scripts/*.sh \
+            > shellcheck-results.sarif 2>/dev/null || true
+
+      - name: Upload ShellCheck SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: shellcheck-results.sarif
+          category: shellcheck
+
+  # ============================================================================
+  # TRIVY FILESYSTEM SCAN
+  # Scan repository for secrets, misconfigurations, and vulnerabilities
+  # ============================================================================
+  trivy-fs:
+    name: Trivy Filesystem Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
+          ignore-unfixed: true
+
+      - name: Upload Trivy SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-fs
+
+  # ============================================================================
+  # SECRET DETECTION
+  # Scan for leaked secrets, API keys, and credentials
+  # ============================================================================
+  secret-detection:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Secret Detection with GitLeaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}  # Optional: for commercial features
+
+      - name: Fallback Secret Scan with TruffleHog
+        if: failure()
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  # ============================================================================
+  # CODEQL ANALYSIS
+  # GitHub's semantic code analysis engine (limited for shell, but useful)
+  # ============================================================================
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript  # Closest match for shell/bash analysis
+          queries: security-extended,security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript"
+
+  # ============================================================================
+  # DEPENDENCY REVIEW
+  # Review dependency changes for vulnerabilities (PRs only)
+  # ============================================================================
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: true
+          deny-licenses: GPL-1.0-or-later, AGPL-1.0-or-later
+
+  # ============================================================================
+  # INFRASTRUCTURE AS CODE SCAN
+  # Scan GitHub Actions workflows and other IaC for misconfigurations
+  # ============================================================================
+  iac-scan:
+    name: Infrastructure as Code Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan GitHub Actions with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: '.github/workflows/'
+          severity: 'CRITICAL,HIGH'
+          format: 'sarif'
+          output: 'trivy-config-results.sarif'
+          exit-code: '0'  # Don't fail, just report
+          ignore-unfixed: true
+
+      - name: Upload IaC Scan SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-config-results.sarif
+          category: trivy-config
+
+  # ============================================================================
+  # AGGREGATE SECURITY REPORT
+  # Summarize all security scan results
+  # ============================================================================
+  security-summary:
+    name: Security Scan Summary
+    runs-on: ubuntu-latest
+    needs:
+      - shellcheck-security
+      - trivy-fs
+      - secret-detection
+      - codeql
+      - iac-scan
+    if: always()
+    steps:
+      - name: Generate Security Report
+        run: |
+          echo "=========================================="
+          echo "     🔒 SECURITY SCAN SUMMARY"
+          echo "=========================================="
+          echo ""
+          echo "Job Results:"
+          echo "  • ShellCheck Security: ${{ needs.shellcheck-security.result }}"
+          echo "  • Trivy Filesystem: ${{ needs.trivy-fs.result }}"
+          echo "  • Secret Detection: ${{ needs.secret-detection.result }}"
+          echo "  • CodeQL Analysis: ${{ needs.codeql.result }}"
+          echo "  • IaC Scan: ${{ needs.iac-scan.result }}"
+          echo ""
+
+          # Check for failures
+          if [[ "${{ needs.shellcheck-security.result }}" == "failure" ]] || \
+             [[ "${{ needs.trivy-fs.result }}" == "failure" ]] || \
+             [[ "${{ needs.secret-detection.result }}" == "failure" ]] || \
+             [[ "${{ needs.codeql.result }}" == "failure" ]]; then
+            echo "❌ CRITICAL/HIGH vulnerabilities detected!"
+            echo "   Review the Security tab for details."
+            exit 1
+          else
+            echo "✅ All security checks passed or were warnings only."
+          fi
+          echo ""
+          echo "All scan results available in the Security tab:"
+          echo "  https://github.com/${{ github.repository }}/security/code-scanning"

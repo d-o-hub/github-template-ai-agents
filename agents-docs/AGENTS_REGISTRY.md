@@ -16,7 +16,7 @@ Agents are organized by CLI tool and purpose.
 | `analysis-swarm` | Claude Code | Multi-persona code analysis orchestrator using RYAN (methodi | Read, Glob, Grep, Bash |
 | `goap-agent` | Claude Code | Invoke for complex multi-step tasks requiring intelligent pl | Task, Read, Glob, Grep, TodoWrite |
 | `loop-agent` | Claude Code | Execute workflow agents iteratively for refinement and progr | Task, Read, TodoWrite, Glob, Grep |
-| `agent-name` | OpenCode | Create new opencode agents with proper format, YAML frontmat |  |
+| `create-agent` | OpenCode | Create new opencode agents with proper format, YAML frontmat |  |
 | `git-worktree-manager` | OpenCode | Manage git worktrees for efficient multi-branch development. |  |
 | `github-action-editor` | OpenCode | Edit and create GitHub Actions workflows and composite actio |  |
 
@@ -41,7 +41,7 @@ See [`SKILLS.md`](SKILLS.md) for authoring guide.
 | `privacy-first` | `.agents/skills/privacy-first` | Prevent email addresses and personal data from entering the  |
 | `shell-script-quality` | `.agents/skills/shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use w |
 | `skill-creator` | `.agents/skills/skill-creator` | Create new skills, modify and improve existing skills, and m |
-| `skill-evaluator` | `.agents/skills/skill-evaluator` | "Reusable skill for evaluating other skills with structure c |
+| `skill-evaluator` | `.agents/skills/skill-evaluator` | Reusable skill for evaluating other skills with structure c |
 | `task-decomposition` | `.agents/skills/task-decomposition` | Break down complex tasks into atomic, actionable goals with  |
 | `triz-solver` | `.agents/skills/triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive P |
 | `ui-ux-optimize` | `.agents/skills/ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research agen |

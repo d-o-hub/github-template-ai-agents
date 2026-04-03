@@ -36,6 +36,7 @@ VERBOSE="${VERBOSE:-true}"
 REMOTE="${REMOTE:-origin}"
 POLL_INTERVAL="${POLL_INTERVAL:-5}"
 MAX_RETRIES="${MAX_RETRIES:-3}"
+RETRY_DELAY="${RETRY_DELAY:-5}"
 
 # State tracking
 STASHED="${STASHED:-false}"
@@ -384,7 +385,7 @@ rebase_changes() {
     return "$EXIT_SUCCESS"
 }
 
-# Push changes to remote
+# Push changes to remote with retry logic
 push_changes() {
     log_section "Pushing to Remote"
     
@@ -402,28 +403,63 @@ push_changes() {
     
     log_info "Pushing ${TARGET_BRANCH} to ${REMOTE}..."
     
+    local retry_count=0
+    local push_success=false
     local push_output
     local push_exit=0
     
-    if ! push_output=$(git push "${push_args[@]}" 2>&1); then
-        push_exit=$?
+    while [[ $retry_count -lt $MAX_RETRIES ]] && [[ "$push_success" == "false" ]]; do
+        push_exit=0
         
-        log_error "Push failed"
-        echo "$push_output" >&2
+        if [[ $retry_count -gt 0 ]]; then
+            log_info "Retry attempt $retry_count/$MAX_RETRIES after ${RETRY_DELAY}s..."
+            sleep "$RETRY_DELAY"
+        fi
         
-        # Analyze failure reason
+        if push_output=$(git push "${push_args[@]}" 2>&1); then
+            push_success=true
+            log_success "Push successful"
+        else
+            push_exit=$?
+            retry_count=$((retry_count + 1))
+            
+            if [[ $retry_count -lt $MAX_RETRIES ]]; then
+                log_warning "Push failed (exit $push_exit), will retry..."
+                
+                # Analyze failure reason for specific handling
+                if echo "$push_output" | grep -q "rejected"; then
+                    log_info "Push was rejected - remote has new commits"
+                    log_info "Attempting to fetch and rebase before retry..."
+                    
+                    # Auto-retry with fetch and rebase
+                    if git fetch "$REMOTE" 2>/dev/null && \
+                       git rebase "${REMOTE}/${TARGET_BRANCH}" 2>/dev/null; then
+                        log_success "Rebased onto ${REMOTE}/${TARGET_BRANCH}"
+                    else
+                        log_warning "Auto-rebase failed, manual intervention may be needed"
+                    fi
+                elif echo "$push_output" | grep -q "lease"; then
+                    log_info "Force-with-lease prevented push - remote has changed"
+                fi
+            else
+                log_error "Push failed after $MAX_RETRIES attempts"
+                echo "$push_output" >&2
+            fi
+        fi
+    done
+    
+    if [[ "$push_success" == "false" ]]; then
+        log_error "All retry attempts exhausted"
+        
+        # Final failure analysis
         if echo "$push_output" | grep -q "rejected"; then
-            log_info "Push was rejected - remote has new commits"
-            log_info "Run sync-and-push.sh again to rebase and retry"
+            log_info "Remote has diverged - run sync-and-push.sh again to rebase and retry"
         elif echo "$push_output" | grep -q "lease"; then
-            log_info "Force-with-lease prevented push - remote has changed"
-            log_info "Review changes and retry if appropriate"
+            log_info "Force-with-lease prevented push - review changes and retry if appropriate"
         fi
         
         return "$EXIT_FAILURE"
     fi
-    
-    log_success "Push successful"
     
     # Extract push details
     if echo "$push_output" | grep -q "remote:"; then
