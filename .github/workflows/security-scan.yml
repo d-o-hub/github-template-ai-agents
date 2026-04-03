@@ -64,13 +64,26 @@ jobs:
               > shellcheck-results.sarif 2>/dev/null || true
           fi
           # Ensure valid SARIF file exists (even if empty)
-          if [ ! -s shellcheck-results.sarif ] || [ "$(wc -l < shellcheck-results.sarif)" -lt 5 ]; then
-            # Build SARIF JSON using jq to avoid long lines
-            schema_url="https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json"
-            jq -n \
-              --arg schema "${schema_url}" \
-              '{"$schema": $schema, "version": "2.1.0", "runs": [{"tool": {"driver": {"name": "shellcheck", "informationUri": "https://www.shellcheck.net/"}}, "results": []}]}' \
-              > shellcheck-results.sarif
+          if [ ! -s shellcheck-results.sarif ] || \
+             [ "$(wc -l < shellcheck-results.sarif)" -lt 5 ]; then
+            # Build empty SARIF using heredoc to avoid long lines
+            cat > shellcheck-results.sarif << 'SARIF_EOF'
+            {
+              "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+              "version": "2.1.0",
+              "runs": [
+                {
+                  "tool": {
+                    "driver": {
+                      "name": "shellcheck",
+                      "informationUri": "https://www.shellcheck.net/"
+                    }
+                  },
+                  "results": []
+                }
+              ]
+            }
+            SARIF_EOF
           fi
 
       - name: Upload ShellCheck SARIF
