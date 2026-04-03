@@ -279,15 +279,22 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
 
     if command -v shellcheck &> /dev/null; then
         # Find all shell scripts and check them
-        SHELL_SCRIPTS=$(find . -name "*.sh" -not -path "./.git/*" -not -path "./target/*" 2>/dev/null)
+        SHELL_SCRIPTS=$(find . -name "*.sh" -not -path "./.git/*" -not -path "./target/*" 2>/dev/null || true)
         if [ -n "$SHELL_SCRIPTS" ]; then
-            # Run shellcheck, exclude info-level warnings (SC2034: unused variables)
-            if ! OUTPUT=$(echo "$SHELL_SCRIPTS" | xargs shellcheck -e SC2034 2>&1); then
-                echo -e "${RED}  ✗ shellcheck failed${NC}"
-                echo "$OUTPUT" >&2
-                FAILED=1
-            else
+            # Run shellcheck with proper error handling
+            local sc_failed=0
+            while IFS= read -r script; do
+                [ -n "$script" ] || continue
+                if ! shellcheck -e SC2034 "$script" 2>/dev/null; then
+                    echo -e "${RED}  ✗ shellcheck failed: $script${NC}"
+                    sc_failed=1
+                fi
+            done <<< "$SHELL_SCRIPTS"
+            
+            if [ $sc_failed -eq 0 ]; then
                 echo -e "${GREEN}  ✓ shellcheck passed${NC}"
+            else
+                FAILED=1
             fi
         fi
     else
