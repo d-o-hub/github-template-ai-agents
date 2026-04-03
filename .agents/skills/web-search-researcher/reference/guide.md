@@ -954,7 +954,7 @@ Recommendation: Consult project maintainers or experiment empirically.
 - **feature-implement**: Research API documentation and best practices before implementation
 - **debug-troubleshoot**: Search for similar error patterns and solutions
 - **architecture-validation**: Research architectural patterns and trade-offs
-- **web-doc-resolver**: Use for fetching specific URLs identified during research
+- **do-web-doc-resolver**: Use for fetching specific URLs identified during research
 
 ## Best Practices Summary
 

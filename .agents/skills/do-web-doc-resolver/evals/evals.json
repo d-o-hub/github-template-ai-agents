@@ -3,90 +3,45 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "I need to fetch the documentation for the Rust Tokio library. What's the best way to do this?",
-      "expected_output": "The agent recommends using the web-doc-resolver skill with URL resolution cascade: first check for llms.txt at docs.rs, then Jina Reader (free), then direct fetch. Mentions that Exa MCP is free for query-based lookups.",
-      "files": [],
+      "prompt": "Resolve this URL to markdown: https://docs.rs/tokio",
+      "expected_output": "Markdown documentation extracted from the tokio docs URL, with quality score and source provider info.",
       "assertions": [
-        "The agent identifies this as a URL resolution task",
-        "The agent recommends the free-first cascade approach",
-        "The agent mentions llms.txt or Jina Reader as free options"
+        "Output contains markdown content",
+        "Output includes source provider name",
+        "Output includes quality score between 0.0 and 1.0",
+        "Content is at least 100 characters"
       ]
     },
     {
       "id": 2,
-      "prompt": "I want to search for best practices on Python async programming, but I don't have any API keys configured. Can this still work?",
-      "expected_output": "The agent confirms that the resolver works without API keys using free providers: Exa MCP (free, no key), DuckDuckGo (free), and llms.txt probes. Mentions the 'free' execution profile.",
-      "files": [],
+      "prompt": "Search for information about Rust async runtime comparison",
+      "expected_output": "Markdown content about Rust async runtimes from a web search provider.",
       "assertions": [
-        "The agent confirms zero-key operation is supported",
-        "The agent mentions Exa MCP or DuckDuckGo as free options",
-        "The agent mentions the 'free' execution profile or free-first approach"
+        "Output contains markdown content about Rust",
+        "Output mentions async or runtime",
+        "Output includes source provider name",
+        "Content is at least 200 characters"
       ]
     },
     {
       "id": 3,
-      "prompt": "My resolver keeps hitting rate limits on Exa. How does the circuit breaker handle this?",
-      "expected_output": "The agent explains the circuit breaker pattern: 3 consecutive failures trigger a 5-minute cooldown, provider is skipped until cooldown expires, successful call resets the failure count. Mentions automatic fallback to next provider.",
-      "files": [],
+      "prompt": "Resolve https://github.com/rust-lang/rust with max 2000 chars",
+      "expected_output": "Truncated markdown from GitHub page, under 2000 chars.",
       "assertions": [
-        "The agent explains the circuit breaker mechanism",
-        "The agent mentions the cooldown period (5 minutes/300 seconds)",
-        "The agent explains automatic fallback behavior"
+        "Output contains markdown content",
+        "Content is under 3000 characters (truncation working)",
+        "Output includes source provider name"
       ]
     },
     {
       "id": 4,
-      "prompt": "I need high-quality research results and don't mind paying for API calls. Which profile should I use?",
-      "expected_output": "The agent recommends the 'quality' execution profile which allows 3-5 paid providers, 6-10 attempts, and has a lower quality threshold (0.55) for accepting more comprehensive results. Mentions Tavily, Exa SDK, and Mistral as paid options.",
-      "files": [],
+      "prompt": "Use the free profile to resolve a query about Python web frameworks",
+      "expected_output": "Markdown about Python web frameworks using only free providers.",
       "assertions": [
-        "The agent recommends the 'quality' profile",
-        "The agent mentions higher provider attempts and paid provider allowance",
-        "The agent lists available paid providers"
-      ]
-    },
-    {
-      "id": 5,
-      "prompt": "What's the difference between the URL resolution cascade and the query resolution cascade?",
-      "expected_output": "The agent explains that URL cascade checks for structured content (llms.txt, Jina Reader) and document types (PDF, DOCX), while query cascade uses search providers (Exa MCP, DuckDuckGo). Both use free-first approach with paid fallbacks.",
-      "files": [],
-      "assertions": [
-        "The agent distinguishes between URL and query input types",
-        "The agent mentions llms.txt/Jina for URLs",
-        "The agent mentions search providers for queries"
-      ]
-    },
-    {
-      "id": 6,
-      "prompt": "How does the routing memory feature work?",
-      "expected_output": "The agent explains that routing memory tracks per-domain provider performance (success rate, latency, quality scores) and uses this data to rank providers for future requests to the same domain.",
-      "files": [],
-      "assertions": [
-        "The agent explains per-domain tracking",
-        "The agent mentions success rate, latency, or quality metrics",
-        "The agent explains how this improves future requests"
-      ]
-    },
-    {
-      "id": 7,
-      "prompt": "I want to resolve documentation but limit the output to 5000 characters. How do I configure this?",
-      "expected_output": "The agent mentions setting WEB_RESOLVER_MAX_CHARS=5000 environment variable or using --max-chars 5000 in the CLI. Explains content compaction removes boilerplate.",
-      "files": [],
-      "assertions": [
-        "The agent mentions the max_chars configuration option",
-        "The agent provides the environment variable or CLI flag",
-        "The agent mentions content compaction or boilerplate removal"
-      ]
-    },
-    {
-      "id": 8,
-      "prompt": "What providers are available and which ones are free?",
-      "expected_output": "The agent lists providers organized by type (URL vs query) and marks free ones: Exa MCP, DuckDuckGo, llms.txt, Jina Reader, Direct Fetch are free. Exa SDK, Tavily, Serper, Firecrawl, Mistral are paid.",
-      "files": [],
-      "assertions": [
-        "The agent lists available providers",
-        "The agent correctly identifies free vs paid providers",
-        "The agent organizes by URL or query type"
+        "Output contains markdown content",
+        "Output mentions Python or web framework",
+        "Output includes source provider name",
+        "Provider used is a free provider (exa_mcp, jina, duckduckgo, llms_txt, or direct_fetch)"
       ]
     }
   ]
