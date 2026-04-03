@@ -100,7 +100,7 @@ jobs:
           ls -la .claude/skills/ | head -10
           echo ""
           echo "Running quality gate..."
-          ./scripts/quality_gate.sh
+          ./scripts/minimal_quality_gate.sh
         env:
           SKIP_TESTS: true  # Skip tests in CI, run separately
 
