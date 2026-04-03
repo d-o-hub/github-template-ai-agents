@@ -2,7 +2,8 @@
 # Validates all CLI skill symlinks and SKILL.md files.
 # Used in pre-commit hook and CI. Exit 2 on failure (surfaced to agent).
 # Note: OpenCode reads directly from .agents/skills/ - no symlinks to validate.
-# NOTE: We don't use set -e because it has unpredictable behavior in CI
+# NOTE: errexit disabled explicitly - it causes unpredictable failures in CI
+set +e
 set -uo pipefail
 
 # Color codes for output
