@@ -92,7 +92,15 @@ jobs:
           hashFiles('.agents/skills/*/pyproject.toml') != ''
 
       - name: Run quality gate
-        run: ./scripts/quality_gate.sh
+        run: |
+          echo "Setting up skills..."
+          ./scripts/setup-skills.sh
+          echo ""
+          echo "Verifying symlinks..."
+          ls -la .claude/skills/ | head -10
+          echo ""
+          echo "Running quality gate..."
+          ./scripts/quality_gate.sh
         env:
           SKIP_TESTS: true  # Skip tests in CI, run separately
 
