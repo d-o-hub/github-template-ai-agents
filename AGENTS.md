@@ -137,6 +137,46 @@ Always run the full quality gate before committing. Fix all errors before finish
 For non-trivial tasks: produce a written plan first, pause, and wait for confirmation
 before writing code.
 
+### Atomic Commit Policy (REQUIRED)
+**ALL changes MUST be committed using the atomic commit workflow.** Never use manual `git commit` or `git push` directly.
+
+```bash
+# 1. Create and checkout a feature branch
+git checkout -b feat/your-feature-name
+
+# 2. Make your changes
+
+# 3. Run atomic commit (validates, commits, pushes, creates PR, verifies)
+./scripts/atomic-commit/run.sh
+
+# 4. If checks fail, fix issues and retry
+```
+
+**The atomic commit workflow:**
+1. Validates code (quality gate)
+2. Creates conventional commit
+3. Pushes to remote
+4. Creates PR automatically
+5. Watches CI checks
+6. **Rolls back on failure** (zero-tolerance policy)
+
+### Pre-Existing Issue Policy (REQUIRED)
+**ALL pre-existing issues MUST be fixed before completing a task.** This includes:
+
+- **Lint warnings** (shellcheck, markdownlint, etc.)
+- **Test failures** (even if unrelated to your changes)
+- **Security warnings** (dependency vulnerabilities, secrets detection)
+- **Documentation gaps** (broken links, missing files)
+- **Code style violations** (magic numbers, formatting issues)
+
+**Process:**
+1. Run quality gate before starting: `./scripts/quality_gate.sh`
+2. Note all failures (even in files you won't modify)
+3. Fix ALL issues as part of your task
+4. Run quality gate again to confirm zero issues
+
+**Rationale:** Pre-existing issues compound over time. The "not my code" mentality creates technical debt. Every agent fixes the repo state before leaving.
+
 ### Skills: Single Source in .agents/skills/
 All skills live canonically in `.agents/skills/`. Claude Code and Gemini CLI use
 symlinks pointing back to `.agents/skills/`. OpenCode reads skills directly from
