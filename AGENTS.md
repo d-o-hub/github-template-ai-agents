@@ -24,6 +24,9 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 ```bash
 # Run quality gate (run before every commit)
 ./scripts/quality_gate.sh
+
+# Validate skill format
+./scripts/validate-skill-format.sh
 ```
 
 Always run the full quality gate before committing. Fix all errors before finishing a task.
@@ -31,6 +34,10 @@ Always run the full quality gate before committing. Fix all errors before finish
 ## Code Style
 
 - **Max 500 lines per source file** - split into focused sub-modules if exceeded
+- **Max 250 lines per SKILL.md** - move detailed content to `references/` folder
+- **SKILL.md must start with frontmatter** (--- on line 1, no content before)
+- **Required frontmatter fields**: `name`, `description`
+- **Recommended frontmatter fields**: `license`
 - Conventional Commits: `feat:`, `fix:`, `docs:`, `ci:`, `test:`, `refactor:`
 - All public APIs must be documented
 - No hardcoded magic numbers - use named constants or config
@@ -57,7 +64,8 @@ Always run the full quality gate before committing. Fix all errors before finish
 ├── .agents/
 │   └── skills/            # CANONICAL skill source - all agents read from here
 │       └── <skill-name>/
-│           ├── SKILL.md   # <= 250 lines
+│           ├── SKILL.md   # <= 250 lines, frontmatter required
+│           ├── evals/     # Test cases (evals.json)
 │           ├── reference/ # Detailed docs linked from SKILL.md
 │           ├── scripts/   # Executable scripts
 │           └── assets/    # Templates, examples
@@ -75,6 +83,7 @@ Always run the full quality gate before committing. Fix all errors before finish
 ├── scripts/
 │   ├── setup-skills.sh    # Creates all symlinks (run on clone)
 │   ├── validate-skills.sh # Validates all symlinks are intact
+│   ├── validate-skill-format.sh # Validates SKILL.md format
 │   ├── quality_gate.sh    # Full pre-commit quality gate
 │   ├── pre-commit-hook.sh # Git hook entry point
 │   ├── gh-labels-creator.sh # GitHub label initialization
@@ -114,6 +123,32 @@ All skills live canonically in `.agents/skills/`. Claude Code and Gemini CLI use
 symlinks pointing back to `.agents/skills/`. OpenCode reads skills directly from
 `.agents/skills/` - no symlinks needed. Run `./scripts/setup-skills.sh` after
 cloning to create symlinks for Claude Code and Gemini CLI. See `agents-docs/SKILLS.md`.
+
+### Available Skills
+
+| Skill | Description | Category |
+|-------|-------------|----------|
+| `agent-coordination` | Multi-agent orchestration (parallel, sequential, swarm) | Coordination |
+| `anti-ai-slop` | UI/UX audit to avoid generic AI aesthetic | UI/UX |
+| `api-design-first` | REST/GraphQL API design with OpenAPI specs | API Development |
+| `architecture-diagram` | Generate SVG architecture diagrams | Documentation |
+| `codeberg-api` | Interact with Codeberg/Forgejo repos | DevOps |
+| `do-web-doc-resolver` | Resolve web URLs to LLM-ready markdown | Research |
+| `docs-hook` | Git hook for docs sync | Documentation |
+| `github-readme` | Create human-focused READMEs | Documentation |
+| `goap-agent` | Goal-Oriented Action Planning execution | Coordination |
+| `intent-classifier` | Intelligent skill routing | Coordination |
+| `iterative-refinement` | Iterative improvement with validation loops | Quality |
+| `parallel-execution` | Parallel task execution | Coordination |
+| `privacy-first` | Prevent personal data in codebase | Security |
+| `security-code-auditor` | Security auditing and vulnerability detection | Security |
+| `shell-script-quality` | ShellCheck and BATS testing | Code Quality |
+| `skill-creator` | Create and optimize skills | Meta |
+| `skill-evaluator` | Evaluate skill structure and performance | Meta |
+| `task-decomposition` | Break down complex tasks | Planning |
+| `triz-solver` | TRIZ problem-solving methodology | Innovation |
+| `ui-ux-optimize` | UI/UX prompt optimizer with swarm | UI/UX |
+| `web-search-researcher` | Web search for current information | Research |
 
 ### Context Discipline
 - Delegate isolated research and analysis to sub-agents
