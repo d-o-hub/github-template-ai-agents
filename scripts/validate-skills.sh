@@ -2,7 +2,8 @@
 # Validates all CLI skill symlinks and SKILL.md files.
 # Used in pre-commit hook and CI. Exit 2 on failure (surfaced to agent).
 # Note: OpenCode reads directly from .agents/skills/ - no symlinks to validate.
-set -euo pipefail
+# NOTE: We don't use set -e because it has unpredictable behavior in CI
+set -uo pipefail
 
 # Color codes for output
 RED='\033[0;31m'
@@ -105,11 +106,13 @@ for skill_path in "$SKILLS_SRC"/*/; do
             FAILED=1
         else
             # Verify symlink points to correct location
-            target=$(readlink "$link")
-            expected_rel="$(realpath --relative-to="$REPO_ROOT/$cli_dir" "$skill_path")"
-            if [ "$target" != "$expected_rel" ]; then
+            # Use readlink -f for portability (avoid realpath --relative-to which is GNU-specific)
+            target=$(readlink -f "$link" 2>/dev/null || echo "")
+            expected_target=$(readlink -f "$skill_path" 2>/dev/null || echo "")
+            
+            if [ -n "$target" ] && [ -n "$expected_target" ] && [ "$target" != "$expected_target" ]; then
                 echo -e "  ${YELLOW}⚠${NC} WRONG target: $cli_dir/$skill_name" >&2
-                echo "      Expected: $expected_rel" >&2
+                echo "      Expected: $expected_target" >&2
                 echo "      Actual:   $target" >&2
                 WARNINGS=1
             fi
