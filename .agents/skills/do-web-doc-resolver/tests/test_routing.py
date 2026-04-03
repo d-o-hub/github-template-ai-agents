@@ -4,7 +4,7 @@ Tests for routing memory module.
 
 import pytest
 
-from ..scripts.routing_memory import RoutingMemory
+from scripts.routing_memory import RoutingMemory
 
 
 class TestRoutingMemoryInit:
