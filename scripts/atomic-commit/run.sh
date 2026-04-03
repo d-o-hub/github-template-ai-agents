@@ -91,22 +91,46 @@ generate_commit_message() {
     local type="$1"
     local files
     local scope=""
-    local description
+    local description=""
     
-    files=$(git diff --name-only)
+    # Get staged files first
+    files=$(git diff --cached --name-only 2>/dev/null || true)
     
-    # Determine scope from first directory
-    if echo "$files" | grep -q "/"; then
-        scope=$(echo "$files" | grep "/" | head -1 | cut -d'/' -f1)
+    # If no staged files, get unstaged
+    if [ -z "$files" ]; then
+        files=$(git diff --name-only 2>/dev/null || true)
     fi
     
-    # Generate description
+    # If still no files, check untracked
+    if [ -z "$files" ]; then
+        files=$(git ls-files --others --exclude-standard 2>/dev/null || true)
+    fi
+    
+    # Default if no files found
+    if [ -z "$files" ]; then
+        echo "$type: update repository"
+        return 0
+    fi
+    
+    # Determine scope from first directory
+    scope=$(echo "$files" | grep "/" | head -1 | cut -d'/' -f1)
+    
+    # Generate description based on file count
     local file_count
-    file_count=$(echo "$files" | wc -l)
-    if [ "$file_count" -eq 1 ]; then
-        description=$(echo "$files" | xargs basename)
-    else
-        description="update multiple files"
+    file_count=$(echo "$files" | grep -c '^' 2>/dev/null || echo "0")
+    
+    if [ "$file_count" -eq 1 ] || [ "$file_count" -eq 0 ]; then
+        # Single file - use filename
+        local filename
+        filename=$(echo "$files" | head -1)
+        if [ -n "$filename" ]; then
+            description=$(basename "$filename" 2>/dev/null || echo "$filename")
+        fi
+    fi
+    
+    # Default description if single file didn't work
+    if [ -z "$description" ]; then
+        description="update files"
     fi
     
     if [ -n "$scope" ]; then
