@@ -66,10 +66,12 @@ jobs:
           # Ensure valid SARIF file exists (even if empty)
           if [ ! -s shellcheck-results.sarif ] || \
              [ "$(wc -l < shellcheck-results.sarif)" -lt 5 ]; then
-            # Build empty SARIF using heredoc to avoid long lines
-            cat > shellcheck-results.sarif << 'SARIF_EOF'
+            # Build empty SARIF using heredoc
+            schema_url="https://raw.githubusercontent.com/oasis-tcs/sarif-spec"
+            schema_url="${schema_url}/master/Schemata/sarif-schema-2.1.0.json"
+            cat > shellcheck-results.sarif <<- 'SARIF_EOF'
             {
-              "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+              "$schema": "${schema_url}",
               "version": "2.1.0",
               "runs": [
                 {
