@@ -25,7 +25,7 @@ Agents are organized by CLI tool and purpose.
 ## Available Skills
 
 Skills are reusable knowledge modules with progressive disclosure.
-See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
+See [`SKILLS.md`](SKILLS.md) for authoring guide.
 
 | Skill | Location | Description |
 |-------|----------|-------------|
