@@ -50,14 +50,23 @@ jobs:
         if: always()
         run: |
           # Run shellcheck again to generate SARIF for GitHub Security tab
-          docker run --rm -v "${PWD}:/src" \
-            koalaman/shellcheck:stable \
-            -f sarif \
-            -s bash \
-            -S warning \
-            /src/scripts/*.sh \
-            /src/.agents/skills/*/scripts/*.sh \
-            > shellcheck-results.sarif 2>/dev/null || true
+          # Find all shell scripts first
+          find scripts .agents/skills -name "*.sh" -type f > /tmp/scripts.txt || true
+          if [ -s /tmp/scripts.txt ]; then
+            # Generate SARIF output
+            docker run --rm -v "${PWD}:/src" \
+              -v /tmp/scripts.txt:/tmp/scripts.txt \
+              koalaman/shellcheck:stable \
+              -f sarif \
+              -s bash \
+              -S warning \
+              $(cat /tmp/scripts.txt | sed 's|^|/src/|') \
+              > shellcheck-results.sarif 2>/dev/null || true
+          fi
+          # Ensure valid SARIF file exists (even if empty)
+          if [ ! -s shellcheck-results.sarif ]; then
+            echo '{"$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","version":"2.1.0","runs":[]}' > shellcheck-results.sarif
+          fi
 
       - name: Upload ShellCheck SARIF
         if: always()
@@ -127,7 +136,9 @@ jobs:
 
   # ============================================================================
   # CODEQL ANALYSIS
-  # GitHub's semantic code analysis engine (limited for shell, but useful)
+  # NOTE: CodeQL has limited support for shell/bash. This job is kept for
+  # future if JavaScript/TypeScript or Python is added to the project.
+  # Currently skipped as this is primarily a shell script repository.
   # ============================================================================
   codeql:
     name: CodeQL Analysis
@@ -142,16 +153,30 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check for JavaScript/Python files
+        id: check_files
+        run: |
+          # Check if there are any JS/TS or Python files to analyze
+          if find . -name "*.js" -o -name "*.ts" -o -name "*.py" | grep -q .; then
+            echo "has_codeql_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_codeql_files=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ No JavaScript/TypeScript/Python files found. Skipping CodeQL analysis."
+          fi
+
       - name: Initialize CodeQL
+        if: steps.check_files.outputs.has_codeql_files == 'true'
         uses: github/codeql-action/init@v3
         with:
-          languages: javascript  # Closest match for shell/bash analysis
+          languages: javascript,python
           queries: security-extended,security-and-quality
 
       - name: Autobuild
+        if: steps.check_files.outputs.has_codeql_files == 'true'
         uses: github/codeql-action/autobuild@v3
 
       - name: Perform CodeQL Analysis
+        if: steps.check_files.outputs.has_codeql_files == 'true'
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:javascript"
@@ -238,16 +263,22 @@ jobs:
           echo "  • IaC Scan: ${{ needs.iac-scan.result }}"
           echo ""
 
-          # Check for failures
-          if [[ "${{ needs.shellcheck-security.result }}" == "failure" ]] || \
-             [[ "${{ needs.trivy-fs.result }}" == "failure" ]] || \
-             [[ "${{ needs.secret-detection.result }}" == "failure" ]] || \
-             [[ "${{ needs.codeql.result }}" == "failure" ]]; then
+          # Check for failures (treat skipped as success)
+          shellcheck_result="${{ needs.shellcheck-security.result }}"
+          trivy_result="${{ needs.trivy-fs.result }}"
+          secret_result="${{ needs.secret-detection.result }}"
+          codeql_result="${{ needs.codeql.result }}"
+          
+          # Normalize results (skipped is OK)
+          if [[ "$shellcheck_result" == "failure" ]] || \
+             [[ "$trivy_result" == "failure" ]] || \
+             [[ "$secret_result" == "failure" ]] || \
+             [[ "$codeql_result" == "failure" ]]; then
             echo "❌ CRITICAL/HIGH vulnerabilities detected!"
             echo "   Review the Security tab for details."
             exit 1
           else
-            echo "✅ All security checks passed or were warnings only."
+            echo "✅ All security checks passed or were skipped."
           fi
           echo ""
           echo "All scan results available in the Security tab:"
