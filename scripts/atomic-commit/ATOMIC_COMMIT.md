@@ -1,8 +1,3 @@
----
-description: Atomic commit, push, PR with full CI verification - zero warnings tolerated
-subtask: false
----
-
 # Atomic Commit
 
 Atomic workflow: validate → commit → push → PR → verify. All changes committed as single unit with **zero warnings** policy.
@@ -34,10 +29,11 @@ stateDiagram-v2
 **Entry:** Uncommitted changes, on feature branch  
 **Operations:**
 ```bash
+./scripts/run-evals.py              # Run skill evaluations
 ./scripts/quality_gate.sh          # Must pass with zero warnings
 git secrets scan 2>/dev/null || true  # No secrets in diff
 ```
-**Success:** Quality gate exit 0, no secrets, not on protected branch  
+**Success:** All evals pass, quality gate exit 0, no secrets, not on protected branch  
 **Fail Action:** Abort, no changes made
 
 ### 2. COMMIT (Atomic)
@@ -102,6 +98,7 @@ gh pr checks --watch --interval 10  # 30 min timeout
 
 | Gate | Check | Treatment |
 |------|-------|-----------|
+| Evals | Skill evals pass | Block commit |
 | Pre-Commit | Quality gate | Warnings = Failures |
 | Lint | No warnings | Block commit |
 | Test | 100% pass | Block push |
@@ -136,16 +133,16 @@ type(scope): Brief description (50 chars max)
 
 ```bash
 # Basic - auto-detect type, commit all, push, PR, verify
-/atomic-commit
+./scripts/atomic-commit/run.sh
 
 # With message
-/atomic-commit --message "feat(auth): add OAuth2 flow"
+./scripts/atomic-commit/run.sh --message "feat(auth): add OAuth2 flow"
 
 # Dry run (validate only)
-/atomic-commit --dry-run
+./scripts/atomic-commit/run.sh --dry-run
 
 # Skip CI (emergency)
-/atomic-commit --skip-ci "Hotfix: security patch"
+./scripts/atomic-commit/run.sh --skip-ci "Hotfix: security patch"
 ```
 
 ## Error Codes
@@ -190,6 +187,8 @@ Scripts located in `scripts/atomic-commit/`:
 
 ## Troubleshooting
 
+**Skill evals failed:** Run `./scripts/run-evals.py` manually. Fix all skill eval failures.
+
 **Quality gate fails:** Run `./scripts/quality_gate.sh` manually. Fix all warnings.
 
 **Push rejected:** Remote diverged. Workflow retries once after rebase.
@@ -201,21 +200,16 @@ Scripts located in `scripts/atomic-commit/`:
 ## Success Criteria
 
 Command succeeds only when:
-1. ✓ All local validation passes (zero warnings)
-2. ✓ Commit created with valid SHA
-3. ✓ Pushed to remote successfully
-4. ✓ PR created with valid URL
-5. ✓ All GitHub Actions pass
-6. ✓ Zero warnings in all checks
+1. ✓ All skill evaluations pass
+2. ✓ All local validation passes (zero warnings)
+3. ✓ Commit created with valid SHA
+4. ✓ Pushed to remote successfully
+5. ✓ PR created with valid URL
+6. ✓ All GitHub Actions pass
+7. ✓ Zero warnings in all checks
 
 ## See Also
 
 - `commit.md` - Basic commit guidelines
 - `scripts/atomic-commit/run.sh` - Implementation
 - `.github/PULL_REQUEST_TEMPLATE.md` - PR template
-
----
-
-**EXECUTE NOW:** Run the atomic commit orchestrator script to perform validate → commit → push → PR → verify workflow.
-
-!`./scripts/atomic-commit/run.sh $ARGUMENTS`

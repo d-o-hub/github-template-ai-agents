@@ -790,4 +790,43 @@ After migration:
 
 ---
 
+## Root Documentation Structure
+
+### Why These Files Stay in Root
+
+**MIGRATION.md** (This File):
+- Primary entry point for humans evaluating this template
+- Contains language-specific migration scenarios
+- Troubleshooting section for common issues
+- **Next user**: Follow the migration scenario for your language
+
+**LEARNINGS.md** (in agents-docs/):
+- Accumulated CI debugging wisdom
+- Shell scripting patterns for CI environments
+- Exit code meanings and bash behavior
+- **Next user**: Reference `@agents-docs/LEARNINGS.md` when CI fails or modifying scripts
+
+**CHANGES_THREAD.md** (in agents-docs/):
+- Historical record of April 2026 swarm analysis
+- Located at `agents-docs/CHANGES_THREAD.md`
+- Links commits to rationale
+- **Next user**: Check before making structural changes
+
+**QUICKSTART.md**:
+- 5-minute getting started guide
+- Quick reference for common commands
+- **Next user**: Start here for fast setup
+
+**README.md**:
+- Project overview and features
+- Badges and status
+- **Next user**: First file to read for overview
+
+**AGENTS.md**:
+- Single source of truth for AI agents
+- Agent instructions and conventions
+- **Next user**: Primary reference when using agents
+
+---
+
 **Need Help?** Open an issue on [GitHub](https://github.com/d-o-hub/github-template-ai-agents/issues).

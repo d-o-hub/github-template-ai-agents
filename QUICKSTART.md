@@ -15,6 +15,49 @@
   - [Qwen Code](https://github.com/QwenLM/Qwen-Coder)
   - Or any agent that supports the AGENTS.md format
 
+## Platform-Specific Setup
+
+### Windows (PowerShell / Git Bash)
+
+On Windows, some commands differ from Unix/Linux. Here are the Windows equivalents:
+
+**Using PowerShell:**
+```powershell
+# Clone repository
+git clone https://github.com/your-org/your-project.git
+cd your-project
+
+# Create skill symlinks (requires Developer Mode or Admin)
+# Run PowerShell as Administrator, or enable Developer Mode
+./scripts/setup-skills.ps1
+
+# Alternative: Use Git Bash which supports symlinks better
+git clone -c core.symlinks=true https://github.com/your-org/your-project.git
+```
+
+**Using Git Bash (recommended):**
+```bash
+# Clone with symlinks enabled
+git clone -c core.symlinks=true https://github.com/your-org/your-project.git
+cd your-project
+
+# Run setup script
+./scripts/setup-skills.sh
+
+# Install pre-commit hook (Git Bash uses Unix-style paths)
+cp scripts/pre-commit-hook.sh .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+**Windows-specific notes:**
+- Enable Developer Mode in Windows Settings (Settings → Update & Security → For Developers)
+- Or run Git Bash as Administrator to create symlinks
+- Alternative: Use WSL2 (Windows Subsystem for Linux) for full Linux compatibility
+
+### macOS / Linux
+
+Standard Unix commands work as documented below.
+
 ## Step 1: Use This Template
 
 ### Option A: GitHub UI
@@ -38,6 +81,8 @@ cd your-project
 
 ## Step 2: Setup (2 minutes)
 
+### Unix / macOS / Linux
+
 ```bash
 # Create skill symlinks for all CLI tools
 ./scripts/setup-skills.sh
@@ -47,6 +92,30 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 
 # Validate setup
 ./scripts/validate-skills.sh
+```
+
+### Windows (PowerShell as Administrator)
+
+```powershell
+# Create skill symlinks
+./scripts/setup-skills.ps1
+
+# Or manually copy files if symlinks fail
+./scripts/setup-skills.sh --copy
+
+# Validate setup
+./scripts/validate-skills.sh
+```
+
+### Windows (WSL2) - Recommended
+
+```bash
+# Use WSL2 for full Linux compatibility
+wsl
+
+# Then follow Unix instructions above
+cd /mnt/c/Users/YourName/your-project
+./scripts/setup-skills.sh
 ```
 
 Expected output:

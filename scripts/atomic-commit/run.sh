@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Atomic Commit Orchestrator - FIXED VERSION
-# Coordinates the full atomic commit workflow with rollback support
+# Atomic Commit Orchestrator
+# 7-phase workflow: validate → commit → push → PR → verify
 #
 
 set -euo pipefail
@@ -16,11 +16,12 @@ NC='\033[0m'
 # Configuration
 TIMEOUT="${ATOMIC_COMMIT_TIMEOUT:-1800}"
 NO_ROLLBACK="${ATOMIC_COMMIT_NO_ROLLBACK:-0}"
+SKIP_CI="${ATOMIC_COMMIT_SKIP_CI:-0}"
 
 # Named constants
 readonly MAX_POLL_ATTEMPTS=12
 readonly POLL_INTERVAL_SECONDS=5
-readonly POLL_WAIT_MESSAGE_INTERVAL=3
+readonly WARNINGS_PATTERN="warning|warn:|deprecated"
 
 # State tracking
 PHASE=""
@@ -81,116 +82,179 @@ generate_commit_message() {
     echo "$type: $description"
 }
 
+# Phase 1: Pre-Commit Validation
 phase_pre_commit() {
     PHASE="PRE-COMMIT"
     log_info "=== Phase 1: Pre-Commit Validation ==="
+    
     local branch
     branch=$(git branch --show-current)
     if [[ "$branch" =~ ^(main|master)$ ]]; then
         log_error "Cannot commit on protected branch: $branch"
         return 1
     fi
-    if [ -f "./scripts/quality_gate.sh" ]; then
-        if ! ./scripts/quality_gate.sh; then
-            log_error "Quality gate failed"
+    
+    # Run skill evaluations first (if available)
+    if [ -f "./scripts/run-evals.py" ]; then
+        log_info "Running skill evaluations..."
+        if ! python3 ./scripts/run-evals.py 2>&1; then
+            log_error "Skill evaluations failed"
             return 2
         fi
+        log_success "Skill evaluations passed"
     fi
-    log_success "Pre-commit validation passed"
+    
+    if [ -f "./scripts/quality_gate.sh" ]; then
+        log_info "Running quality gate (zero warnings policy)..."
+        
+        local gate_output
+        gate_output=$(mktemp)
+        
+        if ! ./scripts/quality_gate.sh 2>&1 | tee "$gate_output"; then
+            log_error "Quality gate failed"
+            rm -f "$gate_output"
+            return 2
+        fi
+        
+        # Check for warnings in quality gate output
+        if grep -qiE "$WARNINGS_PATTERN" "$gate_output"; then
+            log_error "Quality gate output contains warnings (treated as failure)"
+            rm -f "$gate_output"
+            return 2
+        fi
+        
+        rm -f "$gate_output"
+    fi
+    
+    log_success "Pre-commit validation passed (zero warnings)"
     return 0
 }
 
+# Phase 2: Atomic Commit
 phase_commit() {
     PHASE="COMMIT"
     log_info "=== Phase 2: Atomic Commit ==="
+    
     if [ "${1:-}" == "--dry-run" ]; then
         log_info "[DRY RUN] Would commit"
         return 0
     fi
+    
     git add -A
+    
     if git diff --cached --quiet; then
         log_error "No changes to commit"
         return 3
     fi
+    
     local commit_type msg
     commit_type=$(detect_commit_type)
     msg=$(generate_commit_message "$commit_type")
     log_info "Commit: $msg"
+    
     if ! git commit -m "$msg"; then
         log_error "Commit failed"
         return 3
     fi
+    
     COMMIT_SHA=$(git rev-parse HEAD)
     log_success "Created commit: ${COMMIT_SHA:0:8}"
     return 0
 }
 
+# Phase 3: Pre-Push Sync
 phase_pre_push() {
     PHASE="PRE-PUSH"
     log_info "=== Phase 3: Pre-Push Sync ==="
+    
     local branch
     branch=$(git branch --show-current)
     git fetch origin || return 4
+    
     if git ls-remote --heads origin "$branch" | grep -q "$branch"; then
         if ! git merge-base --is-ancestor "origin/$branch" HEAD 2>/dev/null; then
             log_error "Remote diverged"
             return 4
         fi
     fi
+    
     log_success "Pre-push sync OK"
     return 0
 }
 
+# Phase 4: Push
 phase_push() {
     PHASE="PUSH"
     log_info "=== Phase 4: Push ==="
+    
     local branch
     branch=$(git branch --show-current)
+    
     if ! git push -u origin "$branch"; then
         log_error "Push failed"
         return 4
     fi
+    
     log_success "Pushed to origin/$branch"
     return 0
 }
 
+# Phase 5: Create Pull Request
 phase_pr_create() {
     PHASE="PR-CREATE"
     log_info "=== Phase 5: Create Pull Request ==="
+    
     if ! gh auth status &>/dev/null; then
         log_error "GitHub CLI not authenticated"
         return 5
     fi
+    
     local branch title body base
     branch=$(git branch --show-current)
     title=$(git log -1 --pretty=%s)
     body="PR created by atomic-commit"
     base="main"
-    if git rev-parse --verify origin/master &>/dev/null; then base="master"; fi
+    
+    if git rev-parse --verify origin/master &>/dev/null; then
+        base="master"
+    fi
+    
     if ! PR_URL=$(gh pr create --title "$title" --body "$body" --base "$base" 2>&1); then
         local existing
         existing=$(gh pr list --head "$branch" --json url --jq '.[0].url' 2>/dev/null || true)
-        if [ -n "$existing" ]; then PR_URL="$existing"
-        else log_error "PR creation failed"; return 5; fi
+        if [ -n "$existing" ]; then
+            PR_URL="$existing"
+        else
+            log_error "PR creation failed"
+            return 5
+        fi
     fi
+    
     PR_NUMBER=$(echo "$PR_URL" | grep -oE '[0-9]+$')
     log_success "PR #$PR_NUMBER created"
     return 0
 }
 
-# FIXED Phase 6: Verify checks with polling
+# Phase 6: Verify ALL GitHub Actions
 phase_verify() {
     PHASE="VERIFY"
-    log_info "=== Phase 6: Verify CI Checks ==="
+    log_info "=== Phase 6: Verify CI Checks (Zero Warnings) ==="
     log_info "Timeout: ${TIMEOUT}s"
     echo ""
+    
+    # Skip if --skip-ci was specified
+    if [ "$SKIP_CI" -eq 1 ]; then
+        log_warn "Skipping CI verification (--skip-ci specified)"
+        return 0
+    fi
+    
     local start_time elapsed check_list poll_count
     start_time=$(date +%s)
-    
-    # FIXED: Poll for checks to appear
-    log_info "Step 1: Polling for checks..."
     poll_count=0
     check_list=""
+    
+    # Poll for checks to appear
+    log_info "Polling for checks..."
     
     while [ $poll_count -lt $MAX_POLL_ATTEMPTS ]; do
         check_list=$(gh pr checks "$PR_NUMBER" 2>&1) || true
@@ -216,43 +280,54 @@ phase_verify() {
     fi
     
     # Watch checks
-    log_info "Step 2: Watching checks..."
+    log_info "Watching checks for completion..."
     echo "$check_list" | head -5
     echo ""
     
     local checks_output
     checks_output=$(mktemp)
+    
     if ! timeout "$TIMEOUT" gh pr checks "$PR_NUMBER" --watch --interval 10 2>&1 | tee "$checks_output"; then
         elapsed=$(( $(date +%s) - start_time ))
+        
         if [ $elapsed -ge $TIMEOUT ]; then
             log_error "Timeout (${elapsed}s)"
             rm -f "$checks_output"
             return 7
         fi
-        if grep -qiE "warning|deprecated" "$checks_output"; then
-            log_error "Warnings found"
+        
+        # Check for failures
+        if grep -qiE "\bfail(ed)?\b" "$checks_output"; then
+            log_error "One or more checks FAILED"
             rm -f "$checks_output"
             return 6
         fi
+        
         log_error "Checks failed"
         rm -f "$checks_output"
         return 6
     fi
+    
     elapsed=$(( $(date +%s) - start_time ))
-    if grep -qiE "warning|deprecated" "$checks_output"; then
-        log_error "Warnings in output"
+    
+    # Check for ANY warnings in output (zero warnings policy)
+    if grep -qiE "$WARNINGS_PATTERN" "$checks_output"; then
+        log_error "Warnings found in check output (treated as failure)"
         rm -f "$checks_output"
         return 6
     fi
-    log_success "All checks passed (${elapsed}s)"
+    
+    log_success "All checks passed (${elapsed}s) - zero warnings"
     rm -f "$checks_output"
     return 0
 }
 
+# Phase 7: Report
 phase_report() {
     PHASE="REPORT"
     local elapsed
     elapsed=$(( $(date +%s) - START_TIME ))
+    
     echo ""
     log_success "=== WORKFLOW COMPLETE ==="
     log_success "Commit: ${COMMIT_SHA:0:8}"
@@ -262,15 +337,45 @@ phase_report() {
     echo ""
 }
 
+# Main execution
 main() {
     START_TIME=$(date +%s)
+    
     echo ""
     log_info "=== ATOMIC COMMIT ==="
     echo ""
-    if [ "${1:-}" == "--help" ]; then
-        echo "Usage: $0 [--dry-run|--help]"
-        exit 0
-    fi
+    
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --help|-h)
+                echo "Usage: $0 [--dry-run|--skip-ci|--help]"
+                echo ""
+                echo "Options:"
+                echo "  --dry-run    Validate only, don't commit/push"
+                echo "  --skip-ci    Skip CI verification (emergency)"
+                echo "  --help       Show this help"
+                echo ""
+                echo "Environment:"
+                echo "  ATOMIC_COMMIT_TIMEOUT      Max wait time (default: 1800s)"
+                echo "  ATOMIC_COMMIT_NO_ROLLBACK  Set to 1 to disable rollback"
+                exit 0
+                ;;
+            --dry-run)
+                shift
+                ;;
+            --skip-ci)
+                SKIP_CI=1
+                log_warn "--skip-ci: Will skip CI verification"
+                shift
+                ;;
+            *)
+                shift
+                ;;
+        esac
+    done
+    
+    # Execute 7 phases
     phase_pre_commit || exit 2
     phase_commit "${1:-}" || exit 3
     phase_pre_push || exit 4
@@ -278,6 +383,7 @@ main() {
     phase_pr_create || exit 5
     phase_verify || exit 6
     phase_report
+    
     exit 0
 }
 
