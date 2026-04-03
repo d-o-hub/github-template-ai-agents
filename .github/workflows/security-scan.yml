@@ -64,8 +64,13 @@ jobs:
               > shellcheck-results.sarif 2>/dev/null || true
           fi
           # Ensure valid SARIF file exists (even if empty)
-          if [ ! -s shellcheck-results.sarif ] || [ "$(cat shellcheck-results.sarif | wc -l)" -lt 5 ]; then
-            printf '%s' '{"$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","version":"2.1.0","runs":[{"tool":{"driver":{"name":"shellcheck","informationUri":"https://www.shellcheck.net/"}},"results":[]}]}' > shellcheck-results.sarif
+          if [ ! -s shellcheck-results.sarif ] || [ "$(wc -l < shellcheck-results.sarif)" -lt 5 ]; then
+            # Build SARIF JSON in parts to avoid long lines
+            sarif_schema="https://raw.githubusercontent.com/oasis-tcs/sarif-spec"
+            sarif_schema="${sarif_schema}/master/Schemata/sarif-schema-2.1.0.json"
+            # yamllint disable rule:line-length
+            printf '{"$schema":"%s","version":"2.1.0","runs":[{"tool":{"driver":{"name":"shellcheck","informationUri":"https://www.shellcheck.net/"}},"results":[]}]}' "$sarif_schema" > shellcheck-results.sarif
+            # yamllint enable rule:line-length
           fi
 
       - name: Upload ShellCheck SARIF
