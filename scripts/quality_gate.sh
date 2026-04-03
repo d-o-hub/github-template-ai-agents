@@ -2,7 +2,8 @@
 # Full quality gate with auto-detection for multiple languages.
 # Exit 0 = silent success, Exit 2 = errors surfaced to agent.
 # Used in pre-commit hook and CI.
-# NOTE: We don't use set -e because it has unpredictable behavior in CI
+# NOTE: errexit disabled explicitly - it causes unpredictable failures in CI
+set +e
 set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
