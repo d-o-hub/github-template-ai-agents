@@ -2,13 +2,14 @@
 # Full quality gate with auto-detection for multiple languages.
 # Exit 0 = silent success, Exit 2 = errors surfaced to agent.
 # Used in pre-commit hook and CI.
-set -euo pipefail
+# NOTE: We don't use set -e because it has unpredictable behavior in CI
+set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-# Colors for output (disabled in CI)
-if [ -t 1 ]; then
+# Colors for output (disabled in CI via TTY check, or via FORCE_COLOR=0)
+if [[ -t 1 ]] && [[ "${FORCE_COLOR:-}" != "0" ]]; then
     RED='\033[0;31m'
     GREEN='\033[0;32m'
     YELLOW='\033[1;33m'
@@ -25,7 +26,7 @@ fi
 FAILED=0
 DETECTED_LANGUAGES=()
 
-echo -e "${BLUE}Running quality gate...${NC}"
+echo "Running quality gate..."
 echo ""
 
 # --- Always: validate skill symlinks ---
