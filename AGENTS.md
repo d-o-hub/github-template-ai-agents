@@ -134,3 +134,4 @@ The agent reads the nearest file in the directory tree - closest one takes prece
 | Hooks | `agents-docs/HOOKS.md` |
 | Context / back-pressure | `agents-docs/CONTEXT.md` |
 | Rust patterns | `agents-docs/RUST.md` |
+| Docs hook skill | `.agents/skills/docs-hook/SKILL.md` |

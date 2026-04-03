@@ -1,0 +1,34 @@
+{
+  "skill": "docs-hook",
+  "evals": [
+    {
+      "name": "trigger_phrases",
+      "trigger": true,
+      "queries": [
+        "sync docs on commit",
+        "git hook for docs",
+        "update agents-docs on merge",
+        "push docs to docs folder"
+      ]
+    },
+    {
+      "name": "non_trigger_phrases",
+      "trigger": false,
+      "queries": [
+        "write a new doc",
+        "create documentation",
+        "fix typos in readme",
+        "analyze the codebase"
+      ]
+    },
+    {
+      "name": "script_execution",
+      "trigger": true,
+      "queries": [
+        "run docs-sync.sh",
+        "execute the sync script",
+        "run the hook script"
+      ]
+    }
+  ]
+}
