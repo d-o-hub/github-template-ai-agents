@@ -37,6 +37,13 @@ if ! ./scripts/validate-skills.sh; then
 fi
 echo ""
 
+# --- Validate reference links in SKILL.md files ---
+echo -e "${BLUE}Validating reference links in SKILL.md files...${NC}"
+if ! ./scripts/validate-links.sh; then
+    FAILED=1
+fi
+echo ""
+
 # --- Auto-detect project languages ---
 echo -e "${BLUE}Detecting project languages...${NC}"
 

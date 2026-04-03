@@ -97,15 +97,31 @@ process_skill_file() {
     while IFS= read -r line; do
         line_num=$((line_num + 1))
 
-        # Find all markdown links in this line
+        # Skip code blocks: remove text between backticks to avoid matching example code
+        # Using bash parameter expansion to remove code in backticks
+        local line_without_code="$line"
+        while [[ "$line_without_code" == *\`*\`* ]]; do
+            # Remove content between backticks (non-greedy-like behavior)
+            line_without_code="${line_without_code//\`+([^\`])\`/}"
+            # Fallback: if pattern doesn't match, just remove first code block
+            if [[ "$line_without_code" == *\`*\`* ]]; then
+                # Extract parts before and after first pair of backticks
+                local prefix="${line_without_code%%\`*}"
+                local suffix="${line_without_code#*\`}"
+                suffix="${suffix#*\`}"
+                line_without_code="$prefix$suffix"
+            fi
+        done
+
+        # Find all markdown links in this line (after removing code)
         # Using grep to find matches, then processing each
-        while [[ "$line" =~ $LINK_REGEX ]]; do
+        while [[ "$line_without_code" =~ $LINK_REGEX ]]; do
             local link_path="${BASH_REMATCH[2]}"
 
             LINKS_CHECKED=$((LINKS_CHECKED + 1))
 
             # Remove the matched portion to continue searching the same line
-            line="${line#*"${BASH_REMATCH[0]}"}"
+            line_without_code="${line_without_code#*"${BASH_REMATCH[0]}"}"
 
             # Check this link
             # shellcheck disable=SC2094
