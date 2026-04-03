@@ -74,6 +74,16 @@
       "autoActivate": true
     },
     {
+      "skill": "accessibility-auditor",
+      "triggers": {
+        "keywords": ["accessibility", "a11y", "WCAG", "screen reader", "keyboard navigation", "color contrast", "ARIA", "Section 508", "ADA compliance", "alt text", "focus order"],
+        "patterns": ["accessibility.*", "a11y.*", "wcag.*", "contrast.*", "aria.*"],
+        "files": ["**/*.html", "**/*.jsx", "**/*.tsx", "**/*.vue", "**/*.css", "**/*.scss"]
+      },
+      "priority": "high",
+      "autoActivate": true
+    },
+    {
       "skill": "web-search-researcher",
       "triggers": {
         "keywords": ["search", "research", "find information", "look up", "documentation"],
