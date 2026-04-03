@@ -1,245 +1,115 @@
 ---
 name: do-web-doc-resolver
-description: Python implementation for resolving URLs and queries into compact, LLM-ready markdown documentation. Use when you need the Python resolver with full cascade support, quality scoring, circuit breakers, and advanced routing features.
+description: Python resolver for URLs and queries into compact, LLM-ready markdown. Uses progressive free-first cascade with quality scoring, circuit breakers, layered routing memory, trace-based evaluation, and agent-friendly docs validation. Use when fetching documentation, resolving web URLs, or building context from web sources.
 license: MIT
 compatibility: Python 3.10+, async/await
 allowed-tools: Bash(python:*|do-wdr:*) Read
 metadata:
   author: d-oit
-  version: "0.1.0"
+  version: "0.2.0"
   source: https://github.com/d-oit/do-web-doc-resolver
 ---
 
 # Web Doc Resolver Skill
 
-Python implementation for resolving web URLs and queries into compact, LLM-ready markdown documentation with provider cascade, quality scoring, and advanced routing.
+Resolve URLs and queries into compact, LLM-ready markdown using a progressive, free-first cascade with 2026 production patterns.
 
-## When to use this skill
+## When to use
 
-Activate this skill when you need to:
-- Resolve a URL or query to markdown using Python
-- Use the full provider cascade with intelligent routing
-- Access quality scoring and content validation features
-- Use circuit breaker patterns for provider reliability
-- Leverage routing memory for learned provider preferences
-- Run as a CLI tool or import as a Python module
+- Fetch and parse documentation from a URL
+- Search for technical information across the web
+- Build context from web sources for AI agents
+- Validate content against agent-docs-spec v0.3.0
+- Trace resolution trajectories for debugging
 
-## Prerequisites
-
-Install Python dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-## Commands
-
-### CLI Usage (from project root)
+## Quick Start
 
 ```bash
-# Resolve a URL — uses project root scripts/
-python scripts/resolve.py "https://docs.rs/tokio"
-
-# Resolve a query
-python scripts/resolve.py "Rust async runtime comparison"
-
-# With options
-python scripts/resolve.py "query" --log-level INFO --max-chars 5000
+python -m scripts.resolve "https://docs.rust-lang.org/book/"
+python -m scripts.resolve "Rust async programming" --profile quality --trace --json
 ```
 
-### CLI Usage (standalone — after copying skill to any project)
+## Cascade Strategy
 
-```bash
-# From the skill directory
-cd .agents/skills/do-web-doc-resolver && python -m scripts.resolve "https://docs.rs/tokio"
+**URL**: Cache → llms.txt → Jina → Direct Fetch → Firecrawl → Mistral Browser → DuckDuckGo
 
-# Or via PYTHONPATH from anywhere
-PYTHONPATH=.agents/skills/do-web-doc-resolver python -c "from scripts.resolve import main; main()" "https://example.com"
-```
+**Query**: Cache → Exa MCP → Exa SDK → Tavily → Serper → DuckDuckGo → Mistral Web Search
 
-### Python Module Usage
+## Providers (12 total)
 
-```python
-import sys, os
-# Add skill root to path
-skill_root = os.path.join(os.path.dirname(__file__), ".agents", "skills", "do-web-doc-resolver")
-sys.path.insert(0, skill_root)
-
-from scripts.resolve import resolve, resolve_url, resolve_query
-
-# Resolve URL
-result = resolve_url("https://docs.rs/tokio")
-
-# Resolve query
-result = resolve_query("Rust web frameworks")
-
-# Generic resolve (auto-detects URL vs query)
-result = resolve("https://example.com")
-result = resolve("Python web frameworks")
-```
-
-## Provider Cascade
-
-### Query Resolution Cascade
-
-1. Cache check (24h TTL)
-2. Exa MCP (FREE, no API key)
-3. Exa SDK (paid, EXA_API_KEY)
-4. Tavily (paid, TAVILY_API_KEY)
-5. Serper (paid, SERPER_API_KEY)
-6. DuckDuckGo (FREE, no API key)
-7. Mistral Web Search (paid, MISTRAL_API_KEY)
-
-### URL Resolution Cascade
-
-1. Cache check (24h TTL)
-2. Special file type detection (.pdf, .docx, .pptx → Docling; .png, .jpg, .jpeg → OCR)
-3. llms.txt probe (FREE)
-4. Jina Reader (FREE)
-5. Firecrawl (paid, FIRECRAWL_API_KEY)
-6. Direct HTTP fetch (FREE)
-7. Mistral Browser (paid, MISTRAL_API_KEY)
-8. DuckDuckGo fallback (FREE)
-
-## Available Providers
-
-| Provider | Type | Free | Description |
-|----------|------|------|-------------|
-| `exa_mcp` | Query | Yes | Exa MCP (free, no key) |
-| `exa` | Query | No | Exa SDK (requires API key) |
-| `tavily` | Query | No | Tavily comprehensive search |
-| `serper` | Query | No | Google search via Serper |
-| `duckduckgo` | Query | Yes | DuckDuckGo search |
-| `mistral_websearch` | Query | No | Mistral AI search |
-| `llms_txt` | URL | Yes | llms.txt structured docs |
-| `jina` | URL | Yes | Jina Reader |
-| `firecrawl` | URL | No | Firecrawl extraction |
-| `direct_fetch` | URL | Yes | Direct HTML fetch |
-| `mistral_browser` | URL | No | Mistral browser agent |
-| `docling` | URL | No | Docling document processing |
-| `ocr` | URL | No | OCR text extraction |
+| Provider | Type | Free | Latency |
+|----------|------|------|---------|
+| `llms_txt` | URL | Yes | ~100ms |
+| `jina` | URL | Yes | ~300-1500ms |
+| `exa_mcp` | Query | Yes | Varies |
+| `duckduckgo` | Query | Yes | ~2s |
+| `direct_fetch` | URL | Yes | ~500ms |
+| `exa`, `tavily`, `serper` | Query | No | ~1s |
+| `firecrawl`, `mistral_*` | URL/Query | No | ~2-3s |
+| `docling`, `ocr` | URL | No | ~3-5s |
 
 ## Execution Profiles
 
-| Profile | Max Attempts | Max Paid | Max Latency | Quality Threshold |
-|---------|-------------|----------|-------------|-------------------|
-| `free` | 3 | 0 | 6,000ms | 0.70 |
-| `fast` | 2 | 1 | 4,000ms | 0.60 |
-| `balanced` | 4-6 | 1-2 | 9,000-12,000ms | 0.65 |
-| `quality` | 6-10 | 3-5 | 15,000-20,000ms | 0.55 |
+| Profile | Attempts | Paid | Latency | Quality |
+|---------|----------|------|---------|---------|
+| `free` | 3 | 0 | 6s | 0.70 |
+| `fast` | 2 | 1 | 4s | 0.60 |
+| `balanced` | 4-6 | 1-2 | 9-12s | 0.65 |
+| `quality` | 6-10 | 3-5 | 15-20s | 0.55 |
 
-## Quality Scoring
+## Key Features
 
-Content is scored on a 0.0-1.0 scale:
+**Structured Tool Contracts**: Every provider returns `ProviderResult(ok, content, error, meta)` with `ProviderMeta(tool, duration_ms, cache_hit, quality_score, error_type)`.
 
-| Signal | Penalty |
-|--------|---------|
-| Too short (< 500 chars) | -0.35 |
-| Missing links | -0.15 |
-| Duplicate-heavy | -0.25 |
-| Noisy content | -0.20 |
+**Layered Routing Memory**: TTL-based decay (30 days), metadata filtering, recency weighting. See `scripts/routing_memory.py`.
 
-## Error Handling
+**Trace-Based Evaluation**: Emit `ResolutionTrace` with `TraceStep` per provider. CLI: `--trace --json`.
 
-| Error Type | Detection | Behavior |
-|------------|-----------|----------|
-| rate_limit | 429, "rate limit" | Set cooldown, skip provider |
-| auth_error | 401, 403, "unauthorized" | Log error, skip provider |
-| quota_exhausted | 402, "quota", "credits" | Log warning, skip provider |
-| network_error | "timeout", "connection" | Log error, skip provider |
-| not_found | 404, "not found" | Log error, skip provider |
-| provider_5xx | 500-504 | Trip circuit breaker |
+**Agent-Friendly Docs Validation**: Validates against [agent-docs-spec v0.3.0](https://github.com/agent-ecosystem/agent-docs-spec) — 10 checks across 7 categories.
 
-## Circuit Breaker
+**Quality Scoring**: Content scored 0.0-1.0. Penalties: too_short(-0.35), missing_links(-0.15), duplicate_heavy(-0.25), noisy(-0.20).
 
-- **Failure threshold**: 3 consecutive failures
-- **Cooldown period**: 300 seconds (5 minutes)
-- **Behavior**: Provider skipped until cooldown expires
-- **Reset**: Successful call resets failure count
+**Circuit Breakers**: 3 failures → 300s cooldown per provider.
 
 ## Configuration
 
-### Environment Variables
-
 ```bash
-# Provider API keys (all optional)
-export EXA_API_KEY="your_key"
-export TAVILY_API_KEY="your_key"
-export SERPER_API_KEY="your_key"
-export FIRECRAWL_API_KEY="your_key"
-export MISTRAL_API_KEY="your_key"
-
-# Resolver settings
-export WEB_RESOLVER_MAX_CHARS=8000
-export WEB_RESOLVER_MIN_CHARS=200
-export WEB_RESOLVER_TIMEOUT=30
+export EXA_API_KEY="" TAVILY_API_KEY="" FIRECRAWL_API_KEY="" MISTRAL_API_KEY=""
+export WEB_RESOLVER_MAX_CHARS=8000 WEB_RESOLVER_MIN_CHARS=200
 ```
 
-## Output Format
-
-### Dictionary Response
+## Output
 
 ```python
-{
-    "url": "https://example.com/docs",
-    "content": "# Documentation\n\n...",
-    "source": "exa_mcp",
-    "score": 0.87,
-    "metrics": {
-        "latency_ms": 1234,
-        "providers_attempted": ["exa_mcp"],
-        "cache_hit": false
-    }
-}
+{"source": "jina", "content": "...", "score": 0.87,
+ "metrics": {"total_latency_ms": 1234, "provider_metrics": [...], "paid_usage": False},
+ "trace": {"trace_id": "...", "steps": [...], "success": True}}  # when --trace
 ```
 
-## Skill Structure
+## File Structure
 
 ```
-do-web-doc-resolver/
-├── SKILL.md              # This file
-├── requirements.txt      # Python dependencies
-├── pyproject.toml        # Package metadata & tool config
-├── .gitignore            # Python artifacts, cache, .env
-├── .env.example          # Environment variable template
-├── __init__.py           # Package marker (re-exports resolve, resolve_url, resolve_query)
-├── __main__.py           # CLI entry point (python -m do-web-doc-resolver)
-├── scripts/
-│   ├── __init__.py
-│   ├── resolve.py        # Main resolver orchestrator & CLI
-│   ├── models.py         # Data models & enums
-│   ├── providers_impl.py # Provider implementations
-│   ├── utils.py          # Utility functions
-│   ├── quality.py        # Content quality scoring
-│   ├── routing.py        # Budget-aware routing
-│   ├── routing_memory.py # Learned provider preferences
-│   ├── synthesis.py      # LLM synthesis gate
-│   ├── circuit_breaker.py # Circuit breaker patterns
-│   └── cache_negative.py # Negative cache (failed results)
-├── tests/                # Test suite
-│   ├── __init__.py
-│   ├── conftest.py
-│   └── test_resolve.py
-└── references/           # Detailed documentation
-    ├── CASCADE.md
-    ├── CLI.md
-    ├── CONFIG.md
-    ├── PROVIDERS.md
-    ├── RUST_CLI.md
-    └── TESTING.md
+scripts/
+├── resolve.py           # Main orchestrator & CLI
+├── models.py            # Data models, enums, trace types
+├── providers_impl.py    # 12 provider implementations
+├── quality.py           # Content quality scoring
+├── docs_validation.py   # Agent-docs-spec v0.3.0 checks
+├── routing_memory.py    # Layered memory with TTL decay
+├── routing.py           # Budget-aware routing
+├── circuit_breaker.py   # Circuit breaker patterns
+├── cache_negative.py    # Negative cache
+├── synthesis.py         # LLM synthesis gate
+└── utils.py             # Utilities
 ```
 
 ## References
 
 | Topic | File |
 |-------|------|
-| Full cascade logic | `references/CASCADE.md` |
-| CLI usage (Python + Rust) | `references/CLI.md` |
-| Configuration & env vars | `references/CONFIG.md` |
-| All providers & rate limits | `references/PROVIDERS.md` |
-| Rust CLI architecture | `references/RUST_CLI.md` |
-| Test structure & markers | `references/TESTING.md` |
-
-## Related Skills
-
-- `do-wdr-cli`: Rust compiled CLI for faster performance
-- `agent-browser`: Browser automation for complex web interactions
+| Cascade logic | `reference/cascade.md` |
+| Provider details | `reference/providers.md` |
+| Configuration | `reference/configuration.md` |
+| Agent-docs-spec | https://github.com/agent-ecosystem/agent-docs-spec |
+| Memory 2026 | https://mem0.ai/blog/state-of-ai-agent-memory-2026 |
+| Agent architecture | https://andriifurmanets.com/blogs/ai-agents-2026-practical-architecture-tools-memory-evals-guardrails |
