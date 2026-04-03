@@ -192,18 +192,18 @@ phase_verify() {
     poll_count=0
     check_list=""
     
-    while [ $poll_count -lt 12 ]; do
+    while [ $poll_count -lt $MAX_POLL_ATTEMPTS ]; do
         check_list=$(gh pr checks "$PR_NUMBER" 2>&1) || true
         if ! echo "$check_list" | grep -qi "no checks reported"; then
             if [ -n "$check_list" ]; then
-                log_success "Checks found after $((poll_count * 5))s"
+                log_success "Checks found after $((poll_count * $POLL_INTERVAL_SECONDS))s"
                 break
             fi
         fi
         poll_count=$((poll_count + 1))
-        if [ $poll_count -lt 12 ]; then
-            log_info "  Waiting... (${poll_count}/12)"
-            sleep 5
+        if [ $poll_count -lt $MAX_POLL_ATTEMPTS ]; then
+            log_info "  Waiting... (${poll_count}/${MAX_POLL_ATTEMPTS})"
+            sleep $POLL_INTERVAL_SECONDS
         fi
     done
     

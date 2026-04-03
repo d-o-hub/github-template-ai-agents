@@ -408,7 +408,16 @@ validate_pr_data() {
     
     # Validate body
     if [[ -z "${PR_BODY// /}" ]]; then
-        log_warning "PR body is empty"
+        log_error "PR body is empty"
+        return "$EXIT_FAILURE"
+    fi
+    
+    # Check for unfilled template placeholders
+    local placeholder_pattern='<(\[|\()?[^>]+(\]|\)?)>|{{[^}]+}}|___+|TODO|FIXME|XXX'
+    if echo "$PR_BODY" | grep -qE "$placeholder_pattern"; then
+        log_error "PR body contains unfilled template placeholders"
+        log_info "Remove or fill in placeholders like:"
+        log_info "  - <description>, {{variable}}, ___, TODO, FIXME"
         return "$EXIT_FAILURE"
     fi
     

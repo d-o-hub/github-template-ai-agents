@@ -240,12 +240,17 @@ check_secrets() {
         fi
         
         for pattern in "${secret_patterns[@]}"; do
-            if grep -iEn "$pattern" "$file" 2>/dev/null | head -5 > /tmp/secret_matches.txt; then
-                if [[ -s /tmp/secret_matches.txt ]]; then
+            # Use mktemp for secure temporary file
+            local temp_file
+            temp_file=$(mktemp) || { log_error "Failed to create temp file"; return "$EXIT_FAILURE"; }
+            trap "rm -f '$temp_file'" RETURN
+            
+            if grep -iEn "$pattern" "$file" 2>/dev/null | head -5 > "$temp_file"; then
+                if [[ -s "$temp_file" ]]; then
                     log_error "Potential secret found in: $file"
                     while IFS= read -r match; do
                         echo "  ${YELLOW}  Line: $match${NC}" >&2
-                    done < /tmp/secret_matches.txt
+                    done < "$temp_file"
                     found_secrets=1
                 fi
             fi

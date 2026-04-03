@@ -213,18 +213,51 @@ validate_environment() {
     log_success "Git repository validated"
     
     # Check git identity is configured
-    if ! git config user.name > /dev/null 2>&1; then
+    local git_name git_email
+    git_name=$(git config user.name 2>/dev/null || echo "")
+    git_email=$(git config user.email 2>/dev/null || echo "")
+    
+    if [[ -z "$git_name" ]]; then
         log_error "Git user.name not configured"
         log_info "Run: git config user.name 'Your Name'"
         return "$EXIT_FAILURE"
     fi
     
-    if ! git config user.email > /dev/null 2>&1; then
+    # Validate git user.name format (should not be default/generic)
+    if [[ "$git_name" =~ ^(user|name|User|Name|your name|Your Name|test|Test)$ ]]; then
+        log_error "Git user.name appears to be a placeholder: '$git_name'"
+        log_info "Set your actual name: git config user.name 'Your Actual Name'"
+        return "$EXIT_FAILURE"
+    fi
+    
+    # Validate git user.name has reasonable format (at least 2 chars, contains a space for full name)
+    if [[ ${#git_name} -lt 2 ]]; then
+        log_error "Git user.name is too short: '$git_name'"
+        log_info "Use your full name: git config user.name 'Your Full Name'"
+        return "$EXIT_FAILURE"
+    fi
+    
+    if [[ -z "$git_email" ]]; then
         log_error "Git user.email not configured"
         log_info "Run: git config user.email 'your@email.com'"
         return "$EXIT_FAILURE"
     fi
-    log_success "Git identity configured"
+    
+    # Validate git user.email format (basic email pattern)
+    if [[ ! "$git_email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+        log_error "Git user.email has invalid format: '$git_email'"
+        log_info "Use a valid email: git config user.email 'your.email@example.com'"
+        return "$EXIT_FAILURE"
+    fi
+    
+    # Check for placeholder email patterns
+    if [[ "$git_email" =~ ^(user@|test@|example@|email@|your.email@|name@) ]]; then
+        log_error "Git user.email appears to be a placeholder: '$git_email'"
+        log_info "Set your actual email: git config user.email 'your.email@example.com'"
+        return "$EXIT_FAILURE"
+    fi
+    
+    log_success "Git identity configured (${git_name} <${git_email}>)"
     
     # Check for merge/rebase in progress
     if [[ -d "$(git rev-parse --git-path rebase-merge)" ]] || \
