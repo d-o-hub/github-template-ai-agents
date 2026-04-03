@@ -35,12 +35,6 @@ if ! ./scripts/validate-skills.sh; then
 fi
 echo ""
 
-# --- Always: validate SKILL.md format ---
-echo -e "${BLUE}Validating SKILL.md format...${NC}"
-# Run format validation but don't fail the gate for now (warnings only)
-./scripts/validate-skill-format.sh || true
-echo ""
-
 # --- Auto-detect project languages ---
 echo -e "${BLUE}Detecting project languages...${NC}"
 
