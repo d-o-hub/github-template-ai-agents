@@ -4,6 +4,25 @@
 > Supported by: Claude Code, Windsurf, Gemini CLI, Codex, Copilot, OpenCode, Devin, Amp, Zed, Warp, RooCode, Jules or reference with @AGENTS.md in cli .md
 > See the open spec: https://agents.md
 
+## Named Constants
+
+```bash
+# File size limits (lines)
+readonly MAX_LINES_PER_SOURCE_FILE=500
+readonly MAX_LINES_PER_SKILL_MD=250
+
+# Retry and polling configuration
+readonly DEFAULT_MAX_RETRIES=3
+readonly DEFAULT_RETRY_DELAY_SECONDS=5
+readonly DEFAULT_POLL_INTERVAL_SECONDS=5
+readonly DEFAULT_MAX_POLL_ATTEMPTS=12
+readonly DEFAULT_TIMEOUT_SECONDS=1800
+
+# Git/PR configuration
+readonly MAX_COMMIT_SUBJECT_LENGTH=72
+readonly MAX_PR_TITLE_LENGTH=72
+```
+
 ## Project Overview
 
 Production-ready template for AI agent-powered development with Claude Code, Gemini CLI, OpenCode, and more.
@@ -33,14 +52,14 @@ Always run the full quality gate before committing. Fix all errors before finish
 
 ## Code Style
 
-- **Max 500 lines per source file** - split into focused sub-modules if exceeded
-- **Max 250 lines per SKILL.md** - move detailed content to `references/` folder
+- **Max `${MAX_LINES_PER_SOURCE_FILE}` lines per source file** - split into focused sub-modules if exceeded
+- **Max `${MAX_LINES_PER_SKILL_MD}` lines per SKILL.md** - move detailed content to `references/` folder
 - **SKILL.md must start with frontmatter** (--- on line 1, no content before)
 - **Required frontmatter fields**: `name`, `description`
 - **Recommended frontmatter fields**: `license`
 - Conventional Commits: `feat:`, `fix:`, `docs:`, `ci:`, `test:`, `refactor:`
 - All public APIs must be documented
-- No hardcoded magic numbers - use named constants or config
+- **No hardcoded magic numbers** - use named constants (see Named Constants section above) or config
 - Render architecture diagrams as fenced ```mermaid``` blocks, never raw ASCII art
 - Shell scripts: Use `shellcheck` for linting, `bats` for testing
 - Markdown: Use `markdownlint` for consistency
@@ -64,7 +83,7 @@ Always run the full quality gate before committing. Fix all errors before finish
 ├── .agents/
 │   └── skills/            # CANONICAL skill source - all agents read from here
 │       └── <skill-name>/
-│           ├── SKILL.md   # <= 250 lines, frontmatter required
+│           ├── SKILL.md   # <= ${MAX_LINES_PER_SKILL_MD} lines, frontmatter required
 │           ├── evals/     # Test cases (evals.json)
 │           ├── reference/ # Detailed docs linked from SKILL.md
 │           ├── scripts/   # Executable scripts
@@ -101,7 +120,7 @@ Always run the full quality gate before committing. Fix all errors before finish
 
 ## PR Instructions
 
-- Title format: `[type(scope)] short description`
+- Title format: `[type(scope)] short description` (max `${MAX_PR_TITLE_LENGTH}` chars)
 - Always run lint and tests before committing
 - Create a new branch per feature/fix - never commit directly to `main`
 - Keep PRs focused; one concern per PR
