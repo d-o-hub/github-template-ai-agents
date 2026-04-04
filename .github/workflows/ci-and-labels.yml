@@ -103,9 +103,7 @@ jobs:
           ls -la .claude/skills/ | head -10
           echo ""
           echo "Running quality gate..."
-          ./scripts/minimal_quality_gate.sh
-        env:
-          SKIP_TESTS: true  # Skip tests in CI, run separately
+          ./scripts/quality_gate.sh
 
   test:
     name: Run Tests
@@ -184,3 +182,17 @@ jobs:
       - name: Run tests (Go)
         run: go test ./...
         if: hashFiles('go.mod') != ''
+
+      - name: Setup BATS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
+
+      - name: Run BATS tests
+        run: |
+          if [ -d "tests" ] && [ -n "$(find tests -name '*.bats' -print -quit 2>/dev/null)" ]; then
+            echo "Running BATS tests..."
+            bats tests/*.bats
+          else
+            echo "No BATS tests found"
+          fi

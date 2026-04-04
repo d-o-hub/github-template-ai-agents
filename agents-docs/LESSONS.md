@@ -1,0 +1,457 @@
+# Lessons Learned
+
+Catalog of technical discoveries, debugging resolutions, and process improvements for the AI agent template.
+
+## Format
+
+Each lesson follows the standard template:
+- Sequential numbering (LESSON-001, LESSON-002, etc.)
+- Date and component tags
+- Issue/Symptoms/Root Cause/Solution/Prevention structure
+
+For machine-readable index, see `lessons.jsonl`.
+
+---
+
+### LESSON-001: Bash Exit Code 2 - Misuse of Shell Builtins in CI
+
+**Date**: 2026-04-01
+**Component**: CI/CD / Bash Scripts / Quality Gate
+**Severity**: High
+
+**Issue**: Quality Gate CI job fails with exit code 2 in GitHub Actions while passing locally.
+
+**Symptoms**:
+- `Process completed with exit code 2` in CI only
+- Same script passes on developer machines
+- Validate Skills job passes, Quality Gate fails
+- No visible error output before exit
+
+**Root Cause**:
+1. **Exit Code 2 Meaning**: "Misuse of shell builtins" per Bash documentation - indicates empty function definitions, missing keywords, permission problems, or builtin misuse
+2. **`set -e` is unreliable**: Has "extremely convoluted and version-dependent behavior" per BashFAQ/105
+3. **Functions behave differently**: `set -e` is effectively ignored inside functions called in conditionals
+4. **`realpath --relative-to` is GNU-specific**: Not available in minimal CI containers (Alpine, etc.)
+5. **TTY/Color Detection**: `test -t 1` returns true locally, false in non-TTY CI
+
+**Solution**:
+```bash
+# Don't use set -e - it's unreliable in CI
+set -uo pipefail
+
+# Use readlink -f for portability instead of realpath --relative-to
+target=$(readlink -f "$link" 2>/dev/null || echo "")
+
+# Safe color detection
+if [[ -t 1 ]] && [[ "${FORCE_COLOR:-}" != "0" ]]; then
+    RED='\033[0;31m'
+else
+    RED=''
+fi
+
+# Track failures explicitly
+EXIT_CODE=0
+run_check() { ... ; EXIT_CODE=1; }
+exit $EXIT_CODE
+```
+
+**Prevention**:
+- Test scripts in non-TTY mode: `bash script.sh | cat`
+- Avoid GNU-specific options like `realpath --relative-to`
+- Never rely on `set -e` for CI scripts
+- Use explicit error tracking with EXIT_CODE variables
+- Document CI-specific behavior in skill references
+
+**Files Modified**:
+- `scripts/validate-skills.sh` - Fixed set -e and realpath issues
+- `scripts/quality_gate.sh` - Fixed set -e and color handling
+- `.github/workflows/ci-and-labels.yml` - Added debug output
+
+---
+
+### LESSON-002: AGENTS.md Line Limit Violation - Progressive Disclosure Principle
+
+**Date**: 2026-04-02
+**Component**: Documentation / Architecture / AGENTS.md
+**Severity**: Medium
+
+**Issue**: AGENTS.md grew to 278 lines, exceeding the 150-line target for progressive disclosure.
+
+**Symptoms**:
+- Document contains detailed workflow explanations
+- Language-specific code examples duplicated from skills
+- Extensive troubleshooting sections inline
+- Hard to scan for essential information
+
+**Root Cause**:
+1. **Scope creep**: Added detailed content instead of references
+2. **No enforcement**: Line limit documented but not checked automatically
+3. **Duplication**: Content existed in both AGENTS.md and skills
+
+**Solution**:
+1. **Line Count Reduction** (278 → 146 lines):
+   - Moved detailed workflows → `agents-docs/HARNESS.md`
+   - Moved language examples → skill `reference/` folders
+   - Moved troubleshooting → individual skill docs
+   - Kept in AGENTS.md: constants, overview, setup, quality gate commands, style rules, security warnings, agent guidance principles, skills table, reference links
+
+2. **Created specialized skills**:
+   - `agents-md` skill (96 lines): AGENTS.md creation guidance
+   - `code-quality` skill (124 lines): Code patterns and linting tools
+   - `test-runner` skill (160 lines): Framework commands and testing strategy
+
+3. **Reference naming standardization**:
+   - Standardized on `references/` (plural) across all skills
+   - Migrated 13 skills from `reference/` → `references/`
+
+4. **Centralized configuration**:
+   - Created `.agents/config.sh` with named constants and utility functions
+   - Single source of truth for MAX_LINES_PER_SOURCE_FILE, etc.
+
+**Prevention**:
+- Add validation in `validate-skills.sh` to check AGENTS.md line count
+- Document the "250-line rule" prominently in skill creation docs
+- Use `@agents-docs/` references instead of inline content
+- Review AGENTS.md size during PR review
+
+**Files Modified**:
+- `AGENTS.md` - Reduced from 278 to 146 lines
+- `.agents/skills/agents-md/SKILL.md` - Created
+- `.agents/skills/code-quality/SKILL.md` - Created
+- `.agents/skills/test-runner/SKILL.md` - Created
+- `.agents/config.sh` - Created with centralized constants
+- 13 skills migrated: `reference/` → `references/`
+
+---
+
+### LESSON-003: Skill Malformed JSON - Invalid evals.json Syntax
+
+**Date**: 2026-04-04
+**Component**: Skills / Evaluations / skill-creator
+**Severity**: Critical
+
+**Issue**: `skill-creator/evals/evals.json` contains malformed JSON that breaks skill evaluation.
+
+**Symptoms**:
+- Eval ID 4 missing closing brace before ID 5
+- JSON parser fails on skill evaluation
+- Silent failures in skill testing
+- Other skills may have similar issues
+
+**Root Cause**:
+1. **No JSON Schema validation**: `skill-rules.json` and `evals.json` lack schema enforcement
+2. **Manual editing**: JSON files edited without validation
+3. **No CI check**: Quality gate doesn't validate JSON structure
+
+**Solution**:
+1. **Immediate fix**: Add missing closing brace in skill-creator evals.json
+2. **Schema validation**: Create JSON Schema for `evals.json` and `skill-rules.json`
+3. **CI enforcement**: Add validation step to quality gate
+4. **Automated checking**: Add pre-commit hook for JSON validation
+
+**Prevention**:
+- Never edit evals.json manually without validation
+- Use `jq` to validate JSON before committing: `cat evals.json | jq empty`
+- Add JSON Schema validation in `validate-skills.sh`
+- CI check for all skill metadata files
+
+**Files Modified**:
+- `.agents/skills/skill-creator/evals/evals.json` - Fixed JSON syntax
+- Schema validation to be added to quality gate
+
+---
+
+### LESSON-004: Atomic Commit Workflow Zero Test Coverage
+
+**Date**: 2026-04-04
+**Component**: Testing / atomic-commit / Scripts
+**Severity**: Critical
+
+**Issue**: The entire atomic commit workflow (2,835 lines across 8 scripts) has ZERO test coverage.
+
+**Symptoms**:
+- 8 scripts in `scripts/atomic-commit/` completely untested
+- Rollback mechanisms not validated
+- GitHub CLI integration (`gh` commands) not mocked
+- Retry logic with exponential backoff untested
+- Polling mechanisms not validated
+- Secret detection patterns not tested against sample data
+
+**Root Cause**:
+1. **Complex mocking required**: `gh` and `git` commands need sophisticated mocks
+2. **Integration complexity**: Multi-phase workflow hard to test in isolation
+3. **No test framework setup**: BATS not fully integrated in CI
+4. **CI disables tests**: `SKIP_TESTS=true` in workflow
+
+**Solution**:
+1. **Create BATS test suite** for all atomic-commit scripts
+2. **Mock infrastructure**: Create mock `gh` and `git` commands for testing
+3. **Phase-based testing**: Test each phase independently
+4. **Integration tests**: Full workflow with temporary git repositories
+5. **Enable tests in CI**: Remove `SKIP_TESTS=true`
+
+**Prevention**:
+- Every script >50 lines must have tests
+- Mock external dependencies (gh, git, API calls)
+- Property-based testing for validation logic
+- Test coverage reporting with kcov/bashcov
+
+**Files to Test**:
+- `scripts/atomic-commit/run.sh` (285 lines)
+- `scripts/atomic-commit/atomic-commit.sh` (569 lines)
+- `scripts/atomic-commit/pre-commit-check.sh` (439 lines)
+- `scripts/atomic-commit/create-pr.sh` (556 lines)
+- `scripts/atomic-commit/sync-and-push.sh` (523 lines)
+- `scripts/atomic-commit/verify-checks.sh` (463 lines)
+
+---
+
+### LESSON-005: GitHub Actions SKIP_TESTS - Tests Disabled in CI
+
+**Date**: 2026-04-04
+**Component**: CI/CD / Testing / GitHub Actions
+**Severity**: Critical
+
+**Issue**: CI workflow explicitly disables all testing with `SKIP_TESTS=true`.
+
+**Symptoms**:
+- Quality gate runs but skips test execution
+- BATS framework not installed or executed
+- Python tests skipped conditionally
+- No test result reporting (JUnit/SARIF)
+- Code changes not validated
+
+**Root Cause**:
+1. **Historical workaround**: Tests were failing so they were disabled
+2. **No test infrastructure**: BATS not properly set up in CI
+3. **Fear of blocking**: Tests might fail so CI skips them
+
+**Solution**:
+1. **Remove `SKIP_TESTS=true`** from `.github/workflows/ci-and-labels.yml`
+2. **Install BATS in CI**: Add setup step for test framework
+3. **Run all tests**: BATS and Python tests must pass
+4. **Add coverage reporting**: Track coverage over time
+5. **Fix failing tests**: Address pre-existing test failures
+
+**Prevention**:
+- Tests must pass for PR merge
+- Pre-commit hooks run tests locally
+- CI tests identical to local tests
+- Coverage gates in CI (e.g., must maintain 80% coverage)
+
+**Files Modified**:
+- `.github/workflows/ci-and-labels.yml` - Remove SKIP_TESTS, add test execution
+
+---
+
+### LESSON-006: Skill Evaluation Gaps - Insufficient Edge Case Coverage
+
+**Date**: 2026-04-04
+**Component**: Skills / Evaluations / Coverage
+**Severity**: High
+
+**Issue**: 80% of skills (24 of 30) lack comprehensive edge case evaluations.
+
+**Symptoms**:
+- Skills with <5 evals (6 skills, 20%)
+- No error handling evals (18 skills, 60%)
+- No integration scenarios between skills
+- Subjective assertions in evals ("feels natural", "can understand")
+- No negative test cases (failure paths)
+
+**Root Cause**:
+1. **Focus on happy path**: Evals only test success scenarios
+2. **No eval guidance**: SKILLS.md lacks evaluation authoring guide
+3. **No quality gate**: CI doesn't validate eval coverage
+4. **Manual process**: No automation for eval structure
+
+**Solution**:
+1. **Add edge case evals** to all skills:
+   - parallel-execution: threshold synchronization, failure handling
+   - goap-agent: dynamic replanning (only 4 evals currently)
+   - testing-strategy: mutation testing (mentioned but not tested)
+   - security-code-auditor: Go/Rust/Java-specific tests
+
+2. **Standardize eval format**:
+   - Remove subjective assertions
+   - Add version field to all evals.json
+   - Include negative test cases
+
+3. **Create evals documentation**:
+   - Add section to `agents-docs/SKILLS.md`
+   - Document how to write comprehensive evals
+
+**Prevention**:
+- Minimum 5 evals per skill (goap-agent currently fails this)
+- At least 1 negative test case per skill
+- JSON Schema validation for evals.json
+- No subjective assertions (replace with checkable patterns)
+
+**Priority Skills to Fix**:
+- skill-creator: Fix malformed JSON, add line limit eval
+- parallel-execution: Add threshold sync eval
+- testing-strategy: Add mutation testing eval
+- security-code-auditor: Add language-specific evals
+
+---
+
+### LESSON-007: Atomic Commit Missing Timeout - Network Operation Hangs
+
+**Date**: 2026-04-04
+**Component**: atomic-commit / Git Operations / Timeout
+**Severity**: High
+
+**Issue**: Git push retry loop in atomic commit workflow has no timeout; can hang indefinitely.
+
+**Symptoms**:
+- CI jobs hang forever on network issues
+- No visibility into which operation is stuck
+- Resources consumed indefinitely
+- Pipeline blocking
+
+**Root Cause**:
+1. **No timeout wrapper**: `git push` commands lack timeout
+2. **Infinite retry**: Retry loop has no maximum duration
+3. **No progress indication**: Hanging operations are silent
+
+**Solution**:
+```bash
+# Add timeout to all external commands
+MAX_OPERATION_SECONDS=300
+
+timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
+    echo "ERROR: Push timed out after ${MAX_OPERATION_SECONDS}s"
+    EXIT_CODE=1
+}
+
+# Or implement watchdog timer
+```
+
+**Prevention**:
+- Wrap all network operations with timeout
+- Implement exponential backoff with maximum total time
+- Add progress logging for long operations
+- CI timeout should be shorter than GitHub Actions timeout
+
+**Files Modified**:
+- `scripts/atomic-commit/sync-and-push.sh` - Add timeout to git operations
+
+---
+
+### LESSON-008: Agent Override Inconsistency - CLAUDE.md vs GEMINI.md
+
+**Date**: 2026-04-04
+**Component**: Documentation / Agent Overrides / CLAUDE.md
+**Severity**: Medium
+
+**Issue**: Agent-specific override files have inconsistent content depth and purpose.
+
+**Symptoms**:
+- `CLAUDE.md` has substantial content (46 lines)
+- `GEMINI.md` is only `@AGENTS.md` (1 line)
+- `QWEN.md` is minimal
+- Override pattern is unclear
+- Content duplication risk
+
+**Root Cause**:
+1. **No clear policy**: What can be overridden vs. what must stay in AGENTS.md
+2. **Ad hoc additions**: Overrides added without schema
+3. **No validation**: No check that overrides follow pattern
+
+**Solution**:
+1. **Define override schema** in `agents-docs/AGENT_OVERRIDES.md`:
+   - Allowed: CLI-specific settings, tool preferences, timeout overrides
+   - Forbidden: Duplicating AGENTS.md content, changing procedures
+
+2. **Standardize minimal pattern**:
+   ```markdown
+   @AGENTS.md
+   
+   # Claude-Specific Settings
+   - Max output tokens: 8192
+   - Preferred diff format: unified
+   ```
+
+3. **Add validation**: Check that agent files only contain overrides
+
+**Prevention**:
+- Document override hierarchy
+- Validate agent-specific files in CI
+- Never duplicate AGENTS.md content
+- Keep overrides minimal (<20 lines)
+
+**Files Modified**:
+- `CLAUDE.md` - Remove shared content, keep only overrides
+- `GEMINI.md` - Already correct pattern
+- `agents-docs/AGENT_OVERRIDES.md` - Create documentation
+
+---
+
+### LESSON-009: Documentation Sync Duplication - Frontmatter Parsing Logic
+
+**Date**: 2026-04-04
+**Component**: Scripts / Documentation / DRY Principle
+**Severity**: Medium
+
+**Issue**: `update-agents-md.sh` and `update-agents-registry.sh` implement similar frontmatter parsing logic independently.
+
+**Symptoms**:
+- Code duplication between two scripts
+- Same regex patterns in multiple places
+- Violates DRY principle
+- Maintenance burden (fix in 2+ places)
+
+**Root Cause**:
+1. **Scripts evolved separately**: No shared library concept
+2. **Copy-paste development**: Similar functionality added independently
+3. **No abstraction**: Missing shared utility layer
+
+**Solution**:
+1. **Create shared library** `scripts/lib/docs-utils.sh`:
+   ```bash
+   extract_frontmatter_field() { ... }
+   generate_markdown_table() { ... }
+   update_section_in_file() { ... }
+   ```
+
+2. **Refactor scripts** to use library:
+   ```bash
+   source "$(dirname "$0")/../scripts/lib/docs-utils.sh"
+   ```
+
+3. **Add tests** for library functions
+
+**Prevention**:
+- Check for duplication during PR review
+- Create `scripts/lib/` for shared utilities
+- Document library usage in AGENTS.md
+- Add ShellCheck for library imports
+
+**Files Modified**:
+- `scripts/lib/docs-utils.sh` - Create shared library
+- `scripts/update-agents-md.sh` - Refactor to use library
+- `scripts/update-agents-registry.sh` - Refactor to use library
+
+---
+
+## Resources
+
+- [BashFAQ/105 - Why set -e doesn't work](https://mywiki.wooledge.org/BashFAQ/105)
+- [TLDP Exit Codes](https://tldp.org/LDP/abs/html/exitcodes.html)
+- [ShellCheck Wiki](https://github.com/koalaman/shellcheck/wiki/)
+- [GitHub Actions Workflow Commands](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions)
+
+## Status
+
+- ✅ LESSON-001 through LESSON-009 documented
+- ✅ Root cause analysis complete
+- ✅ Solutions implemented or documented
+- ⏳ CI verification pending for some lessons
+
+---
+
+**Next User Should**:
+- Reference specific lesson: `@agents-docs/LESSONS.md#LESSON-001`
+- Add new lessons using the template format above
+- Update `lessons.jsonl` when adding lessons
+- Include Date, Component, Issue, Symptoms, Root Cause, Solution, Prevention
