@@ -107,6 +107,13 @@ Choose separation strategy:
 ✓ Tests pass
 ```
 
+### Step 5: Document
+
+**Save TRIZ analysis to `analysis/` directory** (e.g., `analysis/TRIZ_<problem>.md`) including:
+- Problem statement and contradiction
+- Resolution approach used
+- Validation results
+
 ## Examples
 
 ### Example 1: Performance vs Maintainability

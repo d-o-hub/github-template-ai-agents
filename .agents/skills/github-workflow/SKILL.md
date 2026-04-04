@@ -198,6 +198,7 @@ Workflow succeeds when:
 
 ## See Also
 
-- `reference/IMPLEMENTATION.md` - Technical details
-- `reference/ACTIONS.md` - GitHub Actions monitoring
-- `reference/MERGE.md` - Auto-merge strategies
+- `reference/IMPLEMENTATION.md` - Technical implementation details
+- `run.sh` - Main workflow script
+- `evals/README.md` - Test scenarios and evaluation cases
+

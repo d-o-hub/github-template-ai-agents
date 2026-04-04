@@ -9,15 +9,8 @@ description: Unified atomic git workflow with GitHub integration - commits all c
 
 ## Overview
 
-This skill orchestrates a complete development workflow with **swarm agent coordination**:
-
-```
-[Atomic Commit] → [Check GitHub Issues] → [Create PR] → [Monitor ALL Actions]
-       ↓                    ↓                      ↓                  ↓
-   Any issues?      Fix/Close issues      All passing?     Web Research
-       ↓                    ↓                      ↓                  ↓
-   Research    →     Resolve      →      Merge      →   Validate Main
-```
+This skill orchestrates a complete development workflow with **swarm agent coordination**.
+See `reference/SWARM.md` for detailed agent definitions and coordination patterns.
 
 ## Workflow Phases
 
@@ -35,11 +28,7 @@ This skill orchestrates a complete development workflow with **swarm agent coord
 
 ### Phase 3: CREATE PR (Agent: pr-agent)
 - Push to new feature branch
-- Create comprehensive PR with:
-  - Commit summary
-  - Related issues linking
-  - Change description
-  - Checklist for validation
+- Create comprehensive PR with commit summary and context
 
 ### Phase 4: MONITOR ALL ACTIONS (Agent: monitor-agent)
 **CRITICAL:** ALL GitHub Actions must pass, including pre-existing issues
@@ -53,7 +42,7 @@ If ANY check fails:
 - Trigger web research with doc-resolver skill
 - Use available skills to fix issues
 - Re-run checks after fixes
-- Coordinate with handoff pattern
+- Coordinate with handoff pattern (see `reference/HANDOFF.md`)
 
 ### Phase 6: MERGE (Agent: merge-agent)
 - Verify ALL checks passing
@@ -67,92 +56,6 @@ If ANY check fails:
 - Validate documentation complete
 - Check repository integrity
 - Run final quality gate
-
-## Agent Coordination (Swarm with Handoff)
-
-### Agent Definitions
-
-**Agent 1: commit-agent**
-```yaml
-role: Create atomic commit
-skills: [shell-script-quality, git]
-tasks:
-  - Stage all changes
-  - Run quality gate
-  - Create conventional commit
-output: commit_sha, branch_name
-```
-
-**Agent 2: issue-agent**
-```yaml
-role: Check GitHub issues
-skills: [codeberg-api, github]
-tasks:
-  - List open issues
-  - Check issue relevance
-  - Flag blocking issues
-output: issues_list, blocking_count
-```
-
-**Agent 3: pr-agent**
-```yaml
-role: Create pull request
-skills: [github]
-tasks:
-  - Push branch
-  - Create PR body
-  - Link related issues
-output: pr_number, pr_url
-```
-
-**Agent 4: monitor-agent**
-```yaml
-role: Monitor ALL GitHub Actions
-skills: [github, iterative-refinement]
-tasks:
-  - Poll PR checks
-  - Check repo workflows
-  - Detect failures
-  - Wait for completion
-output: checks_status, failures_list
-```
-
-**Agent 5: fix-agent** (Conditional)
-```yaml
-role: Fix issues using skills
-skills: [web-search-researcher, do-web-doc-resolver, all-available]
-tasks:
-  - Research failures
-  - Apply fixes
-  - Re-run checks
-  - Handoff back to monitor
-trigger: ANY check failure
-```
-
-**Agent 6: merge-agent**
-```yaml
-role: Merge PR
-skills: [github]
-tasks:
-  - Verify checks passing
-  - Merge PR
-  - Cleanup branch
-  - Update issues
-output: merge_status
-```
-
-**Agent 7: validate-agent**
-```yaml
-role: Post-merge validation
-skills: [shell-script-quality, all-available]
-tasks:
-  - Checkout main
-  - Verify files present
-  - Validate docs
-  - Run quality gate
-  - Check integrity
-output: validation_status
-```
 
 ## Usage
 
@@ -246,39 +149,6 @@ git pull origin main
 6. Repository integrity OK
 ```
 
-## Error Codes
-
-| Code | Meaning | Action |
-|------|---------|--------|
-| 0 | Success | Complete |
-| 1 | General error | Stop |
-| 2 | Commit failed | Review changes |
-| 3 | Quality gate failed | Fix issues |
-| 4 | GitHub issues blocking | Resolve issues |
-| 5 | PR creation failed | Manual PR |
-| 6 | Actions failed | Fix and retry |
-| 7 | Max retries exceeded | Manual fix |
-| 8 | Merge failed | Manual merge |
-| 9 | Post-merge validation failed | Emergency fix |
-
-## Handoff Coordination
-
-Agents communicate via structured handoffs:
-
-```json
-{
-  "from": "monitor-agent",
-  "to": "fix-agent",
-  "context": {
-    "pr_number": 123,
-    "failures": ["test failure", "lint error"],
-    "logs": "...",
-    "attempt": 1
-  },
-  "skills_needed": ["web-search-researcher", "shell-script-quality"]
-}
-```
-
 ## Configuration
 
 ```bash
@@ -306,4 +176,4 @@ Workflow succeeds when:
 
 - `reference/SWARM.md` - Agent coordination details
 - `reference/HANDOFF.md` - Handoff protocol
-- `evals/README.md` - Test scenarios
+- `run.sh` - Implementation script

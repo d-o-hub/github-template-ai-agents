@@ -478,13 +478,12 @@ $(git log --oneline "origin/$BASE_BRANCH..HEAD" 2>/dev/null | sed 's/^/- /' | he
 - [ ] Checks passing
 - [ ] Ready for review"
             
-            local pr_url=$(gh pr create \
+            local pr_url
+            if ! pr_url=$(gh pr create \
                 --title "$MESSAGE" \
                 --body "$pr_body" \
                 --base "$BASE_BRANCH" \
-                --head "$BRANCH_NAME" 2>&1)
-            
-            if [[ $? -ne 0 ]]; then
+                --head "$BRANCH_NAME" 2>&1); then
                 error "Failed to create PR: $pr_url"
                 return $E_PR_FAILED
             fi
@@ -730,12 +729,11 @@ phase_merge() {
     # Perform merge
     log "Merging PR #$PR_NUMBER with method: $MERGE_METHOD..."
     
-    local merge_output=$(gh pr merge "$PR_NUMBER" \
-        --${MERGE_METHOD} \
+    local merge_output
+    if ! merge_output=$(gh pr merge "$PR_NUMBER" \
+        --"${MERGE_METHOD}" \
         --delete-branch=false \
-        2>&1)
-    
-    if [[ $? -ne 0 ]]; then
+        2>&1); then
         error "Merge failed: $merge_output"
         return $E_MERGE_FAILED
     fi
