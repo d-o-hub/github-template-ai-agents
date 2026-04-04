@@ -82,34 +82,8 @@
 
 ## Usage
 
-Skills are triggered automatically based on context or loaded explicitly:
-
-```
-# Automatic triggers (examples)
-"accessibility audit"       → loads accessibility-auditor
-"create CI/CD pipeline"       → loads cicd-pipeline
-"migrate from Flask to FastAPI" → loads migration-refactoring
-
-# Explicit reference
-See agents-docs/SKILLS.md for loading skills manually.
-```
-
-## Skill Structure
-
-Each skill follows this structure:
-
-```
-.agents/skills/<skill-name>/
-├── SKILL.md           # Main skill definition (≤250 lines)
-├── evals/
-│   └── evals.json     # Test cases and assertions
-├── reference/         # Detailed documentation
-│   └── *.md
-├── scripts/           # Executable scripts
-│   └── *.sh, *.py
-└── assets/            # Templates, examples
-    └── *
-```
+Skills are triggered automatically based on context or loaded explicitly.
+See `agents-docs/SKILLS.md` for loading skills manually.
 
 ## See Also
 

@@ -27,7 +27,7 @@ jobs:
       issues: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
       - name: Ensure script is executable
         run: chmod +x scripts/gh-labels-creator.sh
@@ -43,25 +43,25 @@ jobs:
     timeout-minutes: 10  # Fail fast instead of waiting 6 hours
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
       - name: Setup skills
         run: ./scripts/setup-skills.sh
 
       - name: Setup Node.js (if package.json exists)
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a  # v4.2.0
         with:
           node-version: '20'
         if: hashFiles('package.json') != ''
 
       - name: Setup Rust (if Cargo.toml exists)
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9  # stable
         with:
           components: rustfmt, clippy
         if: hashFiles('Cargo.toml') != ''
 
       - name: Setup Python (if requirements.txt or pyproject.toml exists)
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55  # v5.5.0
         with:
           python-version: '3.11'
         if: >-
@@ -71,7 +71,7 @@ jobs:
           hashFiles('.agents/skills/*/pyproject.toml') != ''
 
       - name: Setup Go (if go.mod exists)
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34  # v5.3.0
         with:
           go-version: '1.21'
         if: hashFiles('go.mod') != ''
@@ -96,9 +96,7 @@ jobs:
 
       - name: Run quality gate
         run: |
-          # Skip BATS tests in CI to prevent recursion
-          # (tests call quality_gate.sh)
-          SKIP_TESTS=true SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/quality_gate.sh
+          SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/quality_gate.sh
 
   test:
     name: Run Tests
@@ -106,20 +104,20 @@ jobs:
     needs: quality-gate
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
       - name: Setup Node.js (if package.json exists)
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a  # v4.2.0
         with:
           node-version: '20'
         if: hashFiles('package.json') != ''
 
       - name: Setup Rust (if Cargo.toml exists)
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9  # stable
         if: hashFiles('Cargo.toml') != ''
 
       - name: Setup Python (if requirements.txt or pyproject.toml exists)
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55  # v5.5.0
         with:
           python-version: '3.11'
         if: >-
@@ -129,7 +127,7 @@ jobs:
           hashFiles('.agents/skills/*/pyproject.toml') != ''
 
       - name: Setup Go (if go.mod exists)
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34  # v5.3.0
         with:
           go-version: '1.21'
         if: hashFiles('go.mod') != ''

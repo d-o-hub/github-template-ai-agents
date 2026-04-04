@@ -18,6 +18,7 @@ SKILLS_SRC="$REPO_ROOT/.agents/skills"
 CLI_SKILL_DIRS=(
   ".claude/skills"
   ".gemini/skills"
+  ".qwen/skills"
 )
 
 FAILED=0
@@ -99,7 +100,13 @@ for skill_path in "$SKILLS_SRC"/*/; do
     for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
         link="$REPO_ROOT/$cli_dir/$skill_name"
 
-        if [ ! -L "$link" ]; then
+        # .qwen/skills may be real dirs (not symlinks) - accept either
+        if [[ "$cli_dir" == ".qwen/skills" ]]; then
+            if [ ! -d "$link" ]; then
+                echo -e "  ${RED}✗${NC} MISSING: $cli_dir/$skill_name" >&2
+                FAILED=1
+            fi
+        elif [ ! -L "$link" ]; then
             echo -e "  ${RED}✗${NC} MISSING symlink: $cli_dir/$skill_name" >&2
             FAILED=1
         elif [ ! -d "$link" ]; then
