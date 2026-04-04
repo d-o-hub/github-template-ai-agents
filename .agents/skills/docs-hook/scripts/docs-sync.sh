@@ -31,7 +31,7 @@ log_warn() {
     echo -e "${YELLOW}[WARN]${NC} $1"
 }
 
-# shellcheck disable=SC2329
+# shellcheck disable=SC2317,SC2329
 log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
