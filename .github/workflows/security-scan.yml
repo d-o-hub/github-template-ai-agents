@@ -66,25 +66,15 @@ jobs:
           if [[ ! -s shellcheck-results.sarif ]] || \
              ! python3 -c "import json,sys; json.load(open('shellcheck-results.sarif'))" \
                  2>/dev/null; then
-            python3 -c "
-              import json
-              schema = 'https://raw.githubusercontent.com/oasis-tcs/sarif-spec/'
-              schema += 'master/Schemata/sarif-schema-2.1.0.json'
-              sarif = {
-                  '\$schema': schema,
-                  'version': '2.1.0',
-                  'runs': [{
-                      'tool': {
-                          'driver': {
-                              'name': 'shellcheck',
-                              'informationUri': 'https://www.shellcheck.net/'
-                          }
-                      },
-                      'results': []
-                  }]
-              }
-              json.dump(sarif, open('shellcheck-results.sarif', 'w'))
-            "
+            echo 'import json' > /tmp/gen_sarif.py
+            echo 'schema = "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/"' >> /tmp/gen_sarif.py
+            echo 'schema += "master/Schemata/sarif-schema-2.1.0.json"' >> /tmp/gen_sarif.py
+            echo 'sarif = {"$schema": schema, "version": "2.1.0",' >> /tmp/gen_sarif.py
+            echo '  "runs": [{"tool": {"driver": {"name": "shellcheck",' >> /tmp/gen_sarif.py
+            echo '    "informationUri": "https://www.shellcheck.net/"},' >> /tmp/gen_sarif.py
+            echo '    "results": []}]}' >> /tmp/gen_sarif.py
+            echo 'json.dump(sarif, open("shellcheck-results.sarif", "w"))' >> /tmp/gen_sarif.py
+            python3 /tmp/gen_sarif.py
           fi
 
       - name: Upload ShellCheck SARIF
