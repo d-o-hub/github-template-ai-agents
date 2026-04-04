@@ -135,6 +135,7 @@ git commit -m "feat: add user registration"
 - 🤖 **[Sub-Agents](agents-docs/SUB-AGENTS.md)** - Context isolation patterns
 - 🔧 **[Hooks](agents-docs/HOOKS.md)** - Pre/post tool hooks
 - 📊 **[Context](agents-docs/CONTEXT.md)** - Back-pressure mechanisms
+- ⚙️ **[Configuration](agents-docs/CONFIG.md)** - Repository constants and utilities
 - 🔄 **[Migration](agents-docs/MIGRATION.md)** - Adopting in existing projects
 
 ## Available Skills

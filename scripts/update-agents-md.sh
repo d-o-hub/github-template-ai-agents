@@ -12,6 +12,9 @@ cd "$REPO_ROOT"
 AGENTS_FILE="$REPO_ROOT/AGENTS.md"
 TEMP_FILE="$REPO_ROOT/.agents_md_temp.md"
 
+# Trap to clean up temp files on exit or error
+trap 'rm -f "$TEMP_FILE" "$temp_table"' EXIT ERR
+
 # Check if AGENTS.md exists
 if [ ! -f "$AGENTS_FILE" ]; then
     echo "Error: AGENTS.md not found at $AGENTS_FILE"

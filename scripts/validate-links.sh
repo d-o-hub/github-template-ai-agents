@@ -7,27 +7,53 @@
 set -uo pipefail
 
 # Color codes for output
+# These use ANSI escape sequences to provide visual feedback:
+# - RED for errors (broken links, format violations)
+# - GREEN for success (valid links)
+# - YELLOW for warnings (missing files, skipped checks)
+# - NC (No Color) resets formatting to prevent color bleeding
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Resolve repository root using BASH_SOURCE to handle being called from any directory
+# This makes the script portable - works whether run from repo root or scripts folder
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$REPO_ROOT/.agents/skills"
 
+# Counters for the final summary report
+# We track these across all files to provide actionable statistics
 BROKEN_COUNT=0
 FORMAT_ERRORS=0
 FILES_CHECKED=0
 LINKS_CHECKED=0
 
 # Regex to match markdown links: [text](path)
+# Captures two groups: [1]=link text, [2]=link destination
+# Example: [SKILLS.md](agents-docs/SKILLS.md) -> BASH_REMATCH[1]=SKILLS.md, BASH_REMATCH[2]=agents-docs/SKILLS.md
 LINK_REGEX='\[([^]]+)\]\(([^)]+)\)'
 
-# Regex to match @references (deprecated format)
+# Regex to detect deprecated @references format
+# The @ prefix was replaced with backtick format to avoid shell interpretation issues
+# This pattern catches @reference/filename.md or @references/filename.md
+# Why deprecated? @ looks like a mention, backticks clearly indicate code/ reference format
 AT_REF_REGEX='@references?/[^[:space:]]+'
 
-# Regex to match proper format: - `references?/filename.md` - description
-# This is the REQUIRED format for references
+# Regex to validate proper reference format: - `references?/filename.md` - description
+# Breakdown of this pattern:
+#   ^\-              - Line must START with a dash (bullet point)
+#   [[:space:]]+     - One or more spaces after dash
+#   \`               - Opening backtick
+#   (references?/    - Capture group: "reference/" or "references/" (singular/plural both valid)
+#     [a-zA-Z0-9_-]+ - Filename: alphanumeric, underscores, hyphens
+#     \.md)          - Must end with .md extension
+#   \`               - Closing backtick
+#   [[:space:]]*     - Optional spaces
+#   -                - Literal dash separator
+#   [[:space:]]+     - One or more spaces
+#   .+               - Description text (anything)
+#   $                - End of line
 # shellcheck disable=SC2016
 PROPER_REF_REGEX='^\-[[:space:]]+\`(references?/[a-zA-Z0-9_-]+\.md)\`[[:space:]]*-[[:space:]]+.+$'
 
@@ -47,6 +73,12 @@ is_url() {
 }
 
 # Function to resolve a relative path from a base directory
+# This handles path normalization to avoid "../" and "./" in resolved paths
+# Why use realpath? It handles edge cases like:
+#   - Multiple slashes: foo//bar -> foo/bar
+#   - Dot directories: foo/./bar -> foo/bar
+#   - Parent references: foo/../bar -> bar
+# Fallback to simple concatenation if realpath unavailable (macOS compatibility)
 resolve_path() {
     local base_dir="$1"
     local link_path="$2"
@@ -58,6 +90,7 @@ resolve_path() {
     fi
 
     # Normalize path by removing redundant components
+    # realpath -m (mock mode) doesn't require path to exist - we check existence separately
     if command -v realpath &> /dev/null; then
         realpath -m "$base_dir/$link_path"
     else
@@ -146,6 +179,13 @@ check_reference_format() {
 }
 
 # Function to process a single SKILL.md file
+# Uses a state machine pattern to track whether we're in the References section
+# The logic flow per line:
+#   1. Track if we enter/exit References section (in_references flag)
+#   2. If in References: validate format of reference entries
+#   3. Always: find all markdown links and check if targets exist
+#   4. Always: check backtick-wrapped paths (alternative link syntax)
+#   5. Always: flag deprecated @references
 process_skill_file() {
     local skill_file="$1"
     local skill_dir
@@ -162,6 +202,7 @@ process_skill_file() {
         line_num=$((line_num + 1))
 
         # Track if we're in the References section
+        # State transitions: out -> in when see "## References", in -> out when see any other "##"
         if is_references_header "$line"; then
             in_references=1
             continue
@@ -170,6 +211,7 @@ process_skill_file() {
         fi
 
         # Check reference format (only in References section)
+        # We enforce strict format rules here because this section is machine-parsed
         if [[ $in_references -eq 1 ]]; then
             if ! check_reference_format "$line" "$line_num" "$skill_file" "$skill_dir"; then
                 FORMAT_ERRORS=$((FORMAT_ERRORS + 1))
@@ -178,15 +220,19 @@ process_skill_file() {
         fi
 
         # Find all markdown links in this line
+        # We use a temp_line variable because regex matching in bash is stateful
+        # Removing each match lets us find multiple links on the same line
         local temp_line="$line"
         while [[ "$temp_line" =~ $LINK_REGEX ]]; do
             local full_match="${BASH_REMATCH[0]}"
             local link_path="${BASH_REMATCH[2]}"
 
             # Remove this match from temp_line first (to continue loop)
+            # Using ${var#*substring} removes the shortest match from start
             temp_line="${temp_line#*"$full_match"}"
 
             # Skip if this looks like an example (line contains "example:" or the link is in backticks)
+            # We don't want to validate links shown in documentation examples
             if [[ "$line" =~ example[[:space:]]*[:\(] ]] || [[ "$link_path" =~ \.(svg|png|jpg|jpeg|gif)$ ]]; then
                 continue
             fi
@@ -201,6 +247,8 @@ process_skill_file() {
         done
 
         # Also check for backtick-wrapped paths that look like references (only .md files in reference/)
+        # This catches alternative syntax: `reference/file.md` without the "- Description" part
+        # We validate these exist but don't require full format (allows inline references)
         if [[ "$line" =~ \`(references?/[a-zA-Z0-9_-]+\.md)\` ]]; then
             local ref_path="${BASH_REMATCH[1]}"
             LINKS_CHECKED=$((LINKS_CHECKED + 1))
@@ -212,6 +260,7 @@ process_skill_file() {
         fi
 
         # Check for backtick-wrapped paths in docs/ - only .md files, skip .svg and others
+        # docs/ folder contains shared documentation referenced across skills
         if [[ "$line" =~ \`(docs/[a-zA-Z0-9_/-]+\.md)\` ]]; then
             local docs_path="${BASH_REMATCH[1]}"
             LINKS_CHECKED=$((LINKS_CHECKED + 1))
@@ -222,6 +271,7 @@ process_skill_file() {
         fi
 
         # Check for @references (deprecated format pointing to non-existent files)
+        # These are always errors - we don't just warn, we require migration to new format
         if [[ "$line" =~ @(references?/[a-zA-Z0-9_-]+\.md) ]]; then
             local at_ref="${BASH_REMATCH[1]}"
             echo -e "  ${RED}✗${NC} Broken @reference at line $line_num: @$at_ref" >&2
@@ -239,6 +289,10 @@ process_skill_file() {
 
 echo "Validating reference links in SKILL.md files..."
 echo ""
+
+# Main entry point: discover and process all skill files
+# We iterate through the skills directory, skipping backup folders (underscore prefix)
+# For each skill, we look for SKILL.md and run validation
 
 # Check if skills directory exists
 if [[ ! -d "$SKILLS_DIR" ]]; then
