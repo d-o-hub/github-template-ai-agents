@@ -49,6 +49,13 @@ if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
     echo ""
 fi
 
+# --- Validate GitHub Actions SHAs ---
+echo -e "${BLUE}Validating GitHub Actions SHAs...${NC}"
+if ! ./scripts/validate-github-actions-shas.sh; then
+    FAILED=1
+fi
+echo ""
+
 # --- Always: validate skill symlinks ---
 echo -e "${BLUE}Validating skill symlinks...${NC}"
 if ! ./scripts/validate-skills.sh; then
@@ -145,7 +152,7 @@ echo ""
 # Rust checks
 if [[ " ${DETECTED_LANGUAGES[*]} " =~ " rust " ]]; then
     echo -e "${BLUE}Running Rust checks...${NC}"
-    
+
     if command -v cargo &> /dev/null; then
         # Format check: cargo fmt --check returns error if files would be reformatted
         # This enforces consistent formatting without modifying files
@@ -156,7 +163,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " rust " ]]; then
         else
             echo -e "${GREEN}  ✓ cargo fmt passed${NC}"
         fi
-        
+
         # Clippy: Rust's linter - catches common mistakes and anti-patterns
         # SKIP_CLIPPY allows skipping in CI if clippy is slow or has false positives
         if [ "${SKIP_CLIPPY:-false}" != "true" ]; then
@@ -168,7 +175,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " rust " ]]; then
                 echo -e "${GREEN}  ✓ cargo clippy passed${NC}"
             fi
         fi
-        
+
         # Tests: Run library tests only (faster than integration tests)
         # SKIP_TESTS allows skipping in environments without test dependencies
         if [ "${SKIP_TESTS:-false}" != "true" ]; then
@@ -190,7 +197,7 @@ fi
 # Prefers pnpm (faster, disk efficient) but falls back to npm if pnpm unavailable
 if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
     echo -e "${BLUE}Running TypeScript/JavaScript checks...${NC}"
-    
+
     # Check for pnpm first (preferred package manager)
     if command -v pnpm &> /dev/null; then
         # Lint: Runs ESLint or configured linter via "pnpm lint" script
@@ -201,7 +208,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
         else
             echo -e "${GREEN}  ✓ pnpm lint passed${NC}"
         fi
-        
+
         # Typecheck: Runs tsc --noEmit to verify types without generating JS
         # Catches type errors that might not appear in tests
         if ! OUTPUT=$(pnpm typecheck 2>&1); then
@@ -211,7 +218,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
         else
             echo -e "${GREEN}  ✓ pnpm typecheck passed${NC}"
         fi
-        
+
         # Tests via SKIP_TESTS env var (useful for CI without test env)
         if [ "${SKIP_TESTS:-false}" != "true" ]; then
             if ! OUTPUT=$(pnpm test 2>&1); then
@@ -231,7 +238,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
         else
             echo -e "${GREEN}  ✓ npm lint passed${NC}"
         fi
-        
+
         if ! OUTPUT=$(npm run typecheck 2>&1); then
             echo -e "${RED}  ✗ npm typecheck failed${NC}"
             echo "$OUTPUT" >&2
@@ -239,7 +246,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
         else
             echo -e "${GREEN}  ✓ npm typecheck passed${NC}"
         fi
-        
+
         if [ "${SKIP_TESTS:-false}" != "true" ]; then
             if ! OUTPUT=$(npm test 2>&1); then
                 echo -e "${RED}  ✗ npm test failed${NC}"
@@ -260,7 +267,7 @@ fi
 # Falls back to warnings if tools not installed (Python dev tools are optional)
 if [[ " ${DETECTED_LANGUAGES[*]} " =~ " python " ]]; then
     echo -e "${BLUE}Running Python checks...${NC}"
-    
+
     # ruff: Extremely fast Python linter written in Rust
     # Replaces flake8, pylint with unified, faster tool
     if command -v ruff &> /dev/null; then
@@ -274,7 +281,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " python " ]]; then
     else
         echo -e "${YELLOW}  ⚠ ruff not installed - skipping Python lint${NC}"
     fi
-    
+
     # black: The uncompromising Python code formatter
     # --check flag returns error code if files would be reformatted
     if command -v black &> /dev/null; then
@@ -288,7 +295,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " python " ]]; then
     else
         echo -e "${YELLOW}  ⚠ black not installed - skipping Python format${NC}"
     fi
-    
+
     # pytest: Modern Python testing framework
     # -q (quiet) mode for cleaner output in CI
     if [ "${SKIP_TESTS:-false}" != "true" ]; then
@@ -311,7 +318,7 @@ fi
 # Standard Go toolchain provides everything needed: gofmt, go vet, go test
 if [[ " ${DETECTED_LANGUAGES[*]} " =~ " go " ]]; then
     echo -e "${BLUE}Running Go checks...${NC}"
-    
+
     if command -v go &> /dev/null; then
         # gofmt: Standard Go formatter
         # -l lists files that would change (we want empty output = all formatted)
@@ -322,7 +329,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " go " ]]; then
         else
             echo -e "${GREEN}  ✓ gofmt passed${NC}"
         fi
-        
+
         # go vet: Static analysis tool that catches suspicious constructs
         # ./... means check all packages recursively
         if ! OUTPUT=$(go vet ./... 2>&1); then
@@ -332,7 +339,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " go " ]]; then
         else
             echo -e "${GREEN}  ✓ go vet passed${NC}"
         fi
-        
+
         # Tests: Run all tests in all packages
         if [ "${SKIP_TESTS:-false}" != "true" ]; then
             if ! OUTPUT=$(go test ./... 2>&1); then
@@ -371,7 +378,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
                     sc_failed=1
                 fi
             done <<< "$SHELL_SCRIPTS"
-            
+
             if [ $sc_failed -eq 0 ]; then
                 echo -e "${GREEN}  ✓ shellcheck passed${NC}"
             else
@@ -381,7 +388,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
     else
         echo -e "${YELLOW}  ⚠ shellcheck not installed - skipping shell checks${NC}"
     fi
-    
+
     # BATS tests: Run if tests/ directory exists and tests not skipped
     # BATS provides a TAP-compliant testing framework for bash scripts
     # NOTE: Skip if we're already inside a BATS test (prevent recursion)
@@ -405,7 +412,7 @@ fi
 # markdownlint enforces consistent Markdown style across the repo
 if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
     echo -e "${BLUE}Running Markdown checks...${NC}"
-    
+
     if command -v markdownlint &> /dev/null; then
         # Check all .md files, ignoring dependencies and build artifacts
         # --ignore patterns prevent linting generated files or node_modules
