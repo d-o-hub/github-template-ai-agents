@@ -52,7 +52,9 @@ jobs:
         run: |
           # Generate SARIF for GitHub Security tab
           # Find all shell scripts
-          mapfile -t script_files < <(find scripts .agents/skills -name "*.sh" -type f 2>/dev/null || true)
+          # yamllint disable-line rule:line-length
+          mapfile -t script_files < <(find scripts .agents/skills \
+            -name "*.sh" -type f 2>/dev/null || true)
 
           if [[ ${#script_files[@]} -gt 0 ]]; then
             # Run shellcheck once with all files to produce valid merged SARIF
@@ -61,8 +63,11 @@ jobs:
           fi
 
           # Validate SARIF JSON; fall back to empty if invalid or missing
+          # yamllint disable-line rule:line-length
           if [[ ! -s shellcheck-results.sarif ]] || \
-             ! python3 -c "import json,sys; json.load(open('shellcheck-results.sarif'))" 2>/dev/null; then
+             ! python3 -c "import json,sys; json.load(open('shellcheck-results.sarif'))" \
+             2>/dev/null; then
+            # yamllint disable-line rule:line-length
             s='{"$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","version":"2.1.0","runs":[{"tool":{"driver":{"name":"shellcheck","informationUri":"https://www.shellcheck.net/"}}, "results":[]}]}'
             echo "$s" > shellcheck-results.sarif
           fi
@@ -160,12 +165,14 @@ jobs:
 
       - name: Check for JavaScript/Python files
         id: check_files
+        # yamllint disable-line rule:line-length
         run: |
           # Check if there are any JS/TS or Python files to analyze
           if find . -name "*.js" -o -name "*.ts" -o -name "*.py" | grep -q .; then
             echo "has_codeql_files=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_codeql_files=false" >> "$GITHUB_OUTPUT"
+            # yamllint disable-line rule:line-length
             echo "ℹ️ No JavaScript/TypeScript/Python files found. Skipping CodeQL analysis."
           fi
 
@@ -194,9 +201,11 @@ jobs:
         run: |
           # Upload an empty but valid SARIF so GitHub's code scanning check
           # resolves cleanly instead of erroring with "Error when processing
-          # the SARIF file" (caused by a pre-registered check run with no upload).
+          # the SARIF file" (caused by a pre-registered check run with
+          # no upload).
           cat > codeql-empty-results.sarif << 'EOF'
           {
+            # yamllint disable-line rule:line-length
             "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
             "version": "2.1.0",
             "runs": [
@@ -278,6 +287,7 @@ jobs:
           echo "=========================================="
           echo ""
           echo "Job Results:"
+          # yamllint disable-line rule:line-length
           echo "  • ShellCheck Security: ${{ needs.shellcheck-security.result }}"
           echo "  • Trivy Filesystem: ${{ needs.trivy-fs.result }}"
           echo "  • Secret Detection: ${{ needs.secret-detection.result }}"
@@ -302,9 +312,11 @@ jobs:
           else
             echo "✅ All critical security checks passed."
             if [[ "$codeql_result" == "failure" ]]; then
+              # yamllint disable-line rule:line-length
               echo "   ℹ️ CodeQL skipped (no supported languages in shell script repo)"
             fi
           fi
           echo ""
           echo "All scan results available in the Security tab:"
+          # yamllint disable-line rule:line-length
           echo "  https://github.com/${{ github.repository }}/security/code-scanning"

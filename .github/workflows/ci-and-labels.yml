@@ -96,7 +96,8 @@ jobs:
 
       - name: Run quality gate
         run: |
-          # Skip BATS tests in CI to prevent recursion (tests call quality_gate.sh)
+          # Skip BATS tests in CI to prevent recursion
+          # (tests call quality_gate.sh)
           SKIP_TESTS=true SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/quality_gate.sh
 
   test:
@@ -184,7 +185,9 @@ jobs:
 
       - name: Run BATS tests
         run: |
-          if [ -d "tests" ] && [ -n "$(find tests -name '*.bats' -print -quit 2>/dev/null)" ]; then
+          if [ -d "tests" ] && [ -n "$(find tests -name '*.bats' \
+            -print -quit 2>/dev/null)" ]
+          then
             echo "Running BATS tests..."
             bats tests/*.bats
           else
