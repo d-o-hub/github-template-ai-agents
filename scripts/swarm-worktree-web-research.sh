@@ -154,6 +154,9 @@ resolve_with_optimization() {
             # Reference: max quality, full validation
             resolve_args+=("--profile" "quality" "--validate-all")
             ;;
+        *)
+            # Default: no additional context-specific options
+            ;;
     esac
     
     # Execute resolution
@@ -207,7 +210,9 @@ batch_resolve() {
         context=$(echo "$line" | cut -d'|' -f2 | xargs)
         context="${context:-general}"
         
-        local output_file="${output_dir}/$(echo "$query" | tr -c '[:alnum:]' '_').json"
+        local sanitized_query
+        sanitized_query=$(echo "$query" | tr -c '[:alnum:]' '_')
+        local output_file="${output_dir}/${sanitized_query}.json"
         
         # Control parallelism
         if [[ ${#pids[@]} -ge $max_parallel ]]; then
@@ -300,7 +305,7 @@ EOF
 execute_swarm_analysis() {
     local worktree_path="$1"
     local analysis_topic="$2"
-    local research_dir="$3"
+    local _research_dir="$3"  # Reserved for future use; currently derived internally
     
     log_info "Executing swarm analysis in worktree: ${worktree_path}"
     log_info "Analysis topic: ${analysis_topic}"
@@ -643,7 +648,8 @@ main() {
     validate_environment
     
     # Phase 2: Worktree Setup
-    local branch_name="${SWARM_BRANCH_PREFIX}-$(date +%s)"
+    local branch_name
+    branch_name="${SWARM_BRANCH_PREFIX}-$(date +%s)"
     if [[ -n "$worktree_path" ]]; then
         setup_worktree "$branch_name" > /dev/null
         worktree_path="${WORKTREE_BASE}/${branch_name}"

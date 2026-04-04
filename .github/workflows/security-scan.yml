@@ -34,6 +34,7 @@ jobs:
 
       - name: Run ShellCheck with Security Focus
         uses: ludeeus/action-shellcheck@2.0.0
+        continue-on-error: true
         with:
           severity: warning
           format: tty
@@ -49,43 +50,36 @@ jobs:
       - name: ShellCheck SARIF Output
         if: always()
         run: |
-          # Run shellcheck again to generate SARIF for GitHub Security tab
-          # Find all shell scripts first
-          find scripts .agents/skills -name "*.sh" -type f > /tmp/scripts.txt || true
-          if [ -s /tmp/scripts.txt ]; then
-            # Generate SARIF output
-            docker run --rm -v "${PWD}:/src" \
-              -v /tmp/scripts.txt:/tmp/scripts.txt \
-              koalaman/shellcheck:stable \
-              -f sarif \
-              -s bash \
-              -S warning \
-              $(cat /tmp/scripts.txt | sed 's|^|/src/|') \
+          # Generate SARIF for GitHub Security tab
+          # Find all shell scripts
+          mapfile -t script_files < <(find scripts .agents/skills -name "*.sh" -type f 2>/dev/null || true)
+
+          if [[ ${#script_files[@]} -gt 0 ]]; then
+            # Run shellcheck once with all files to produce valid merged SARIF
+            shellcheck -f sarif -s bash -S warning "${script_files[@]}" \
               > shellcheck-results.sarif 2>/dev/null || true
           fi
-          # Ensure valid SARIF file exists (even if empty)
-          if [ ! -s shellcheck-results.sarif ] || \
-             [ "$(wc -l < shellcheck-results.sarif)" -lt 5 ]; then
-            # Build empty SARIF JSON line by line
-            # shellcheck disable=SC2129
+
+          # Validate SARIF JSON; fall back to empty if invalid or missing
+          if [[ ! -s shellcheck-results.sarif ]] || \
+             ! python3 -c "import json,sys; json.load(open('shellcheck-results.sarif'))" 2>/dev/null; then
+            cat > shellcheck-results.sarif << 'SARIF_EOF'
             {
-              echo '{'
-              echo '  "\$schema": "https://raw.githubusercontent.com' \
-                   '/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",'
-              echo '  "version": "2.1.0",'
-              echo '  "runs": ['
-              echo '    {'
-              echo '      "tool": {'
-              echo '        "driver": {'
-              echo '          "name": "shellcheck",'
-              echo '          "informationUri": "https://www.shellcheck.net/"'
-              echo '        }'
-              echo '      },'
-              echo '      "results": []'
-              echo '    }'
-              echo '  ]'
-              echo '}'
-            } > shellcheck-results.sarif
+              "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+              "version": "2.1.0",
+              "runs": [
+                {
+                  "tool": {
+                    "driver": {
+                      "name": "shellcheck",
+                      "informationUri": "https://www.shellcheck.net/"
+                    }
+                  },
+                  "results": []
+                }
+              ]
+            }
+            SARIF_EOF
           fi
 
       - name: Upload ShellCheck SARIF

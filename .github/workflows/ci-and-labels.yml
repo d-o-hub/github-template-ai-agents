@@ -109,7 +109,9 @@ jobs:
           ./scripts/setup-skills.sh
           echo ""
           echo "Verifying symlinks..."
-          ls -la .claude/skills/ | head -10
+          find .claude/skills/ -maxdepth 1 -type l \
+            -printf "  %p -> %l\n" 2>/dev/null | head -10 || \
+            echo "  (no symlinks found or directory doesn't exist)"
           echo ""
           echo "Running quality gate..."
           # Skip BATS tests in CI to prevent recursion (tests call quality_gate.sh)
