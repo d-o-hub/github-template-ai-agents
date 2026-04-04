@@ -4,10 +4,15 @@ Catalog of technical discoveries, debugging resolutions, and process improvement
 
 ## Format
 
-Each lesson follows the standard template:
-- Sequential numbering (LESSON-001, LESSON-002, etc.)
-- Date and component tags
-- Issue/Symptoms/Root Cause/Solution/Prevention structure
+Each lesson follows a dual-write pattern for both human readability and agent discovery:
+
+1. **Verbose Entry (this file)**: Detailed debugging log and onboarding resource.
+   - Sequential numbering (LESSON-001, LESSON-002, etc.)
+   - Date and component tags
+   - Issue/Symptoms/Root Cause/Solution/Prevention structure
+2. **Distilled Insight (nearest AGENTS.md)**: 1–3 line note for runtime agent loading.
+   - Placed in the `AGENTS.md` file closest to the affected code (e.g., `scripts/AGENTS.md`).
+   - Focuses on the non-obvious core finding.
 
 For machine-readable index, see `lessons.jsonl`.
 
@@ -443,7 +448,7 @@ timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
 
 ## Status
 
-- ✅ LESSON-001 through LESSON-012 documented
+- ✅ LESSON-001 through LESSON-015 documented
 - ✅ Root cause analysis complete
 - ✅ Solutions implemented or documented
 - ✅ CI verified for all recent lessons
@@ -458,7 +463,131 @@ timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
 
 ---
 
-### LESSON-010: CI Hangs Indefinitely Due to BATS Recursion
+### LESSON-010: Git Worktree Cleanup and Registration
+
+**Date**: 2026-04-05
+**Component**: Scripts / Worktree Management
+**Severity**: Medium
+
+**Issue**: Scripts creating git worktrees leave orphaned directories and administrative data if they crash or are interrupted.
+
+**Symptoms**:
+- `git worktree list` shows many unused worktrees
+- `fatal: '...' already exists` when running scripts multiple times
+- Disk space consumption on long-running development machines
+
+**Root Cause**:
+1. **Missing Cleanup Traps**: Scripts didn't use `trap` to ensure cleanup on exit/error
+2. **No Central Registration**: No shared array to track created worktrees for bulk cleanup
+
+**Solution**:
+```bash
+# Register worktrees in a shared array
+CREATED_WORKTREES=()
+cleanup() {
+    for wt in "${CREATED_WORKTREES[@]}"; do
+        git worktree remove --force "$wt" 2>/dev/null || true
+    done
+}
+trap cleanup EXIT ERR
+
+# Add to registry when created
+git worktree add "$path" "$branch"
+CREATED_WORKTREES+=("$path")
+```
+
+**Prevention**:
+- Use `scripts/lib/worktree-manager.sh` for all worktree operations
+- Always register created worktrees in `CREATED_WORKTREES`
+- Use the `trap cleanup EXIT ERR` pattern in all stateful scripts
+
+**Files Modified**:
+- `scripts/lib/worktree-manager.sh` - Implemented registration and cleanup logic
+- `scripts/swarm-worktree-web-research.sh` - Updated to use manager
+
+---
+
+### LESSON-011: CI Reliability - Why Validation Scripts Need `set +e`
+
+**Date**: 2026-04-05
+**Component**: CI/CD / Bash Scripts / Quality Gate
+**Severity**: Medium
+
+**Issue**: Validation scripts (like `validate-skills.sh`) exit prematurely on the first minor failure, preventing a full report of all issues.
+
+**Symptoms**:
+- CI job stops after the first failing skill check
+- Developers have to fix one error at a time (whack-a-mole)
+- Incomplete validation state in CI logs
+
+**Root Cause**:
+1. **Global `set -e`**: Scripts used `set -e` which causes immediate exit on any non-zero return code
+2. **Incompatible with Error Accumulation**: Manual error tracking (e.g., `FAILED=1`) is bypassed by `set -e` if a command fails inside a loop
+
+**Solution**:
+```bash
+# Explicitly disable errexit to allow manual error tracking
+set +e
+set -uo pipefail
+
+FAILED=0
+# ... run checks ...
+[[ $something_failed ]] && FAILED=1
+
+# Exit with accumulated status at the end
+exit $((FAILED))
+```
+
+**Prevention**:
+- Use `set +e` in scripts designed to accumulate multiple errors
+- Document why `set +e` is used to prevent well-intentioned "fixes" back to `set -e`
+- Use explicit `exit` codes based on accumulated `FAILED` variables
+
+**Files Modified**:
+- `scripts/validate-skills.sh` - Changed to `set +e` with error tracking
+- `scripts/validate-skill-format.sh` - Changed to `set +e`
+
+---
+
+### LESSON-012: Bash Variable Scope - The `temp_table` Issue
+
+**Date**: 2026-04-05
+**Component**: Scripts / Bash / Variable Shadowing
+**Severity**: Low
+
+**Issue**: Using generic variable names like `temp_table` in scripts causes collisions and unexpected behavior when scripts are sourced or have complex trap logic.
+
+**Symptoms**:
+- Temporary files not being cleaned up
+- `trap` removing files still in use by other parts of the script
+- Data corruption in temporary markdown tables
+
+**Root Cause**:
+1. **Global Scope by Default**: Bash variables are global unless declared `local` in a function
+2. **Naming Collisions**: Multiple functions or sourced scripts using the same `temp_table` name
+3. **Trap Execution Context**: Traps run in the global scope and may see modified or unset variables
+
+**Solution**:
+```bash
+# Define unique, descriptive names for temporary files
+# Use REPO_ROOT and script-specific prefixes
+readonly UPDATE_MD_TEMP_TABLE="$REPO_ROOT/.update_md_temp.md"
+
+# Declare before trap to ensure availability
+trap 'rm -f "$UPDATE_MD_TEMP_TABLE"' EXIT
+```
+
+**Prevention**:
+- Use unique prefixes for temporary variables and files
+- Use `readonly` where possible for configuration variables
+- Define all variables used in `trap` BEFORE the trap is set
+
+**Files Modified**:
+- `scripts/update-agents-md.sh` - Refactored `temp_table` usage
+
+---
+
+### LESSON-013: CI Hangs Indefinitely Due to BATS Recursion
 
 **Date**: 2026-04-04
 **Component**: CI/CD / BATS Testing / Quality Gate
@@ -509,7 +638,7 @@ quality-gate:
 
 ---
 
-### LESSON-011: Shellcheck Warnings vs Errors in CI
+### LESSON-014: Shellcheck Warnings vs Errors in CI
 
 **Date**: 2026-04-04
 **Component**: CI/CD / Shellcheck / Code Quality
@@ -551,7 +680,7 @@ shellcheck --severity=error -f quiet "$script"
 
 ---
 
-### LESSON-012: GitHub API 403 Errors in Generic Templates
+### LESSON-015: GitHub API 403 Errors in Generic Templates
 
 **Date**: 2026-04-04
 **Component**: CI/CD / GitHub API / Token Permissions

@@ -24,9 +24,11 @@ Never hardcode paths.
 
 ## Non-Obvious Lessons
 
-- `validate-skills.sh` and `validate-skill-format.sh` must use `set +e` explicitly (LESSON-011)
-- `temp_table` variable in Bash has scope issues - use unique names (LESSON-012)
-- Scripts creating worktrees must register them in `CREATED_WORKTREES` and use trap cleanup pattern (LESSON-010)
+- `validate-skills.sh` and `validate-skill-format.sh` must use `set +e` explicitly to allow full error report (LESSON-011)
+- Avoid generic Bash variables like `temp_table` in global scope; use script-specific prefixes (LESSON-012)
+- CI hangs can be caused by BATS recursion if a script under test calls BATS itself (LESSON-013)
+- Use `--severity=error` in Shellcheck CI to prevent style warnings from blocking functional PRs (LESSON-014)
+- GitHub API 403 errors in CI usually mean the workflow needs explicit `permissions: issues: write` (LESSON-015)
 - Linting results for `shellcheck` and `markdownlint` are cached in `.git/lint-cache/` to speed up subsequent runs. The cache is per-file and aware of configuration changes.
 
 ## Adding a New Script
