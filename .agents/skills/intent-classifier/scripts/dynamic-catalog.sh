@@ -19,14 +19,14 @@ cat > "$CATALOG_FILE" << 'HEADER'
 HEADER
 
 # Add timestamp
-echo ">> Last updated: $(date +%Y-%m-%d)" >> "$CATALOG_FILE"
-echo "" >> "$CATALOG_FILE"
-
-# Generate available skills table
-echo "## Available Skills" >> "$CATALOG_FILE"
-echo "" >> "$CATALOG_FILE"
-echo "| Skill | Description | Key Triggers |" >> "$CATALOG_FILE"
-echo "|-------|-------------|--------------|" >> "$CATALOG_FILE"
+{
+    echo ">> Last updated: $(date +%Y-%m-%d)"
+    echo ""
+    echo "## Available Skills"
+    echo ""
+    echo "| Skill | Description | Key Triggers |"
+    echo "|-------|-------------|--------------|"
+} >> "$CATALOG_FILE"
 
 # Process each skill
 for skill_path in "$SKILLS_DIR"/*/; do
@@ -54,13 +54,15 @@ for skill_path in "$SKILLS_DIR"/*/; do
     fi
 done
 
-echo "" >> "$CATALOG_FILE"
-echo "## Update Catalog" >> "$CATALOG_FILE"
-echo "" >> "$CATALOG_FILE"
-echo "To regenerate this catalog:" >> "$CATALOG_FILE"
-echo '```bash' >> "$CATALOG_FILE"
-echo "./scripts/dynamic-catalog.sh" >> "$CATALOG_FILE"
-echo '```' >> "$CATALOG_FILE"
+{
+    echo ""
+    echo "## Update Catalog"
+    echo ""
+    echo "To regenerate this catalog:"
+    echo '```bash'
+    echo "./scripts/dynamic-catalog.sh"
+    echo '```'
+} >> "$CATALOG_FILE"
 
 echo "Skill catalog updated: $CATALOG_FILE"
 echo "Total skills indexed: $(grep -c '^| [a-z-]* |' "$CATALOG_FILE" || echo 0)"

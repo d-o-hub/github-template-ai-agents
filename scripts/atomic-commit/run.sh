@@ -20,7 +20,6 @@ NO_ROLLBACK="${ATOMIC_COMMIT_NO_ROLLBACK:-0}"
 # Named constants
 readonly MAX_POLL_ATTEMPTS=12
 readonly POLL_INTERVAL_SECONDS=5
-readonly POLL_WAIT_MESSAGE_INTERVAL=3
 
 # State tracking
 PHASE=""
@@ -36,17 +35,19 @@ log_warn() { echo -e "${YELLOW}[WARN]${NC} $*"; }
 log_error() { echo -e "${RED}[FAIL]${NC} $*" >&2; }
 
 # Error handler
+# shellcheck disable=SC2329
 cleanup_on_error() {
-    local exit_code=$?
-    if [ $exit_code -ne 0 ] && [ "$NO_ROLLBACK" -eq 0 ]; then
+    local exit_code="$?"
+    if [ "$exit_code" -ne 0 ] && [ "$NO_ROLLBACK" -eq 0 ]; then
         log_error "Workflow failed at phase: $PHASE"
         execute_rollback
     fi
-    exit $exit_code
+    exit "$exit_code"
 }
 trap cleanup_on_error EXIT
 
 # Rollback function
+# shellcheck disable=SC2329
 execute_rollback() {
     echo ""
     log_warn "=== ROLLING BACK ==="
@@ -196,7 +197,7 @@ phase_verify() {
         check_list=$(gh pr checks "$PR_NUMBER" 2>&1) || true
         if ! echo "$check_list" | grep -qi "no checks reported"; then
             if [ -n "$check_list" ]; then
-                log_success "Checks found after $((poll_count * $POLL_INTERVAL_SECONDS))s"
+                log_success "Checks found after $((poll_count * POLL_INTERVAL_SECONDS))s"
                 break
             fi
         fi
@@ -224,7 +225,7 @@ phase_verify() {
     checks_output=$(mktemp)
     if ! timeout "$TIMEOUT" gh pr checks "$PR_NUMBER" --watch --interval 10 2>&1 | tee "$checks_output"; then
         elapsed=$(( $(date +%s) - start_time ))
-        if [ $elapsed -ge $TIMEOUT ]; then
+        if [ $elapsed -ge "$TIMEOUT" ]; then
             log_error "Timeout (${elapsed}s)"
             rm -f "$checks_output"
             return 7

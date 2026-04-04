@@ -21,6 +21,25 @@ LINKS_CHECKED=0
 # Captures the path portion which may contain letters, numbers, dots, slashes, hyphens, underscores
 LINK_REGEX='\[([^]]+)\]\(([^)]+)\)'
 
+# Regex to match backtick-wrapped references in bullet points
+# Matches lines like: - `reference/filename.md` - description
+# shellcheck disable=SC2016
+REFTEXT_REGEX='- [`](reference/[^`]+)[`]'
+
+# Track if we're in the References section (used in process_skill_file)
+# shellcheck disable=SC2034
+IN_REFERENCES=0
+
+# Function to check if a line starts the References section
+is_references_header() {
+    [[ "$1" =~ ^##[[:space:]]+[Rr]eferences ]]
+}
+
+# Function to check if a line starts a new section (## header)
+is_section_header() {
+    [[ "$1" =~ ^##[[:space:]]+ ]] && ! [[ "$1" =~ ^##[[:space:]]+[Rr]eferences ]]
+}
+
 # Function to check if a path is a URL (http/https)
 is_url() {
     [[ "$1" =~ ^https?:// ]] || [[ "$1" =~ ^ftp:// ]] || [[ "$1" =~ ^mailto: ]]
@@ -83,6 +102,7 @@ check_link() {
 }
 
 # Function to process a single SKILL.md file
+# shellcheck disable=SC2094
 process_skill_file() {
     local skill_file="$1"
     local skill_dir
@@ -92,22 +112,61 @@ process_skill_file() {
 
     local line_num=0
     local file_broken=0
+    local in_references=0
 
     while IFS= read -r line; do
         line_num=$((line_num + 1))
 
-        # Find all markdown links in this line
+        # Track if we're in the References section
+        if is_references_header "$line"; then
+            in_references=1
+            continue
+        elif is_section_header "$line"; then
+            in_references=0
+        fi
+
+        # Check for backtick-wrapped references (only in References section)
+        if [[ $in_references -eq 1 ]] && [[ "$line" =~ $REFTEXT_REGEX ]]; then
+            local ref_path="${BASH_REMATCH[1]}"
+            # Only check if it looks like a file path (contains / or ends with .md)
+            if [[ "$ref_path" == */* ]] || [[ "$ref_path" == *.md ]]; then
+                LINKS_CHECKED=$((LINKS_CHECKED + 1))
+                if ! check_link "$skill_dir" "$ref_path" "$skill_file" "$line_num"; then
+                    BROKEN_COUNT=$((BROKEN_COUNT + 1))
+                    file_broken=1
+                fi
+            fi
+            continue
+        fi
+
+        # Skip code blocks: remove text between backticks to avoid matching example code
+        # Using bash parameter expansion to remove code in backticks
+        local line_without_code="$line"
+        while [[ "$line_without_code" == *\`*\`* ]]; do
+            # Remove content between backticks (non-greedy-like behavior)
+            line_without_code="${line_without_code//\`+([^\`])\`/}"
+            # Fallback: if pattern doesn't match, just remove first code block
+            if [[ "$line_without_code" == *\`*\`* ]]; then
+                # Extract parts before and after first pair of backticks
+                local prefix="${line_without_code%%\`*}"
+                local suffix="${line_without_code#*\`}"
+                suffix="${suffix#*\`}"
+                line_without_code="$prefix$suffix"
+            fi
+        done
+
+        # Find all markdown links in this line (after removing code)
         # Using grep to find matches, then processing each
-        while [[ "$line" =~ $LINK_REGEX ]]; do
-            local link_text="${BASH_REMATCH[1]}"
+        while [[ "$line_without_code" =~ $LINK_REGEX ]]; do
             local link_path="${BASH_REMATCH[2]}"
 
             LINKS_CHECKED=$((LINKS_CHECKED + 1))
 
             # Remove the matched portion to continue searching the same line
-            line="${line#*"${BASH_REMATCH[0]}"}"
+            line_without_code="${line_without_code#*"${BASH_REMATCH[0]}"}"
 
             # Check this link
+            # shellcheck disable=SC2094
             if ! check_link "$skill_dir" "$link_path" "$skill_file" "$line_num"; then
                 BROKEN_COUNT=$((BROKEN_COUNT + 1))
                 file_broken=1

@@ -1,22 +1,96 @@
 ---
 name: agents-md
-description: Manage AGENTS.md files across the repository - validate, update, and synchronize agent instructions
+description: Create AGENTS.md files with production-ready best practices. Use when creating new AGENTS.md or implementing quality gates.
+license: MIT
 ---
 
-# agents-md
+# AGENTS.md Best Practices
 
-Manage AGENTS.md files across the repository.
+Create production-ready AGENTS.md files. See @references/templates.md for detailed templates.
 
-## Overview
+## Quick Start
 
-This skill provides capabilities for managing AGENTS.md files, which serve as the single source of truth for AI coding agents in this repository.
+**Basic:**
+```bash
+cat > AGENTS.md << 'EOF'
+# AGENTS.md
+## Named Constants
+readonly MAX_FILE_SIZE=500
 
-## Usage
+## Setup
+- Install: npm install
+- Test: npm test
 
-- Validate AGENTS.md format and structure
-- Update AGENTS.md with new conventions
-- Synchronize agent instructions across multiple AGENTS.md files
+## Code Style
+- TypeScript strict
+- Max line: 100
+EOF
+```
+
+**Production:** Use @references/templates.md
+
+## Core Sections
+
+### 1. Named Constants
+```bash
+## Named Constants
+readonly MAX_FILE_SIZE=500
+readonly TIMEOUT_SECONDS=30
+readonly MAX_RETRIES=3
+```
+
+### 2. Pre-existing Issue Policy
+```markdown
+## Pre-existing Issues
+**Fix ALL before completing:**
+- [ ] Lint warnings
+- [ ] Test failures
+- [ ] Security vulnerabilities
+```
+
+### 3. Quality Gate
+```markdown
+## Quality Gate
+```bash
+npm run typecheck
+npm run lint
+npm run test
+npm audit
+```
+```
+
+## Tier Structure
+
+- **Tier 1 (Essential):** Constants, setup, style, testing
+- **Tier 2 (Professional):** Add quality gate, atomic commit, security
+- **Tier 3 (Enterprise):** Add skills, sub-agents, nested AGENTS.md
+
+See @references/tier-breakdown.md for details.
+
+## Best Practices
+
+### DO:
+- Define named constants at top
+- Include pre-existing issue policy
+- Specify quality gate commands
+- Reference @agents-docs/ for detail
+
+### DON'T:
+- Use magic numbers
+- Skip pre-existing issues
+- Write vague commands ("run tests")
+- Duplicate README content
+
+## Quality Criteria
+
+- [ ] Named constants defined
+- [ ] Pre-existing issue policy included
+- [ ] Quality gate specified
+- [ ] < 150 lines (progressive disclosure)
 
 ## References
 
-- See `references/` folder for detailed documentation
+- @references/templates.md - Production templates
+- @agents-docs/SKILLS.md - Skill framework
+- @agents-docs/SUB-AGENTS.md - Sub-agent patterns
+- https://agents.md - Official spec
