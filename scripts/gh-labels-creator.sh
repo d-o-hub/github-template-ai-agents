@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Check if GitHub CLI and jq are installed
 if ! command -v gh &> /dev/null || ! command -v jq &> /dev/null; then

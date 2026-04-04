@@ -45,7 +45,6 @@ fi
 
 # Error codes
 readonly E_SUCCESS=0
-readonly E_GENERAL=1
 readonly E_COMMIT_FAILED=2
 readonly E_QUALITY_GATE=3
 readonly E_ISSUES_BLOCKING=4
@@ -369,13 +368,12 @@ $(git log --oneline origin/main..HEAD 2>/dev/null | sed 's/^/- /' | head -20)
 - [ ] Ready for merge"
 
         log "Creating pull request..."
-        local pr_output=$(gh pr create \
+        local pr_output
+        if ! pr_output=$(gh pr create \
             --title "$MESSAGE" \
             --body "$pr_body" \
             --base "main" \
-            --head "$BRANCH_NAME" 2>&1)
-        
-        if [[ $? -ne 0 ]]; then
+            --head "$BRANCH_NAME" 2>&1); then
             error "Failed to create PR: $pr_output"
             return $E_PR_FAILED
         fi
@@ -579,12 +577,11 @@ agent_merge() {
     
     log "Merging PR #$PR_NUMBER..."
     
-    local merge_output=$(gh pr merge "$PR_NUMBER" \
+    local merge_output
+    if ! merge_output=$(gh pr merge "$PR_NUMBER" \
         --squash \
         --delete-branch=false \
-        2>&1)
-    
-    if [[ $? -ne 0 ]]; then
+        2>&1); then
         error "Merge failed: $merge_output"
         return $E_MERGE_FAILED
     fi

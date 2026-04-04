@@ -73,8 +73,10 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 **Dynamic Folders** (Created as needed):
 - `.claude/`, `.gemini/`, `.qwen/` - Agent-specific symlinks → `.agents/skills/`
 - `<agent-name>.md` - Override files for specific agents
+- `analysis/` - Generated analysis outputs (audits, swarm analysis, TRIZ analysis)
+- `reports/` - Generated reports and summaries
 
-**Principle**: Document only fixed structure. Tool-specific folders follow the symlink pattern and are created by `./scripts/setup-skills.sh`.
+**Generated Files Rule**: Place all agent-generated analysis, reports, and temporary outputs in `analysis/` or `reports/`, never in project root.
 
 ## Testing
 

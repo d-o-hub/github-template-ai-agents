@@ -666,7 +666,7 @@ Examples:
     
     parser.add_argument(
         "--output", "-o",
-        help="Write report to file instead of stdout"
+        help="Write report to file instead of stdout (suggest: reports/eval-report.json)"
     )
     
     args = parser.parse_args()

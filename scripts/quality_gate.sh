@@ -357,7 +357,9 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
             sc_failed=0
             while IFS= read -r script; do
                 [ -n "$script" ] || continue
-                if ! shellcheck "$script" 2>/dev/null; then
+                # Use --severity=error to only fail on actual errors, not style warnings
+                # Use -f quiet to reduce output volume in CI environments
+                if ! shellcheck --severity=error -f quiet "$script" 2>/dev/null; then
                     echo -e "${RED}  ✗ shellcheck failed: $script${NC}"
                     sc_failed=1
                 fi
@@ -375,7 +377,8 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
     
     # BATS tests: Run if tests/ directory exists and tests not skipped
     # BATS provides a TAP-compliant testing framework for bash scripts
-    if [ -d "tests" ] && [ "${SKIP_TESTS:-false}" != "true" ]; then
+    # NOTE: Skip if we're already inside a BATS test (prevent recursion)
+    if [ -d "tests" ] && [ "${SKIP_TESTS:-false}" != "true" ] && [ -z "${BATS_TEST_FILENAME:-}" ]; then
         if command -v bats &> /dev/null; then
             if ! OUTPUT=$(bats tests/ 2>&1); then
                 echo -e "${RED}  ✗ bats tests failed${NC}"

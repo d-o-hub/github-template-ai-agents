@@ -89,8 +89,9 @@ echo "$CHANGED_FILES" | grep -q ".agents/skills/" && {
     "$REPO_ROOT/scripts/update-agents-md.sh"
     git add AGENTS.md
     # Amend the commit to include the updated AGENTS.md
-    # 2>/dev/null || true suppresses errors if amend fails
-    git commit --amend --no-edit 2>/dev/null || true
+    if ! git commit --amend --no-edit 2>/dev/null; then
+        echo "Warning: Failed to amend commit with updated AGENTS.md"
+    fi
 }
 
 # Update registry if agents changed  
@@ -99,7 +100,9 @@ echo "$CHANGED_FILES" | grep -qE "\.(claude|opencode)/agents/" && {
     echo "Agents changed - updating AGENTS_REGISTRY.md..."
     "$REPO_ROOT/scripts/update-agents-registry.sh"
     git add agents-docs/AGENTS_REGISTRY.md
-    git commit --amend --no-edit 2>/dev/null || true
+    if ! git commit --amend --no-edit 2>/dev/null; then
+        echo "Warning: Failed to amend commit with updated AGENTS_REGISTRY.md"
+    fi
 }
 
 exit 0

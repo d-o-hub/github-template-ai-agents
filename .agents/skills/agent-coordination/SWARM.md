@@ -43,6 +43,8 @@ After all complete, analyze:
 - What patterns emerge?
 - What is the root cause?
 
+**Save synthesized analysis to `analysis/` directory** (e.g., `analysis/SWARM_ANALYSIS.md`)
+
 ### Phase 3: Resolution
 Based on synthesis:
 - Prioritize actions

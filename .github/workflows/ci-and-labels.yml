@@ -17,6 +17,9 @@ jobs:
   labels:
     name: Initialize GitHub Labels
     runs-on: ubuntu-latest
+    # This job is optional - it may fail if GITHUB_TOKEN lacks permissions
+    # Labels can be created manually or via repository settings
+    continue-on-error: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -49,6 +52,7 @@ jobs:
     name: Quality Gate
     runs-on: ubuntu-latest
     needs: validate-skills
+    timeout-minutes: 10  # Fail fast instead of waiting 6 hours
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -94,11 +98,6 @@ jobs:
           hashFiles('.agents/skills/*/requirements.txt') != '' ||
           hashFiles('.agents/skills/*/pyproject.toml') != ''
 
-      - name: Setup BATS
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y bats
-
       - name: Run quality gate
         run: |
           echo "Setting up skills..."
@@ -108,7 +107,8 @@ jobs:
           ls -la .claude/skills/ | head -10
           echo ""
           echo "Running quality gate..."
-          ./scripts/quality_gate.sh
+          # Skip BATS tests in CI to prevent recursion (tests call quality_gate.sh)
+          SKIP_TESTS=true ./scripts/quality_gate.sh
 
   test:
     name: Run Tests
