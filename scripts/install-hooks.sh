@@ -137,6 +137,13 @@ set -e
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo ".")"
 cd "$REPO_ROOT" || exit 1
 
+# Source lint-cache library
+# shellcheck source=scripts/lib/lint_cache.sh
+if [ -f "$REPO_ROOT/scripts/lib/lint_cache.sh" ]; then
+    # shellcheck source=scripts/lib/lint_cache.sh
+    source "$REPO_ROOT/scripts/lib/lint_cache.sh"
+fi
+
 # Validate git hooks configuration (prevent global hooks from overriding local)
 # This catches cases where user's global git config would prevent hooks from running
 if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
