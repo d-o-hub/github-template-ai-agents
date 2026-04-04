@@ -27,6 +27,7 @@ Never hardcode paths.
 - `validate-skills.sh` and `validate-skill-format.sh` must use `set +e` explicitly (LESSON-011)
 - `temp_table` variable in Bash has scope issues - use unique names (LESSON-012)
 - Scripts creating worktrees must register them in `CREATED_WORKTREES` and use trap cleanup pattern (LESSON-010)
+- Linting results for `shellcheck` and `markdownlint` are cached in `.git/lint-cache/` to speed up subsequent runs. The cache is per-file and aware of configuration changes.
 
 ## Adding a New Script
 

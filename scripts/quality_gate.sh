@@ -11,6 +11,13 @@ set -uo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT" || exit 1
 
+# Source lint-cache library
+# shellcheck source=scripts/lib/lint_cache.sh
+if [ -f "$REPO_ROOT/scripts/lib/lint_cache.sh" ]; then
+    # shellcheck source=scripts/lib/lint_cache.sh
+    source "$REPO_ROOT/scripts/lib/lint_cache.sh"
+fi
+
 # Colors for output (disabled in CI via TTY check, or via FORCE_COLOR=0)
 # TTY check (-t 1): Determines if stdout is a terminal (not redirected to file/pipe)
 # This prevents ANSI codes from appearing in CI logs while keeping colors for local dev
@@ -373,7 +380,8 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
                 [ -n "$script" ] || continue
                 # Use --severity=error to only fail on actual errors, not style warnings
                 # Use -f quiet to reduce output volume in CI environments
-                if ! shellcheck --severity=error -f quiet "$script" 2>/dev/null; then
+                # lint_if_changed handles hashing and caching
+                if ! lint_if_changed "$script" "shellcheck" ".shellcheckrc" shellcheck --severity=error -f quiet "$script" 2>/dev/null; then
                     echo -e "${RED}  ✗ shellcheck failed: $script${NC}"
                     sc_failed=1
                 fi
@@ -416,12 +424,24 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
     if command -v markdownlint &> /dev/null; then
         # Check all .md files, ignoring dependencies and build artifacts
         # --ignore patterns prevent linting generated files or node_modules
-        if ! OUTPUT=$(markdownlint "**/*.md" --ignore node_modules --ignore target 2>&1); then
-            echo -e "${RED}  ✗ markdownlint failed${NC}"
-            echo "$OUTPUT" >&2
-            FAILED=1
-        else
-            echo -e "${GREEN}  ✓ markdownlint passed${NC}"
+        MD_FILES=$(find . -name "*.md" -not -path "./node_modules/*" -not -path "./target/*" -not -path "./.git/*" 2>/dev/null || true)
+        if [ -n "$MD_FILES" ]; then
+            md_failed=0
+            while IFS= read -r md_file; do
+                [ -n "$md_file" ] || continue
+                # lint_if_changed handles hashing and caching
+                if ! OUTPUT=$(lint_if_changed "$md_file" "markdownlint" "markdownlint.toml" markdownlint "$md_file" 2>&1); then
+                    echo -e "${RED}  ✗ markdownlint failed: $md_file${NC}"
+                    echo "$OUTPUT" >&2
+                    md_failed=1
+                fi
+            done <<< "$MD_FILES"
+
+            if [ $md_failed -eq 0 ]; then
+                echo -e "${GREEN}  ✓ markdownlint passed${NC}"
+            else
+                FAILED=1
+            fi
         fi
     else
         echo -e "${YELLOW}  ⚠ markdownlint not installed - skipping markdown checks${NC}"

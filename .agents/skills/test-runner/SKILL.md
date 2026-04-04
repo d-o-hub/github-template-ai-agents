@@ -1,6 +1,8 @@
 ---
 name: test-runner
 description: Execute tests, analyze results, and diagnose failures across any testing framework. Use when running test suites, debugging failing tests, or configuring CI/CD testing pipelines.
+version: "1.0"
+template_version: "0.2"
 license: MIT
 ---
 
