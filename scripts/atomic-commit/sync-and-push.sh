@@ -40,6 +40,7 @@ REMOTE="${REMOTE:-origin}"
 POLL_INTERVAL="${POLL_INTERVAL:-5}"
 MAX_RETRIES="${MAX_RETRIES:-3}"
 RETRY_DELAY="${RETRY_DELAY:-5}"
+MAX_OPERATION_SECONDS="${MAX_OPERATION_SECONDS:-300}"
 
 # State tracking
 STASHED="${STASHED:-false}"
@@ -417,14 +418,21 @@ push_changes() {
             sleep "$RETRY_DELAY"
         fi
         
-        if push_output=$(git push "${push_args[@]}" 2>&1); then
+        if push_output=$(timeout "$MAX_OPERATION_SECONDS" git push "${push_args[@]}" 2>&1); then
             push_success=true
             log_success "Push successful"
         else
             push_exit=$?
             retry_count=$((retry_count + 1))
             
-            if [[ $retry_count -lt $MAX_RETRIES ]]; then
+            # Check for timeout (exit code 124 from timeout command)
+            if [[ $push_exit -eq 124 ]]; then
+                log_error "Push timed out after ${MAX_OPERATION_SECONDS}s"
+                
+                if [[ $retry_count -lt $MAX_RETRIES ]]; then
+                    log_info "Will retry after ${RETRY_DELAY}s..."
+                fi
+            elif [[ $retry_count -lt $MAX_RETRIES ]]; then
                 log_warning "Push failed (exit $push_exit), will retry..."
                 
                 # Analyze failure reason for specific handling
