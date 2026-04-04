@@ -95,12 +95,6 @@ jobs:
           hashFiles('.agents/skills/*/requirements.txt') != '' ||
           hashFiles('.agents/skills/*/pyproject.toml') != ''
 
-      - name: Setup BATS
-        run: |
-          # Install BATS via npm to get latest version (1.5+)
-          # Ubuntu apt-get provides old 1.2.1 which doesn't support setup_file()
-          npm install -g bats
-
       - name: Run quality gate
         run: |
           echo "Setting up skills..."
