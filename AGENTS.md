@@ -108,6 +108,9 @@ Fix ALL pre-existing issues before completing. See `agents-docs/WORKFLOW.md#pre-
 ### Post-Task Learning
 After non-trivial work: run the `learn` skill or manually append non-obvious discoveries to the nearest relevant `AGENTS.md`. Capture only: hidden file relationships, surprising execution behavior, undocumented commands, fragile config, files that must change together. Never write: obvious facts, duplicates, verbose explanations. See `agents-docs/WORKFLOW.md#post-task-learning` for details.
 
+#### Recent Project-Wide Learnings
+- **Worktree Cleanup**: Scripts creating worktrees must register them in `CREATED_WORKTREES` and use the `trap cleanup EXIT ERR` pattern (LESSON-010)
+
 ### Context Discipline
 - Delegate research to sub-agents; Use `/clear` between unrelated tasks
 - Load skills only when needed; See `agents-docs/SKILLS.md` for skill framework

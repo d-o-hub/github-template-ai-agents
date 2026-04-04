@@ -38,9 +38,15 @@ Place learnings in the most specific `AGENTS.md` file:
 - **Script-specific**: `scripts/AGENTS.md`.
 - **Skill-specific**: `.agents/skills/<name>/AGENTS.md`.
 
+### Dual-Write Requirement
+
+Every new non-obvious insight must be recorded in two places:
+1. **Verbose Log**: Add a full `LESSON-NNN` entry to `agents-docs/LESSONS.md` with Issue/Root Cause/Solution.
+2. **Distilled Note**: Add a 1–3 line note to the nearest `AGENTS.md` (this is what `learn` automates).
+
 ### Format
 
-- 1–3 lines per insight.
+- 1–3 lines per insight in `AGENTS.md`.
 - Fits within `MAX_LINES_AGENTS_MD=150` constraint.
 - Bulleted list under a "Learnings" or "Context" section.
 
