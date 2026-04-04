@@ -13,13 +13,18 @@ on:
       - main
       - develop
 
+# Default permissions for all jobs
+permissions:
+  contents: read
+
 jobs:
   labels:
     name: Initialize GitHub Labels
     runs-on: ubuntu-latest
-    # This job is optional - it may fail if GITHUB_TOKEN lacks permissions
-    # Labels can be created manually or via repository settings
-    continue-on-error: true
+    # Requires write permission to create labels
+    # See: https://docs.github.com/en/rest/issues/labels#create-a-label
+    permissions:
+      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,7 +35,7 @@ jobs:
       - name: Run label initialization
         run: ./scripts/gh-labels-creator.sh --ci
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   validate-skills:
     name: Validate Skills
