@@ -13,12 +13,29 @@ on:
       - main
       - develop
 
+# Default permissions for all jobs
+permissions:
+  contents: read
+
 jobs:
-  # NOTE: Labels initialization removed from automated CI
-  # The gh-labels-creator.sh script is available for manual use:
-  #   ./scripts/gh-labels-creator.sh --ci
-  # This requires GITHUB_TOKEN with write permissions which most
-  # repository tokens don't have by default.
+  labels:
+    name: Initialize GitHub Labels
+    runs-on: ubuntu-latest
+    # Requires write permission to create labels
+    # See: https://docs.github.com/en/rest/issues/labels#create-a-label
+    permissions:
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Ensure script is executable
+        run: chmod +x scripts/gh-labels-creator.sh
+
+      - name: Run label initialization
+        run: ./scripts/gh-labels-creator.sh --ci
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   validate-skills:
     name: Validate Skills
