@@ -45,6 +45,7 @@
         "The agent lists description as required with constraints",
         "The agent mentions the 250-line SKILL.md body limit"
       ]
+    },
     {
       "id": 5,
       "prompt": "Review my skill's References section - it uses @references/filename.md and markdown links [text](reference/file.md). Is this correct?",
@@ -61,3 +62,5 @@
         "The agent explains correct format is `reference/filename.md` - Description"
       ]
     }
+  ]
+}
