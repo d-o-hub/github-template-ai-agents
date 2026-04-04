@@ -3,18 +3,13 @@ description: Complete GitHub workflow - push, create branch/PR, monitor Actions 
 subtask: false
 ---
 
-#!/usr/bin/env bash
-# GitHub Workflow Skill - Command wrapper
-# Complete workflow: push → branch → PR → monitor → merge
+Execute the GitHub workflow script.
 
-set -euo pipefail
+Run: `./.agents/skills/github-workflow/run.sh $ARGUMENTS`
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-SKILL_SCRIPT="$REPO_ROOT/.agents/skills/github-workflow/run.sh"
-
-if [[ ! -x "$SKILL_SCRIPT" ]]; then
-    echo "Error: github-workflow skill not found at $SKILL_SCRIPT" >&2
-    exit 1
-fi
-
-exec "$SKILL_SCRIPT" "$@"
+This script will:
+1. Push current branch to remote
+2. Create or update a PR
+3. Monitor GitHub Actions
+4. Detect pre-existing issues
+5. Auto-merge or rebase when checks pass

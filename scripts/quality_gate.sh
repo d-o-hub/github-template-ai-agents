@@ -56,6 +56,13 @@ if ! ./scripts/validate-skills.sh; then
 fi
 echo ""
 
+# --- Validate SKILL.md format ---
+echo -e "${BLUE}Validating SKILL.md format...${NC}"
+if ! ./scripts/validate-skill-format.sh; then
+    FAILED=1
+fi
+echo ""
+
 # --- Validate reference links in SKILL.md files ---
 echo -e "${BLUE}Validating reference links in SKILL.md files...${NC}"
 if ! ./scripts/validate-links.sh; then

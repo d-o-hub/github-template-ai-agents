@@ -37,30 +37,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  validate-skills:
-    name: Validate Skills
+  quality-gate:
+    name: Quality Gate
     runs-on: ubuntu-latest
+    timeout-minutes: 10  # Fail fast instead of waiting 6 hours
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup skills
         run: ./scripts/setup-skills.sh
-
-      - name: Validate skill symlinks
-        run: ./scripts/validate-skills.sh
-
-      - name: Validate skill format
-        run: ./scripts/validate-skill-format.sh
-
-  quality-gate:
-    name: Quality Gate
-    runs-on: ubuntu-latest
-    needs: validate-skills
-    timeout-minutes: 10  # Fail fast instead of waiting 6 hours
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       - name: Setup Node.js (if package.json exists)
         uses: actions/setup-node@v4
@@ -103,17 +89,16 @@ jobs:
           hashFiles('.agents/skills/*/requirements.txt') != '' ||
           hashFiles('.agents/skills/*/pyproject.toml') != ''
 
+      - name: Install shellcheck and bats
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck bats
+
       - name: Run quality gate
         run: |
-          echo "Setting up skills..."
-          ./scripts/setup-skills.sh
-          echo ""
-          echo "Verifying symlinks..."
-          ls -la .claude/skills/ | head -10
-          echo ""
-          echo "Running quality gate..."
-          # Skip BATS tests in CI to prevent recursion (tests call quality_gate.sh)
-          SKIP_TESTS=true ./scripts/quality_gate.sh
+          # Skip BATS tests in CI to prevent recursion
+          # (tests call quality_gate.sh)
+          SKIP_TESTS=true SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/quality_gate.sh
 
   test:
     name: Run Tests
@@ -200,7 +185,9 @@ jobs:
 
       - name: Run BATS tests
         run: |
-          if [ -d "tests" ] && [ -n "$(find tests -name '*.bats' -print -quit 2>/dev/null)" ]; then
+          if [ -d "tests" ] && [ -n "$(find tests -name '*.bats' \
+            -print -quit 2>/dev/null)" ]
+          then
             echo "Running BATS tests..."
             bats tests/*.bats
           else

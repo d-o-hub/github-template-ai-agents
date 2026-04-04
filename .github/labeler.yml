@@ -1,5 +1,6 @@
 # PR Labeler Configuration
 # See: https://github.com/actions/labeler
+---
 
 # Documentation changes
 documentation:

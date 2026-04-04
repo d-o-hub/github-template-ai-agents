@@ -1,20 +1,16 @@
 ---
-description: Unified atomic git workflow with GitHub integration - commits all changes, checks issues, creates PR, validates ALL Actions including pre-existing, uses swarm coordination with web research on failures. Post-merge validation of all files and docs.
+description: Unified atomic git workflow with GitHub integration - commits all changes, checks issues, creates PR, validates ALL Actions including pre-existing, uses swarm coordination with web research on failures
 subtask: false
 ---
 
-#!/usr/bin/env bash
-# Git-GitHub Workflow Skill - Command wrapper
-# Unified workflow with swarm coordination
+Execute the git-github workflow script with swarm coordination.
 
-set -euo pipefail
+Run: `./.agents/skills/git-github-workflow/run.sh $ARGUMENTS`
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-SKILL_SCRIPT="$REPO_ROOT/.agents/skills/git-github-workflow/run.sh"
-
-if [[ ! -x "$SKILL_SCRIPT" ]]; then
-    echo "Error: git-github-workflow skill not found at $SKILL_SCRIPT" >&2
-    exit 1
-fi
-
-exec "$SKILL_SCRIPT" "$@"
+This script will:
+1. Commit all changes with proper message format
+2. Check for existing GitHub issues
+3. Create a PR
+4. Validate ALL GitHub Actions pass (including pre-existing)
+5. Use swarm coordination with web research on failures
+6. Post-merge validation of all files and docs
