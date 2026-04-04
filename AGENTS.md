@@ -91,6 +91,7 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 ## Security
 
 - Never commit secrets/API keys - use `.env` (gitignored)
+- Pin all GitHub Actions to full SHA (use `# vX.Y` comment); Dependabot handles updates
 - Never connect to untrusted MCP servers; Report vulnerabilities via GitHub private advisories
 
 ## Agent Guidance

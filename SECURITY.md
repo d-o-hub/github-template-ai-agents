@@ -32,6 +32,18 @@ privately to the maintainers.
 2. **Assessment** — severity and scope evaluation with progress updates
 3. **Fix & disclosure** — coordinated release and public advisory upon resolution
 
+## Supply Chain Security
+
+To mitigate the risk of tag mutation or hijacking, all GitHub Actions used in
+workflows should be pinned to a full 40-character commit SHA. A comment with the
+original version tag should be included on the same line to allow Dependabot
+to track and propose updates.
+
+Example:
+```yaml
+- uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+```
+
 ## Scope
 
 This policy covers the source code, workflows, scripts, and configuration files
