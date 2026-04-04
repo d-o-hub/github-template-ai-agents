@@ -567,34 +567,42 @@ shellcheck --severity=error -f quiet "$script"
 
 **Root Cause**:
 1. **Default Token Permissions**: `secrets.GITHUB_TOKEN` has read-only by default for security
-2. **Fork Restrictions**: Workflows from forks have limited permissions
-3. **Organization Policies**: Many orgs restrict token permissions
-4. **Not Generic**: Requires specific repository settings to work
+2. **Missing Permissions Key**: Workflow didn't explicitly request `issues: write` permission
+3. **Operation Requirements**: Creating labels via API requires `issues: write` permission (not just `pull-requests: write`)
 
-**Solution**:
+**Solution** (Verified Working):
 ```yaml
-# Option 1: Make job optional (won't block merge)
-labels:
-  continue-on-error: true
-  steps:
-    - run: ./scripts/gh-labels-creator.sh --ci
+# Add explicit permissions at job level
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write    # Required for creating labels
+    steps:
+      - run: gh label create "bug" --color d73a4a
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-```yaml
-# Option 2: Remove from automated CI entirely
-# Keep script for manual use only
-```
+**Alternative Approaches**:
+- Use Personal Access Token (PAT) with full repo scope (less secure)
+- Use GitHub App token (most secure for orgs)
+- Pre-create labels manually (simplest for static sets)
 
 **Prevention**:
-- Don't assume write permissions in generic templates
-- Use `continue-on-error: true` for API-dependent jobs
-- Document permission requirements in comments
-- Provide manual alternative for setup tasks
-- Remove from CI if it consistently fails
+- Always check GitHub API permission requirements for operations
+- Use `permissions:` key to explicitly request needed scopes
+- Reference official docs: https://docs.github.com/en/rest/issues/labels
+- Test workflows in PR before merging to main
 
-**Tags**: #github-api #permissions #token #generic-template #ci
+**Tags**: #github-api #permissions #token #issues-write #ci
 
 **Files Modified**:
-- `.github/workflows/ci-and-labels.yml` - Remove labels job from CI
+- `.github/workflows/ci-and-labels.yml` - Add `permissions: issues: write`
+
+**References**:
+- GitHub Actions labeler shows exact permission requirements
+- Community Discussion #60820 on 403 errors
+- REST API docs: POST /repos/{owner}/{repo}/labels requires issues:write
 
 ---
