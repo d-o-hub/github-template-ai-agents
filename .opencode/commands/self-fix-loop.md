@@ -3,18 +3,16 @@ description: Self-learning fix loop - commit, push, monitor CI, auto-fix failure
 subtask: false
 ---
 
-#!/usr/bin/env bash
-# Self-Fix Loop - Command wrapper
-# Automated commit, push, monitor, fix, retry cycle using swarm agents
+Execute the self-fix-loop script to automate commit, push, CI monitoring, and fix cycles.
 
-set -euo pipefail
+Run: `./scripts/self-fix-loop.sh $ARGUMENTS`
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-SKILL_SCRIPT="$REPO_ROOT/scripts/self-fix-loop.sh"
+This script will:
+1. Commit all changes
+2. Push to remote
+3. Create/update a PR
+4. Monitor GitHub Actions
+5. If checks fail, analyze failures and attempt automatic fixes
+6. Retry until all checks pass or max retries reached
 
-if [[ ! -x "$SKILL_SCRIPT" ]]; then
-    echo "Error: self-fix-loop script not found at $SKILL_SCRIPT" >&2
-    exit 1
-fi
-
-exec "$SKILL_SCRIPT" "$@"
+Available options: `--max-retries N`, `--dry-run`, `--no-fix-issues`, `--strict-validation`, `--timeout SECONDS`, `--poll-interval SECS`, `--base-branch BRANCH`

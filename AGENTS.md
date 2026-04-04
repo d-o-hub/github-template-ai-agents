@@ -136,13 +136,12 @@ For monorepos, place additional `AGENTS.md` inside each sub-package. Nearest fil
 
 ## Reference Docs
 
-| Topic | File |
-|---|---|
-| Skill authoring | `agents-docs/SKILLS.md` |
-| Sub-agent patterns | `agents-docs/SUB-AGENTS.md` |
-| Context/back-pressure | `agents-docs/CONTEXT.md` |
-| Architecture | `agents-docs/HARNESS.md` |
-| Available skills | `agents-docs/AVAILABLE_SKILLS.md` |
-| AGENTS.md authoring | `.agents/skills/agents-md/SKILL.md` |
-| Configuration | `agents-docs/CONFIG.md` |
-| Migration guide | `agents-docs/MIGRATION.md` |
+See `agents-docs/` for detailed reference documentation.
+
+## Available Skills
+
+Skills are auto-generated from `.agents/skills/` and symlinked to agent directories (`.claude/skills/`, `.gemini/skills/`, `.qwen/skills/`).
+
+Run `ls .agents/skills/` to see all available skills, or check `agents-docs/AVAILABLE_SKILLS.md` for descriptions.
+
+To add a new skill: create `SKILL.md` in `.agents/skills/<skill-name>/` and run `./scripts/setup-skills.sh`.

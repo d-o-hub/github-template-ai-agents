@@ -1,20 +1,16 @@
 ---
-description: Execute atomic commit workflow using the atomic-commit skill
+description: Execute atomic commit workflow - validate, commit, push, create PR, and verify CI passes
 subtask: false
 ---
 
-#!/usr/bin/env bash
-# Thin wrapper for atomic-commit skill
-# Delegates to: .agents/skills/atomic-commit/run.sh
+Execute the atomic commit workflow script.
 
-set -euo pipefail
+Run: `./scripts/atomic-commit/run.sh $ARGUMENTS`
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-SKILL_SCRIPT="$REPO_ROOT/.agents/skills/atomic-commit/run.sh"
-
-if [[ ! -x "$SKILL_SCRIPT" ]]; then
-    echo "Error: atomic-commit skill not found at $SKILL_SCRIPT" >&2
-    exit 1
-fi
-
-exec "$SKILL_SCRIPT" "$@"
+This script will:
+1. Run quality gate validation
+2. Create a feature branch if on main
+3. Stage and commit all changes
+4. Push to remote
+5. Create a PR
+6. Monitor GitHub Actions until all checks pass
