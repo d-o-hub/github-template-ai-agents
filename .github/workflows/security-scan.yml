@@ -33,7 +33,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run ShellCheck with Security Focus
-        uses: ludeeus/action-shellcheck@2.0.0
+        uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38  # 2.0.0
         continue-on-error: true
         with:
           severity: warning
@@ -75,7 +75,7 @@ jobs:
 
       - name: Upload ShellCheck SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
         continue-on-error: true
         with:
           sarif_file: shellcheck-results.sarif
@@ -95,7 +95,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1  # v0.35.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -107,7 +107,7 @@ jobs:
 
       - name: Upload Trivy SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
         with:
           sarif_file: trivy-results.sarif
           category: trivy-fs
@@ -127,7 +127,7 @@ jobs:
 
       - name: Secret Detection with GitLeaks
         id: gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc  # v2
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -135,7 +135,7 @@ jobs:
 
       - name: Fallback Secret Scan with TruffleHog
         if: steps.gitleaks.outcome == 'failure'
-        uses: trufflesecurity/trufflehog@v3.82.7
+        uses: trufflesecurity/trufflehog@59c615a5e9001224d1dd4049f92f046ca620498c  # v3.82.7
         with:
           path: ./
           base: ""
@@ -179,7 +179,7 @@ jobs:
 
       - name: Initialize CodeQL
         if: steps.check_files.outputs.has_codeql_files == 'true'
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
         continue-on-error: true
         with:
           languages: javascript,python
@@ -187,12 +187,12 @@ jobs:
 
       - name: Autobuild
         if: steps.check_files.outputs.has_codeql_files == 'true'
-        uses: github/codeql-action/autobuild@v3
+        uses: github/codeql-action/autobuild@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
         continue-on-error: true
 
       - name: Perform CodeQL Analysis
         if: steps.check_files.outputs.has_codeql_files == 'true'
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
         continue-on-error: true
         with:
           category: "/language:javascript"
@@ -229,7 +229,7 @@ jobs:
 
       - name: Upload empty CodeQL SARIF (no supported files found)
         if: steps.check_files.outputs.has_codeql_files == 'false'
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
         continue-on-error: true
         with:
           sarif_file: codeql-empty-results.sarif
@@ -249,7 +249,7 @@ jobs:
           fetch-depth: 0
 
       - name: Scan GitHub Actions with Trivy
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1  # v0.35.0
         with:
           scan-type: 'config'
           scan-ref: '.github/workflows/'
@@ -261,7 +261,7 @@ jobs:
 
       - name: Upload IaC Scan SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
         with:
           sarif_file: trivy-config-results.sarif
           category: trivy-config
