@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-04-04 08:30 UTC
+> Last updated: 2026-04-04 16:31 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -49,10 +49,12 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `goap-agent` | `.agents/skills/goap-agent` | Invoke for complex multi-step tasks requiring intelligent pl |
 | `intent-classifier` | `.agents/skills/intent-classifier` | Classify user intents and route to appropriate skills, comma |
 | `iterative-refinement` | `.agents/skills/iterative-refinement` | Execute iterative refinement workflows with validation loops |
+| `learn` | `.agents/skills/learn` | Extract non-obvious session learnings into scoped AGENTS.md  |
 | `migration-refactoring` | `.agents/skills/migration-refactoring` | Automate complex code migrations and refactorings with safet |
 | `parallel-execution` | `.agents/skills/parallel-execution` | Execute multiple independent tasks simultaneously using para |
 | `privacy-first` | `.agents/skills/privacy-first` | Prevent email addresses and personal data from entering the  |
 | `security-code-auditor` | `.agents/skills/security-code-auditor` | Perform security audits on code to identify vulnerabilities, |
+| `self-fix-loop` | `.agents/skills/self-fix-loop` | Self-learning fix loop - commit, push, monitor CI, auto-fix  |
 | `shell-script-quality` | `.agents/skills/shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use w |
 | `skill-creator` | `.agents/skills/skill-creator` | Create new skills, modify and improve existing skills, and m |
 | `skill-evaluator` | `.agents/skills/skill-evaluator` | "Reusable skill for evaluating other skills with structure c |

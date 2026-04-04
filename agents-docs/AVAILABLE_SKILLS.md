@@ -1,46 +1,84 @@
 # Available Skills Reference
 
-> Auto-generated from skill definitions in `.agents/skills/`
-> Do not edit manually. Run `./scripts/generate-available-skills.sh` to regenerate.
+> Complete registry of all skills in `.agents/skills/`
+> Auto-generated from skill definitions
 
-## General
+## By Category
 
+### Coordination
 | Skill | Description |
 |-------|-------------|
-| `accessibility-auditor` | Audit web applications for WCAG 2.2 compliance, screen reader compatibility, keyboard navigation, and color contrast. Triggers on "accessibility audit", "a11y check", "WCAG compliance", "screen reader test", "keyboard navigation", "color contrast check", "ARIA validation", "wcag", " Section 508", "ADA compliance". |
-| `agent-coordination` | Coordinate multiple agents for software development across any language. Use for parallel execution of independent tasks, sequential chains with dependencies, swarm analysis from multiple perspectives, or iterative refinement loops. Handles Python, JavaScript, Java, Go, Rust, C#, and other languages. |
-| `agents-md` | Create AGENTS.md files with production-ready best practices. Use when creating new AGENTS.md or implementing quality gates. |
-| `anti-ai-slop` | Apply this skill whenever the user wants to audit, fix, redesign, write, or review UI, UX, copy, or text to avoid the generic "AI slop" aesthetic of 2025–2026. Triggers include: "make this feel less AI", "this looks too generic", "avoid AI clichés", "audit my copy", "anti-pattern review", "humanize this", "this feels soulless", "too corporate", "fix the UX writing", "why does this feel like ChatGPT made it", "anti-design", "brutalist", "raw", "intentional", "authentic", "distinctive", "not like every other AI app", "responsive", "mobile", "tablet", "desktop". Also trigger when producing new UI, copy, or UX flows and the user cares about quality and distinctiveness. Always verify mobile, tablet, and desktop views for proper navigation and layout. This skill is your checklist, diagnostic tool, and creative brief for everything that makes design feel human, considered, and real in 2026. |
-| `api-design-first` | Design and document RESTful APIs using design-first principles with OpenAPI specifications. Use when users ask to 'design an API', 'create API spec', 'REST API', 'OpenAPI', 'Swagger', or 'API documentation'. Trigger on API design tasks, endpoint planning, request/response modeling, or API versioning discussions. |
-| `architecture-diagram` | Generate or update a project architecture SVG diagram by scanning the live project structure. Use this skill whenever the user asks to regenerate, refresh, or update the architecture diagram, or when skills, agents, or commands have been added/removed and the diagram is stale. Triggers on phrases like "update the diagram", "regenerate the architecture SVG", "sync the diagram", or "diagram is out of date". |
-| `atomic-commit` | Atomic git workflow - validates, commits, pushes, creates PR, and verifies CI with zero-warnings policy. Orchestrates complete code submission as state machine with rollback on failure. |
-| `cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, GitLab CI, and Forgejo Actions. Use for automated testing, deployment strategies (blue-green, canary), security scanning, and multi-environment workflows. Includes pipeline optimization, secrets management, and failure handling patterns. |
-| `code-quality` | Review and improve code quality across any programming language. Use when conducting code reviews, refactoring for best practices, identifying code smells, or improving maintainability. |
-| `code-review-assistant` | Automated code review with PR analysis, change summaries, and quality checks. Use for reviewing pull requests, generating review comments, checking against best practices, and identifying potential issues. Includes style guide compliance, security issue detection, and review automation. |
-| `codeberg-api` | Interact with Forgejo/Codeberg repositories via the REST API — read or write files, manage issues, create pull requests, list branches/tags, search repos, and automate CI/CD workflows. Use this skill when the user wants to: read file contents from a Forgejo repo, create or update files, manage issues (create, list, close), list repositories for a user, search, set up Forgejo Actions workflows, or automate any git-forge operation. Works without authentication for public repos; requires FORGEJO_TOKEN for private repos and write operations. |
-| `database-devops` | Database design, migration, and DevOps automation with safety patterns. Use for schema design, migration planning, query optimization, multi-database orchestration, and Infrastructure-as-Code. Includes rollback strategies, performance analysis, and cross-database synchronization. |
-| `do-web-doc-resolver` | Python resolver for URLs and queries into compact, LLM-ready markdown. Uses progressive free-first cascade with quality scoring, circuit breakers, layered routing memory, trace-based evaluation, and agent-friendly docs validation. Use when fetching documentation, resolving web URLs, or building context from web sources. |
-| `docs-hook` | Lightweight git hook integration for updating agents-docs with minimal tokens. Triggered on commit/merge events to sync documentation. |
-| `git-github-workflow` | Unified atomic git workflow with GitHub integration - commits all changes, checks GitHub issues, creates PR, validates all Actions pass including pre-existing, uses swarm coordination with web research on failures. Post-merge validation of all files and docs. |
-| `github-readme` | Create human-focused GitHub README.md files with 2026 best practices. Use when creating new projects, improving documentation, adding quick start guides, writing contribution guidelines, or making repositories more discoverable and user-friendly. |
-| `github-workflow` | Complete GitHub workflow automation - push, create branch/PR, monitor Actions with pre-existing issue detection, auto-merge/rebase when checks pass. Handles the full git→GitHub→merge lifecycle. |
-| `goap-agent` | Invoke for complex multi-step tasks requiring intelligent planning and multi-agent coordination. Use when tasks need decomposition, dependency mapping, parallel/sequential/swarm/iterative execution strategies, or coordination of multiple specialized agents with quality gates. |
-| `intent-classifier` | Classify user intents and route to appropriate skills, commands, or workflows. Use when determining which skill to invoke, routing requests to specialized agents, or building skill selection logic. Trigger on 'which skill should I use', 'route this to', 'classify this request', 'skill selection', or when multiple skills could handle a task. |
-| `iterative-refinement` | Execute iterative refinement workflows with validation loops until quality criteria are met. Use for test-fix cycles, code quality improvement, performance optimization, or any task requiring repeated action-validate-improve cycles. |
-| `migration-refactoring` | Automate complex code migrations and refactorings with safety patterns. Use when upgrading dependencies, migrating frameworks (React class→hooks, Flask→FastAPI), modernizing languages (Python 2→3), or performing large-scale refactories. Includes breaking change analysis, automated fix application, rollback strategies, and cross-file dependency tracking. |
-| `parallel-execution` | Execute multiple independent tasks simultaneously using parallel agent coordination to maximize throughput and minimize execution time. Use when tasks have no dependencies, results can be aggregated, and agents are available for concurrent work. |
-| `privacy-first` | Prevent email addresses and personal data from entering the codebase. Use when user asks to "prevent emails", "remove personal data", "privacy check", "no email", or when writing/ editing any code, config, or documentation files. |
-| `security-code-auditor` | Perform security audits on code to identify vulnerabilities, misconfigurations, and security anti-patterns. Use when users ask to 'audit', 'review', or 'check security' of code, configurations, or repositories. Trigger on keywords like 'security review', 'vulnerability scan', 'OWASP', 'secure coding', 'penetration test', or 'security assessment'. |
-| `self-fix-loop` | Self-learning fix loop - commit, push, monitor CI, auto-fix failures using swarm agents with skills on demand, loop until all checks pass. |
-| `shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use when checking bash/sh scripts for errors, writing shell script tests, fixing ShellCheck warnings, setting up CI/CD for shell scripts, or improving bash code quality. |
-| `skill-creator` | Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy. |
-| `skill-evaluator` | Reusable skill for evaluating other skills with structure checks, eval coverage review, and real usage spot checks. Use when you need to check a skill, add evals, benchmark a skill, validate outputs against assertions, or compare current skill behavior against a baseline. |
-| `task-decomposition` | Break down complex tasks into atomic, actionable goals with clear dependencies and success criteria. Use when planning multi-step projects, coordinating agents, or decomposing complex requests. |
-| `test-runner` | Execute tests, analyze results, and diagnose failures across any testing framework. Use when running test suites, debugging failing tests, or configuring CI/CD testing pipelines. |
-| `testing-strategy` | Design comprehensive testing strategies with modern techniques. Use for test planning, property-based testing, visual regression, load testing, mutation testing, and E2E test generation. Includes coverage analysis, test maintenance strategies, and CI/CD integration. |
-| `triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive Problem Solving) principles adapted for software engineering. Use when stuck on complex problems, facing technical contradictions, optimizing system design, or seeking innovative solutions beyond trial-and-error. Prevents solving the wrong problem correctly. |
-| `ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination, confidence-scored autoresearch loops, and backpressure quality gates. Use for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, and any screen-based product. |
-| `web-search-researcher` | Research topics using web search to find accurate, current information. Use when you need modern information, official documentation, best practices, or technical solutions beyond training data. |
+| `agent-coordination` | Coordinate multiple agents for software development across any language |
+| `goap-agent` | Complex multi-step tasks with intelligent planning and multi-agent coordination |
+| `intent-classifier` | Classify user intents and route to appropriate skills/commands |
+| `parallel-execution` | Execute multiple independent tasks simultaneously |
+| `task-decomposition` | Break down complex tasks into atomic, actionable goals |
+
+### DevOps
+| Skill | Description |
+|-------|-------------|
+| `cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, GitLab CI, Forgejo |
+| `codeberg-api` | Interact with Forgejo/Codeberg repositories via REST API |
+| `database-devops` | Database design, migration, and DevOps automation |
+
+### Documentation
+| Skill | Description |
+|-------|-------------|
+| `architecture-diagram` | Generate or update project architecture SVG diagrams |
+| `docs-hook` | Git hook integration for updating agents-docs |
+| `github-readme` | Create human-focused GitHub README.md files |
+
+### Migration & Modernization
+| Skill | Description |
+|-------|-------------|
+| `migration-refactoring` | Automate complex code migrations (React class→hooks, Flask→FastAPI, etc.) |
+
+### Quality & Security
+| Skill | Description |
+|-------|-------------|
+| `accessibility-auditor` | Audit web applications for WCAG 2.2 compliance |
+| `code-quality` | Code quality analysis and improvement |
+| `code-review-assistant` | Automated code review with PR analysis |
+| `iterative-refinement` | Execute iterative refinement workflows with validation loops |
+| `privacy-first` | Prevent email addresses and personal data in codebase |
+| `security-code-auditor` | Security audits for vulnerabilities and misconfigurations |
+| `shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS |
+| `testing-strategy` | Comprehensive testing strategies with modern techniques |
+
+### Research
+| Skill | Description |
+|-------|-------------|
+| `do-web-doc-resolver` | Resolve URLs and queries into compact, LLM-ready markdown |
+| `web-search-researcher` | Research topics using web search |
+
+### Knowledge Management
+| Skill | Description |
+|-------|-------------|
+| `learn` | Extract non-obvious session learnings into scoped AGENTS.md files |
+
+### Meta (Skill Management)
+| Skill | Description |
+|-------|-------------|
+| `agents-md` | Create AGENTS.md files with production-ready best practices |
+| `skill-creator` | Create new skills and modify existing ones |
+| `skill-evaluator` | Evaluate other skills with structure checks and spot tests |
+
+### Innovation & Problem Solving
+| Skill | Description |
+|-------|-------------|
+| `triz-solver` | Systematic problem-solving using TRIZ principles |
+| `ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer |
+
+### API Development
+| Skill | Description |
+|-------|-------------|
+| `api-design-first` | Design and document RESTful APIs with OpenAPI |
+
+### General
+| Skill | Description |
+|-------|-------------|
+| `anti-ai-slop` | Avoid generic "AI slop" aesthetic in UI/UX |
+| `test-runner` | Test execution and result aggregation |
 
 ## Usage
 
