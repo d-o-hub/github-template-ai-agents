@@ -1,10 +1,13 @@
 #!/bin/bash
 # Simple skill format validator
 
+# Get repository root for portable paths
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 echo "=== Validating SKILL.md Format ==="
 ERRORS=0
 
-for skill_dir in .agents/skills/*/; do
+for skill_dir in "$REPO_ROOT/.agents/skills"/*/; do
     if [[ -d "$skill_dir" ]]; then
         skill_file="${skill_dir}SKILL.md"
         skill_name=$(basename "$skill_dir")

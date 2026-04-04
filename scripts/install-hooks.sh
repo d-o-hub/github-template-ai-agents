@@ -14,11 +14,11 @@ echo ""
 # Check for global hooks configuration before installing
 if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
     echo "Checking git hooks configuration..."
-    if ! ./scripts/validate-git-hooks.sh 2>/dev/null; then
+    if ! "$REPO_ROOT/scripts/validate-git-hooks.sh" 2>/dev/null; then
         echo ""
         echo "⚠️  WARNING: Git hooks configuration issue detected!"
         echo ""
-        ./scripts/validate-git-hooks.sh || true
+        "$REPO_ROOT/scripts/validate-git-hooks.sh" || true
         echo ""
         echo "It's recommended to fix this before installing hooks."
         echo "To continue anyway: SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/install-hooks.sh"
@@ -39,6 +39,10 @@ cat > "$HOOKS_DIR/post-commit" << 'HOOK'
 # Auto-update documentation when skills/agents change
 # Runs after each commit to keep docs in sync
 
+# Get the repository root dynamically
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo ".")"
+cd "$REPO_ROOT" || exit 1
+
 # Get the previous commit hash
 PREV_COMMIT=$(git rev-parse HEAD~1 2>/dev/null || echo "")
 
@@ -53,7 +57,7 @@ CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
 # Update skill table if skills changed
 if echo "$CHANGED_FILES" | grep -q ".agents/skills/"; then
     echo "Skills changed - updating AGENTS.md..."
-    ./scripts/update-agents-md.sh
+    "$REPO_ROOT/scripts/update-agents-md.sh"
     git add AGENTS.md
     # Create a fixup commit (won't trigger another hook)
     git commit --amend --no-edit 2>/dev/null || true
@@ -62,7 +66,7 @@ fi
 # Update registry if agents changed  
 if echo "$CHANGED_FILES" | grep -qE "\.(claude|opencode)/agents/"; then
     echo "Agents changed - updating AGENTS_REGISTRY.md..."
-    ./scripts/update-agents-registry.sh
+    "$REPO_ROOT/scripts/update-agents-registry.sh"
     git add agents-docs/AGENTS_REGISTRY.md
     # Create a fixup commit
     git commit --amend --no-edit 2>/dev/null || true
@@ -82,9 +86,13 @@ cat > "$HOOKS_DIR/pre-commit" << 'HOOK'
 
 set -e
 
+# Get the repository root dynamically
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo ".")"
+cd "$REPO_ROOT" || exit 1
+
 # Validate git hooks configuration (prevent global hooks from overriding local)
 if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
-    if ! ./scripts/validate-git-hooks.sh; then
+    if ! "$REPO_ROOT/scripts/validate-git-hooks.sh"; then
         echo ""
         echo "Commit aborted. Fix the hooks configuration or use SKIP_GLOBAL_HOOKS_CHECK=true to skip."
         exit 1
@@ -94,7 +102,7 @@ fi
 echo "Running pre-commit quality checks..."
 
 # Run quality gate
-if ! ./scripts/quality_gate.sh; then
+if ! "$REPO_ROOT/scripts/quality_gate.sh"; then
     echo ""
     echo "❌ Quality gate failed. Fix issues before committing."
     echo "   To bypass (not recommended): git commit --no-verify"

@@ -4,10 +4,13 @@
 set +e
 set -uo pipefail
 
+# Get repository root for portable paths
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 echo "Starting minimal quality gate..."
 
 # Test 1: Validate skills
-./scripts/validate-skills.sh
+"$REPO_ROOT/scripts/validate-skills.sh"
 result=$?
 echo "validate-skills.sh exit code: $result"
 
@@ -17,7 +20,7 @@ if [ $result -ne 0 ]; then
 fi
 
 # Test 2: Check some files exist
-if [ ! -d ".agents/skills" ]; then
+if [ ! -d "$REPO_ROOT/.agents/skills" ]; then
     echo "ERROR: .agents/skills not found"
     exit 2
 fi

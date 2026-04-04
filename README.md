@@ -160,8 +160,8 @@ We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for:
 
 ## Community
 
-- 🐛 [Issue Tracker](https://github.com/d-o-hub/github-template-ai-agents/issues) - Report bugs
-- 📝 [Discussions](https://github.com/d-o-hub/github-template-ai-agents/discussions) - Ask questions
+- 🐛 [Issue Tracker](../../issues) - Report bugs
+- 📝 [Discussions](../../discussions) - Ask questions
 
 ## License
 

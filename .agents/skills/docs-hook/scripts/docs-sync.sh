@@ -5,10 +5,13 @@
 
 set -euo pipefail
 
+# Get repository root for portable paths
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
+
 # Configuration
-DOCS_DIR="${DOCS_DIR:-agents-docs}"
-SKILLS_DIR="${SKILLS_DIR:-.agents/skills}"
-AGENTS_DIR="${AGENTS_DIR:-agents-docs}"
+DOCS_DIR="${DOCS_DIR:-$REPO_ROOT/agents-docs}"
+SKILLS_DIR="${SKILLS_DIR:-$REPO_ROOT/.agents/skills}"
+AGENTS_DIR="${AGENTS_DIR:-$REPO_ROOT/agents-docs}"
 
 # Colors for output (disable if not terminal)
 if [ -t 1 ]; then
@@ -72,7 +75,7 @@ echo "$CHANGED_FILES" | while read -r file; do
     # Determine target directory based on file type
     target_dir=""
     
-    if [[ "$file" == .agents/skills/* ]]; then
+    if [[ "$file" == "$REPO_ROOT/.agents/skills"* ]] || [[ "$file" == .agents/skills/* ]]; then
         # Skill documentation
         skill_name=$(basename "$(dirname "$file")")
         target_dir="${AGENTS_DIR}/skills/${skill_name}"
@@ -83,11 +86,12 @@ echo "$CHANGED_FILES" | while read -r file; do
         target_dir="${AGENTS_DIR}/skills"
         log_info "Syncing generic skill doc: $(basename "$file")"
         
-    elif [[ "$file" == agents-docs/* ]]; then
+    if [[ "$file" == "$REPO_ROOT/agents-docs"* ]] || [[ "$file" == agents-docs/* ]]; then
         # Already in docs, skip
         log_info "Already in docs dir, skipping: $file"
         ((SKIPPED++)) || true
         continue
+    fi
         
     elif [[ "$file" == README.md ]]; then
         # Project README - keep at root
@@ -124,7 +128,7 @@ if echo "$CHANGED_FILES" | grep -q '.agents/skills/'; then
         echo ""
     } > "$INDEX_FILE"
     
-    for skill_dir in .agents/skills/*/; do
+    for skill_dir in "$REPO_ROOT/.agents/skills"/*/; do
         if [ -f "${skill_dir}/SKILL.md" ]; then
             skill_name=$(basename "$skill_dir")
             echo "- [${skill_name}](skills/${skill_name}/)" >> "$INDEX_FILE"
