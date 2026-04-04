@@ -20,22 +20,18 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const MAX_RETRIES = 12;
-            const POLL_INTERVAL_MS = 30000; // 30 seconds
+            const MAX_RETRIES = 24;
+            const POLL_INTERVAL_MS = 30000;
             for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-              const { data: checks } = await github.rest.checks.listForRef({
+              const { data: status } = await github.rest.repos.getCombinedStatusForRef({
                 ...context.repo,
                 ref: context.payload.pull_request.head.sha
               });
-              const pending = checks.check_runs.filter(c => c.status !== 'completed');
-              if (pending.length === 0) {
-                const failures = checks.check_runs.filter(c =>
-                  c.conclusion === 'failure' || c.conclusion === 'cancelled'
-                );
-                if (failures.length > 0) {
-                  core.setFailed('Some checks failed');
-                }
+              if (status.state === 'success') {
                 return;
+              }
+              if (status.state === 'failure' || status.state === 'error') {
+                core.setFailed(`Checks failed with state: ${status.state}`);
               }
               if (attempt < MAX_RETRIES - 1) {
                 await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
