@@ -33,12 +33,14 @@ for skill_path in "$SKILLS_DIR"/*/; do
         sub(/^["'"'"']/, "")
         sub(/["'"'"']$/, "")
         if ($0 ~ /^>[-|]?$/) {
-            # Multiline - read next line
-            getline
-            sub(/^  /, "")
-            sub(/^["'"'"']/, "")
-            sub(/["'"'"']$/, "")
-            print
+            # Multiline - read subsequent lines starting with space
+            desc = ""
+            while (getline > 0 && $0 ~ /^  /) {
+                line = $0
+                sub(/^  /, "", line)
+                desc = (desc == "" ? line : desc " " line)
+            }
+            print desc
         } else {
             print
         }
@@ -52,7 +54,8 @@ for skill_path in "$SKILLS_DIR"/*/; do
         sub(/["'"'"']$/, "")
         print
         exit
-    }' "$skill_file" || echo "general")
+    }' "$skill_file")
+    [ -z "$category" ] && category="general"
 
     # Capitalize category for display
     category_display=$(echo "$category" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
