@@ -19,14 +19,16 @@
 set -euo pipefail
 
 # Script metadata
-readonly SCRIPT_NAME="$(basename "$0")"
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+SCRIPT_NAME="$(basename "$0")"
+readonly SCRIPT_NAME
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+readonly REPO_ROOT
 
 # Exit codes
 readonly EXIT_SUCCESS=0
 readonly EXIT_FAILURE=1
-readonly EXIT_WARNING=2
 
 # Configuration
 COMMIT_TYPE=""
@@ -90,6 +92,7 @@ log_dry_run() {
 }
 
 # Error handler
+# shellcheck disable=SC2329
 error_handler() {
     local line=$1
     log_error "Unexpected error in ${SCRIPT_NAME} at line ${line}"

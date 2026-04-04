@@ -209,10 +209,10 @@ Score each criterion:
 
 ## References
 
-- **[references/wcag-checklist.md](references/wcag-checklist.md)** - Complete WCAG 2.2 criteria
-- **[references/aria-guide.md](references/aria-guide.md)** - ARIA authoring practices
-- **[references/screen-reader-testing.md](references/screen-reader-testing.md)** - Testing procedures
-- **[references/color-contrast.md](references/color-contrast.md)** - Contrast calculations
+- `references/wcag-checklist.md` - Complete WCAG 2.2 criteria
+- `references/aria-guide.md` - ARIA authoring practices
+- `references/screen-reader-testing.md` - Testing procedures
+- `references/color-contrast.md` - Contrast calculations
 
 ## Examples
 

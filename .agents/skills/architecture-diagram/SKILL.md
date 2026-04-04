@@ -64,8 +64,8 @@ After the script exits:
 
 ## Output
 
-`docs/architecture.svg` — a standalone SVG, viewBox 680 × auto, compatible
-with GitHub README embedding (`![Architecture](docs/architecture.svg)`).
+`docs/architecture.svg` — a standalone SVG output file, viewBox 680 × auto, compatible
+with GitHub README embedding (example: `![Architecture](docs/architecture.svg)`).
 
 ## Customisation
 

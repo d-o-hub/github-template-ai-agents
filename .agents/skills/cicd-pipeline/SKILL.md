@@ -198,7 +198,7 @@ See `reference/failure-recovery.md` for:
 
 ## Forgejo Actions
 
-See `reference/forgejo-actions.md` for self-hosted CI/CD configuration.
+Self-hosted CI/CD configuration using Forgejo/Gitea Actions.
 
 ## Quality Checklist
 

@@ -199,10 +199,4 @@ jobs:
 
 ## References
 
-| Topic | File |
-|-------|------|
-| Full API endpoint list | `references/API_ENDPOINTS.md` |
-| Authentication guide | `references/AUTH.md` |
-| Pagination & rate limits | `references/PAGINATION.md` |
-| Forgejo Actions (CI/CD) | `references/FORGEJO_ACTIONS.md` |
-| Eval test cases | `evals/evals.json` (pending) |
+- `agents-docs/SKILLS.md` - Skill authoring guide

@@ -2,7 +2,8 @@
 
 **Date**: April 3, 2026  
 **Repository**: github-template-ai-agents  
-**Status**: All changes merged to main ✅
+**Status**: All changes merged to main ✅  
+**Permanent Documentation**: See `agents-docs/LEARNINGS.md` (Architecture Decision: AGENTS.md Consolidation section)
 
 ---
 

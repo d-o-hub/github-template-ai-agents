@@ -1,8 +1,8 @@
 # AGENTS.md
 
 > Single source of truth for all AI coding agents in this repository.
-> Supported by: Claude Code, Windsurf, Gemini CLI, Codex, Copilot, OpenCode, Devin, Amp, Zed, Warp, RooCode, Jules or reference with @AGENTS.md in cli .md
-> See the open spec: https://agents.md
+> Supported by: Claude Code, Windsurf, Gemini CLI, Codex, Copilot, OpenCode, Devin, Amp, Zed, Warp, RooCode, Jules
+> See: https://agents.md
 
 ## Named Constants
 
@@ -10,6 +10,7 @@
 # File size limits (lines)
 readonly MAX_LINES_PER_SOURCE_FILE=500
 readonly MAX_LINES_PER_SKILL_MD=250
+readonly MAX_LINES_AGENTS_MD=150
 
 # Retry and polling configuration
 readonly DEFAULT_MAX_RETRIES=3
@@ -25,213 +26,122 @@ readonly MAX_PR_TITLE_LENGTH=72
 
 ## Project Overview
 
-Production-ready template for AI agent-powered development with Claude Code, Gemini CLI, OpenCode, and more.
+Production-ready template for AI agent-powered development.
 Primary stack: Bash scripts, Markdown documentation, GitHub Actions CI/CD.
 
 ## Setup
 
 ```bash
-# Create skill symlinks after cloning (single source: .agents/skills/)
+# Create skill symlinks (run after clone)
 ./scripts/setup-skills.sh
 
 # Install git pre-commit hook
 cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
-## Run Tests
+## Quality Gate (Required Before Commit)
 
 ```bash
-# Run quality gate (run before every commit)
 ./scripts/quality_gate.sh
-
-# Validate skill format
-./scripts/validate-skill-format.sh
 ```
 
-Always run the full quality gate before committing. Fix all errors before finishing a task.
+**Always run before committing. Fix all errors.**
+
+**Guard Rails:** The pre-commit hook validates git config to prevent global hooks from overriding local. If global hooks detected, run `git config --global --unset core.hooksPath` or use `SKIP_GLOBAL_HOOKS_CHECK=true git commit -m "..."` to skip.
 
 ## Code Style
 
-- **Max `${MAX_LINES_PER_SOURCE_FILE}` lines per source file** - split into focused sub-modules if exceeded
-- **Max `${MAX_LINES_PER_SKILL_MD}` lines per SKILL.md** - move detailed content to `references/` folder
-- **SKILL.md must start with frontmatter** (--- on line 1, no content before)
-- **Required frontmatter fields**: `name`, `description`
-- **Recommended frontmatter fields**: `license`
+- Max `${MAX_LINES_PER_SOURCE_FILE}` lines per source file; `${MAX_LINES_PER_SKILL_MD}` per `SKILL.md`; `${MAX_LINES_AGENTS_MD}` per `AGENTS.md`
+- `SKILL.md` must start with frontmatter (`---` on line 1)
+- **Reference format**: `` `reference/filename.md` - Description `` (no @ prefix, no markdown links)
 - Conventional Commits: `feat:`, `fix:`, `docs:`, `ci:`, `test:`, `refactor:`
-- All public APIs must be documented
-- **No hardcoded magic numbers** - use named constants (see Named Constants section above) or config
-- Render architecture diagrams as fenced ```mermaid``` blocks, never raw ASCII art
-- Shell scripts: Use `shellcheck` for linting, `bats` for testing
-- Markdown: Use `markdownlint` for consistency
+- Shell scripts: `shellcheck` for linting, `bats` for testing
+- Markdown: `markdownlint` for consistency
+- No magic numbers - use named constants; Use `mermaid` for diagrams
 
 ## Repository Structure
 
 ```
 <project-root>/
-├── AGENTS.md              # This file - agent instructions (single source of truth)
-├── CLAUDE.md              # Claude Code-specific overrides only (@AGENTS.md)
-├── GEMINI.md              # Gemini CLI-specific overrides only (@AGENTS.md)
-├── QWEN.md                # Qwen Code-specific overrides only (@AGENTS.md)
-├── agents-docs/           # Detailed reference docs (loaded on demand, not by default)
-│   ├── HARNESS.md         # MCP, skills, sub-agents, hooks overview
-│   ├── SKILLS.md          # Skill authoring and progressive disclosure
-│   ├── SUB-AGENTS.md      # Context isolation patterns
-│   ├── HOOKS.md           # Hook configuration and verification
-│   ├── CONTEXT.md         # Context engineering and back-pressure
-│   ├── RUST.md            # Rust-specific patterns (remove if not Rust)
-│   └── AGENTS_REGISTRY.md # Auto-generated registry of all sub-agents
-├── .agents/
-│   └── skills/            # CANONICAL skill source - all agents read from here
-│       └── <skill-name>/
-│           ├── SKILL.md   # <= ${MAX_LINES_PER_SKILL_MD} lines, frontmatter required
-│           ├── evals/     # Test cases (evals.json)
-│           ├── reference/ # Detailed docs linked from SKILL.md
-│           ├── scripts/   # Executable scripts
-│           └── assets/    # Templates, examples
-├── .claude/
-│   ├── agents/            # Claude Code sub-agent definitions
-│   ├── commands/          # Custom slash commands
-│   └── skills/            # Symlinks -> ../../.agents/skills/<name>
-├── .opencode/
-│   ├── agents/            # OpenCode-specific agents (real files, not symlinks)
-│   └── commands/
-├── .gemini/
-│   └── skills/            # Symlinks -> ../../.agents/skills/<name>
-├── .qwen/
-│   └── skills/            # Symlinks -> ../../.agents/skills/<name>
-├── scripts/
-│   ├── setup-skills.sh    # Creates all symlinks (run on clone)
-│   ├── validate-skills.sh # Validates all symlinks are intact
-│   ├── validate-skill-format.sh # Validates SKILL.md format
-│   ├── quality_gate.sh    # Full pre-commit quality gate
-│   ├── pre-commit-hook.sh # Git hook entry point
-│   ├── gh-labels-creator.sh # GitHub label initialization
-│   └── update-agents-registry.sh # Regenerates AGENTS_REGISTRY.md
-├── README.md
-└── .github/workflows/
+├── AGENTS.md              # This file (single source of truth)
+├── CLAUDE.md              # Claude-specific overrides (@AGENTS.md)
+├── GEMINI.md              # Gemini-specific overrides
+├── QWEN.md                # Qwen-specific overrides
+├── agents-docs/           # Detailed reference (loaded on demand)
+│   ├── SKILLS.md          # Skill authoring guide
+│   ├── SUB-AGENTS.md      # Sub-agent patterns
+│   ├── CONTEXT.md         # Back-pressure patterns
+│   ├── AVAILABLE_SKILLS.md # Complete skills registry
+│   └── HARNESS.md         # Architecture overview
+├── .agents/skills/        # Canonical skill source (30+ skills)
+├── .claude/skills/        # Symlinks → .agents/skills/
+├── .gemini/skills/        # Symlinks → .agents/skills/
+├── .qwen/skills/          # Symlinks → .agents/skills/
+└── scripts/               # Setup, validation, quality gates
 ```
 
-## Testing Instructions
+## Testing
 
-- Write or update tests for every code change, even if not explicitly requested
-- Tests must be deterministic - use seeded RNG where randomness is needed
-- Success is silent; only surface failures (context-efficient back-pressure)
-- See `agents-docs/CONTEXT.md` for back-pressure patterns
+- Write/update tests for every change; Tests must be deterministic
+- Success is silent; surface only failures. See `agents-docs/CONTEXT.md`
 
 ## PR Instructions
 
-- Title format: `[type(scope)] short description` (max `${MAX_PR_TITLE_LENGTH}` chars)
-- Always run lint and tests before committing
-- Create a new branch per feature/fix - never commit directly to `main`
-- Keep PRs focused; one concern per PR
+- Title: `[type(scope)] description` (max `${MAX_PR_TITLE_LENGTH}` chars)
+- Create branch per feature - never commit to `main`; One concern per PR
 
 ## Security
 
-- Never commit secrets or API keys - use environment variables or `.env` (gitignored)
-- Never connect to untrusted MCP servers - tool descriptions inject into the system prompt
-- Report vulnerabilities via GitHub private advisories
+- Never commit secrets/API keys - use `.env` (gitignored)
+- Never connect to untrusted MCP servers; Report vulnerabilities via GitHub private advisories
 
 ## Agent Guidance
 
 ### Plan Before Executing
-For non-trivial tasks: produce a written plan first, pause, and wait for confirmation
-before writing code.
+For non-trivial tasks: produce a written plan first, pause, wait for confirmation.
 
 ### Atomic Commit Policy (REQUIRED)
-**ALL changes MUST be committed using the atomic commit workflow.** Never use manual `git commit` or `git push` directly.
+**ALL changes MUST use the atomic commit workflow.**
 
 ```bash
-# 1. Create and checkout a feature branch
+# 1. Create feature branch
 git checkout -b feat/your-feature-name
 
-# 2. Make your changes
+# 2. Make changes
 
 # 3. Run atomic commit (validates, commits, pushes, creates PR, verifies)
 ./scripts/atomic-commit/run.sh
 
-# 4. If checks fail, fix issues and retry
+# 4. If checks fail, fix and retry
 ```
 
-**The atomic commit workflow:**
-1. Validates code (quality gate)
-2. Creates conventional commit
-3. Pushes to remote
-4. Creates PR automatically
-5. Watches CI checks
-6. **Rolls back on failure** (zero-tolerance policy)
-
 ### Pre-Existing Issue Policy (REQUIRED)
-**ALL pre-existing issues MUST be fixed before completing a task.** This includes:
+**Fix ALL pre-existing issues before completing:**
 
-- **Lint warnings** (shellcheck, markdownlint, etc.)
-- **Test failures** (even if unrelated to your changes)
-- **Security warnings** (dependency vulnerabilities, secrets detection)
-- **Documentation gaps** (broken links, missing files)
-- **Code style violations** (magic numbers, formatting issues)
+- [ ] Lint warnings (shellcheck, markdownlint), Test failures, Security vulnerabilities
+- [ ] Documentation gaps (broken links, missing files), Code style violations
 
 **Process:**
-1. Run quality gate before starting: `./scripts/quality_gate.sh`
-2. Note all failures (even in files you won't modify)
-3. Fix ALL issues as part of your task
-4. Run quality gate again to confirm zero issues
-
-**Rationale:** Pre-existing issues compound over time. The "not my code" mentality creates technical debt. Every agent fixes the repo state before leaving.
-
-### Skills: Single Source in .agents/skills/
-All skills live canonically in `.agents/skills/`. Claude Code and Gemini CLI use
-symlinks pointing back to `.agents/skills/`. OpenCode reads skills directly from
-`.agents/skills/` - no symlinks needed. Run `./scripts/setup-skills.sh` after
-cloning to create symlinks for Claude Code and Gemini CLI. See `agents-docs/SKILLS.md`.
-
-### Available Skills
-
-| Skill | Description | Category |
-|-------|-------------|----------|
-| `accessibility-auditor` | Audit web applications for WCAG 2.2 compliance, screen reade | Security |
-| `agent-coordination` | Coordinate multiple agents for software development across a | Coordination |
-| `anti-ai-slop` | Apply this skill whenever the user wants to audit, fix, rede | UI/UX |
-| `api-design-first` | Design and document RESTful APIs using design-first principl | APIDevelopment |
-| `architecture-diagram` | Generate or update a project architecture SVG diagram by sca | Documentation |
-| `cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, Gi | DevOps |
-| `code-review-assistant` | Automated code review with PR analysis, change summaries, an | General |
-| `codeberg-api` | - Interact with Forgejo/Codeberg repositories via the REST A | DevOps |
-| `database-devops` | Database design, migration, and DevOps automation with safet | DevOps |
-| `do-web-doc-resolver` | Python resolver for URLs and queries into compact, LLM-ready | Research |
-| `docs-hook` | Lightweight git hook integration for updating agents-docs wi | Documentation |
-| `github-readme` | Create human-focused GitHub README.md files with 2026 best p | Documentation |
-| `goap-agent` | Invoke for complex multi-step tasks requiring intelligent pl | Coordination |
-| `intent-classifier` | Classify user intents and route to appropriate skills, comma | Coordination |
-| `iterative-refinement` | Execute iterative refinement workflows with validation loops | Quality |
-| `migration-refactoring` | Automate complex code migrations and refactorings with safet | Migration |
-| `parallel-execution` | Execute multiple independent tasks simultaneously using para | Coordination |
-| `privacy-first` | Prevent email addresses and personal data from entering the | Security |
-| `security-code-auditor` | Perform security audits on code to identify vulnerabilities, | Security |
-| `shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use w | CodeQuality |
-| `skill-creator` | Create new skills, modify and improve existing skills, and m | Meta |
-| `skill-evaluator` | "Reusable skill for evaluating other skills with structure c | Meta |
-| `task-decomposition` | Break down complex tasks into atomic, actionable goals with | Planning |
-| `testing-strategy` | Design comprehensive testing strategies with modern techniqu | Quality |
-| `triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive P | Innovation |
-| `ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research agen | UI/UX |
-| `web-search-researcher` | Research topics using web search to find accurate, current i | Research |
+1. Run quality gate: `./scripts/quality_gate.sh`
+2. Note all failures (even unrelated to your changes)
+3. Fix ALL issues
+4. Re-run quality gate to confirm zero issues
 
 ### Context Discipline
-- Delegate isolated research and analysis to sub-agents
-- Use `/clear` between unrelated tasks
-- Load skills only when needed, not upfront
+- Delegate research to sub-agents; Use `/clear` between unrelated tasks
+- Load skills only when needed; See `agents-docs/SKILLS.md` for skill framework
 
 ### Nested AGENTS.md
-For monorepos, place an additional `AGENTS.md` inside each sub-package.
-The agent reads the nearest file in the directory tree - closest one takes precedence.
+For monorepos, place additional `AGENTS.md` inside each sub-package. Nearest file takes precedence.
 
-### Reference Docs
+## Reference Docs
 
 | Topic | File |
 |---|---|
-| Harness engineering overview | `agents-docs/HARNESS.md` |
 | Skill authoring | `agents-docs/SKILLS.md` |
 | Sub-agent patterns | `agents-docs/SUB-AGENTS.md` |
-| Hooks | `agents-docs/HOOKS.md` |
-| Context / back-pressure | `agents-docs/CONTEXT.md` |
-| Rust patterns | `agents-docs/RUST.md` |
-| Docs hook skill | `.agents/skills/docs-hook/SKILL.md` |
+| Context/back-pressure | `agents-docs/CONTEXT.md` |
+| Architecture | `agents-docs/HARNESS.md` |
+| Available skills | `agents-docs/AVAILABLE_SKILLS.md` |
+| AGENTS.md authoring | `.agents/skills/agents-md/SKILL.md` |
+| Migration guide | `agents-docs/MIGRATION.md` |

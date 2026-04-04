@@ -107,9 +107,6 @@ scripts/
 
 | Topic | File |
 |-------|------|
-| Cascade logic | `reference/cascade.md` |
-| Provider details | `reference/providers.md` |
-| Configuration | `reference/configuration.md` |
 | Agent-docs-spec | https://github.com/agent-ecosystem/agent-docs-spec |
 | Memory 2026 | https://mem0.ai/blog/state-of-ai-agent-memory-2026 |
 | Agent architecture | https://andriifurmanets.com/blogs/ai-agents-2026-practical-architecture-tools-memory-evals-guardrails |

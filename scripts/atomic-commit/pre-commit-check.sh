@@ -14,9 +14,12 @@
 set -euo pipefail
 
 # Script metadata
-readonly SCRIPT_NAME="$(basename "$0")"
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+SCRIPT_NAME="$(basename "$0")"
+readonly SCRIPT_NAME
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_DIR
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+readonly REPO_ROOT
 
 # Exit codes
 readonly EXIT_SUCCESS=0
@@ -73,6 +76,7 @@ log_section() {
 }
 
 # Error handler
+# shellcheck disable=SC2329
 error_handler() {
     local line=$1
     log_error "Error in ${SCRIPT_NAME} at line ${line}"
@@ -176,9 +180,8 @@ check_quality_gate() {
 # Check for secrets in code
 check_secrets() {
     log_section "Secret Detection"
-    
+
     local found_secrets=0
-    local check_failed=0
     
     # Patterns that indicate secrets (case-insensitive)
     local secret_patterns=(
@@ -243,7 +246,7 @@ check_secrets() {
             # Use mktemp for secure temporary file
             local temp_file
             temp_file=$(mktemp) || { log_error "Failed to create temp file"; return "$EXIT_FAILURE"; }
-            trap "rm -f '$temp_file'" RETURN
+            trap 'rm -f "$temp_file"' RETURN
             
             if grep -iEn "$pattern" "$file" 2>/dev/null | head -5 > "$temp_file"; then
                 if [[ -s "$temp_file" ]]; then
@@ -329,6 +332,7 @@ check_tests() {
 }
 
 # Verify commit message format (if provided)
+# shellcheck disable=SC2329
 check_commit_message() {
     log_section "Commit Message Validation"
     

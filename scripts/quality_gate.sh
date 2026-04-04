@@ -7,7 +7,7 @@ set +e
 set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$REPO_ROOT"
+cd "$REPO_ROOT" || exit 1
 
 # Colors for output (disabled in CI via TTY check, or via FORCE_COLOR=0)
 if [[ -t 1 ]] && [[ "${FORCE_COLOR:-}" != "0" ]]; then
@@ -30,9 +30,26 @@ DETECTED_LANGUAGES=()
 echo "Running quality gate..."
 echo ""
 
+# --- Validate git hooks configuration (prevent global hooks from overriding local) ---
+if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
+    echo -e "${BLUE}Validating git hooks configuration...${NC}"
+    if ! ./scripts/validate-git-hooks.sh; then
+        # Don't fail the quality gate, just warn
+        FAILED=1
+    fi
+    echo ""
+fi
+
 # --- Always: validate skill symlinks ---
 echo -e "${BLUE}Validating skill symlinks...${NC}"
 if ! ./scripts/validate-skills.sh; then
+    FAILED=1
+fi
+echo ""
+
+# --- Validate reference links in SKILL.md files ---
+echo -e "${BLUE}Validating reference links in SKILL.md files...${NC}"
+if ! ./scripts/validate-links.sh; then
     FAILED=1
 fi
 echo ""
