@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 # health-check.sh - Verify environment has all required template dependencies
 #
 # Usage: ./scripts/health-check.sh

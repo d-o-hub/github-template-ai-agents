@@ -1,0 +1,36 @@
+# scripts/ AGENTS.md
+
+> Scoped guidance for agents working in this directory.
+> Nearest AGENTS.md takes precedence over root.
+
+## Protected Scripts
+
+Do NOT modify without explicit user instruction:
+- `quality_gate.sh` - Core quality gate
+- `pre-commit-hook.sh` - Git hook template
+- `setup-skills.sh` - Skill symlink creation
+
+## Naming Convention
+
+Scripts use `snake_case.sh`. New scripts must follow this convention.
+
+## REPO_ROOT Detection
+
+Every script must detect repo root portably:
+```bash
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+```
+Never hardcode paths.
+
+## Non-Obvious Lessons
+
+- `validate-skills.sh` and `validate-skill-format.sh` must use `set +e` explicitly (LESSON-011)
+- `temp_table` variable in Bash has scope issues - use unique names (LESSON-012)
+- Scripts creating worktrees must register them in `CREATED_WORKTREES` and use trap cleanup pattern (LESSON-010)
+
+## Adding a New Script
+
+1. Must pass `shellcheck` with no warnings
+2. Must have a `bats` test if stateful
+3. Add to `agents-docs/SCRIPTS.md`
+4. Use `#!/usr/bin/env bash` shebang

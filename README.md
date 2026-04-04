@@ -140,16 +140,9 @@ git commit -m "feat: add user registration"
 
 ## Available Skills
 
-| Skill | Description |
-|---|---|
-| [`task-decomposition`](.agents/skills/task-decomposition/) | Break complex tasks into atomic goals |
-| [`shell-script-quality`](.agents/skills/shell-script-quality/) | Lint/test shell scripts (ShellCheck + BATS) |
-| [`github-readme`](.agents/skills/github-readme/) | Create human-focused README.md files |
-| [`parallel-execution`](.agents/skills/parallel-execution/) | Coordinate parallel agent execution |
-| [`iterative-refinement`](.agents/skills/iterative-refinement/) | Progressive improvement loops |
-| [`agent-coordination`](.agents/skills/agent-coordination/) | Multi-agent orchestration patterns |
-| [`goap-agent`](.agents/skills/goap-agent/) | Goal-oriented action planning |
-| [`web-search-researcher`](.agents/skills/web-search-researcher/) | Web research and synthesis |
+See `agents-docs/AVAILABLE_SKILLS.md` for the full auto-generated list of all available skills.
+
+Run `ls .agents/skills/` to see all skill directories, or check the [Available Skills](agents-docs/AVAILABLE_SKILLS.md) reference.
 
 ## Contributing
 
@@ -171,4 +164,3 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 ---
 
 **Built with AI agents. Maintained by humans.**
-# Test

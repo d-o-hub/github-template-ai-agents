@@ -99,33 +99,13 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 For non-trivial tasks: produce a written plan first, pause, wait for confirmation.
 
 ### Atomic Commit Policy (Optional / Customizable)
-You MAY customize the atomic commit workflow for your project needs. The template provides documentation for this pattern at `.opencode/commands/atomic-commit.md` but implementation is left to individual projects.
-
-**Example workflow pattern:**
-
-```bash
-# Create feature branch
-git checkout -b feat/your-feature-name
-
-# Make changes
-
-# Run atomic commit (validates, commits, pushes, creates PR, verifies)
-./scripts/atomic-commit/run.sh
-
-# If checks fail, fix and retry
-```
+You MAY customize the atomic commit workflow for your project needs. See `agents-docs/WORKFLOW.md#atomic-commit-workflow` for details.
 
 ### Pre-Existing Issue Policy (REQUIRED)
-**Fix ALL pre-existing issues before completing:**
+Fix ALL pre-existing issues before completing. See `agents-docs/WORKFLOW.md#pre-existing-issue-resolution` for the full process.
 
-- [ ] Lint warnings (shellcheck, markdownlint), Test failures, Security vulnerabilities
-- [ ] Documentation gaps (broken links, missing files), Code style violations
-
-**Process:**
-1. Run quality gate: `./scripts/quality_gate.sh`
-2. Note all failures (even unrelated to your changes)
-3. Fix ALL issues
-4. Re-run quality gate to confirm zero issues
+### Post-Task Learning
+After non-trivial work: run the `learn` skill or manually append non-obvious discoveries to the nearest relevant `AGENTS.md`. Capture only: hidden file relationships, surprising execution behavior, undocumented commands, fragile config, files that must change together. Never write: obvious facts, duplicates, verbose explanations. See `agents-docs/WORKFLOW.md#post-task-learning` for details.
 
 ### Context Discipline
 - Delegate research to sub-agents; Use `/clear` between unrelated tasks
