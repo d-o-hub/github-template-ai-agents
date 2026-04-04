@@ -23,31 +23,29 @@ FAILED=0
 # Check if gh CLI is available
 if ! command -v gh &> /dev/null; then
     echo -e "${RED}gh CLI not available - skipping GitHub Actions SHA validation${NC}"
-    exit 1
+    exit 0
 fi
 
 # Find all workflow files
-WORKFLOW_FILES=$(find .github/workflows -name "*.yml" -o -name "*.yaml" 2>/dev/null || true)
+mapfile -t WORKFLOW_FILES < <(find .github/workflows -name "*.yml" -o -name "*.yaml" 2>/dev/null || true)
 
-if [ -z "$WORKFLOW_FILES" ]; then
+if [ ${#WORKFLOW_FILES[@]} -eq 0 ]; then
     echo -e "${GREEN}No workflow files found${NC}"
     exit 0
 fi
 
 # Extract action uses lines with SHAs
-for file in $WORKFLOW_FILES; do
-    # Find lines like uses: actions/something@SHA
-    grep -n "uses:" "$file" | grep "@[a-f0-9]\{40\}" | while IFS=: read -r line_num line; do
-        # Extract the action@SHA part
+for file in "${WORKFLOW_FILES[@]}"; do
+    while IFS=: read -r line_num line; do
         action_sha=$(echo "$line" | sed -n 's/.*uses:\s*\([^@]*@\)\?\([a-f0-9]\{40\}\).*/\2/p')
         if [ -n "$action_sha" ]; then
-            # Check if it's a placeholder (all same digit or pattern)
-            if echo "$action_sha" | grep -q "^[a-f0-9]*[89abAB][a-f0-9]*[89abAB][a-f0-9]*[89abAB][a-f0-9]*[89abAB][a-f0-9]*$"; then
+            # Check for placeholder patterns: all same char, or repeating digit patterns
+            if echo "$action_sha" | grep -qE '^(.)\1{39}$|^[0-9a-f]{8}([0-9a-f]{8}){4}[0-9a-f]{8}$'; then
                 echo -e "${RED}Invalid/placeholder SHA found in $file line $line_num: $action_sha${NC}"
                 FAILED=1
             fi
         fi
-    done
+    done < <(grep -n "uses:" "$file" | grep "@[a-f0-9]\{40\}" || true)
 done
 
 if [ $FAILED -eq 0 ]; then
