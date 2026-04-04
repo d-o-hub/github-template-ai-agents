@@ -27,6 +27,9 @@ jobs:
   detect-unused:
     name: Detect Unused Files
     runs-on: ubuntu-latest
+    outputs:
+      unused_files: ${{ steps.unused.outputs.unused_files }}
+      quality_passed: ${{ steps.quality.outputs.quality_passed }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,69 +39,73 @@ jobs:
       - name: Detect unused scripts
         id: unused
         run: |
-          echo "# Detecting potentially unused files..." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          unused_files=""
-          
-          # Check each shell script for references
-          for script in scripts/*.sh; do
-            if [ -f "$script" ]; then
-              script_name=$(basename "$script")
-              # Check if script is referenced anywhere (except itself)
-              refs=$(grep -r "$script_name" --include="*.yml" --include="*.yaml" --include="*.sh" --include="*.md" . 2>/dev/null | grep -v "^Binary" | grep -v "^\./\.git" | wc -l)
-              
-              if [ "$refs" -eq 0 ] && [ "$script_name" != "quality_gate.sh" ] && [ "$script_name" != "setup-skills.sh" ]; then
-                echo "⚠️ Potentially unused: $script_name (0 references found)" >> $GITHUB_STEP_SUMMARY
-                unused_files="$unused_files $script"
+          {
+            echo "# Detecting potentially unused files..."
+            echo ""
+            
+            unused_files=""
+            
+            # Check each shell script for references
+            for script in scripts/*.sh; do
+              if [ -f "${script}" ]; then
+                script_name=$(basename "${script}")
+                # Check if script is referenced anywhere (except itself)
+                refs=$(grep -r "${script_name}" --include="*.yml" --include="*.yaml" --include="*.sh" --include="*.md" . 2>/dev/null | grep -v "^Binary" | grep -v "^\./\.git" | grep -c . || true)
+                
+                if [ "${refs}" -eq 0 ] && [ "${script_name}" != "quality_gate.sh" ] && [ "${script_name}" != "setup-skills.sh" ]; then
+                  echo "⚠️ Potentially unused: ${script_name} (0 references found)"
+                  unused_files="${unused_files} ${script}"
+                fi
               fi
+            done
+            
+            # Check for broken symlinks
+            broken_links=$(find . -type l ! -exec test -e {} \; -print 2>/dev/null | grep -v ".git" || true)
+            if [ -n "${broken_links}" ]; then
+              echo "## Broken Symlinks"
+              echo "${broken_links}"
             fi
-          done
+            
+            # Check for old temp/debug files
+            old_files=$(find scripts/ .agents/ -name "*debug*" -o -name "*temp*" -o -name "*backup*" 2>/dev/null || true)
+            if [ -n "${old_files}" ]; then
+              echo "## Temp/Debug Files"
+              echo "${old_files}"
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
           
-          # Check for broken symlinks
-          broken_links=$(find . -type l ! -exec test -e {} \; -print 2>/dev/null | grep -v ".git" || true)
-          if [ -n "$broken_links" ]; then
-            echo "## Broken Symlinks" >> $GITHUB_STEP_SUMMARY
-            echo "$broken_links" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          # Check for old temp/debug files
-          old_files=$(find scripts/ .agents/ -name "*debug*" -o -name "*temp*" -o -name "*backup*" 2>/dev/null || true)
-          if [ -n "$old_files" ]; then
-            echo "## Temp/Debug Files" >> $GITHUB_STEP_SUMMARY
-            echo "$old_files" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          echo "unused_files=$unused_files" >> $GITHUB_OUTPUT
+          echo "unused_files=${unused_files}" >> "${GITHUB_OUTPUT}"
 
       - name: Check file ages
         id: ages
         run: |
-          echo "## Files Not Modified in 90+ Days" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          # Find files not modified in 90 days (excluding .git, node_modules, etc.)
-          old_files=$(find scripts/ .agents/ -type f -mtime +90 -not -path "./.git/*" -not -name "*.md" 2>/dev/null || true)
-          
-          if [ -n "$old_files" ]; then
-            echo "$old_files" | head -10 >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "*(showing first 10)*" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "✅ No old files detected" >> $GITHUB_STEP_SUMMARY
-          fi
+          {
+            echo "## Files Not Modified in 90+ Days"
+            echo ""
+            
+            # Find files not modified in 90 days (excluding .git, node_modules, etc.)
+            old_files=$(find scripts/ .agents/ -type f -mtime +90 -not -path "./.git/*" -not -name "*.md" 2>/dev/null || true)
+            
+            if [ -n "${old_files}" ]; then
+              echo "${old_files}" | head -10
+              echo ""
+              echo "*(showing first 10)*"
+            else
+              echo "✅ No old files detected"
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Run quality gate
         id: quality
         run: |
-          echo "## Quality Gate Check" >> $GITHUB_STEP_SUMMARY
+          echo "## Quality Gate Check" >> "${GITHUB_STEP_SUMMARY}"
           
           if ./scripts/quality_gate.sh; then
-            echo "✅ Quality gate passes" >> $GITHUB_STEP_SUMMARY
-            echo "quality_passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Quality gate passes" >> "${GITHUB_STEP_SUMMARY}"
+            echo "quality_passed=true" >> "${GITHUB_OUTPUT}"
           else
-            echo "❌ Quality gate failed - cleanup aborted" >> $GITHUB_STEP_SUMMARY
-            echo "quality_passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Quality gate failed - cleanup aborted" >> "${GITHUB_STEP_SUMMARY}"
+            echo "quality_passed=false" >> "${GITHUB_OUTPUT}"
             exit 1
           fi
         continue-on-error: true
@@ -144,12 +151,15 @@ jobs:
   report:
     name: Generate Report
     runs-on: ubuntu-latest
+    needs: detect-unused
     if: always()
     steps:
       - name: Summary
         run: |
-          echo "## Cleanup Workflow Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Detection job: ${{ needs.detect-unused.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- If files were detected, a DRAFT PR was created" >> $GITHUB_STEP_SUMMARY
-          echo "- Human review required before merging" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Cleanup Workflow Complete"
+            echo ""
+            echo "- Detection job: ${{ needs.detect-unused.result }}"
+            echo "- If files were detected, a DRAFT PR was created"
+            echo "- Human review required before merging"
+          } >> "${GITHUB_STEP_SUMMARY}"
