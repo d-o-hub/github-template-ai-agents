@@ -47,7 +47,7 @@ cleanup_on_error() {
 trap cleanup_on_error EXIT
 
 # Rollback function
-# shellcheck disable=SC2329
+# shellcheck disable=SC2317,SC2329
 execute_rollback() {
     echo ""
     log_warn "=== ROLLING BACK ==="
