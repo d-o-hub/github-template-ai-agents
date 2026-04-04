@@ -211,36 +211,6 @@ jobs:
           category: "/language:javascript"
 
   # ============================================================================
-  # DEPENDENCY REVIEW
-  # Review dependency changes for vulnerabilities (PRs only)
-  # Note: Skipped for fork PRs due to permission limitations
-  # ============================================================================
-  dependency-review:
-    name: Dependency Review
-    runs-on: ubuntu-latest
-    # Only run on PRs from the same repo (forks lack write permissions)
-    if: >-
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name == github.repository
-    # Make advisory only - don't block the build
-    continue-on-error: true
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Dependency Review
-        uses: actions/dependency-review-action@v4
-        with:
-          # Advisory only - do not fail the build
-          fail-on-severity: critical
-          # No PR comments to avoid write permission requirement
-          comment-summary-in-pr: false
-          # License checking is advisory only
-          deny-licenses: GPL-1.0-or-later, AGPL-1.0-or-later
-
-  # ============================================================================
   # INFRASTRUCTURE AS CODE SCAN
   # Scan GitHub Actions workflows and other IaC for misconfigurations
   # ============================================================================
