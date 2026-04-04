@@ -61,24 +61,20 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 
 ## Repository Structure
 
+**Fixed Infrastructure** (Required, never changes):
 ```
 <project-root>/
-├── AGENTS.md              # This file (single source of truth)
-├── CLAUDE.md              # Claude-specific overrides (@AGENTS.md)
-├── GEMINI.md              # Gemini-specific overrides
-├── QWEN.md                # Qwen-specific overrides
+├── AGENTS.md              # Single source of truth (this file)
 ├── agents-docs/           # Detailed reference (loaded on demand)
-│   ├── SKILLS.md          # Skill authoring guide
-│   ├── SUB-AGENTS.md      # Sub-agent patterns
-│   ├── CONTEXT.md         # Back-pressure patterns
-│   ├── AVAILABLE_SKILLS.md # Complete skills registry
-│   └── HARNESS.md         # Architecture overview
-├── .agents/skills/        # Canonical skill source (30+ skills)
-├── .claude/skills/        # Symlinks → .agents/skills/
-├── .gemini/skills/        # Symlinks → .agents/skills/
-├── .qwen/skills/          # Symlinks → .agents/skills/
+├── .agents/skills/        # Canonical skill source
 └── scripts/               # Setup, validation, quality gates
 ```
+
+**Dynamic Folders** (Created as needed):
+- `.claude/`, `.gemini/`, `.qwen/` - Agent-specific symlinks → `.agents/skills/`
+- `<agent-name>.md` - Override files for specific agents
+
+**Principle**: Document only fixed structure. Tool-specific folders follow the symlink pattern and are created by `./scripts/setup-skills.sh`.
 
 ## Testing
 

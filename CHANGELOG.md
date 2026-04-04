@@ -85,5 +85,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Quality gate exits with code 2 to surface errors to agent
 - Progressive disclosure for skills (load on demand)
 
-[Unreleased]: https://github.com/your-org/github-template-ai-agents/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/your-org/github-template-ai-agents/releases/tag/v0.1.0
+[Unreleased]: https://github.com/your-org/your-project/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/your-org/your-project/releases/tag/v0.1.0

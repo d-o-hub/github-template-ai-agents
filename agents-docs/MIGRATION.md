@@ -89,10 +89,10 @@ Download the template files to a temporary location:
 
 ```bash
 # Option A: Clone the template repository
-git clone https://github.com/d-o-hub/github-template-ai-agents.git /tmp/ai-agent-template
+git clone https://github.com/your-org/your-project.git /tmp/ai-agent-template
 
 # Option B: Download as zip
-curl -L -o /tmp/ai-agent-template.zip https://github.com/d-o-hub/github-template-ai-agents/archive/main.zip
+curl -L -o /tmp/ai-agent-template.zip https://github.com/your-org/your-project/archive/main.zip
 unzip /tmp/ai-agent-template.zip -d /tmp/ai-agent-template
 ```
 
@@ -790,4 +790,4 @@ After migration:
 
 ---
 
-**Need Help?** Open an issue on [GitHub](https://github.com/d-o-hub/github-template-ai-agents/issues).
+**Need Help?** Open an issue on [GitHub](../../issues).

@@ -2,8 +2,11 @@
 # Dynamic Skill Catalog Updater
 # Scans .agents/skills/ and regenerates the skill catalog
 
-SKILLS_DIR="${1:-.agents/skills}"
-CATALOG_FILE=".agents/skills/intent-classifier/references/skill-catalog.md"
+# Get repository root for portable paths
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../" && pwd)"
+
+SKILLS_DIR="${1:-$REPO_ROOT/.agents/skills}"
+CATALOG_FILE="$REPO_ROOT/.agents/skills/intent-classifier/references/skill-catalog.md"
 
 # Check if skills directory exists
 if [[ ! -d "$SKILLS_DIR" ]]; then

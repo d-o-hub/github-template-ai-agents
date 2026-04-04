@@ -11,8 +11,8 @@ Thank you for your interest in contributing! This guide helps you contribute eff
 
 ```bash
 # Fork and clone
-git clone https://github.com/your-org/github-template-ai-agents.git
-cd github-template-ai-agents
+git clone https://github.com/your-org/your-project.git
+cd your-project
 
 # Setup skills symlinks
 ./scripts/setup-skills.sh
@@ -25,7 +25,7 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 
 ### 1. Find or Create an Issue
 
-- Check existing [issues](https://github.com/d-o-hub/github-template-ai-agents/issues) for open tasks
+- Check existing [issues](../../issues) for open tasks
 - Look for labels like `good first issue`, `help wanted`, or `priority: high`
 - Create a new issue if you found a bug or have a feature idea
 
@@ -247,8 +247,8 @@ Labels help organize issues and PRs:
 
 ## Questions?
 
-- **General questions**: Start a [discussion](https://github.com/d-o-hub/github-template-ai-agents/discussions)
-- **Bugs**: Open an [issue](https://github.com/d-o-hub/github-template-ai-agents/issues)
+- **General questions**: Start a [discussion](../../discussions)
+- **Bugs**: Open an [issue](../../issues)
 - **Chat**: Check if there's a community chat link in README
 
 ## Thank You!
@@ -257,4 +257,4 @@ Every contribution makes AI agent workflows better. Whether it's a typo fix or a
 
 ---
 
-**Ready to contribute?** Check out [good first issues](https://github.com/d-o-hub/github-template-ai-agents/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to get started!
+**Ready to contribute?** Check out [good first issues](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to get started!
