@@ -63,13 +63,28 @@ jobs:
           fi
 
           # Validate SARIF JSON; fall back to empty if invalid or missing
-          # yamllint disable-line rule:line-length
           if [[ ! -s shellcheck-results.sarif ]] || \
              ! python3 -c "import json,sys; json.load(open('shellcheck-results.sarif'))" \
-             2>/dev/null; then
-            # yamllint disable-line rule:line-length
-            s='{"$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","version":"2.1.0","runs":[{"tool":{"driver":{"name":"shellcheck","informationUri":"https://www.shellcheck.net/"}}, "results":[]}]}'
-            echo "$s" > shellcheck-results.sarif
+                 2>/dev/null; then
+            python3 -c "
+              import json
+              schema = 'https://raw.githubusercontent.com/oasis-tcs/sarif-spec/'
+              schema += 'master/Schemata/sarif-schema-2.1.0.json'
+              sarif = {
+                  '\$schema': schema,
+                  'version': '2.1.0',
+                  'runs': [{
+                      'tool': {
+                          'driver': {
+                              'name': 'shellcheck',
+                              'informationUri': 'https://www.shellcheck.net/'
+                          }
+                      },
+                      'results': []
+                  }]
+              }
+              json.dump(sarif, open('shellcheck-results.sarif', 'w'))
+            "
           fi
 
       - name: Upload ShellCheck SARIF
