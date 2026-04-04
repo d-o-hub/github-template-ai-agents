@@ -130,6 +130,7 @@ git checkout -b feat/your-feature-name
 ### Context Discipline
 - Delegate research to sub-agents; Use `/clear` between unrelated tasks
 - Load skills only when needed; See `agents-docs/SKILLS.md` for skill framework
+- **Post-task**: Use `learn` skill to capture non-obvious insights in scoped `AGENTS.md` files
 
 ### Nested AGENTS.md
 For monorepos, place additional `AGENTS.md` inside each sub-package. Nearest file takes precedence.

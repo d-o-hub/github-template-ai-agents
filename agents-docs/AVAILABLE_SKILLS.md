@@ -51,6 +51,11 @@
 | `do-web-doc-resolver` | Resolve URLs and queries into compact, LLM-ready markdown |
 | `web-search-researcher` | Research topics using web search |
 
+### Knowledge Management
+| Skill | Description |
+|-------|-------------|
+| `learn` | Extract non-obvious session learnings into scoped AGENTS.md files |
+
 ### Meta (Skill Management)
 | Skill | Description |
 |-------|-------------|
