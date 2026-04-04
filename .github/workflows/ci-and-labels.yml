@@ -17,6 +17,9 @@ jobs:
   labels:
     name: Initialize GitHub Labels
     runs-on: ubuntu-latest
+    # This job is optional - it may fail if GITHUB_TOKEN lacks permissions
+    # Labels can be created manually or via repository settings
+    continue-on-error: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
