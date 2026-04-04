@@ -210,6 +210,42 @@ jobs:
         with:
           category: "/language:javascript"
 
+      - name: Generate empty CodeQL SARIF (no supported files found)
+        if: steps.check_files.outputs.has_codeql_files == 'false'
+        run: |
+          # Upload an empty but valid SARIF so GitHub's code scanning check
+          # resolves cleanly instead of erroring with "Error when processing
+          # the SARIF file" (caused by a pre-registered check run with no upload).
+          cat > codeql-empty-results.sarif << 'EOF'
+          {
+            "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+            "version": "2.1.0",
+            "runs": [
+              {
+                "tool": {
+                  "driver": {
+                    "name": "CodeQL",
+                    "informationUri": "https://codeql.github.com/",
+                    "rules": []
+                  }
+                },
+                "results": [],
+                "properties": {
+                  "semmle.formatSpecifier": "sarifv2.1.0"
+                }
+              }
+            ]
+          }
+          EOF
+
+      - name: Upload empty CodeQL SARIF (no supported files found)
+        if: steps.check_files.outputs.has_codeql_files == 'false'
+        uses: github/codeql-action/upload-sarif@v3
+        continue-on-error: true
+        with:
+          sarif_file: codeql-empty-results.sarif
+          category: "/language:javascript"
+
   # ============================================================================
   # INFRASTRUCTURE AS CODE SCAN
   # Scan GitHub Actions workflows and other IaC for misconfigurations
