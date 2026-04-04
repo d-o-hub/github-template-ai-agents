@@ -6,7 +6,7 @@ license: MIT
 
 # Code Quality Reviewer
 
-Expert skill for code quality assessment and improvement. See @references/language-patterns.md for language-specific examples.
+Expert skill for code quality assessment and improvement.
 
 ## Quick Check
 
@@ -119,6 +119,4 @@ if timeout > TIMEOUT_MS { /* ... */ }
 
 ## References
 
-- @references/language-patterns.md - Language-specific examples
-- Clean Code (Martin)
-- Refactoring (Fowler)
+- `agents-docs/SKILL.md` - Skill authoring guide

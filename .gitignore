@@ -31,9 +31,12 @@ target/
 # Logs
 *.log
 
-# Build outputs
-dist/
-build/
+# Temporary files
+temp/
+*.tmp
+
+# Reports
+reports/
 
 # Environment
 .env

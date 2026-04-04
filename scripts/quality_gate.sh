@@ -30,6 +30,16 @@ DETECTED_LANGUAGES=()
 echo "Running quality gate..."
 echo ""
 
+# --- Validate git hooks configuration (prevent global hooks from overriding local) ---
+if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
+    echo -e "${BLUE}Validating git hooks configuration...${NC}"
+    if ! ./scripts/validate-git-hooks.sh; then
+        # Don't fail the quality gate, just warn
+        FAILED=1
+    fi
+    echo ""
+fi
+
 # --- Always: validate skill symlinks ---
 echo -e "${BLUE}Validating skill symlinks...${NC}"
 if ! ./scripts/validate-skills.sh; then

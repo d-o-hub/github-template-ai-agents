@@ -6,7 +6,7 @@ license: MIT
 
 # AGENTS.md Best Practices
 
-Create production-ready AGENTS.md files. See @references/templates.md for detailed templates.
+Create production-ready AGENTS.md files following best practices below.
 
 ## Quick Start
 
@@ -27,7 +27,7 @@ readonly MAX_FILE_SIZE=500
 EOF
 ```
 
-**Production:** Use @references/templates.md
+**Production:** See guide in `agents-docs/` folder
 
 ## Core Sections
 
@@ -65,7 +65,7 @@ npm audit
 - **Tier 2 (Professional):** Add quality gate, atomic commit, security
 - **Tier 3 (Enterprise):** Add skills, sub-agents, nested AGENTS.md
 
-See @references/tier-breakdown.md for details.
+See `agents-docs/SKILLS.md` for tier details.
 
 ## Best Practices
 
@@ -86,11 +86,10 @@ See @references/tier-breakdown.md for details.
 - [ ] Named constants defined
 - [ ] Pre-existing issue policy included
 - [ ] Quality gate specified
-- [ ] < 150 lines (progressive disclosure)
+- [ ] < 160 lines (progressive disclosure)
 
 ## References
 
-- @references/templates.md - Production templates
-- @agents-docs/SKILLS.md - Skill framework
-- @agents-docs/SUB-AGENTS.md - Sub-agent patterns
+- `agents-docs/SKILLS.md` - Skill framework
+- `agents-docs/SUB-AGENTS.md` - Sub-agent patterns
 - https://agents.md - Official spec

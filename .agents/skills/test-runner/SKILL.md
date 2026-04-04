@@ -6,7 +6,7 @@ license: MIT
 
 # Test Runner
 
-Expert skill for test execution and failure diagnosis. See @references/framework-commands.md for detailed framework commands.
+Expert skill for test execution and failure diagnosis.
 
 ## Quick Start
 
@@ -156,5 +156,4 @@ for i in {1..10}; do pytest || echo "Failed run $i"; done
 
 ## References
 
-- @references/framework-commands.md - Full command reference
-- @references/ci-integration.md - CI/CD setup
+- `agents-docs/SKILLS.md` - Skill framework guide

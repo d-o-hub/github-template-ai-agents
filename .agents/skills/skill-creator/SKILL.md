@@ -111,7 +111,6 @@ Store in `evals/evals.json`:
 
 - `references/best-practices.md` - Best practices for skill creators
 - `references/evaluating-skills.md` - Evaluating skill output quality
-- `references/schemas.md` - JSON structures for evals.json, grading.json
 - `references/output-patterns.md` - Common output patterns
 - `references/workflows.md` - Common workflow patterns
 

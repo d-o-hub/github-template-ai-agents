@@ -64,7 +64,7 @@ Layer information from simple to complex:
 ### 4. Accessibility First
 
 Requirements:
-- Alt text for all images: `![Description](url)`
+- Alt text for all images (format: `![Description](image-url)`)
 - Semantic headings (H1 → H2 → H3, not skipped)
 - Descriptive link text (not "click here")
 - Screen reader friendly emoji use (sparingly)
@@ -209,4 +209,4 @@ A great README is the single most important factor in project adoption and contr
 
 ## Reference Files
 
-- **[reference/guide.md](reference/guide.md)** - Complete section-by-section guidance, detailed examples, templates for different project types, writing style deep dive, accessibility checklist, SEO tips, multilingual READMEs, anti-patterns, testing methods, and maintenance guide
+- `reference/guide.md` - Complete section-by-section guidance, detailed examples, templates, writing style, accessibility checklist, SEO tips, multilingual READMEs, anti-patterns, testing methods, and maintenance guide

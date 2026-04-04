@@ -11,8 +11,8 @@ Always use the plans/ folder for all files.
 
 ## Quick Reference
 
-- **[Execution Strategies](execution-strategies.md)** - Detailed guide on execution patterns
-- **[Reference Guide](reference/guide.md)** - Complete examples, templates, and advanced topics
+- `execution-strategies.md` - Detailed guide on execution patterns
+- `reference/guide.md` - Complete examples, templates, and advanced topics
 
 ## When to Use This Skill
 
@@ -140,5 +140,5 @@ GOAP enables systematic planning through: Analysis, Decomposition, Strategy, Qua
 
 ## Reference Files
 
-- **[reference/guide.md](reference/guide.md)** - Complete templates, detailed examples, extended patterns, error handling, optimization
-- **[execution-strategies.md](execution-strategies.md)** - Execution pattern details
+- `reference/guide.md` - Complete templates, detailed examples, extended patterns, error handling, optimization
+- `execution-strategies.md` - Execution pattern details

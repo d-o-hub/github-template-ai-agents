@@ -9,6 +9,23 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOOKS_DIR="$REPO_ROOT/.git/hooks"
 
 echo "Installing git hooks for documentation auto-update..."
+echo ""
+
+# Check for global hooks configuration before installing
+if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
+    echo "Checking git hooks configuration..."
+    if ! ./scripts/validate-git-hooks.sh 2>/dev/null; then
+        echo ""
+        echo "⚠️  WARNING: Git hooks configuration issue detected!"
+        echo ""
+        ./scripts/validate-git-hooks.sh || true
+        echo ""
+        echo "It's recommended to fix this before installing hooks."
+        echo "To continue anyway: SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/install-hooks.sh"
+        echo ""
+        exit 1
+    fi
+fi
 
 # Ensure .git/hooks directory exists
 if [ ! -d "$HOOKS_DIR" ]; then
@@ -64,6 +81,15 @@ cat > "$HOOKS_DIR/pre-commit" << 'HOOK'
 # Install: ./scripts/install-hooks.sh
 
 set -e
+
+# Validate git hooks configuration (prevent global hooks from overriding local)
+if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
+    if ! ./scripts/validate-git-hooks.sh; then
+        echo ""
+        echo "Commit aborted. Fix the hooks configuration or use SKIP_GLOBAL_HOOKS_CHECK=true to skip."
+        exit 1
+    fi
+fi
 
 echo "Running pre-commit quality checks..."
 
