@@ -76,7 +76,7 @@ log_section() {
 }
 
 # Error handler
-# shellcheck disable=SC2329
+# shellcheck disable=SC2317,SC2329
 error_handler() {
     local line=$1
     log_error "Error in ${SCRIPT_NAME} at line ${line}"
@@ -328,52 +328,6 @@ check_tests() {
     fi
     
     log_success "All tests passed"
-    return "$EXIT_SUCCESS"
-}
-
-# Verify commit message format (if provided)
-# shellcheck disable=SC2329
-check_commit_message() {
-    log_section "Commit Message Validation"
-    
-    local commit_msg_file="${1:-}"
-    
-    if [[ -z "$commit_msg_file" ]] || [[ ! -f "$commit_msg_file" ]]; then
-        log_info "No commit message file provided, skipping validation"
-        return "$EXIT_SUCCESS"
-    fi
-    
-    local msg
-    msg=$(cat "$commit_msg_file")
-    
-    # Check for empty message
-    if [[ -z "${msg// /}" ]]; then
-        log_error "Commit message is empty"
-        return "$EXIT_FAILURE"
-    fi
-    
-    # Check conventional commit format
-    # Format: type(scope): description or type: description
-    local conventional_pattern='^(feat|fix|docs|style|refactor|test|chore|ci|build|perf)(\([a-z-]+\))?: .+'
-    
-    if ! echo "$msg" | grep -qE "$conventional_pattern"; then
-        log_warning "Commit message doesn't follow conventional commit format"
-        log_info "Expected format: type(scope): description"
-        log_info "Types: feat, fix, docs, style, refactor, test, chore, ci, build, perf"
-        
-        # This is a warning but we treat warnings as failures
-        return "$EXIT_WARNING"
-    fi
-    
-    # Check message length (subject line should be <= 72 chars)
-    local subject
-    subject=$(echo "$msg" | head -1)
-    if [[ ${#subject} -gt 72 ]]; then
-        log_warning "Subject line exceeds 72 characters (${#subject} chars)"
-        return "$EXIT_WARNING"
-    fi
-    
-    log_success "Commit message format valid"
     return "$EXIT_SUCCESS"
 }
 

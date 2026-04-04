@@ -107,7 +107,7 @@ clear_progress() {
 }
 
 # Error handler
-# shellcheck disable=SC2329
+# shellcheck disable=SC2317,SC2329
 error_handler() {
     local line=$1
     log_error "Unexpected error in ${SCRIPT_NAME} at line ${line}"
