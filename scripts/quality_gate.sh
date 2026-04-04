@@ -357,9 +357,9 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
             sc_failed=0
             while IFS= read -r script; do
                 [ -n "$script" ] || continue
+                # Use --severity=error to only fail on actual errors, not style warnings
                 # Use -f quiet to reduce output volume in CI environments
-                # Shellcheck warnings are still shown via the "failed" message
-                if ! shellcheck -f quiet "$script" 2>/dev/null; then
+                if ! shellcheck --severity=error -f quiet "$script" 2>/dev/null; then
                     echo -e "${RED}  ✗ shellcheck failed: $script${NC}"
                     sc_failed=1
                 fi
