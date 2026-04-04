@@ -11,6 +11,7 @@ cd "$REPO_ROOT"
 
 AGENTS_FILE="$REPO_ROOT/AGENTS.md"
 TEMP_FILE="$REPO_ROOT/.agents_md_temp.md"
+temp_table="$REPO_ROOT/.temp_table.md"  # Define before trap
 
 # Trap to clean up temp files on exit or error
 trap 'rm -f "$TEMP_FILE" "$temp_table"' EXIT ERR
@@ -101,7 +102,6 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
 fi
 
 # Sort the table rows (excluding header) alphabetically by skill name
-temp_table="$REPO_ROOT/.temp_table.md"
 head -n $((SKILLS_SECTION_LINE + 3)) "$TEMP_FILE" > "$temp_table"
 tail -n +$((SKILLS_SECTION_LINE + 4)) "$TEMP_FILE" | sort >> "$temp_table"
 mv "$temp_table" "$TEMP_FILE"
