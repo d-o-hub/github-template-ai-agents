@@ -63,23 +63,7 @@ jobs:
           # Validate SARIF JSON; fall back to empty if invalid or missing
           if [[ ! -s shellcheck-results.sarif ]] || \
              ! python3 -c "import json,sys; json.load(open('shellcheck-results.sarif'))" 2>/dev/null; then
-            cat > shellcheck-results.sarif << 'SARIF_EOF'
-            {
-              "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
-              "version": "2.1.0",
-              "runs": [
-                {
-                  "tool": {
-                    "driver": {
-                      "name": "shellcheck",
-                      "informationUri": "https://www.shellcheck.net/"
-                    }
-                  },
-                  "results": []
-                }
-              ]
-            }
-            SARIF_EOF
+            python3 -c 'import json,sys;s={"$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","version":"2.1.0","runs":[{"tool":{"driver":{"name":"shellcheck","informationUri":"https://www.shellcheck.net/"}},"results":[]}]};json.dump(s,sys.stdout,indent=2)' > shellcheck-results.sarif
           fi
 
       - name: Upload ShellCheck SARIF
