@@ -47,6 +47,29 @@ validate_skill_file() {
         ((errors++))
     fi
 
+    # Warn if missing version field (non-breaking)
+    if ! grep -q "^version:" "$skill_file" 2>/dev/null; then
+        echo -e "  ${YELLOW}⚠${NC} $skill_name: Missing 'version:' field (recommended)" >&2
+    fi
+
+    # Warn if template_version is older than current by more than one minor version
+    if grep -q "^template_version:" "$skill_file" 2>/dev/null; then
+        local current_version skill_template_version
+        current_version=$(cat "$REPO_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]')
+        skill_template_version=$(grep "^template_version:" "$skill_file" | head -1 | sed 's/template_version: *//;s/"//g;s/ *$//')
+        if [[ -n "$current_version" && -n "$skill_template_version" ]]; then
+            local current_major current_minor skill_major skill_minor
+            current_major=$(echo "$current_version" | cut -d. -f1)
+            current_minor=$(echo "$current_version" | cut -d. -f2)
+            skill_major=$(echo "$skill_template_version" | cut -d. -f1)
+            skill_minor=$(echo "$skill_template_version" | cut -d. -f2)
+            if [[ "$skill_major" -lt "$current_major" ]] || \
+               { [[ "$skill_major" -eq "$current_major" ]] && [[ $((current_minor - skill_minor)) -gt 1 ]]; }; then
+                echo -e "  ${YELLOW}⚠${NC} $skill_name: template_version $skill_template_version is >1 minor behind current $current_version" >&2
+            fi
+        fi
+    fi
+
     # Check line count
     local line_count
     line_count=$(wc -l < "$skill_file" | tr -d ' ')
