@@ -18,6 +18,9 @@ readonly MAX_LINES_PER_SKILL_MD=250
 # Maximum lines per configuration file
 readonly MAX_LINES_PER_CONFIG_FILE=250
 
+# Maximum context tokens for semantic memory retrieval
+readonly MAX_CONTEXT_TOKENS=4000
+
 # ============================================================================
 # RETRY AND POLLING CONFIGURATION
 # ============================================================================
@@ -86,7 +89,7 @@ readonly SKILL_REQUIRED_FIELDS=("name" "description")
 readonly SKILL_RECOMMENDED_FIELDS=("license")
 
 # Valid skill categories
-readonly SKILL_CATEGORIES=("Security" "Coordination" "UI/UX" "APIDevelopment" "Documentation" "DevOps" "General" "CodeQuality" "Database" "Research" "Migration" "Planning" "Quality" "Innovation" "Meta")
+readonly SKILL_CATEGORIES=("Security" "Coordination" "UI/UX" "APIDevelopment" "Documentation" "DevOps" "General" "CodeQuality" "Database" "Research" "Migration" "Planning" "Quality" "Innovation" "Meta" "knowledge-management")
 
 # ============================================================================
 # DIRECTORY STRUCTURE
