@@ -96,19 +96,21 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 ### Plan Before Executing
 For non-trivial tasks: produce a written plan first, pause, wait for confirmation.
 
-### Atomic Commit Policy (REQUIRED)
-**ALL changes MUST use the atomic commit workflow.**
+### Atomic Commit Policy (Optional / Customizable)
+You MAY customize the atomic commit workflow for your project needs. The template provides documentation for this pattern at `.opencode/commands/atomic-commit.md` but implementation is left to individual projects.
+
+**Example workflow pattern:**
 
 ```bash
-# 1. Create feature branch
+# Create feature branch
 git checkout -b feat/your-feature-name
 
-# 2. Make changes
+# Make changes
 
-# 3. Run atomic commit (validates, commits, pushes, creates PR, verifies)
+# Run atomic commit (validates, commits, pushes, creates PR, verifies)
 ./scripts/atomic-commit/run.sh
 
-# 4. If checks fail, fix and retry
+# If checks fail, fix and retry
 ```
 
 ### Pre-Existing Issue Policy (REQUIRED)
@@ -140,4 +142,5 @@ For monorepos, place additional `AGENTS.md` inside each sub-package. Nearest fil
 | Architecture | `agents-docs/HARNESS.md` |
 | Available skills | `agents-docs/AVAILABLE_SKILLS.md` |
 | AGENTS.md authoring | `.agents/skills/agents-md/SKILL.md` |
+| Configuration | `agents-docs/CONFIG.md` |
 | Migration guide | `agents-docs/MIGRATION.md` |
