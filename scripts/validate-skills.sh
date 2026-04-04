@@ -66,6 +66,29 @@ for skill_path in "$SKILLS_SRC"/*/; do
         FAILED=1
     fi
 
+    # Check 2b: Warn if missing version field (non-breaking)
+    if ! grep -q "^version:" "$skill_path/SKILL.md" 2>/dev/null; then
+        echo -e "  ${YELLOW}⚠${NC} $skill_name: Missing 'version:' field (recommended)" >&2
+        WARNINGS=1
+    fi
+
+    # Check 2c: Warn if template_version is older than current by >1 minor version
+    if grep -q "^template_version:" "$skill_path/SKILL.md" 2>/dev/null; then
+        current_version=$(cat "$REPO_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]')
+        skill_template_version=$(grep "^template_version:" "$skill_path/SKILL.md" | head -1 | sed 's/template_version: *//;s/"//g;s/ *$//')
+        if [[ -n "$current_version" && -n "$skill_template_version" ]]; then
+            current_major=$(echo "$current_version" | cut -d. -f1)
+            current_minor=$(echo "$current_version" | cut -d. -f2)
+            skill_major=$(echo "$skill_template_version" | cut -d. -f1)
+            skill_minor=$(echo "$skill_template_version" | cut -d. -f2)
+            if [[ "$skill_major" -lt "$current_major" ]] || \
+               { [[ "$skill_major" -eq "$current_major" ]] && [[ $((current_minor - skill_minor)) -gt 1 ]]; }; then
+                echo -e "  ${YELLOW}⚠${NC} $skill_name: template_version $skill_template_version is >1 minor behind current $current_version" >&2
+                WARNINGS=1
+            fi
+        fi
+    fi
+
     # Check 3: SKILL.md line count (<= MAX_SKILL_LINES)
     line_count=$(wc -l < "$skill_path/SKILL.md" | tr -d ' ')
     if [ "$line_count" -gt "$MAX_SKILL_LINES" ]; then

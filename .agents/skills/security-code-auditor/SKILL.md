@@ -1,6 +1,8 @@
 ---
 name: security-code-auditor
 description: Perform security audits on code to identify vulnerabilities, misconfigurations, and security anti-patterns. Use when users ask to 'audit', 'review', or 'check security' of code, configurations, or repositories. Trigger on keywords like 'security review', 'vulnerability scan', 'OWASP', 'secure coding', 'penetration test', or 'security assessment'.
+version: "1.0"
+template_version: "0.2"
 license: MIT
 ---
 

@@ -41,6 +41,14 @@ when the agent decides it is needed. Do not pre-load all skills at session start
 ## SKILL.md Template
 
 ```markdown
+---
+name: skill-name
+description: One-line description
+category: coordination|quality|documentation|workflow|research|knowledge-management
+version: "1.0"
+template_version: "0.2"
+---
+
 # Skill Name
 
 Brief description.
@@ -58,6 +66,19 @@ Activate when: [specific triggers]
 ## Examples
 [Concrete usage]
 ```
+
+## Frontmatter Fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Skill identifier (lowercase, hyphens) |
+| `description` | Yes | One-line description with trigger keywords |
+| `category` | Yes | One of: coordination, quality, documentation, workflow, research, knowledge-management |
+| `version` | Recommended | Semantic version of the skill itself (e.g., "1.0") |
+| `template_version` | Recommended | Minimum template version this skill requires (matches VERSION file) |
+
+`version` and `template_version` enable `validate-skills.sh` to detect stale skills
+and help template consumers know which template version a skill was authored for.
 
 ## Rules
 
