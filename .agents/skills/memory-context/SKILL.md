@@ -39,7 +39,7 @@ Index stored in `.git/memory-index/csm.db` (per-clone, never committed).
 csm query "how to handle git worktree cleanup" --top-k 5
 
 # Code identifier query (exact match optimized)
-csm query "MAX_CONTEXT_TOKENS" --top-k 3 --output json
+csm query "MAX_CONTEXT_TOKENS" --top-k 3 --output-format json
 
 # Code-heavy query
 csm query "get_user_by_id" --code-aware --top-k 5
@@ -47,9 +47,9 @@ csm query "get_user_by_id" --code-aware --top-k 5
 
 ## Output Formats
 
-- `--output table` (default): human-readable
-- `--output json`: machine-parseable for agent consumption
-- `--output quiet`: IDs only
+- `--output-format table` (default): human-readable
+- `--output-format json`: machine-parseable for agent consumption
+- `--output-format quiet`: IDs only
 
 ## Token Budget
 
