@@ -129,7 +129,7 @@ jobs:
 ```
 
 ### Pattern 3: Caching Strategy
-See `reference/optimization-patterns.md` for caching configuration.
+See `references/optimization-patterns.md` for caching configuration.
 
 ### Pattern 4: Conditional Jobs
 ```yaml
@@ -145,7 +145,7 @@ jobs:
 
 ## Deployment Strategies
 
-See `reference/deployment-strategies.md` for detailed implementations of:
+See `references/deployment-strategies.md` for detailed implementations of:
 - Blue-green deployments
 - Canary deployments with automatic promotion
 - Rolling deployments in Kubernetes
@@ -153,7 +153,7 @@ See `reference/deployment-strategies.md` for detailed implementations of:
 
 ## Security Integration
 
-See `reference/security-scanning.md` for:
+See `references/security-scanning.md` for:
 - Secrets detection with GitLeaks
 - Dependency vulnerability scanning with Trivy
 - SAST with SonarQube/CodeQL
@@ -182,7 +182,7 @@ jobs:
 
 ## Pipeline Optimization
 
-See `reference/optimization-patterns.md` for:
+See `references/optimization-patterns.md` for:
 - Parallel job execution strategies
 - Docker layer caching
 - Test sharding and categorization
@@ -191,7 +191,7 @@ See `reference/optimization-patterns.md` for:
 
 ## Failure Handling
 
-See `reference/failure-recovery.md` for:
+See `references/failure-recovery.md` for:
 - Automatic rollback procedures
 - Health check implementations
 - Slack/Teams notifications
@@ -215,7 +215,7 @@ Self-hosted CI/CD configuration using Forgejo/Gitea Actions.
 
 ## References
 
-- `reference/deployment-strategies.md` - Detailed deployment guides
-- `reference/security-scanning.md` - Security tool integration
-- `reference/optimization-patterns.md` - Performance optimization
-- `reference/failure-recovery.md` - Rollback and recovery
+- `references/deployment-strategies.md` - Detailed deployment guides
+- `references/security-scanning.md` - Security tool integration
+- `references/optimization-patterns.md` - Performance optimization
+- `references/failure-recovery.md` - Rollback and recovery

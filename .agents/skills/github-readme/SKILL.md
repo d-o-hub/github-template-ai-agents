@@ -209,4 +209,4 @@ A great README is the single most important factor in project adoption and contr
 
 ## Reference Files
 
-- `reference/guide.md` - Complete section-by-section guidance, detailed examples, templates, writing style, accessibility checklist, SEO tips, multilingual READMEs, anti-patterns, testing methods, and maintenance guide
+- `references/guide.md` - Complete section-by-section guidance, detailed examples, templates, writing style, accessibility checklist, SEO tips, multilingual READMEs, anti-patterns, testing methods, and maintenance guide

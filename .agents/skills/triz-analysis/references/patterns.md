@@ -100,7 +100,7 @@ Resolution: #19 Periodic action (continuous testing) + #25 Self-service (self-te
 ```
 Improving: Instruction completeness
 Worsening: Token limit consumption
-Resolution: #4 Asymmetry (heavy in reference/, light in skill) + #15 Dynamics (lazy loading)
+Resolution: #4 Asymmetry (heavy in references/, light in skill) + #15 Dynamics (lazy loading)
 ```
 
 ### Autonomy vs Consistency

@@ -73,7 +73,7 @@ CREATE TABLE orders (
 CREATE INDEX idx_orders_tenant ON orders(tenant_id);
 ```
 
-See `reference/schema-patterns.md` for event sourcing, temporal tables, and more.
+See `references/schema-patterns.md` for event sourcing, temporal tables, and more.
 
 ## Migration Safety
 
@@ -98,7 +98,7 @@ pt-online-schema-change \
     D=mydb,t=users
 ```
 
-See `reference/migration-patterns.md` for gh-ost, batching strategies, and zero-downtime patterns.
+See `references/migration-patterns.md` for gh-ost, batching strategies, and zero-downtime patterns.
 
 ## Query Optimization
 
@@ -124,7 +124,7 @@ JOIN users ON orders.user_id = users.id
 WHERE orders.user_id = 1;
 ```
 
-See `reference/query-optimization.md` for EXPLAIN analysis, covering indexes, and performance tuning.
+See `references/query-optimization.md` for EXPLAIN analysis, covering indexes, and performance tuning.
 
 ## Infrastructure-as-Code
 
@@ -143,7 +143,7 @@ resource "aws_db_instance" "main" {
 }
 ```
 
-See `reference/iac-examples.md` for Pulumi, CloudFormation, and multi-cloud examples.
+See `references/iac-examples.md` for Pulumi, CloudFormation, and multi-cloud examples.
 
 ## Backup and Recovery
 
@@ -155,7 +155,7 @@ archive_mode = on
 archive_command = 'cp %p /backup/wal/%f'
 ```
 
-See `reference/backup-strategies.md` for point-in-time recovery, automated backups, and disaster recovery procedures.
+See `references/backup-strategies.md` for point-in-time recovery, automated backups, and disaster recovery procedures.
 
 ## Quality Checklist
 
@@ -172,11 +172,11 @@ See `reference/backup-strategies.md` for point-in-time recovery, automated backu
 
 ## References
 
-- `reference/schema-patterns.md` - Advanced schema design patterns
-- `reference/migration-patterns.md` - Migration safety patterns
-- `reference/query-optimization.md` - Performance tuning guide
-- `reference/iac-examples.md` - Terraform/Pulumi examples
-- `reference/backup-strategies.md` - Backup and recovery
+- `references/schema-patterns.md` - Advanced schema design patterns
+- `references/migration-patterns.md` - Migration safety patterns
+- `references/query-optimization.md` - Performance tuning guide
+- `references/iac-examples.md` - Terraform/Pulumi examples
+- `references/backup-strategies.md` - Backup and recovery
 
 ## Integration with other skills
 

@@ -38,7 +38,7 @@ Swallow passing output - surface only failures.
 AGENTS.md (concise, universal)
   +-- agents-docs/ (detailed reference, loaded on demand)
        +-- Skills with SKILL.md (loaded when agent needs them)
-            +-- reference/ within each skill (read only what is needed)
+            +-- references/ within each skill (read only what is needed)
 ```
 
 For efficient retrieval of past project knowledge, use the `memory-context` skill (`csm` CLI) instead of loading the entire `LESSONS.md` file.

@@ -67,7 +67,7 @@ See `agents-docs/VERSION.md` for full workflow details.
 
 - Max `${MAX_LINES_PER_SOURCE_FILE}` lines per source file; `${MAX_LINES_PER_SKILL_MD}` per `SKILL.md`; `${MAX_LINES_AGENTS_MD}` per `AGENTS.md`
 - `SKILL.md` must start with frontmatter (`---` on line 1)
-- **Reference format**: `` `reference/filename.md` - Description `` (no @ prefix, no markdown links)
+- **Reference format**: `` `references/filename.md` - Description `` (no @ prefix, no markdown links)
 - Conventional Commits: `feat:`, `fix:`, `docs:`, `ci:`, `test:`, `refactor:`
 - Shell scripts: `shellcheck` for linting, `bats` for testing
 - Markdown: `markdownlint` for consistency

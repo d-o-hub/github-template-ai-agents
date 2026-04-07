@@ -10,7 +10,7 @@ description: Unified atomic git workflow with GitHub integration - commits all c
 ## Overview
 
 This skill orchestrates a complete development workflow with **swarm agent coordination**.
-See `reference/SWARM.md` for detailed agent definitions and coordination patterns.
+See `references/SWARM.md` for detailed agent definitions and coordination patterns.
 
 ## Workflow Phases
 
@@ -42,7 +42,7 @@ If ANY check fails:
 - Trigger web research with doc-resolver skill
 - Use available skills to fix issues
 - Re-run checks after fixes
-- Coordinate with handoff pattern (see `reference/HANDOFF.md`)
+- Coordinate with handoff pattern (see `references/HANDOFF.md`)
 
 ### Phase 6: MERGE (Agent: merge-agent)
 - Verify ALL checks passing
@@ -174,6 +174,6 @@ Workflow succeeds when:
 
 ## See Also
 
-- `reference/SWARM.md` - Agent coordination details
-- `reference/HANDOFF.md` - Handoff protocol
+- `references/SWARM.md` - Agent coordination details
+- `references/HANDOFF.md` - Handoff protocol
 - `run.sh` - Implementation script

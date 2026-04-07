@@ -22,7 +22,7 @@ Adapted from Genrich Altshuller's original principles for software engineering.
 ### 4. Asymmetry
 - Change symmetrical → asymmetrical
 - **Software**: Non-uniform data structures, priority queues
-- **Agent Instructions**: Heavy knowledge in reference/, load lazily
+- **Agent Instructions**: Heavy knowledge in references/, load lazily
 
 ### 5. Merging (Consolidation)
 - Combine operations

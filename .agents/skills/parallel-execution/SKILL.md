@@ -200,4 +200,4 @@ Parallel execution maximizes efficiency through concurrent execution, independen
 
 ## Reference Files
 
-- **[reference/guide.md](reference/guide.md)** - Complete guide with detailed steps, patterns, synchronization strategies, error handling, performance optimization, and troubleshooting
+- **[references/guide.md](references/guide.md)** - Complete guide with detailed steps, patterns, synchronization strategies, error handling, performance optimization, and troubleshooting

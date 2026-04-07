@@ -48,18 +48,18 @@
     },
     {
       "id": 5,
-      "prompt": "Review my skill's References section - it uses @references/filename.md and markdown links [text](reference/file.md). Is this correct?",
-      "expected_output": "The agent identifies the incorrect formats and explains the correct format: use backticks without @ prefix (e.g., `reference/filename.md` - Description). No markdown links, no @ prefix.",
+      "prompt": "Review my skill's References section - it uses @references/filename.md and markdown links [text](references/file.md). Is this correct?",
+      "expected_output": "The agent identifies the incorrect formats and explains the correct format: use backticks without @ prefix (e.g., `references/filename.md` - Description). No markdown links, no @ prefix.",
       "files": [
         {
           "path": "SKILL.md",
-          "content": "---\nname: test-skill\ndescription: Test skill\n---\n\n# Test Skill\n\nSome instructions.\n\n## References\n\n- @references/templates.md - Templates\n- [guide.md](reference/guide.md) - Guide"
+          "content": "---\nname: test-skill\ndescription: Test skill\n---\n\n# Test Skill\n\nSome instructions.\n\n## References\n\n- @references/templates.md - Templates\n- [guide.md](references/guide.md) - Guide"
         }
       ],
       "assertions": [
         "The agent identifies @references/ as incorrect format",
         "The agent identifies markdown links as incorrect format",
-        "The agent explains correct format is `reference/filename.md` - Description"
+        "The agent explains correct format is `references/filename.md` - Description"
       ]
     }
   ]
