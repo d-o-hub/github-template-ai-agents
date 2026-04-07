@@ -1,0 +1,64 @@
+---
+name: Detect & Auto-Close Duplicate Issues
+
+# yamllint disable-line rule:truthy
+on:
+  issues:
+    types: [opened, reopened]
+  workflow_dispatch:  # Allow manual trigger for verification
+
+permissions:
+  models: read  # GitHub Models — FREE for public repos
+  issues: write
+
+concurrency:
+  group: dedup-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  dedup:
+    name: Detect Duplicate Issues
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.issue.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Detect duplicates via GitHub Models (no API key needed)
+      - name: Run duplicate detection
+        uses: pelikhan/action-genai-issue-dedup@v0
+        id: dedup
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: ""        # check across all labels
+          count: "30"       # compare against last 30 issues
+          since: "180d"     # look back 6 months
+
+      # Step 2: If duplicate found — label + comment with impact reasoning
+      - name: Label and comment if duplicate
+        if: steps.dedup.outputs.duplicate_of != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const canonical = process.env.DUPLICATE_OF;
+            const current = context.issue.number;
+
+            // Add duplicate label
+            await github.rest.issues.addLabels({
+              ...context.repo,
+              issue_number: current,
+              labels: ['duplicate']
+            });
+
+            // Comment with redirect + grace period notice
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: current,
+              body: `👋 This looks like a duplicate of #${canonical}.\n\n` +
+                    `The canonical issue has broader scope and/or more tasks — ` +
+                    `please subscribe there for updates.\n\n` +
+                    `⏳ This issue will be **auto-closed in 3 days** unless ` +
+                    `you react with 👎 to dispute.\n\n` +
+                    `_Automated by [action-genai-issue-dedup](https://github.com/pelikhan/action-genai-issue-dedup)_`
+            });
+        env:
+          DUPLICATE_OF: ${{ steps.dedup.outputs.duplicate_of }}
