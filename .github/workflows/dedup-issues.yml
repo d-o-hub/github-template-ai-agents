@@ -42,6 +42,7 @@ jobs:
         with:
           script: |
             const currentTitle = context.payload.issue.title.toLowerCase();
+            const currentBody = (context.payload.issue.body || '').toLowerCase();
             const currentNumber = context.issue.number;
             const currentLabels = (context.payload.issue.labels || [])
               .map(l => l.name.toLowerCase());
@@ -55,19 +56,18 @@ jobs:
               direction: 'desc'
             });
 
-            // Simple similarity functions
+            // Similarity functions
             function jaccardSimilarity(a, b) {
               const setA = new Set(a.split(/\s+/));
               const setB = new Set(b.split(/\s+/));
               const intersection = [...setA].filter(w => setB.has(w));
               const union = new Set([...setA, ...setB]);
-              return intersection.length / union.size;
+              return union.size === 0 ? 0 : intersection.length / union.size;
             }
 
             function levenshteinRatio(a, b) {
               const maxLen = Math.max(a.length, b.length);
               if (maxLen === 0) return 1.0;
-              // Simple character-level similarity
               let matches = 0;
               const minLen = Math.min(a.length, b.length);
               for (let i = 0; i < minLen; i++) {
@@ -76,39 +76,73 @@ jobs:
               return matches / maxLen;
             }
 
-            function sharedKeywordScore(titleA, titleB) {
-              const wordsA = titleA.split(/\s+/).filter(w => w.length > 3);
-              const wordsB = titleB.split(/\s+/).filter(w => w.length > 3);
-              const shared = wordsA.filter(w => wordsB.includes(w));
-              return shared.length;
+            function sharedKeywords(a, b) {
+              const wa = a.split(/\s+/).filter(w => w.length > 3);
+              const wb = b.split(/\s+/).filter(w => w.length > 3);
+              return wa.filter(w => wb.includes(w)).length;
+            }
+
+            // Extract key phrases (2-3 word sequences) from title
+            function keyPhrases(text) {
+              const words = text.split(/\s+/).filter(w => w.length > 2);
+              const phrases = [];
+              for (let i = 0; i < words.length - 1; i++) {
+                phrases.push(words[i] + ' ' + words[i + 1]);
+              }
+              for (let i = 0; i < words.length - 2; i++) {
+                phrases.push(words[i] + ' ' + words[i + 1] + ' ' + words[i + 2]);
+              }
+              return phrases;
+            }
+
+            function bodyOverlap(bodyA, bodyB) {
+              if (!bodyA || !bodyB) return 0;
+              const wordsA = new Set(bodyA.split(/\s+/).filter(w => w.length > 4));
+              const wordsB = new Set(bodyB.split(/\s+/).filter(w => w.length > 4));
+              const shared = [...wordsA].filter(w => wordsB.has(w));
+              return shared.length / Math.max(wordsA.size, wordsB.size, 1);
             }
 
             let bestMatch = null;
             let bestScore = 0;
-            const TITLE_JACCARD_THRESHOLD = 0.4;
-            const TITLE_LEVENSHTEIN_THRESHOLD = 0.6;
-            const KEYWORD_THRESHOLD = 3;
+            const debug = [];
 
             for (const issue of issues) {
               if (issue.number === currentNumber) continue;
-              if (issue.pull_request) continue;  // Skip PRs
+              if (issue.pull_request) continue;
 
               const otherTitle = issue.title.toLowerCase();
+              const otherBody = (issue.body || '').toLowerCase();
 
               const jaccard = jaccardSimilarity(currentTitle, otherTitle);
               const levenshtein = levenshteinRatio(currentTitle, otherTitle);
-              const keywordScore = sharedKeywordScore(currentTitle, otherTitle);
+              const kwCount = sharedKeywords(currentTitle, otherTitle);
+
+              // Key phrase matching (e.g. "memory-context skill")
+              const phrasesA = keyPhrases(currentTitle);
+              const phrasesB = keyPhrases(otherTitle);
+              const sharedPhrases = phrasesA.filter(p => phrasesB.includes(p));
+              const phraseScore = sharedPhrases.length * 0.15;
+
+              // Body keyword overlap
+              const bodyScore = bodyOverlap(currentBody, otherBody) * 0.5;
 
               // Combined scoring
               let score = 0;
-              if (jaccard >= TITLE_JACCARD_THRESHOLD) score += jaccard;
-              if (levenshtein >= TITLE_LEVENSHTEIN_THRESHOLD) score += levenshtein;
-              if (keywordScore >= KEYWORD_THRESHOLD) score += 0.3;
+              if (jaccard >= 0.3) score += jaccard;
+              if (levenshtein >= 0.5) score += levenshtein * 0.5;
+              if (kwCount >= 2) score += Math.min(kwCount * 0.1, 0.4);
+              score += phraseScore;
+              score += bodyScore;
 
               // Bonus for shared labels
               const otherLabels = issue.labels.map(l => l.name.toLowerCase());
               const sharedLabels = currentLabels.filter(l => otherLabels.includes(l));
               if (sharedLabels.length > 0) score += 0.1 * sharedLabels.length;
+
+              debug.push(`#${issue.number}: jaccard=${jaccard.toFixed(2)} lev=${levenshtein.toFixed(2)} ` +
+                `kw=${kwCount} phrases=${sharedPhrases.length} body=${bodyScore.toFixed(2)} ` +
+                `labels=${sharedLabels.length} total=${score.toFixed(2)}`);
 
               if (score > bestScore) {
                 bestScore = score;
@@ -116,7 +150,10 @@ jobs:
               }
             }
 
-            if (bestMatch && bestScore >= 0.5) {
+            // Log debug info
+            debug.forEach(d => console.log(d));
+
+            if (bestMatch && bestScore >= 0.4) {
               core.setOutput('duplicate_of', bestMatch.number.toString());
               core.setOutput('confidence', bestScore.toFixed(2));
               console.log(`Rule-based match: #${currentNumber} ~ #${bestMatch.number} ` +
