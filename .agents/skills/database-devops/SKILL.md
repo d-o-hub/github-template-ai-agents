@@ -177,3 +177,7 @@ See `reference/backup-strategies.md` for point-in-time recovery, automated backu
 - `reference/query-optimization.md` - Performance tuning guide
 - `reference/iac-examples.md` - Terraform/Pulumi examples
 - `reference/backup-strategies.md` - Backup and recovery
+
+## Integration with other skills
+
+- **turso-db**: Use `turso-db` for Turso-specific SDKs, bidirectional sync patterns, and experimental features like MVCC, vector search, and encryption. Use `database-devops` for general schema design, migration safety, and Infrastructure-as-Code.
