@@ -1,0 +1,204 @@
+---
+name: Detect & Auto-Close Duplicate Issues
+
+# yamllint disable-line rule:truthy
+on:
+  issues:
+    types: [opened, reopened]
+  workflow_dispatch:  # Allow manual trigger for verification
+
+permissions:
+  models: read  # GitHub Models — FREE for public repos
+  issues: write
+
+concurrency:
+  group: dedup-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  dedup:
+    name: Detect Duplicate Issues
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.issue.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Detect duplicates via GitHub Models (no API key needed)
+      - name: Run LLM duplicate detection
+        uses: pelikhan/action-genai-issue-dedup@v0
+        id: dedup_llm
+        continue-on-error: true
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: "auto"      # auto-classify for better matching
+          count: "30"         # compare against last 30 issues
+          since: "180d"       # look back 6 months
+
+      # Step 2: Rule-based fallback — title similarity check
+      - name: Rule-based title similarity check
+        id: dedup_rulebased
+        if: steps.dedup_llm.outputs.duplicate_of == ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const currentTitle = context.payload.issue.title.toLowerCase();
+            const currentBody = (context.payload.issue.body || '').toLowerCase();
+            const currentNumber = context.issue.number;
+            const currentLabels = (context.payload.issue.labels || [])
+              .map(l => l.name.toLowerCase());
+
+            // Fetch recent open issues for comparison
+            const { data: issues } = await github.rest.issues.listForRepo({
+              ...context.repo,
+              state: 'open',
+              per_page: 50,
+              sort: 'created',
+              direction: 'desc'
+            });
+
+            // Similarity functions
+            function jaccardSimilarity(a, b) {
+              const setA = new Set(a.split(/\s+/));
+              const setB = new Set(b.split(/\s+/));
+              const intersection = [...setA].filter(w => setB.has(w));
+              const union = new Set([...setA, ...setB]);
+              return union.size === 0 ? 0 : intersection.length / union.size;
+            }
+
+            function levenshteinRatio(a, b) {
+              const maxLen = Math.max(a.length, b.length);
+              if (maxLen === 0) return 1.0;
+              let matches = 0;
+              const minLen = Math.min(a.length, b.length);
+              for (let i = 0; i < minLen; i++) {
+                if (a[i] === b[i]) matches++;
+              }
+              return matches / maxLen;
+            }
+
+            function sharedKeywords(a, b) {
+              const wa = a.split(/\s+/).filter(w => w.length > 3);
+              const wb = b.split(/\s+/).filter(w => w.length > 3);
+              return wa.filter(w => wb.includes(w)).length;
+            }
+
+            // Extract key phrases (2-3 word sequences) from title
+            function keyPhrases(text) {
+              const words = text.split(/\s+/).filter(w => w.length > 2);
+              const phrases = [];
+              for (let i = 0; i < words.length - 1; i++) {
+                phrases.push(words[i] + ' ' + words[i + 1]);
+              }
+              for (let i = 0; i < words.length - 2; i++) {
+                phrases.push(words[i] + ' ' + words[i + 1] + ' ' + words[i + 2]);
+              }
+              return phrases;
+            }
+
+            function bodyOverlap(bodyA, bodyB) {
+              if (!bodyA || !bodyB) return 0;
+              const wordsA = new Set(bodyA.split(/\s+/).filter(w => w.length > 4));
+              const wordsB = new Set(bodyB.split(/\s+/).filter(w => w.length > 4));
+              const shared = [...wordsA].filter(w => wordsB.has(w));
+              return shared.length / Math.max(wordsA.size, wordsB.size, 1);
+            }
+
+            let bestMatch = null;
+            let bestScore = 0;
+            const debug = [];
+
+            for (const issue of issues) {
+              if (issue.number === currentNumber) continue;
+              if (issue.pull_request) continue;
+
+              const otherTitle = issue.title.toLowerCase();
+              const otherBody = (issue.body || '').toLowerCase();
+
+              const jaccard = jaccardSimilarity(currentTitle, otherTitle);
+              const levenshtein = levenshteinRatio(currentTitle, otherTitle);
+              const kwCount = sharedKeywords(currentTitle, otherTitle);
+
+              // Key phrase matching (e.g. "memory-context skill")
+              const phrasesA = keyPhrases(currentTitle);
+              const phrasesB = keyPhrases(otherTitle);
+              const sharedPhrases = phrasesA.filter(p => phrasesB.includes(p));
+              const phraseScore = sharedPhrases.length * 0.15;
+
+              // Body keyword overlap
+              const bodyScore = bodyOverlap(currentBody, otherBody) * 0.5;
+
+              // Combined scoring
+              let score = 0;
+              if (jaccard >= 0.3) score += jaccard;
+              if (levenshtein >= 0.5) score += levenshtein * 0.5;
+              if (kwCount >= 2) score += Math.min(kwCount * 0.1, 0.4);
+              score += phraseScore;
+              score += bodyScore;
+
+              // Bonus for shared labels
+              const otherLabels = issue.labels.map(l => l.name.toLowerCase());
+              const sharedLabels = currentLabels.filter(l => otherLabels.includes(l));
+              if (sharedLabels.length > 0) score += 0.1 * sharedLabels.length;
+
+              debug.push(`#${issue.number}: jaccard=${jaccard.toFixed(2)} lev=${levenshtein.toFixed(2)} ` +
+                `kw=${kwCount} phrases=${sharedPhrases.length} body=${bodyScore.toFixed(2)} ` +
+                `labels=${sharedLabels.length} total=${score.toFixed(2)}`);
+
+              if (score > bestScore) {
+                bestScore = score;
+                bestMatch = issue;
+              }
+            }
+
+            // Log debug info
+            debug.forEach(d => console.log(d));
+
+            if (bestMatch && bestScore >= 0.4) {
+              core.setOutput('duplicate_of', bestMatch.number.toString());
+              core.setOutput('confidence', bestScore.toFixed(2));
+              console.log(`Rule-based match: #${currentNumber} ~ #${bestMatch.number} ` +
+                          `(score: ${bestScore.toFixed(2)})`);
+            } else {
+              console.log(`No rule-based duplicate found (best score: ${bestScore.toFixed(2)})`);
+            }
+
+      # Step 3: If duplicate found (LLM or rule-based) — label + comment
+      - name: Label and comment if duplicate
+        if: >-
+          steps.dedup_llm.outputs.duplicate_of != '' ||
+          steps.dedup_rulebased.outputs.duplicate_of != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const canonical = process.env.DUPLICATE_OF;
+            const current = context.issue.number;
+            const method = process.env.DEDUP_METHOD;
+
+            // Add duplicate label
+            await github.rest.issues.addLabels({
+              ...context.repo,
+              issue_number: current,
+              labels: ['duplicate']
+            });
+
+            const methodNote = method === 'llm'
+              ? '_Detected via semantic analysis (GitHub Models, free)_'
+              : '_Detected via title similarity analysis_';
+
+            // Comment with redirect + grace period notice
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: current,
+              body: `👋 This looks like a duplicate of #${canonical}.\n\n` +
+                    `The canonical issue has broader scope and/or more tasks — ` +
+                    `please subscribe there for updates.\n\n` +
+                    `⏳ This issue will be **auto-closed in 3 days** unless ` +
+                    `you react with 👎 to dispute.\n\n` +
+                    `${methodNote}`
+            });
+        env:
+          DUPLICATE_OF: >-
+            ${{ steps.dedup_llm.outputs.duplicate_of ||
+                steps.dedup_rulebased.outputs.duplicate_of }}
+          DEDUP_METHOD: >-
+            ${{ steps.dedup_llm.outputs.duplicate_of != '' && 'llm' || 'rule-based' }}

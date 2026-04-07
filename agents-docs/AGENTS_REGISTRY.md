@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-04-04 16:31 UTC
+> Last updated: 2026-04-07 10:33 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -61,7 +61,9 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `task-decomposition` | `.agents/skills/task-decomposition` | Break down complex tasks into atomic, actionable goals with  |
 | `test-runner` | `.agents/skills/test-runner` | Execute tests, analyze results, and diagnose failures across |
 | `testing-strategy` | `.agents/skills/testing-strategy` | Design comprehensive testing strategies with modern techniqu |
+| `triz-analysis` | `.agents/skills/triz-analysis` | Run a systematic TRIZ contradiction audit against a codebase |
 | `triz-solver` | `.agents/skills/triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive P |
+| `turso-db` | `.agents/skills/turso-db` | Use this skill for Turso (LibSQL/Limbo) database development |
 | `ui-ux-optimize` | `.agents/skills/ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research agen |
 | `web-search-researcher` | `.agents/skills/web-search-researcher` | Research topics using web search to find accurate, current i |
 
