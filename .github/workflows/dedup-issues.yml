@@ -24,23 +24,118 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Step 1: Detect duplicates via GitHub Models (no API key needed)
-      - name: Run duplicate detection
+      - name: Run LLM duplicate detection
         uses: pelikhan/action-genai-issue-dedup@v0
-        id: dedup
+        id: dedup_llm
+        continue-on-error: true
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: ""        # check across all labels
-          count: "30"       # compare against last 30 issues
-          since: "180d"     # look back 6 months
+          labels: "auto"      # auto-classify for better matching
+          count: "30"         # compare against last 30 issues
+          since: "180d"       # look back 6 months
 
-      # Step 2: If duplicate found — label + comment with impact reasoning
+      # Step 2: Rule-based fallback — title similarity check
+      - name: Rule-based title similarity check
+        id: dedup_rulebased
+        if: steps.dedup_llm.outputs.duplicate_of == ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const currentTitle = context.payload.issue.title.toLowerCase();
+            const currentNumber = context.issue.number;
+            const currentLabels = (context.payload.issue.labels || [])
+              .map(l => l.name.toLowerCase());
+
+            // Fetch recent open issues for comparison
+            const { data: issues } = await github.rest.issues.listForRepo({
+              ...context.repo,
+              state: 'open',
+              per_page: 50,
+              sort: 'created',
+              direction: 'desc'
+            });
+
+            // Simple similarity functions
+            function jaccardSimilarity(a, b) {
+              const setA = new Set(a.split(/\s+/));
+              const setB = new Set(b.split(/\s+/));
+              const intersection = [...setA].filter(w => setB.has(w));
+              const union = new Set([...setA, ...setB]);
+              return intersection.length / union.size;
+            }
+
+            function levenshteinRatio(a, b) {
+              const maxLen = Math.max(a.length, b.length);
+              if (maxLen === 0) return 1.0;
+              // Simple character-level similarity
+              let matches = 0;
+              const minLen = Math.min(a.length, b.length);
+              for (let i = 0; i < minLen; i++) {
+                if (a[i] === b[i]) matches++;
+              }
+              return matches / maxLen;
+            }
+
+            function sharedKeywordScore(titleA, titleB) {
+              const wordsA = titleA.split(/\s+/).filter(w => w.length > 3);
+              const wordsB = titleB.split(/\s+/).filter(w => w.length > 3);
+              const shared = wordsA.filter(w => wordsB.includes(w));
+              return shared.length;
+            }
+
+            let bestMatch = null;
+            let bestScore = 0;
+            const TITLE_JACCARD_THRESHOLD = 0.4;
+            const TITLE_LEVENSHTEIN_THRESHOLD = 0.6;
+            const KEYWORD_THRESHOLD = 3;
+
+            for (const issue of issues) {
+              if (issue.number === currentNumber) continue;
+              if (issue.pull_request) continue;  // Skip PRs
+
+              const otherTitle = issue.title.toLowerCase();
+
+              const jaccard = jaccardSimilarity(currentTitle, otherTitle);
+              const levenshtein = levenshteinRatio(currentTitle, otherTitle);
+              const keywordScore = sharedKeywordScore(currentTitle, otherTitle);
+
+              // Combined scoring
+              let score = 0;
+              if (jaccard >= TITLE_JACCARD_THRESHOLD) score += jaccard;
+              if (levenshtein >= TITLE_LEVENSHTEIN_THRESHOLD) score += levenshtein;
+              if (keywordScore >= KEYWORD_THRESHOLD) score += 0.3;
+
+              // Bonus for shared labels
+              const otherLabels = issue.labels.map(l => l.name.toLowerCase());
+              const sharedLabels = currentLabels.filter(l => otherLabels.includes(l));
+              if (sharedLabels.length > 0) score += 0.1 * sharedLabels.length;
+
+              if (score > bestScore) {
+                bestScore = score;
+                bestMatch = issue;
+              }
+            }
+
+            if (bestMatch && bestScore >= 0.5) {
+              core.setOutput('duplicate_of', bestMatch.number.toString());
+              core.setOutput('confidence', bestScore.toFixed(2));
+              console.log(`Rule-based match: #${currentNumber} ~ #${bestMatch.number} ` +
+                          `(score: ${bestScore.toFixed(2)})`);
+            } else {
+              console.log(`No rule-based duplicate found (best score: ${bestScore.toFixed(2)})`);
+            }
+
+      # Step 3: If duplicate found (LLM or rule-based) — label + comment
       - name: Label and comment if duplicate
-        if: steps.dedup.outputs.duplicate_of != ''
+        if: >-
+          steps.dedup_llm.outputs.duplicate_of != '' ||
+          steps.dedup_rulebased.outputs.duplicate_of != ''
         uses: actions/github-script@v7
         with:
           script: |
             const canonical = process.env.DUPLICATE_OF;
             const current = context.issue.number;
+            const method = process.env.DEDUP_METHOD;
 
             // Add duplicate label
             await github.rest.issues.addLabels({
@@ -48,6 +143,10 @@ jobs:
               issue_number: current,
               labels: ['duplicate']
             });
+
+            const methodNote = method === 'llm'
+              ? '_Detected via semantic analysis (GitHub Models, free)_'
+              : '_Detected via title similarity analysis_';
 
             // Comment with redirect + grace period notice
             await github.rest.issues.createComment({
@@ -58,7 +157,11 @@ jobs:
                     `please subscribe there for updates.\n\n` +
                     `⏳ This issue will be **auto-closed in 3 days** unless ` +
                     `you react with 👎 to dispute.\n\n` +
-                    `_Automated by [action-genai-issue-dedup](https://github.com/pelikhan/action-genai-issue-dedup)_`
+                    `${methodNote}`
             });
         env:
-          DUPLICATE_OF: ${{ steps.dedup.outputs.duplicate_of }}
+          DUPLICATE_OF: >-
+            ${{ steps.dedup_llm.outputs.duplicate_of ||
+                steps.dedup_rulebased.outputs.duplicate_of }}
+          DEDUP_METHOD: >-
+            ${{ steps.dedup_llm.outputs.duplicate_of != '' && 'llm' || 'rule-based' }}
