@@ -56,9 +56,9 @@ jobs:
               body: `👋 This looks like a duplicate of #${canonical}.\n\n` +
                     `The canonical issue has broader scope and/or more tasks — ` +
                     `please subscribe there for updates.\n\n` +
-                    `⏳ This issue will be **auto-closed in 3 days** unless you ` +
-                    `react with 👎 to dispute.\n\n` +
-                    `_Automated by [action-genai-issue-dedup](https://github.com/pelikhan/action-genai-issue-dedup) via GitHub Models (free)_`
+                    `⏳ This issue will be **auto-closed in 3 days** unless ` +
+                    `you react with 👎 to dispute.\n\n` +
+                    `_Automated by [action-genai-issue-dedup](https://github.com/pelikhan/action-genai-issue-dedup)_`
             });
         env:
           DUPLICATE_OF: ${{ steps.dedup.outputs.duplicate_of }}

@@ -83,7 +83,8 @@ jobs:
                       await github.rest.issues.createComment({
                         ...context.repo,
                         issue_number: prNumber,
-                        body: `🔒 This PR was closed because the referenced issue #${issue.number} was auto-closed as a duplicate.`
+                        body: `🔒 PR closed — referenced issue #${issue.number} ` +
+                              `was auto-closed as a duplicate.`
                       });
                     }
                   }
@@ -99,4 +100,5 @@ jobs:
               closedCount++;
             }
 
-            console.log(`Processed duplicate issues: ${closedCount} closed, ${skippedCount} skipped (grace period or vetoed)`);
+            console.log(`Duplicates: ${closedCount} closed, ` +
+                        `${skippedCount} skipped`);
