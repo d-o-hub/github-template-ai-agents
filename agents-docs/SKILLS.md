@@ -33,7 +33,7 @@ when the agent decides it is needed. Do not pre-load all skills at session start
 .agents/skills/
 +-- skill-name/
     +-- SKILL.md          # Primary instructions (<= 250 lines)
-    +-- reference/        # Detailed docs linked from SKILL.md
+    +-- references/        # Detailed docs linked from SKILL.md
     +-- scripts/          # Executable scripts the agent can run directly
     +-- assets/           # Templates, examples
 ```
@@ -60,7 +60,7 @@ Activate when: [specific triggers]
 [Concise, universally applicable instructions]
 
 ## Reference Files
-- `reference/guide.md` - [when to read]
+- `references/guide.md` - [when to read]
 - `scripts/run.sh` - [what it does]
 
 ## Examples
@@ -82,7 +82,7 @@ and help template consumers know which template version a skill was authored for
 
 ## Rules
 
-- `SKILL.md` <= 250 lines - detailed content in `reference/`
+- `SKILL.md` <= 250 lines - detailed content in `references/`
 - Include executable scripts so the agent can validate directly
 - Cite sources as `filepath:line` so the parent agent can find context
 - Do not duplicate content already in `AGENTS.md`

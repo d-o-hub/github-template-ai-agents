@@ -198,7 +198,7 @@ Workflow succeeds when:
 
 ## See Also
 
-- `reference/IMPLEMENTATION.md` - Technical implementation details
+- `references/IMPLEMENTATION.md` - Technical implementation details
 - `run.sh` - Main workflow script
 - `evals/README.md` - Test scenarios and evaluation cases
 

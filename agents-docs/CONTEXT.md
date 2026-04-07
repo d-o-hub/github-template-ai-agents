@@ -38,7 +38,7 @@ Swallow passing output - surface only failures.
 AGENTS.md (concise, universal)
   +-- agents-docs/ (detailed reference, loaded on demand)
        +-- Skills with SKILL.md (loaded when agent needs them)
-            +-- reference/ within each skill (read only what is needed)
+            +-- references/ within each skill (read only what is needed)
 ```
 
 All skills are canonical in `.agents/skills/`.

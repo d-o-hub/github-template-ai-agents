@@ -58,7 +58,7 @@ Systematic innovation methodology for software engineering problems.
 
 ### Extended Reference
 
-See [reference/principles.md](reference/principles.md) for all 40 principles with software examples.
+See [references/principles.md](references/principles.md) for all 40 principles with software examples.
 
 ## Contradiction Matrix (Software)
 
@@ -133,7 +133,7 @@ Result: Security maintained, UX unaffected for legitimate users
 ```
 Problem: More instructions improve reliability but consume context
 Contradiction: Completeness (improve) vs Token limits (worsen)
-Apply: #4 Asymmetry → Heavy knowledge in reference/, load lazily
+Apply: #4 Asymmetry → Heavy knowledge in references/, load lazily
 Result: Reliability maintained, context efficiency improved
 ```
 
@@ -153,6 +153,6 @@ Result: Reliability maintained, context efficiency improved
 
 ## Reference Files
 
-- **[reference/principles.md](reference/principles.md)** - All 40 TRIZ principles with software examples
-- **[reference/patterns.md](reference/patterns.md)** - Common software contradiction patterns and resolutions
-- **[reference/evolution.md](reference/evolution.md)** - TRIZ evolution trends for system design
+- **[references/principles.md](references/principles.md)** - All 40 TRIZ principles with software examples
+- **[references/patterns.md](references/patterns.md)** - Common software contradiction patterns and resolutions
+- **[references/evolution.md](references/evolution.md)** - TRIZ evolution trends for system design
