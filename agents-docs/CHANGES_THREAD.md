@@ -26,8 +26,8 @@ This document catalogs all new skills, commands, and changes that have been succ
 - **Includes**:
   - `SKILL.md` (221 lines) - Complete workflow documentation
   - `evals/evals.json` - Test cases for CI pipeline design
-  - `reference/deployment-strategies.md` - Blue-green, canary, rolling deployments
-  - `reference/security-scanning.md` - SAST, DAST, secrets scanning
+  - `references/deployment-strategies.md` - Blue-green, canary, rolling deployments
+  - `references/security-scanning.md` - SAST, DAST, secrets scanning
 - **Triggers**: CI/CD, deployment, pipeline, GitHub Actions
 
 #### 2. **code-review-assistant** Skill
@@ -56,8 +56,8 @@ This document catalogs all new skills, commands, and changes that have been succ
 - **Includes**:
   - `SKILL.md` (234 lines) - Testing patterns and strategies
   - `evals/evals.json` - Testing scenarios
-  - `reference/property-testing-patterns.md` - Property-based testing
-  - `reference/visual-testing-guide.md` - Visual regression testing
+  - `references/property-testing-patterns.md` - Property-based testing
+  - `references/visual-testing-guide.md` - Visual regression testing
 - **Triggers**: testing, test strategy, coverage, mutation testing
 
 ### Fixed Skills
@@ -248,7 +248,7 @@ generate_commit_message() {
 ├── cicd-pipeline/                [NEW]
 │   ├── SKILL.md
 │   ├── evals/evals.json
-│   └── reference/
+│   └── references/
 ├── code-review-assistant/        [NEW]
 │   ├── SKILL.md
 │   └── evals/evals.json
@@ -261,7 +261,7 @@ generate_commit_message() {
 └── testing-strategy/            [NEW]
     ├── SKILL.md
     ├── evals/evals.json
-    └── reference/
+    └── references/
 ```
 
 ### Fixed Skills (1)

@@ -125,8 +125,8 @@ cat .agents/skills/<skill>/evals/evals.json | jq empty
 **Symptom**: `validate-links.sh` reports broken links in SKILL.md
 
 **Solution**:
-- Use correct format: `` `reference/filename.md` - Description ``
-- Don't use: `@reference/` or markdown links `[text](url)`
+- Use correct format: `` `references/filename.md` - Description ``
+- Don't use: `@references/` or markdown links `[text](url)`
 
 ---
 
@@ -184,8 +184,8 @@ cat .agents/skills/<skill>/evals/evals.json | jq empty
 
 **Solution**:
 - Run `./scripts/validate-links.sh` to see which links
-- Check file exists in skill's `reference/` folder
-- Verify format: `` `reference/filename.md` ``
+- Check file exists in skill's `references/` folder
+- Verify format: `` `references/filename.md` ``
 
 ### BATS Not Installed
 

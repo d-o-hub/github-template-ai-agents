@@ -96,7 +96,7 @@ exit $EXIT_CODE
 **Solution**:
 1. **Line Count Reduction** (278 → 146 lines):
    - Moved detailed workflows → `agents-docs/HARNESS.md`
-   - Moved language examples → skill `reference/` folders
+   - Moved language examples → skill `references/` folders
    - Moved troubleshooting → individual skill docs
    - Kept in AGENTS.md: constants, overview, setup, quality gate commands, style rules, security warnings, agent guidance principles, skills table, reference links
 
@@ -107,7 +107,7 @@ exit $EXIT_CODE
 
 3. **Reference naming standardization**:
    - Standardized on `references/` (plural) across all skills
-   - Migrated 13 skills from `reference/` → `references/`
+   - Migrated 13 skills from `references/` → `references/`
 
 4. **Centralized configuration**:
    - Created `.agents/config.sh` with named constants and utility functions
@@ -125,7 +125,7 @@ exit $EXIT_CODE
 - `.agents/skills/code-quality/SKILL.md` - Created
 - `.agents/skills/test-runner/SKILL.md` - Created
 - `.agents/config.sh` - Created with centralized constants
-- 13 skills migrated: `reference/` → `references/`
+- 13 skills migrated: `references/` → `references/`
 
 ---
 
