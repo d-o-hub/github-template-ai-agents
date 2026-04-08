@@ -5,17 +5,83 @@ name: Detect & Auto-Close Duplicate Issues
 on:
   issues:
     types: [opened, reopened]
-  workflow_dispatch:  # Allow manual trigger for verification
+  schedule:
+    - cron: '0 9 * * *'   # Daily: close issues flagged duplicate 3+ days ago
+  workflow_dispatch:       # Allow manual trigger for verification
 
 permissions:
   models: read  # GitHub Models — FREE for public repos
   issues: write
 
 concurrency:
-  group: dedup-${{ github.event.issue.number }}
+  group: dedup-${{ github.event.issue.number || 'scheduled' }}
   cancel-in-progress: true
 
 jobs:
+  # ─── Auto-close job (runs on schedule only) ───────────────────────────────
+  auto-close:
+    name: Auto-Close Stale Duplicates
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close issues flagged duplicate 3+ days ago
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const cutoff = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              ...context.repo,
+              state: 'open',
+              labels: 'duplicate',
+              per_page: 100,
+            });
+
+            for (const issue of issues) {
+              if (issue.pull_request) continue;
+
+              // Check for a 👎 reaction — user disputed the duplicate call
+              const { data: reactions } = await github.rest.reactions.listForIssue({
+                ...context.repo,
+                issue_number: issue.number,
+              });
+              const disputed = reactions.some(r => r.content === '-1');
+              if (disputed) {
+                console.log(`#${issue.number} disputed — skipping`);
+                continue;
+              }
+
+              // Find the bot comment that set the grace-period timer
+              const { data: comments } = await github.rest.issues.listComments({
+                ...context.repo,
+                issue_number: issue.number,
+              });
+              const flagComment = comments.find(
+                c => c.user.type === 'Bot' && c.body.includes('auto-closed in 3 days')
+              );
+              if (!flagComment) continue;
+
+              const flaggedAt = new Date(flagComment.created_at);
+              if (flaggedAt > cutoff) {
+                console.log(`#${issue.number} flagged too recently — skipping`);
+                continue;
+              }
+
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: issue.number,
+                body: '🤖 Closing as duplicate — grace period elapsed with no dispute.',
+              });
+              await github.rest.issues.update({
+                ...context.repo,
+                issue_number: issue.number,
+                state: 'closed',
+                state_reason: 'not_planned',
+              });
+              console.log(`Closed #${issue.number}`);
+            }
+
+  # ─── Detection job (runs on issue open/reopen + manual trigger) ───────────
   dedup:
     name: Detect Duplicate Issues
     if: >-
@@ -25,6 +91,7 @@ jobs:
     steps:
       # Step 1: Detect duplicates via GitHub Models (no API key needed)
       - name: Run LLM duplicate detection
+        if: github.event_name != 'workflow_dispatch'
         uses: pelikhan/action-genai-issue-dedup@v0
         id: dedup_llm
         continue-on-error: true
@@ -37,7 +104,10 @@ jobs:
       # Step 2: Rule-based fallback — title similarity check
       - name: Rule-based title similarity check
         id: dedup_rulebased
-        if: steps.dedup_llm.outputs.duplicate_of == ''
+        # Skip if LLM already found a match; also skip on manual runs (no payload)
+        if: >-
+          github.event_name != 'workflow_dispatch' &&
+          steps.dedup_llm.outputs.duplicate_of == ''
         uses: actions/github-script@v7
         with:
           script: |
@@ -82,7 +152,6 @@ jobs:
               return wa.filter(w => wb.includes(w)).length;
             }
 
-            // Extract key phrases (2-3 word sequences) from title
             function keyPhrases(text) {
               const words = text.split(/\s+/).filter(w => w.length > 2);
               const phrases = [];
@@ -118,16 +187,13 @@ jobs:
               const levenshtein = levenshteinRatio(currentTitle, otherTitle);
               const kwCount = sharedKeywords(currentTitle, otherTitle);
 
-              // Key phrase matching (e.g. "memory-context skill")
               const phrasesA = keyPhrases(currentTitle);
               const phrasesB = keyPhrases(otherTitle);
               const sharedPhrases = phrasesA.filter(p => phrasesB.includes(p));
               const phraseScore = sharedPhrases.length * 0.15;
 
-              // Body keyword overlap
               const bodyScore = bodyOverlap(currentBody, otherBody) * 0.5;
 
-              // Combined scoring
               let score = 0;
               if (jaccard >= 0.3) score += jaccard;
               if (levenshtein >= 0.5) score += levenshtein * 0.5;
@@ -135,7 +201,6 @@ jobs:
               score += phraseScore;
               score += bodyScore;
 
-              // Bonus for shared labels
               const otherLabels = issue.labels.map(l => l.name.toLowerCase());
               const sharedLabels = currentLabels.filter(l => otherLabels.includes(l));
               if (sharedLabels.length > 0) score += 0.1 * sharedLabels.length;
@@ -150,7 +215,6 @@ jobs:
               }
             }
 
-            // Log debug info
             debug.forEach(d => console.log(d));
 
             if (bestMatch && bestScore >= 0.4) {
@@ -162,19 +226,35 @@ jobs:
               console.log(`No rule-based duplicate found (best score: ${bestScore.toFixed(2)})`);
             }
 
-      # Step 3: If duplicate found (LLM or rule-based) — label + comment
-      - name: Label and comment if duplicate
+      # Step 3: Resolve which method found the match + which issue it points to
+      - name: Resolve detection result
+        id: resolved
         if: >-
           steps.dedup_llm.outputs.duplicate_of != '' ||
           steps.dedup_rulebased.outputs.duplicate_of != ''
         uses: actions/github-script@v7
         with:
           script: |
-            const canonical = process.env.DUPLICATE_OF;
-            const current = context.issue.number;
-            const method = process.env.DEDUP_METHOD;
+            const llmResult = '${{ steps.dedup_llm.outputs.duplicate_of }}';
+            const ruleResult = '${{ steps.dedup_rulebased.outputs.duplicate_of }}';
+            if (llmResult) {
+              core.setOutput('duplicate_of', llmResult);
+              core.setOutput('method', 'llm');
+            } else {
+              core.setOutput('duplicate_of', ruleResult);
+              core.setOutput('method', 'rule-based');
+            }
 
-            // Add duplicate label
+      # Step 4: If duplicate found — label + comment
+      - name: Label and comment if duplicate
+        if: steps.resolved.outputs.duplicate_of != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const canonical = '${{ steps.resolved.outputs.duplicate_of }}';
+            const method    = '${{ steps.resolved.outputs.method }}';
+            const current   = context.issue.number;
+
             await github.rest.issues.addLabels({
               ...context.repo,
               issue_number: current,
@@ -185,7 +265,6 @@ jobs:
               ? '_Detected via semantic analysis (GitHub Models, free)_'
               : '_Detected via title similarity analysis_';
 
-            // Check if bot already commented to avoid duplicate comments
             const { data: comments } = await github.rest.issues.listComments({
               ...context.repo,
               issue_number: current,
@@ -197,8 +276,7 @@ jobs:
               console.log('Duplicate comment already posted, skipping.');
               return;
             }
-            
-            // Comment with redirect + grace period notice
+
             await github.rest.issues.createComment({
               ...context.repo,
               issue_number: current,
@@ -209,9 +287,3 @@ jobs:
                     `you react with 👎 to dispute.\n\n` +
                     `${methodNote}`
             });
-        env:
-          DUPLICATE_OF: >-
-            ${{ steps.dedup_llm.outputs.duplicate_of ||
-                steps.dedup_rulebased.outputs.duplicate_of }}
-          DEDUP_METHOD: >-
-            ${{ steps.dedup_llm.outputs.duplicate_of != '' && 'llm' || 'rule-based' }}
