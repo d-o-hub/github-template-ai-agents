@@ -8,7 +8,8 @@
       "assertions": [
         "A workflow file is created",
         "The YAML is valid"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -17,7 +18,8 @@
       "assertions": [
         "A new job is added to the workflow",
         "The job contains linting steps"
-      ]
+      ],
+      "files": []
     }
   ]
 }

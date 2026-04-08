@@ -11,7 +11,8 @@
         "The agent includes indexing strategy for performance",
         "The agent mentions soft delete or audit trail patterns",
         "The agent considers scalability (10K orders/day)"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -23,7 +24,8 @@
         "The agent suggests batch backfill strategy",
         "The agent mentions pt-online-schema-change or gh-ost",
         "The agent warns about adding NOT NULL constraint only after backfill"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 3,
@@ -35,7 +37,8 @@
         "The agent addresses LIKE '%...@gmail.com%' performance issue",
         "The agent suggests EXPLAIN ANALYZE for verification",
         "The agent mentions covering indexes for ORDER BY"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 4,
@@ -47,7 +50,8 @@
         "The agent configures multi_az for high availability",
         "The agent includes read replica resource",
         "The agent adds deletion_protection for production"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 5,
@@ -59,7 +63,8 @@
         "The agent includes offsite/encrypted storage",
         "The agent provides PITR recovery procedure",
         "The agent recommends regular restore testing"
-      ]
+      ],
+      "files": []
     }
   ]
 }

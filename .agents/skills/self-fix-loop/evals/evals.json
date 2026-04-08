@@ -3,20 +3,24 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Explain how to use the self-fix-loop skill.",
-      "expected_output": "The agent provides a clear explanation based on SKILL.md.",
+      "prompt": "I have a Python script `myscript.py` that is failing with a `TypeError`. Can you fix it using a self-correction loop?",
+      "expected_output": "The agent runs the script, captures the error, analyzes it, applies a fix, and verifies the fix by running the script again.",
+      "files": [],
       "assertions": [
-        "The output is accurate",
-        "The output references core features"
+        "The agent runs the script to reproduce the error",
+        "The agent applies a code change to address the TypeError",
+        "The agent verifies the fix with a subsequent run"
       ]
     },
     {
       "id": 2,
-      "prompt": "Provide a practical example of self-fix-loop in action.",
-      "expected_output": "The agent shows a realistic usage scenario.",
+      "prompt": "Run the `scripts/quality_gate.sh` and fix any linting errors it finds.",
+      "expected_output": "The agent runs the quality gate, identifies specific lint failures, fixes them, and repeats the process until the gate passes.",
+      "files": [],
       "assertions": [
-        "The example is relevant",
-        "The example follows the skill's best practices"
+        "The agent identifies a specific file with lint errors",
+        "The agent modifies the file to fix the lint error",
+        "The final output indicates that the quality gate now passes"
       ]
     }
   ]

@@ -10,17 +10,19 @@
         "The README includes a Quick Start section with install and first usage",
         "The README includes a 'What Is This?' or similar explanation section",
         "All images (if any) have alt text"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
       "prompt": "Improve my existing README - it's just a wall of text with no structure",
       "expected_output": "The agent restructures the README with: proper headings hierarchy, bullet points, code blocks with language tags, quick start section, and progressive disclosure.",
       "assertions": [
-        "The agent restructures with proper heading hierarchy (H1 → H2 → H3)",
+        "The agent restructures with proper heading hierarchy (H1 \u2192 H2 \u2192 H3)",
         "The agent breaks up walls of text into sections",
         "The agent adds a quick start or installation section"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 3,
@@ -30,7 +32,8 @@
         "The agent applies the 5-second test criteria",
         "The agent identifies vague or generic language",
         "The agent suggests a more specific, benefit-focused tagline"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 4,
@@ -40,7 +43,8 @@
         "The agent checks for alt text on images",
         "The agent verifies heading hierarchy",
         "The agent ensures descriptive link text (not 'click here')"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 5,
@@ -50,7 +54,8 @@
         "The README includes Rust-specific install instructions (cargo add)",
         "The README includes a Documentation section with doc links",
         "The README follows the standard structure template"
-      ]
+      ],
+      "files": []
     }
   ]
 }

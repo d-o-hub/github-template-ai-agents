@@ -11,7 +11,8 @@
         "The agent suggests testing/validation at each checkpoint",
         "The agent warns about 'this' context binding issues",
         "The agent provides rollback strategy"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -23,7 +24,8 @@
         "The agent suggests testing in staging first",
         "The agent recommends dependency compatibility checks",
         "The agent provides a rollback procedure"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 3,
@@ -35,7 +37,8 @@
         "The agent includes backup/rollback procedures",
         "The agent identifies MySQL 8.0 breaking changes (auth, reserved words)",
         "The agent suggests testing with production-like data volume"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 4,
@@ -47,7 +50,8 @@
         "The agent proposes incremental/strangler fig approach",
         "The agent mentions maintaining test coverage throughout",
         "The agent includes rollback plan"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 5,
@@ -59,7 +63,8 @@
         "The agent mentions route-by-route migration strategy",
         "The agent suggests maintaining API compatibility layer",
         "The agent includes rollback to Flask procedure"
-      ]
+      ],
+      "files": []
     }
   ]
 }

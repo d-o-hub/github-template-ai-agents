@@ -12,7 +12,8 @@
         "Mentions debug options (--pdb)",
         "Suggests isolation strategies",
         "Includes environment verification steps"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -24,7 +25,8 @@
         "Mentions CI environment matching",
         "Provides parallel execution guidance",
         "Suggests caching/cleanup steps"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 3,
@@ -36,7 +38,8 @@
         "Provides GitHub Actions workflow YAML",
         "Mentions artifact upload",
         "Includes coverage thresholds or reporting"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 4,
@@ -48,7 +51,8 @@
         "Explains panic message interpretation",
         "Suggests checking nil pointers",
         "Provides debugging workflow"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 5,
@@ -60,7 +64,8 @@
         "Provides quarantine strategy",
         "Suggests marking/skip options",
         "Includes root cause analysis steps"
-      ]
+      ],
+      "files": []
     }
   ]
 }
