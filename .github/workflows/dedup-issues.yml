@@ -185,6 +185,19 @@ jobs:
               ? '_Detected via semantic analysis (GitHub Models, free)_'
               : '_Detected via title similarity analysis_';
 
+            // Check if bot already commented to avoid duplicate comments
+            const { data: comments } = await github.rest.issues.listComments({
+              ...context.repo,
+              issue_number: current,
+            });
+            const alreadyCommented = comments.some(
+              c => c.user.type === 'Bot' && c.body.includes('This looks like a duplicate')
+            );
+            if (alreadyCommented) {
+              console.log('Duplicate comment already posted, skipping.');
+              return;
+            }
+            
             // Comment with redirect + grace period notice
             await github.rest.issues.createComment({
               ...context.repo,
