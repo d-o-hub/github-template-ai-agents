@@ -1,0 +1,54 @@
+{
+  "skill_name": "ci-autofix",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "The GitHub Actions run for this commit is failing with a YAML lint error in .github/workflows/version-propagation.yml. The error is: '[error] truthy value should be one of [false, true] (rule:truthy)' on the line containing 'on:'. Fix it using OpenCode CLI with Ollama Cloud.",
+      "expected_output": "The agent identifies the yamllint rule:truthy false positive on the 'on:' key, confirms the fix from official yamllint documentation, and applies exactly: 'on: # yamllint disable-line rule:truthy' in version-propagation.yml using OpenCode CLI with the ollama/qwen3-coder:cloud model. No other lines are modified.",
+      "assertions": [
+        "The agent reads the CI error from the open browser tab or provided log",
+        "The agent identifies the file as version-propagation.yml",
+        "The agent references official yamllint docs or a validated GitHub issue",
+        "The agent applies the fix inline on the 'on:' line (not on a preceding line)",
+        "The agent uses OpenCode CLI with ollama/qwen3-coder:cloud model",
+        "The agent verifies with yamllint locally before committing",
+        "The agent does NOT modify any other lines"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Multiple workflow files in .github/workflows/ are failing yamllint with truthy errors. Scan all workflow files and fix only the ones with documented, unambiguous fixes.",
+      "expected_output": "The agent scans all .github/workflows/*.yml files, identifies each 'on:' line missing the yamllint disable comment, applies the inline comment fix to each affected file via OpenCode CLI with Ollama Cloud, and skips any files where the error cause is different or unclear.",
+      "assertions": [
+        "The agent uses glob to find all .github/workflows/*.yml files",
+        "The agent identifies each file with a yamllint rule:truthy error",
+        "The agent applies the fix only where it is unambiguous",
+        "The agent reports files skipped due to unclear errors",
+        "The agent runs yamllint verification after all fixes"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "A CI job is failing with 'Error: Process completed with exit code 1' but the log shows only a generic error with no specific line number or rule. Should the agent auto-fix this?",
+      "expected_output": "The agent correctly identifies that the error is ambiguous (no specific rule, no line number), applies the decision tree, and escalates to the user instead of attempting an auto-fix. The agent provides the raw error output and asks the user for guidance.",
+      "assertions": [
+        "The agent does NOT attempt to auto-fix an ambiguous error",
+        "The agent correctly applies the decision tree: ambiguous error -> escalate",
+        "The agent reports the raw error to the user",
+        "The agent asks the user for clarification or next steps"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Fix the yamllint error in .github/workflows/dedup-issues.yml where the disable-line comment is on the line BEFORE 'on:' instead of inline.",
+      "expected_output": "The agent detects that the comment is on the wrong line (preceding line instead of inline), references the yamllint disable-line documentation to confirm that the comment must be on the same line, moves the comment to be inline on the 'on:' line, removes the now-orphaned preceding comment line, and verifies the fix.",
+      "assertions": [
+        "The agent detects the misplaced disable-line comment",
+        "The agent references yamllint documentation for disable-line behavior",
+        "The agent places the comment inline: 'on: # yamllint disable-line rule:truthy'",
+        "The agent removes the orphaned preceding comment if present",
+        "The agent verifies the fix with yamllint"
+      ]
+    }
+  ]
+}
