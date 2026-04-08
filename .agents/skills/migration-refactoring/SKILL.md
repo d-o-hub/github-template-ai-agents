@@ -74,7 +74,7 @@ Old System (read-only) → Data Sync → New System (write)
 ```
 **When**: Zero-downtime migrations with data changes
 
-See `reference/migration-patterns.md` for detailed implementations.
+See `references/migration-patterns.md` for detailed implementations.
 
 ## Breaking Change Analysis
 
@@ -111,7 +111,7 @@ See `reference/migration-patterns.md` for detailed implementations.
 - **Go**: `godepgraph`
 - **Rust**: `cargo-deps`
 
-See `reference/dependency-analysis.md` for detailed usage.
+See `references/dependency-analysis.md` for detailed usage.
 
 ## Safety Patterns
 
@@ -140,7 +140,7 @@ def test_migration_preserves_properties(data):
 3. Gradually increase to 100%
 4. Rollback if issues detected
 
-See `reference/safety-patterns.md` for more patterns.
+See `references/safety-patterns.md` for more patterns.
 
 ## Rollback Strategies
 
@@ -164,7 +164,7 @@ ALTER TABLE users DROP COLUMN email_normalized;
 ```
 **Best for**: Schema changes with data loss concerns
 
-See `reference/rollback-strategies.md` for platform-specific guides.
+See `references/rollback-strategies.md` for platform-specific guides.
 
 ## Examples
 
@@ -184,7 +184,7 @@ See `reference/rollback-strategies.md` for platform-specific guides.
 # Fix imports, print statements, string handling
 ```
 
-See `reference/language-migrations.md` for framework-specific guides.
+See `references/language-migrations.md` for framework-specific guides.
 
 ## Quality Checklist
 
@@ -201,9 +201,9 @@ See `reference/language-migrations.md` for framework-specific guides.
 
 ## References
 
-- `reference/migration-patterns.md` - Detailed pattern implementations
-- `reference/breaking-change-catalog.md` - Common breaking changes by library
-- `reference/dependency-analysis.md` - Cross-file dependency tracking
-- `reference/rollback-strategies.md` - Platform-specific rollback guides
-- `reference/language-migrations.md` - Framework migration guides
-- `reference/safety-patterns.md` - Testing and safety patterns
+- `references/migration-patterns.md` - Detailed pattern implementations
+- `references/breaking-change-catalog.md` - Common breaking changes by library
+- `references/dependency-analysis.md` - Cross-file dependency tracking
+- `references/rollback-strategies.md` - Platform-specific rollback guides
+- `references/language-migrations.md` - Framework migration guides
+- `references/safety-patterns.md` - Testing and safety patterns

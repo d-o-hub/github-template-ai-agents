@@ -142,4 +142,4 @@ Good decomposition enables optimal execution, clear validation, and higher quali
 
 ## Reference Files
 
-- **[reference/guide.md](reference/guide.md)** - Complete guide with detailed framework, process, patterns, examples, and GOAP integration
+- **[references/guide.md](references/guide.md)** - Complete guide with detailed framework, process, patterns, examples, and GOAP integration

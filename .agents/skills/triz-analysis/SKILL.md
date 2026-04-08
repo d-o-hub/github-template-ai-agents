@@ -80,6 +80,6 @@ Example: `analysis/triz-scripts-2025-05-20.md`
 
 ## Reference Files
 
-- `reference/principles.md` - All 40 TRIZ principles with software examples
-- `reference/patterns.md` - Common software contradiction patterns and resolutions
-- `reference/evolution.md` - TRIZ evolution trends for system design
+- `references/principles.md` - All 40 TRIZ principles with software examples
+- `references/patterns.md` - Common software contradiction patterns and resolutions
+- `references/evolution.md` - TRIZ evolution trends for system design

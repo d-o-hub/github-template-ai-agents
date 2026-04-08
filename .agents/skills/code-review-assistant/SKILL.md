@@ -104,7 +104,7 @@ This {practice} improves {benefit}.
 
 ## GitHub Integration
 
-See `reference/github-integration.md` for API usage, auto-approval criteria, and webhook setup.
+See `references/github-integration.md` for API usage, auto-approval criteria, and webhook setup.
 
 ## Auto-Approve Criteria
 
@@ -176,6 +176,6 @@ jobs:
 
 ## References
 
-- `reference/github-integration.md` - GitHub API integration
-- `reference/security-patterns.md` - Security review patterns
-- `reference/style-guides.md` - Common style guide configurations
+- `references/github-integration.md` - GitHub API integration
+- `references/security-patterns.md` - Security review patterns
+- `references/style-guides.md` - Common style guide configurations

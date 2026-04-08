@@ -39,6 +39,20 @@ Primary stack: Bash scripts, Markdown documentation, GitHub Actions CI/CD.
 cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
+## Version Management
+
+**Single source of truth**: `VERSION` file at project root. Never manually edit version strings in other files.
+
+```bash
+# Bump version - edit VERSION only
+echo "0.3.0" > VERSION
+git add VERSION
+git commit -m "chore: bump version to 0.3.0"
+# Pre-commit hook auto-propagates to README.md, QUICKSTART.md, etc.
+```
+
+See `agents-docs/VERSION.md` for full workflow details.
+
 ## Quality Gate (Required Before Commit)
 
 ```bash
@@ -53,7 +67,7 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 
 - Max `${MAX_LINES_PER_SOURCE_FILE}` lines per source file; `${MAX_LINES_PER_SKILL_MD}` per `SKILL.md`; `${MAX_LINES_AGENTS_MD}` per `AGENTS.md`
 - `SKILL.md` must start with frontmatter (`---` on line 1)
-- **Reference format**: `` `reference/filename.md` - Description `` (no @ prefix, no markdown links)
+- **Reference format**: `` `references/filename.md` - Description `` (no @ prefix, no markdown links)
 - Conventional Commits: `feat:`, `fix:`, `docs:`, `ci:`, `test:`, `refactor:`
 - Shell scripts: `shellcheck` for linting, `bats` for testing
 - Markdown: `markdownlint` for consistency

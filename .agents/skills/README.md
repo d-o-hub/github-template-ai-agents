@@ -27,7 +27,7 @@ Validate symlinks are intact:
 ## Adding a New Skill
 
 1. Create `.agents/skills/<skill-name>/SKILL.md` (see `agents-docs/SKILLS.md`)
-2. Add `reference/` folder for detailed content (optional)
+2. Add `references/` folder for detailed content (optional)
 3. Run `./scripts/setup-skills.sh` to create symlinks for all CLI tools
 4. The skill is now available in Claude Code, OpenCode, Gemini CLI, and Qwen Code
 
@@ -71,6 +71,7 @@ Validate symlinks are intact:
 | [`testing-strategy/`](testing-strategy/) | Design comprehensive testing strategies with modern techniques. Use for test planning, property-based testing, visual regression, load testing, mutation testing, and E2E test generation. Includes coverage analysis, test maintenance strategies, and CI/CD integration. |
 | [`triz-analysis/`](triz-analysis/) | Run a systematic TRIZ contradiction audit against a codebase, architecture, or workflow to identify hidden trade-offs and innovation opportunities. |
 | [`triz-solver/`](triz-solver/) | Systematic problem-solving using TRIZ (Theory of Inventive Problem Solving) principles adapted for software engineering. Use when stuck on complex problems, facing technical contradictions, optimizing system design, or seeking innovative solutions beyond trial-and-error. Prevents solving the wrong problem correctly. |
+| [`turso-db/`](turso-db/) | Use this skill for Turso (LibSQL/Limbo) database development, including scaffolding, querying, migrations, and maintenance. Supports vector search, full-text search, CDC, MVCC, encryption, and bidirectional remote sync. Use when working with Turso SDKs for JavaScript, Rust, Python, Go, and React Native. Provides current API guidance to avoid stale "libsql" legacy knowledge. |
 | [`ui-ux-optimize/`](ui-ux-optimize/) | Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination, confidence-scored autoresearch loops, and backpressure quality gates. Use for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, and any screen-based product. |
 | [`web-search-researcher/`](web-search-researcher/) | Research topics using web search to find accurate, current information. Use when you need modern information, official documentation, best practices, or technical solutions beyond training data. |
 

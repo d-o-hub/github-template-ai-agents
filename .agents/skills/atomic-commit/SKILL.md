@@ -138,5 +138,5 @@ Command succeeds only when:
 
 - `.opencode/commands/commit.md` - Basic commit guidelines
 - `.github/PULL_REQUEST_TEMPLATE.md` - PR template
-- `reference/IMPLEMENTATION.md` - Technical details
+- `references/IMPLEMENTATION.md` - Technical details
 # Test change
