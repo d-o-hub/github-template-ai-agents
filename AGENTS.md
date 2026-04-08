@@ -39,6 +39,20 @@ Primary stack: Bash scripts, Markdown documentation, GitHub Actions CI/CD.
 cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
+## Version Management
+
+**Single source of truth**: `VERSION` file at project root. Never manually edit version strings in other files.
+
+```bash
+# Bump version - edit VERSION only
+echo "0.3.0" > VERSION
+git add VERSION
+git commit -m "chore: bump version to 0.3.0"
+# Pre-commit hook auto-propagates to README.md, QUICKSTART.md, etc.
+```
+
+See `agents-docs/VERSION.md` for full workflow details.
+
 ## Quality Gate (Required Before Commit)
 
 ```bash
