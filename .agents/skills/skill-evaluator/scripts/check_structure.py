@@ -51,8 +51,6 @@ def check_skill(skill_dir: Path) -> dict:
     if not has_skill_md:
         issues.append("missing SKILL.md")
 
-    if not has_spec_ref:
-        issues.append("missing references/evaluating-skills.md")
 
     eval_count = 0
     if has_evals:

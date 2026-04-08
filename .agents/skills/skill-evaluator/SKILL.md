@@ -41,7 +41,7 @@ Expected layout:
 skill-name/
   SKILL.md
   evals/evals.json                   # required
-  references/evaluating-skills.md    # required
+  references/evaluating-skills.md    # required for evaluator
   scripts/                           # optional but useful
 ```
 
