@@ -40,9 +40,9 @@ Expected layout:
 ```text
 skill-name/
   SKILL.md
-  evals/evals.json          # recommended
-  references/               # recommended
-  scripts/                  # optional but useful
+  evals/evals.json                   # required
+  references/evaluating-skills.md    # required
+  scripts/                           # optional but useful
 ```
 
 Flag these issues explicitly:
@@ -82,14 +82,18 @@ For each live run:
 
 ### 4. Baseline Comparison
 
-When useful, rerun the same prompt without the skill or against a snapshot of the older skill.
+Always rerun the same prompt without the skill (or against a snapshot of the older skill) to establish a baseline.
+
+For each run, capture:
+- `with_skill`: Standard run using the current skill version.
+- `without_skill`: Run using the same prompt but without any skill loaded.
+- `old_skill`: (Optional) Run using a prior snapshot of the skill for regression testing.
 
 Compare:
-
 - pass rate
 - missing details
 - format compliance
-- time or token cost if available
+- time (`duration_ms`) and token cost (`total_tokens`)
 
 ### 5. Verdict
 
@@ -98,6 +102,74 @@ End with one of:
 - `PASS` — structure is sound and live output meets assertions
 - `NEEDS_WORK` — usable, but structure gaps or output gaps remain
 - `FAIL` — skill is broken, misleading, or missing core pieces
+
+## Workspace Layout
+
+Organize eval results in a dedicated workspace directory (e.g., `<skill-name>-workspace/`). Each iteration of the eval loop produces structured artifacts.
+
+```text
+<skill-name>-workspace/
+└── iteration-N/
+    ├── eval-<id>/
+    │   ├── with_skill/
+    │   │   ├── outputs/       # Files produced by the run
+    │   │   ├── timing.json    # total_tokens and duration_ms
+    │   │   └── grading.json   # Assertion results with evidence
+    │   └── without_skill/
+    │       ├── outputs/
+    │       ├── timing.json
+    │       └── grading.json
+    ├── benchmark.json         # Aggregated pass rates and deltas
+    └── feedback.json          # Human review notes for next iteration
+```
+
+## Artifact Schemas
+
+### timing.json
+```json
+{
+  "total_tokens": 84852,
+  "duration_ms": 23332
+}
+```
+
+### grading.json
+```json
+{
+  "assertion_results": [
+    {
+      "text": "The output includes a bar chart image file",
+      "passed": true,
+      "evidence": "Found chart.png (45KB) in outputs directory"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4,
+    "pass_rate": 0.75
+  }
+}
+```
+
+### benchmark.json
+```json
+{
+  "run_summary": {
+    "with_skill": { "pass_rate": { "mean": 0.83 }, "tokens": { "mean": 3800 } },
+    "without_skill": { "pass_rate": { "mean": 0.33 }, "tokens": { "mean": 2100 } },
+    "delta": { "pass_rate": 0.50, "tokens": 1700 }
+  }
+}
+```
+
+### feedback.json
+```json
+{
+  "eval-case-id": "Actionable feedback message from human review",
+  "another-eval-id": ""
+}
+```
 
 ## Assertion Rules
 

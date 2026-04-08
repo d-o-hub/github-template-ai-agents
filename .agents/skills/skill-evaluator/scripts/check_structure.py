@@ -38,6 +38,7 @@ def check_skill(skill_dir: Path) -> dict:
     issues: list[str] = []
     has_skill_md = (skill_dir / "SKILL.md").is_file()
     has_references = (skill_dir / "references").is_dir()
+    has_spec_ref = (skill_dir / "references" / "evaluating-skills.md").is_file()
     has_scripts = (skill_dir / "scripts").is_dir()
     has_evals = (skill_dir / "evals").is_dir()
 
@@ -49,6 +50,9 @@ def check_skill(skill_dir: Path) -> dict:
 
     if not has_skill_md:
         issues.append("missing SKILL.md")
+
+    if not has_spec_ref:
+        issues.append("missing references/evaluating-skills.md")
 
     eval_count = 0
     if has_evals:
@@ -67,6 +71,7 @@ def check_skill(skill_dir: Path) -> dict:
         "skill": skill_dir.name,
         "has_skill_md": has_skill_md,
         "has_references": has_references,
+        "has_spec_ref": has_spec_ref,
         "has_scripts": has_scripts,
         "has_evals": has_evals,
         "eval_count": eval_count,
@@ -97,6 +102,8 @@ def main() -> int:
         print(f"## {result['skill']} — {result['status']}")
         print(f"- SKILL.md: {'yes' if result['has_skill_md'] else 'no'}")
         print(f"- references/: {'yes' if result['has_references'] else 'no'}")
+        if result["has_references"]:
+            print(f"  - evaluating-skills.md: {'yes' if result['has_spec_ref'] else 'no'}")
         print(f"- scripts/: {'yes' if result['has_scripts'] else 'no'}")
         print(f"- evals/: {'yes' if result['has_evals'] else 'no'}")
         if result["has_evals"]:
