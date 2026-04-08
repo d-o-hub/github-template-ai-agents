@@ -1,0 +1,23 @@
+{
+  "skill_name": "memory-context",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Explain how to use the memory-context skill.",
+      "expected_output": "The agent provides a clear explanation based on SKILL.md.",
+      "assertions": [
+        "The output is accurate",
+        "The output references core features"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Provide a practical example of memory-context in action.",
+      "expected_output": "The agent shows a realistic usage scenario.",
+      "assertions": [
+        "The example is relevant",
+        "The example follows the skill's best practices"
+      ]
+    }
+  ]
+}
