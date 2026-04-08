@@ -28,7 +28,7 @@
     {
       "id": 3,
       "prompt": "What files does the docs hook sync and where does it put them?",
-      "expected_output": "The agent explains that skill docs go to agents-docs/skills/, reference docs go to agents-docs/reference/, excludes README.md at root, and updates the skill index when skills change.",
+      "expected_output": "The agent explains that skill docs go to agents-docs/skills/, reference docs go to agents-docs/references/, excludes README.md at root, and updates the skill index when skills change.",
       "assertions": [
         "The agent explains skill doc destination (agents-docs/skills/)",
         "The agent mentions reference docs destination",

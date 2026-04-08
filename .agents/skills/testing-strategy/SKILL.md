@@ -84,7 +84,7 @@ def test_json_roundtrip(text):
     assert json.loads(json.dumps(text)) == text
 ```
 
-See `reference/property-testing-patterns.md` for advanced patterns including stateful testing.
+See `references/property-testing-patterns.md` for advanced patterns including stateful testing.
 
 ## Visual Regression Testing
 
@@ -103,7 +103,7 @@ test('homepage visual regression', async ({ page }) => {
 });
 ```
 
-See `reference/visual-testing-guide.md` for Storybook, Chromatic, and multi-browser setups.
+See `references/visual-testing-guide.md` for Storybook, Chromatic, and multi-browser setups.
 
 ## Load Testing
 
@@ -134,7 +134,7 @@ export default function () {
 }
 ```
 
-See `reference/load-testing-scenarios.md` for Artillery, JMeter, and advanced patterns.
+See `references/load-testing-scenarios.md` for Artillery, JMeter, and advanced patterns.
 
 ## Mutation Testing
 
@@ -148,7 +148,7 @@ mutmut run --paths-to-mutate=src/ --tests-dir=tests/
 mutmut results
 ```
 
-See `reference/mutation-testing.md` for Stryker (JS), Pitest (Java), and interpreting results.
+See `references/mutation-testing.md` for Stryker (JS), Pitest (Java), and interpreting results.
 
 ## E2E Test Generation
 
@@ -187,7 +187,7 @@ class UserFactory(factory.Factory):
     name = factory.Faker('name')
 ```
 
-See `reference/test-maintenance.md` for coverage tracking and test health metrics.
+See `references/test-maintenance.md` for coverage tracking and test health metrics.
 
 ## CI/CD Integration
 
@@ -227,8 +227,8 @@ jobs:
 
 ## References
 
-- `reference/property-testing-patterns.md` - Advanced property-based testing
-- `reference/visual-testing-guide.md` - Visual testing platforms
-- `reference/load-testing-scenarios.md` - Pre-built load test scenarios
-- `reference/mutation-testing.md` - Mutation testing tools
-- `reference/test-maintenance.md` - Test health monitoring
+- `references/property-testing-patterns.md` - Advanced property-based testing
+- `references/visual-testing-guide.md` - Visual testing platforms
+- `references/load-testing-scenarios.md` - Pre-built load test scenarios
+- `references/mutation-testing.md` - Mutation testing tools
+- `references/test-maintenance.md` - Test health monitoring

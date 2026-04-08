@@ -202,4 +202,4 @@ Analyze, Search strategically, Fetch authoritative, Synthesize with attribution.
 
 ## Reference Files
 
-- **[reference/guide.md](reference/guide.md)** - Complete guide with strategies, rounds, operators, depth levels, workflow, and examples
+- **[references/guide.md](references/guide.md)** - Complete guide with strategies, rounds, operators, depth levels, workflow, and examples

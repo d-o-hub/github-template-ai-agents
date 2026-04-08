@@ -30,7 +30,7 @@ Supported: web apps, mobile apps, dashboards, admin tools, e-commerce, SaaS, web
 
 ## Swarm Architecture
 
-7 specialized agents with handoff coordination. Full details → `reference/swarm-coordination.md`
+7 specialized agents with handoff coordination. Full details → `references/swarm-coordination.md`
 
 ```
 RESEARCH SCOUT → TOKEN ARCHITECT → LAYOUT ENGINEER → VARIANT GENERATOR → BROWSER VERIFIER → QUALITY AUDITOR
@@ -61,7 +61,7 @@ Inspired by pi-autoresearch: try → measure → keep/revert → repeat until sc
 5. Score regresses → **REVERT** (discard, try different approach)
 6. Max 5 iterations per session
 
-Full details → `reference/swarm-coordination.md`
+Full details → `references/swarm-coordination.md`
 
 ## Session Files
 
@@ -75,35 +75,35 @@ Run every step. Swarm coordinates handoffs.
 
 ### Phase 1: Research & Translate
 
-**Step 0 — Research Scout: Auto-Research.** Research domain trends, platform guidelines, competitor patterns via `websearch`. Handoff → `research_context`. See → `reference/auto-research.md`
+**Step 0 — Research Scout: Auto-Research.** Research domain trends, platform guidelines, competitor patterns via `websearch`. Handoff → `research_context`. See → `references/auto-research.md`
 
-**Step 1 — Anti-Slop Sentinel: Translate.** Convert vague words to measurable constraints. Cross-ref `anti-ai-slop` skill. Handoff → `anti_slop_warnings`. See → `reference/anti-slop-rules.md`
+**Step 1 — Anti-Slop Sentinel: Translate.** Convert vague words to measurable constraints. Cross-ref `anti-ai-slop` skill. Handoff → `anti_slop_warnings`. See → `references/anti-slop-rules.md`
 
 ### Phase 2: Token & Structure
 
-**Step 2 — Token Architect: Build Tokens.** Semantic token system from research + translated language. Handoff → `design_tokens`. See → `reference/design-tokens.md`
+**Step 2 — Token Architect: Build Tokens.** Semantic token system from research + translated language. Handoff → `design_tokens`. See → `references/design-tokens.md`
 
-**Step 3 — Layout Engineer: Navigation & Composition.** Nav model, screen map, responsive spec. See → `reference/navigation-clarity.md`, `reference/layout-composition.md`
+**Step 3 — Layout Engineer: Navigation & Composition.** Nav model, screen map, responsive spec. See → `references/navigation-clarity.md`, `references/layout-composition.md`
 
-**Step 3a — Game Layer** *(skip if not game).* HUD, menus, safe zones. See → `reference/game-ui-rules.md`
+**Step 3a — Game Layer** *(skip if not game).* HUD, menus, safe zones. See → `references/game-ui-rules.md`
 
 ### Phase 3: Generate & Verify
 
 **Step 4 — Coordinator: Assemble Prompt.** See → `templates/optimize-prompt-template.md`
 
-**Step 5 — Variant Generator: 3 Variants.** Default: editorial/product/expressive. Game: immersive/competitive/minimal-hud. See → `reference/variant-worktree-flow.md`
+**Step 5 — Variant Generator: 3 Variants.** Default: editorial/product/expressive. Game: immersive/competitive/minimal-hud. See → `references/variant-worktree-flow.md`
 
 **Step 6 — Layout Engineer: Safety Audit.** Overlap, wrapping, truncation at all breakpoints.
 
-**Step 6a — Browser Verifier: Screenshots** *(when HTML available).* Playwright at 375/768/1024/1440px. If no HTML prototype exists, **SKIP** with a `browser_verification.status: "SKIPPED"` note describing what would be verified. See → `reference/browser-verification.md`
+**Step 6a — Browser Verifier: Screenshots** *(when HTML available).* Playwright at 375/768/1024/1440px. If no HTML prototype exists, **SKIP** with a `browser_verification.status: "SKIPPED"` note describing what would be verified. See → `references/browser-verification.md`
 
 ### Phase 4: Audit & Learn
 
 **Step 7 — Anti-Slop Sentinel: Final Audit.** No banned words remain.
 
-**Step 8 — Quality Auditor: Score & Gate.** Score against checklist (0–66). See → `reference/review-checklist.md`
+**Step 8 — Quality Auditor: Score & Gate.** Score against checklist (0–66). See → `references/review-checklist.md`
 
-**Step 9 — Quality Auditor: Record Lessons.** Append to session files. See → `reference/self-learning-loop.md`
+**Step 9 — Quality Auditor: Record Lessons.** Append to session files. See → `references/self-learning-loop.md`
 
 ## Required Outputs
 
@@ -149,19 +149,19 @@ Run every step. Swarm coordinates handoffs.
 
 | File | Purpose |
 |---|---|
-| `reference/swarm-coordination.md` | Swarm architecture, handoff protocol, agent contracts |
-| `reference/auto-research.md` | Auto-research workflow, search strategies |
-| `reference/design-tokens.md` | Token categories, naming, semantic structure |
-| `reference/typography.md` | Role-based type system, wrapping safety |
-| `reference/color-system.md` | Restrained palettes, contrast rules |
-| `reference/layout-composition.md` | Layout rhythm, density, hierarchy |
-| `reference/navigation-clarity.md` | Navigation models, labels, cross-screen rules |
-| `reference/responsive-screen-rules.md` | Per-breakpoint behavior, no-overlap validation |
-| `reference/game-ui-rules.md` | HUD, controls, safe zones, menu systems |
-| `reference/anti-slop-rules.md` | Banned phrases, banned clichés |
-| `reference/prompt-patterns.md` | Weak-to-strong rewrites, brief upgrades |
-| `reference/review-checklist.md` | Pass/fail quality checks (0–66 scoring) |
-| `reference/self-learning-loop.md` | Lesson capture, rule distillation |
-| `reference/variant-worktree-flow.md` | Variant generation with shared tokens |
-| `reference/browser-verification.md` | Playwright screenshot workflow, overlap detection |
-| `reference/stitch-design-token-alignment.md` | Design-first workflow, token DNA normalization |
+| `references/swarm-coordination.md` | Swarm architecture, handoff protocol, agent contracts |
+| `references/auto-research.md` | Auto-research workflow, search strategies |
+| `references/design-tokens.md` | Token categories, naming, semantic structure |
+| `references/typography.md` | Role-based type system, wrapping safety |
+| `references/color-system.md` | Restrained palettes, contrast rules |
+| `references/layout-composition.md` | Layout rhythm, density, hierarchy |
+| `references/navigation-clarity.md` | Navigation models, labels, cross-screen rules |
+| `references/responsive-screen-rules.md` | Per-breakpoint behavior, no-overlap validation |
+| `references/game-ui-rules.md` | HUD, controls, safe zones, menu systems |
+| `references/anti-slop-rules.md` | Banned phrases, banned clichés |
+| `references/prompt-patterns.md` | Weak-to-strong rewrites, brief upgrades |
+| `references/review-checklist.md` | Pass/fail quality checks (0–66 scoring) |
+| `references/self-learning-loop.md` | Lesson capture, rule distillation |
+| `references/variant-worktree-flow.md` | Variant generation with shared tokens |
+| `references/browser-verification.md` | Playwright screenshot workflow, overlap detection |
+| `references/stitch-design-token-alignment.md` | Design-first workflow, token DNA normalization |

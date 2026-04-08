@@ -3,7 +3,7 @@
 > Production-ready template for AI agent-powered development with Claude Code, Gemini CLI, OpenCode, Qwen Code, and more.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Template Version](https://img.shields.io/badge/version-0.2.1-blue)](VERSION)
+[![Template Version](https://img.shields.io/badge/version-0.2.2-blue)](VERSION)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Quick Links**: [Quick Start](#-quick-start) · [Documentation](#-documentation) · [Contributing](#-contributing)
