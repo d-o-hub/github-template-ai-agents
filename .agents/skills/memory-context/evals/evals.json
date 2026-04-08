@@ -3,20 +3,24 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Explain how to use the memory-context skill.",
-      "expected_output": "The agent provides a clear explanation based on SKILL.md.",
+      "prompt": "What is LESSON-011 and how does it relate to Bash scripts in this repo?",
+      "expected_output": "The agent retrieves the specific lesson about `set +e` in validation scripts from the memory store and explains its importance for error reporting.",
+      "files": [],
       "assertions": [
-        "The output is accurate",
-        "The output references core features"
+        "The agent correctly identifies LESSON-011 as being about 'set +e'",
+        "The agent explains that 'set +e' ensures all errors are reported in a single run",
+        "The agent references the memory retrieval process"
       ]
     },
     {
       "id": 2,
-      "prompt": "Provide a practical example of memory-context in action.",
-      "expected_output": "The agent shows a realistic usage scenario.",
+      "prompt": "Find all project guidelines related to GitHub Action SHA pinning.",
+      "expected_output": "The agent searches the memory context and identifies guidelines in `AGENTS.md` and `SECURITY.md` regarding 40-character commit SHAs.",
+      "files": [],
       "assertions": [
-        "The example is relevant",
-        "The example follows the skill's best practices"
+        "The agent cites the 40-character commit SHA requirement",
+        "The agent mentions both AGENTS.md and SECURITY.md as sources",
+        "The output includes an example of a pinned action"
       ]
     }
   ]

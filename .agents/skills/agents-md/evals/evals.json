@@ -14,7 +14,8 @@
         "Contains testing commands",
         "Contains '## Quality Gate' or quality check section",
         "Contains '## Pre-existing Issue Policy' or similar"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -27,7 +28,8 @@
         "Testing strategy includes multiple test types",
         "Security considerations included",
         "Code style is specific (not generic)"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 3,
@@ -40,7 +42,8 @@
         "Includes backend-specific configuration example",
         "Documents precedence rules (closest wins)",
         "Mentions monorepo organization"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 4,
@@ -53,7 +56,8 @@
         "Testing includes data validation",
         "Quality gate includes mypy type checking",
         "Security includes pip-audit"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 5,
@@ -66,7 +70,8 @@
         "Quality gate section added with multiple checks",
         "Security scanning included",
         "No vague instructions like 'run tests'"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 6,
@@ -79,7 +84,8 @@
         "Mentions zero-tolerance policy",
         "Has timeout or timing configuration",
         "Includes dry-run or validation options"
-      ]
+      ],
+      "files": []
     }
   ]
 }

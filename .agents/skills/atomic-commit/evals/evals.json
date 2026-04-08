@@ -8,7 +8,8 @@
       "assertions": [
         "A commit is created",
         "The commit message follows conventions"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -17,7 +18,8 @@
       "assertions": [
         "The last commit is amended",
         "The new file is included in the commit"
-      ]
+      ],
+      "files": []
     }
   ]
 }

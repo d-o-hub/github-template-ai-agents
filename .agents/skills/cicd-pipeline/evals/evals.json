@@ -11,7 +11,8 @@
         "The agent runs tests on PR trigger",
         "The agent deploys to staging on main merge",
         "The agent uses 'needs' for job dependencies"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -23,7 +24,8 @@
         "The agent has traffic switching mechanism",
         "The agent implements automatic rollback",
         "The agent includes post-deployment monitoring"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 3,
@@ -35,7 +37,8 @@
         "The agent suggests SAST integration",
         "The agent uses SARIF format for GitHub integration",
         "The agent configures scan failure thresholds"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 4,
@@ -47,7 +50,8 @@
         "The agent proposes test splitting strategies",
         "The agent mentions artifact caching",
         "The agent includes conditional job skipping"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 5,
@@ -59,7 +63,8 @@
         "The agent requires manual approval for production",
         "The agent includes promotion gates between stages",
         "The agent provides rollback procedures"
-      ]
+      ],
+      "files": []
     }
   ]
 }

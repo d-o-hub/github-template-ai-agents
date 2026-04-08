@@ -11,7 +11,8 @@
         "The agent suggests security-specific checks",
         "The agent recommends specific test scenarios",
         "The agent provides actionable feedback"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -23,7 +24,8 @@
         "The agent flags dependency changes",
         "The agent identifies no blocking issues",
         "The agent provides clear recommendation"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 3,
@@ -35,7 +37,8 @@
         "The agent explains the security risk",
         "The agent suggests parameterized queries",
         "The agent provides corrected code example"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 4,
@@ -47,7 +50,8 @@
         "The agent recommends focused review strategy",
         "The agent categorizes changes by risk/pattern",
         "The agent provides time estimate for review"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 5,
@@ -59,7 +63,8 @@
         "The agent acknowledges test coverage",
         "The agent provides specific praise points",
         "The agent recommends approval with clear reasoning"
-      ]
+      ],
+      "files": []
     }
   ]
 }

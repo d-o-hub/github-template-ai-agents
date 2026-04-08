@@ -10,7 +10,8 @@
         "The code includes `connect({ path, url, authToken })`.",
         "The agent mentions that sync is explicit (manual push/pull).",
         "The agent warns against opening the synced database with other tools."
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -21,7 +22,8 @@
         "The output includes an example of `vector_distance_cos`.",
         "The agent mentions that lower distance means more similar.",
         "The agent includes an `ORDER BY distance ASC` clause."
-      ]
+      ],
+      "files": []
     },
     {
       "id": 3,
@@ -32,7 +34,8 @@
         "The output explains different CDC modes (id, before, after, full).",
         "The agent shows how to query the `turso_cdc` table.",
         "The agent notes that changes to the CDC table itself are also logged."
-      ]
+      ],
+      "files": []
     },
     {
       "id": 4,
@@ -43,7 +46,8 @@
         "The output mentions 'No multi-process access'.",
         "The output mentions 'No WITHOUT ROWID tables'.",
         "The output mentions 'WAL is the default and only supported mode'."
-      ]
+      ],
+      "files": []
     }
   ]
 }

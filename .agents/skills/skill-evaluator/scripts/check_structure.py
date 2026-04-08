@@ -27,7 +27,9 @@ def check_eval_fields(data: dict) -> list[str]:
         issues.append(f"only {len(evals)} eval case(s); recommend at least 2")
     for idx, case in enumerate(evals, start=1):
         missing = [
-            field for field in ("id", "prompt", "expected_output") if field not in case
+            field
+            for field in ("id", "prompt", "expected_output", "files")
+            if field not in case
         ]
         if missing:
             issues.append(f"eval #{idx} missing fields: {', '.join(missing)}")

@@ -9,7 +9,8 @@
         "The agent runs shellcheck on the script",
         "The agent reports specific warning codes and explanations",
         "The agent suggests concrete fixes"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
