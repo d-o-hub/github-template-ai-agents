@@ -4,7 +4,8 @@
 set -euo pipefail
 
 # Get repository root for portable paths
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Use git rev-parse for reliable resolution regardless of hook install location
+REPO_ROOT="$(git rev-parse --show-toplevel)"
 
 # Source lint-cache library
 # shellcheck source=scripts/lib/lint_cache.sh
