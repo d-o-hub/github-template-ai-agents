@@ -9,6 +9,7 @@ on:
 
 permissions:
   issues: write
+  pull-requests: write
 
 jobs:
   close:
@@ -19,86 +20,101 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const { data: issues } = await github.rest.issues.listForRepo({
-              ...context.repo,
-              labels: 'duplicate',
-              state: 'open',
-              per_page: 50
-            });
+            const issues = [];
+            let page = 1;
+            const perPage = 100;
+
+            while (true) {
+              const { data } = await github.rest.issues.listForRepo({
+                ...context.repo,
+                labels: 'duplicate',
+                state: 'open',
+                per_page: perPage,
+                page
+              });
+
+              issues.push(...data);
+              if (data.length < perPage) break;
+              page += 1;
+            }
 
             const now = Date.now();
             const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
 
             let closedCount = 0;
             let skippedCount = 0;
+            let errorCount = 0;
 
             for (const issue of issues) {
-              // Skip if issue was updated within the grace period
-              const age = now - new Date(issue.updated_at).getTime();
-              if (age < THREE_DAYS) {
-                skippedCount++;
-                continue;
-              }
+              try {
+                const age = now - new Date(issue.updated_at).getTime();
+                if (age < THREE_DAYS) {
+                  skippedCount++;
+                  continue;
+                }
 
-              // Check for 👎 veto reaction
-              const { data: reactions } = await github.rest.reactions.listForIssue({
-                ...context.repo,
-                issue_number: issue.number
-              });
-              const vetoed = reactions.some(r => r.content === '-1');
-              if (vetoed) {
-                skippedCount++;
-                continue;
-              }
+                const { data: reactions } = await github.rest.reactions.listForIssue({
+                  ...context.repo,
+                  issue_number: issue.number
+                });
+                const vetoed = reactions.some(r => r.content === '-1');
+                if (vetoed) {
+                  skippedCount++;
+                  continue;
+                }
 
-              // Close the issue as duplicate
-              await github.rest.issues.update({
-                ...context.repo,
-                issue_number: issue.number,
-                state: 'closed',
-                state_reason: 'duplicate'
-              });
+                await github.rest.issues.update({
+                  ...context.repo,
+                  issue_number: issue.number,
+                  state: 'closed',
+                  state_reason: 'duplicate'
+                });
 
-              // Close any open PRs that reference this issue
-              const { data: pullRequests } = await github.rest.issues.listEvents({
-                ...context.repo,
-                issue_number: issue.number,
-                per_page: 100
-              });
+                const { data: events } = await github.rest.issues.listEvents({
+                  ...context.repo,
+                  issue_number: issue.number,
+                  per_page: 100
+                });
 
-              for (const pr of pullRequests) {
-                if (pr.event === 'cross-referenced' && pr.source) {
-                  const prNumber = pr.source.issue?.number;
-                  if (prNumber) {
+                for (const event of events) {
+                  if (event.event !== 'cross-referenced' || !event.source) continue;
+                  const prNumber = event.source.issue?.number;
+                  if (!prNumber) continue;
+
+                  try {
                     const { data: prData } = await github.rest.pulls.get({
                       ...context.repo,
                       pull_number: prNumber
                     });
-                    if (prData.state === 'open') {
-                      await github.rest.pulls.update({
-                        ...context.repo,
-                        pull_number: prNumber,
-                        state: 'closed'
-                      });
-                      await github.rest.issues.createComment({
-                        ...context.repo,
-                        issue_number: prNumber,
-                        body: `🔒 PR closed — referenced issue #${issue.number} ` +
-                              `was auto-closed as a duplicate.`
-                      });
-                    }
+
+                    if (prData.state !== 'open') continue;
+
+                    await github.rest.pulls.update({
+                      ...context.repo,
+                      pull_number: prNumber,
+                      state: 'closed'
+                    });
+                    await github.rest.issues.createComment({
+                      ...context.repo,
+                      issue_number: prNumber,
+                      body: `🔒 PR closed — referenced issue #${issue.number} was auto-closed as a duplicate.`
+                    });
+                  } catch (prError) {
+                    console.warn(`PR close failed for #${prNumber}: ${prError.message}`);
                   }
                 }
+
+                await github.rest.issues.createComment({
+                  ...context.repo,
+                  issue_number: issue.number,
+                  body: `🔒 Auto-closed as duplicate (no veto within 3 days). Track progress in the canonical issue.`
+                });
+
+                closedCount++;
+              } catch (issueError) {
+                console.warn(`Failed to process issue #${issue.number}: ${issueError.message}`);
+                errorCount++;
               }
-
-              await github.rest.issues.createComment({
-                ...context.repo,
-                issue_number: issue.number,
-                body: `🔒 Auto-closed as duplicate (no veto within 3 days). Track progress in the canonical issue.`
-              });
-
-              closedCount++;
             }
 
-            console.log(`Duplicates: ${closedCount} closed, ` +
-                        `${skippedCount} skipped`);
+            console.log(`Duplicates: ${closedCount} closed, ${skippedCount} skipped, ${errorCount} failed`);
