@@ -69,6 +69,17 @@ Two files persist across runs (matching pi-autoresearch pattern):
 - `ui-ux-session.md` — living document: objective, what's been tried, key wins, dead ends
 - `ui-ux-session.jsonl` — append-only log: one JSON line per iteration
 
+## Gotchas
+
+These failure modes recur across sessions. Keep as quick-reference.
+
+- **AI Slop gravity:** Agents default to Inter, purple gradients, three-column feature grids. Override explicitly with opinionated font choices and precedent products.
+- **Mobile horizontal overflow:** Horizontal nav/lists break on mobile <768px. Always enforce `overflow-x-auto` for horizontal navigation, `overflow-x-hidden` on root container.
+- **Z-Index wars:** Absolute positioning for core layout causes overlapping elements. Enforce flow-based layouts (Flexbox/Grid). Absolute only for HUDs/overlays with defined safe zones.
+- **Flickering transitions:** State transitions without presence guards flicker. Use `AnimatePresence` with `mode="wait"` and `initial={false}`. High-motion elements need `will-change-transform transform-gpu backface-visibility-hidden`.
+- **Scrollbar jitter:** Unstable scrollbars cause layout shifts between viewports. Enforce `overflow-x-hidden` on root, `overflow-y-auto` for content containers.
+- **Nested scroll contexts:** `min-h-screen` in sub-components inside scrollable parents creates double scrollbars. Use `min-h-full` for sub-components.
+
 ## Required Workflow
 
 Run every step. Swarm coordinates handoffs.
@@ -93,9 +104,11 @@ Run every step. Swarm coordinates handoffs.
 
 **Step 5 — Variant Generator: 3 Variants.** Default: editorial/product/expressive. Game: immersive/competitive/minimal-hud. See → `references/variant-worktree-flow.md`
 
-**Step 6 — Layout Engineer: Safety Audit.** Overlap, wrapping, truncation at all breakpoints.
+**Step 6 — Layout Engineer: Safety Audit.** Overlap, wrapping, truncation at all breakpoints. Fill `templates/design-audit-template.md`.
 
-**Step 6a — Browser Verifier: Screenshots** *(when HTML available).* Playwright at 375/768/1024/1440px. If no HTML prototype exists, **SKIP** with a `browser_verification.status: "SKIPPED"` note describing what would be verified. See → `references/browser-verification.md`
+**Step 6a — Token Validation (pre-check).** Run `node .agents/skills/ui-ux-optimize/scripts/validate-tokens.cjs` to fast-fail if design docs or TOKENS export are missing. Fix before browser verification.
+
+**Step 6b — Browser Verifier: Screenshots** *(when HTML available).* Playwright at 375/768/1024/1440px. If no HTML prototype exists, **SKIP** with a `browser_verification.status: "SKIPPED"` note describing what would be verified. See → `references/browser-verification.md`
 
 ### Phase 4: Audit & Learn
 
@@ -165,3 +178,13 @@ Run every step. Swarm coordinates handoffs.
 | `references/variant-worktree-flow.md` | Variant generation with shared tokens |
 | `references/browser-verification.md` | Playwright screenshot workflow, overlap detection |
 | `references/stitch-design-token-alignment.md` | Design-first workflow, token DNA normalization |
+| `templates/optimize-prompt-template.md` | Structured prompt assembly template |
+| `templates/design-audit-template.md` | Fill-in audit checklist for Step 6 |
+
+## Scripts
+
+| Script | Purpose |
+|---|---|
+| `scripts/validate-tokens.cjs` | Fast-fail: checks design docs + TOKENS export exist |
+| `scripts/check-output.cjs` | Eval assertion: contains/not_contains for code output |
+| `scripts/verify.py` | Browser verification: overlap, tap targets, scroll audit |
