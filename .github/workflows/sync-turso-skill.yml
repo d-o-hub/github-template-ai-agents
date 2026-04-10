@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        uses: actions/checkout@08c6903cd8c003d8d9e9be628f3d4e86e9a9723a  # v4.3.0
 
       - name: Fetch latest Turso release and llms.txt
         run: |
