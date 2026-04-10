@@ -71,7 +71,7 @@ jobs:
           hashFiles('.agents/skills/*/pyproject.toml') != ''
 
       - name: Setup Go (if go.mod exists)
-        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34  # v5.3.0
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c  # v6.4.0
         with:
           go-version: '1.21'
         if: hashFiles('go.mod') != ''
@@ -127,7 +127,7 @@ jobs:
           hashFiles('.agents/skills/*/pyproject.toml') != ''
 
       - name: Setup Go (if go.mod exists)
-        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34  # v5.3.0
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c  # v6.4.0
         with:
           go-version: '1.21'
         if: hashFiles('go.mod') != ''

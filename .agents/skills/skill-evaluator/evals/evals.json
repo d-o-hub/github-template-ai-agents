@@ -9,6 +9,7 @@
       "assertions": [
         "The agent checks for SKILL.md existence",
         "The agent checks for evals/evals.json",
+        "The agent checks for references/evaluating-skills.md",
         "The agent reports a verdict (PASS, NEEDS_WORK, or FAIL)"
       ]
     },
@@ -44,6 +45,17 @@
         "The agent identifies the assertion as subjective/invalid",
         "The agent explains that assertions must be concrete and checkable",
         "The agent provides an example of a good assertion"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Prepare the workspace for an evaluation of the 'csv-analyzer' skill. Show the expected directory structure and the schemas for timing.json and grading.json.",
+      "expected_output": "The agent describes the <skill>-workspace/iteration-N/ layout and provides the JSON schemas for timing.json (total_tokens, duration_ms) and grading.json (assertion_results with text, passed, evidence).",
+      "files": [],
+      "assertions": [
+        "The output includes the iteration-N/ directory pattern",
+        "The output includes the timing.json schema with total_tokens and duration_ms",
+        "The output includes the grading.json schema with assertion_results"
       ]
     }
   ]

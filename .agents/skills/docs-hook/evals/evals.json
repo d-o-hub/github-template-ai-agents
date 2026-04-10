@@ -11,7 +11,8 @@
         "The agent mentions pre-commit/post-commit hooks",
         "The agent explains what files get synced",
         "The agent mentions the agents-docs target directory"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -23,7 +24,8 @@
         "The agent explains chmod +x for the hook",
         "The agent gives exact .git/hooks/post-commit path",
         "The agent mentions manual sync option"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 3,
@@ -35,7 +37,8 @@
         "The agent notes README.md stays at root",
         "The agent explains the index auto-update",
         "The agent mentions skipped files (deleted, already in docs)"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 4,
@@ -46,7 +49,8 @@
         "The agent provides example with custom path",
         "The agent explains the default is agents-docs",
         "The agent mentions script behavior with custom dir"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 5,
@@ -58,7 +62,8 @@
         "The agent explains exit code behavior",
         "The agent mentions color-coded output (if terminal)",
         "The agent notes the agents-docs directory content"
-      ]
+      ],
+      "files": []
     }
   ]
 }

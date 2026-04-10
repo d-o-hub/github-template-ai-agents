@@ -8,7 +8,8 @@
       "assertions": [
         "The agent does not add email addresses",
         "The agent uses GitHub Issues URL for support"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -17,7 +18,8 @@
       "assertions": [
         "The agent does not add email field to authors",
         "The agent uses correct pyproject.toml format without email"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 3,
@@ -26,7 +28,8 @@
       "assertions": [
         "The agent does not add email addresses",
         "The agent suggests GitHub Issues URL"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 4,
@@ -35,7 +38,8 @@
       "assertions": [
         "The agent correctly identifies test domain exception",
         "The agent applies correct rules based on file location"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 5,
@@ -44,7 +48,8 @@
       "assertions": [
         "The agent does not add personal email addresses",
         "The agent uses appropriate security reporting URL"
-      ]
+      ],
+      "files": []
     }
   ]
 }

@@ -3,7 +3,7 @@
 > Get started with AI agent-powered development in 5 minutes.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Template Version](https://img.shields.io/badge/version-0.2.1-blue)](VERSION)
+[![Template Version](https://img.shields.io/badge/version-0.2.2-blue)](VERSION)
 
 ## Prerequisites
 

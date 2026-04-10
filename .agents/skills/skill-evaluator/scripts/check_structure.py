@@ -27,7 +27,9 @@ def check_eval_fields(data: dict) -> list[str]:
         issues.append(f"only {len(evals)} eval case(s); recommend at least 2")
     for idx, case in enumerate(evals, start=1):
         missing = [
-            field for field in ("id", "prompt", "expected_output") if field not in case
+            field
+            for field in ("id", "prompt", "expected_output", "files")
+            if field not in case
         ]
         if missing:
             issues.append(f"eval #{idx} missing fields: {', '.join(missing)}")
@@ -38,6 +40,7 @@ def check_skill(skill_dir: Path) -> dict:
     issues: list[str] = []
     has_skill_md = (skill_dir / "SKILL.md").is_file()
     has_references = (skill_dir / "references").is_dir()
+    has_spec_ref = (skill_dir / "references" / "evaluating-skills.md").is_file()
     has_scripts = (skill_dir / "scripts").is_dir()
     has_evals = (skill_dir / "evals").is_dir()
 
@@ -49,6 +52,7 @@ def check_skill(skill_dir: Path) -> dict:
 
     if not has_skill_md:
         issues.append("missing SKILL.md")
+
 
     eval_count = 0
     if has_evals:
@@ -67,6 +71,7 @@ def check_skill(skill_dir: Path) -> dict:
         "skill": skill_dir.name,
         "has_skill_md": has_skill_md,
         "has_references": has_references,
+        "has_spec_ref": has_spec_ref,
         "has_scripts": has_scripts,
         "has_evals": has_evals,
         "eval_count": eval_count,
@@ -97,6 +102,8 @@ def main() -> int:
         print(f"## {result['skill']} — {result['status']}")
         print(f"- SKILL.md: {'yes' if result['has_skill_md'] else 'no'}")
         print(f"- references/: {'yes' if result['has_references'] else 'no'}")
+        if result["has_references"]:
+            print(f"  - evaluating-skills.md: {'yes' if result['has_spec_ref'] else 'no'}")
         print(f"- scripts/: {'yes' if result['has_scripts'] else 'no'}")
         print(f"- evals/: {'yes' if result['has_evals'] else 'no'}")
         if result["has_evals"]:

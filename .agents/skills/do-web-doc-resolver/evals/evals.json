@@ -10,7 +10,8 @@
         "Output includes source provider name",
         "Output includes quality score between 0.0 and 1.0",
         "Content is at least 100 characters"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -21,7 +22,8 @@
         "Output mentions async or runtime",
         "Output includes source provider name",
         "Content is at least 200 characters"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 3,
@@ -31,7 +33,8 @@
         "Output contains markdown content",
         "Content is under 3000 characters (truncation working)",
         "Output includes source provider name"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 4,
@@ -42,7 +45,8 @@
         "Output mentions Python or web framework",
         "Output includes source provider name",
         "Provider used is a free provider (exa_mcp, jina, duckduckgo, llms_txt, or direct_fetch)"
-      ]
+      ],
+      "files": []
     }
   ]
 }

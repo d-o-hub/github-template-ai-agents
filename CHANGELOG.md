@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-04-06
+
+### Fixed
+- Corrected `csm` CLI flag from `--output` to `--output-format` in memory-context skill
+- Added missing `version` and `template_version` fields to memory-context SKILL.md
+
 ## [0.2.1] - 2026-04-03
 
 ### Changed

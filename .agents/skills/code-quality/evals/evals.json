@@ -12,7 +12,8 @@
         "Notes missing type hints",
         "Notes missing docstring",
         "Suggests clearer function name"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 2,
@@ -24,7 +25,8 @@
         "Adds error handling",
         "Uses async/await",
         "Maintains same functionality"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 3,
@@ -35,7 +37,8 @@
         "Notes multiple responsibilities",
         "Suggests extraction strategies",
         "Proposes service separation"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 4,
@@ -46,7 +49,8 @@
         "Suggests Result type",
         "Recommends error propagation",
         "Mentions error crates (anyhow/thiserror)"
-      ]
+      ],
+      "files": []
     },
     {
       "id": 5,
@@ -57,7 +61,8 @@
         "Notes idiom opportunity",
         "Mentions error handling need",
         "Suggests context propagation if applicable"
-      ]
+      ],
+      "files": []
     }
   ]
 }
