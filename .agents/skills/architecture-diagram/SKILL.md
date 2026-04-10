@@ -50,8 +50,8 @@ python /path/to/skill/scripts/generate_diagram.py \
 
 The script auto-discovers:
 - Skills  → `.agents/skills/*/SKILL.md` (reads `name:` from frontmatter)
-- Agents  → `.opencode/agents/*.md`    (uses filename stem)
-- Commands → `.opencode/commands/*.md` (uses filename stem, strips leading `/`)
+- Agents  → `*/agents/*.md`    (uses filename stem)
+- Commands → `*/commands/*.md` (uses filename stem, strips leading `/`)
 
 It writes a self-contained SVG to `--out` (default: `docs/architecture.svg`).
 
