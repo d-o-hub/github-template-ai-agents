@@ -60,7 +60,7 @@ git checkout -b fix/issue-123-bug-description
 
 ### 4. Write Commit Messages
 
-Use [Conventional Commits](https://www.conventionalcommits.org/) format:
+Use [Conventional Commits](https://www.conventionalcommits.org/) format. **Note: Conventional Commits are enforced via CI.**
 
 ```
 type(scope): Brief description (50 chars max)
