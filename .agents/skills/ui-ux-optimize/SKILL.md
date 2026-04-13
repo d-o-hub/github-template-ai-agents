@@ -4,11 +4,23 @@ description: >
   Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination,
   confidence-scored autoresearch loops, and backpressure quality gates. Use for web apps,
   mobile apps, games, dashboards, SaaS, e-commerce, kiosks, and any screen-based product.
+version: 2.1.0
 ---
 
 # UI/UX Prompt Optimizer
 
 Swarm-powered skill for generating implementation-ready UI/UX prompts. Uses a **swarm of 7 specialized agents** with handoff coordination, an **autoresearch loop** (try → score → keep/revert → repeat), and **backpressure quality gates** to converge on high-quality output.
+
+## Goal
+Ensure that any LLM consuming this skill (Gemini 3, Qwen 3, Claude, etc.) produces identical visual output because every design decision is enumerated, not described. Remove all subjective discretion from the generation loop.
+
+## Compliance Mandate
+You are operating as a constrained design executor, NOT a creative agent.
+- Style decisions not listed in LOCKED Design DNA: FORBIDDEN.
+- Font substitution: FORBIDDEN.
+- Color variation ("similar to...", "a shade of..."): FORBIDDEN.
+- Inventing new token names: FORBIDDEN.
+- When a token is missing: output a warning and ask the user — do NOT infer a value.
 
 ## When to Use
 
@@ -68,6 +80,11 @@ Full details → `references/swarm-coordination.md`
 Two files persist across runs (matching pi-autoresearch pattern):
 - `ui-ux-session.md` — living document: objective, what's been tried, key wins, dead ends
 - `ui-ux-session.jsonl` — append-only log: one JSON line per iteration
+- `evals/golden-card.html`: Reference output snapshot — the canonical correct render.
+- `evals/golden-card.png`: Screenshot baseline for visual regression.
+- `evals/eval-prompt.md`: The exact prompt that produced the golden output.
+
+Before submitting any output, mentally compare against `evals/golden-card.html`. If your output deviates in color, font, spacing, or radius from the LOCKED Design DNA, revise before responding.
 
 ## Gotchas
 
@@ -80,6 +97,40 @@ These failure modes recur across sessions. Keep as quick-reference.
 - **Scrollbar jitter:** Unstable scrollbars cause layout shifts between viewports. Enforce `overflow-x-hidden` on root, `overflow-y-auto` for content containers.
 - **Nested scroll contexts:** `min-h-screen` in sub-components inside scrollable parents creates double scrollbars. Use `min-h-full` for sub-components.
 
+## LOCKED Design DNA (Non-Negotiable Defaults)
+These values MUST be used verbatim. Do NOT infer alternatives.
+If a project overrides these, the override MUST be explicitly declared in `docs/design/design-system.tsx` before Phase 2 begins.
+
+TOKENS = {
+  colors: {
+    primary:     "#2563EB",
+    background:  "#0F172A",
+    surface:     "#1E293B",
+    text_primary:"#F8FAFC",
+    text_muted:  "#94A3B8",
+    accent:      "#7C3AED",
+    error:       "#EF4444",
+    success:     "#22C55E",
+  },
+  typography: {
+    font_family: "'Inter', sans-serif",
+    scale_px:    ,
+    weight:      { normal: 400, medium: 500, semibold: 600, bold: 700 },
+    line_height: { tight: 1.25, base: 1.5, loose: 1.75 },
+  },
+  spacing: {
+    unit:   4,
+    gutter: 16,
+    // All spacing values MUST be multiples of 4px
+  },
+  radius:  { sm: 4, md: 8, lg: 16, pill: 9999 },
+  shadow:  "0 1px 3px rgba(0,0,0,0.4), 0 4px 6px rgba(0,0,0,0.2)",
+  breakpoints: ,
+  effects: {
+    antiFlicker: "transform: translateZ(0); will-change: transform;",
+  },
+}
+
 ## Required Workflow
 
 Run every step. Swarm coordinates handoffs.
@@ -90,17 +141,16 @@ Run every step. Swarm coordinates handoffs.
 
 **Step 1 — Anti-Slop Sentinel: Translate.** Convert vague words to measurable constraints. Cross-ref `anti-ai-slop` skill. Handoff → `anti_slop_warnings`. See → `references/anti-slop-rules.md`
 
-### Phase 2: Token & Structure
-
-**Step 2 — Token Architect: Build Tokens.** Semantic token system from research + translated language. Handoff → `design_tokens`. See → `references/design-tokens.md`
-
-**Step 3 — Layout Engineer: Navigation & Composition.** Nav model, screen map, responsive spec. See → `references/navigation-clarity.md`, `references/layout-composition.md`
-
-**Step 3a — Game Layer** *(skip if not game).* HUD, menus, safe zones. See → `references/game-ui-rules.md`
+### Phase 2: Token Lock
+1. **READ** `docs/design/design-system.tsx` — do NOT modify unless the user explicitly instructs an override.
+2. **DIFF** every proposed style value against the LOCKED Design DNA above.
+3. **REJECT** any divergence: output a warning listing the conflicting value and revert to the locked token.
+4. **NEVER** generate new token names — only use the enumerated set from LOCKED Design DNA.
+5. **Structure:** Map the IA and screen hierarchy before styling.
 
 ### Phase 3: Generate & Verify
 
-**Step 4 — Coordinator: Assemble Prompt.** See → `templates/optimize-prompt-template.md`
+1. **Generate:** Copy the LOCKED Design DNA block as a comment header into every generated file. Reference only token keys — never raw values — in component code. Output must include: component JSX, token import, and responsive styles for all four breakpoints (375 / 768 / 1280 / 1920px).
 
 **Step 5 — Variant Generator: 3 Variants.** Default: editorial/product/expressive. Game: immersive/competitive/minimal-hud. See → `references/variant-worktree-flow.md`
 
