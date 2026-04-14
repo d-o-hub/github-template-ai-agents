@@ -1,2 +1,2 @@
-# Placeholder for eval-prompt.md
+# Eval Prompt
 This is the exact prompt that produced the golden output.
