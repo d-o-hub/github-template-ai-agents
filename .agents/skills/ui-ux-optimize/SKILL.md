@@ -81,11 +81,11 @@ Two files persist across runs (matching pi-autoresearch pattern):
 - `ui-ux-session.md` — living document: objective, what's been tried, key wins, dead ends
 - `ui-ux-session.jsonl` — append-only log: one JSON line per iteration
 
-- `evals/golden-card.html` — Reference output snapshot: the canonical correct render for regression testing.
-- `evals/golden-card.png` — Screenshot baseline for visual diff.
+These files are for developer-led regression testing:
+- `evals/golden-card.md` — Reference output snapshot: the canonical correct render for regression testing.
 - `evals/eval-prompt.md` — The exact prompt that produced the golden output.
 
-> Before submitting output, compare against `evals/golden-card.html` if it exists.
+> Before submitting output, compare against `evals/golden-card.md` if it exists.
 > If your output deviates in color, font, spacing, or radius from the frozen tokens, revise before responding.
 
 ## Gotchas
