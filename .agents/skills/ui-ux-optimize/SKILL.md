@@ -19,6 +19,7 @@ You are operating as a **constrained design executor**, not a free creative agen
 - Inventing new token names not in the scaffold: **FORBIDDEN**.
 - When a required token category is missing: output a warning and ask the user — do NOT infer a value.
 - Before Phase 2: full creative freedom to research and propose. After Phase 2 freeze: zero discretion.
+- **FREEZE ENFORCEMENT**: `scripts/validate-tokens.cjs` programmatically enforces the freeze. Any attempt to modify a locked token after its initial commit will cause a validation failure.
 
 Swarm-powered skill for generating implementation-ready UI/UX prompts. Uses a **swarm of 7 specialized agents** with handoff coordination, an **autoresearch loop** (try → score → keep/revert → repeat), and **backpressure quality gates** to converge on high-quality output.
 
@@ -82,10 +83,10 @@ Two files persist across runs (matching pi-autoresearch pattern):
 - `ui-ux-session.jsonl` — append-only log: one JSON line per iteration
 
 These files are for developer-led regression testing:
-- `evals/golden-card.md` — Reference output snapshot: the canonical correct render for regression testing.
+- `evals/golden-tokens.json` — Reference token snapshot: the canonical correct tokens for regression testing.
 - `evals/eval-prompt.md` — The exact prompt that produced the golden output.
 
-> Before submitting output, compare against `evals/golden-card.md` if it exists.
+> Before submitting output, compare against `evals/golden-tokens.json` if it exists.
 > If your output deviates in color, font, spacing, or radius from the frozen tokens, revise before responding.
 
 ## Gotchas
@@ -101,7 +102,7 @@ These failure modes recur across sessions. Keep as quick-reference.
 
 ## Token Scaffold (Populated in Phase 2, Frozen for All Subsequent Phases)
 
-Before any code or prompt is generated, the Token Architect MUST define and commit all of the following categories to `docs/design/design-system.tsx`. Values are chosen by the model based on project context and research — but once written, they are FROZEN for the session.
+Before any code or prompt is generated, the Token Architect MUST define and commit all of the following categories to `docs/design/design-tokens.json` (W3C Design Tokens format). Values are chosen by the model based on project context and research — but once written, they are FROZEN for the session.
 
 **Required categories:**
 
@@ -115,7 +116,7 @@ Before any code or prompt is generated, the Token Architect MUST define and comm
 | `breakpoints` | `[mobile, tablet, desktop, wide]` as px values |
 | `effects` | `antiFlicker` string |
 
-**FREEZE RULE:** Once written to `docs/design/design-system.tsx`, no token value may change without an explicit user instruction in the chat. All phases read from this file — never re-invent.
+**FREEZE RULE:** Once written to `docs/design/design-tokens.json`, no token value may change without an explicit user instruction in the chat. All phases read from this file — never re-invent.
 
 **CREATIVE FREEDOM:** The actual values are fully up to the model's judgment based on:
 - Research Scout findings (domain trends, competitor patterns)
@@ -135,9 +136,9 @@ Run every step. Swarm coordinates handoffs.
 ### Phase 2: Token & Structure
 
 **Step 2 — Token Architect: Build & Freeze Tokens.**
-1. **If `docs/design/design-system.tsx` exists:** READ it — do NOT modify unless the user explicitly instructs an override.
-2. **If it does not exist:** Populate all Token Scaffold categories creatively based on `research_context` and `anti_slop_warnings`. Write to `docs/design/design-system.tsx`.
-3. **DIFF check:** For any proposed style value, compare against the Token Scaffold. Reject divergence — output a warning listing the conflicting value and revert to the frozen token.
+1. **If `docs/design/design-tokens.json` exists:** READ it — do NOT modify unless the user explicitly instructs an override.
+2. **If it does not exist:** Populate all Token Scaffold categories creatively based on `research_context` and `anti_slop_warnings`. Write to `docs/design/design-tokens.json`.
+3. **DIFF check:** For any proposed style value, compare against the local `docs/design/design-tokens.json`. Reject divergence — output a warning listing the conflicting value and revert to the frozen token.
 4. **NEVER** generate new token category names outside the scaffold.
 5. Handoff → `design_tokens`. See → `references/design-tokens.md`
 
@@ -152,11 +153,13 @@ Run every step. Swarm coordinates handoffs.
 - Reference only token keys — never raw values — in component code.
 - Output must include responsive styles for all four breakpoints defined in `breakpoints` token.
 
+**Step 4a — Sync Code.** Run `node .agents/skills/ui-ux-optimize/scripts/sync-tokens.cjs` to generate `src/lib/design-system.tsx` from your JSON tokens. Never edit the `.tsx` file directly.
+
 **Step 5 — Variant Generator: 3 Variants.** Default: editorial/product/expressive. Game: immersive/competitive/minimal-hud. See → `references/variant-worktree-flow.md`
 
 **Step 6 — Layout Engineer: Safety Audit.** Overlap, wrapping, truncation at all breakpoints. Fill `templates/design-audit-template.md`.
 
-**Step 6a — Token Validation (pre-check).** Run `node .agents/skills/ui-ux-optimize/scripts/validate-tokens.cjs` to fast-fail if design docs or TOKENS export are missing. Fix before browser verification.
+**Step 6a — Token Validation (pre-check).** Run `node .agents/skills/ui-ux-optimize/scripts/validate-tokens.cjs` to fast-fail if `docs/design/design-tokens.json` or `src/lib/design-system.tsx` are missing or misaligned. Fix before browser verification.
 
 **Step 6b — Browser Verifier: Screenshots** *(when HTML available).* Playwright at 375/768/1024/1440px. If no HTML prototype exists, **SKIP** with a `browser_verification.status: "SKIPPED"` note describing what would be verified. See → `references/browser-verification.md`
 
