@@ -4,9 +4,21 @@ description: >
   Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination,
   confidence-scored autoresearch loops, and backpressure quality gates. Use for web apps,
   mobile apps, games, dashboards, SaaS, e-commerce, kiosks, and any screen-based product.
+version: "2.1.0"
 ---
 
 # UI/UX Prompt Optimizer
+
+## Compliance Mandate
+
+You are operating as a **constrained design executor**, not a free creative agent, once tokens are frozen.
+
+- Style decisions not listed in the project Token Scaffold: **FORBIDDEN** after Phase 2.
+- Font substitution mid-session: **FORBIDDEN**.
+- Color variation ("similar to...", "a shade of..."): **FORBIDDEN** after freeze.
+- Inventing new token names not in the scaffold: **FORBIDDEN**.
+- When a required token category is missing: output a warning and ask the user — do NOT infer a value.
+- Before Phase 2: full creative freedom to research and propose. After Phase 2 freeze: zero discretion.
 
 Swarm-powered skill for generating implementation-ready UI/UX prompts. Uses a **swarm of 7 specialized agents** with handoff coordination, an **autoresearch loop** (try → score → keep/revert → repeat), and **backpressure quality gates** to converge on high-quality output.
 
@@ -69,6 +81,13 @@ Two files persist across runs (matching pi-autoresearch pattern):
 - `ui-ux-session.md` — living document: objective, what's been tried, key wins, dead ends
 - `ui-ux-session.jsonl` — append-only log: one JSON line per iteration
 
+- `evals/golden-card.html` — Reference output snapshot: the canonical correct render for regression testing.
+- `evals/golden-card.png` — Screenshot baseline for visual diff.
+- `evals/eval-prompt.md` — The exact prompt that produced the golden output.
+
+> Before submitting output, compare against `evals/golden-card.html` if it exists.
+> If your output deviates in color, font, spacing, or radius from the frozen tokens, revise before responding.
+
 ## Gotchas
 
 These failure modes recur across sessions. Keep as quick-reference.
@@ -79,6 +98,29 @@ These failure modes recur across sessions. Keep as quick-reference.
 - **Flickering transitions:** State transitions without presence guards flicker. Use `AnimatePresence` with `mode="wait"` and `initial={false}`. High-motion elements need `will-change-transform transform-gpu backface-visibility-hidden`.
 - **Scrollbar jitter:** Unstable scrollbars cause layout shifts between viewports. Enforce `overflow-x-hidden` on root, `overflow-y-auto` for content containers.
 - **Nested scroll contexts:** `min-h-screen` in sub-components inside scrollable parents creates double scrollbars. Use `min-h-full` for sub-components.
+
+## Token Scaffold (Populated in Phase 2, Frozen for All Subsequent Phases)
+
+Before any code or prompt is generated, the Token Architect MUST define and commit all of the following categories to `docs/design/design-system.tsx`. Values are chosen by the model based on project context and research — but once written, they are FROZEN for the session.
+
+**Required categories:**
+
+| Category | Required keys |
+|---|---|
+| `colors` | `primary`, `background`, `surface`, `text_primary`, `text_muted`, `accent`, `error`, `success` |
+| `typography` | `font_family`, `scale_px[]`, `weight{}`, `line_height{}` |
+| `spacing` | `unit` (must be 4 or 8), `gutter` |
+| `radius` | `sm`, `md`, `lg`, `pill` |
+| `shadow` | single string value |
+| `breakpoints` | `[mobile, tablet, desktop, wide]` as px values |
+| `effects` | `antiFlicker` string |
+
+**FREEZE RULE:** Once written to `docs/design/design-system.tsx`, no token value may change without an explicit user instruction in the chat. All phases read from this file — never re-invent.
+
+**CREATIVE FREEDOM:** The actual values are fully up to the model's judgment based on:
+- Research Scout findings (domain trends, competitor patterns)
+- Anti-Slop Sentinel translation (what "premium" or "minimal" actually means for this product)
+- Platform guidelines (iOS HIG, Material 3, game genre conventions, etc.)
 
 ## Required Workflow
 
@@ -92,7 +134,12 @@ Run every step. Swarm coordinates handoffs.
 
 ### Phase 2: Token & Structure
 
-**Step 2 — Token Architect: Build Tokens.** Semantic token system from research + translated language. Handoff → `design_tokens`. See → `references/design-tokens.md`
+**Step 2 — Token Architect: Build & Freeze Tokens.**
+1. **If `docs/design/design-system.tsx` exists:** READ it — do NOT modify unless the user explicitly instructs an override.
+2. **If it does not exist:** Populate all Token Scaffold categories creatively based on `research_context` and `anti_slop_warnings`. Write to `docs/design/design-system.tsx`.
+3. **DIFF check:** For any proposed style value, compare against the Token Scaffold. Reject divergence — output a warning listing the conflicting value and revert to the frozen token.
+4. **NEVER** generate new token category names outside the scaffold.
+5. Handoff → `design_tokens`. See → `references/design-tokens.md`
 
 **Step 3 — Layout Engineer: Navigation & Composition.** Nav model, screen map, responsive spec. See → `references/navigation-clarity.md`, `references/layout-composition.md`
 
@@ -101,6 +148,9 @@ Run every step. Swarm coordinates handoffs.
 ### Phase 3: Generate & Verify
 
 **Step 4 — Coordinator: Assemble Prompt.** See → `templates/optimize-prompt-template.md`
+- Copy the frozen Token Scaffold keys as a comment header into every generated file.
+- Reference only token keys — never raw values — in component code.
+- Output must include responsive styles for all four breakpoints defined in `breakpoints` token.
 
 **Step 5 — Variant Generator: 3 Variants.** Default: editorial/product/expressive. Game: immersive/competitive/minimal-hud. See → `references/variant-worktree-flow.md`
 
