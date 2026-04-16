@@ -24,6 +24,10 @@ fi
 
 mkdir -p "$CACHE_DIR"
 
+# Global associative array for config hash caching (Bash 4+)
+# This avoids re-hashing the same config file hundreds of times
+declare -A _CONFIG_HASH_CACHE
+
 # Helper for portable sha256
 _get_hash_internal() {
     local file="$1"
@@ -31,6 +35,8 @@ _get_hash_internal() {
         echo "none"
         return
     fi
+    # Optimization: Use internal Bash variables if we can avoid external tools
+    # but for content hashing, external tool is safer.
     if command -v sha256sum &> /dev/null; then
         sha256sum "$file" | cut -d' ' -f1
     elif command -v shasum &> /dev/null; then
@@ -55,11 +61,22 @@ lint_if_changed() {
 
     local config_hash="none"
     if [ -n "$config_file" ]; then
-        # Check if config_file is absolute or relative to REPO_ROOT
-        if [ -f "$config_file" ]; then
-            config_hash=$(_get_hash_internal "$config_file")
-        elif [ -f "$REPO_ROOT/$config_file" ]; then
-            config_hash=$(_get_hash_internal "$REPO_ROOT/$config_file")
+        # Check if config_file is in memory cache
+        if [[ -v "_CONFIG_HASH_CACHE[$config_file]" ]]; then
+            config_hash="${_CONFIG_HASH_CACHE[$config_file]}"
+        else
+            # Check if config_file is absolute or relative to REPO_ROOT
+            local real_config=""
+            if [ -f "$config_file" ]; then
+                real_config="$config_file"
+            elif [ -f "$REPO_ROOT/$config_file" ]; then
+                real_config="$REPO_ROOT/$config_file"
+            fi
+
+            if [ -n "$real_config" ]; then
+                config_hash=$(_get_hash_internal "$real_config")
+                _CONFIG_HASH_CACHE["$config_file"]="$config_hash"
+            fi
         fi
     fi
 
