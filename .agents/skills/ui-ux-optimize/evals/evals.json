@@ -1,6 +1,6 @@
 {
   "skill_name": "ui-ux-optimize",
-  "version": "2.0",
+  "version": "2.1.0",
   "evals": [
     {
       "id": 1,
@@ -9,15 +9,16 @@
       "files": [],
       "assertions": [
         "research_context includes at least 2 domain trends",
-        "All colors use semantic token names",
-        "'fun' translated to specific token values",
+        "All colors use semantic token names in design-tokens.json",
+        "'fun' translated to specific token values in design-tokens.json",
         "'not corporate' produces exclusion list",
         "Navigation has specific item names",
         "HUD scoped to in-quest only",
         "3 variants with token diffs",
         "Responsive defined for 375px and 768px",
         "Anti-slop audit passes",
-        "Quality score >= 60/66"
+        "Quality score >= 60/66",
+        "design-system.tsx contains identical values to design-tokens.json"
       ]
     },
     {

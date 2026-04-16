@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-04-07 10:33 UTC
+> Last updated: 2026-04-14 09:14 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -30,6 +30,7 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | Skill | Location | Description |
 |-------|----------|-------------|
 | `accessibility-auditor` | `.agents/skills/accessibility-auditor` | Audit web applications for WCAG 2.2 compliance, screen reade |
+| `agent-browser` | `.agents/skills/agent-browser` | Browser automation CLI for AI agents. Use when the user need |
 | `agent-coordination` | `.agents/skills/agent-coordination` | Coordinate multiple agents for software development across a |
 | `agents-md` | `.agents/skills/agents-md` | Create AGENTS.md files with production-ready best practices. |
 | `anti-ai-slop` | `.agents/skills/anti-ai-slop` | Apply this skill whenever the user wants to audit, fix, rede |
@@ -37,12 +38,16 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `architecture-diagram` | `.agents/skills/architecture-diagram` | Generate or update a project architecture SVG diagram by sca |
 | `atomic-commit` | `.agents/skills/atomic-commit` | Atomic git workflow - validates, commits, pushes, creates PR |
 | `cicd-pipeline` | `.agents/skills/cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, Gi |
+| `cloudflare-worker-api` | `.agents/skills/cloudflare-worker-api` | Structure Worker API routes and handlers. Activate for route |
 | `code-quality` | `.agents/skills/code-quality` | Review and improve code quality across any programming langu |
 | `code-review-assistant` | `.agents/skills/code-review-assistant` | Automated code review with PR analysis, change summaries, an |
 | `codeberg-api` | `.agents/skills/codeberg-api` | Interact with Forgejo/Codeberg repositories via the REST API |
 | `database-devops` | `.agents/skills/database-devops` | Database design, migration, and DevOps automation with safet |
+| `database-schema-migrations` | `.agents/skills/database-schema-migrations` | Design database schema and write migrations. Activate for ta |
 | `do-web-doc-resolver` | `.agents/skills/do-web-doc-resolver` | Python resolver for URLs and queries into compact, LLM-ready |
 | `docs-hook` | `.agents/skills/docs-hook` | Lightweight git hook integration for updating agents-docs wi |
+| `document-rendering-and-locators` | `.agents/skills/document-rendering-and-locators` | Implement resilient document rendering and annotation anchor |
+| `dogfood` | `.agents/skills/dogfood` | Systematically explore and test a web application to find bu |
 | `git-github-workflow` | `.agents/skills/git-github-workflow` | Unified atomic git workflow with GitHub integration - commit |
 | `github-readme` | `.agents/skills/github-readme` | Create human-focused GitHub README.md files with 2026 best p |
 | `github-workflow` | `.agents/skills/github-workflow` | Complete GitHub workflow automation - push, create branch/PR |
@@ -50,9 +55,13 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `intent-classifier` | `.agents/skills/intent-classifier` | Classify user intents and route to appropriate skills, comma |
 | `iterative-refinement` | `.agents/skills/iterative-refinement` | Execute iterative refinement workflows with validation loops |
 | `learn` | `.agents/skills/learn` | Extract non-obvious session learnings into scoped AGENTS.md  |
+| `memory-context` | `.agents/skills/memory-context` | Retrieve semantically relevant past learnings and analysis o |
 | `migration-refactoring` | `.agents/skills/migration-refactoring` | Automate complex code migrations and refactorings with safet |
 | `parallel-execution` | `.agents/skills/parallel-execution` | Execute multiple independent tasks simultaneously using para |
 | `privacy-first` | `.agents/skills/privacy-first` | Prevent email addresses and personal data from entering the  |
+| `pwa-offline-sync` | `.agents/skills/pwa-offline-sync` | Design Cache Storage + IndexedDB strategy and sync queue. Ac |
+| `reader-ui-ux` | `.agents/skills/reader-ui-ux` | Build localized, accessible reader/admin UI with responsive  |
+| `secure-invite-and-access` | `.agents/skills/secure-invite-and-access` | Implement access control, authentication, and authorization  |
 | `security-code-auditor` | `.agents/skills/security-code-auditor` | Perform security audits on code to identify vulnerabilities, |
 | `self-fix-loop` | `.agents/skills/self-fix-loop` | Self-learning fix loop - commit, push, monitor CI, auto-fix  |
 | `shell-script-quality` | `.agents/skills/shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use w |
@@ -60,6 +69,7 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `skill-evaluator` | `.agents/skills/skill-evaluator` | "Reusable skill for evaluating other skills with structure c |
 | `task-decomposition` | `.agents/skills/task-decomposition` | Break down complex tasks into atomic, actionable goals with  |
 | `test-runner` | `.agents/skills/test-runner` | Execute tests, analyze results, and diagnose failures across |
+| `testdata-builders` | `.agents/skills/testdata-builders` | Maintain deterministic builders/factories for test entities. |
 | `testing-strategy` | `.agents/skills/testing-strategy` | Design comprehensive testing strategies with modern techniqu |
 | `triz-analysis` | `.agents/skills/triz-analysis` | Run a systematic TRIZ contradiction audit against a codebase |
 | `triz-solver` | `.agents/skills/triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive P |
