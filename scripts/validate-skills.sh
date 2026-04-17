@@ -39,6 +39,9 @@ fi
 # --- Validate canonical skills in .agents/skills/ ---
 echo "Checking canonical skills in .agents/skills/..."
 
+# Read current version once
+CURRENT_VERSION=$(cat "$REPO_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]')
+
 for skill_path in "$SKILLS_SRC"/*/; do
     [ -d "$skill_path" ] || continue
     skill_name="$(basename "$skill_path")"
@@ -49,48 +52,67 @@ for skill_path in "$SKILLS_SRC"/*/; do
     fi
     
     # Check 1: SKILL.md must exist
-    if [ ! -f "$skill_path/SKILL.md" ]; then
+    skill_file="$skill_path/SKILL.md"
+    if [ ! -f "$skill_file" ]; then
         echo -e "  ${RED}✗${NC} $skill_name: Missing SKILL.md" >&2
         FAILED=1
         continue
     fi
 
-    # Check 2: SKILL.md must have YAML frontmatter with name and description
-    if ! grep -q "^name:" "$skill_path/SKILL.md" 2>/dev/null; then
+    # Optimized check: read file once
+    has_name=0
+    has_description=0
+    has_version=0
+    template_version=""
+    line_count=0
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        ((line_count++))
+        [[ $line == "name:"* ]] && has_name=1
+        [[ $line == "description:"* ]] && has_description=1
+        [[ $line == "version:"* ]] && has_version=1
+        if [[ $line == "template_version:"* ]]; then
+            template_version="${line#template_version:}"
+            template_version="${template_version//\"/}"
+            template_version="${template_version#"${template_version%%[![:space:]]*}"}"
+            template_version="${template_version%"${template_version##*[![:space:]]}"}"
+        fi
+    done < "$skill_file"
+
+    if [ $has_name -eq 0 ]; then
         echo -e "  ${RED}✗${NC} $skill_name: SKILL.md missing 'name:' in frontmatter" >&2
         FAILED=1
     fi
 
-    if ! grep -q "^description:" "$skill_path/SKILL.md" 2>/dev/null; then
+    if [ $has_description -eq 0 ]; then
         echo -e "  ${RED}✗${NC} $skill_name: SKILL.md missing 'description:' in frontmatter" >&2
         FAILED=1
     fi
 
     # Check 2b: Warn if missing version field (non-breaking)
-    if ! grep -q "^version:" "$skill_path/SKILL.md" 2>/dev/null; then
+    if [ $has_version -eq 0 ]; then
         echo -e "  ${YELLOW}⚠${NC} $skill_name: Missing 'version:' field (recommended)" >&2
         WARNINGS=1
     fi
 
     # Check 2c: Warn if template_version is older than current by >1 minor version
-    if grep -q "^template_version:" "$skill_path/SKILL.md" 2>/dev/null; then
-        current_version=$(cat "$REPO_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]')
-        skill_template_version=$(grep "^template_version:" "$skill_path/SKILL.md" | head -1 | sed 's/template_version: *//;s/"//g;s/ *$//')
-        if [[ -n "$current_version" && -n "$skill_template_version" ]]; then
-            current_major=$(echo "$current_version" | cut -d. -f1)
-            current_minor=$(echo "$current_version" | cut -d. -f2)
-            skill_major=$(echo "$skill_template_version" | cut -d. -f1)
-            skill_minor=$(echo "$skill_template_version" | cut -d. -f2)
-            if [[ "$skill_major" -lt "$current_major" ]] || \
-               { [[ "$skill_major" -eq "$current_major" ]] && [[ $((current_minor - skill_minor)) -gt 1 ]]; }; then
-                echo -e "  ${YELLOW}⚠${NC} $skill_name: template_version $skill_template_version is >1 minor behind current $current_version" >&2
-                WARNINGS=1
-            fi
+    if [ -n "$template_version" ] && [ -n "$CURRENT_VERSION" ]; then
+        c_major="${CURRENT_VERSION%%.*}"
+        rest="${CURRENT_VERSION#*.}"
+        c_minor="${rest%%.*}"
+
+        s_major="${template_version%%.*}"
+        s_rest="${template_version#*.}"
+        s_minor="${s_rest%%.*}"
+
+        if [[ "$s_major" -lt "$c_major" ]] || \
+           { [[ "$s_major" -eq "$c_major" ]] && [[ $((c_minor - s_minor)) -gt 1 ]]; }; then
+            echo -e "  ${YELLOW}⚠${NC} $skill_name: template_version $template_version is >1 minor behind current $CURRENT_VERSION" >&2
+            WARNINGS=1
         fi
     fi
 
     # Check 3: SKILL.md line count (<= MAX_SKILL_LINES)
-    line_count=$(wc -l < "$skill_path/SKILL.md" | tr -d ' ')
     if [ "$line_count" -gt "$MAX_SKILL_LINES" ]; then
         echo -e "  ${RED}✗${NC} $skill_name: SKILL.md exceeds $MAX_SKILL_LINES lines ($line_count lines)" >&2
         echo "      Consider moving detailed content to reference/ folder" >&2

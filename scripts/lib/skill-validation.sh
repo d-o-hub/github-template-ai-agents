@@ -27,52 +27,69 @@ validate_skill_file() {
         return 1
     fi
 
-    # Check starts with ---
-    local first
-    first=$(head -1 "$skill_file")
-    if [[ "$first" != "---" ]]; then
+    # Optimization: Read file once and parse with internal Bash logic or a single awk call
+    # instead of multiple grep/head/sed/cut calls.
+
+    local has_name=0
+    local has_description=0
+    local has_version=0
+    local template_version=""
+    local line_count=0
+    local first_line=""
+
+    # Read first line specifically
+    read -r first_line < "$skill_file" || true
+    if [[ "$first_line" != "---" ]]; then
         echo -e "  ${RED}✗${NC} $skill_name: Must start with '---'" >&2
         ((errors++))
     fi
 
-    # Check has name field
-    if ! grep -q "^name:" "$skill_file" 2>/dev/null; then
+    # Single pass to gather info
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        ((line_count++))
+        if [[ $line == "name:"* ]]; then has_name=1; fi
+        if [[ $line == "description:"* ]]; then has_description=1; fi
+        if [[ $line == "version:"* ]]; then has_version=1; fi
+        if [[ $line == "template_version:"* ]]; then
+            template_version="${line#template_version:}"
+            template_version="${template_version//\"/}" # remove quotes
+            template_version="${template_version#"${template_version%%[![:space:]]*}"}" # trim leading
+            template_version="${template_version%"${template_version##*[![:space:]]}"}" # trim trailing
+        fi
+    done < "$skill_file"
+
+    if [[ $has_name -eq 0 ]]; then
         echo -e "  ${RED}✗${NC} $skill_name: Missing 'name:' field" >&2
         ((errors++))
     fi
-
-    # Check has description field
-    if ! grep -q "^description:" "$skill_file" 2>/dev/null; then
+    if [[ $has_description -eq 0 ]]; then
         echo -e "  ${RED}✗${NC} $skill_name: Missing 'description:' field" >&2
         ((errors++))
     fi
-
-    # Warn if missing version field (non-breaking)
-    if ! grep -q "^version:" "$skill_file" 2>/dev/null; then
+    if [[ $has_version -eq 0 ]]; then
         echo -e "  ${YELLOW}⚠${NC} $skill_name: Missing 'version:' field (recommended)" >&2
     fi
 
-    # Warn if template_version is older than current by more than one minor version
-    if grep -q "^template_version:" "$skill_file" 2>/dev/null; then
-        local current_version skill_template_version
+    if [[ -n "$template_version" ]]; then
+        local current_version
         current_version=$(cat "$REPO_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]')
-        skill_template_version=$(grep "^template_version:" "$skill_file" | head -1 | sed 's/template_version: *//;s/"//g;s/ *$//')
-        if [[ -n "$current_version" && -n "$skill_template_version" ]]; then
-            local current_major current_minor skill_major skill_minor
-            current_major=$(echo "$current_version" | cut -d. -f1)
-            current_minor=$(echo "$current_version" | cut -d. -f2)
-            skill_major=$(echo "$skill_template_version" | cut -d. -f1)
-            skill_minor=$(echo "$skill_template_version" | cut -d. -f2)
-            if [[ "$skill_major" -lt "$current_major" ]] || \
-               { [[ "$skill_major" -eq "$current_major" ]] && [[ $((current_minor - skill_minor)) -gt 1 ]]; }; then
-                echo -e "  ${YELLOW}⚠${NC} $skill_name: template_version $skill_template_version is >1 minor behind current $current_version" >&2
+        if [[ -n "$current_version" ]]; then
+            # Use internal parameter expansion instead of cut
+            local c_major="${current_version%%.*}"
+            local rest="${current_version#*.}"
+            local c_minor="${rest%%.*}"
+
+            local s_major="${template_version%%.*}"
+            local s_rest="${template_version#*.}"
+            local s_minor="${s_rest%%.*}"
+
+            if [[ "$s_major" -lt "$c_major" ]] || \
+               { [[ "$s_major" -eq "$c_major" ]] && [[ $((c_minor - s_minor)) -gt 1 ]]; }; then
+                echo -e "  ${YELLOW}⚠${NC} $skill_name: template_version $template_version is >1 minor behind current $current_version" >&2
             fi
         fi
     fi
 
-    # Check line count
-    local line_count
-    line_count=$(wc -l < "$skill_file" | tr -d ' ')
     if [[ "$line_count" -gt "$MAX_SKILL_LINES" ]]; then
         echo -e "  ${RED}✗${NC} $skill_name: SKILL.md exceeds $MAX_SKILL_LINES lines ($line_count lines)" >&2
         ((errors++))
