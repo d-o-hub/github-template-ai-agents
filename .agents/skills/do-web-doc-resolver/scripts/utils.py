@@ -89,7 +89,11 @@ def is_safe_url(url: str) -> bool:
             return False
         if parsed.scheme not in ("http", "https"):
             return False
-        hostname = parsed.netloc.split(":")[0]
+        # Use .hostname instead of .netloc to correctly handle credentials
+        # (e.g., http://user@localhost) and avoid SSRF bypasses.
+        hostname = parsed.hostname
+        if hostname is None:
+            return False
         if hostname.lower() in (
             "localhost",
             "localhost.localdomain",
