@@ -49,7 +49,7 @@ deploy:
     group: production-deployment
     cancel-in-progress: false
   steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Deploy
       run: ./deploy.sh
 ```
@@ -132,7 +132,7 @@ rollback:
     name: production
     url: ${{ steps.deploy.outputs.url }}
   steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         ref: ${{ github.event.inputs.previous_version }}
     

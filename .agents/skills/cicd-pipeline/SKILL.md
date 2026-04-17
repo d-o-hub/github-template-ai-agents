@@ -84,8 +84,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ inputs.node_version }}
           cache: 'npm'
@@ -118,8 +118,8 @@ jobs:
             os: ubuntu-latest
             coverage: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
       - run: npm ci

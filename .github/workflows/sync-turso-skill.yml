@@ -1,10 +1,15 @@
 ---
 name: Sync Turso Skill
 
-"on":
+# yamllint disable-line rule:truthy
+on:
   schedule:
     - cron: '0 6 * * 1'  # Every Monday at 06:00 UTC
-  workflow_dispatch: {}
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -12,7 +17,9 @@ permissions:
 
 jobs:
   sync:
+    name: Sync Turso Documentation
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
@@ -47,7 +54,7 @@ jobs:
 
       - name: Create Pull Request
         if: steps.check_changes.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e  # v7.0.8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1  # v8.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "feat(turso-db): sync with latest Turso docs (${{ env.LATEST_RELEASE }})"

@@ -180,7 +180,7 @@ jobs:
   build:
     runs-on: docker
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run tests
         run: npm test
       - name: Build

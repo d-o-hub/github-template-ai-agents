@@ -4,24 +4,23 @@ name: Pull Request Labeler
 # yamllint disable-line rule:truthy
 on:
   pull_request_target:
-    types: [opened, synchronize, reopened]
+    branches: [main, develop]
 
 permissions:
   contents: read
   pull-requests: write
 
 jobs:
-  labeler:
+  label:
+    name: Auto-Label PRs
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
-        with:
-          sparse-checkout: |
-            .github/labeler.yml
-          sparse-checkout-cone-mode: false
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
-      - uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b  # v6.0.1
+      - name: Apply labels
+        uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b  # v6.0.1
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          configuration-path: .github/labeler.yml
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
           sync-labels: true

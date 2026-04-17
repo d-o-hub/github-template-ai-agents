@@ -735,3 +735,49 @@ jobs:
 - REST API docs: POST /repos/{owner}/{repo}/labels requires issues:write
 
 ---
+
+# LESSON-016: GitHub Actions Job Hardening and Optimization
+
+**Context**:
+Workflows lacked consistent timeouts, concurrency controls, and hardened permissions. Actions were often outdated or missing full SHA pinning.
+
+**Surprising Behavior**:
+- GitHub Actions without `timeout-minutes` can run for up to 6 hours by default, potentially incurring massive costs if a process hangs.
+- Redundant CI runs on the same branch can waste significant resources if `concurrency` groups are not used.
+
+**Hard Truths**:
+- Floating tags (like `@v4`) are a security risk; a compromised action owner could push malicious code to an existing tag.
+- Full SHA pinning is the only way to ensure truly immutable and secure supply chains.
+
+**Best Practices**:
+1. Always include `timeout-minutes` (5-10m for typical jobs, 30m+ for heavy analysis).
+2. Pin to 40-char SHAs and add `# vX.Y.Z` for readability.
+3. Use `concurrency` with `cancel-in-progress: true` for development workflows.
+4. Default to `permissions: contents: read`.
+
+**Tags**: #github-actions #security #performance #cost-optimization #best-practices
+
+**Files Modified**:
+- `.github/workflows/*.yml`
+- `.agents/skills/**/*.md` (updated references)
+- `AGENTS.md` (updated security standards)
+
+---
+
+# LESSON-017: Precise YAML Comment Spacing
+
+**Context**:
+`yamllint` enforces exactly two spaces before a comment on a line with content.
+
+**Surprising Behavior**:
+Single spaces or triple spaces before `#` tags in workflow files will trigger linting warnings, even if the SHA pinning itself is correct.
+
+**Best Practices**:
+Always use exactly two spaces before the version comment: `uses: action@SHA  # vX.Y.Z`.
+
+**Tags**: #yaml #linting #yamllint #best-practices
+
+**Files Modified**:
+- `.github/workflows/*.yml`
+
+---

@@ -63,9 +63,9 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: ShellCheck
-        uses: ludeeus/action-shellcheck@master
+        uses: ludeeus/action-shellcheck@v2
       - name: Install BATS
         run: sudo apt-get install -y bats
       - name: Run Tests

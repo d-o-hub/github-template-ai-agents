@@ -374,3 +374,17 @@ scripts/
 **Repository**: https://github.com/d-o-hub/github-template-ai-agents  
 **Branch**: main  
 **Status**: Production Ready 🚀
+
+## GitHub Actions Hardening and Optimization (2026-04-17) ✅
+
+**Scope**: Security, Performance, and Standard Compliance for all workflows.
+
+### Accomplishments
+- **SHA Pinning**: All 12 workflows now use full 40-character commit SHAs for actions.
+- **Resource Management**: Added `timeout-minutes` to all jobs (5m to 30m depending on complexity).
+- **Cost Reduction**: Implemented `concurrency` groups with `cancel-in-progress: true` for development branches.
+- **Security Hardening**: Enforced least-privilege `permissions: contents: read` as the baseline.
+- **Skill Alignment**: Propagated latest action versions across 47 agent skill reference files.
+- **Documentation**: Updated `AGENTS.md`, `WORKFLOW.md`, and `LESSONS.md` with new GHA standards.
+
+**Status**: Verified via `quality_gate.sh`. Ready for production. 🚀

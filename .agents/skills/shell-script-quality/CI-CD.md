@@ -19,9 +19,9 @@ jobs:
     name: ShellCheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@master
+        uses: ludeeus/action-shellcheck@v2
         with:
           scandir: './scripts'
           severity: warning
@@ -31,7 +31,7 @@ jobs:
     name: BATS Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install BATS
         run: sudo apt-get install -y bats
       - name: Run Tests
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [shellcheck, bats]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: All checks passed
         run: echo "✅ Shell script quality gate passed!"
 ```
@@ -151,8 +151,8 @@ printf "\n🎉 All quality checks PASSED!\n"
 lint-fast:
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/checkout@v4
-    - uses: ludeeus/action-shellcheck@master
+    - uses: actions/checkout@v6
+    - uses: ludeeus/action-shellcheck@v2
       with:
         scandir: 'scripts/'
 ```
@@ -163,7 +163,7 @@ full-test:
   if: github.ref == 'refs/heads/main'
   needs: lint-fast
   steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - run: sudo apt-get install -y bats
     - run: bats tests/
 ```

@@ -20,6 +20,10 @@ on:
       - '**.yaml'
       - '.github/workflows/**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -27,11 +31,12 @@ jobs:
   yamllint:
     name: YAML Syntax Validation
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
       - name: Set up Python
-        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55  # v5.5.0
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
         with:
           python-version: '3.x'
 
@@ -42,16 +47,17 @@ jobs:
         run: |
           yamllint -d \
             "{extends: default, rules: {line-length: {max: 120}, indentation: {spaces: 2}}}" \
-            .github/ || (echo "❌ YAML lint failed" && exit 1)
+            .github/
 
   actionlint:
     name: GitHub Actions Workflow Validation
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
       - name: Run actionlint
-        uses: reviewdog/action-actionlint@e0207a28405ecad11953ba625a95d92f7889572a  # v1
+        uses: reviewdog/action-actionlint@be0761e4c1bab7cfdfca56cd03d4bb6253e39a4a  # v1.72.0
         with:
           fail_level: error
           filter_mode: nofilter

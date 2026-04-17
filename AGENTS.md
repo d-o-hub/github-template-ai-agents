@@ -106,6 +106,9 @@ See `agents-docs/VERSION.md` for full workflow details.
 
 - Never commit secrets/API keys - use `.env` (gitignored)
 - Pin all GitHub Actions to full SHA (use `# vX.Y` comment); Dependabot handles updates
+- Workflows must include `timeout-minutes` for all jobs to prevent hanging
+- Use `concurrency` groups with `cancel-in-progress: true` to save resources
+- Follow principle of least privilege for `permissions` (default `contents: read`)
 - Never connect to untrusted MCP servers; Report vulnerabilities via GitHub private advisories
 
 ## Agent Guidance

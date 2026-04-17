@@ -89,7 +89,7 @@ source "./lib/utils.sh"
 ```bash
 # GitHub Actions
 - name: ShellCheck
-  uses: ludeeus/action-shellcheck@master
+  uses: ludeeus/action-shellcheck@v2
   with:
     scandir: 'scripts/'
     severity: warning

@@ -17,19 +17,19 @@ jobs:
   test-unit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: npm test:unit
   
   test-integration:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: npm test:integration
   
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: npm run lint
 ```
 
@@ -56,7 +56,7 @@ Cache package managers to speed up installs. **Updated for 2026**: Prefer `setup
 
 ```yaml
 # Recommended: setup-* actions with automatic caching
-- uses: actions/setup-node@v4
+- uses: actions/setup-node@v6
   with:
     node-version: '20'
     cache: 'npm'  # Enables automatic caching

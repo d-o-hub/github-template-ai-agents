@@ -93,7 +93,7 @@ bats tests/example.bats
 Quick integration:
 ```yaml
 - name: ShellCheck
-  uses: ludeeus/action-shellcheck@master
+  uses: ludeeus/action-shellcheck@v2
 - name: Run BATS
   run: |
     sudo apt-get install -y bats

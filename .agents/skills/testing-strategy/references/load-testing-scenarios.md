@@ -1015,7 +1015,7 @@ jobs:
   load-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Setup k6
         uses: grafana/setup-k6-action@v1

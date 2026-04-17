@@ -445,12 +445,12 @@ jobs:
       pull-requests: write
       checks: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Full history for accurate diffs
       
       - name: Setup review environment
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       
@@ -481,7 +481,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Post review summary
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const summary = `${{ steps.review.outputs.summary }}`;
@@ -519,7 +519,7 @@ jobs:
   review:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       

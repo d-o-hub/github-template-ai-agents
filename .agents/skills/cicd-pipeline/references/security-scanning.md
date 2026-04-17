@@ -10,7 +10,7 @@ jobs:
   secrets-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Full history for scan
       - uses: gitleaks/gitleaks-action@v2
@@ -24,7 +24,7 @@ jobs:
   trufflehog:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: TruffleHog OSS
@@ -44,7 +44,7 @@ jobs:
   dependency-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
@@ -62,7 +62,7 @@ jobs:
   snyk:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -78,7 +78,7 @@ jobs:
   sonarqube:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: SonarQube Scan
@@ -114,7 +114,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -136,7 +136,7 @@ jobs:
   scan-image:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Build image
         run: docker build -t myapp:${{ github.sha }} .
@@ -159,7 +159,7 @@ jobs:
   anchore:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Scan with Anchore
         uses: anchore/scan-action@v3
@@ -183,7 +183,7 @@ jobs:
   compliance:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Run OPA checks
         uses: open-policy-agent/setup-opa@v2
@@ -222,7 +222,7 @@ jobs:
     outputs:
       risk_level: ${{ steps.assess.outputs.risk }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Assess Risk
         id: assess

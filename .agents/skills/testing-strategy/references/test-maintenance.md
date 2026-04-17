@@ -727,7 +727,7 @@ jobs:
   fast-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run fast tests
         run: pytest -m "fast and not flaky" --timeout=60
   
@@ -735,7 +735,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: fast-tests
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run main test suite
         run: pytest -m "not flaky and not slow" -n auto --cov=src
       
@@ -746,7 +746,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule'  # Nightly only
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run quarantined tests
         run: pytest -m "flaky" --reruns 5
         continue-on-error: true
@@ -755,7 +755,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run slow tests
         run: pytest -m "slow" --timeout=600
 ```
@@ -910,7 +910,7 @@ jobs:
   health-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Analyze test health
         run: |
@@ -930,7 +930,7 @@ jobs:
           python scripts/quarantine_report.py > quarantine_report.md
       
       - name: Create maintenance issue
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');

@@ -67,3 +67,13 @@ SKIP_LINKS=true ./scripts/quality_gate.sh
 ## Dependabot PRs
 
 Dependabot PRs are auto-merged via CI when all checks pass. Do not manually merge or close Dependabot PRs.
+
+## GitHub Actions Best Practices
+
+All workflows in this repository must adhere to the following security and reliability standards:
+
+1. **Full SHA Pinning**: All actions must be pinned to a 40-character commit SHA. Always include a comment with the readable version (e.g., `uses: actions/checkout@SHA # v4`).
+2. **Timeout Minutes**: Every job must include a `timeout-minutes` property to prevent hanging runners and unnecessary costs.
+3. **Least Privilege**: Workflows and jobs must explicitly define `permissions`. Start with `permissions: contents: read` and only add required scopes.
+4. **Concurrency Control**: Use `concurrency` groups with `cancel-in-progress: true` for PRs and development branches to optimize resource usage.
+5. **Fail-Fast Pattern**: Sequence jobs and steps so that lightweight validations (linting, quality gates) run before expensive or time-consuming tests.
