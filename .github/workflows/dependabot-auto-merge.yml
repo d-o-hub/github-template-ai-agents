@@ -4,16 +4,15 @@ name: Dependabot Auto-Merge
 # yamllint disable-line rule:truthy
 on: pull_request
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   dependabot:
     name: Auto-Merge Dependabot PRs
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: github.actor == 'dependabot[bot]'
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Dependabot metadata
         id: metadata

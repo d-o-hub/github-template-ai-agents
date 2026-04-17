@@ -13,17 +13,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
-
 jobs:
   dedup:
     name: Duplicate Issue Detection
     runs-on: ubuntu-latest
     timeout-minutes: 10
     if: github.event_name == 'issues' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
     steps:
       - name: Fetch repository context
         uses: actions/github-script@d746ffe35508b1917358783b479e04febd2b8f71  # v9.0.0
@@ -51,6 +50,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     if: github.event_name == 'schedule'
+    permissions:
+      contents: read
+      issues: write
     steps:
       - name: Close confirmed duplicates
         uses: actions/github-script@d746ffe35508b1917358783b479e04febd2b8f71  # v9.0.0
