@@ -17,6 +17,11 @@ trap 'rm -f "$TEMP_FILE"' EXIT ERR
 
 echo "Scanning for agent definitions..."
 
+# Initialize counters for summary
+CLAUDE_COUNT=0
+OPENCODE_COUNT=0
+SKILL_COUNT=0
+
 # Start registry file
 cat > "$TEMP_FILE" << 'HEADER'
 # Agents Registry
@@ -40,27 +45,34 @@ extract_agent_info() {
     local file="$1"
     local cli_type="$2"
     
-    # Extract frontmatter (between first and second ---)
-    local frontmatter
-    frontmatter=$(sed -n '/^---$/,/^---$/p' "$file" | sed '1d;$d')
-
-    # Extract name from frontmatter
-    local name
-    name=$(echo "$frontmatter" | grep "^name:" | head -1 | sed 's/^name: *//' | tr -d '"' || echo "")
-    
-    # Extract description from frontmatter
-    local description
-    description=$(echo "$frontmatter" | grep "^description:" | head -1 | sed 's/^description: *//' | tr -d '"' | cut -c1-60 || echo "No description")
-    
-    # Extract tools from frontmatter
-    local tools
-    tools=$(echo "$frontmatter" | grep "^tools:" | head -1 | sed 's/^tools: *//' | tr -d '"' || echo "Inherited")
-
-    if [ -n "$name" ]; then
-        # Clean up description - remove "Invoke when..." for brevity
-        description=$(echo "$description" | sed 's/\. Invoke when.*//g' | sed 's/Invoke when.*//g')
-        echo "| \`$name\` | $cli_type | $description | $tools |"
-    fi
+    # Optimized extraction using a single awk pass to avoid multiple process spawns
+    awk -v cli_type="$cli_type" '
+    BEGIN { name=""; desc="No description"; tools="Inherited"; in_fm=0 }
+    /^---$/ {
+        in_fm++;
+        if (in_fm == 2) {
+            if (name != "") {
+                # Clean up description
+                sub(/\. Invoke when.*/, "", desc);
+                sub(/Invoke when.*/, "", desc);
+                # Trim to 60 chars
+                if (length(desc) > 60) desc = substr(desc, 1, 60);
+                printf("| `%s` | %s | %s | %s |\n", name, cli_type, desc, tools);
+            }
+            exit;
+        }
+        next;
+    }
+    in_fm == 1 {
+        if (/^name:/) {
+            val = $0; sub(/^name: */, "", val); gsub(/"/, "", val); name = val;
+        } else if (/^description:/) {
+            val = $0; sub(/^description: */, "", val); gsub(/"/, "", val); desc = val;
+        } else if (/^tools:/) {
+            val = $0; sub(/^tools: */, "", val); gsub(/"/, "", val); tools = val;
+        }
+    }
+    ' "$file"
 }
 
 # Scan .claude/agents/ directory
@@ -69,7 +81,7 @@ if [ -d "$REPO_ROOT/.claude/agents" ]; then
     
     for agent_file in "$REPO_ROOT/.claude/agents"/*.md; do
         [ -f "$agent_file" ] || continue
-        agent_name=$(basename "$agent_file" .md)
+        ((CLAUDE_COUNT++))
         extract_agent_info "$agent_file" "Claude Code" >> "$TEMP_FILE"
     done
 fi
@@ -82,8 +94,7 @@ if [ -d "$REPO_ROOT/.opencode/agents" ]; then
         [ -f "$agent_file" ] || continue
         # Skip symlinks to .agents/skills
         [ -L "$agent_file" ] && continue
-        # shellcheck disable=SC2034
-        agent_name=$(basename "$agent_file" .md)
+        ((OPENCODE_COUNT++))
         extract_agent_info "$agent_file" "OpenCode" >> "$TEMP_FILE"
     done
 fi
@@ -108,18 +119,56 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
     
     for skill_dir in "$REPO_ROOT/.agents/skills"/*/; do
         [ -d "$skill_dir" ] || continue
-        skill_name=$(basename "$skill_dir")
+        # Use Bash parameter expansion instead of basename
+        skill_name="${skill_dir%/}"
+        skill_name="${skill_name##*/}"
         
         # Skip if no SKILL.md exists
-        [ -f "$skill_dir/SKILL.md" ] || continue
+        skill_file="$skill_dir/SKILL.md"
+        [ -f "$skill_file" ] || continue
+        ((SKILL_COUNT++))
         
-        # Extract description from frontmatter (handling block scalars like >- or |)
-        description=$(sed -n '/^description:/,/^[a-z-]*:/p' "$skill_dir/SKILL.md" | sed '1s/^description: *//;$d' | tr -d '\n' | sed 's/^[>-]* *//;s/  */ /g' | cut -c1-60 || echo "No description")
-        
-        # Extract name from frontmatter if available
-        skill_display_name=$(grep "^name:" "$skill_dir/SKILL.md" | head -1 | sed 's/^name: *//' | tr -d '"' || echo "$skill_name")
-        
-        echo "| \`${skill_display_name}\` | \`.agents/skills/$skill_name\` | $description |" >> "$TEMP_FILE"
+        # Optimized extraction using a single awk pass
+        awk -v name="$skill_name" '
+        BEGIN { display_name=name; desc="No description"; in_fm=0 }
+        /^---$/ {
+            in_fm++;
+            if (in_fm == 2) {
+                # Trim description to 60 chars
+                if (length(desc) > 60) desc = substr(desc, 1, 60);
+                printf("| `%s` | `.agents/skills/%s` | %s |\n", display_name, name, desc);
+                exit;
+            }
+            next;
+        }
+        in_fm == 1 {
+            if (/^name:/) {
+                val = $0; sub(/^name: */, "", val); gsub(/"/, "", val); display_name = val;
+            } else if (/^description: *[>|]/) {
+                desc = "";
+                while (getline > 0) {
+                    if (/^[a-z-]*:/) {
+                        # Re-process this field line
+                        if (/^name:/) {
+                            val = $0; sub(/^name: */, "", val); gsub(/"/, "", val); display_name = val;
+                        }
+                        break;
+                    }
+                    if (/^---$/) {
+                        # End of frontmatter
+                        # Trim description to 60 chars
+                        if (length(desc) > 60) desc = substr(desc, 1, 60);
+                        printf("| `%s` | `.agents/skills/%s` | %s |\n", display_name, name, desc);
+                        exit;
+                    }
+                    line = $0; sub(/^ +/, "", line);
+                    if (line != "") desc = (desc == "" ? line : desc " " line);
+                }
+            } else if (/^description:/) {
+                val = $0; sub(/^description: */, "", val); gsub(/"/, "", val); desc = val;
+            }
+        }
+        ' "$skill_file" >> "$TEMP_FILE"
     done
 fi
 
@@ -227,9 +276,9 @@ echo "✓ agents-docs/AGENTS_REGISTRY.md updated successfully"
 echo "  Timestamp: $TIMESTAMP"
 echo ""
 echo "Agents found:"
-echo "  - Claude Code: $(find .claude/agents -name '*.md' 2>/dev/null | wc -l | tr -d ' ')"
-echo "  - OpenCode: $(find .opencode/agents -name '*.md' ! -type l 2>/dev/null | wc -l | tr -d ' ')"
-echo "  - Skills: $(find .agents/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')"
+echo "  - Claude Code: $CLAUDE_COUNT"
+echo "  - OpenCode: $OPENCODE_COUNT"
+echo "  - Skills: $SKILL_COUNT"
 echo ""
 echo "To commit changes:"
 echo "  git add agents-docs/AGENTS_REGISTRY.md"
