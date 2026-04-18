@@ -123,6 +123,7 @@ Fix ALL pre-existing issues before completing. See `agents-docs/WORKFLOW.md#pre-
 After non-trivial work: run the `learn` skill or manually append non-obvious discoveries to the nearest relevant `AGENTS.md`. Capture only: hidden file relationships, surprising execution behavior, undocumented commands, fragile config, files that must change together. Never write: obvious facts, duplicates, verbose explanations. See `agents-docs/WORKFLOW.md#post-task-learning` for details.
 
 #### Recent Project-Wide Learnings
+- **GitHub Action SHA Pinning**: Always pin actions to full 40-character commit SHAs with version comments to ensure supply chain security (LESSON-016)
 - **Worktree Cleanup**: Scripts creating worktrees must register them in `CREATED_WORKTREES` and use the `trap cleanup EXIT ERR` pattern (LESSON-010)
 
 ### Context Discipline
