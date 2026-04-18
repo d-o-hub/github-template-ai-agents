@@ -270,9 +270,13 @@ def fetch_url_content(
 
 
 def fetch_llms_txt(url: str) -> str | None:
+    if not is_safe_url(url):
+        return None
     try:
         parsed = urlparse(url)
-        base_url = f"{parsed.scheme}://{parsed.netloc}"
+        # Reconstruct base_url without credentials to ensure safety
+        netloc = _reconstruct_safe_netloc(parsed)
+        base_url = f"{parsed.scheme}://{netloc}"
         llms_url = f"{base_url}/llms.txt"
         cached = _get_from_cache(base_url, "llms_txt")
         if cached is not None:
@@ -336,6 +340,22 @@ _TRACKING_PARAMS = {
 }
 
 
+def _reconstruct_safe_netloc(parsed) -> str:
+    """Reconstruct netloc from parsed URL, stripping credentials and default ports."""
+    host = (parsed.hostname or "").lower()
+    port = parsed.port
+    if port:
+        if (port == 80 and parsed.scheme == "http") or (
+            port == 443 and parsed.scheme == "https"
+        ):
+            port_str = ""
+        else:
+            port_str = f":{port}"
+    else:
+        port_str = ""
+    return f"{host}{port_str}"
+
+
 def normalize_url(url: str) -> str:
     """Normalize URL by stripping tracking params, anchors, and common aliases."""
     try:
@@ -362,16 +382,16 @@ def normalize_url(url: str) -> str:
         if path and path != "/" and path.endswith("/"):
             path = path.rstrip("/")
 
-        # Normalize netloc: lowercase, strip default ports
-        netloc = parsed.netloc.lower()
-        if netloc.endswith(":80") and parsed.scheme == "http":
-            netloc = netloc[:-3]
-        elif netloc.endswith(":443") and parsed.scheme == "https":
-            netloc = netloc[:-4]
+        # Normalize netloc: lowercase, strip credentials and default ports
+        netloc = _reconstruct_safe_netloc(parsed)
 
         # Reconstruct
         normalized = parsed._replace(
-            scheme=parsed.scheme.lower(), netloc=netloc, path=path, query=query, fragment=fragment
+            scheme=parsed.scheme.lower(),
+            netloc=netloc,
+            path=path,
+            query=query,
+            fragment=fragment,
         ).geturl()
         return normalized.strip()
     except Exception:
