@@ -249,9 +249,18 @@ def fetch_url_content(
     validation = validate_url(url, timeout=timeout // 2)
     if not validation.is_valid:
         return None
+
+    # Reconstruct safe URL without credentials for fetching
+    try:
+        parsed = urlparse(url)
+        safe_netloc = _reconstruct_safe_netloc(parsed)
+        safe_url = parsed._replace(netloc=safe_netloc).geturl()
+    except Exception:
+        safe_url = url
+
     session = get_session()
     try:
-        response = session.get(url, timeout=timeout, allow_redirects=True, verify=True)
+        response = session.get(safe_url, timeout=timeout, allow_redirects=True, verify=True)
         if response.status_code >= 400:
             return None
         content = (
