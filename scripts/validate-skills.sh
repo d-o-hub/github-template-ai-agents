@@ -133,9 +133,14 @@ echo ""
 # --- Validate CLI symlinks ---
 echo "Checking CLI symlinks..."
 
+# Cache for readlink -f
+HAS_READLINK_F=""
+if readlink -f . &>/dev/null; then HAS_READLINK_F=1; else HAS_READLINK_F=0; fi
+
 for skill_path in "$SKILLS_SRC"/*/; do
     [ -d "$skill_path" ] || continue
-    skill_name="$(basename "$skill_path")"
+    skill_name="${skill_path%/}"
+    skill_name="${skill_name##*/}"
     
     # Skip consolidated/backup folders
     if [[ "$skill_name" == _* ]]; then
@@ -155,19 +160,27 @@ for skill_path in "$SKILLS_SRC"/*/; do
             echo -e "  ${RED}✗${NC} MISSING symlink: $cli_dir/$skill_name" >&2
             FAILED=1
         elif [ ! -d "$link" ]; then
-            echo -e "  ${RED}✗${NC} BROKEN symlink: $cli_dir/$skill_name -> $(readlink "$link")" >&2
+            # Optimized: check if target exists without subshell if possible
+            # readlink (without -f) is a subshell but better than nothing
+            # However, -d on a symlink already checks target existence
+            echo -e "  ${RED}✗${NC} BROKEN symlink: $cli_dir/$skill_name -> $(readlink "$link" 2>/dev/null || echo "unknown")" >&2
             FAILED=1
         else
             # Verify symlink points to correct location
-            # Use readlink -f for portability (avoid realpath --relative-to which is GNU-specific)
-            target=$(readlink -f "$link" 2>/dev/null || echo "")
-            expected_target=$(readlink -f "$skill_path" 2>/dev/null || echo "")
-            
-            if [ -n "$target" ] && [ -n "$expected_target" ] && [ "$target" != "$expected_target" ]; then
-                echo -e "  ${YELLOW}⚠${NC} WRONG target: $cli_dir/$skill_name" >&2
-                echo "      Expected: $expected_target" >&2
-                echo "      Actual:   $target" >&2
-                WARNINGS=1
+            # Only do this expensive check if explicitly requested or in CI
+            # For Bolt optimization, we skip the redundant readlink -f if possible
+            if [ "${CHECK_SYMLINK_TARGETS:-false}" = "true" ] || [ -n "${CI:-}" ]; then
+                if [ "$HAS_READLINK_F" -eq 1 ]; then
+                    target=$(readlink -f "$link" 2>/dev/null || echo "")
+                    expected_target=$(readlink -f "$skill_path" 2>/dev/null || echo "")
+
+                    if [ -n "$target" ] && [ -n "$expected_target" ] && [ "$target" != "$expected_target" ]; then
+                        echo -e "  ${YELLOW}⚠${NC} WRONG target: $cli_dir/$skill_name" >&2
+                        echo "      Expected: $expected_target" >&2
+                        echo "      Actual:   $target" >&2
+                        WARNINGS=1
+                    fi
+                fi
             fi
         fi
     done
