@@ -13,6 +13,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
+# Cache for VERSION file content
+REPO_VERSION=""
+
 # Validate a single SKILL.md file for format correctness
 # Returns 0 if valid, 1 if invalid (prints errors to stderr)
 validate_skill_file() {
@@ -71,8 +74,10 @@ validate_skill_file() {
     fi
 
     if [[ -n "$template_version" ]]; then
-        local current_version
-        current_version=$(cat "$REPO_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]')
+        if [[ -z "$REPO_VERSION" ]]; then
+            REPO_VERSION=$(cat "$REPO_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]')
+        fi
+        local current_version="$REPO_VERSION"
         if [[ -n "$current_version" ]]; then
             # Use internal parameter expansion instead of cut
             local c_major="${current_version%%.*}"

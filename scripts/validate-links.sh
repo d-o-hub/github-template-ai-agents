@@ -72,31 +72,8 @@ is_url() {
     [[ "$1" =~ ^https?:// ]] || [[ "$1" =~ ^ftp:// ]] || [[ "$1" =~ ^mailto: ]]
 }
 
-# Function to resolve a relative path from a base directory
-# This handles path normalization to avoid "../" and "./" in resolved paths
-# Why use realpath? It handles edge cases like:
-#   - Multiple slashes: foo//bar -> foo/bar
-#   - Dot directories: foo/./bar -> foo/bar
-#   - Parent references: foo/../bar -> bar
-# Fallback to simple concatenation if realpath unavailable (macOS compatibility)
-resolve_path() {
-    local base_dir="$1"
-    local link_path="$2"
-
-    # Handle absolute paths (shouldn't happen but be safe)
-    if [[ "$link_path" == /* ]]; then
-        echo "$link_path"
-        return
-    fi
-
-    # Normalize path by removing redundant components
-    # realpath -m (mock mode) doesn't require path to exist - we check existence separately
-    if command -v realpath &> /dev/null; then
-        realpath -m "$base_dir/$link_path"
-    else
-        echo "$base_dir/$link_path"
-    fi
-}
+# Cache for realpath existence check
+HAS_REALPATH=""
 
 # Function to check if a link target exists
 check_link() {
@@ -123,18 +100,38 @@ check_link() {
     # Remove any anchor from the path (file.md#section -> file.md)
     local clean_path="${link_path%%#*}"
 
-    # Resolve the full path
+    # Resolve the full path without subshells
     local full_path
-    full_path="$(resolve_path "$skill_dir" "$clean_path")"
-
-    # Check if file or directory exists
-    if [[ ! -e "$full_path" && ! -L "$full_path" ]]; then
-        echo -e "  ${RED}✗${NC} Broken link at line $line_num: \`${clean_path}'" >&2
-        echo -e "     in: $skill_file" >&2
-        return 1
+    if [[ "$clean_path" == /* ]]; then
+        full_path="$clean_path"
+    else
+        # Quick check: does the path exist relative to skill_dir?
+        # This covers 99% of cases without needing realpath
+        full_path="$skill_dir/$clean_path"
     fi
 
-    return 0
+    # Check if file or directory exists directly
+    if [[ -e "$full_path" || -L "$full_path" ]]; then
+        return 0
+    fi
+
+    # Only if direct check fails, try normalizing with realpath (if available)
+    # This handles complex relative paths like ../../
+    if [ -z "$HAS_REALPATH" ]; then
+        if command -v realpath &> /dev/null; then HAS_REALPATH=1; else HAS_REALPATH=0; fi
+    fi
+
+    if [ "$HAS_REALPATH" -eq 1 ]; then
+        # realpath -m (mock mode) doesn't require path to exist
+        full_path=$(realpath -m "$full_path" 2>/dev/null)
+        if [[ -e "$full_path" || -L "$full_path" ]]; then
+            return 0
+        fi
+    fi
+
+    echo -e "  ${RED}✗${NC} Broken link at line $line_num: \`${clean_path}'" >&2
+    echo -e "     in: $skill_file" >&2
+    return 1
 }
 
 # Function to check reference format in References section
