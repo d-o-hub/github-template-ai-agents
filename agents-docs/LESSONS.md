@@ -735,3 +735,25 @@ jobs:
 - REST API docs: POST /repos/{owner}/{repo}/labels requires issues:write
 
 ---
+
+### LESSON-016: GitHub Actions Security - SHA Pinning for Third-Party Actions
+
+**Issue**: Using floating tags or branch names (e.g., `@v1.3`) for GitHub Actions can introduce security risks if the tag is moved to a malicious commit or the branch is compromised.
+
+**Root Cause**: Git tags are mutable and can be reassigned. SHA-1 hashes are immutable and provide a deterministic way to reference a specific version of an action.
+
+**Solution**: Always pin GitHub Actions to a full 40-character commit SHA and add a comment with the version tag for readability (e.g., `uses: action/name@SHA # v1.3`).
+
+**Prevention**:
+- Use `git ls-remote --tags` to find the exact SHA behind a release tag before adding it to a workflow.
+- Review project-wide `AGENTS.md` for SHA pinning mandates.
+- Enable Dependabot to automatically update pinned SHAs when new versions are released.
+
+**Tags**: #security #github-actions #sha-pinning #supply-chain
+
+**Files Modified**:
+- `.github/workflows/resolve-outdated-comments.yml`
+
+**References**:
+- GitHub Security Best Practices: https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions
+---
