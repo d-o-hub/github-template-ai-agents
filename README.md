@@ -126,6 +126,24 @@ git commit -m "feat: add user registration"
 ./scripts/quality_gate.sh
 ```
 
+### Optional: Rehearse GitHub Actions Locally with `act`
+
+You can run key CI jobs locally before pushing by using
+[`nektos/act`](https://github.com/nektos/act):
+
+```bash
+# Run the default CI workflow locally (pull_request event)
+./scripts/run_act_local.sh
+
+# Run only one job (for faster feedback)
+ACT_JOB=quality-gate ./scripts/run_act_local.sh
+```
+
+Why this helps:
+- Faster feedback loop on workflow changes
+- Easier debugging than remote-only GitHub Actions runs
+- Optional and non-blocking for contributors who do not use Docker
+
 ## Documentation
 
 - 📚 **[AGENTS.md](AGENTS.md)** - Main agent instructions (single source of truth)

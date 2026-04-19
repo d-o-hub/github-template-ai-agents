@@ -41,6 +41,7 @@
 | `gh-labels-creator.sh` | Create GitHub labels | `./scripts/gh-labels-creator.sh --ci` |
 | `health-check.sh` | Verify environment dependencies | `./scripts/health-check.sh` |
 | `minimal_quality_gate.sh` | Fast-path quality gate (CI debug) | `./scripts/minimal_quality_gate.sh` |
+| `run_act_local.sh` | Optional local GitHub Actions rehearsal via `act` | `./scripts/run_act_local.sh` |
 
 ## Shared Library
 

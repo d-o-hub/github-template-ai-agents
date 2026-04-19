@@ -94,6 +94,23 @@ chmod +x scripts/atomic-commit/*.sh
     pull-requests: write
   ```
 
+### Reproducing CI Locally with act
+
+**Symptom**: You need to debug workflow behavior without waiting for remote CI.
+
+**Solution**:
+```bash
+# Requires Docker + act
+./scripts/run_act_local.sh
+
+# Narrow to one job if needed
+ACT_JOB=quality-gate ./scripts/run_act_local.sh
+```
+
+**Notes**:
+- Local `act` execution is optional and may differ from hosted runners.
+- Use this for fast feedback; keep GitHub Actions as the source of truth.
+
 ---
 
 ## Skill Issues

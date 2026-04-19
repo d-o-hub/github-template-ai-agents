@@ -179,6 +179,19 @@ claude "Refactor the authentication module to improve readability"
 # Expected: All checks pass
 ```
 
+## Optional: Test GitHub Actions Locally
+
+If you install [`act`](https://github.com/nektos/act) and Docker, you can
+rehearse CI locally before pushing:
+
+```bash
+# Run CI workflow locally (default: pull_request event)
+./scripts/run_act_local.sh
+
+# Run only the quality-gate job
+ACT_JOB=quality-gate ./scripts/run_act_local.sh
+```
+
 ## Next Steps
 
 | Topic | Resource |
