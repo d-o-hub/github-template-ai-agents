@@ -1,0 +1,153 @@
+# Command Verification Configuration
+# Copy to .command-verify.conf and customize for your project
+
+# =============================================================================
+# COMMAND CATEGORIZATION
+# =============================================================================
+# Keywords used to classify commands into safety categories
+# Format: colon-separated list of keywords (case-insensitive matching)
+
+# Safe commands - Can run without side effects
+SAFE_KEYWORDS="build:test:lint:check:status:list:help:version:describe:doc:info:show:get"
+
+# Conditional commands - May modify files, use with caution
+CONDITIONAL_KEYWORDS="install:clean:format:migrate:update:init:add:remove:delete:replace"
+
+# Dangerous commands - Potentially destructive, always warn
+DANGEROUS_KEYWORDS="rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:format:"
+
+# =============================================================================
+# SMART INVALIDATION RULES
+# =============================================================================
+# When these files change, revalidate commands matching the prefix
+# Format: "file_pattern:command_prefix"
+
+INVALIDATION_RULES=(
+    # Node.js / JavaScript
+    "package.json:npm"
+    "package.json:yarn"
+    "package.json:pnpm"
+    "package.json:npx"
+    "package.json:node"
+
+    # Rust
+    "Cargo.toml:cargo"
+    "Cargo.toml:rustc"
+    "Cargo.lock:cargo"
+
+    # Python
+    "requirements.txt:pip"
+    "requirements-dev.txt:pip"
+    "pyproject.toml:python"
+    "pyproject.toml:pip"
+    "setup.py:python"
+    "setup.py:pip"
+
+    # Go
+    "go.mod:go"
+    "go.sum:go"
+
+    # Ruby
+    "Gemfile:bundle"
+    "Gemfile.lock:gem"
+
+    # Java
+    "pom.xml:mvn"
+    "pom.xml:maven"
+    "build.gradle:gradle"
+
+    # PHP
+    "composer.json:composer"
+    "composer.lock:composer"
+
+    # Markdown files - revalidate commands in that specific file
+    "*.md:*"
+)
+
+# =============================================================================
+# FILE EXCLUSIONS
+# =============================================================================
+# Directories and patterns to skip during command discovery
+
+EXCLUDE_PATTERNS=(
+    "node_modules"
+    ".git"
+    ".svn"
+    "dist"
+    "build"
+    "target"
+    "vendor"
+    "__pycache__"
+    ".venv"
+    "venv"
+    ".cache"
+    "*.min.js"
+    "coverage"
+    ".nyc_output"
+)
+
+# =============================================================================
+# CODE BLOCK LANGUAGES
+# =============================================================================
+# Which code block types to scan for commands
+
+CODE_BLOCK_LANGUAGES=(
+    "bash"
+    "sh"
+    "shell"
+    "console"
+    "zsh"
+    "fish"
+)
+
+# =============================================================================
+# ADVANCED SETTINGS
+# =============================================================================
+
+# Knowledge base path (optional)
+# Stores learned corrections and project-specific rules
+# KNOWLEDGE_BASE_PATH=".claude/knowledge.json"
+
+# Fail build on dangerous commands? (true/false)
+# If true, finding dangerous commands will cause verification to fail
+FAIL_ON_DANGEROUS=false
+
+# Cache TTL in days (0 = forever)
+# After this many days, cached validations expire
+CACHE_TTL_DAYS=30
+
+# Minimum command length (filter out noise)
+MIN_COMMAND_LENGTH=2
+
+# Enable debug output (true/false)
+DEBUG=false
+
+# =============================================================================
+# PROJECT-SPECIFIC OVERRIDES
+# =============================================================================
+# Add custom rules for your project below
+
+# Example: Always treat 'make clean' as conditional, not dangerous
+# CUSTOM_CATEGORIES=(
+#     "conditional:make clean"
+# )
+
+# Example: Custom invalidation rule
+# When Dockerfile changes, revalidate docker commands
+# CUSTOM_INVALIDATION=(
+#     "Dockerfile:docker"
+#     "docker-compose.yml:docker"
+# )
+
+# =============================================================================
+# CI/CD SETTINGS
+# =============================================================================
+
+# Skip verification in CI? (useful for quick local iterations)
+SKIP_IN_CI=false
+
+# Only verify changed files in CI (faster)
+CI_ONLY_CHANGED=true
+
+# Output format for CI (text/json/junit)
+CI_OUTPUT_FORMAT=text
