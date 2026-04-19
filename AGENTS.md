@@ -43,6 +43,7 @@ See `agents-docs/VERSION.md` for full workflow details.
 
 ```bash
 ./scripts/quality_gate.sh # Always run before committing. Fix all errors.
+./scripts/update-all-docs.sh # Verify and update documentation
 ```
 **Guard Rails:** Pre-commit validates git config. If global hooks detected, run `git config --global --unset core.hooksPath` or use `SKIP_GLOBAL_HOOKS_CHECK=true`.
 
