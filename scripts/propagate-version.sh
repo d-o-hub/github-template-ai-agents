@@ -28,6 +28,7 @@ FILES_TO_UPDATE=(
     "README.md"
     "QUICKSTART.md"
     "agents-docs/MIGRATION.md"
+    "agents-docs/VERSION.md"
 )
 
 UPDATED=0
@@ -50,6 +51,15 @@ for file in "${FILES_TO_UPDATE[@]}"; do
         sed -i "s/Template version: [0-9]\+\.[0-9]\+\.[0-9]\+/Template version: ${VERSION}/g" "$file"
         UPDATED=1
         echo "  Updated template version in $file"
+    fi
+
+    # Update version strings in VERSION.md table
+    if [[ "$file" == *"VERSION.md" ]]; then
+        if grep -q "| \`VERSION\` | \`[0-9]\+\.[0-9]\+\.[0-9]\+\` |" "$file" 2>/dev/null; then
+            sed -i "s/| \`VERSION\` | \`[0-9]\+\.[0-9]\+\.[0-9]\+\` |/| \`VERSION\` | \`${VERSION}\` |/g" "$file"
+            UPDATED=1
+            echo "  Updated version table in $file"
+        fi
     fi
 done
 
