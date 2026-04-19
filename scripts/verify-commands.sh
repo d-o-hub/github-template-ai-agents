@@ -141,7 +141,7 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
         # Check cache first
         CACHED=false
         if ! $FORCE && type get_cached_result &> /dev/null; then
-            cached_result=$(get_cached_result "$cmd" 2>/dev/null || echo "")
+            cached_result=$(get_cached_result "$cmd_entry" 2>/dev/null || echo "")
             if [ -n "$cached_result" ]; then
                 # Check if this command needs invalidation
                 if type should_invalidate_command &> /dev/null; then
@@ -176,7 +176,7 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
         # Save to cache
         if type save_cached_result &> /dev/null; then
             result="{\"valid\":true,\"category\":\"$category\",\"command\":\"$cmd\"}"
-            save_cached_result "$cmd" "$result" 2>/dev/null || true
+            save_cached_result "$cmd_entry" "$result" 2>/dev/null || true
         fi
 
         ((VALIDATED++))
