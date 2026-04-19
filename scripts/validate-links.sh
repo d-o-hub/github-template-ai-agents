@@ -100,30 +100,43 @@ check_link() {
     # Remove any anchor from the path (file.md#section -> file.md)
     local clean_path="${link_path%%#*}"
 
-    # Resolve the full path without subshells
-    local full_path
+    # Security check: Reject absolute paths (Path Traversal prevention)
     if [[ "$clean_path" == /* ]]; then
-        full_path="$clean_path"
-    else
-        # Quick check: does the path exist relative to skill_dir?
-        # This covers 99% of cases without needing realpath
-        full_path="$skill_dir/$clean_path"
+        echo -e "  ${RED}✗${NC} Security Error: Absolute path detected at line $line_num: \`${clean_path}'" >&2
+        echo -e "     Links must be relative to the skill directory or repository root." >&2
+        echo -e "     in: $skill_file" >&2
+        return 1
     fi
 
-    # Check if file or directory exists directly
-    if [[ -e "$full_path" || -L "$full_path" ]]; then
-        return 0
-    fi
+    # Resolve the full path
+    local full_path="$skill_dir/$clean_path"
 
-    # Only if direct check fails, try normalizing with realpath (if available)
-    # This handles complex relative paths like ../../
+    # Security check: Ensure the path is within REPO_ROOT (Path Traversal prevention)
     if [ -z "$HAS_REALPATH" ]; then
         if command -v realpath &> /dev/null; then HAS_REALPATH=1; else HAS_REALPATH=0; fi
     fi
 
     if [ "$HAS_REALPATH" -eq 1 ]; then
-        # realpath -m (mock mode) doesn't require path to exist
-        full_path=$(realpath -m "$full_path" 2>/dev/null)
+        # Normalize paths for reliable prefix checking
+        local resolved_path
+        resolved_path=$(realpath -m "$full_path" 2>/dev/null)
+        local resolved_root
+        resolved_root=$(realpath -m "$REPO_ROOT" 2>/dev/null)
+
+        # Ensure trailing slash for robust prefix matching
+        if [[ "$resolved_path/" != "$resolved_root/"* ]]; then
+            echo -e "  ${RED}✗${NC} Security Error: Path traversal detected at line $line_num: \`${clean_path}'" >&2
+            echo -e "     Link attempts to reference a file outside the repository boundary." >&2
+            echo -e "     in: $skill_file" >&2
+            return 1
+        fi
+
+        # Check if file or directory exists within the boundary
+        if [[ -e "$resolved_path" || -L "$resolved_path" ]]; then
+            return 0
+        fi
+    else
+        # Fallback if realpath not available: basic existence check
         if [[ -e "$full_path" || -L "$full_path" ]]; then
             return 0
         fi

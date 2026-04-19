@@ -12,3 +12,8 @@
 **Vulnerability:** URL reconstruction in `normalize_url` and `fetch_llms_txt` in `.agents/skills/do-web-doc-resolver/scripts/utils.py` used `parsed.netloc`, which includes user credentials (e.g., `user:pass@host`).
 **Learning:** `parsed.netloc` preserves credentials and raw port strings. Using it to reconstruct URLs for further requests or cache keys can lead to credential leakage in logs/cache or SSRF bypasses if the host is misidentified.
 **Prevention:** Use a dedicated helper to reconstruct `netloc` from `parsed.hostname` and `parsed.port`, explicitly stripping credentials and normalizing default ports.
+
+## 2026-04-20 - Path Traversal in Bash Link Validation
+**Vulnerability:** Path traversal in `scripts/validate-links.sh` allowed checking existence of files outside the repository via absolute paths or `..` sequences in documentation links.
+**Learning:** Bash string prefix matching `[[ "$path" != "$base"* ]]` is vulnerable to partial directory name bypasses (e.g., `/app` matching `/app-secret`).
+**Prevention:** Reject absolute paths explicitly and use `realpath` to resolve links. Always append trailing slashes to both path and base when performing boundary checks: `[[ "$resolved_path/" != "$resolved_root/"* ]]`.
