@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-04-19
+
+### Changed
+- Bumped version to 0.2.5 across all documentation files
+- Updated `scripts/propagate-version.sh` to include `agents-docs/VERSION.md`
+
 ## [0.2.2] - 2026-04-06
 
 ### Fixed
