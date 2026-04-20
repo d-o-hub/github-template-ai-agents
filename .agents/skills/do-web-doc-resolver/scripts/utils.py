@@ -10,7 +10,7 @@ import re
 import socket
 from html.parser import HTMLParser
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -24,6 +24,7 @@ MAX_CHARS = int(os.getenv("WEB_RESOLVER_MAX_CHARS", "8000"))
 DEFAULT_TIMEOUT = int(os.getenv("WEB_RESOLVER_TIMEOUT", "30"))
 CACHE_DIR = os.path.expanduser(os.getenv("WEB_RESOLVER_CACHE_DIR", "~/.cache/do-web-doc-resolver"))
 CACHE_TTL = int(os.getenv("WEB_RESOLVER_CACHE_TTL", str(3600 * 24)))
+MAX_REDIRECTS = 5
 
 USER_AGENT = (
     "Mozilla/5.0 (compatible; WebDocResolver/2.0; +https://github.com/d-oit/do-web-doc-resolver)"
@@ -80,6 +81,35 @@ def close_session() -> None:
     if _global_session is not None:
         _global_session.close()
         _global_session = None
+
+
+def _request_with_safe_redirects(
+    method: str, url: str, timeout: int, check_ssrf: bool = True, **kwargs
+) -> requests.Response:
+    """Perform a request while manually following and validating redirects."""
+    session = get_session()
+    current_url = url
+    history = []
+    max_redirs = MAX_REDIRECTS
+
+    for _ in range(max_redirs + 1):
+        if check_ssrf and not is_safe_url(current_url):
+            raise requests.exceptions.RequestException(f"URL blocked (SSRF): {current_url}")
+
+        # Ensure we don't follow redirects automatically
+        kwargs["allow_redirects"] = False
+        response = session.request(method, current_url, timeout=timeout, **kwargs)
+
+        if response.is_redirect or (
+            300 <= response.status_code < 400 and "Location" in response.headers
+        ):
+            history.append(response)
+            current_url = urljoin(current_url, response.headers["Location"])
+        else:
+            response.history = history
+            return response
+
+    raise requests.exceptions.TooManyRedirects(f"Exceeded {max_redirs} redirects")
 
 
 def is_safe_url(url: str) -> bool:
@@ -141,9 +171,10 @@ def validate_url(url: str, timeout: int = 10, check_ssrf: bool = True) -> Valida
     if check_ssrf and not is_safe_url(url):
         return ValidationResult(is_valid=False, error="URL blocked (SSRF)")
 
-    session = get_session()
     try:
-        response = session.head(url, timeout=timeout, allow_redirects=True, verify=True)
+        response = _request_with_safe_redirects(
+            "HEAD", url, timeout=timeout, check_ssrf=check_ssrf, verify=True
+        )
         redirect_chain = [h.url for h in response.history] + [response.url]
         if response.status_code >= 400:
             return ValidationResult(
@@ -166,12 +197,9 @@ def validate_url(url: str, timeout: int = 10, check_ssrf: bool = True) -> Valida
 
 def validate_links(links: list[str], timeout: int = 5) -> list[str]:
     valid_links = []
-    session = get_session()
     for link in links:
         try:
-            if not is_safe_url(link):
-                continue
-            response = session.head(link, timeout=timeout, allow_redirects=True)
+            response = _request_with_safe_redirects("HEAD", link, timeout=timeout)
             if response.status_code < 400:
                 valid_links.append(link)
         except Exception:
@@ -250,17 +278,10 @@ def fetch_url_content(
     if not validation.is_valid:
         return None
 
-    # Reconstruct safe URL without credentials for fetching
     try:
-        parsed = urlparse(url)
-        safe_netloc = _reconstruct_safe_netloc(parsed)
-        safe_url = parsed._replace(netloc=safe_netloc).geturl()
-    except Exception:
-        safe_url = url
-
-    session = get_session()
-    try:
-        response = session.get(safe_url, timeout=timeout, allow_redirects=True, verify=True)
+        response = _request_with_safe_redirects(
+            "GET", url, timeout=timeout, check_ssrf=True, verify=True
+        )
         if response.status_code >= 400:
             return None
         content = (
@@ -292,8 +313,7 @@ def fetch_llms_txt(url: str) -> str | None:
             if cached.get("found"):
                 return str(cached.get("content", ""))
             return None
-        session = get_session()
-        response = session.get(llms_url, timeout=10, allow_redirects=True)
+        response = _request_with_safe_redirects("GET", llms_url, timeout=10)
         if response.status_code == 200:
             content_type = response.headers.get("Content-Type", "")
             if "text" in content_type or "markdown" in content_type:
