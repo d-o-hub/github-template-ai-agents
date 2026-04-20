@@ -17,3 +17,8 @@
 **Vulnerability:** Path traversal in `scripts/validate-links.sh` allowed checking existence of files outside the repository via absolute paths or `..` sequences in documentation links.
 **Learning:** Bash string prefix matching `[[ "$path" != "$base"* ]]` is vulnerable to partial directory name bypasses (e.g., `/app` matching `/app-secret`).
 **Prevention:** Reject absolute paths explicitly and use `realpath` to resolve links. Always append trailing slashes to both path and base when performing boundary checks: `[[ "$resolved_path/" != "$resolved_root/"* ]]`.
+
+## 2026-04-22 - SSRF via Redirect Bypass
+**Vulnerability:** SSRF protection in `do-web-doc-resolver` was bypassed by providing a safe initial URL that redirected to an internal resource (e.g., `127.0.0.1`).
+**Learning:** The `requests` library follows redirects automatically by default, but only validates the initial URL against SSRF blacklists.
+**Prevention:** Disable automatic redirects (`allow_redirects=False`) and implement a manual redirect loop that validates each hop against `is_safe_url()`.
