@@ -44,7 +44,9 @@ CURRENT_VERSION=$(cat "$REPO_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]')
 
 for skill_path in "$SKILLS_SRC"/*/; do
     [ -d "$skill_path" ] || continue
-    skill_name="$(basename "$skill_path")"
+    # Performance optimization: Use Bash parameter expansion instead of basename
+    skill_name="${skill_path%/}"
+    skill_name="${skill_name##*/}"
     
     # Skip consolidated/backup folders
     if [[ "$skill_name" == _* ]]; then
@@ -147,6 +149,13 @@ for skill_path in "$SKILLS_SRC"/*/; do
         continue
     fi
     
+    # Performance optimization: Pre-calculate expected target once per skill
+    # This avoids redundant subshell calls in the inner CLI directory loop
+    expected_target=""
+    if { [ "${CHECK_SYMLINK_TARGETS:-false}" = "true" ] || [ -n "${CI:-}" ]; } && [ "$HAS_READLINK_F" -eq 1 ]; then
+        expected_target=$(readlink -f "$skill_path" 2>/dev/null || echo "")
+    fi
+
     for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
         link="$REPO_ROOT/$cli_dir/$skill_name"
 
@@ -168,18 +177,15 @@ for skill_path in "$SKILLS_SRC"/*/; do
         else
             # Verify symlink points to correct location
             # Only do this expensive check if explicitly requested or in CI
-            # For Bolt optimization, we skip the redundant readlink -f if possible
-            if [ "${CHECK_SYMLINK_TARGETS:-false}" = "true" ] || [ -n "${CI:-}" ]; then
-                if [ "$HAS_READLINK_F" -eq 1 ]; then
-                    target=$(readlink -f "$link" 2>/dev/null || echo "")
-                    expected_target=$(readlink -f "$skill_path" 2>/dev/null || echo "")
+            # For Bolt optimization, we use the pre-calculated expected_target
+            if [ -n "$expected_target" ]; then
+                target=$(readlink -f "$link" 2>/dev/null || echo "")
 
-                    if [ -n "$target" ] && [ -n "$expected_target" ] && [ "$target" != "$expected_target" ]; then
-                        echo -e "  ${YELLOW}⚠${NC} WRONG target: $cli_dir/$skill_name" >&2
-                        echo "      Expected: $expected_target" >&2
-                        echo "      Actual:   $target" >&2
-                        WARNINGS=1
-                    fi
+                if [ -n "$target" ] && [ "$target" != "$expected_target" ]; then
+                    echo -e "  ${YELLOW}⚠${NC} WRONG target: $cli_dir/$skill_name" >&2
+                    echo "      Expected: $expected_target" >&2
+                    echo "      Actual:   $target" >&2
+                    WARNINGS=1
                 fi
             fi
         fi

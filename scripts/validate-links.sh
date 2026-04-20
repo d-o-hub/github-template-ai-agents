@@ -22,6 +22,13 @@ NC='\033[0m' # No Color
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$REPO_ROOT/.agents/skills"
 
+# Performance optimization: Pre-resolve REPO_ROOT once
+# This avoids hundreds of realpath/subshell calls during link validation
+RESOLVED_ROOT=""
+if command -v realpath &> /dev/null; then
+    RESOLVED_ROOT=$(realpath -m "$REPO_ROOT")
+fi
+
 # Counters for the final summary report
 # We track these across all files to provide actionable statistics
 BROKEN_COUNT=0
@@ -116,15 +123,13 @@ check_link() {
         if command -v realpath &> /dev/null; then HAS_REALPATH=1; else HAS_REALPATH=0; fi
     fi
 
-    if [ "$HAS_REALPATH" -eq 1 ]; then
-        # Normalize paths for reliable prefix checking
+    if [ "$HAS_REALPATH" -eq 1 ] && [ -n "$RESOLVED_ROOT" ]; then
+        # Performance optimization: Use pre-resolved root to avoid subshell
         local resolved_path
         resolved_path=$(realpath -m "$full_path" 2>/dev/null)
-        local resolved_root
-        resolved_root=$(realpath -m "$REPO_ROOT" 2>/dev/null)
 
         # Ensure trailing slash for robust prefix matching
-        if [[ "$resolved_path/" != "$resolved_root/"* ]]; then
+        if [[ "$resolved_path/" != "$RESOLVED_ROOT/"* ]]; then
             echo -e "  ${RED}✗${NC} Security Error: Path traversal detected at line $line_num: \`${clean_path}'" >&2
             echo -e "     Link attempts to reference a file outside the repository boundary." >&2
             echo -e "     in: $skill_file" >&2
@@ -199,7 +204,8 @@ check_reference_format() {
 process_skill_file() {
     local skill_file="$1"
     local skill_dir
-    skill_dir="$(dirname "$skill_file")"
+    # Performance optimization: Use Bash parameter expansion instead of dirname
+    skill_dir="${skill_file%/*}"
 
     FILES_CHECKED=$((FILES_CHECKED + 1))
 
@@ -293,7 +299,9 @@ process_skill_file() {
     done < "$skill_file"
 
     if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
-        echo -e "  ${GREEN}✓${NC} $(basename "$skill_dir"): All links valid"
+        # Performance optimization: Use Bash parameter expansion instead of basename
+        local display_name="${skill_dir%/}"
+        echo -e "  ${GREEN}✓${NC} ${display_name##*/}: All links valid"
     fi
 }
 
@@ -314,7 +322,9 @@ fi
 for skill_path in "$SKILLS_DIR"/*/; do
     [[ -d "$skill_path" ]] || continue
 
-    skill_name="$(basename "$skill_path")"
+    # Performance optimization: Use Bash parameter expansion instead of basename
+    skill_name="${skill_path%/}"
+    skill_name="${skill_name##*/}"
 
     # Skip consolidated/backup folders
     if [[ "$skill_name" == _* ]]; then
