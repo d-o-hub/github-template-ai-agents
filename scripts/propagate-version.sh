@@ -28,6 +28,7 @@ FILES_TO_UPDATE=(
     "README.md"
     "QUICKSTART.md"
     "agents-docs/MIGRATION.md"
+    "CHANGELOG-TEMPLATE.md"
 )
 
 UPDATED=0

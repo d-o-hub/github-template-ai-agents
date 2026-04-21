@@ -1,3 +1,5 @@
+**Version:** 0.2.5
+
 # Swarm Analysis Report
 
 > Generated: 2026-04-04
@@ -26,7 +28,7 @@ The codebase is architecturally sound with good progressive disclosure patterns,
 - 2 BATS test files
 - 1 Python evaluation framework (`run-evals.py`)
 
-**Version:** 0.2.1
+**Version:** 0.2.5
 
 ---
 
