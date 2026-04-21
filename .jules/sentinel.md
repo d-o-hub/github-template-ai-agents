@@ -22,3 +22,8 @@
 **Vulnerability:** SSRF protection in `do-web-doc-resolver` was bypassed by providing a safe initial URL that redirected to an internal resource (e.g., `127.0.0.1`).
 **Learning:** The `requests` library follows redirects automatically by default, but only validates the initial URL against SSRF blacklists.
 **Prevention:** Disable automatic redirects (`allow_redirects=False`) and implement a manual redirect loop that validates each hop against `is_safe_url()`.
+
+## 2026-04-21 - Defense-in-Depth for SSRF Protection
+**Vulnerability:** Incomplete SSRF protection in `do-web-doc-resolver` where orchestrator and provider levels lacked initial URL validation.
+**Learning:** Relying on utility-level SSRF checks is insufficient if high-level entry points bypass them or if specialized tools (e.g., `docling`, `tesseract`) are called directly without validation.
+**Prevention:** Implement centralized SSRF validation at all entry points (orchestrators) and redundant checks at the provider level. Use `--` separators in subprocess calls to prevent argument injection from malicious URLs.
