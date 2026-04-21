@@ -128,8 +128,8 @@ git commit -m "feat: add user registration"
 
 ### Optional: Rehearse GitHub Actions Locally with `act`
 
-You can run key CI jobs locally before pushing by using
-[`nektos/act`](https://github.com/nektos/act):
+Catch CI errors before pushing by running workflows locally with
+[`nektos/act`](https://github.com/nektos/act) and **Docker**:
 
 ```bash
 # Run the default CI workflow locally (pull_request event)
@@ -139,10 +139,7 @@ You can run key CI jobs locally before pushing by using
 ACT_JOB=quality-gate ./scripts/run_act_local.sh
 ```
 
-Why this helps:
-- Faster feedback loop on workflow changes
-- Easier debugging than remote-only GitHub Actions runs
-- Optional and non-blocking for contributors who do not use Docker
+See [**Local Actions Guide**](agents-docs/ACT.md) for installation and secrets handling.
 
 ## Documentation
 
