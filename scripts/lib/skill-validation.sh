@@ -16,12 +16,8 @@ NC='\033[0m'
 # Cache for VERSION file content
 REPO_VERSION=""
 
-# Global variable for line count
-line_count=0
-
 # Validate a single SKILL.md file for format correctness
 # Returns 0 if valid, 1 if invalid (prints errors to stderr)
-# Sets: line_count (for callers)
 validate_skill_file() {
     local skill_file="$1"
     local skill_name
@@ -37,6 +33,11 @@ validate_skill_file() {
     # Optimization: Read file once and parse with internal Bash logic or a single awk call
     # instead of multiple grep/head/sed/cut calls.
 
+    local has_name=0
+    local has_description=0
+    local has_version=0
+    local template_version=""
+    local line_count=0
     local first_line=""
 
     # Read first line specifically
@@ -46,47 +47,33 @@ validate_skill_file() {
         ((errors++))
     fi
 
-    # Optimized: single pass to gather info using awk
-    local awk_out
-    awk_out=$(awk '
-        BEGIN { name=0; desc=0; ver=0; tv="none"; lc=0 }
-        /^name:/ { name=1 }
-        /^description:/ { desc=1 }
-        /^version:/ { ver=1 }
-        /^template_version:/ {
-            v=$0
-            sub(/^template_version:[[:space:]]*/, "", v)
-            gsub(/"/, "", v)
-            sub(/[[:space:]]+$/, "", v)
-            if (v != "") tv=v
-        }
-        { lc++ }
-        END { printf "%d|%d|%d|%s|%d\n", name, desc, ver, tv, lc }
-    ' "$skill_file")
+    # Single pass to gather info
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        ((line_count++))
+        if [[ $line == "name:"* ]]; then has_name=1; fi
+        if [[ $line == "description:"* ]]; then has_description=1; fi
+        if [[ $line == "version:"* ]]; then has_version=1; fi
+        if [[ $line == "template_version:"* ]]; then
+            template_version="${line#template_version:}"
+            template_version="${template_version//\"/}" # remove quotes
+            template_version="${template_version#"${template_version%%[![:space:]]*}"}" # trim leading
+            template_version="${template_version%"${template_version##*[![:space:]]}"}" # trim trailing
+        fi
+    done < "$skill_file"
 
-    local h_name h_desc h_ver t_ver l_count
-    IFS='|' read -r h_name h_desc h_ver t_ver l_count <<< "$awk_out"
-    [[ "$t_ver" == "none" ]] && t_ver=""
-
-    # Export line_count for callers like validate-skill-format.sh
-    # We use a global variable because validate_skill_file is often called in a loop
-    # but we want to avoid subshell overhead of returning multiple values.
-    # shellcheck disable=SC2034
-    line_count="$l_count"
-
-    if [[ $h_name -eq 0 ]]; then
+    if [[ $has_name -eq 0 ]]; then
         echo -e "  ${RED}✗${NC} $skill_name: Missing 'name:' field" >&2
         ((errors++))
     fi
-    if [[ $h_desc -eq 0 ]]; then
+    if [[ $has_description -eq 0 ]]; then
         echo -e "  ${RED}✗${NC} $skill_name: Missing 'description:' field" >&2
         ((errors++))
     fi
-    if [[ $h_ver -eq 0 ]]; then
+    if [[ $has_version -eq 0 ]]; then
         echo -e "  ${YELLOW}⚠${NC} $skill_name: Missing 'version:' field (recommended)" >&2
     fi
 
-    if [[ -n "$t_ver" ]]; then
+    if [[ -n "$template_version" ]]; then
         if [[ -z "$REPO_VERSION" ]]; then
             REPO_VERSION=$(cat "$REPO_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]')
         fi
@@ -97,13 +84,13 @@ validate_skill_file() {
             local rest="${current_version#*.}"
             local c_minor="${rest%%.*}"
 
-            local s_major="${t_ver%%.*}"
-            local s_rest="${t_ver#*.}"
+            local s_major="${template_version%%.*}"
+            local s_rest="${template_version#*.}"
             local s_minor="${s_rest%%.*}"
 
             if [[ "$s_major" -lt "$c_major" ]] || \
                { [[ "$s_major" -eq "$c_major" ]] && [[ $((c_minor - s_minor)) -gt 1 ]]; }; then
-                echo -e "  ${YELLOW}⚠${NC} $skill_name: template_version $t_ver is >1 minor behind current $current_version" >&2
+                echo -e "  ${YELLOW}⚠${NC} $skill_name: template_version $template_version is >1 minor behind current $current_version" >&2
             fi
         fi
     fi
