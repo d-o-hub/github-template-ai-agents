@@ -7,7 +7,12 @@ commit and push
 
 ## Commit Message Structure
 
-Use this format for commits:
+Use `./scripts/ai-commit.sh` to ensure valid commits:
+```bash
+./scripts/ai-commit.sh --type <type> --subject <subject> --body <body>
+```
+
+Or follow this format for manual commits:
 ```
 type(scope): Brief description (50 chars max)
 

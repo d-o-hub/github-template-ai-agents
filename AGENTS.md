@@ -65,6 +65,25 @@ See `agents-docs/VERSION.md` for full workflow details.
 - Title/Commit: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
 - Branch per feature; One concern per PR; Never commit to `main`
 
+### Commit Workflow (Mandatory)
+
+1. **Use Helper (Preferred)**: Run `./scripts/ai-commit.sh --type <type> --subject <subject> --body <body>`
+2. **Manual Commits**: Validated via `.githooks/commit-msg` (requires `./scripts/install-git-hooks.sh`)
+3. **If Validation Fails**: Identify violation, then `git commit --amend` to fix message.
+
+**Valid Example:**
+```text
+feat(search): add fuzzy matching to improve discovery
+
+Users can now find documents even with typos. This uses the
+Levenshtein distance algorithm for better results.
+```
+
+**Invalid Example (Body line too long):**
+```text
+fix(auth): resolve login timeout issue for users on slow connections by increasing the default timeout from 5 to 30 seconds
+```
+
 ### Commit Type Mapping
 
 | Intent                        | Type     | Scope suggestion |
