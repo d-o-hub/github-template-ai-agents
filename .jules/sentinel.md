@@ -27,3 +27,8 @@
 **Vulnerability:** Incomplete SSRF protection in `do-web-doc-resolver` where orchestrator and provider levels lacked initial URL validation.
 **Learning:** Relying on utility-level SSRF checks is insufficient if high-level entry points bypass them or if specialized tools (e.g., `docling`, `tesseract`) are called directly without validation.
 **Prevention:** Implement centralized SSRF validation at all entry points (orchestrators) and redundant checks at the provider level. Use `--` separators in subprocess calls to prevent argument injection from malicious URLs.
+
+## 2026-04-21 - Local Commit Message Validation
+**Requirement:** CI was catching commit message violations that should be caught locally.
+**Learning:** Relying on CI for format validation increases feedback loop time and results in broken builds.
+**Prevention:** Enforce commit message validation locally via `commit-msg` git hook. Provide `./scripts/ai-commit.sh` helper for agents to produce valid commits.
