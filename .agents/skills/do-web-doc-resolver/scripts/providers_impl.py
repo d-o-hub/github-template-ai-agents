@@ -13,6 +13,7 @@ from .utils import (
     _get_from_cache,
     _save_to_cache,
     get_session,
+    is_safe_url,
 )
 
 logger = logging.getLogger(__name__)
@@ -46,6 +47,9 @@ set_rate_limit = _set_rate_limit
 
 def resolve_with_jina(url: str, max_chars: int = MAX_CHARS) -> ProviderResult:
     start = time.time()
+    if not is_safe_url(url):
+        meta = ProviderMeta(tool="jina", duration_ms=0, error_type="ssrf_blocked")
+        return ProviderResult(ok=False, error="ssrf_blocked", meta=meta, url=url, source="jina")
     cached = _get_from_cache(url, "jina")
     if cached:
         duration = int((time.time() - start) * 1000)
@@ -233,6 +237,9 @@ def resolve_with_duckduckgo(query: str, max_chars: int = MAX_CHARS) -> ProviderR
 
 def resolve_with_firecrawl(url: str, max_chars: int = MAX_CHARS) -> ProviderResult:
     start = time.time()
+    if not is_safe_url(url):
+        meta = ProviderMeta(tool="firecrawl", duration_ms=0, error_type="ssrf_blocked")
+        return ProviderResult(ok=False, error="ssrf_blocked", meta=meta, url=url, source="firecrawl")
     cached = _get_from_cache(url, "firecrawl")
     if cached:
         duration = int((time.time() - start) * 1000)
@@ -263,6 +270,9 @@ def resolve_with_firecrawl(url: str, max_chars: int = MAX_CHARS) -> ProviderResu
 
 def resolve_with_mistral_browser(url: str, max_chars: int = MAX_CHARS) -> ProviderResult:
     start = time.time()
+    if not is_safe_url(url):
+        meta = ProviderMeta(tool="mistral_browser", duration_ms=0, error_type="ssrf_blocked")
+        return ProviderResult(ok=False, error="ssrf_blocked", meta=meta, url=url, source="mistral-browser")
     cached = _get_from_cache(url, "mistral_browser")
     if cached:
         duration = int((time.time() - start) * 1000)
@@ -329,9 +339,12 @@ def resolve_with_mistral_websearch(query: str, max_chars: int = MAX_CHARS) -> Pr
 
 def resolve_with_docling(url: str, max_chars: int) -> ProviderResult:
     start = time.time()
+    if not is_safe_url(url):
+        meta = ProviderMeta(tool="docling", duration_ms=0, error_type="ssrf_blocked")
+        return ProviderResult(ok=False, error="ssrf_blocked", meta=meta, url=url, source="docling")
     try:
         res = subprocess.run(
-            ["docling", "--format", "markdown", url], capture_output=True, text=True, timeout=60
+            ["docling", "--format", "markdown", "--", url], capture_output=True, text=True, timeout=60
         )
         duration = int((time.time() - start) * 1000)
         if res.returncode == 0:
@@ -348,9 +361,12 @@ def resolve_with_docling(url: str, max_chars: int) -> ProviderResult:
 
 def resolve_with_ocr(url: str, max_chars: int) -> ProviderResult:
     start = time.time()
+    if not is_safe_url(url):
+        meta = ProviderMeta(tool="ocr", duration_ms=0, error_type="ssrf_blocked")
+        return ProviderResult(ok=False, error="ssrf_blocked", meta=meta, url=url, source="ocr-tesseract")
     try:
         res = subprocess.run(
-            ["tesseract", url, "stdout"], capture_output=True, text=True, timeout=30
+            ["tesseract", "--", url, "stdout"], capture_output=True, text=True, timeout=30
         )
         duration = int((time.time() - start) * 1000)
         if res.returncode == 0:

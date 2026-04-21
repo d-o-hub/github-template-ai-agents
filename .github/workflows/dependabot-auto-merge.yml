@@ -1,26 +1,25 @@
----
 name: Dependabot Auto-Merge
 
-# yamllint disable-line rule:truthy
-on: pull_request
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
   auto-merge:
-    if: github.actor == 'dependabot[bot]'
+    # Check PR author, not actor — much more stable
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: write
     steps:
       - name: Wait for all checks to pass
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const MAX_RETRIES = 60; // Increased from 24 (now ~30 minutes)
+            const MAX_RETRIES = 60;
             const POLL_INTERVAL_MS = 30000;
 
             for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
