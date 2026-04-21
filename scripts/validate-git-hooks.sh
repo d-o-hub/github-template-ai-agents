@@ -42,12 +42,14 @@ if [ -n "$GLOBAL_HOOKS_PATH" ]; then
 fi
 
 # Check if local hooks path is correctly set
-if [ -n "$LOCAL_HOOKS_PATH" ] && [ "$LOCAL_HOOKS_PATH" != ".git/hooks" ]; then
+if [ -n "$LOCAL_HOOKS_PATH" ] && [ "$LOCAL_HOOKS_PATH" != ".git/hooks" ] && [ "$LOCAL_HOOKS_PATH" != ".githooks" ]; then
     echo -e "${RED}✗ ERROR: Local hooks path is non-standard!${NC}"
     echo -e "   Local hooks path: ${YELLOW}$LOCAL_HOOKS_PATH${NC}"
     echo ""
     echo "To reset to standard path:"
     echo "    git config --local core.hooksPath .git/hooks"
+    echo "Or to use repository hooks:"
+    echo "    git config --local core.hooksPath .githooks"
     echo ""
     exit 1
 fi
