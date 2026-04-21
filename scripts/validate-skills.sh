@@ -61,25 +61,25 @@ for skill_path in "$SKILLS_SRC"/*/; do
         continue
     fi
 
-    # Optimized check: read file once
-    has_name=0
-    has_description=0
-    has_version=0
-    template_version=""
-    line_count=0
+    # Optimized check: read file once using awk
+    awk_out=$(awk '
+        BEGIN { name=0; desc=0; ver=0; tv="none"; lc=0 }
+        /^name:/ { name=1 }
+        /^description:/ { desc=1 }
+        /^version:/ { ver=1 }
+        /^template_version:/ {
+            v=$0
+            sub(/^template_version:[[:space:]]*/, "", v)
+            gsub(/"/, "", v)
+            sub(/[[:space:]]+$/, "", v)
+            if (v != "") tv=v
+        }
+        { lc++ }
+        END { printf "%d|%d|%d|%s|%d\n", name, desc, ver, tv, lc }
+    ' "$skill_file")
 
-    while IFS= read -r line || [[ -n "$line" ]]; do
-        ((line_count++))
-        [[ $line == "name:"* ]] && has_name=1
-        [[ $line == "description:"* ]] && has_description=1
-        [[ $line == "version:"* ]] && has_version=1
-        if [[ $line == "template_version:"* ]]; then
-            template_version="${line#template_version:}"
-            template_version="${template_version//\"/}"
-            template_version="${template_version#"${template_version%%[![:space:]]*}"}"
-            template_version="${template_version%"${template_version##*[![:space:]]}"}"
-        fi
-    done < "$skill_file"
+    IFS='|' read -r has_name has_description has_version template_version line_count <<< "$awk_out"
+    [[ "$template_version" == "none" ]] && template_version=""
 
     if [ $has_name -eq 0 ]; then
         echo -e "  ${RED}✗${NC} $skill_name: SKILL.md missing 'name:' in frontmatter" >&2

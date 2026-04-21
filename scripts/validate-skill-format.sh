@@ -10,6 +10,7 @@ source "$REPO_ROOT/scripts/lib/skill-validation.sh"
 
 echo "=== Validating SKILL.md Format ==="
 ERRORS=0
+line_count=0
 
 for skill_dir in "$SKILLS_SRC"/*/; do
     if [[ -d "$skill_dir" ]]; then
@@ -17,8 +18,8 @@ for skill_dir in "$SKILLS_SRC"/*/; do
         [[ "$skill_name" == _* ]] && continue
 
         if validate_skill_file "${skill_dir}SKILL.md"; then
-            lines=$(wc -l < "${skill_dir}SKILL.md" | tr -d ' ')
-            echo -e "  ${GREEN}[OK]${NC} $skill_name: Valid ($lines lines)"
+            # line_count is set by validate_skill_file
+            echo -e "  ${GREEN}[OK]${NC} $skill_name: Valid ($line_count lines)"
         else
             ERRORS=$((ERRORS + 1))
         fi
