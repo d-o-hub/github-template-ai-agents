@@ -60,6 +60,7 @@ from .utils import (
     get_cache,
     get_session,
     is_url,
+    is_safe_url,
     validate_links,
     validate_url,
 )
@@ -165,6 +166,18 @@ def resolve_url_stream(
     trace: ResolutionTrace | None = None,
 ) -> Generator[dict[str, Any], None, None]:
     logger.info(f"Resolving URL: {url}")
+
+    if not is_safe_url(url):
+        logger.warning(f"Blocked unsafe URL: {url}")
+        yield {
+            "source": "none",
+            "url": url,
+            "content": "Failed",
+            "error": "URL blocked (SSRF)",
+            **({"trace": trace.to_dict()} if trace else {}),
+        }
+        return
+
     metrics = ResolveMetrics()
     budget_data = routing.PROFILE_BUDGETS.get(profile.value, routing.PROFILE_BUDGETS["balanced"])
     budget = routing.ResolutionBudget(
@@ -579,6 +592,21 @@ def resolve(
 def resolve_direct(
     input_str: str, provider: ProviderType, max_chars: int = MAX_CHARS
 ) -> dict[str, Any]:
+    # URL-based providers must be checked for SSRF
+    url_providers = {
+        ProviderType.JINA,
+        ProviderType.FIRECRAWL,
+        ProviderType.DIRECT_FETCH,
+        ProviderType.MISTRAL_BROWSER,
+        ProviderType.DOCLING,
+        ProviderType.OCR,
+        ProviderType.LLMS_TXT,
+    }
+
+    if provider in url_providers and is_url(input_str) and not is_safe_url(input_str):
+        logger.warning(f"resolve_direct: Blocked unsafe URL: {input_str}")
+        return {"source": "none", "error": "URL blocked (SSRF)"}
+
     funcs = {
         ProviderType.JINA: resolve_with_jina,
         ProviderType.EXA_MCP: resolve_with_exa_mcp,
