@@ -24,6 +24,7 @@ target/
 *.out
 
 # Logs and temporary files
+.secrets
 *.log
 *.tmp
 *.swp

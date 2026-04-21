@@ -118,21 +118,13 @@ check_link() {
     # Resolve the full path
     local full_path="$skill_dir/$clean_path"
 
-    # Performance optimization: if no ".." in path, it cannot escape skill_dir
-    # which we know is inside REPO_ROOT. This avoids expensive realpath subshell.
-    if [[ "$clean_path" != *".."* ]]; then
-        if [[ -e "$full_path" || -L "$full_path" ]]; then
-            return 0
-        fi
-    fi
-
     # Security check: Ensure the path is within REPO_ROOT (Path Traversal prevention)
     if [ -z "$HAS_REALPATH" ]; then
         if command -v realpath &> /dev/null; then HAS_REALPATH=1; else HAS_REALPATH=0; fi
     fi
 
     if [ "$HAS_REALPATH" -eq 1 ] && [ -n "$RESOLVED_ROOT" ]; then
-        # Expensive path resolution needed for traversal check
+        # Performance optimization: Use pre-resolved root to avoid subshell
         local resolved_path
         resolved_path=$(realpath -m "$full_path" 2>/dev/null)
 

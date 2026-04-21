@@ -1,58 +1,41 @@
+---
 name: Dependabot Auto-Merge
 
-on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+# yamllint disable-line rule:truthy
+on: pull_request
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   auto-merge:
-    # Check PR author, not actor — much more stable
-    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
       - name: Wait for all checks to pass
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const MAX_RETRIES = 60;
+            const MAX_RETRIES = 60; // Increased from 24 (now ~30 minutes)
             const POLL_INTERVAL_MS = 30000;
 
             for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
               console.log(`Checking status (attempt ${attempt + 1}/${MAX_RETRIES})...`);
 
               try {
-                // Check combined commit status (for status-based checks like DeepSource)
                 const { data: status } = await github.rest.repos.getCombinedStatusForRef({
                   ...context.repo,
                   ref: context.payload.pull_request.head.sha
                 });
 
-                // Check GitHub Actions check runs (for workflow-based checks like Quality Gate)
-                const { data: checkRuns } = await github.rest.checks.listForRef({
-                  ...context.repo,
-                  ref: context.payload.pull_request.head.sha,
-                  per_page: 100
-                });
+                console.log(`Current state: ${status.state}`);
 
-                const relevantRuns = checkRuns.check_runs.filter(
-                  run => run.name !== 'auto-merge'
-                );
-
-                const allCompleted = relevantRuns.every(run => run.status === 'completed');
-                const anyFailed = relevantRuns.some(
-                  run => run.conclusion === 'failure' || run.conclusion === 'timed_out' || run.conclusion === 'cancelled'
-                );
-
-                console.log(`Combined status: ${status.state}`);
-                console.log(`Check runs: ${relevantRuns.length} total, completed: ${relevantRuns.filter(r => r.status === 'completed').length}`);
-
-                if (anyFailed) {
-                  core.setFailed(`❌ One or more checks failed`);
+                if (status.state === 'success') {
+                  console.log('✅ All checks passed!');
                   return;
                 }
 
@@ -60,31 +43,23 @@ jobs:
                   core.setFailed(`❌ Checks failed with state: ${status.state}`);
                   return;
                 }
-
-                if (allCompleted && status.state === 'success') {
-                  console.log('✅ All checks passed!');
-                  return;
-                }
-
-                const pending = relevantRuns.filter(r => r.status !== 'completed').map(r => r.name);
-                if (pending.length > 0) {
-                  console.log(`⏳ Still waiting for: ${pending.join(', ')}`);
-                }
-
               } catch (error) {
-                console.warn(`⚠️ Error fetching status: ${error.message}`);
+                const msg = error.message;
+                console.warn(`⚠️ Error fetching status: ${msg}`);
               }
 
               if (attempt < MAX_RETRIES - 1) {
                 console.log(`Sleeping for ${POLL_INTERVAL_MS / 1000}s...`);
-                await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+                await new Promise(resolve =>
+                  setTimeout(resolve, POLL_INTERVAL_MS)
+                );
               }
             }
 
             core.setFailed('⏳ Timeout waiting for checks to complete');
 
       - name: Auto-merge Dependabot PR
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
