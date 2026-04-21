@@ -75,7 +75,7 @@ jobs:
 
       - name: Upload ShellCheck SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225  # v4
         continue-on-error: true
         with:
           sarif_file: shellcheck-results.sarif
@@ -107,7 +107,7 @@ jobs:
 
       - name: Upload Trivy SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225  # v4
         with:
           sarif_file: trivy-results.sarif
           category: trivy-fs
@@ -179,7 +179,7 @@ jobs:
 
       - name: Initialize CodeQL
         if: steps.check_files.outputs.has_codeql_files == 'true'
-        uses: github/codeql-action/init@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/init@95e58e9a2cdfd71adc6e0353d5c52f41a045d225  # v4
         continue-on-error: true
         with:
           languages: javascript,python
@@ -187,12 +187,12 @@ jobs:
 
       - name: Autobuild
         if: steps.check_files.outputs.has_codeql_files == 'true'
-        uses: github/codeql-action/autobuild@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/autobuild@95e58e9a2cdfd71adc6e0353d5c52f41a045d225  # v4
         continue-on-error: true
 
       - name: Perform CodeQL Analysis
         if: steps.check_files.outputs.has_codeql_files == 'true'
-        uses: github/codeql-action/analyze@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/analyze@95e58e9a2cdfd71adc6e0353d5c52f41a045d225  # v4
         continue-on-error: true
         with:
           category: "/language:javascript"
@@ -229,7 +229,7 @@ jobs:
 
       - name: Upload empty CodeQL SARIF (no supported files found)
         if: steps.check_files.outputs.has_codeql_files == 'false'
-        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225  # v4
         continue-on-error: true
         with:
           sarif_file: codeql-empty-results.sarif
@@ -261,7 +261,7 @@ jobs:
 
       - name: Upload IaC Scan SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225  # v4
         with:
           sarif_file: trivy-config-results.sarif
           category: trivy-config
