@@ -304,7 +304,7 @@ process_skill_file() {
             BROKEN_COUNT=$((BROKEN_COUNT + 1))
             file_broken=1
         fi
-    done < "$skill_file" || [[ -n "${line:-}" ]]
+    done < "$skill_file"
 
     if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
         # Performance optimization: Use Bash parameter expansion instead of basename
