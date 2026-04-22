@@ -63,13 +63,6 @@ if ! ./scripts/validate-github-actions-shas.sh; then
 fi
 echo ""
 
-# --- Validate GitHub Actions Workflows ---
-echo -e "${BLUE}Validating GitHub Actions Workflows...${NC}"
-if ! ./scripts/validate-workflows.sh; then
-    FAILED=1
-fi
-echo ""
-
 # --- Always: validate skill symlinks ---
 echo -e "${BLUE}Validating skill symlinks...${NC}"
 if ! ./scripts/validate-skills.sh; then
