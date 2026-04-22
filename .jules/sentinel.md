@@ -32,3 +32,8 @@
 **Requirement:** CI was catching commit message violations that should be caught locally.
 **Learning:** Relying on CI for format validation increases feedback loop time and results in broken builds.
 **Prevention:** Enforce commit message validation locally via `commit-msg` git hook. Provide `./scripts/ai-commit.sh` helper for agents to produce valid commits.
+
+## 2026-04-23 - Script Injection Detection in Workflows
+**Vulnerability:** GitHub Actions `actions/github-script` blocks were vulnerable to script injection if they used direct interpolation of untrusted data (e.g., `${{ github.event.issue.title }}`).
+**Learning:** Automated validation of GitHub Action workflows often misses script injection risks unless explicitly checking for interpolation patterns within script-related YAML keys.
+**Prevention:** Integrate a workflow validator into the project quality gate that specifically flags `${{` patterns in `script:` blocks while allowing safe interpolation like `secrets.`. Use environment variables or GitHub API fetches instead of direct interpolation.
