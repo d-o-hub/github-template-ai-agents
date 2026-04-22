@@ -62,8 +62,8 @@ done
 
 if [ $FAILED -ne 0 ]; then
     echo -e "\n${RED}Validation FAILED${NC}"
-    # exit 1  # Avoiding exit
+    exit 1
 else
     echo -e "\n${GREEN}Validation PASSED${NC}"
-    # exit 0  # Avoiding exit
+    exit 0
 fi
