@@ -15,13 +15,17 @@ NC='\033[0m'
 
 # Cache for VERSION file content
 REPO_VERSION=""
+# Shared variable to return line count without extra subshell
+SKILL_LINE_COUNT=0
 
 # Validate a single SKILL.md file for format correctness
 # Returns 0 if valid, 1 if invalid (prints errors to stderr)
 validate_skill_file() {
     local skill_file="$1"
     local skill_name
-    skill_name="$(basename "$(dirname "$skill_file")")"
+    # Performance optimization: Use Bash parameter expansion instead of basename/dirname
+    local skill_dir="${skill_file%/*}"
+    skill_name="${skill_dir##*/}"
     local errors=0
 
     # Check exists
@@ -99,6 +103,9 @@ validate_skill_file() {
         echo -e "  ${RED}✗${NC} $skill_name: SKILL.md exceeds $MAX_SKILL_LINES lines ($line_count lines)" >&2
         ((errors++))
     fi
+
+    # Export line count for callers to avoid redundant reads
+    SKILL_LINE_COUNT=$line_count
 
     return $errors
 }

@@ -123,6 +123,14 @@ check_link() {
         if command -v realpath &> /dev/null; then HAS_REALPATH=1; else HAS_REALPATH=0; fi
     fi
 
+    # Performance optimization: skip realpath subshell if path has no '..'
+    # Absolute paths are already rejected, and simple relative paths can't escape
+    if [[ "$clean_path" != *".."* ]]; then
+        if [[ -e "$full_path" || -L "$full_path" ]]; then
+            return 0
+        fi
+    fi
+
     if [ "$HAS_REALPATH" -eq 1 ] && [ -n "$RESOLVED_ROOT" ]; then
         # Performance optimization: Use pre-resolved root to avoid subshell
         local resolved_path
@@ -214,7 +222,7 @@ process_skill_file() {
     local file_format_errors=0
     local in_references=0
 
-    while IFS= read -r line; do
+    while IFS= read -r line || [[ -n "$line" ]]; do
         line_num=$((line_num + 1))
 
         # Track if we're in the References section
@@ -296,7 +304,7 @@ process_skill_file() {
             BROKEN_COUNT=$((BROKEN_COUNT + 1))
             file_broken=1
         fi
-    done < "$skill_file"
+    done < "$skill_file" || [[ -n "${line:-}" ]]
 
     if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
         # Performance optimization: Use Bash parameter expansion instead of basename
