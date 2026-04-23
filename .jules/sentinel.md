@@ -32,3 +32,8 @@
 **Requirement:** CI was catching commit message violations that should be caught locally.
 **Learning:** Relying on CI for format validation increases feedback loop time and results in broken builds.
 **Prevention:** Enforce commit message validation locally via `commit-msg` git hook. Provide `./scripts/ai-commit.sh` helper for agents to produce valid commits.
+
+## 2026-04-23 - Robust SSRF Protection via ip.is_global
+**Vulnerability:** SSRF protection in `do-web-doc-resolver` used a manual blacklist of `BLOCKED_NETWORKS`, which could miss non-public IP ranges like CGNAT (100.64.0.0/10) or documentation/reserved ranges.
+**Learning:** Manual IP blacklists are brittle and incomplete. Using `ipaddress.ip_address(ip).is_global` provides a more robust, future-proof way to identify non-public IPs (including private, reserved, loopback, and IPv4-mapped IPv6).
+**Prevention:** Prefer `ip.is_global` (or `not ip.is_global` to block) for SSRF validation. Always restore `socket.getdefaulttimeout()` when temporarily overriding it to avoid side effects in other network operations.
