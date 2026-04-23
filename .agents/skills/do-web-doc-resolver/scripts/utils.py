@@ -30,16 +30,6 @@ USER_AGENT = (
     "Mozilla/5.0 (compatible; WebDocResolver/2.0; +https://github.com/d-oit/do-web-doc-resolver)"
 )
 
-BLOCKED_NETWORKS = [
-    ipaddress.ip_network("127.0.0.0/8"),
-    ipaddress.ip_network("10.0.0.0/8"),
-    ipaddress.ip_network("172.16.0.0/12"),
-    ipaddress.ip_network("192.168.0.0/16"),
-    ipaddress.ip_network("169.254.0.0/16"),
-    ipaddress.ip_network("::1/128"),
-    ipaddress.ip_network("fc00::/7"),
-    ipaddress.ip_network("fe80::/10"),
-]
 
 BLOCKED_SCHEMES: set[str] = {"file", "javascript", "data", "vbscript"}
 
@@ -134,20 +124,21 @@ def is_safe_url(url: str) -> bool:
             return False
         try:
             ip = ipaddress.ip_address(hostname)
-            if any(ip in network for network in BLOCKED_NETWORKS):
+            if not ip.is_global:
                 return False
         except ValueError:
+            orig_timeout = socket.getdefaulttimeout()
             try:
                 socket.setdefaulttimeout(5)
                 infos = socket.getaddrinfo(hostname, None)
                 for _family, _socktype, _proto, _canonname, sockaddr in infos:
                     ip = ipaddress.ip_address(sockaddr[0])
-                    if any(ip in network for network in BLOCKED_NETWORKS):
+                    if not ip.is_global:
                         return False
             except Exception:
                 pass
             finally:
-                socket.setdefaulttimeout(None)
+                socket.setdefaulttimeout(orig_timeout)
         return True
     except Exception:
         return False
