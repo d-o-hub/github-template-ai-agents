@@ -38,9 +38,13 @@ _get_hash_internal() {
     # Optimization: Use internal Bash variables if we can avoid external tools
     # but for content hashing, external tool is safer.
     if command -v sha256sum &> /dev/null; then
-        sha256sum "$file" | cut -d' ' -f1
+        local res
+        res=$(sha256sum "$file")
+        echo "${res%% *}"
     elif command -v shasum &> /dev/null; then
-        shasum -a 256 "$file" | cut -d' ' -f1
+        local res
+        res=$(shasum -a 256 "$file")
+        echo "${res%% *}"
     else
         # Fallback to just timestamp + size if no shasum tool
         # shellcheck disable=SC2012
@@ -84,13 +88,18 @@ lint_if_changed() {
 
     # Use a safe filename for the cache key
     # Replace characters that might be problematic in filenames
-    local safe_file
-    safe_file=$(echo "$file" | tr '/. ' '___')
+    # Performance optimization: Use native Bash parameter expansion instead of tr subshell
+    local safe_file="${file//[\/\. ]/_}"
     local cache_key="$CACHE_DIR/${tool_id}_${safe_file}"
 
     # Check cache
-    if [[ -f "$cache_key" ]] && [[ "$(cat "$cache_key")" == "$cache_value" ]]; then
-        return 0  # Unchanged, skip
+    # Performance optimization: Use read instead of cat subshell
+    if [[ -f "$cache_key" ]]; then
+        local cached_content
+        read -r cached_content < "$cache_key" || true
+        if [[ "$cached_content" == "$cache_value" ]]; then
+            return 0  # Unchanged, skip
+        fi
     fi
 
     # Run the command

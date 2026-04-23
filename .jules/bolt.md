@@ -17,3 +17,7 @@
 ## 2026-04-19 - [Subshell elimination and shared state]
 **Learning:** Significant performance gains (up to 75%) in Bash scripts can be achieved by sharing state between functions and scripts to avoid redundant file processing. For example, exposing a global variable like `SKILL_LINE_COUNT` from a validation function eliminates the need for callers to fork `wc -l` subshells. Additionally, skipping expensive `realpath` resolutions for simple relative paths (without '..') avoids the ~2.5ms fork overhead per call, which is critical in high-frequency validation loops.
 **Action:** Design library functions to populate global "result" variables for common metadata. Only use `realpath` or `readlink -f` when path normalization is strictly required for security or logical correctness.
+
+## 2026-05-22 - [Optimizing Bash cache keys and hash extraction]
+**Learning:** Significant performance gains in Bash scripts (up to 350x for string manipulation) can be achieved by replacing external utility pipes (`tr`, `cut`) and subshells (`$(cat ...)`) with native Bash parameter expansion and built-ins (`read`). In `lint_cache.sh`, replacing `echo | tr` with `${file//[\/\. ]/_}` and `cat` with `read` eliminated hundreds of subshells during quality gate execution.
+**Action:** Always prefer `${var//pattern/string}` for character replacement and `read -r var < file` for reading small config/cache files over `tr`, `sed`, or `cat` subshells.
