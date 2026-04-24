@@ -39,11 +39,6 @@
 **Prevention:** Prefer `ip.is_global` (or `not ip.is_global` to block) for SSRF validation. Always restore `socket.getdefaulttimeout()` when temporarily overriding it to avoid side effects in other network operations.
 
 ## 2026-04-24 - Trust Score Manipulation via Insecure URL Parsing
-**Vulnerability:** URL trust scoring in  used  and loose substring matching () to identify trusted sites.
-**Learning:**  includes user credentials (e.g., ), allowing attackers to masquerade as trusted domains. Furthermore,  operator matching allows spoofing via related domains (e.g., ).
-**Prevention:** Always use  for domain-based security decisions to strip credentials. Use strict exact matching or explicit subdomain checks () instead of loose substring searches.
-
-## 2026-04-24 - Trust Score Manipulation via Insecure URL Parsing
 **Vulnerability:** URL trust scoring in `do-web-doc-resolver/scripts/utils.py` used `urlparse(url).netloc` and loose substring matching (`site in domain`) to identify trusted sites.
 **Learning:** `urlparse().netloc` includes user credentials (e.g., `trusted.com@evil.com`), allowing attackers to masquerade as trusted domains. Furthermore, `in` operator matching allows spoofing via related domains (e.g., `notgithub.com`).
 **Prevention:** Always use `urlparse(url).hostname` for domain-based security decisions to strip credentials. Use strict exact matching or explicit subdomain checks (`domain.endswith("." + site)`) instead of loose substring searches.
