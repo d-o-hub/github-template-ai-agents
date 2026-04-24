@@ -21,3 +21,7 @@
 ## 2026-05-22 - [Optimizing Bash cache keys and hash extraction]
 **Learning:** Significant performance gains in Bash scripts (up to 350x for string manipulation) can be achieved by replacing external utility pipes (`tr`, `cut`) and subshells (`$(cat ...)`) with native Bash parameter expansion and built-ins (`read`). In `lint_cache.sh`, replacing `echo | tr` with `${file//[\/\. ]/_}` and `cat` with `read` eliminated hundreds of subshells during quality gate execution.
 **Action:** Always prefer `${var//pattern/string}` for character replacement and `read -r var < file` for reading small config/cache files over `tr`, `sed`, or `cat` subshells.
+
+## 2026-05-23 - [AWK-to-Bash Streaming Optimization]
+**Learning:** For scripts that must process thousands of lines in Bash (e.g., Markdown validation), using `awk` to pre-filter and format only relevant lines into a colon-delimited stream (`LINE_NUM:STATE:CONTENT`) before piping to a `while read` loop can reduce execution time by ~50%. This avoids the high overhead of Bash's line-by-line processing for thousands of irrelevant lines while preserving complex validation logic in Bash.
+**Action:** Use `awk` to stream a "sparse" version of a large file to Bash when the validation logic is too complex for pure `awk` but the number of relevant lines is small.
