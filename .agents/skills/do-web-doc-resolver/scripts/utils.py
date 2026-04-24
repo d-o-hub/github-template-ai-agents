@@ -202,11 +202,13 @@ def score_result(url: str | None, content: str) -> float:
     score = 0.5
     if url:
         try:
-            domain = urlparse(url).netloc.lower()
-            if any(domain.endswith(tld) for tld in [".edu", ".gov", ".org", ".rs", ".io"]):
+            # Use .hostname to avoid credential-based masquerading (e.g., github.com@evil.com)
+            parsed = urlparse(url)
+            domain = (parsed.hostname or "").lower()
+            if any(domain == tld[1:] or domain.endswith(tld) for tld in [".edu", ".gov", ".org", ".rs", ".io"]):
                 score += 0.2
             if any(
-                site in domain
+                domain == site or domain.endswith("." + site)
                 for site in ["github.com", "stackoverflow.com", "docs.rs", "mozilla.org"]
             ):
                 score += 0.2
