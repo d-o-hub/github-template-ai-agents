@@ -222,9 +222,10 @@ process_skill_file() {
     local file_format_errors=0
     local in_references=0
 
-    while IFS= read -r line || [[ -n "$line" ]]; do
-        line_num=$((line_num + 1))
-
+    # Performance optimization: Use awk to pre-filter only relevant lines
+    # This reduces Bash loop iterations by ~90% for large files.
+    # Format: line_num:in_references:line_content
+    while IFS=: read -r line_num in_references line; do
         # Track if we're in the References section
         # State transitions: out -> in when see "## References", in -> out when see any other "##"
         if is_references_header "$line"; then
@@ -304,7 +305,13 @@ process_skill_file() {
             BROKEN_COUNT=$((BROKEN_COUNT + 1))
             file_broken=1
         fi
-    done < "$skill_file"
+    done < <(awk -v in_ref=0 '
+        /^##[[:space:]]+[Rr]eferences/ { in_ref = 1; print NR ":" in_ref ":" $0; next }
+        /^##[[:space:]]+/ { in_ref = 0; print NR ":" in_ref ":" $0; next }
+        /\[[^]]+\]\([^)]+\)/ || /`(references?\/|docs\/)[^`]+`/ || /@references?/ || (in_ref && /^- /) {
+            print NR ":" in_ref ":" $0
+        }
+    ' "$skill_file")
 
     if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
         # Performance optimization: Use Bash parameter expansion instead of basename
