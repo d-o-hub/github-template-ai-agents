@@ -6,14 +6,10 @@
 set +e
 set -uo pipefail
 
-# Color codes for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-NC='\033[0m' # No Color
-
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_SRC="$REPO_ROOT/.agents/skills"
+# shellcheck source=lib/skill-validation.sh
+source "$REPO_ROOT/scripts/lib/skill-validation.sh"
 
 CLI_SKILL_DIRS=(
   ".claude/skills"
@@ -24,9 +20,6 @@ CLI_SKILL_DIRS=(
 FAILED=0
 WARNINGS=0
 
-# Configuration
-MAX_SKILL_LINES=${MAX_SKILL_LINES:-250}
-
 echo "Validating skills..."
 echo ""
 
@@ -36,11 +29,11 @@ if [ ! -d "$SKILLS_SRC" ] || [ -z "$(ls -A "$SKILLS_SRC" 2>/dev/null)" ]; then
     exit 0
 fi
 
-# --- Validate canonical skills in .agents/skills/ ---
-echo "Checking canonical skills in .agents/skills/..."
+echo "Checking canonical skills and CLI symlinks..."
 
-# Read current version once
-CURRENT_VERSION=$(cat "$REPO_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]')
+# Cache for readlink -f existence
+HAS_READLINK_F=""
+if readlink -f . &>/dev/null; then HAS_READLINK_F=1; else HAS_READLINK_F=0; fi
 
 for skill_path in "$SKILLS_SRC"/*/; do
     [ -d "$skill_path" ] || continue
@@ -53,104 +46,25 @@ for skill_path in "$SKILLS_SRC"/*/; do
         continue
     fi
     
-    # Check 1: SKILL.md must exist
-    skill_file="$skill_path/SKILL.md"
-    if [ ! -f "$skill_file" ]; then
-        echo -e "  ${RED}✗${NC} $skill_name: Missing SKILL.md" >&2
-        FAILED=1
-        continue
-    fi
-
-    # Optimized check: read file once
-    has_name=0
-    has_description=0
-    has_version=0
-    template_version=""
-    line_count=0
-
-    while IFS= read -r line || [[ -n "$line" ]]; do
-        ((line_count++))
-        [[ $line == "name:"* ]] && has_name=1
-        [[ $line == "description:"* ]] && has_description=1
-        [[ $line == "version:"* ]] && has_version=1
-        if [[ $line == "template_version:"* ]]; then
-            template_version="${line#template_version:}"
-            template_version="${template_version//\"/}"
-            template_version="${template_version#"${template_version%%[![:space:]]*}"}"
-            template_version="${template_version%"${template_version##*[![:space:]]}"}"
-        fi
-    done < "$skill_file"
-
-    if [ $has_name -eq 0 ]; then
-        echo -e "  ${RED}✗${NC} $skill_name: SKILL.md missing 'name:' in frontmatter" >&2
-        FAILED=1
-    fi
-
-    if [ $has_description -eq 0 ]; then
-        echo -e "  ${RED}✗${NC} $skill_name: SKILL.md missing 'description:' in frontmatter" >&2
-        FAILED=1
-    fi
-
-    # Check 2b: Warn if missing version field (non-breaking)
-    if [ $has_version -eq 0 ]; then
-        echo -e "  ${YELLOW}⚠${NC} $skill_name: Missing 'version:' field (recommended)" >&2
-        WARNINGS=1
-    fi
-
-    # Check 2c: Warn if template_version is older than current by >1 minor version
-    if [ -n "$template_version" ] && [ -n "$CURRENT_VERSION" ]; then
-        c_major="${CURRENT_VERSION%%.*}"
-        rest="${CURRENT_VERSION#*.}"
-        c_minor="${rest%%.*}"
-
-        s_major="${template_version%%.*}"
-        s_rest="${template_version#*.}"
-        s_minor="${s_rest%%.*}"
-
-        if [[ "$s_major" -lt "$c_major" ]] || \
-           { [[ "$s_major" -eq "$c_major" ]] && [[ $((c_minor - s_minor)) -gt 1 ]]; }; then
-            echo -e "  ${YELLOW}⚠${NC} $skill_name: template_version $template_version is >1 minor behind current $CURRENT_VERSION" >&2
-            WARNINGS=1
-        fi
-    fi
-
-    # Check 3: SKILL.md line count (<= MAX_SKILL_LINES)
-    if [ "$line_count" -gt "$MAX_SKILL_LINES" ]; then
-        echo -e "  ${RED}✗${NC} $skill_name: SKILL.md exceeds $MAX_SKILL_LINES lines ($line_count lines)" >&2
-        echo "      Consider moving detailed content to reference/ folder" >&2
+    # Check 1: SKILL.md format and frontmatter
+    skill_file="${skill_path}SKILL.md"
+    if ! validate_skill_file "$skill_file"; then
+        # Check if it was a failure or just a warning (validate_skill_file returns non-zero for errors)
+        # Note: validate_skill_file in library handles printing the status line
         FAILED=1
     else
-        echo -e "  ${GREEN}✓${NC} $skill_name: $line_count lines"
+        # If valid, print the success line like validate-skill-format.sh does
+        echo -e "  ${GREEN}✓${NC} $skill_name: $SKILL_LINE_COUNT lines"
     fi
 
-    # Check 4: Circular symlink detection
+    # Check 2: Circular symlink detection for the skill directory
     if [ -L "$skill_path" ]; then
         echo -e "  ${RED}✗${NC} $skill_name: Circular symlink detected" >&2
         FAILED=1
     fi
-done
 
-echo ""
-
-# --- Validate CLI symlinks ---
-echo "Checking CLI symlinks..."
-
-# Cache for readlink -f
-HAS_READLINK_F=""
-if readlink -f . &>/dev/null; then HAS_READLINK_F=1; else HAS_READLINK_F=0; fi
-
-for skill_path in "$SKILLS_SRC"/*/; do
-    [ -d "$skill_path" ] || continue
-    skill_name="${skill_path%/}"
-    skill_name="${skill_name##*/}"
-    
-    # Skip consolidated/backup folders
-    if [[ "$skill_name" == _* ]]; then
-        continue
-    fi
-    
+    # Check 3: Validate CLI symlinks
     # Performance optimization: Pre-calculate expected target once per skill
-    # This avoids redundant subshell calls in the inner CLI directory loop
     expected_target=""
     if { [ "${CHECK_SYMLINK_TARGETS:-false}" = "true" ] || [ -n "${CI:-}" ]; } && [ "$HAS_READLINK_F" -eq 1 ]; then
         expected_target=$(readlink -f "$skill_path" 2>/dev/null || echo "")
@@ -170,14 +84,12 @@ for skill_path in "$SKILLS_SRC"/*/; do
             FAILED=1
         elif [ ! -d "$link" ]; then
             # Optimized: check if target exists without subshell if possible
-            # readlink (without -f) is a subshell but better than nothing
-            # However, -d on a symlink already checks target existence
-            echo -e "  ${RED}✗${NC} BROKEN symlink: $cli_dir/$skill_name -> $(readlink "$link" 2>/dev/null || echo "unknown")" >&2
+            # -d on a symlink already checks target existence
+            echo -e "  ${RED}✗${NC} BROKEN symlink: $cli_dir/$skill_name" >&2
             FAILED=1
         else
             # Verify symlink points to correct location
             # Only do this expensive check if explicitly requested or in CI
-            # For Bolt optimization, we use the pre-calculated expected_target
             if [ -n "$expected_target" ]; then
                 target=$(readlink -f "$link" 2>/dev/null || echo "")
 

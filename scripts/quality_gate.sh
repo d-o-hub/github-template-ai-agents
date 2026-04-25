@@ -70,16 +70,9 @@ if ! ./scripts/validate-workflows.sh; then
 fi
 echo ""
 
-# --- Always: validate skill symlinks ---
-echo -e "${BLUE}Validating skill symlinks...${NC}"
+# --- Always: validate skills (symlinks and format) ---
+echo -e "${BLUE}Validating skills...${NC}"
 if ! ./scripts/validate-skills.sh; then
-    FAILED=1
-fi
-echo ""
-
-# --- Validate SKILL.md format ---
-echo -e "${BLUE}Validating SKILL.md format...${NC}"
-if ! ./scripts/validate-skill-format.sh; then
     FAILED=1
 fi
 echo ""
@@ -134,14 +127,15 @@ fi
 # Shell script detection via file existence
 # Unlike compiled languages, shell scripts don't have a manifest file
 # We use find + grep to check if any .sh files exist (excluding .git directory)
-if find . -name "*.sh" -not -path "./.git/*" | grep -q .; then
+# Using -print -quit makes find exit as soon as it finds one match (faster)
+if find . -name "*.sh" -not -path "./.git/*" -print -quit | grep -q .; then
     echo "  ${GREEN}✓${NC} Shell scripts detected"
     DETECTED_LANGUAGES+=("shell")
 fi
 
 # Markdown detection via file existence
 # We always check markdown if .md files exist (for linting with markdownlint)
-if find . -name "*.md" -not -path "./.git/*" | grep -q .; then
+if find . -name "*.md" -not -path "./.git/*" -print -quit | grep -q .; then
     echo "  ${GREEN}✓${NC} Markdown files detected"
     DETECTED_LANGUAGES+=("markdown")
 fi
