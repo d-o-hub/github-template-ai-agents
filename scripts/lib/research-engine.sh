@@ -30,18 +30,27 @@ resolve_with_optimization() {
 
     local result
     result=$(cd "$resolver_dir" && \
-        python3 -m scripts.resolve "$query_or_url" "${resolve_args[@]}" 2>/dev/null || \
+        python3 -m scripts.resolve "${resolve_args[@]}" -- "$query_or_url" 2>/dev/null || \
         echo '{"source": "error", "content": "Resolution failed", "score": 0}')
 
-    cat > "$output_file" << EOF
-{
-  "query": "$query_or_url",
-  "context": "$context",
-  "profile": "$profile",
-  "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "result": $result
+    # Safe JSON generation using Python to avoid shell injection and malformed output
+    python3 -c '
+import json, sys, datetime
+query, context, profile, result_str = sys.argv[1:]
+try:
+    result = json.loads(result_str)
+except Exception:
+    result = {"source": "error", "content": "Invalid JSON", "score": 0}
+
+output = {
+    "query": query,
+    "context": context,
+    "profile": profile,
+    "timestamp": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    "result": result
 }
-EOF
+print(json.dumps(output, indent=2))
+' "$query_or_url" "$context" "$profile" "$result" > "$output_file"
 
     local score
     score=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.stdin).get('score', 0))" 2>/dev/null || echo "0")

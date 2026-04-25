@@ -42,3 +42,8 @@
 **Vulnerability:** URL trust scoring in `do-web-doc-resolver/scripts/utils.py` used `urlparse(url).netloc` and loose substring matching (`site in domain`) to identify trusted sites.
 **Learning:** `urlparse().netloc` includes user credentials (e.g., `trusted.com@evil.com`), allowing attackers to masquerade as trusted domains. Furthermore, `in` operator matching allows spoofing via related domains (e.g., `notgithub.com`).
 **Prevention:** Always use `urlparse(url).hostname` for domain-based security decisions to strip credentials. Use strict exact matching or explicit subdomain checks (`domain.endswith("." + site)`) instead of loose substring searches.
+
+## 2026-04-25 - JSON and Argument Injection in Research Engine
+**Vulnerability:** `scripts/lib/research-engine.sh` used heredocs with variable interpolation for JSON generation and lacked `--` separator for positional arguments in a Python call.
+**Learning:** Shell heredocs are fragile for JSON generation if content contains quotes or control characters. Positional arguments starting with `-` can be misinterpreted as command flags by the receiving process.
+**Prevention:** Use `python3 -c "import json; ..."` with `sys.argv` for safe JSON construction instead of shell templates. Use `--` to explicitly separate options from positional arguments in CLI calls.
