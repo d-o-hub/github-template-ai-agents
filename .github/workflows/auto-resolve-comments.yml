@@ -3,9 +3,8 @@ name: "Auto Resolve PR Comments"
 
 # yamllint disable-line rule:truthy
 on:
-  push:
-    branches-ignore:
-      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
   pull_request_review_comment:
     types: [created]
 
