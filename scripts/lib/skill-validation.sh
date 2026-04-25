@@ -44,16 +44,13 @@ validate_skill_file() {
     local line_count=0
     local first_line=""
 
-    # Read first line specifically
-    read -r first_line < "$skill_file" || true
-    if [[ "$first_line" != "---" ]]; then
-        echo -e "  ${RED}✗${NC} $skill_name: Must start with '---'" >&2
-        ((errors++))
-    fi
-
     # Single pass to gather info
     while IFS= read -r line || [[ -n "$line" ]]; do
         ((line_count++))
+        if [[ $line_count -eq 1 && "$line" != "---" ]]; then
+            echo -e "  ${RED}✗${NC} $skill_name: Must start with '---'" >&2
+            ((errors++))
+        fi
         if [[ $line == "name:"* ]]; then has_name=1; fi
         if [[ $line == "description:"* ]]; then has_description=1; fi
         if [[ $line == "version:"* ]]; then has_version=1; fi
@@ -79,7 +76,11 @@ validate_skill_file() {
 
     if [[ -n "$template_version" ]]; then
         if [[ -z "$REPO_VERSION" ]]; then
-            REPO_VERSION=$(cat "$REPO_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]')
+            if [[ -f "$REPO_ROOT/VERSION" ]]; then
+                read -r REPO_VERSION < "$REPO_ROOT/VERSION"
+                # Remove spaces using internal parameter expansion
+                REPO_VERSION="${REPO_VERSION//[[:space:]]/}"
+            fi
         fi
         local current_version="$REPO_VERSION"
         if [[ -n "$current_version" ]]; then
