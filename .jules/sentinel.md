@@ -47,3 +47,8 @@
 **Vulnerability:** `scripts/lib/research-engine.sh` used heredocs with variable interpolation for JSON generation and lacked `--` separator for positional arguments in a Python call.
 **Learning:** Shell heredocs are fragile for JSON generation if content contains quotes or control characters. Positional arguments starting with `-` can be misinterpreted as command flags by the receiving process.
 **Prevention:** Use `python3 -c "import json; ..."` with `sys.argv` for safe JSON construction instead of shell templates. Use `--` to explicitly separate options from positional arguments in CLI calls.
+
+## 2026-05-24 - Injection and Fragility in Manual JSON Handling
+**Vulnerability:** Command discovery and verification scripts used manual string concatenation for JSON generation and brittle `grep | cut` for parsing, leading to injection risks and failures on special characters (quotes, commas, braces).
+**Learning:** Manual JSON construction in shell scripts is highly error-prone and insecure when handling untrusted or complex strings. Standardizing on a dedicated tool like `jq` eliminates these risks.
+**Prevention:** Always use `jq` with `--arg` or `--argjson` for safe JSON generation and `jq -r` for robust parsing in shell scripts. Avoid regex-based "parsing" of JSON structures.

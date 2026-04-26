@@ -71,13 +71,13 @@ get_affected_commands() {
             while IFS= read -r line; do
                 [ -z "$line" ] && continue
                 local cmd
-                cmd=$(echo "$line" | grep -o '"command":"[^"]*"' | cut -d'"' -f4)
-                [ -z "$cmd" ] && continue
+                cmd=$(echo "$line" | jq -r '.command')
+                [ -z "$cmd" ] || [ "$cmd" = "null" ] && continue
 
                 # Special case: *.md means commands in that specific file
                 if [[ "$file_pattern" == "*.md" ]] && [[ "$changed_file" == *.md ]]; then
                     local cmd_file
-                    cmd_file=$(echo "$line" | grep -o '"file":"[^"]*"' | cut -d'"' -f4)
+                    cmd_file=$(echo "$line" | jq -r '.file')
                     if [[ "$cmd_file" == "$changed_file" ]]; then
                         affected+=("$cmd")
                     fi

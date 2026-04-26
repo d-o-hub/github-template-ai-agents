@@ -59,9 +59,9 @@ should_invalidate_command() {
     local changed_files="$2"
 
     local cmd
-    cmd=$(echo "$cmd_json" | grep -o '"command":"[^"]*"' | cut -d'"' -f4)
+    cmd=$(echo "$cmd_json" | jq -r '.command')
     local file
-    file=$(echo "$cmd_json" | grep -o '"file":"[^"]*"' | cut -d'"' -f4)
+    file=$(echo "$cmd_json" | jq -r '.file')
 
     # Use a loop that handles spaces in filenames if needed, though here changed_files is space-separated
     for changed in $changed_files; do
@@ -85,9 +85,9 @@ should_invalidate_command() {
 get_cache_path() {
     local cmd_json="$1"
     local file
-    file=$(echo "$cmd_json" | grep -o '"file":"[^"]*"' | cut -d'"' -f4 || echo "unknown")
+    file=$(echo "$cmd_json" | jq -r '.file // "unknown"')
     local line
-    line=$(echo "$cmd_json" | grep -o '"line":[0-9]*' | cut -d':' -f2 || echo "0")
+    line=$(echo "$cmd_json" | jq -r '.line // 0')
 
     # Sanitize file path for use in directory structure
     local safe_file
@@ -120,7 +120,7 @@ save_cached_result() {
 
     # Log to audit trail and rotate
     local cmd
-    cmd=$(echo "$cmd_json" | grep -o '"command":"[^"]*"' | cut -d'"' -f4)
+    cmd=$(echo "$cmd_json" | jq -r '.command')
     echo "$(date -Iseconds) CACHED: $cmd" >> "$AUDIT_LOG"
 
     if [ "$(wc -l < "$AUDIT_LOG")" -gt "$MAX_AUDIT_LOG_LINES" ]; then

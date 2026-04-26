@@ -135,8 +135,8 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
         [ -z "$cmd_entry" ] && continue
 
         # Extract command from JSON
-        cmd=$(echo "$cmd_entry" | grep -o '"command":"[^"]*"' | cut -d'"' -f4 || echo "")
-        [ -z "$cmd" ] && continue
+        cmd=$(echo "$cmd_entry" | jq -r '.command' 2>/dev/null || echo "")
+        [ -z "$cmd" ] || [ "$cmd" = "null" ] && continue
 
         # Check cache first
         CACHED=false
@@ -150,7 +150,7 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
                         CACHED=true
 
                         # Extract category from cached result
-                        cached_cat=$(echo "$cached_result" | grep -o '"category":"[^"]*"' | cut -d'"' -f4 || echo "unknown")
+                        cached_cat=$(echo "$cached_result" | jq -r '.category // "unknown"' 2>/dev/null || echo "unknown")
                         if [ -n "$cached_cat" ]; then
                             CATEGORY_COUNT[$cached_cat]=$((CATEGORY_COUNT[$cached_cat]+1))
                         fi
