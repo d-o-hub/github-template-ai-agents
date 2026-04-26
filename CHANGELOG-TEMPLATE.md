@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.6] - 2026-04-26
+
+### Added
+- Synchronized `turso-db` skill with latest Turso docs (v0.5.3).
+- Switched to custom GraphQL script for resolving bot threads in CI.
+
+### Fixed
+- Used verified actions/checkout SHA that resolves correctly in CI.
+
+### Changed
+- Optimized GitHub Action workflow validation script (`scripts/validate-workflows.sh`) to run significantly faster.
+- Upgraded GitHub Actions dependencies to resolve Node.js 20 deprecation warnings.
+- Hardened and optimized GitHub Actions workflows.
+
 ## [0.2.5] - 2026-05-14
 
 ### Added
