@@ -26,10 +26,6 @@ CACHE_DIR = os.path.expanduser(os.getenv("WEB_RESOLVER_CACHE_DIR", "~/.cache/do-
 CACHE_TTL = int(os.getenv("WEB_RESOLVER_CACHE_TTL", str(3600 * 24)))
 MAX_REDIRECTS = 5
 
-# Characters that are dangerous in shell contexts and highly suspicious in URLs.
-# We exclude & (query params), () (Wikipedia), and ; (matrix params) as they are common in legitimate URLs.
-SHELL_DANGEROUS_CHARS = {"|", "`", "$", "<", ">", "\\", "\"", "'", " ", "\t", "\n", "\r"}
-
 USER_AGENT = (
     "Mozilla/5.0 (compatible; WebDocResolver/2.0; +https://github.com/d-oit/do-web-doc-resolver)"
 )
@@ -104,13 +100,6 @@ def _request_with_safe_redirects(
             return response
 
     raise requests.exceptions.TooManyRedirects(f"Exceeded {max_redirs} redirects")
-
-
-def is_shell_safe_url(url: str) -> bool:
-    """Check if the URL contains characters that could be used for command injection."""
-    if not url:
-        return False
-    return not any(c in url for c in SHELL_DANGEROUS_CHARS)
 
 
 def is_safe_url(url: str) -> bool:
