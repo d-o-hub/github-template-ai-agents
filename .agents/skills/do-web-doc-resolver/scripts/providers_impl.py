@@ -14,6 +14,7 @@ from .utils import (
     _save_to_cache,
     get_session,
     is_safe_url,
+    is_shell_safe_url,
 )
 
 logger = logging.getLogger(__name__)
@@ -342,6 +343,9 @@ def resolve_with_docling(url: str, max_chars: int) -> ProviderResult:
     if not is_safe_url(url):
         meta = ProviderMeta(tool="docling", duration_ms=0, error_type="ssrf_blocked")
         return ProviderResult(ok=False, error="ssrf_blocked", meta=meta, url=url, source="docling")
+    if not is_shell_safe_url(url):
+        meta = ProviderMeta(tool="docling", duration_ms=0, error_type="security_error")
+        return ProviderResult(ok=False, error="security_error", meta=meta, url=url, source="docling")
     try:
         res = subprocess.run(
             ["docling", "--format", "markdown", "--", url], capture_output=True, text=True, timeout=60
@@ -364,6 +368,9 @@ def resolve_with_ocr(url: str, max_chars: int) -> ProviderResult:
     if not is_safe_url(url):
         meta = ProviderMeta(tool="ocr", duration_ms=0, error_type="ssrf_blocked")
         return ProviderResult(ok=False, error="ssrf_blocked", meta=meta, url=url, source="ocr-tesseract")
+    if not is_shell_safe_url(url):
+        meta = ProviderMeta(tool="ocr", duration_ms=0, error_type="security_error")
+        return ProviderResult(ok=False, error="security_error", meta=meta, url=url, source="ocr-tesseract")
     try:
         res = subprocess.run(
             ["tesseract", "--", url, "stdout"], capture_output=True, text=True, timeout=30
