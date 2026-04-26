@@ -4,15 +4,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from pathlib import Path
+from pathlib import Path
 
 
 class EvalType(Enum):
     """Types of evaluations that can be performed."""
-
     STRUCTURE = "structure"
     COMMAND = "command"
     FILE_VALIDATION = "file_validation"
@@ -20,7 +16,6 @@ class EvalType(Enum):
 
 class EvalStatus(Enum):
     """Status of an individual eval scenario."""
-
     PASS = "PASS"
     FAIL = "FAIL"
     SKIP = "SKIP"
@@ -30,7 +25,6 @@ class EvalStatus(Enum):
 @dataclass
 class EvalResult:
     """Result of a single eval scenario."""
-
     eval_id: int
     status: EvalStatus
     message: str = ""
@@ -41,7 +35,6 @@ class EvalResult:
 @dataclass
 class SkillEvalResult:
     """Result of evaluating a single skill."""
-
     skill_name: str
     skill_path: Path
     status: EvalStatus
@@ -56,7 +49,6 @@ class SkillEvalResult:
 @dataclass
 class EvalReport:
     """Overall evaluation report."""
-
     total_skills: int = 0
     skills_passed: int = 0
     skills_failed: int = 0
