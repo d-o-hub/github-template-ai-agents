@@ -35,7 +35,8 @@ extract_commands() {
                 [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
                 local cmd=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
                 [[ -z "$cmd" ]] && continue
-                echo "{"command":"$(echo "$cmd" | sed 's/"/\"/g')","file":"$rel_path","line":$line_num,"type":"code-block"}"
+                jq -n --arg cmd "$cmd" --arg file "$rel_path" --argjson line "$line_num" --arg type "code-block" \
+                    '{command: $cmd, file: $file, line: $line, type: $type}' -c
             fi
         fi
     done < "$file"
@@ -45,18 +46,24 @@ find "$REPO_ROOT" -type f -name "*.md" -not -path "*/node_modules/*" -not -path 
     extract_commands "$md_file"
 done > "$results_file"
 if [[ "$FORMAT" == "sarif" ]]; then
-    echo '{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"CommandDiscovery"}},"results":['
-    first=1
-    while read -r line; do
-        [ -z "$line" ] && continue
-        [ $first -eq 0 ] && echo ","
-        cmd=$(echo "$line" | grep -o '"command":"[^"]*"' | cut -d'"' -f4)
-        file=$(echo "$line" | grep -o '"file":"[^"]*"' | cut -d'"' -f4)
-        line_no=$(echo "$line" | grep -o '"line":[0-9]*' | cut -d':' -f2)
-        echo "{"ruleId":"CMD001","message":{"text":"$cmd"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"$file"},"region":{"startLine":$line_no}}}]}"
-        first=0
-    done < "$results_file"
-    echo ']}]}'
+    jq -s '
+      {
+        version: "2.1.0",
+        runs: [{
+          tool: { driver: { name: "CommandDiscovery" } },
+          results: map({
+            ruleId: "CMD001",
+            message: { text: .command },
+            locations: [{
+              physicalLocation: {
+                artifactLocation: { uri: .file },
+                region: { startLine: .line }
+              }
+            }]
+          })
+        }]
+      }
+    ' "$results_file"
 else
     cat "$results_file"
 fi
