@@ -10,6 +10,13 @@ import json
 from pathlib import Path
 from typing import List, Dict, Tuple
 
+# Pre-compiled regex patterns for performance
+MODAL_PATTERNS = [
+    re.compile(r'role\s*=\s*"dialog"', re.IGNORECASE),
+    re.compile(r'class\s*=\s*"modal"', re.IGNORECASE),
+    re.compile(r'class\s*=\s*"dialog"', re.IGNORECASE),
+]
+
 
 def check_alt_text(html: str) -> List[Dict]:
     """Check for images missing alt text (1.1.1)"""
@@ -157,13 +164,7 @@ def check_keyboard_traps(html: str) -> List[Dict]:
     """Check for potential keyboard traps (2.1.2)"""
     issues = []
     # Look for elements that might trap focus
-    modal_patterns = [
-        r'role\s*=\s*"dialog"',
-        r'class\s*=\s*"modal"',
-        r'class\s*=\s*"dialog"',
-    ]
-    
-    has_modal = any(re.search(pattern, html, re.IGNORECASE) for pattern in modal_patterns)
+    has_modal = any(pattern.search(html) for pattern in MODAL_PATTERNS)
     has_keydown = 'onkeydown' in html.lower() or 'keydown' in html.lower()
     
     if has_modal and not has_keydown:
