@@ -1,1 +1,0 @@
-gh pr view --comments
