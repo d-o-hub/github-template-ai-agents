@@ -10,7 +10,7 @@ Usage:
     python3 scripts/run-evals.py --verbose --format json
 """
 
-from __future__ import annotations
+
 
 import argparse
 import json
