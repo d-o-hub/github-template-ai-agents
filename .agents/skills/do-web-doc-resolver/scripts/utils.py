@@ -102,6 +102,20 @@ def _request_with_safe_redirects(
     raise requests.exceptions.TooManyRedirects(f"Exceeded {max_redirs} redirects")
 
 
+def is_shell_safe_url(url: str) -> bool:
+    """
+    Check if a URL contains dangerous shell characters.
+    Provides defense-in-depth against command injection for CLI-based providers.
+    Denylists dangerous characters (whitespace, pipes, backticks, redirects, etc.)
+    but allows characters common in legitimate URLs like &, ;, and parentheses.
+    """
+    # Denylist: whitespace, quotes, backticks, pipes, redirects, dollar sign, backslash, etc.
+    # Note: & and ; are allowed as they are common in URL query strings.
+    dangerous_pattern = r'[\s|`<>"\'\\\$\[\]\{\}\*!]'
+    if re.search(dangerous_pattern, url):
+        return False
+    return True
+
 def is_safe_url(url: str) -> bool:
     try:
         parsed = urlparse(url)
