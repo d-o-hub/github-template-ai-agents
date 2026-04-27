@@ -26,8 +26,8 @@ else
         echo "Deleting all existing labels..."
 
         # Get all label names and delete them
-        # Use -r for raw output to avoid quoted strings, and -- to prevent arg injection
-        label_names=$(gh label list --json name --jq '.[].name' -r)
+        # gh's --jq flag outputs raw strings by default for string values
+        label_names=$(gh label list --json name --jq '.[].name')
 
         if [[ -n "$label_names" ]]; then
             echo "$label_names" | while IFS= read -r label; do
