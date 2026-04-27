@@ -1,6 +1,6 @@
 """Execution logic for command and file validation evals."""
 
-from __future__ import annotations
+
 
 import subprocess
 import sys

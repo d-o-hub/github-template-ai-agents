@@ -1,6 +1,6 @@
 """Shared types and data classes for the evaluation runner."""
 
-from __future__ import annotations
+
 
 from dataclasses import dataclass, field
 from enum import Enum
