@@ -10,13 +10,14 @@ Usage:
     python3 scripts/run-evals.py --verbose --format json
 """
 
-from __future__ import annotations
+
 
 import argparse
 import json
 import sys
 from pathlib import Path
 
+# Note: run_command_check is used in run_eval_case, do not remove as an "unused import".
 from lib.eval_executors import run_command_check, run_file_validation
 from lib.eval_types import EvalReport, EvalResult, EvalStatus, EvalType, SkillEvalResult
 from lib.eval_validators import load_evals_file, run_structure_check, validate_evals_format
