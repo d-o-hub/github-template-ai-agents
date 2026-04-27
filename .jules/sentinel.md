@@ -52,3 +52,8 @@
 **Vulnerability:** Command discovery and verification scripts used manual string concatenation for JSON generation and brittle `grep | cut` for parsing, leading to injection risks and failures on special characters (quotes, commas, braces).
 **Learning:** Manual JSON construction in shell scripts is highly error-prone and insecure when handling untrusted or complex strings. Standardizing on a dedicated tool like `jq` eliminates these risks.
 **Prevention:** Always use `jq` with `--arg` or `--argjson` for safe JSON generation and `jq -r` for robust parsing in shell scripts. Avoid regex-based "parsing" of JSON structures.
+
+## 2026-05-24 - Argument Injection in GH CLI
+**Vulnerability:** Argument injection in `scripts/gh-labels-creator.sh` where label names from `gh label list` were passed to `gh label delete` without `--` separator.
+**Learning:** Using `--` separator after flags is mandatory to safely handle positional arguments that might start with a hyphen. Placing flags *after* `--` causes them to be treated as positional arguments, breaking the command.
+**Prevention:** Always use `gh command --flags -- "positional_args"` and use `jq -r` to ensure raw output from JSON.
