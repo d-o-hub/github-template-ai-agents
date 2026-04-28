@@ -145,12 +145,15 @@ def is_safe_url(url: str) -> bool:
             try:
                 socket.setdefaulttimeout(5)
                 infos = socket.getaddrinfo(hostname, None)
+                if not infos:
+                    return False
                 for _family, _socktype, _proto, _canonname, sockaddr in infos:
                     ip = ipaddress.ip_address(sockaddr[0])
                     if not ip.is_global:
                         return False
             except Exception:
-                pass
+                # If DNS resolution fails, fail-closed for security
+                return False
             finally:
                 socket.setdefaulttimeout(orig_timeout)
         return True
