@@ -44,7 +44,7 @@ The pre-commit hook detects the VERSION change and runs `propagate-version.sh`, 
 
 | File | Pattern | Updated By |
 |------|---------|------------|
-| `VERSION` | `0.2.6` | Manual edit |
+| `VERSION` | `0.2.7` | Manual edit |
 | `README.md` | `version-X.Y.Z` badge | propagate-version.sh |
 | `QUICKSTART.md` | `version-X.Y.Z` badge | propagate-version.sh |
 | `agents-docs/MIGRATION.md` | badge + `Template version:` text | propagate-version.sh |

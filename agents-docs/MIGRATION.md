@@ -2,7 +2,7 @@
 
 > Step-by-step guide for adopting the AI agent template in existing projects.
 
-[![Template Version](https://img.shields.io/badge/version-0.2.6-blue)](VERSION)
+[![Template Version](https://img.shields.io/badge/version-0.2.7-blue)](VERSION)
 
 ---
 
@@ -318,7 +318,7 @@ cat > your-project/MIGRATION_NOTES.md << 'EOF'
 # Migration Notes
 
 Migration completed on: $(date +%Y-%m-%d)
-Template version: 0.2.6
+Template version: 0.2.7
 
 ## Changes Made
 
