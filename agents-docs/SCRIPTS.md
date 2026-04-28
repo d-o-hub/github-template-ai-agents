@@ -1,6 +1,21 @@
 # Scripts Reference
 
 > All scripts in `scripts/` with their purpose, usage, and dependencies.
+
+## Initial Setup
+
+Use these commands to prepare the environment:
+
+```bash
+# Create skill symlinks from .agents/skills/ to agent-specific directories
+./scripts/setup-skills.sh
+
+# Install pre-commit for local secret scanning (required for commits)
+pip install pre-commit
+
+# Install custom git pre-commit hook (integrates Gitleaks)
+cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+```
 > Keep this file updated when adding or removing scripts.
 
 ## Core Scripts
