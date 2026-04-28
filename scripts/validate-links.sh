@@ -320,9 +320,6 @@ process_skill_file() {
     fi
 }
 
-echo "Validating reference links in SKILL.md files..."
-echo ""
-
 # Main entry point: discover and process all skill files
 # We iterate through the skills directory, skipping backup folders (underscore prefix)
 # For each skill, we look for SKILL.md and run validation
