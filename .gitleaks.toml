@@ -6,15 +6,8 @@
 useDefault = true
 
 [allowlist]
-description = "Allow documentation examples and non-sensitive files"
+description = "Allow known false positives and non-sensitive files"
 paths = [
-    '''AGENTS.md''',
-    '''README.md''',
-    '''QUICKSTART.md''',
-    '''CHANGELOG.md''',
-    '''CHANGELOG-TEMPLATE.md''',
-    '''agents-docs/.*''',
     '''examples/.*''',
-    '''.agents/skills/.*/README.md''',
     '''.pre-commit-config.yaml'''
 ]
