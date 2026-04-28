@@ -1,34 +1,6 @@
 # Workflow Reference
 
 > Detailed workflow procedures referenced by AGENTS.md.
-
-## PR & Commit Guidelines
-
-- **Branching**: Use one branch per feature or bugfix.
-- **Scope**: Ensure each PR addresses exactly one concern.
-- **Protection**: NEVER commit directly to the `main` branch.
-
-### Commit Type Mapping
-
-Use the following mapping to choose the correct commit type for security-related changes:
-
-| Intent                        | Type     | Scope suggestion |
-|-------------------------------|----------|------------------|
-| Security patch / hardening    | `fix`    | `security`       |
-| New security feature/control  | `feat`   | `security`       |
-| Security-related CI/tooling   | `ci`     | `security`       |
-
-### Troubleshooting Commitlint Failures
-
-The following types are allowed: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`.
-
-If `commitlint` rejects your message:
-1. Identify the correct type from the table above.
-2. Reword the commit: `git commit --amend -m "<type>(<scope>): <subject>"`
-3. Verify the fix: `npx commitlint --from HEAD~1`
-4. If the error is not in the HEAD commit: `git rebase -i <commit>^` and change `pick` to `reword`.
-
-DO NOT invent new types or skip linting.
 > Keep procedures here, not in AGENTS.md, to stay within `MAX_LINES_AGENTS_MD=150`.
 
 ## Pre-Existing Issue Resolution
