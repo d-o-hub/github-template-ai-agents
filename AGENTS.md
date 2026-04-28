@@ -1,8 +1,7 @@
 # AGENTS.md
 
 > Single source of truth for all AI coding agents in this repository.
-> Supported by: Claude Code, Windsurf, Gemini CLI, Codex, Copilot, OpenCode, Devin, Amp, Zed, Warp, RooCode, Jules
-> See: https://agents.md
+> @see agents-docs/HARNESS.md for architecture and repository structure.
 
 ## Named Constants
 
@@ -27,105 +26,40 @@ readonly MAX_PR_TITLE_LENGTH=72
 readonly GITLEAKS_VERSION="v8.27.2"
 ```
 
-## Setup
+## TIER 1 — CRITICAL SAFETY
 
-```bash
-./scripts/setup-skills.sh # Create skill symlinks
-# Install pre-commit for local secret scanning (required for commits)
-pip install pre-commit
-# Install custom git pre-commit hook (integrates Gitleaks)
-cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
-```
+1. **NEVER** commit directly to the `main` branch. ALWAYS use feature branches.
+2. **NEVER** include secrets, API keys, or tokens in commits. USE `.env` files for local secrets.
+3. **ALWAYS** pin GitHub Actions to a 40-character commit SHA and include a version comment (e.g., `uses: action/name@SHA # v1.0`).
+4. **NEVER** connect to or use untrusted MCP servers or tools.
+5. **NEVER** perform irreversible operations (like database deletions) without explicit human confirmation.
+6. **REPORT** all discovered security vulnerabilities via Private Advisories immediately.
 
-## Version Management
+## TIER 2 — QUALITY & WORKFLOW
 
-**Single source of truth**: `VERSION` file at root. Never edit version strings elsewhere.
-```bash
-echo "0.3.0" > VERSION && git add VERSION && git commit -m "chore: bump version to 0.3.0"
-```
-See `agents-docs/VERSION.md` for full workflow details.
+7. **ALWAYS** run `./scripts/quality_gate.sh` before committing and FIX all errors.
+8. **ALWAYS** produce a written plan and WAIT for user confirmation before starting non-trivial tasks.
+9. **ALWAYS** use the `VERSION` file at the root as the single source of truth for project versioning.
+10. **ALWAYS** use the commit helper `./scripts/ai-commit.sh` for all commits to ensure proper formatting.
+11. **USE** the `type(scope): description` format for all PR titles and manual commit messages (max `${MAX_COMMIT_SUBJECT_LENGTH}` chars).
+12. **FOLLOW** the Atomic Commit Workflow defined in `agents-docs/WORKFLOW.md`.
+13. **DELEGATE** complex research or isolated tasks to sub-agents to maintain context hygiene.
+14. **LOAD** skills progressively only when needed; DO NOT load all skills at session start.
 
-## Quality Gate (Required Before Commit)
+## TIER 3 — STANDARDS & STYLE
 
-```bash
-./scripts/quality_gate.sh # Always run before committing. Fix all errors.
-./scripts/update-all-docs.sh # Verify and update documentation
-```
-**Guard Rails:**
-- **Secret Scanning**: `pre-commit` is required for Gitleaks scanning. Skip with `SKIP_GITLEAKS=true`.
-- **Git Config**: Pre-commit validates git config. If global hooks detected, run `git config --global --unset core.hooksPath` or use `SKIP_GLOBAL_HOOKS_CHECK=true`.
+15. **ALWAYS** use named constants from the "Named Constants" section above. **NEVER** use magic numbers.
+16. **ENFORCE** file size limits: `${MAX_LINES_PER_SOURCE_FILE}` lines/source file; `${MAX_LINES_PER_SKILL_MD}`/`SKILL.md`; `${MAX_LINES_AGENTS_MD}`/`AGENTS.md`.
+17. **ENSURE** all `SKILL.md` files start with the required frontmatter and follow the structure in `agents-docs/SKILLS.md`.
+18. **USE** the reference format `` `references/filename.md` - Description `` for all skill documentation.
+19. **CAPTURE** non-obvious technical discoveries in the nearest `AGENTS.md` or `LESSONS.md` after completing a task.
+20. **USE** `shellcheck` (severity=error) for Shell, `markdownlint` for Markdown, and `mermaid` for diagrams.
+21. **NORMALIZE** all paths relative to the repository root before execution.
 
-## Code Style
+## Compliance Self-Check (Agents: run before finalizing any response)
 
-- Max `${MAX_LINES_PER_SOURCE_FILE}` lines/file; `${MAX_LINES_PER_SKILL_MD}`/`SKILL.md`; `${MAX_LINES_AGENTS_MD}`/`AGENTS.md`
-- `SKILL.md` must start with frontmatter; No magic numbers - use named constants
-- **Reference format**: `` `references/filename.md` - Description ``
-- Shell: `shellcheck` (severity=error); Markdown: `markdownlint`; Diagrams: `mermaid`
-
-## Repository Structure
-
-- `agents-docs/`: Detailed reference; `.agents/skills/`: Canonical skills
-- `scripts/`: Setup/validation; `analysis/` & `reports/`: Generated outputs
-- `.claude/`, `.gemini/`, `.qwen/`: Agent-specific symlinks
-
-## PR & Commit Instructions
-
-- Title/Commit: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
-- Branch per feature; One concern per PR; Never commit to `main`
-
-### Commit Workflow (Mandatory)
-
-1. **Use Helper (Preferred)**: Run `./scripts/ai-commit.sh --type <type> --subject <subject> --body <body>`
-2. **Manual Commits**: Validated via `.githooks/commit-msg` (requires `./scripts/install-git-hooks.sh`)
-3. **If Validation Fails**: Identify violation, then `git commit --amend` to fix message.
-
-**Valid Example:**
-```text
-feat(search): add fuzzy matching to improve discovery
-
-Users can now find documents even with typos. This uses the
-Levenshtein distance algorithm for better results.
-```
-
-**Invalid Example (Body line too long):**
-```text
-fix(auth): resolve login timeout issue for users on slow connections by increasing the default timeout from 5 to 30 seconds
-```
-
-### Commit Type Mapping
-
-| Intent                        | Type     | Scope suggestion |
-|-------------------------------|----------|------------------|
-| Security patch / hardening    | `fix`    | `security`       |
-| New security feature/control  | `feat`   | `security`       |
-| Security-related CI/tooling   | `ci`     | `security`       |
-
-### Commitlint failures
-
-Allowed types: `build` `chore` `ci` `docs` `feat` `fix` `perf` `refactor` `revert` `style` `test`
-
-If `commitlint` rejects your message:
-1. Identify correct type from table. Reword: `git commit --amend -m "<type>(<scope>): <subject>"`
-2. Verify: `npx commitlint --from HEAD~1`
-3. If not HEAD: `git rebase -i <commit>^` → change `pick` to `reword`.
-
-Do not invent new types. Do not skip linting.
-
-## Security
-
-- **Secret Scanning**: Gitleaks is enforced via pre-commit hooks to prevent credential leakage.
-- No secrets in commits (use `.env`); Pin Actions to SHA (with `# vX.Y` comment)
-- No untrusted MCPs; Report vulnerabilities via Private Advisories
-
-## Agent Guidance
-
-- **Plan**: Produce written plan, wait for confirmation for non-trivial tasks.
-- **Policies**: See `agents-docs/WORKFLOW.md` for Atomic Commit & Pre-Existing Issue resolution.
-- **Learning**: After work, run `learn` or append discoveries to nearest `AGENTS.md`.
-- **Context**: Delegate to sub-agents; Use `/clear`; Load skills only when needed.
-
-#### Recent Project-Wide Learnings
-- **Action SHA Pinning**: Pin to 40-char SHAs for security (LESSON-016)
-- **Worktree Cleanup**: Use `trap cleanup EXIT ERR` and `CREATED_WORKTREES` (LESSON-010)
-
-See `agents-docs/` for detailed reference documentation.
+- [ ] Did I read **ALL** of `AGENTS.md` before starting? (not just the first half)
+- [ ] Did I check the **Named Constants** section for any values I used?
+- [ ] Did I verify no **secrets/tokens** appear in my output?
+- [ ] Did I confirm my **branch name** and **commit message** follow conventions?
+- [ ] Did I run the **Quality Gate** (`./scripts/quality_gate.sh`)?
