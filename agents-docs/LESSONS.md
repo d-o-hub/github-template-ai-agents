@@ -463,24 +463,6 @@ timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
 
 ---
 
-### LESSON-017: Agent Guidance and Capturing Learnings
-
-**Component**: Documentation / Knowledge Management
-
-**Principle**: After completing non-trivial tasks, agents must capture non-obvious technical discoveries to ensure the project self-improves.
-
-**Guidelines**:
-- **Capture**: Hidden file relationships, surprising execution behavior, undocumented commands, fragile configurations, and files that must change together.
-- **Avoid**: Obvious facts, duplicates, verbose explanations, or session-specific notes.
-- **Scoping**:
-  - Project-wide → Root `AGENTS.md`
-  - Script-specific → `scripts/AGENTS.md`
-  - Skill-specific → `.agents/skills/<name>/AGENTS.md`
-
-**Reference**: See `agents-docs/WORKFLOW.md#post-task-learning` for more details.
-
----
-
 ### LESSON-010: Git Worktree Cleanup and Registration
 
 **Date**: 2026-04-05

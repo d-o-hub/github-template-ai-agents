@@ -20,14 +20,6 @@ Throw away what does not help - more config is not always better.
 - Concise and universally applicable - every instruction costs tokens
 - Use progressive disclosure: detailed docs in `agents-docs/`, not the root file
 
-## Repository Structure
-
-- `agents-docs/`: Detailed reference documentation
-- `.agents/skills/`: Canonical location for all reusable skills
-- `scripts/`: Environment setup and validation scripts
-- `analysis/` & `reports/`: Directories for generated audit and research outputs
-- `.claude/`, `.gemini/`, `.qwen/`: Agent-specific directories containing skill symlinks
-
 ## Skills (Single Canonical Source)
 
 All skills live in `.agents/skills/`. Claude Code, Gemini CLI, and Qwen Code use symlinks
