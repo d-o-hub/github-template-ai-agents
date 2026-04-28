@@ -1,12 +1,13 @@
 # Gitleaks configuration file
 # For more information, see https://github.com/gitleaks/gitleaks
 
+[extend]
+# Inherit Gitleaks default rules
+useDefault = true
+
 [allowlist]
-description = "Allow documentation, examples, and non-sensitive files"
+description = "Allow documentation examples and non-sensitive files"
 paths = [
-    '''AGENTS.md''',
-    '''README.md''',
-    '''QUICKSTART.md''',
     '''CHANGELOG.md''',
     '''CHANGELOG-TEMPLATE.md''',
     '''agents-docs/.*''',
