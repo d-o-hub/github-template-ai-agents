@@ -12,39 +12,68 @@ while [[ $# -gt 0 ]]; do
         *) echo "Unknown option: $1" >&2; exit 1 ;;
     esac
 done
-extract_commands() {
-    local file="$1"
-    local rel_path="${file#$REPO_ROOT/}"
-    local line_num=0
-    local in_code_block=0
-    local btype=""
-    while IFS= read -r line || [[ -n "$line" ]]; do
-        line_num=$((line_num + 1))
-        if [[ "$line" =~ ^\`\`\`([a-zA-Z]*) ]]; then
-            if [[ $in_code_block -eq 0 ]]; then
-                in_code_block=1
-                btype="${BASH_REMATCH[1]}"
-            else
-                in_code_block=0
-                btype=""
-            fi
-            continue
-        fi
-        if [[ $in_code_block -eq 1 ]]; then
-            if [[ "$btype" == "bash" ]] || [[ "$btype" == "sh" ]] || [[ "$btype" == "shell" ]] || [[ "$btype" == "console" ]]; then
-                [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
-                local cmd=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-                [[ -z "$cmd" ]] && continue
-                jq -n --arg cmd "$cmd" --arg file "$rel_path" --argjson line "$line_num" --arg type "code-block" \
-                    '{command: $cmd, file: $file, line: $line, type: $type}' -c
-            fi
-        fi
-    done < "$file"
-}
+
+# Use a single awk pass to extract all commands from all files
+# This is much faster than a bash loop with per-file awk/sed and per-command jq calls
+# We also exclude symlinked skill directories to avoid redundant processing
 results_file=$(mktemp)
-find "$REPO_ROOT" -type f -name "*.md" -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/.cache/*" -print0 | while IFS= read -r -d '' md_file; do
-    extract_commands "$md_file"
-done > "$results_file"
+find "$REPO_ROOT" -type f -name "*.md" \
+    -not -path "*/node_modules/*" \
+    -not -path "*/.git/*" \
+    -not -path "*/.cache/*" \
+    -not -path "*/.claude/skills/*" \
+    -not -path "*/.gemini/skills/*" \
+    -not -path "*/.qwen/skills/*" \
+    -print0 | \
+    xargs -0 awk -v root="$REPO_ROOT/" '
+    BEGIN {
+        valid_types["bash"] = 1
+        valid_types["sh"] = 1
+        valid_types["shell"] = 1
+        valid_types["console"] = 1
+    }
+    { sub(/\r$/, "") }
+    FNR == 1 { in_block = 0; btype = "" }
+    /^[[:space:]]*```/ {
+        if (in_block) {
+            in_block = 0
+            btype = ""
+        } else {
+            in_block = 1
+            # Extract language type from after the backticks
+            if (match(substr($0, index($0, "```") + 3), /^[a-zA-Z]+/)) {
+                btype = substr($0, index($0, "```") + 3, RLENGTH)
+            } else {
+                btype = ""
+            }
+        }
+        next
+    }
+    in_block && valid_types[btype] {
+        if ($0 ~ /^[[:space:]]*$/ || $0 ~ /^[[:space:]]*#/) next
+        cmd = $0
+        sub(/^[[:space:]]*/, "", cmd)
+        sub(/[[:space:]]*$/, "", cmd)
+        if (length(cmd) > 0) {
+            if (index(FILENAME, root) == 1) {
+                rel_path = substr(FILENAME, length(root) + 1)
+            } else {
+                rel_path = FILENAME
+            }
+            # Output 3 lines per record for robust jq consumption
+            print rel_path
+            print FNR
+            print cmd
+        }
+    }' | \
+    jq -R -n -c '
+        def group3:
+          [inputs] |
+          range(0; length; 3) as $i |
+          .[$i:$i+3];
+        group3 | {command: .[2], file: .[0], line: .[1]|tonumber, type: "code-block"}
+    ' > "$results_file"
+
 if [[ "$FORMAT" == "sarif" ]]; then
     jq -s '
       {
