@@ -86,7 +86,7 @@ for skill_path in "$SKILLS_SRC"/*/; do
         elif [ ! -L "$link" ] && { [ "$IS_WINDOWS" = "false" ] || [ ! -f "$link" ]; }; then
             echo -e "  ${RED}✗${NC} MISSING symlink: $cli_dir/$skill_name" >&2
             FAILED=1
-        elif [ ! -d "$link" ]; then
+        elif [ ! -d "$link" ] && { [ "$IS_WINDOWS" = "false" ] || [ ! -f "$link" ]; }; then
             # Optimized: check if target exists without subshell if possible
             # -d on a symlink already checks target existence
             echo -e "  ${RED}✗${NC} BROKEN symlink: $cli_dir/$skill_name" >&2
