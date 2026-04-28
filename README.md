@@ -18,6 +18,7 @@ A unified harness for AI coding agents that provides consistent workflows across
 - ✓ **Multi-Agent Support**: Works with 6+ AI coding tools simultaneously
 - ✓ **Skills System**: Reusable knowledge modules in canonical location
 - ✓ **Quality Gates**: Automatic lint, test, format before commits
+- ✓ **Permission Boundaries**: Explicit per-agent ALLOWED/NEVER ALLOWED documentation
 - ✓ **Context Discipline**: Prevents context rot with sub-agents and hooks
 - ✓ **Dependabot Integration**: Automated security and version updates
 
