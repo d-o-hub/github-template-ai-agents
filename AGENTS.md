@@ -116,6 +116,15 @@ Do not invent new types. Do not skip linting.
 - No secrets in commits (use `.env`); Pin Actions to SHA (with `# vX.Y` comment)
 - No untrusted MCPs; Report vulnerabilities via Private Advisories
 
+## Permission Boundaries (All Agents)
+
+- **Never** commit to `main` directly
+- **Never** read or reproduce secrets, tokens, or API keys
+- **Never** modify `.github/workflows/` without human review step
+- **Never** install global tooling
+- **Never** access resources outside the git workspace root
+- When in doubt: stop and ask via a GitHub comment, don't proceed
+
 ## Agent Guidance
 
 - **Plan**: Produce written plan, wait for confirmation for non-trivial tasks.
