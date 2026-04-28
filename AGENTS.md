@@ -53,6 +53,14 @@ See `agents-docs/VERSION.md` for full workflow details.
 ```
 **Guard Rails:** Pre-commit validates git config. If global hooks detected, run `git config --global --unset core.hooksPath` or use `SKIP_GLOBAL_HOOKS_CHECK=true`.
 
+### Contract Testing Rules
+
+- NEVER change an API endpoint shape without updating its Pact contract in `contracts/pacts/`
+- NEVER delete a field from a response/request without a deprecation cycle documented in `agents-docs/CONTRACT-TESTING.md`
+- ALWAYS use the `@pact-contract-testing` skill when adding/modifying HTTP API boundaries
+- When adding a new endpoint: write the Pact consumer test FIRST, then implement
+- Pact files in `contracts/pacts/` are the source of truth for API contracts — do not modify JSON manually
+
 ## Code Style
 
 - Max `${MAX_LINES_PER_SOURCE_FILE}` lines/file; `${MAX_LINES_PER_SKILL_MD}`/`SKILL.md`; `${MAX_LINES_AGENTS_MD}`/`AGENTS.md`
