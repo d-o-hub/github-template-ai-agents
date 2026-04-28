@@ -35,10 +35,11 @@ jobs:
       - name: Lint Pact files (Docker)
         run: |
           docker run --rm -v "$(pwd)/contracts/pacts:/pacts" \
-            pactfoundation/pact-cli:latest-multi \
-            pact-stub-server --file "/pacts/consumer-provider.json" --port 0 --loglevel info &
+            pactfoundation/pact-stub-server:latest \
+            --file "/pacts/consumer-provider.json" --port 8080 &
           STUB_PID=$!
-          sleep 5
+          sleep 10
+          curl -s http://localhost:8080/users/123 || (echo "Stub server failed to start" && exit 1)
           kill $STUB_PID
 
   verify-provider:
@@ -54,29 +55,27 @@ jobs:
         run: |
           echo "Starting dummy provider..."
           cat << 'EOF' > provider.py
-          import json
-          from http.server import HTTPServer, BaseHTTPRequestHandler
-          class Handler(BaseHTTPRequestHandler):
-              def do_GET(self):
-                  if self.path == '/health' or self.path == '/_pact/provider_states':
-                      self.send_response(200)
-                      self.end_headers()
-                      self.wfile.write(b'OK')
-                  elif self.path == '/users/123':
-                      self.send_response(200)
-                      self.send_header('Content-Type', 'application/json')
-                      self.end_headers()
-                      self.wfile.write(json.dumps({'id': '123', 'name': 'John Doe'}).encode())
-                  else:
-                      self.send_response(404)
-                      self.end_headers()
-              def do_POST(self):
-                  self.send_response(200)
-                  self.end_headers()
-          HTTPServer(('localhost', 8080), Handler).serve_forever()
-          EOF
-          # Strip YAML-induced indentation before running
-          sed -i 's/^          //' provider.py
+import json
+from http.server import HTTPServer, BaseHTTPRequestHandler
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/health' or self.path == '/_pact/provider_states':
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b'OK')
+        elif self.path == '/users/123':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'id': '123', 'name': 'John Doe'}).encode())
+        else:
+            self.send_response(404)
+            self.end_headers()
+    def do_POST(self):
+        self.send_response(200)
+        self.end_headers()
+HTTPServer(('localhost', 8080), Handler).serve_forever()
+EOF
           python3 provider.py &
           timeout 30 bash -c 'until curl -s http://localhost:8080/health > /dev/null; do sleep 1; done'
           echo "PROVIDER_URL=http://localhost:8080" >> "$GITHUB_ENV"
@@ -85,7 +84,7 @@ jobs:
         run: |
           docker run --rm --network="host" \
             -v "$(pwd)/contracts/pacts:/pacts" \
-            pactfoundation/pact-cli:latest-multi \
-            verifier --file "/pacts/consumer-provider.json" \
+            pactfoundation/pact-cli:latest \
+            verify --file "/pacts/consumer-provider.json" \
             --provider-base-url "http://localhost:8080" \
             --loglevel info
