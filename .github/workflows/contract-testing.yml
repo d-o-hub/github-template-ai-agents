@@ -1,0 +1,73 @@
+name: Contract Testing
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'contracts/**'
+      - '.agents/skills/pact-contract-testing/**'
+      - 'tests/validate-pact-contracts.bats'
+      - 'tests/verify-pact-contracts.sh'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'contracts/**'
+      - '.agents/skills/pact-contract-testing/**'
+      - 'tests/validate-pact-contracts.bats'
+      - 'tests/verify-pact-contracts.sh'
+
+jobs:
+  validate-pacts:
+    name: Validate Pact Contract Files
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install bats
+        run: sudo apt-get install -y bats
+
+      - name: Install pact CLI tools (Rust)
+        run: |
+          cargo install pact_mock_server_cli --locked
+          cargo install pact_verifier_cli --locked
+
+      - name: Validate all pact JSON files
+        run: bats tests/validate-pact-contracts.bats
+
+  verify-provider:
+    name: Verify Provider Against Contracts
+    runs-on: ubuntu-latest
+    # Run if there is provider code or if pacts changed
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pact CLI tools (Rust)
+        run: cargo install pact_verifier_cli --locked
+
+      - name: Start provider service
+        run: |
+          # This is a placeholder. Users should adapt this to their stack.
+          # For example, for a Node.js app:
+          # npm install && npm start &
+          # Or for a Rust app:
+          # cargo run &
+          echo "Starting provider placeholder..."
+          # Mock a successful health check for the sake of the template CI
+          python3 -c "from http.server import HTTPServer, BaseHTTPRequestHandler;
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'OK')
+HTTPServer(('localhost', 8080), Handler).serve_forever()" &
+
+          timeout 30 bash -c 'until curl -s http://localhost:8080 > /dev/null; do sleep 1; done'
+          echo "PROVIDER_URL=http://localhost:8080" >> $GITHUB_ENV
+
+      - name: Verify all pacts against provider
+        run: bash tests/verify-pact-contracts.sh
