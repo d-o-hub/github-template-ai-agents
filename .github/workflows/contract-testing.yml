@@ -53,10 +53,9 @@ jobs:
       - name: Start provider service (Dummy JSON)
         run: |
           echo "Starting dummy provider..."
-          python3 -c "
+          cat << 'EOF' > provider.py
 import json
 from http.server import HTTPServer, BaseHTTPRequestHandler
-
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/health' or self.path == '/_pact/provider_states':
@@ -71,14 +70,12 @@ class Handler(BaseHTTPRequestHandler):
         else:
             self.send_response(404)
             self.end_headers()
-
     def do_POST(self):
-        # Handle state changes
         self.send_response(200)
         self.end_headers()
-
-HTTPServer(('localhost', 8080), Handler).serve_forever()" &
-
+HTTPServer(('localhost', 8080), Handler).serve_forever()
+EOF
+          python3 provider.py &
           timeout 30 bash -c 'until curl -s http://localhost:8080/health > /dev/null; do sleep 1; done'
           echo "PROVIDER_URL=http://localhost:8080" >> "$GITHUB_ENV"
 
