@@ -20,8 +20,11 @@ CLI_SKILL_DIRS=(
 FAILED=0
 WARNINGS=0
 
-echo "Validating skills..."
-echo ""
+# Detect Windows (MSYS/Cygwin) to handle symlink differences
+IS_WINDOWS=false
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+    IS_WINDOWS=true
+fi
 
 # If no skills exist, nothing to validate
 if [ ! -d "$SKILLS_SRC" ] || [ -z "$(ls -A "$SKILLS_SRC" 2>/dev/null)" ]; then
@@ -58,7 +61,8 @@ for skill_path in "$SKILLS_SRC"/*/; do
     fi
 
     # Check 2: Circular symlink detection for the skill directory
-    if [ -L "$skill_path" ]; then
+    # On Windows, we skip this check as MSYS/Cygwin symlinks appear as files
+    if [ "$IS_WINDOWS" = "false" ] && [ -L "$skill_path" ]; then
         echo -e "  ${RED}✗${NC} $skill_name: Circular symlink detected" >&2
         FAILED=1
     fi
@@ -79,7 +83,7 @@ for skill_path in "$SKILLS_SRC"/*/; do
                 echo -e "  ${RED}✗${NC} MISSING: $cli_dir/$skill_name" >&2
                 FAILED=1
             fi
-        elif [ ! -L "$link" ]; then
+        elif [ ! -L "$link" ] && { [ "$IS_WINDOWS" = "false" ] || [ ! -f "$link" ]; }; then
             echo -e "  ${RED}✗${NC} MISSING symlink: $cli_dir/$skill_name" >&2
             FAILED=1
         elif [ ! -d "$link" ]; then
