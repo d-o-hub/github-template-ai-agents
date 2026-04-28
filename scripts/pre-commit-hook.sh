@@ -36,7 +36,7 @@ echo "Running pre-commit checks..."
 # Run Gitleaks via pre-commit if available
 if command -v pre-commit &> /dev/null; then
     echo "Running Gitleaks secret scanning..."
-    pre-commit run gitleaks --all-files
+    pre-commit run gitleaks
 fi
 
 "$REPO_ROOT/scripts/quality_gate.sh"

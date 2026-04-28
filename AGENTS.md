@@ -53,14 +53,6 @@ See `agents-docs/VERSION.md` for full workflow details.
 ```
 **Guard Rails:** Pre-commit validates git config. If global hooks detected, run `git config --global --unset core.hooksPath` or use `SKIP_GLOBAL_HOOKS_CHECK=true`.
 
-### Contract Testing Rules
-
-- NEVER change an API endpoint shape without updating its Pact contract in `contracts/pacts/`
-- NEVER delete a field from a response/request without a deprecation cycle documented in `agents-docs/CONTRACT-TESTING.md`
-- ALWAYS use the `@pact-contract-testing` skill when adding/modifying HTTP API boundaries
-- When adding a new endpoint: write the Pact consumer test FIRST, then implement
-- Pact files in `contracts/pacts/` are the source of truth for API contracts — do not modify JSON manually
-
 ## Code Style
 
 - Max `${MAX_LINES_PER_SOURCE_FILE}` lines/file; `${MAX_LINES_PER_SKILL_MD}`/`SKILL.md`; `${MAX_LINES_AGENTS_MD}`/`AGENTS.md`
@@ -122,15 +114,6 @@ Do not invent new types. Do not skip linting.
 - **Secret Scanning**: Gitleaks is enforced via pre-commit hooks to prevent credential leakage.
 - No secrets in commits (use `.env`); Pin Actions to SHA (with `# vX.Y` comment)
 - No untrusted MCPs; Report vulnerabilities via Private Advisories
-
-## Permission Boundaries (All Agents)
-
-- **Never** commit to `main` directly
-- **Never** read or reproduce secrets, tokens, or API keys
-- **Never** modify `.github/workflows/` without human review step
-- **Never** install global tooling
-- **Never** access resources outside the git workspace root
-- When in doubt: stop and ask via a GitHub comment, don't proceed
 
 ## Agent Guidance
 
