@@ -31,7 +31,7 @@ readonly GITLEAKS_VERSION="v8.27.2"
 
 ```bash
 ./scripts/setup-skills.sh # Create skill symlinks
-# Install pre-commit for local secret scanning (optional but recommended)
+# Install pre-commit for local secret scanning (required for commits)
 pip install pre-commit
 # Install custom git pre-commit hook (integrates Gitleaks)
 cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
@@ -51,7 +51,9 @@ See `agents-docs/VERSION.md` for full workflow details.
 ./scripts/quality_gate.sh # Always run before committing. Fix all errors.
 ./scripts/update-all-docs.sh # Verify and update documentation
 ```
-**Guard Rails:** Pre-commit validates git config. If global hooks detected, run `git config --global --unset core.hooksPath` or use `SKIP_GLOBAL_HOOKS_CHECK=true`.
+**Guard Rails:**
+- **Secret Scanning**: `pre-commit` is required for Gitleaks scanning. Skip with `SKIP_GITLEAKS=true`.
+- **Git Config**: Pre-commit validates git config. If global hooks detected, run `git config --global --unset core.hooksPath` or use `SKIP_GLOBAL_HOOKS_CHECK=true`.
 
 ## Code Style
 
