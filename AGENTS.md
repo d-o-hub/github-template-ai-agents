@@ -22,12 +22,18 @@ readonly DEFAULT_TIMEOUT_SECONDS=1800
 # Git/PR configuration
 readonly MAX_COMMIT_SUBJECT_LENGTH=72
 readonly MAX_PR_TITLE_LENGTH=72
+
+# Security configuration
+readonly GITLEAKS_VERSION="v8.27.2"
 ```
 
 ## Setup
 
 ```bash
 ./scripts/setup-skills.sh # Create skill symlinks
+# Install pre-commit for local secret scanning (optional but recommended)
+pip install pre-commit
+# Install custom git pre-commit hook (integrates Gitleaks)
 cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
@@ -105,6 +111,7 @@ Do not invent new types. Do not skip linting.
 
 ## Security
 
+- **Secret Scanning**: Gitleaks is enforced via pre-commit hooks to prevent credential leakage.
 - No secrets in commits (use `.env`); Pin Actions to SHA (with `# vX.Y` comment)
 - No untrusted MCPs; Report vulnerabilities via Private Advisories
 

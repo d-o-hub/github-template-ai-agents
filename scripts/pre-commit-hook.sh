@@ -32,6 +32,13 @@ if git diff --cached --name-only | grep -q "^VERSION$"; then
 fi
 
 echo "Running pre-commit checks..."
+
+# Run Gitleaks via pre-commit if available
+if command -v pre-commit &> /dev/null; then
+    echo "Running Gitleaks secret scanning..."
+    pre-commit run gitleaks --all-files
+fi
+
 "$REPO_ROOT/scripts/quality_gate.sh"
 
 echo "Pre-commit checks passed."

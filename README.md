@@ -42,7 +42,10 @@ cd your-project
 # Create skill symlinks (run once)
 ./scripts/setup-skills.sh
 
-# Install git pre-commit hook
+# Install pre-commit for local secret scanning (optional but recommended)
+pip install pre-commit
+
+# Install custom git pre-commit hook (integrates Gitleaks)
 cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
