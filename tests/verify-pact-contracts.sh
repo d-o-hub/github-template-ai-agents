@@ -8,6 +8,7 @@ set -euo pipefail
 export PATH="$HOME/.cargo/bin:$PATH"
 
 PROVIDER_URL="${PROVIDER_URL:-http://localhost:8080}"
+STATE_CHANGE_URL="${STATE_CHANGE_URL:-$PROVIDER_URL/_pact/provider_states}"
 PACT_DIR="contracts/pacts"
 
 if ! command -v pact_verifier_cli &> /dev/null; then
@@ -21,17 +22,12 @@ if [ ! -d "$PACT_DIR" ]; then
   exit 0
 fi
 
-pact_files=$(find "$PACT_DIR" -name "*.json")
-
-if [ -z "$pact_files" ]; then
-  echo "No pact files found in $PACT_DIR"
-  exit 0
-fi
-
-for pact in $pact_files; do
+# Use find -print0 for safe file iteration
+while IFS= read -r -d '' pact; do
   echo "--- Verifying $pact against $PROVIDER_URL ---"
   pact_verifier_cli \
     --file "$pact" \
     --provider-base-url "$PROVIDER_URL" \
+    --state-change-url "$STATE_CHANGE_URL" \
     --loglevel info
-done
+done < <(find "$PACT_DIR" -name "*.json" -print0)
