@@ -8,3 +8,8 @@
 **Vulnerability:** The `is_safe_url` helper used a fail-open approach where DNS resolution failures or empty results would allow the URL to pass validation.
 **Learning:** Security validation functions must explicitly handle errors by denying access (fail-closed) rather than ignoring them.
 **Prevention:** Always implement explicit exception handling in safety-critical code that defaults to `False` or `AccessDenied`.
+
+## 2026-04-29 - Path Traversal in Evaluation Framework
+**Vulnerability:** The evaluation runner (`scripts/run-evals.py`) and its executors allowed path traversal via the `--skill` argument and `files` definitions in `evals.json`, potentially leading to arbitrary code execution if a malicious skill was loaded.
+**Learning:** Even internal tooling should enforce strict path boundaries. Relying on simple sanitization (like stripping leading slashes) is insufficient compared to explicit rejection of traversal sequences and absolute paths.
+**Prevention:** Use `Path.is_absolute()` and check for `..` substrings before joining paths in tools that handle user-provided or data-driven file paths.
