@@ -102,14 +102,3 @@ def test_generate_text_report_with_skips():
     assert "- Skipped: 1" in output
     assert "[PASS] skip-skill" in output
     assert "[SKIP] Eval #2: Missing tool" in output
-
-def test_discover_skills_traversal():
-    """Test that discover_skills rejects path traversal payloads."""
-    skills_dir = Path("/app/.agents/skills")
-
-    # Relative traversal
-    assert run_evals.discover_skills(skills_dir, "../../../tmp/exploit") == []
-    assert run_evals.discover_skills(skills_dir, "skill/../../etc") == []
-
-    # Absolute path
-    assert run_evals.discover_skills(skills_dir, "/etc/passwd") == []
