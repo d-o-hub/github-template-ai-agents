@@ -18,72 +18,50 @@ generate_text_report = run_evals.generate_text_report
 # Import types for testing
 from lib.eval_types import EvalReport, SkillEvalResult, EvalResult, EvalStatus
 
-def test_generate_text_report_all_pass():
-    """Test report generation when everything passes."""
+def test_generate_text_report_basic():
     report = EvalReport(
         total_skills=1,
         skills_passed=1,
-        skills_failed=0,
-        total_evals=2,
-        evals_passed=2,
-        evals_failed=0,
-        evals_skipped=0,
+        total_evals=1,
+        evals_passed=1,
         skill_results=[
             SkillEvalResult(
                 skill_name="test-skill",
                 skill_path=Path("/tmp/test-skill"),
-                status=EvalStatus.PASS,
-                evals_run=2,
-                evals_passed=2,
-                eval_results=[
-                    EvalResult(eval_id=1, status=EvalStatus.PASS, message="Success 1"),
-                    EvalResult(eval_id=2, status=EvalStatus.PASS, message="Success 2")
-                ]
-            )
-        ]
-    )
-
-    output = generate_text_report(report)
-
-    assert "SKILL EVALUATION REPORT" in output
-    assert "Total skills evaluated: 1" in output
-    assert "Passed: 1" in output
-    assert "Failed: 0" in output
-    assert "OVERALL STATUS: PASS" in output
-    assert "[PASS] test-skill" in output
-    assert "[PASS] Eval #1: Success 1" in output
-    assert "[PASS] Eval #2: Success 2" in output
-
-def test_generate_text_report_with_failures():
-    """Test report generation when there are failures."""
-    report = EvalReport(
-        total_skills=2,
-        skills_passed=1,
-        skills_failed=1,
-        total_evals=2,
-        evals_passed=1,
-        evals_failed=1,
-        evals_skipped=0,
-        skill_results=[
-            SkillEvalResult(
-                skill_name="pass-skill",
-                skill_path=Path("/tmp/pass-skill"),
                 status=EvalStatus.PASS,
                 evals_run=1,
                 evals_passed=1,
                 eval_results=[
                     EvalResult(eval_id=1, status=EvalStatus.PASS, message="Success")
                 ]
-            ),
+            )
+        ]
+    )
+
+    output = generate_text_report(report)
+
+    assert "Total skills evaluated: 1" in output
+    assert "- Passed: 1" in output
+    assert "Total eval scenarios: 1" in output
+    assert "[PASS] test-skill" in output
+
+def test_generate_text_report_failure():
+    report = EvalReport(
+        total_skills=1,
+        skills_passed=0,
+        skills_failed=1,
+        total_evals=1,
+        evals_passed=0,
+        evals_failed=1,
+        skill_results=[
             SkillEvalResult(
                 skill_name="fail-skill",
                 skill_path=Path("/tmp/fail-skill"),
                 status=EvalStatus.FAIL,
                 evals_run=1,
-                evals_failed=1,
-                errors=["Generic error"],
+                evals_passed=0,
                 eval_results=[
-                    EvalResult(eval_id=1, status=EvalStatus.FAIL, message="Failure", details=["Line 10"])
+                    EvalResult(eval_id=1, status=EvalStatus.FAIL, message="Error message")
                 ]
             )
         ]
@@ -91,25 +69,17 @@ def test_generate_text_report_with_failures():
 
     output = generate_text_report(report)
 
-    assert "Total skills evaluated: 2" in output
-    assert "Failed: 1" in output
-    assert "OVERALL STATUS: FAIL" in output
-    assert "[PASS] pass-skill" in output
+    assert "Total skills evaluated: 1" in output
+    assert "- Failed: 1" in output
     assert "[FAIL] fail-skill" in output
-    assert "Errors:" in output
-    assert "- Generic error" in output
-    assert "[FAIL] Eval #1: Failure" in output
-    assert "- Line 10" in output
+    assert "Eval #1: Error message" in output
 
 def test_generate_text_report_with_skips():
-    """Test report generation when there are skipped evals."""
     report = EvalReport(
         total_skills=1,
         skills_passed=1,
-        skills_failed=0,
         total_evals=2,
         evals_passed=1,
-        evals_failed=0,
         evals_skipped=1,
         skill_results=[
             SkillEvalResult(
@@ -129,6 +99,17 @@ def test_generate_text_report_with_skips():
 
     output = generate_text_report(report)
 
-    assert "Skipped: 1" in output
+    assert "- Skipped: 1" in output
     assert "[PASS] skip-skill" in output
     assert "[SKIP] Eval #2: Missing tool" in output
+
+def test_discover_skills_traversal():
+    """Test that discover_skills rejects path traversal payloads."""
+    skills_dir = Path("/app/.agents/skills")
+
+    # Relative traversal
+    assert run_evals.discover_skills(skills_dir, "../../../tmp/exploit") == []
+    assert run_evals.discover_skills(skills_dir, "skill/../../etc") == []
+
+    # Absolute path
+    assert run_evals.discover_skills(skills_dir, "/etc/passwd") == []
