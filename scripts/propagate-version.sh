@@ -29,6 +29,8 @@ FILES_TO_UPDATE=(
     "QUICKSTART.md"
     "agents-docs/MIGRATION.md"
     "CHANGELOG-TEMPLATE.md"
+    "agents-docs/VERSION.md"
+    "analysis/SWARM_ANALYSIS.md"
 )
 
 UPDATED=0
@@ -51,6 +53,20 @@ for file in "${FILES_TO_UPDATE[@]}"; do
         sed -i "s/Template version: [0-9]\+\.[0-9]\+\.[0-9]\+/Template version: ${VERSION}/g" "$file"
         UPDATED=1
         echo "  Updated template version in $file"
+    fi
+
+    # Update "**Version:** X.Y.Z" text
+    if grep -q "\*\*Version:\*\* [0-9]\+\.[0-9]\+\.[0-9]\+" "$file" 2>/dev/null; then
+        sed -i "s/\*\*Version:\*\* [0-9]\+\.[0-9]\+\.[0-9]\+/\*\*Version:\*\* ${VERSION}/g" "$file"
+        UPDATED=1
+        echo "  Updated **Version:** text in $file"
+    fi
+
+    # Update "| \`VERSION\` | \`X.Y.Z\` |" text in tables
+    if grep -q "| \`VERSION\` | \`[0-9]\+\.[0-9]\+\.[0-9]\+\` |" "$file" 2>/dev/null; then
+        sed -i "s/| \`VERSION\` | \`[0-9]\+\.[0-9]\+\.[0-9]\+\` |/| \`VERSION\` | \`${VERSION}\` |/g" "$file"
+        UPDATED=1
+        echo "  Updated table VERSION text in $file"
     fi
 done
 
