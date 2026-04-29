@@ -12,58 +12,69 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$REPO_ROOT/.agents/skills"
 OUTPUT_FILE="$REPO_ROOT/agents-docs/AVAILABLE_SKILLS.md"
 
-# Collect skills by category
-declare -A CATEGORIES
-declare -A SKILL_DESCRIPTIONS
-declare -A SKILL_CATEGORIES
+# Optimization: Use a single awk process to extract data from all SKILL.md files.
+# This eliminates the O(N) process forks where N is the number of skills.
+SKILL_DATA=$(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" | xargs awk '
+    BEGINFILE {
+        category = "general"
+        description = ""
+        name = ""
+        # Get skill name from directory name
+        split(FILENAME, parts, "/")
+        skill_dir_name = parts[length(parts)-1]
+        in_fm = 0
+        fm_count = 0
+    }
+    /^---$/ {
+        fm_count++
+        if (fm_count == 1) in_fm = 1
+        else in_fm = 0
+        next
+    }
+    !in_fm { next }
 
-for skill_path in "$SKILLS_DIR"/*/; do
-    [ -d "$skill_path" ] || continue
-    skill_name="$(basename "$skill_path")"
-
-    # Skip internal folders
-    [[ "$skill_name" == _* ]] && continue
-
-    skill_file="$skill_path/SKILL.md"
-    [ -f "$skill_file" ] || continue
-
-    # Extract description (handle YAML multiline strings: >, >-, |)
-    description=$(awk '/^description:/{
-        sub(/^description: */, "")
-        sub(/^["'"'"']/, "")
-        sub(/["'"'"']$/, "")
-        if ($0 ~ /^>[-|]?$/) {
-            # Multiline - read subsequent lines starting with space
-            desc = ""
-            while (getline > 0 && $0 ~ /^  /) {
-                line = $0
-                sub(/^  /, "", line)
-                desc = (desc == "" ? line : desc " " line)
-            }
-            print desc
-        } else {
-            print
+    function clean(s) {
+        sub(/^[^:]*: */, "", s)
+        # Handle cases like description: "value" or description: '\''value'\''
+        if (s ~ /^".*"$/ || s ~ /^\x27.*\x27$/) {
+            s = substr(s, 2, length(s) - 2)
         }
-        exit
-    }' "$skill_file" || echo "No description available")
+        return s
+    }
 
-    # Extract category (handle YAML multiline strings)
-    category=$(awk '/^category:/{
-        sub(/^category: */, "")
-        sub(/^["'"'"']/, "")
-        sub(/["'"'"']$/, "")
-        print
-        exit
-    }' "$skill_file")
-    [ -z "$category" ] && category="general"
+    /^name:/ { name = clean($0) }
+    /^category:/ { category = clean($0) }
+    /^description:/ {
+        # Check if description uses multiline or is single line
+        orig_val = $0
+        sub(/^description: */, "", orig_val)
 
-    # Capitalize category for display
-    category_display=$(echo "$category" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
-
-    CATEGORIES["$category"]=1
-    SKILL_DESCRIPTIONS["$skill_name"]="$description"
-    SKILL_CATEGORIES["$skill_name"]="$category"
-done
+        if (orig_val ~ /^>[-|]?$/) {
+            desc = ""
+            while (getline > 0) {
+                if ($0 ~ /^  /) {
+                    line = $0
+                    sub(/^  /, "", line)
+                    desc = (desc == "" ? line : desc " " line)
+                } else {
+                    # Handle the line that broke the multiline loop
+                    if ($0 ~ /^name:/) name = clean($0)
+                    if ($0 ~ /^category:/) category = clean($0)
+                    if ($0 ~ /^---$/) { fm_count++; in_fm = 0 }
+                    break
+                }
+            }
+            description = desc
+        } else {
+            description = clean($0)
+        }
+    }
+    ENDFILE {
+        if (name == "") name = skill_dir_name
+        if (description == "") description = "No description available"
+        print category "|" name "|" description
+    }
+')
 
 # Generate output
 {
@@ -73,18 +84,21 @@ done
     echo "> Do not edit manually. Run \`./scripts/generate-available-skills.sh\` to regenerate."
     echo ""
 
-    # Sort categories and output
-    for category in $(echo "${!CATEGORIES[@]}" | tr ' ' '\n' | sort); do
+    # Get sorted categories first to match original script's outer loop
+    CATEGORIES=$(echo "$SKILL_DATA" | cut -d'|' -f1 | sort -u)
+
+    for category in $CATEGORIES; do
+        # Capitalize category for display
         category_display=$(echo "$category" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
+
         echo "## $category_display"
         echo ""
         echo "| Skill | Description |"
         echo "|-------|-------------|"
 
-        for skill_name in $(echo "${!SKILL_CATEGORIES[@]}" | tr ' ' '\n' | sort); do
-            if [[ "${SKILL_CATEGORIES[$skill_name]}" == "$category" ]]; then
-                echo "| \`$skill_name\` | ${SKILL_DESCRIPTIONS[$skill_name]} |"
-            fi
+        # Filter skills for this category and sort by name
+        echo "$SKILL_DATA" | grep "^$category|" | sort -t'|' -k2,2 | while IFS="|" read -r _ name description; do
+            echo "| \`$name\` | $description |"
         done
         echo ""
     done
@@ -100,4 +114,6 @@ done
     echo "- \`.agents/skills/skill-rules.json\` - Skill validation rules"
 } > "$OUTPUT_FILE"
 
-echo "Generated $OUTPUT_FILE with ${#SKILL_DESCRIPTIONS[@]} skills"
+# Count skills processed
+SKILL_COUNT=$(echo "$SKILL_DATA" | grep -c "^" || echo 0)
+echo "Generated $OUTPUT_FILE with $SKILL_COUNT skills"
