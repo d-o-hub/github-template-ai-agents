@@ -84,6 +84,20 @@ if ! ./scripts/validate-links.sh; then
 fi
 echo ""
 
+# --- Enforce LOC limits ---
+echo -e "${BLUE}Enforcing LOC limits...${NC}"
+if ! ./scripts/loc_gate.sh; then
+    FAILED=1
+fi
+echo ""
+
+# --- Enforce WASM size limits ---
+echo -e "${BLUE}Enforcing WASM size limits...${NC}"
+if ! ./scripts/wasm_size_gate.sh; then
+    FAILED=1
+fi
+echo ""
+
 # --- Auto-detect project languages ---
 # We detect languages by checking for ecosystem-specific marker files.
 # This avoids running Rust checks on a Python project, for example.
