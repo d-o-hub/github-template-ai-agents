@@ -7,7 +7,7 @@ description: Invoke for complex multi-step tasks requiring intelligent planning 
 
 Enable intelligent planning and execution of complex multi-step tasks through systematic decomposition, dependency mapping, and coordinated multi-agent execution.
 
-Always use the plans/ folder for all files.
+Always use the plans/ folder for all files. Use `templates/GOAP_STATE.md` to track persistent state.
 
 ## Quick Reference
 

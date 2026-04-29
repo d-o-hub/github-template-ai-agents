@@ -1,0 +1,39 @@
+---
+name: verification-template
+description: Template for creating portable domain-specific verification skills. Use this as a starting point when defining systematic verification checklists for new features, modules, or domain-specific operations.
+---
+
+# Verification Skill Template
+
+Define systematic, portable verification checklists for common operations within a specific domain.
+
+## When to Use
+- Establishing a new verification protocol for a specific component.
+- Ensuring consistent quality gates across different implementations.
+- Automating manual verification steps into a structured checklist.
+
+## Verification Checklist
+
+### [Operation Name]
+- [ ] Requirement 1: [Description of success criteria]
+- [ ] Requirement 2: [Description of success criteria]
+- [ ] Edge Case 1: [Description of how to verify]
+
+### [Data Integrity]
+- [ ] Roundtrip: [Verify data matches after save/load]
+- [ ] Schema: [Verify output adheres to expected schema]
+
+### [Security/Safety]
+- [ ] Permission: [Verify restricted access works as intended]
+- [ ] Sanitization: [Verify inputs are correctly handled]
+
+## Process
+1. **Identify Operation**: What specific action needs verification?
+2. **Define Success**: What does a "perfect" execution look like?
+3. **Draft Checklist**: Use the categories above to list specific checks.
+4. **Test Checklist**: Run through the checks on a real instance.
+5. **Iterate**: Refine the checklist based on discovered edge cases.
+
+## References
+- `AGENTS.md` - Repository standards and quality gates
+- `scripts/quality_gate.sh` - Automated verification entry point
