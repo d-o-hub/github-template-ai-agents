@@ -91,9 +91,13 @@ def run_file_validation(
     base_path = skill_path.resolve()
     for file_path in files:
         # Prevent path traversal by ensuring it stays within skill_path
-        # Remove leading slash to prevent joining as absolute path
-        safe_rel_path = str(file_path).lstrip('/')
-        full_path = (skill_path / safe_rel_path).resolve()
+        # Rejects absolute paths and traversal sequences explicitly
+        fpath = Path(file_path)
+        if ".." in str(file_path) or fpath.is_absolute():
+            missing.append(file_path)
+            continue
+
+        full_path = (skill_path / file_path).resolve()
 
         try:
             full_path.relative_to(base_path)
