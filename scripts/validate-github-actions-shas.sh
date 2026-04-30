@@ -32,10 +32,8 @@ fi
 # Extract action uses lines
 for file in "${WORKFLOW_FILES[@]}"; do
     # Only match lines that look like YAML uses keys at the appropriate indentation
-    # Allows for bullet points "- uses:"
     while IFS=: read -r line_num line; do
         # Extract the action reference (the part after "uses:")
-        # Handles single/double quotes and trailing comments
         action_ref=$(echo "$line" | sed -n 's/.*uses:[[:space:]]*//p' | sed "s/['\"]//g" | cut -d' ' -f1 | cut -d'#' -f1)
 
         # Skip empty lines or malformed uses
@@ -53,31 +51,11 @@ for file in "${WORKFLOW_FILES[@]}"; do
 
         # Check if it uses a SHA pinning (@ followed by 40 hex chars)
         if [[ "$action_ref" =~ @([a-f0-9]{40})$ ]]; then
-            # Extract SHA from regex match
-            action_sha="${BASH_REMATCH[1]}"
+            # Extract SHA
+            action_sha=$(echo "$action_ref" | cut -d'@' -f2)
 
-            # Check for placeholder patterns:
-            # 1. All same char: e.g. 0000... or ffff...
-            # 2. Repeating 8-char blocks: e.g. 1234567812345678123456781234567812345678
-
-            # Check all same char
-            first_char="${action_sha:0:1}"
-            all_same=true
-            for (( i=1; i<${#action_sha}; i++ )); do
-                if [[ "${action_sha:$i:1}" != "$first_char" ]]; then
-                    all_same=false
-                    break
-                fi
-            done
-
-            # Check repeating 8-char blocks
-            block8="${action_sha:0:8}"
-            repeating8=true
-            if [[ "$action_sha" != "$block8$block8$block8$block8$block8" ]]; then
-                repeating8=false
-            fi
-
-            if [ "$all_same" = true ] || [ "$repeating8" = true ]; then
+            # Check for placeholder patterns: all same char, or repeating 8-char blocks
+            if echo "$action_sha" | grep -qE '^(.)\1{39}$|^([0-9a-f]{8})\2{4}$'; then
                 echo -e "${RED}Invalid/placeholder SHA found in $file line $line_num: $action_sha${NC}"
                 FAILED=1
             fi
