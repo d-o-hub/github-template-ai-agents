@@ -20,39 +20,71 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const MAX_RETRIES = 60; // Increased from 24 (now ~30 minutes)
+            const MAX_RETRIES = 60; // ~30 minutes total
             const POLL_INTERVAL_MS = 30000;
+            const ref = context.payload.pull_request.head.sha;
 
             for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
               console.log(`Checking status (attempt ${attempt + 1}/${MAX_RETRIES})...`);
 
               try {
+                // 1. Get Combined Status (legacy statuses)
                 const { data: status } = await github.rest.repos.getCombinedStatusForRef({
                   ...context.repo,
-                  ref: context.payload.pull_request.head.sha
+                  ref
                 });
 
-                console.log(`Current state: ${status.state}`);
+                // 2. Get Check Runs (modern GitHub Actions jobs)
+                const { data: checks } = await github.rest.checks.listForRef({
+                  ...context.repo,
+                  ref
+                });
 
-                if (status.state === 'success') {
-                  console.log('✅ All checks passed!');
+                // Filter out the current workflow's check runs to avoid self-waiting
+                // Note: The Check Run object doesn't have run_id directly. We use html_url as a fallback
+                // and check if external_id matches our runId.
+                const otherChecks = checks.check_runs.filter(run => {
+                  const isCurrentRun = run.external_id === String(context.runId) ||
+                                      (run.html_url && run.html_url.includes(`/actions/runs/${context.runId}`));
+                  return !isCurrentRun;
+                });
+
+                const pendingChecks = otherChecks.filter(run => run.status !== 'completed');
+                const failedChecks = otherChecks.filter(run =>
+                  run.status === 'completed' &&
+                  !['success', 'neutral', 'skipped'].includes(run.conclusion)
+                );
+
+                console.log(`Combined status state: ${status.state}`);
+                console.log(`Pending check runs: ${pendingChecks.length}`);
+                if (pendingChecks.length > 0) {
+                  console.log(`Waiting for: ${pendingChecks.map(c => c.name).join(', ')}`);
+                }
+
+                // Check for hard failures
+                if (status.state === 'failure' || status.state === 'error' || failedChecks.length > 0) {
+                  const failedNames = [
+                    ...status.statuses.filter(s => s.state === 'failure' || s.state === 'error').map(s => s.context),
+                    ...failedChecks.map(c => c.name)
+                  ];
+                  core.setFailed(`❌ Checks failed: ${failedNames.join(', ')}`);
                   return;
                 }
 
-                if (status.state === 'failure' || status.state === 'error') {
-                  core.setFailed(`❌ Checks failed with state: ${status.state}`);
+                // Success condition:
+                // - Combined status is 'success' (or no statuses exist)
+                // - ALL other check runs are 'completed' and successful
+                if ((status.state === 'success' || status.total_count === 0) && pendingChecks.length === 0) {
+                  console.log('✅ All checks and statuses passed!');
                   return;
                 }
               } catch (error) {
-                const msg = error.message;
-                console.warn(`⚠️ Error fetching status: ${msg}`);
+                console.warn(`⚠️ Error fetching status: ${error.message}`);
               }
 
               if (attempt < MAX_RETRIES - 1) {
                 console.log(`Sleeping for ${POLL_INTERVAL_MS / 1000}s...`);
-                await new Promise(resolve =>
-                  setTimeout(resolve, POLL_INTERVAL_MS)
-                );
+                await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
               }
             }
 
