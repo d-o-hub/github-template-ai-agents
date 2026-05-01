@@ -26,7 +26,7 @@ repos:
 
   # Secret scanning — catches API keys, tokens, credentials before commit
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.27.2  # pin to latest stable, update via pre-commit autoupdate
+    rev: v8.30.1  # pin to latest stable, update via pre-commit autoupdate
     hooks:
       - id: gitleaks
 
