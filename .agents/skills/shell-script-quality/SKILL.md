@@ -25,6 +25,8 @@ Shell Script Quality Workflow:
 
 ### Step 1: Lint with ShellCheck
 
+**Note**: When searching for patterns across scripts, use the dedicated **Grep Tool** (with pattern/type parameters) instead of calling `grep` or `find` directly, as per `AGENTS.md`.
+
 ```bash
 # Lint single file
 shellcheck script.sh

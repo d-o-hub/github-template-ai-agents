@@ -7,6 +7,8 @@ description: Execute multiple independent tasks simultaneously using parallel ag
 
 Execute multiple independent tasks simultaneously to maximize throughput and minimize total execution time.
 
+**Session Start Protocol**: Identify parallelizable work and spawn task agents immediately at the start of a session, instead of doing everything sequentially.
+
 ## When to Use
 
 - Multiple independent tasks (no dependencies)

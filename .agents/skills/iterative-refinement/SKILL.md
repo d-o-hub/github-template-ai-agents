@@ -62,8 +62,7 @@ Establish before starting:
 - Min iterations: (optional)
 
 **Termination Mode**:
-- Fixed: Run exactly N iterations
-- Criteria: Stop when success criteria met
+- Fixed: Run exactly N iterations; Criteria: Stop when success criteria met
 - Convergence: Stop when improvements < threshold (e.g., <10% over 3 iterations)
 - Hybrid: Combine multiple conditions
 
@@ -98,6 +97,8 @@ Each iteration needs:
 This prevents repeating failed approaches.
 
 ### Step 4: Handle Stuck States
+
+**Self-Fix Threshold**: If 2+ similar errors occur during iterations, pause and diagnose the root cause before attempting another fix.
 
 If no progress for 2-3 iterations:
 1. Analyze why progress stopped
