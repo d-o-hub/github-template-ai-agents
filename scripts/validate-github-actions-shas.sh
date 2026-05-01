@@ -64,7 +64,7 @@ for file in "${WORKFLOW_FILES[@]}"; do
             echo -e "  External actions MUST be pinned to a 40-character commit SHA for security."
             FAILED=1
         fi
-    done < <(grep -n "^[[:space:]]*\(-[[:space:]]*\)\?uses:" "$file" || true)
+    done < <(grep -n -- "^[[:space:]]*\(-[[:space:]]*\)\?uses:" "$file" || true)
 done
 
 if [ $FAILED -eq 0 ]; then
