@@ -1,0 +1,203 @@
+Running quality gate...
+
+Validating GitHub Actions SHAs...
+All GitHub Actions SHAs appear valid and pinned
+
+Validating GitHub Actions Workflows...
+Validating GitHub Actions JavaScript blocks...
+Checking .github/workflows/auto-resolve-comments.yml...
+Checking .github/workflows/ci-and-labels.yml...
+Checking .github/workflows/cleanup.yml...
+Checking .github/workflows/commitlint.yml...
+Checking .github/workflows/dedup-issues.yml...
+  [0;32m✓ Script block syntax OK[0m
+  [0;32m✓ Script block syntax OK[0m
+  [0;32m✓ Script block syntax OK[0m
+Checking .github/workflows/dependabot-auto-merge.yml...
+  [0;32m✓ Script block syntax OK[0m
+Checking .github/workflows/gitleaks.yml...
+Checking .github/workflows/knowledge-cleanup.yml...
+Checking .github/workflows/labeler.yml...
+Checking .github/workflows/security-scan.yml...
+Checking .github/workflows/stale.yml...
+Checking .github/workflows/sync-turso-skill.yml...
+Checking .github/workflows/version-propagation.yml...
+Checking .github/workflows/yaml-lint.yml...
+
+[0;32mValidation PASSED[0m
+
+Validating skills...
+Checking canonical skills and CLI symlinks...
+  [0;33m⚠[0m accessibility-auditor: Missing 'version:' field (recommended)
+  [0;32m✓[0m accessibility-auditor: 246 lines
+  [0;32m✓[0m agent-browser: 69 lines
+  [0;33m⚠[0m agent-coordination: Missing 'version:' field (recommended)
+  [0;32m✓[0m agent-coordination: 87 lines
+  [0;33m⚠[0m agents-md: Missing 'version:' field (recommended)
+  [0;32m✓[0m agents-md: 95 lines
+  [0;33m⚠[0m anti-ai-slop: Missing 'version:' field (recommended)
+  [0;32m✓[0m anti-ai-slop: 245 lines
+  [0;32m✓[0m api-design-first: 123 lines
+  [0;33m⚠[0m architecture-diagram: Missing 'version:' field (recommended)
+  [0;32m✓[0m architecture-diagram: 92 lines
+  [0;33m⚠[0m atomic-commit: Missing 'version:' field (recommended)
+  [0;32m✓[0m atomic-commit: 142 lines
+  [0;33m⚠[0m cicd-pipeline: Missing 'version:' field (recommended)
+  [0;32m✓[0m cicd-pipeline: 221 lines
+  [0;32m✓[0m cloudflare-worker-api: 46 lines
+  [0;33m⚠[0m code-quality: Missing 'version:' field (recommended)
+  [0;32m✓[0m code-quality: 122 lines
+  [0;33m⚠[0m code-review-assistant: Missing 'version:' field (recommended)
+  [0;32m✓[0m code-review-assistant: 181 lines
+  [0;33m⚠[0m codeberg-api: Missing 'version:' field (recommended)
+  [0;32m✓[0m codeberg-api: 202 lines
+  [0;33m⚠[0m database-devops: Missing 'version:' field (recommended)
+  [0;32m✓[0m database-devops: 183 lines
+  [0;32m✓[0m database-schema-migrations: 54 lines
+  [0;33m⚠[0m dist-channel-selection: Missing 'version:' field (recommended)
+  [0;32m✓[0m dist-channel-selection: 43 lines
+  [0;33m⚠[0m do-web-doc-resolver: Missing 'version:' field (recommended)
+  [0;32m✓[0m do-web-doc-resolver: 112 lines
+  [0;33m⚠[0m docs-hook: Missing 'version:' field (recommended)
+  [0;32m✓[0m docs-hook: 37 lines
+  [0;32m✓[0m document-rendering-and-locators: 35 lines
+  [0;32m✓[0m dogfood: 136 lines
+  [0;33m⚠[0m git-github-workflow: Missing 'version:' field (recommended)
+  [0;32m✓[0m git-github-workflow: 179 lines
+  [0;33m⚠[0m github-readme: Missing 'version:' field (recommended)
+  [0;32m✓[0m github-readme: 212 lines
+  [0;33m⚠[0m github-workflow: Missing 'version:' field (recommended)
+  [0;32m✓[0m github-workflow: 204 lines
+  [0;33m⚠[0m goap-agent: Missing 'version:' field (recommended)
+  [0;32m✓[0m goap-agent: 144 lines
+  [0;33m⚠[0m intent-classifier: Missing 'version:' field (recommended)
+  [0;32m✓[0m intent-classifier: 85 lines
+  [0;33m⚠[0m iterative-refinement: Missing 'version:' field (recommended)
+  [0;32m✓[0m iterative-refinement: 249 lines
+  [0;33m⚠[0m learn: Missing 'version:' field (recommended)
+  [0;32m✓[0m learn: 56 lines
+  [0;32m✓[0m memory-context: 75 lines
+  [0;33m⚠[0m migration-refactoring: Missing 'version:' field (recommended)
+  [0;32m✓[0m migration-refactoring: 209 lines
+  [0;33m⚠[0m parallel-execution: Missing 'version:' field (recommended)
+  [0;32m✓[0m parallel-execution: 203 lines
+  [0;33m⚠[0m privacy-first: Missing 'version:' field (recommended)
+  [0;32m✓[0m privacy-first: 115 lines
+  [0;32m✓[0m pwa-offline-sync: 35 lines
+  [0;32m✓[0m reader-ui-ux: 38 lines
+  [0;32m✓[0m secure-invite-and-access: 36 lines
+  [0;32m✓[0m security-code-auditor: 84 lines
+  [0;32m✓[0m self-fix-loop: 138 lines
+  [0;32m✓[0m shell-script-quality: 231 lines
+  [0;33m⚠[0m skill-creator: Missing 'version:' field (recommended)
+  [0;32m✓[0m skill-creator: 135 lines
+  [0;33m⚠[0m skill-evaluator: Missing 'version:' field (recommended)
+  [0;32m✓[0m skill-evaluator: 225 lines
+  [0;33m⚠[0m task-decomposition: Missing 'version:' field (recommended)
+  [0;32m✓[0m task-decomposition: 145 lines
+  [0;32m✓[0m test-runner: 161 lines
+  [0;32m✓[0m testdata-builders: 52 lines
+  [0;33m⚠[0m testing-strategy: Missing 'version:' field (recommended)
+  [0;32m✓[0m testing-strategy: 234 lines
+  [0;33m⚠[0m triz-analysis: Missing 'version:' field (recommended)
+  [0;32m✓[0m triz-analysis: 85 lines
+  [0;33m⚠[0m triz-solver: Missing 'version:' field (recommended)
+  [0;32m✓[0m triz-solver: 158 lines
+  [0;32m✓[0m turso-db: 189 lines
+  [0;32m✓[0m ui-ux-optimize: 243 lines
+  [0;33m⚠[0m verification-template: Missing 'version:' field (recommended)
+  [0;32m✓[0m verification-template: 39 lines
+  [0;33m⚠[0m web-search-researcher: Missing 'version:' field (recommended)
+  [0;32m✓[0m web-search-researcher: 205 lines
+
+Checking skill-rules.json...
+  [0;32m✓[0m skill-rules.json: Valid JSON
+  [0;32m✓[0m skill-rules.json: 9 rules defined
+
+─────────────────────────────────────────────────────────────────
+│ ✓ All skill validations passed                                │
+─────────────────────────────────────────────────────────────────
+
+Validating reference links in SKILL.md files...
+  [0;32m✓[0m accessibility-auditor: All links valid
+  [0;32m✓[0m agent-browser: All links valid
+  [0;32m✓[0m agent-coordination: All links valid
+  [0;32m✓[0m agents-md: All links valid
+  [0;32m✓[0m anti-ai-slop: All links valid
+  [0;32m✓[0m api-design-first: All links valid
+  [0;32m✓[0m architecture-diagram: All links valid
+  [0;32m✓[0m atomic-commit: All links valid
+  [0;32m✓[0m cicd-pipeline: All links valid
+  [0;32m✓[0m cloudflare-worker-api: All links valid
+  [0;32m✓[0m code-quality: All links valid
+  [0;32m✓[0m code-review-assistant: All links valid
+  [0;32m✓[0m codeberg-api: All links valid
+  [0;32m✓[0m database-devops: All links valid
+  [0;32m✓[0m database-schema-migrations: All links valid
+  [0;32m✓[0m dist-channel-selection: All links valid
+  [0;32m✓[0m do-web-doc-resolver: All links valid
+  [0;32m✓[0m docs-hook: All links valid
+  [0;32m✓[0m document-rendering-and-locators: All links valid
+  [0;32m✓[0m dogfood: All links valid
+  [0;32m✓[0m git-github-workflow: All links valid
+  [0;32m✓[0m github-readme: All links valid
+  [0;32m✓[0m github-workflow: All links valid
+  [0;32m✓[0m goap-agent: All links valid
+  [0;32m✓[0m intent-classifier: All links valid
+  [0;32m✓[0m iterative-refinement: All links valid
+  [0;32m✓[0m learn: All links valid
+  [0;32m✓[0m memory-context: All links valid
+  [0;32m✓[0m migration-refactoring: All links valid
+  [0;32m✓[0m parallel-execution: All links valid
+  [0;32m✓[0m privacy-first: All links valid
+  [0;32m✓[0m pwa-offline-sync: All links valid
+  [0;32m✓[0m reader-ui-ux: All links valid
+  [0;32m✓[0m secure-invite-and-access: All links valid
+  [0;32m✓[0m security-code-auditor: All links valid
+  [0;32m✓[0m self-fix-loop: All links valid
+  [0;32m✓[0m shell-script-quality: All links valid
+  [0;32m✓[0m skill-creator: All links valid
+  [0;32m✓[0m skill-evaluator: All links valid
+  [0;32m✓[0m task-decomposition: All links valid
+  [0;32m✓[0m test-runner: All links valid
+  [0;32m✓[0m testdata-builders: All links valid
+  [0;32m✓[0m testing-strategy: All links valid
+  [0;32m✓[0m triz-analysis: All links valid
+  [0;32m✓[0m triz-solver: All links valid
+  [0;32m✓[0m turso-db: All links valid
+  [0;32m✓[0m ui-ux-optimize: All links valid
+  [0;32m✓[0m verification-template: All links valid
+  [0;32m✓[0m web-search-researcher: All links valid
+
+─────────────────────────────────────────────────────────────────
+│ [0;32m✓ All reference links valid[0m                                   │
+─────────────────────────────────────────────────────────────────
+
+  Files checked: 49
+  Links checked: 180
+  Broken links: 0
+
+Enforcing LOC limits...
+Checking LOC limits...
+LOC check passed.
+
+Enforcing WASM size limits...
+Checking WASM size limits (Max: 1048576 bytes)...
+No WASM files found to check.
+
+Detecting project languages...
+  ✓ Shell scripts detected
+  ✓ Markdown files detected
+
+Running Shell script checks...
+  ⚠ shellcheck not installed - skipping shell checks
+  ⚠ bats not installed - skipping shell tests
+
+Running Markdown checks...
+  ⚠ markdownlint not installed - skipping markdown checks
+
+─────────────────────────────────────────────────────────────────
+│ ✓ All Quality Gates PASSED                                    │
+─────────────────────────────────────────────────────────────────
+
+Languages checked: shell markdown
