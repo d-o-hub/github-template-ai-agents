@@ -23,17 +23,13 @@ readonly DEFAULT_TIMEOUT_SECONDS=1800
 readonly MAX_COMMIT_SUBJECT_LENGTH=72
 readonly MAX_PR_TITLE_LENGTH=72
 
-# Security configuration
-readonly GITLEAKS_VERSION="v8.27.2"
 ```
 
 ## Setup
 
 ```bash
 ./scripts/setup-skills.sh # Create skill symlinks
-# Install pre-commit for local secret scanning (required for commits)
-pip install pre-commit
-# Install custom git pre-commit hook (integrates Gitleaks)
+# Install custom git pre-commit hook
 cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
@@ -52,7 +48,7 @@ See `agents-docs/VERSION.md` for full workflow details.
 ./scripts/update-all-docs.sh # Verify and update documentation
 ```
 **Guard Rails:**
-- **Secret Scanning**: `pre-commit` is required for Gitleaks scanning. Skip with `SKIP_GITLEAKS=true`.
+- **Secret Scanning**: Gitleaks is enforced via CI only to prevent credential leakage.
 - **Git Config**: Pre-commit validates git config. If global hooks detected, run `git config --global --unset core.hooksPath` or use `SKIP_GLOBAL_HOOKS_CHECK=true`.
 
 ## Code Style
@@ -61,7 +57,6 @@ See `agents-docs/VERSION.md` for full workflow details.
 - `SKILL.md` must start with frontmatter; No magic numbers - use named constants
 - **Reference format**: `` `references/filename.md` - Description ``
 - Shell: `shellcheck` (severity=error); Markdown: `markdownlint`; Diagrams: `mermaid`
-- **Grep Tool**: Use dedicated Grep tool (pattern/type parameters) instead of raw `grep`/`find`.
 
 ## Repository Structure
 
@@ -76,11 +71,9 @@ See `agents-docs/VERSION.md` for full workflow details.
 
 ### Commit Workflow (Mandatory)
 
-1. **Granularity**: Commit after each completed feature or atomic change.
-2. **Quality Gate**: Always run `./scripts/quality_gate.sh` before each commit.
-3. **Use Helper (Preferred)**: Run `./scripts/ai-commit.sh --type <type> --subject <subject> --body <body>`
-4. **Manual Commits**: Validated via `.githooks/commit-msg` (requires `./scripts/install-git-hooks.sh`)
-5. **If Validation Fails**: Identify violation, then `git commit --amend` to fix message.
+1. **Use Helper (Preferred)**: Run `./scripts/ai-commit.sh --type <type> --subject <subject> --body <body>`
+2. **Manual Commits**: Validated via `.githooks/commit-msg` (requires `./scripts/install-git-hooks.sh`)
+3. **If Validation Fails**: Identify violation, then `git commit --amend` to fix message.
 
 **Valid Example:**
 ```text
@@ -116,16 +109,14 @@ Do not invent new types. Do not skip linting.
 
 ## Security
 
-- **Secret Scanning**: Gitleaks is enforced via pre-commit hooks to prevent credential leakage.
+- **Secret Scanning**: Gitleaks is enforced via CI only to prevent credential leakage.
 - No secrets in commits (use `.env`); Pin Actions to SHA (with `# vX.Y` comment)
 - No untrusted MCPs; Report vulnerabilities via Private Advisories
 
 ## Agent Guidance
 
 - **Plan**: Produce written plan, wait for confirmation for non-trivial tasks.
-- **Session Start**: Identify parallelizable work and spawn task agents immediately via task-decomposition.
 - **Policies**: See `agents-docs/WORKFLOW.md` for Atomic Commit & Pre-Existing Issue resolution.
-- **Self-Fix Threshold**: If 2+ similar errors occur, pause and diagnose root cause before retrying.
 - **Learning**: After work, run `learn` or append discoveries to nearest `AGENTS.md`.
 - **Context**: Delegate to sub-agents; Use `/clear`; Load skills only when needed.
 

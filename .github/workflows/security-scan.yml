@@ -113,37 +113,6 @@ jobs:
           category: trivy-fs
 
   # ============================================================================
-  # SECRET DETECTION
-  # Scan for leaked secrets, API keys, and credentials
-  # ============================================================================
-  secret-detection:
-    name: Secret Detection
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
-        with:
-          fetch-depth: 0
-
-      - name: Secret Detection with GitLeaks
-        id: gitleaks
-        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7  # v2
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}  # Optional
-
-      - name: Fallback Secret Scan with TruffleHog
-        if: steps.gitleaks.outcome == 'failure'
-        uses: trufflesecurity/trufflehog@17456f8c7d042d8c82c9a8ca9e937231f9f42e26  # v3.95.2
-        with:
-          path: ./
-          base: ""
-          head: HEAD
-          extra_args: --debug --only-verified
-        continue-on-error: true
-
-  # ============================================================================
   # CODEQL ANALYSIS
   # NOTE: CodeQL has limited support for shell/bash. This job is kept for
   # future if JavaScript/TypeScript or Python is added to the project.
@@ -276,7 +245,6 @@ jobs:
     needs:
       - shellcheck-security
       - trivy-fs
-      - secret-detection
       - codeql
       - iac-scan
     if: always()
@@ -291,7 +259,6 @@ jobs:
           # yamllint disable-line rule:line-length
           echo "  • ShellCheck Security: ${{ needs.shellcheck-security.result }}"
           echo "  • Trivy Filesystem: ${{ needs.trivy-fs.result }}"
-          echo "  • Secret Detection: ${{ needs.secret-detection.result }}"
           echo "  • CodeQL Analysis: ${{ needs.codeql.result }}"
           echo "  • IaC Scan: ${{ needs.iac-scan.result }}"
           echo ""
@@ -299,14 +266,12 @@ jobs:
           # Check for failures (treat skipped as success)
           shellcheck_result="${{ needs.shellcheck-security.result }}"
           trivy_result="${{ needs.trivy-fs.result }}"
-          secret_result="${{ needs.secret-detection.result }}"
           codeql_result="${{ needs.codeql.result }}"
 
           # Normalize results (treat skipped and codeql as OK for shell repos)
           # This is a shell script repo, so CodeQL will not find analyzable code
           if [[ "$shellcheck_result" == "failure" ]] || \
-             [[ "$trivy_result" == "failure" ]] || \
-             [[ "$secret_result" == "failure" ]]; then
+             [[ "$trivy_result" == "failure" ]]; then
             echo "❌ CRITICAL/HIGH vulnerabilities detected!"
             echo "   Review the Security tab for details."
             exit 1

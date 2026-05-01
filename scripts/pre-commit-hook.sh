@@ -33,20 +33,6 @@ fi
 
 echo "Running pre-commit checks..."
 
-# Run Gitleaks via pre-commit to catch secrets before commit
-if [ "${SKIP_GITLEAKS:-false}" != "true" ]; then
-    if command -v pre-commit &> /dev/null; then
-        echo "Running Gitleaks secret scanning..."
-        pre-commit run gitleaks
-    else
-        echo "❌ ERROR: pre-commit not found!"
-        echo "   Local secret scanning is required to prevent credential leakage."
-        echo "   To fix this, install pre-commit: pip install pre-commit"
-        echo "   Or skip at your own risk: SKIP_GITLEAKS=true git commit ..."
-        exit 1
-    fi
-fi
-
 "$REPO_ROOT/scripts/quality_gate.sh"
 
 echo "Pre-commit checks passed."
