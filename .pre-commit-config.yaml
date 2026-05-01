@@ -24,12 +24,6 @@ repos:
         args: ['--fix=lf']
       - id: trailing-whitespace
 
-  # Secret scanning — catches API keys, tokens, credentials before commit
-  - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.27.2  # pin to latest stable, update via pre-commit autoupdate
-    hooks:
-      - id: gitleaks
-
   # Shell script checks
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.10.0.1

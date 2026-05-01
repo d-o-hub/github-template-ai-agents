@@ -23,17 +23,13 @@ readonly DEFAULT_TIMEOUT_SECONDS=1800
 readonly MAX_COMMIT_SUBJECT_LENGTH=72
 readonly MAX_PR_TITLE_LENGTH=72
 
-# Security configuration
-readonly GITLEAKS_VERSION="v8.27.2"
 ```
 
 ## Setup
 
 ```bash
 ./scripts/setup-skills.sh # Create skill symlinks
-# Install pre-commit for local secret scanning (required for commits)
-pip install pre-commit
-# Install custom git pre-commit hook (integrates Gitleaks)
+# Install custom git pre-commit hook
 cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 ```
 
@@ -52,7 +48,7 @@ See `agents-docs/VERSION.md` for full workflow details.
 ./scripts/update-all-docs.sh # Verify and update documentation
 ```
 **Guard Rails:**
-- **Secret Scanning**: `pre-commit` is required for Gitleaks scanning. Skip with `SKIP_GITLEAKS=true`.
+- **Secret Scanning**: Gitleaks is enforced via CI only to prevent credential leakage.
 - **Git Config**: Pre-commit validates git config. If global hooks detected, run `git config --global --unset core.hooksPath` or use `SKIP_GLOBAL_HOOKS_CHECK=true`.
 
 ## Code Style
@@ -113,7 +109,7 @@ Do not invent new types. Do not skip linting.
 
 ## Security
 
-- **Secret Scanning**: Gitleaks is enforced via pre-commit hooks to prevent credential leakage.
+- **Secret Scanning**: Gitleaks is enforced via CI only to prevent credential leakage.
 - No secrets in commits (use `.env`); Pin Actions to SHA (with `# vX.Y` comment)
 - No untrusted MCPs; Report vulnerabilities via Private Advisories
 
