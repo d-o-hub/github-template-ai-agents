@@ -39,16 +39,17 @@ _get_hash_internal() {
     # but for content hashing, external tool is safer.
     if command -v sha256sum &> /dev/null; then
         local res
-        res=$(sha256sum "$file")
+        res=$(sha256sum -- "$file")
         echo "${res%% *}"
     elif command -v shasum &> /dev/null; then
         local res
-        res=$(shasum -a 256 "$file")
+        res=$(shasum -a 256 -- "$file")
         echo "${res%% *}"
     else
         # Fallback to just timestamp + size if no shasum tool
+        # Security: Use -- to prevent option injection
         # shellcheck disable=SC2012
-        ls -l "$file" | awk '{print $5 "_" $6 "_" $7 "_" $8}'
+        ls -l -- "$file" | awk '{print $5 "_" $6 "_" $7 "_" $8}'
     fi
 }
 
