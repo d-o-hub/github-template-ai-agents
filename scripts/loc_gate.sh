@@ -12,9 +12,15 @@ MAX_AGENTS=150
 
 # Try to extract from AGENTS.md if available
 if [ -f "AGENTS.md" ]; then
-    MAX_SOURCE=$(grep "MAX_LINES_PER_SOURCE_FILE=" AGENTS.md | cut -d'=' -f2 || echo 500)
-    MAX_SKILL=$(grep "MAX_LINES_PER_SKILL_MD=" AGENTS.md | cut -d'=' -f2 || echo 250)
-    MAX_AGENTS=$(grep "MAX_LINES_AGENTS_MD=" AGENTS.md | cut -d'=' -f2 || echo 150)
+    # Security: Validate numeric format to prevent injection from AGENTS.md values
+    MAX_SOURCE_RAW=$(grep "MAX_LINES_PER_SOURCE_FILE=" AGENTS.md | cut -d'=' -f2 || echo 500)
+    MAX_SKILL_RAW=$(grep "MAX_LINES_PER_SKILL_MD=" AGENTS.md | cut -d'=' -f2 || echo 250)
+    MAX_AGENTS_RAW=$(grep "MAX_LINES_AGENTS_MD=" AGENTS.md | cut -d'=' -f2 || echo 150)
+
+    # Validate numeric format or fallback to defaults
+    [[ "$MAX_SOURCE_RAW" =~ ^[0-9]+$ ]] && MAX_SOURCE="$MAX_SOURCE_RAW"
+    [[ "$MAX_SKILL_RAW" =~ ^[0-9]+$ ]] && MAX_SKILL="$MAX_SKILL_RAW"
+    [[ "$MAX_AGENTS_RAW" =~ ^[0-9]+$ ]] && MAX_AGENTS="$MAX_AGENTS_RAW"
 fi
 
 FAILED=0
