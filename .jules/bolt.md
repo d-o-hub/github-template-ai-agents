@@ -29,3 +29,7 @@
 ## 2026-05-24 - [Variable accumulation vs Line-by-line I/O]
 **Learning:** In Bash scripts, accumulating text in a variable and writing it to a file once with `printf` is significantly faster than using `>>` append redirection in a loop. For a GitHub Action workflow validator, this optimization, combined with reducing `mktemp` calls, yielded a ~7x speedup (from 2.5s to 0.34s) when processing multiple files with script blocks.
 **Action:** Avoid line-by-line file appends in loops. Use Bash variables to buffer content and perform a single write operation. Reuse temporary files across loop iterations instead of creating new ones.
+
+## 2026-05-25 - [Optimizing LOC gate via batched wc]
+**Learning:** Replacing an O(N) process-forking loop (calling `wc -l` for every file) with a single batched `xargs -0 wc -l` call and an `awk` validation pass yielded an ~8.8x speedup (from 0.44s to 0.05s) for ~100 files. Handling the `total` line in `awk` and using `print0` for space-safety is essential for robustness.
+**Action:** Always prefer `xargs wc -l | awk` over `while read ...; do wc -l; done` for line-count validation across multiple files.
