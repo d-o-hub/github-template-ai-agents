@@ -93,6 +93,13 @@ validate_skill_file() {
             local s_rest="${template_version#*.}"
             local s_minor="${s_rest%%.*}"
 
+            # Security: Validate numeric components to prevent shell arithmetic injection
+            if [[ ! "$c_major" =~ ^[0-9]+$ ]] || [[ ! "$c_minor" =~ ^[0-9]+$ ]] || \
+               [[ ! "$s_major" =~ ^[0-9]+$ ]] || [[ ! "$s_minor" =~ ^[0-9]+$ ]]; then
+                # If malformed, use safe defaults to avoid injection in $(( ))
+                c_major=0; c_minor=0; s_major=0; s_minor=0
+            fi
+
             if [[ "$s_major" -lt "$c_major" ]] || \
                { [[ "$s_major" -eq "$c_major" ]] && [[ $((c_minor - s_minor)) -gt 1 ]]; }; then
                 echo -e "  ${YELLOW}⚠${NC} $skill_name: template_version $template_version is >1 minor behind current $current_version" >&2
