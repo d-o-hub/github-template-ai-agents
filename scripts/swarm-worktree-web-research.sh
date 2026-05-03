@@ -46,14 +46,6 @@ readonly GITHUB_TIMEOUT="${GITHUB_TIMEOUT:-3600}"
 readonly GITHUB_MERGE_METHOD="${GITHUB_MERGE_METHOD:-squash}"
 readonly GITHUB_FAIL_ON_WARNING="${GITHUB_FAIL_ON_WARNING:-1}"
 
-# Security: Validate numeric configuration to prevent shell arithmetic injection
-for var in WEB_RESOLVER_MAX_CHARS WEB_RESOLVER_MIN_CHARS WEB_RESOLVER_CACHE_TTL_DAYS GITHUB_TIMEOUT GITHUB_FAIL_ON_WARNING; do
-    if [[ ! "${!var}" =~ ^[0-9]+$ ]]; then
-        echo "Error: $var must be numeric" >&2
-        exit 1
-    fi
-done
-
 # Logging
 log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
@@ -390,6 +382,14 @@ main() {
         show_usage
         exit 1
     fi
+
+    # Security: Validate numeric configuration to prevent shell arithmetic injection
+    for var in WEB_RESOLVER_MAX_CHARS WEB_RESOLVER_MIN_CHARS WEB_RESOLVER_CACHE_TTL_DAYS GITHUB_TIMEOUT GITHUB_FAIL_ON_WARNING; do
+        if [[ ! "${!var}" =~ ^[0-9]+$ ]]; then
+            log_error "$var must be numeric"
+            exit 1
+        fi
+    done
 
     export WEB_RESOLVER_PROFILE="$profile"
 
