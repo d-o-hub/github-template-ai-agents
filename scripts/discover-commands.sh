@@ -31,8 +31,6 @@ find "$REPO_ROOT" -type f -name "*.md" \
         valid_types["sh"] = 1
         valid_types["shell"] = 1
         valid_types["console"] = 1
-        valid_types["zsh"] = 1
-        valid_types["fish"] = 1
     }
     { sub(/\r$/, "") }
     FNR == 1 { in_block = 0; btype = "" }
@@ -42,11 +40,9 @@ find "$REPO_ROOT" -type f -name "*.md" \
             btype = ""
         } else {
             in_block = 1
-            # Extract language type from after the backticks, allowing for spaces
-            rest = substr($0, index($0, "```") + 3)
-            sub(/^[[:space:]]*/, "", rest)
-            if (match(rest, /^[a-zA-Z]+/)) {
-                btype = substr(rest, 1, RLENGTH)
+            # Extract language type from after the backticks
+            if (match(substr($0, index($0, "```") + 3), /^[a-zA-Z]+/)) {
+                btype = substr($0, index($0, "```") + 3, RLENGTH)
             } else {
                 btype = ""
             }
@@ -58,8 +54,7 @@ find "$REPO_ROOT" -type f -name "*.md" \
         cmd = $0
         sub(/^[[:space:]]*/, "", cmd)
         sub(/[[:space:]]*$/, "", cmd)
-        # Skip structural brackets and empty commands
-        if (length(cmd) > 0 && cmd != "{" && cmd != "}") {
+        if (length(cmd) > 0) {
             if (index(FILENAME, root) == 1) {
                 rel_path = substr(FILENAME, length(root) + 1)
             } else {

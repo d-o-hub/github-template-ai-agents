@@ -1,12 +1,17 @@
 import sys
+import importlib.util
 from pathlib import Path
+import pytest
 
 # Add scripts directory to path for internal imports
 REPO_ROOT = Path(__file__).parent.parent
 scripts_dir = REPO_ROOT / "scripts"
 sys.path.append(str(scripts_dir))
 
-from lib import eval_executors
+# Import eval_executors using importlib
+spec = importlib.util.spec_from_file_location("eval_executors", scripts_dir / "lib" / "eval_executors.py")
+eval_executors = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(eval_executors)
 
 
 def test_run_command_check_no_scripts_dir(tmp_path):
