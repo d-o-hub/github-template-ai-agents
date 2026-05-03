@@ -55,6 +55,17 @@
         "The output provides specific concrete details",
         "The output uses direct language"
       ]
+    },
+    {
+      "id": 100,
+      "prompt": "Review this UI design which uses glassmorphism and heavy borders.",
+      "expected_output": "The agent identifies the UI slop patterns (glassmorphism, heavy borders) and suggests solid styling per surfaces.md rules.",
+      "files": [],
+      "assertions": [
+        "Identifies glassmorphism as a slop pattern",
+        "Suggests replacing it with solid surfaces",
+        "References the rules from surfaces.md"
+      ]
     }
   ]
 }

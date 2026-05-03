@@ -89,6 +89,17 @@
         "Typography includes mono role",
         "Quality score >= 60/66"
       ]
+    },
+    {
+      "id": 99,
+      "prompt": "Optimize the typography and animations for this pricing card UI.",
+      "expected_output": "The agent references typography rules (text-wrap: balance for titles, tabular-nums for prices) and animation patterns from the references.",
+      "files": [],
+      "assertions": [
+        "Uses tabular-nums for dynamic numbers like prices",
+        "Uses text-wrap: balance or pretty appropriately",
+        "Applies interruptible or exit/enter animations correctly"
+      ]
     }
   ]
 }

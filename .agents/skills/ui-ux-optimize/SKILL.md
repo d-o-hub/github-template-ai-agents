@@ -218,7 +218,8 @@ Run every step. Swarm coordinates handoffs.
 | `references/swarm-coordination.md` | Swarm architecture, handoff protocol, agent contracts |
 | `references/auto-research.md` | Auto-research workflow, search strategies |
 | `references/design-tokens.md` | Token categories, naming, semantic structure |
-| `references/typography.md` | Role-based type system, wrapping safety |
+| `references/typography.md` | Role-based type system, text-wrap and tabular numbers |
+| `references/animations.md` | Interruptible animations, enter/exit transitions |
 | `references/color-system.md` | Restrained palettes, contrast rules |
 | `references/layout-composition.md` | Layout rhythm, density, hierarchy |
 | `references/navigation-clarity.md` | Navigation models, labels, cross-screen rules |
