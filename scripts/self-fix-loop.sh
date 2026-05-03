@@ -13,6 +13,15 @@ TIMEOUT="${SELF_FIX_LOOP_TIMEOUT:-1800}"
 POLL_INTERVAL="${SELF_FIX_LOOP_POLL_INTERVAL:-30}"
 AUTO_RESEARCH="${SELF_FIX_LOOP_AUTO_RESEARCH:-1}"
 STRICT_VALIDATION="${SELF_FIX_LOOP_STRICT_VALIDATION:-1}"
+
+# Security: Validate numeric configuration to prevent shell arithmetic injection
+for var in MAX_RETRIES TIMEOUT POLL_INTERVAL AUTO_RESEARCH STRICT_VALIDATION; do
+    if [[ ! "${!var}" =~ ^[0-9]+$ ]]; then
+        echo "Error: $var must be numeric" >&2
+        exit 1
+    fi
+done
+
 DRY_RUN=false
 FIX_ISSUES=true
 BASE_BRANCH="main"

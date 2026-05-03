@@ -46,6 +46,14 @@ readonly GITHUB_TIMEOUT="${GITHUB_TIMEOUT:-3600}"
 readonly GITHUB_MERGE_METHOD="${GITHUB_MERGE_METHOD:-squash}"
 readonly GITHUB_FAIL_ON_WARNING="${GITHUB_FAIL_ON_WARNING:-1}"
 
+# Security: Validate numeric configuration to prevent shell arithmetic injection
+for var in WEB_RESOLVER_MAX_CHARS WEB_RESOLVER_MIN_CHARS WEB_RESOLVER_CACHE_TTL_DAYS GITHUB_TIMEOUT GITHUB_FAIL_ON_WARNING; do
+    if [[ ! "${!var}" =~ ^[0-9]+$ ]]; then
+        echo "Error: $var must be numeric" >&2
+        exit 1
+    fi
+done
+
 # Logging
 log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
@@ -92,6 +100,12 @@ batch_resolve() {
     local queries_file="$1"
     local output_dir="$2"
     local max_parallel="${3:-3}"
+
+    # Security: Validate numeric input to prevent shell arithmetic injection
+    if [[ ! "$max_parallel" =~ ^[0-9]+$ ]]; then
+        log_error "max_parallel must be numeric"
+        return 1
+    fi
 
     log_info "Batch resolving $(wc -l < "$queries_file") queries (max parallel: ${max_parallel})"
     mkdir -p "$output_dir"

@@ -13,3 +13,8 @@
 **Vulnerability:** Shell arithmetic expansion `$((...))` with unvalidated variables derived from `SKILL.md` frontmatter allowed arbitrary command execution during skill validation.
 **Learning:** Bash evaluates variables within arithmetic contexts (`$(( ))` and `(( ))`) as expressions. If these variables contain command substitution or other shell constructs, they are executed.
 **Prevention:** Strictly validate that all variables used in shell arithmetic contexts are numeric (e.g., using `[[ "$var" =~ ^[0-9]+$ ]]`) before evaluation.
+
+## 2026-05-03 - Shell Arithmetic Injection via Environment Variables
+**Vulnerability:** Environment-overridable numeric variables used in `(( ))`, `$(( ))`, and `[[ $A -lt $B ]]` were vulnerable to command injection (e.g., `VAR='a[$(id)0]'`).
+**Learning:** Bash evaluates operands in arithmetic contexts as expressions. If a variable contains an array index like `a[$(...)0]`, the code inside `$(...)` is executed during evaluation.
+**Prevention:** Strictly validate that all variables used in Bash arithmetic contexts are numeric (e.g., using `[[ "$var" =~ ^[0-9]+$ ]]`) before they are evaluated.
