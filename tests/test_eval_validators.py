@@ -1,17 +1,12 @@
 import sys
-import importlib.util
 from pathlib import Path
-import pytest
 
 # Add scripts directory to path for internal imports
 REPO_ROOT = Path(__file__).parent.parent
 scripts_dir = REPO_ROOT / "scripts"
 sys.path.append(str(scripts_dir))
 
-# Import eval_validators using importlib
-spec = importlib.util.spec_from_file_location("eval_validators", scripts_dir / "lib" / "eval_validators.py")
-eval_validators = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(eval_validators)
+from lib import eval_validators
 
 validate_evals_format = eval_validators.validate_evals_format
 
