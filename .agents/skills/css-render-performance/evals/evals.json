@@ -1,0 +1,61 @@
+{
+  "skill_name": "css-render-performance",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My CSS transition on left: 0 to left: 300px is janky on mobile. Fix it.",
+      "expected_output": "Replace with transform: translateX(300px), explain compositor-only property",
+      "files": [],
+      "assertions": ["Uses transform instead of left", "Explains compositor reason", "Keeps same visual result"]
+    },
+    {
+      "id": 2,
+      "prompt": "I applied will-change: transform to all 200 cards. Is that fine?",
+      "expected_output": "Flags layer explosion risk, recommends removing will-change from static cards",
+      "files": [],
+      "assertions": ["Identifies layer explosion", "Recommends targeted will-change only on animating element", "Mentions budget"]
+    },
+    {
+      "id": 3,
+      "prompt": "My chat message list with 1000 messages is slow to scroll. Optimize.",
+      "expected_output": "Recommends content-visibility: auto with contain-intrinsic-size on list items",
+      "files": [],
+      "assertions": ["Mentions content-visibility: auto", "Includes contain-intrinsic-size", "Explains browser skip behaviour"]
+    },
+    {
+      "id": 4,
+      "prompt": "How do I prevent a complex widget from causing full-page layout recalculation?",
+      "expected_output": "Recommends contain: layout style paint or contain: strict on the widget",
+      "files": [],
+      "assertions": ["Recommends CSS contain", "Explains isolation benefit"]
+    },
+    {
+      "id": 5,
+      "prompt": "Add a fade-in animation to modal, respecting reduced motion preference.",
+      "expected_output": "Uses opacity transition, wraps in @media (prefers-reduced-motion: no-preference)",
+      "files": [],
+      "assertions": ["Uses opacity", "Includes prefers-reduced-motion guard"]
+    },
+    {
+      "id": 6,
+      "prompt": "Design a hero section for my SaaS homepage.",
+      "expected_output": "Skill should NOT be the primary trigger — ui-ux-optimize handles design tasks",
+      "files": [],
+      "assertions": ["Does not over-apply render performance rules to a static design task"]
+    },
+    {
+      "id": 7,
+      "prompt": "Audit my CSS animations for performance issues.",
+      "expected_output": "Full audit using property cost table, checks transform/opacity usage, will-change budget",
+      "files": [],
+      "assertions": ["Checks for non-compositor properties in animations", "Audits will-change usage", "Provides actionable fixes"]
+    },
+    {
+      "id": 8,
+      "prompt": "Set up a Postgres database schema for my app.",
+      "expected_output": "Skill should NOT trigger — backend task",
+      "files": [],
+      "assertions": ["CSS render performance rules not applied to database task"]
+    }
+  ]
+}
