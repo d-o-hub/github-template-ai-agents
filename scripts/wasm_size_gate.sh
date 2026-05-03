@@ -3,6 +3,13 @@
 set -euo pipefail
 
 MAX_SIZE_BYTES=${MAX_WASM_SIZE_BYTES:-1048576} # Default 1MB
+
+# Security: Validate numeric configuration to prevent shell arithmetic injection
+if [[ ! "$MAX_SIZE_BYTES" =~ ^[0-9]+$ ]]; then
+    echo "Error: MAX_WASM_SIZE_BYTES must be numeric" >&2
+    exit 1
+fi
+
 FAILED=0
 
 echo "Checking WASM size limits (Max: $MAX_SIZE_BYTES bytes)..."

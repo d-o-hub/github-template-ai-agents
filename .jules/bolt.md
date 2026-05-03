@@ -33,7 +33,3 @@
 ## 2026-05-25 - [Optimizing LOC gate via batched wc]
 **Learning:** Replacing an O(N) process-forking loop (calling `wc -l` for every file) with a single batched `xargs -0 wc -l` call and an `awk` validation pass yielded an ~8.8x speedup (from 0.44s to 0.05s) for ~100 files. Handling the `total` line in `awk` and using `print0` for space-safety is essential for robustness.
 **Action:** Always prefer `xargs wc -l | awk` over `while read ...; do wc -l; done` for line-count validation across multiple files.
-
-## 2026-05-26 - [Relative Path Construction in Loops]
-**Learning:** When creating symlinks in multiple target directories, pre-calculating the `realpath --relative-to` base path for each target directory (O(N)) and manually appending the filename (O(1)) is significantly faster than calling `realpath` for every individual link (O(N*M)). In `setup-skills.sh`, this contributed to a ~27x speedup.
-**Action:** For bulk symlink creation, pre-resolve the relative base path outside the inner loop.

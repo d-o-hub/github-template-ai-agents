@@ -93,6 +93,12 @@ batch_resolve() {
     local output_dir="$2"
     local max_parallel="${3:-3}"
 
+    # Security: Validate numeric input to prevent shell arithmetic injection
+    if [[ ! "$max_parallel" =~ ^[0-9]+$ ]]; then
+        log_error "max_parallel must be numeric"
+        return 1
+    fi
+
     log_info "Batch resolving $(wc -l < "$queries_file") queries (max parallel: ${max_parallel})"
     mkdir -p "$output_dir"
 
@@ -376,6 +382,14 @@ main() {
         show_usage
         exit 1
     fi
+
+    # Security: Validate numeric configuration to prevent shell arithmetic injection
+    for var in WEB_RESOLVER_MAX_CHARS WEB_RESOLVER_MIN_CHARS WEB_RESOLVER_CACHE_TTL_DAYS GITHUB_TIMEOUT GITHUB_FAIL_ON_WARNING; do
+        if [[ ! "${!var}" =~ ^[0-9]+$ ]]; then
+            log_error "$var must be numeric"
+            exit 1
+        fi
+    done
 
     export WEB_RESOLVER_PROFILE="$profile"
 

@@ -13,6 +13,7 @@ TIMEOUT="${SELF_FIX_LOOP_TIMEOUT:-1800}"
 POLL_INTERVAL="${SELF_FIX_LOOP_POLL_INTERVAL:-30}"
 AUTO_RESEARCH="${SELF_FIX_LOOP_AUTO_RESEARCH:-1}"
 STRICT_VALIDATION="${SELF_FIX_LOOP_STRICT_VALIDATION:-1}"
+
 DRY_RUN=false
 FIX_ISSUES=true
 BASE_BRANCH="main"
@@ -66,6 +67,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         *) error "Unknown option: $1"; exit 1 ;;
     esac
+done
+
+# Security: Validate numeric configuration AFTER parsing to prevent injection via CLI flags
+for var in MAX_RETRIES TIMEOUT POLL_INTERVAL AUTO_RESEARCH STRICT_VALIDATION; do
+    if [[ ! "${!var}" =~ ^[0-9]+$ ]]; then
+        error "$var must be numeric"
+        exit 1
+    fi
 done
 
 # Phase 1: Commit & Push

@@ -7,6 +7,12 @@ REPO_ROOT="${REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 SKILLS_SRC="$REPO_ROOT/.agents/skills"
 MAX_SKILL_LINES=${MAX_SKILL_LINES:-250}
 
+# Security: Validate numeric configuration to prevent shell arithmetic injection
+if [[ ! "$MAX_SKILL_LINES" =~ ^[0-9]+$ ]]; then
+    echo "Error: MAX_SKILL_LINES must be numeric" >&2
+    exit 1
+fi
+
 # Color codes
 RED='\033[0;31m'
 GREEN='\033[0;32m'
