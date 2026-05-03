@@ -1,7 +1,6 @@
 import sys
 import importlib.util
 from pathlib import Path
-import pytest
 
 # Add scripts directory to path for internal imports
 REPO_ROOT = Path(__file__).parent.parent
