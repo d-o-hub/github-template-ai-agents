@@ -10,8 +10,8 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 AGENTS_FILE="$REPO_ROOT/AGENTS.md"
-TEMP_FILE=$(mktemp /tmp/agents-md-XXXXXX)
-temp_table=$(mktemp /tmp/temp-table-XXXXXX)  # Define before trap
+TEMP_FILE="$REPO_ROOT/.agents_md_temp.md"
+temp_table="$REPO_ROOT/.temp_table.md"  # Define before trap
 
 # Trap to clean up temp files on exit or error
 trap 'rm -f "$TEMP_FILE" "$temp_table"' EXIT ERR
