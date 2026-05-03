@@ -13,6 +13,11 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+if ! command -v jq >/dev/null 2>&1; then
+    echo "Error: jq is required but not installed. Please install jq to run this script." >&2
+    exit 1
+fi
+
 # Use a single awk pass to extract all commands from all files
 # This is much faster than a bash loop with per-file awk/sed and per-command jq calls
 # We also exclude symlinked skill directories to avoid redundant processing
