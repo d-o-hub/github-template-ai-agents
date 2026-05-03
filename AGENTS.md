@@ -48,6 +48,7 @@ See `agents-docs/VERSION.md` for full workflow details.
 ./scripts/update-all-docs.sh # Verify and update documentation
 ```
 **Guard Rails:**
+- **Temporary Files**: NEVER create temporary files or debug outputs in the repository root or source directories. Always use system temporary directories (e.g., `/tmp` or via `mktemp`).
 - **Secret Scanning**: Gitleaks is enforced via CI only to prevent credential leakage.
 - **Git Config**: Pre-commit validates git config. If global hooks detected, run `git config --global --unset core.hooksPath` or use `SKIP_GLOBAL_HOOKS_CHECK=true`.
 
