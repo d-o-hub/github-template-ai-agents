@@ -10,7 +10,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 REGISTRY_FILE="$REPO_ROOT/agents-docs/AGENTS_REGISTRY.md"
-TEMP_FILE="$REPO_ROOT/agents-docs/.agents_registry_temp.md"
+TEMP_FILE=$(mktemp /tmp/agents-registry-XXXXXX)
 
 # Trap to clean up temp files on exit or error
 trap 'rm -f "$TEMP_FILE"' EXIT ERR

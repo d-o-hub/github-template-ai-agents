@@ -20,12 +20,6 @@ if [ -z "$VERSION" ]; then
     exit 1
 fi
 
-# Security: Validate version format to prevent injection in sed commands
-if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    echo "Error: Invalid version format '$VERSION'. Must be X.Y.Z"
-    exit 1
-fi
-
 echo "Propagating version $VERSION..."
 
 # Files that contain version badges or references
