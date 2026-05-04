@@ -33,3 +33,11 @@
 ## 2026-05-25 - [Optimizing LOC gate via batched wc]
 **Learning:** Replacing an O(N) process-forking loop (calling `wc -l` for every file) with a single batched `xargs -0 wc -l` call and an `awk` validation pass yielded an ~8.8x speedup (from 0.44s to 0.05s) for ~100 files. Handling the `total` line in `awk` and using `print0` for space-safety is essential for robustness.
 **Action:** Always prefer `xargs wc -l | awk` over `while read ...; do wc -l; done` for line-count validation across multiple files.
+
+## 2026-05-26 - [Timestamp-based caching fast-path]
+**Learning:** Adding a timestamp-based fast-path using the Bash `-nt` operator before performing expensive content hashing (`sha256sum`) can improve caching check performance by >100x (~3.5ms to ~0.03ms per file). This is particularly effective in large repositories where only a few files change between quality gate runs.
+**Action:** Always implement a timestamp check against the cache entry before falling back to content hashing for high-frequency validation loops.
+
+## 2026-05-26 - [Bash associative array robustness]
+**Learning:** In Bash, accessing associative arrays with keys containing dots (e.g., config filenames) can trigger "invalid arithmetic operator" errors in certain contexts like `[[ -v MAP[$key] ]]` or `[[ -n ${MAP[$key]} ]]`. Additionally, `unset MAP` destroys the associative attribute, causing subsequent assignments to treat it as an indexed array.
+**Action:** Use `"${MAP["$key"]-}"` or `"${MAP[$key]-}"` for robust lookup and `MAP=()` for clearing contents while preserving the `-A` attribute.

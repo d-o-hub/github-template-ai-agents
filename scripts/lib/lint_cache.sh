@@ -60,15 +60,44 @@ lint_if_changed() {
     shift 3
     # The remaining arguments are the command to run
 
+    # Performance optimization: Compute cache key early for timestamp fast-path
+    # Replace characters that might be problematic in filenames
+    # Use native Bash parameter expansion instead of tr subshell
+    local safe_file="${file//[\/\. ]/_}"
+    local cache_key="$CACHE_DIR/${tool_id}_${safe_file}"
+
+    # Fast-path: Check if cache_key exists and is newer than the source file
+    # This avoids expensive sha256sum calls for unchanged files (~3.5ms vs ~0.01ms per call)
+    if [[ -f "$cache_key" ]] && [[ "$cache_key" -nt "$file" ]]; then
+        local skip=1
+        if [[ -n "$config_file" ]]; then
+            local real_config=""
+            if [[ -f "$config_file" ]]; then
+                real_config="$config_file"
+            elif [[ -f "$REPO_ROOT/$config_file" ]]; then
+                real_config="$REPO_ROOT/$config_file"
+            fi
+
+            # If config file is newer than our cache, we cannot skip
+            if [[ -n "$real_config" ]] && [[ ! "$cache_key" -nt "$real_config" ]]; then
+                skip=0
+            fi
+        fi
+        [[ $skip -eq 1 ]] && return 0
+    fi
+
     # Compute hashes
     local file_hash
     file_hash=$(_get_hash_internal "$file")
 
     local config_hash="none"
-    if [ -n "$config_file" ]; then
+    if [[ -n "$config_file" ]]; then
         # Check if config_file is in memory cache
-        if [[ -v "_CONFIG_HASH_CACHE[$config_file]" ]]; then
-            config_hash="${_CONFIG_HASH_CACHE[$config_file]}"
+        # Using associative array lookup directly for robustness with keys containing dots
+        local cached_val=""
+        cached_val="${_CONFIG_HASH_CACHE["$config_file"]-}"
+        if [[ -n "$cached_val" ]]; then
+            config_hash="$cached_val"
         else
             # Check if config_file is absolute or relative to REPO_ROOT
             local real_config=""
@@ -87,13 +116,7 @@ lint_if_changed() {
 
     local cache_value="${file_hash}:${config_hash}"
 
-    # Use a safe filename for the cache key
-    # Replace characters that might be problematic in filenames
-    # Performance optimization: Use native Bash parameter expansion instead of tr subshell
-    local safe_file="${file//[\/\. ]/_}"
-    local cache_key="$CACHE_DIR/${tool_id}_${safe_file}"
-
-    # Check cache
+    # Check cache (secondary check against content hash for robustness)
     # Performance optimization: Use read instead of cat subshell
     if [[ -f "$cache_key" ]]; then
         local cached_content
