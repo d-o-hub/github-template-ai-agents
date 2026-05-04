@@ -9,44 +9,22 @@ from .models import ResolvedResult
 
 logger = logging.getLogger(__name__)
 
-# Constants for synthesis gating
-SIMILARITY_THRESHOLD = 0.2
-CONTENT_SIMILARITY_LIMIT = 2000
-
 
 def _content_similarity(a: str, b: str) -> float:
     """Compute similarity ratio between two strings (0.0 to 1.0)."""
     if not a or not b:
         return 0.0
-
-    # Truncate to limit to ensure performance if called with large strings
-    a_trunc = a[:CONTENT_SIMILARITY_LIMIT]
-    b_trunc = b[:CONTENT_SIMILARITY_LIMIT]
-
-    matcher = SequenceMatcher(None, a_trunc, b_trunc)
-    if matcher.real_quick_ratio() < SIMILARITY_THRESHOLD:
-        return 0.0
-    if matcher.quick_ratio() < SIMILARITY_THRESHOLD:
-        return 0.0
-    return matcher.ratio()
+    return SequenceMatcher(None, a[:2000], b[:2000]).ratio()
 
 
 def _has_conflicts(results: list[ResolvedResult]) -> bool:
     """Check if results contain conflicting information."""
     if len(results) < 2:
         return False
-
-    # Pre-truncate content to avoid redundant slicing in the O(N^2) loop
-    contents = [
-        r.content[:CONTENT_SIMILARITY_LIMIT] if r.content else "" for r in results
-    ]
-
-    for i in range(len(contents)):
-        content_i = contents[i]
-        for j in range(i + 1, len(contents)):
-            # _content_similarity also truncates, but it's now cheap since strings are already short
-            similarity = _content_similarity(content_i, contents[j])
-            if similarity < SIMILARITY_THRESHOLD:
+    for i in range(len(results)):
+        for j in range(i + 1, len(results)):
+            similarity = _content_similarity(results[i].content, results[j].content)
+            if similarity < 0.2:
                 return True
     return False
 
