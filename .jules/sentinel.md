@@ -18,3 +18,8 @@
 **Vulnerability:** Environment-overridable numeric variables used in `(( ))`, `$(( ))`, and `[[ $A -lt $B ]]` were vulnerable to command injection (e.g., `VAR='a[$(id)0]'`).
 **Learning:** Bash evaluates operands in arithmetic contexts as expressions. If a variable contains an array index like `a[$(...)0]`, the code inside `$(...)` is executed during evaluation.
 **Prevention:** Strictly validate that all variables used in Bash arithmetic contexts are numeric (e.g., using `[[ "$var" =~ ^[0-9]+$ ]]`) before they are evaluated.
+
+## 2026-05-15 - Sed Injection via Version File
+**Vulnerability:** The `propagate-version.sh` script used an unvalidated `VERSION` variable directly in `sed` substitution strings, which could lead to command execution if `sed` supports the `e` flag (e.g., `VERSION='1.2.3/e;s/.*/echo INJECTED/e;#'`).
+**Learning:** External files used as sources for shell script variables must be strictly validated even if they are internal to the repository, as they can be manipulated to achieve command injection in sensitive contexts like `sed`.
+**Prevention:** Use anchored regular expressions (e.g., `[[ "$var" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]`) to validate all variables derived from files before using them in shell commands or substitutions.
