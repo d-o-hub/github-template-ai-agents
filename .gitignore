@@ -1,3 +1,4 @@
+```
 # Dependencies
 node_modules/
 __pycache__/
@@ -48,4 +49,4 @@ htmlcov/
 .mypy_cache/
 .pytest_cache/
 .gradle/
-.cache/
+```.cache/
