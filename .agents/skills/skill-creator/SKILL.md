@@ -39,8 +39,6 @@ skill-name/
 |-------|----------|-------------|
 | `name` | Yes | Max 64 chars. Lowercase letters, numbers, hyphens only. |
 | `description` | Yes | Max 1024 chars. Describes what the skill does AND when to use it. |
-| `version` | Recommended | Semantic version of the skill itself (e.g., "1.0"). |
-| `template_version` | Recommended | Minimum template version required (matches VERSION file). |
 | `license` | No | License name or reference to bundled license file. |
 | `compatibility` | No | Max 500 chars. Environment requirements. |
 | `metadata` | No | Arbitrary key-value mapping. |
@@ -108,16 +106,6 @@ Store in `evals/evals.json`:
 - **Near-misses**: Include queries that share keywords but need something different
 
 ---
-
-## Domain-Specific Verification Skills
-
-When creating a new domain-specific skill, always include a verification checklist.
-Use `.agents/skills/verification-template/SKILL.md` as a starting point.
-
-### Benefits
-- Deep domain knowledge encoded in skills.
-- Reduces onboarding time.
-- Ensures consistent debugging and verification approach.
 
 ## Reference Files
 

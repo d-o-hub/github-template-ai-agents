@@ -108,6 +108,17 @@ If `commitlint` rejects your message:
 
 Do not invent new types. Do not skip linting.
 
+## Skills
+
+| Skill | Description |
+|-------|-------------|
+| `skill-creator` | Meta-skill for creating and optimizing agent skills |
+| `anti-ai-slop` | Quality enforcement for UI, UX, and copy |
+| `github-pr-sentinel` | Continuous PR monitoring and CI auto-fix |
+| `readme-best-practices` | Expert guidance for GitHub documentation |
+| `privacy-first` | Prevent PII/email leaks in the codebase |
+| `agent-browser` | Browser automation CLI for agents |
+
 ## Security
 
 - **Secret Scanning**: Gitleaks is enforced via CI only to prevent credential leakage.

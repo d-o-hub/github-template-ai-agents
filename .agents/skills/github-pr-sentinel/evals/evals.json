@@ -1,0 +1,53 @@
+{
+  "skill_name": "github-pr-sentinel",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Monitor my PR until CI passes and it's ready to merge",
+      "expected_output": "The watcher script runs in continuous --watch mode, polling CI status, review comments, and mergeability. Reports progress updates and stops when PR is ready to merge or requires user intervention.",
+      "files": [],
+      "assertions": [
+        "The agent invokes gh_pr_watch.py with --watch or --once",
+        "The agent inspects the actions list from the JSON output",
+        "The agent continues polling until a strict stop condition is met",
+        "The agent reports CI pass/fail counts during monitoring"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "There are some failing CI checks on PR #42, can you look into it and retry if it's a flaky failure?",
+      "expected_output": "The watcher snapshots PR #42, diagnoses CI failures, classifies them as branch-related or flaky, and retries failed jobs if appropriate.",
+      "files": [],
+      "assertions": [
+        "The agent passes --pr 42 to the watcher script",
+        "The agent checks the diagnose_ci_failure action from the output",
+        "The agent uses gh run view to inspect failed logs before deciding",
+        "The agent retries failed checks only if classified as flaky"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "A reviewer left some comments on my open PR, address the actionable ones and keep watching CI",
+      "expected_output": "The watcher surfaces new review items, the agent addresses actionable comments by patching code and pushing, then resumes monitoring.",
+      "files": [],
+      "assertions": [
+        "The agent checks process_review_comment action from the output",
+        "The agent inspects surfaced review items for actionability",
+        "The agent commits review fixes with appropriate message format",
+        "The agent resumes watching after pushing the fix"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Hey, just pushed a commit to my feature branch — can you babysit the CI and merge when green?",
+      "expected_output": "The watcher starts monitoring the PR from the current branch, polls CI, and merges or reports ready-to-merge when all checks pass.",
+      "files": [],
+      "assertions": [
+        "The agent resolves the PR from the current branch (--pr auto)",
+        "The agent starts continuous monitoring mode",
+        "The agent checks mergeability and review decision before declaring ready",
+        "The agent provides a final summary with SHA, CI status, and merge state"
+      ]
+    }
+  ]
+}
