@@ -8,6 +8,9 @@ name: PR Validation
   pull_request:
     branches: ["main"]
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest
