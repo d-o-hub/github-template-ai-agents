@@ -32,6 +32,12 @@ privately to the maintainers.
 2. **Assessment** — severity and scope evaluation with progress updates
 3. **Fix & disclosure** — coordinated release and public advisory upon resolution
 
+## General Security Expectations
+
+- **Secret Scanning**: Use secret scanning tools (e.g., Gitleaks) to prevent credential leakage.
+- **Dependency Auditing**: Regularly audit dependencies for known vulnerabilities.
+- **Agent Reviews**: AI Agents interacting with this repository are restricted from modifying secrets or deployment environments without human approval.
+
 ## Supply Chain Security
 
 To mitigate the risk of tag mutation or hijacking, all GitHub Actions used in
