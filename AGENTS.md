@@ -59,11 +59,7 @@ See `agents-docs/VERSION.md` for full workflow details.
 - **Reference format**: `` `references/filename.md` - Description ``
 - Shell: `shellcheck` (severity=error); Markdown: `markdownlint`; Diagrams: `mermaid`
 
-## Repository Structure
 
-- `agents-docs/`: Detailed reference; `.agents/skills/`: Canonical skills
-- `scripts/`: Setup/validation; `analysis/` & `reports/`: Generated outputs
-- `.claude/`, `.gemini/`, `.qwen/`: Agent-specific symlinks
 
 ## PR & Commit Instructions
 
@@ -76,18 +72,7 @@ See `agents-docs/VERSION.md` for full workflow details.
 2. **Manual Commits**: Validated via `.githooks/commit-msg` (requires `./scripts/install-git-hooks.sh`)
 3. **If Validation Fails**: Identify violation, then `git commit --amend` to fix message.
 
-**Valid Example:**
-```text
-feat(search): add fuzzy matching to improve discovery
 
-Users can now find documents even with typos. This uses the
-Levenshtein distance algorithm for better results.
-```
-
-**Invalid Example (Body line too long):**
-```text
-fix(auth): resolve login timeout issue for users on slow connections by increasing the default timeout from 5 to 30 seconds
-```
 
 ### Commit Type Mapping
 
@@ -97,22 +82,54 @@ fix(auth): resolve login timeout issue for users on slow connections by increasi
 | New security feature/control  | `feat`   | `security`       |
 | Security-related CI/tooling   | `ci`     | `security`       |
 
-### Commitlint failures
 
-Allowed types: `build` `chore` `ci` `docs` `feat` `fix` `perf` `refactor` `revert` `style` `test`
-
-If `commitlint` rejects your message:
-1. Identify correct type from table. Reword: `git commit --amend -m "<type>(<scope>): <subject>"`
-2. Verify: `npx commitlint --from HEAD~1`
-3. If not HEAD: `git rebase -i <commit>^` → change `pick` to `reword`.
-
-Do not invent new types. Do not skip linting.
 
 ## Security
 
 - **Secret Scanning**: Gitleaks is enforced via CI only to prevent credential leakage.
 - No secrets in commits (use `.env`); Pin Actions to SHA (with `# vX.Y` comment)
 - No untrusted MCPs; Report vulnerabilities via Private Advisories
+
+## Agent Concepts and Memory
+
+Agents working in this codebase share a common mental model for memory and learning:
+
+- **Episode**: One unit of work an agent performs (e.g., a single task, PR review, or refactor).
+- **Reward**: How the "goodness" of an episode is judged (e.g., tests passing, reduced complexity, user feedback).
+- **Reflection**: A short written summary of what worked, what failed, and what should change next time.
+- **Skill evolution**: Agents can update their own guidelines (in `agents-docs/`) when recurring patterns are discovered.
+
+## Behavioral Expectations
+
+All agents must adhere to the following behaviors:
+- Always log what was done and why.
+- Prefer small, reversible changes and attach a short reflection for risky changes.
+- Use project state (plans/progress/docs) as context before acting, and update it afterwards. (See [Planning and Progress Surfaces](#planning-and-progress-surfaces)).
+
+## Standard Cross-Agent Patterns
+
+- **Planner → Worker → Reviewer**: This is the default multi-agent pattern. Work should be planned, executed, and then reviewed by separate roles or distinct phases.
+- **Explicit Handoffs**: Pass work to another agent when specialized context is needed. Escalate to a human when blocked, unsure, or if changes touch restricted areas (e.g., secrets, infrastructure).
+
+## Planning and Progress Surfaces
+
+Each repository should maintain surfaces for agents to coordinate:
+- **Planning Surface**: A place (like a `PLANS.md` or `plans/` folder) tracking high-level goals and pending tasks.
+- **Progress Surface**: A place (like a `PROGRESS.md` or `progress/` folder) tracking completed work, state, and reflections.
+- **Agent Duty**: Read from the planning surface before acting; append updates to the progress surface after acting.
+
+## Memory & Concepts
+
+- **Episode**: Agent work unit.
+- **Reward**: Success metric.
+- **Reflection**: Post-task summary.
+- **Evolution**: Updating docs when patterns emerge.
+
+## Behaviors
+
+- Always log actions/reasons. Prefer small, reversible changes.
+- Read `plans/`, update `progress/`. (Planner → Worker → Reviewer pattern).
+- Escalate to human if blocked or touching secrets.
 
 ## Agent Guidance
 

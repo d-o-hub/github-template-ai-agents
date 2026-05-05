@@ -1,0 +1,26 @@
+name: PR Validation
+
+# Placeholder workflow for generic PR validation.
+# Downstream repositories should adapt the 'run' commands to their language stack.
+
+"on":
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Run Linting
+        run: ./scripts/run-lint.sh
+
+      - name: Run Tests
+        run: ./scripts/run-tests.sh
+
+      - name: Check Coverage
+        run: echo "Replace with coverage check (e.g., matching .test-quality.toml minimums)"
+
+      - name: Run Security Checks
+        run: ./scripts/run-security-checks.sh
