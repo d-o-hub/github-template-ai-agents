@@ -201,129 +201,157 @@ check_reference_format() {
     return 0
 }
 
-# Main entry point: discover and process all skill files
-# Uses a batched awk process to filter relevant lines across all SKILL.md files.
-# This eliminates per-file process forks, providing significant speedup.
+# Function to process a single SKILL.md file
+# Uses a state machine pattern to track whether we're in the References section
+# The logic flow per line:
+#   1. Track if we enter/exit References section (in_references flag)
+#   2. If in References: validate format of reference entries
+#   3. Always: find all markdown links and check if targets exist
+#   4. Always: check backtick-wrapped paths (alternative link syntax)
+#   5. Always: flag deprecated @references
+process_skill_file() {
+    local skill_file="$1"
+    local skill_dir
+    # Performance optimization: Use Bash parameter expansion instead of dirname
+    skill_dir="${skill_file%/*}"
 
+    FILES_CHECKED=$((FILES_CHECKED + 1))
+
+    local line_num=0
+    local file_broken=0
+    local file_format_errors=0
+    local in_references=0
+
+    # Performance optimization: Use awk to pre-filter only relevant lines
+    # This reduces Bash loop iterations by ~90% for large files.
+    # Format: line_num:in_references:line_content
+    while IFS=: read -r line_num in_references line; do
+        # Track if we're in the References section
+        # State transitions: out -> in when see "## References", in -> out when see any other "##"
+        if is_references_header "$line"; then
+            in_references=1
+            continue
+        elif is_section_header "$line"; then
+            in_references=0
+        fi
+
+        # Check reference format (only in References section)
+        # We enforce strict format rules here because this section is machine-parsed
+        if [[ $in_references -eq 1 ]]; then
+            if ! check_reference_format "$line" "$line_num" "$skill_file" "$skill_dir"; then
+                FORMAT_ERRORS=$((FORMAT_ERRORS + 1))
+                file_format_errors=1
+            fi
+        fi
+
+        # Find all markdown links in this line
+        # We use a temp_line variable because regex matching in bash is stateful
+        # Removing each match lets us find multiple links on the same line
+        local temp_line="$line"
+        while [[ "$temp_line" =~ $LINK_REGEX ]]; do
+            local full_match="${BASH_REMATCH[0]}"
+            local link_path="${BASH_REMATCH[2]}"
+
+            # Remove this match from temp_line first (to continue loop)
+            # Using ${var#*substring} removes the shortest match from start
+            temp_line="${temp_line#*"$full_match"}"
+
+            # Skip if this looks like an example (line contains "example:" or the link is in backticks)
+            # We don't want to validate links shown in documentation examples
+            if [[ "$line" =~ example[[:space:]]*[:\(] ]] || [[ "$link_path" =~ \.(svg|png|jpg|jpeg|gif)$ ]]; then
+                continue
+            fi
+
+            LINKS_CHECKED=$((LINKS_CHECKED + 1))
+
+            # Check this link
+            if ! check_link "$skill_dir" "$link_path" "$skill_file" "$line_num"; then
+                BROKEN_COUNT=$((BROKEN_COUNT + 1))
+                file_broken=1
+            fi
+        done
+
+        # Also check for backtick-wrapped paths that look like references (only .md files in reference/)
+        # This catches alternative syntax: `reference/file.md` without the "- Description" part
+        # We validate these exist but don't require full format (allows inline references)
+        if [[ "$line" =~ \`(references?/[a-zA-Z0-9_-]+\.md)\` ]]; then
+            local ref_path="${BASH_REMATCH[1]}"
+            LINKS_CHECKED=$((LINKS_CHECKED + 1))
+
+            if ! check_link "$skill_dir" "$ref_path" "$skill_file" "$line_num"; then
+                BROKEN_COUNT=$((BROKEN_COUNT + 1))
+                file_broken=1
+            fi
+        fi
+
+        # Check for backtick-wrapped paths in docs/ - only .md files, skip .svg and others
+        # docs/ folder contains shared documentation referenced across skills
+        if [[ "$line" =~ \`(docs/[a-zA-Z0-9_/-]+\.md)\` ]]; then
+            local docs_path="${BASH_REMATCH[1]}"
+            LINKS_CHECKED=$((LINKS_CHECKED + 1))
+            if ! check_link "$skill_dir" "$docs_path" "$skill_file" "$line_num"; then
+                BROKEN_COUNT=$((BROKEN_COUNT + 1))
+                file_broken=1
+            fi
+        fi
+
+        # Check for @references (deprecated format pointing to non-existent files)
+        # These are always errors - we don't just warn, we require migration to new format
+        if [[ "$line" =~ @(references?/[a-zA-Z0-9_-]+\.md) ]]; then
+            local at_ref="${BASH_REMATCH[1]}"
+            echo -e "  ${RED}✗${NC} Broken @reference at line $line_num: @$at_ref" >&2
+            echo -e "     @ prefix is deprecated. Use: \`reference/filename.md\` or \`references/filename.md\`" >&2
+            echo -e "     in: $skill_file" >&2
+            BROKEN_COUNT=$((BROKEN_COUNT + 1))
+            file_broken=1
+        fi
+    done < <(awk -v in_ref=0 '
+        /^##[[:space:]]+[Rr]eferences/ { in_ref = 1; print NR ":" in_ref ":" $0; next }
+        /^##[[:space:]]+/ { in_ref = 0; print NR ":" in_ref ":" $0; next }
+        /\[[^]]+\]\([^)]+\)/ || /`(references?\/|docs\/)[^`]+`/ || /@references?/ || (in_ref && /^- /) {
+            print NR ":" in_ref ":" $0
+        }
+    ' "$skill_file")
+
+    if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
+        # Performance optimization: Use Bash parameter expansion instead of basename
+        local display_name="${skill_dir%/}"
+        echo -e "  ${GREEN}✓${NC} ${display_name##*/}: All links valid"
+    fi
+}
+
+# Main entry point: discover and process all skill files
+# We iterate through the skills directory, skipping backup folders (underscore prefix)
+# For each skill, we look for SKILL.md and run validation
+
+# Check if skills directory exists
 if [[ ! -d "$SKILLS_DIR" ]]; then
     echo -e "${YELLOW}⚠${NC} Skills directory not found: $SKILLS_DIR"
     exit 0
 fi
 
-# Collect all SKILL.md files, skipping backup folders (underscore prefix)
-SKILL_FILES=()
-while IFS= read -r -d '' skill_file; do
-    SKILL_FILES+=("$skill_file")
-done < <(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" -print0 | sort -z)
+# Find and process all SKILL.md files
+for skill_path in "$SKILLS_DIR"/*/; do
+    [[ -d "$skill_path" ]] || continue
 
-if [[ ${#SKILL_FILES[@]} -eq 0 ]]; then
-    echo "No skills found to validate."
-    exit 0
-fi
+    # Performance optimization: Use Bash parameter expansion instead of basename
+    skill_name="${skill_path%/}"
+    skill_name="${skill_name##*/}"
 
-current_file=""
-file_broken=0
-file_format_errors=0
-
-# Process all files with a single awk call.
-# Format: FILENAME:LINE_NUM:IN_REF:CONTENT
-while IFS=: read -r skill_file line_num in_references line; do
-    # Handle file transition and reporting
-    if [[ "$skill_file" != "$current_file" ]]; then
-        if [[ -n "$current_file" ]]; then
-            if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
-                skill_dir="${current_file%/*}"
-                echo -e "  ${GREEN}✓${NC} ${skill_dir##*/}: All links valid"
-            fi
-        fi
-        current_file="$skill_file"
-        file_broken=0
-        file_format_errors=0
-        FILES_CHECKED=$((FILES_CHECKED + 1))
-        skill_dir="${skill_file%/*}"
-        # Skip processing for the start-of-file marker
-        [[ "$line_num" == "0" ]] && continue
-    fi
-
-    # Track if we're in the References section
-    if is_references_header "$line"; then
-        continue
-    elif is_section_header "$line"; then
+    # Skip consolidated/backup folders
+    if [[ "$skill_name" == _* ]]; then
         continue
     fi
 
-    # Check reference format (only in References section)
-    if [[ "$in_references" -eq 1 ]]; then
-        if ! check_reference_format "$line" "$line_num" "$skill_file" "$skill_dir"; then
-            FORMAT_ERRORS=$((FORMAT_ERRORS + 1))
-            file_format_errors=1
-        fi
+    skill_file="$skill_path/SKILL.md"
+
+    if [[ ! -f "$skill_file" ]]; then
+        echo -e "  ${YELLOW}⚠${NC} $skill_name: Missing SKILL.md"
+        continue
     fi
 
-    # Find all markdown links in this line
-    temp_line="$line"
-    while [[ "$temp_line" =~ $LINK_REGEX ]]; do
-        full_match="${BASH_REMATCH[0]}"
-        link_path="${BASH_REMATCH[2]}"
-        temp_line="${temp_line#*"$full_match"}"
-
-        if [[ "$line" =~ example[[:space:]]*[:\(] ]] || [[ "$link_path" =~ \.(svg|png|jpg|jpeg|gif)$ ]]; then
-            continue
-        fi
-
-        LINKS_CHECKED=$((LINKS_CHECKED + 1))
-        if ! check_link "$skill_dir" "$link_path" "$skill_file" "$line_num"; then
-            BROKEN_COUNT=$((BROKEN_COUNT + 1))
-            file_broken=1
-        fi
-    done
-
-    # Check for backtick-wrapped paths that look like references
-    if [[ "$line" =~ \`(references?/[a-zA-Z0-9_-]+\.md)\` ]]; then
-        ref_path="${BASH_REMATCH[1]}"
-        LINKS_CHECKED=$((LINKS_CHECKED + 1))
-        if ! check_link "$skill_dir" "$ref_path" "$skill_file" "$line_num"; then
-            BROKEN_COUNT=$((BROKEN_COUNT + 1))
-            file_broken=1
-        fi
-    fi
-
-    # Check for backtick-wrapped paths in docs/
-    if [[ "$line" =~ \`(docs/[a-zA-Z0-9_/-]+\.md)\` ]]; then
-        docs_path="${BASH_REMATCH[1]}"
-        LINKS_CHECKED=$((LINKS_CHECKED + 1))
-        if ! check_link "$skill_dir" "$docs_path" "$skill_file" "$line_num"; then
-            BROKEN_COUNT=$((BROKEN_COUNT + 1))
-            file_broken=1
-        fi
-    fi
-
-    # Check for deprecated @references
-    if [[ "$line" =~ @(references?/[a-zA-Z0-9_-]+\.md) ]]; then
-        at_ref="${BASH_REMATCH[1]}"
-        echo -e "  ${RED}✗${NC} Broken @reference at line $line_num: @$at_ref" >&2
-        echo -e "     @ prefix is deprecated. Use: \`reference/filename.md\` or \`references/filename.md\`" >&2
-        echo -e "     in: $skill_file" >&2
-        BROKEN_COUNT=$((BROKEN_COUNT + 1))
-        file_broken=1
-    fi
-done < <(awk '
-    BEGIN { in_ref = 0 }
-    FNR == 1 { in_ref = 0; print FILENAME ":0:0:__START__" }
-    /^##[[:space:]]+[Rr]eferences/ { in_ref = 1; print FILENAME ":" FNR ":" in_ref ":" $0; next }
-    /^##[[:space:]]+/ { in_ref = 0; print FILENAME ":" FNR ":" in_ref ":" $0; next }
-    /\[[^]]+\]\([^)]+\)/ || /`(references?\/|docs\/)[^`]+`/ || /@references?/ || (in_ref && /^- /) {
-        print FILENAME ":" FNR ":" in_ref ":" $0
-    }
-' "${SKILL_FILES[@]}")
-
-# Final report for the last file
-if [[ -n "$current_file" ]]; then
-    if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
-        skill_dir="${current_file%/*}"
-        echo -e "  ${GREEN}✓${NC} ${skill_dir##*/}: All links valid"
-    fi
-fi
+    process_skill_file "$skill_file"
+done
 
 echo ""
 echo "─────────────────────────────────────────────────────────────────"

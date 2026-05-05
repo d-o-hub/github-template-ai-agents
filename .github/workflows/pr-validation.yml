@@ -1,3 +1,4 @@
+---
 name: PR Validation
 
 # Placeholder workflow for generic PR validation.
@@ -5,13 +6,13 @@ name: PR Validation
 
 "on":
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
       - name: Run Linting
         run: ./scripts/run-lint.sh
