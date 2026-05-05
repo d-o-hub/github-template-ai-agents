@@ -115,21 +115,6 @@ SKIP_TESTS=true ./scripts/quality_gate.sh
 
 ### 6. Submit a Pull Request
 
-#### For AI Agents
-
-Agent-generated PRs must adhere to strict expectations:
-- **Small**: PRs should address a single concern to make reviews manageable.
-- **Tested**: All changes must pass CI validation and include new tests if applicable.
-- **Documented**: PR descriptions must include a summary, any necessary reflection on the approach taken, and note potential impact.
-
-#### Reviewing Agent Changes
-
-When a human reviews an agent-generated PR:
-- Ensure the agent did not stray outside its bounds (e.g., unintended infrastructure or secret changes).
-- Verify that new tests genuinely test behavior, not just appease coverage tools.
-
-#### General Guidelines
-
 1. Push your branch: `git push origin feature/your-feature`
 2. Open a PR on GitHub
 3. Fill out the PR template
