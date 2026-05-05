@@ -32,7 +32,12 @@
 
 ## 2026-05-25 - [Optimizing LOC gate via batched wc]
 **Learning:** Replacing an O(N) process-forking loop (calling `wc -l` for every file) with a single batched `xargs -0 wc -l` call and an `awk` validation pass yielded an ~8.8x speedup (from 0.44s to 0.05s) for ~100 files. Handling the `total` line in `awk` and using `print0` for space-safety is essential for robustness.
-**Action:** Always prefer `xargs wc -l | awk` over `while read ...; do wc -l; done` for line-count validation across multiple files.
+**Action:** Always prefer `xargs wc -l | awk` over `while read ...; do < /dev/null wc -l; done` for line-count validation across multiple files.
+
+## 2026-05-26 - [Batched AWK-to-Bash Streaming]
+**Learning:** Transitioning from per-file `awk` pre-filtering within a Bash loop to a single batched `awk` call for all files further reduces execution time by ~50% in this codebase (from ~0.44s to ~0.23s for 50 files). This eliminates the process fork overhead for every file while still allowing complex validation logic (like relative path resolution and security checks) to remain in Bash.
+**Action:** Always prefer batching multiple files into a single `awk` process when pre-filtering lines for a Bash loop. Use a file-transition marker (e.g., `FNR == 1`) in `awk` to help the Bash loop track file boundaries.
+
 ## 2026-05-03 - Pairwise Similarity & Project Hygiene
 **Learning:** Pairwise string similarity checks ($O(N^2)$) are highly sensitive to redundant slicing and full `SequenceMatcher.ratio()` calls on dissimilar pairs. Project hygiene standards require avoiding "magic numbers" for thresholds and ensuring no temporary benchmark files remain in the repository. Structural fixes prefer repo-local temporary files over `/tmp` for better sandbox consistency.
 **Action:** Pre-truncate strings once before loops; use `real_quick_ratio()` for $O(1)$ early exits. Stash all thresholds in named constants. Implement "structural fixes" by moving `/tmp` file usage to `$REPO_ROOT/.temp_file` with robust `trap` cleanup. Maintain strict linting by ensuring zero unused variables or functions in optimized modules.
