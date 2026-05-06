@@ -24,6 +24,7 @@ fi
 # Configuration
 CACHE_DIR=".cache/command-validations"
 CONFIG_FILE=".command-verify.conf"
+readonly UNKNOWN_CATEGORY="unknown"
 
 # Load config if exists
 [ -f "$CONFIG_FILE" ] && source "$CONFIG_FILE"
@@ -128,7 +129,7 @@ fi
 VALIDATED=0
 CACHE_HITS=0
 declare -a FAILED_COMMANDS=()
-declare -A CATEGORY_COUNT=(["safe"]=0 ["conditional"]=0 ["dangerous"]=0 ["unknown"]=0)
+declare -A CATEGORY_COUNT=(["safe"]=0 ["conditional"]=0 ["dangerous"]=0 ["$UNKNOWN_CATEGORY"]=0)
 
 if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
     while IFS= read -r cmd_entry; do
@@ -150,11 +151,11 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
                         CACHED=true
 
                         # Extract category from cached result
-                        cached_cat=$(echo "$cached_result" | jq -r '.category // "unknown"' 2>/dev/null || echo "unknown")
+                        cached_cat=$(echo "$cached_result" | jq -r --arg unknown "$UNKNOWN_CATEGORY" '.category // $unknown' 2>/dev/null || echo "$UNKNOWN_CATEGORY")
 
                         # Security: Validate category against whitelist to prevent injection in arithmetic expansion
-                        if [[ ! "$cached_cat" =~ ^(safe|conditional|dangerous|unknown)$ ]]; then
-                            cached_cat="unknown"
+                        if [[ ! "$cached_cat" =~ ^(safe|conditional|dangerous|$UNKNOWN_CATEGORY)$ ]]; then
+                            cached_cat="$UNKNOWN_CATEGORY"
                         fi
 
                         if [ -n "$cached_cat" ]; then
@@ -171,14 +172,14 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
         fi
 
         # Validate command (categorize only, don't execute)
-        category="unknown"
+        category="$UNKNOWN_CATEGORY"
         if type categorize_command &> /dev/null; then
-            category=$(categorize_command "$cmd" 2>/dev/null || echo "unknown")
+            category=$(categorize_command "$cmd" 2>/dev/null || echo "$UNKNOWN_CATEGORY")
         fi
 
         # Security: Validate category against whitelist to prevent injection in arithmetic expansion
-        if [[ ! "$category" =~ ^(safe|conditional|dangerous|unknown)$ ]]; then
-            category="unknown"
+        if [[ ! "$category" =~ ^(safe|conditional|dangerous|$UNKNOWN_CATEGORY)$ ]]; then
+            category="$UNKNOWN_CATEGORY"
         fi
 
         # Update category count
@@ -205,7 +206,7 @@ fi
 TOTAL_SAFE=${CATEGORY_COUNT[safe]:-0}
 TOTAL_CONDITIONAL=${CATEGORY_COUNT[conditional]:-0}
 TOTAL_DANGEROUS=${CATEGORY_COUNT[dangerous]:-0}
-TOTAL_UNKNOWN=${CATEGORY_COUNT[unknown]:-0}
+TOTAL_UNKNOWN=${CATEGORY_COUNT[$UNKNOWN_CATEGORY]:-0}
 TOTAL_ALL=$((TOTAL_SAFE + TOTAL_CONDITIONAL + TOTAL_DANGEROUS + TOTAL_UNKNOWN))
 
 # PHASE 4: Results
