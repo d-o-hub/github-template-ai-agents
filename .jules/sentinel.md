@@ -23,3 +23,8 @@
 **Vulnerability:** Unvalidated variables in Bash `sed` substitution commands, especially when the `e` (execute) flag is supported or delimiters are manipulated, can lead to command injection.
 **Learning:** Variables read from external files (like `VERSION`) must be treated as untrusted input before being used as patterns or replacement strings in `sed` to prevent arbitrary code execution or file corruption.
 **Prevention:** Enforce strict format validation (e.g., regex `^[0-9]+\.[0-9]+\.[0-9]+$`) for all external variables before passing them to `sed` or other shell commands.
+
+## 2026-05-06 - Bash Arithmetic Injection via Associative Array Keys
+**Vulnerability:** Associative array keys in Bash arithmetic expansion contexts (`$((MAP[$key]))`) were evaluated as expressions. If `$key` was derived from an untrusted source (like a cache file), it allowed arbitrary command execution.
+**Learning:** Bash treats array indices in arithmetic contexts as expressions. Maliciously crafted keys containing `$(...)` or `a[$(...)0]` are executed during expansion.
+**Prevention:** Strictly validate keys against a whitelist (e.g., `^(safe|conditional|dangerous|unknown)$`) before use in arithmetic contexts and use `jq -n --arg` for secure JSON serialization of commands.

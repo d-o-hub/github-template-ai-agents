@@ -24,6 +24,7 @@ fi
 # Configuration
 CACHE_DIR=".cache/command-validations"
 CONFIG_FILE=".command-verify.conf"
+readonly UNKNOWN_CATEGORY="unknown"
 
 # Load config if exists
 [ -f "$CONFIG_FILE" ] && source "$CONFIG_FILE"
@@ -128,7 +129,7 @@ fi
 VALIDATED=0
 CACHE_HITS=0
 declare -a FAILED_COMMANDS=()
-declare -A CATEGORY_COUNT=(["safe"]=0 ["conditional"]=0 ["dangerous"]=0 ["unknown"]=0)
+declare -A CATEGORY_COUNT=(["safe"]=0 ["conditional"]=0 ["dangerous"]=0 ["$UNKNOWN_CATEGORY"]=0)
 
 if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
     while IFS= read -r cmd_entry; do
@@ -150,7 +151,13 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
                         CACHED=true
 
                         # Extract category from cached result
-                        cached_cat=$(echo "$cached_result" | jq -r '.category // "unknown"' 2>/dev/null || echo "unknown")
+                        cached_cat=$(echo "$cached_result" | jq -r --arg unknown "$UNKNOWN_CATEGORY" '.category // $unknown' 2>/dev/null || echo "$UNKNOWN_CATEGORY")
+
+                        # Security: Validate category against whitelist to prevent injection in arithmetic expansion
+                        if [[ ! "$cached_cat" =~ ^(safe|conditional|dangerous|$UNKNOWN_CATEGORY)$ ]]; then
+                            cached_cat="$UNKNOWN_CATEGORY"
+                        fi
+
                         if [ -n "$cached_cat" ]; then
                             CATEGORY_COUNT[$cached_cat]=$((CATEGORY_COUNT[$cached_cat]+1))
                         fi
@@ -165,9 +172,14 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
         fi
 
         # Validate command (categorize only, don't execute)
-        category="unknown"
+        category="$UNKNOWN_CATEGORY"
         if type categorize_command &> /dev/null; then
-            category=$(categorize_command "$cmd" 2>/dev/null || echo "unknown")
+            category=$(categorize_command "$cmd" 2>/dev/null || echo "$UNKNOWN_CATEGORY")
+        fi
+
+        # Security: Validate category against whitelist to prevent injection in arithmetic expansion
+        if [[ ! "$category" =~ ^(safe|conditional|dangerous|$UNKNOWN_CATEGORY)$ ]]; then
+            category="$UNKNOWN_CATEGORY"
         fi
 
         # Update category count
@@ -175,7 +187,9 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
 
         # Save to cache
         if type save_cached_result &> /dev/null; then
-            result="{\"valid\":true,\"category\":\"$category\",\"command\":\"$cmd\"}"
+            # Security: Use jq to safely generate JSON and prevent injection
+            result=$(jq -n --arg cat "$category" --arg cmd "$cmd" \
+                '{"valid":true, "category":$cat, "command":$cmd}')
             save_cached_result "$cmd_entry" "$result" 2>/dev/null || true
         fi
 
@@ -192,7 +206,7 @@ fi
 TOTAL_SAFE=${CATEGORY_COUNT[safe]:-0}
 TOTAL_CONDITIONAL=${CATEGORY_COUNT[conditional]:-0}
 TOTAL_DANGEROUS=${CATEGORY_COUNT[dangerous]:-0}
-TOTAL_UNKNOWN=${CATEGORY_COUNT[unknown]:-0}
+TOTAL_UNKNOWN=${CATEGORY_COUNT[$UNKNOWN_CATEGORY]:-0}
 TOTAL_ALL=$((TOTAL_SAFE + TOTAL_CONDITIONAL + TOTAL_DANGEROUS + TOTAL_UNKNOWN))
 
 # PHASE 4: Results
@@ -250,7 +264,8 @@ if $STATS && ! $JSON_OUTPUT; then
         get_cache_stats 2>/dev/null || echo "Cache stats unavailable"
     fi
     echo ""
-    echo "Cache hit rate: $(awk "BEGIN {if ($COMMAND_COUNT > 0) printf \"%.1f\", ($CACHE_HITS/$COMMAND_COUNT)*100; else print \"0.0\"}")%"
+    # Security: Pass variables to awk using -v to prevent injection
+    echo "Cache hit rate: $(awk -v count="$COMMAND_COUNT" -v hits="$CACHE_HITS" 'BEGIN {if (count > 0) printf "%.1f", (hits/count)*100; else print "0.0"}')%"
 fi
 
 # Save current commit
