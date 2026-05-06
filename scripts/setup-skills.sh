@@ -27,12 +27,20 @@ for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
   target_dir="$REPO_ROOT/$cli_dir"
   mkdir -p "$target_dir"
 
+  # Performance optimization: Pre-calculate relative path base once per target dir
+  # to avoid O(N) subshell calls in the inner loop.
+  rel_base=$(realpath --relative-to="$target_dir" "$SKILLS_SRC")
+
   for skill_path in "$SKILLS_SRC"/*/; do
     [ -d "$skill_path" ] || continue
-    skill_name="$(basename "$skill_path")"
+
+    # Performance optimization: Use Bash parameter expansion instead of basename
+    skill_name="${skill_path%/}"
+    skill_name="${skill_name##*/}"
+
     link="$target_dir/$skill_name"
-    # Relative path from CLI dir back to .agents/skills
-    rel="$(realpath --relative-to="$target_dir" "$skill_path")"
+    # Performance optimization: Use pre-calculated base
+    rel="$rel_base/$skill_name"
 
     if [ -L "$link" ]; then
       echo "  skip (exists): $cli_dir/$skill_name"
