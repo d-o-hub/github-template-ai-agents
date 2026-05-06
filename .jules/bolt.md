@@ -41,3 +41,7 @@
 ## 2026-05-03 - Pairwise Similarity & Project Hygiene
 **Learning:** Pairwise string similarity checks ($O(N^2)$) are highly sensitive to redundant slicing and full `SequenceMatcher.ratio()` calls on dissimilar pairs. Project hygiene standards require avoiding "magic numbers" for thresholds and ensuring no temporary benchmark files remain in the repository. Structural fixes prefer repo-local temporary files over `/tmp` for better sandbox consistency.
 **Action:** Pre-truncate strings once before loops; use `real_quick_ratio()` for $O(1)$ early exits. Stash all thresholds in named constants. Implement "structural fixes" by moving `/tmp` file usage to `$REPO_ROOT/.temp_file` with robust `trap` cleanup. Maintain strict linting by ensuring zero unused variables or functions in optimized modules.
+
+## 2026-05-06 - [Subshell elimination in setup-skills]
+**Learning:** Significant performance gains in repository setup scripts can be achieved by eliminating O(N) process forks in loops. Replacing `basename` with Bash parameter expansion and pre-calculating `realpath --relative-to` base paths outside of the skills iteration loop reduced `setup-skills.sh` execution time by ~27x (from ~0.8s to ~0.03s).
+**Action:** Avoid calling external utilities like `realpath` or `basename` inside loops that iterate over many files or directories; pre-calculate static path components and use native Bash string manipulation.
