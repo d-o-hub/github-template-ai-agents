@@ -151,6 +151,12 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
 
                         # Extract category from cached result
                         cached_cat=$(echo "$cached_result" | jq -r '.category // "unknown"' 2>/dev/null || echo "unknown")
+
+                        # Security: Validate category against whitelist to prevent injection in arithmetic expansion
+                        if [[ ! "$cached_cat" =~ ^(safe|conditional|dangerous|unknown)$ ]]; then
+                            cached_cat="unknown"
+                        fi
+
                         if [ -n "$cached_cat" ]; then
                             CATEGORY_COUNT[$cached_cat]=$((CATEGORY_COUNT[$cached_cat]+1))
                         fi
@@ -170,12 +176,19 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
             category=$(categorize_command "$cmd" 2>/dev/null || echo "unknown")
         fi
 
+        # Security: Validate category against whitelist to prevent injection in arithmetic expansion
+        if [[ ! "$category" =~ ^(safe|conditional|dangerous|unknown)$ ]]; then
+            category="unknown"
+        fi
+
         # Update category count
         CATEGORY_COUNT[$category]=$((CATEGORY_COUNT[$category]+1))
 
         # Save to cache
         if type save_cached_result &> /dev/null; then
-            result="{\"valid\":true,\"category\":\"$category\",\"command\":\"$cmd\"}"
+            # Security: Use jq to safely generate JSON and prevent injection
+            result=$(jq -n --arg cat "$category" --arg cmd "$cmd" \
+                '{"valid":true, "category":$cat, "command":$cmd}')
             save_cached_result "$cmd_entry" "$result" 2>/dev/null || true
         fi
 
@@ -250,7 +263,8 @@ if $STATS && ! $JSON_OUTPUT; then
         get_cache_stats 2>/dev/null || echo "Cache stats unavailable"
     fi
     echo ""
-    echo "Cache hit rate: $(awk "BEGIN {if ($COMMAND_COUNT > 0) printf \"%.1f\", ($CACHE_HITS/$COMMAND_COUNT)*100; else print \"0.0\"}")%"
+    # Security: Pass variables to awk using -v to prevent injection
+    echo "Cache hit rate: $(awk -v count="$COMMAND_COUNT" -v hits="$CACHE_HITS" 'BEGIN {if (count > 0) printf "%.1f", (hits/count)*100; else print "0.0"}')%"
 fi
 
 # Save current commit
