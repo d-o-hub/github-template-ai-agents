@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.8] - 2026-05-06
+
+### Changed
+- feat: add automatic patch version bump script
+- Update init_skill.py with functional template logic (#287)
+- ⚡ Bolt: optimize setup-skills.sh performance (#285)
+- 🛡️ Sentinel: [HIGH] Harden verify-commands against shell injection (#284)
+- Backport mature skills from do-web-doc-resolver (#283)
+- feat(template): add language-agnostic AI agent contracts from self-learning memory (#282)
+- perf: optimize link validation via batched awk processing (#279)
+- fix(security): validate VERSION format in propagate-version.sh (#280)
+- ci: bump github/codeql-action in the github-actions group (#277)
+- perf(synthesis): optimize pairwise similarity in conflict check (#278)
+- ⚡ Bolt: implement timestamp-based fast-path for lint cache (#276)
+- ⚡ perf(synthesis): optimize pairwise similarity in conflict check (#268)
+- fix: prevent sed injection in propagate-version.sh (#274)
+- test(run-evals): implement unit tests for evaluate_skill (#275)
+- fix(ci): resolve outdated workflow permissions issue (#273)
+
 ## [0.2.6] - 2026-04-26
 
 ### Added
