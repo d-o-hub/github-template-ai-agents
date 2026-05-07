@@ -102,7 +102,6 @@ Copy the essential files to your project:
 # Create directory structure
 mkdir -p your-project/.agents/skills
 mkdir -p your-project/.claude/skills
-mkdir -p your-project/.gemini/skills
 mkdir -p your-project/scripts
 
 # Copy core scripts

@@ -10,7 +10,6 @@ Claude Code, Gemini CLI, and Qwen Code use symlinks; OpenCode reads directly:
 ```
 .agents/skills/<name>/          <- CANONICAL (all agents read from here)
 .claude/skills/<name>           -> symlink -> ../../.agents/skills/<name>
-.gemini/skills/<name>           -> symlink -> ../../.agents/skills/<name>
 .qwen/skills/<name>             -> symlink -> ../../.agents/skills/<name>
 ```
 

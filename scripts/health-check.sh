@@ -136,11 +136,6 @@ else
     echo -e "  ${YELLOW}⚠${NC} Claude symlinks missing - run ./scripts/setup-skills.sh"
 fi
 
-if [[ -L ".gemini/skills" ]]; then
-    echo -e "  ${GREEN}✓${NC} Gemini symlinks configured"
-else
-    echo -e "  ${YELLOW}⚠${NC} Gemini symlinks missing - run ./scripts/setup-skills.sh"
-fi
 
 if [[ -f ".git/hooks/pre-commit" ]]; then
     echo -e "  ${GREEN}✓${NC} Pre-commit hook installed"
