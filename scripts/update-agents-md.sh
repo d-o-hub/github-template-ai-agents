@@ -24,20 +24,23 @@ fi
 
 echo "Updating AGENTS.md skill table..."
 
-# Find the line number of "### Available Skills"
-SKILLS_SECTION_LINE=$(grep -n "^### Available Skills" "$AGENTS_FILE" | head -1 | cut -d: -f1)
+# Find the line number of the skills section header
+# Supports both "### Available Skills" (template) and "## Skills" (customized)
+SKILLS_SECTION_LINE=$(grep -nE "^(### Available Skills|## Skills)" "$AGENTS_FILE" | head -1 | cut -d: -f1)
 
 if [ -z "$SKILLS_SECTION_LINE" ]; then
-    echo "Error: Could not find '### Available Skills' section in AGENTS.md"
+    echo "Error: Could not find skills section header in AGENTS.md"
     exit 1
 fi
 
-# Find the line number of "### Context Discipline" (end of skills table)
-NEXT_SECTION_LINE=$(grep -n "^### Context Discipline" "$AGENTS_FILE" | head -1 | cut -d: -f1)
+# Find the line number of the next section (end of skills table)
+# Supports both "### Context Discipline" and "## Security"
+NEXT_SECTION_LINE=$(grep -nE "^(### Context Discipline|## Security)" "$AGENTS_FILE" | cut -d: -f1 | awk -v start="$SKILLS_SECTION_LINE" '$1 > start { print $1; exit }')
 
 if [ -z "$NEXT_SECTION_LINE" ]; then
-    echo "Error: Could not find '### Context Discipline' section in AGENTS.md"
-    exit 1
+    # Fallback to end of file if no next section found
+    NEXT_SECTION_LINE=$(wc -l < "$AGENTS_FILE")
+    NEXT_SECTION_LINE=$((NEXT_SECTION_LINE + 1))
 fi
 
 # Extract everything before the table (including the header)
