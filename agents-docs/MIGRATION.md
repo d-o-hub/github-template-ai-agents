@@ -234,6 +234,9 @@ cat > your-project/.gemini/GEMINI.md << 'EOF'
 - Gemini CLI is the secondary agent for this project
 - Use `gemini` command for research tasks
 EOF
+
+# Create commands directory (Gemini CLI uses TOML schema)
+mkdir -p your-project/.gemini/commands
 ```
 
 #### 5.2 Install Pre-Commit Hook

@@ -63,6 +63,15 @@ if ! ./scripts/validate-github-actions-shas.sh; then
 fi
 echo ""
 
+# --- Validate Gemini TOML commands ---
+if [ -d ".gemini/commands" ]; then
+    echo -e "${BLUE}Validating Gemini TOML commands...${NC}"
+    if ! python3 ./scripts/validate_gemini_toml.py; then
+        FAILED=1
+    fi
+    echo ""
+fi
+
 # --- Validate GitHub Actions Workflows ---
 echo -e "${BLUE}Validating GitHub Actions Workflows...${NC}"
 if ! ./scripts/validate-workflows.sh; then
