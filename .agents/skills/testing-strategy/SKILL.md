@@ -39,6 +39,18 @@ Integrate testing into CI/CD:
 - Monitor Core Web Vitals in load tests.
 - Auto-quarantine flaky tests.
 
+## Rationalizations
+| Rationalization | Reality |
+|-----------------|---------|
+| "Testing takes too long, I need to ship now" | Skipping tests creates technical debt and leads to regressions that take longer to fix. |
+| "The code is self-explanatory, it doesn't need tests" | Tests document behavior and ensure it stays consistent as code evolves. |
+| "I'll add tests once the feature is 'finished'" | Tests should be written alongside code (TDD/BDD) to ensure the implementation is correct. |
+
+## Red Flags
+- [ ] Declining code coverage on new features
+- [ ] Committing code with failing or bypassed tests
+- [ ] Ignoring flaky tests instead of identifying and fixing the root cause
+
 ## References
 
 - [Testing Strategy Patterns](../../../agents-docs/references/testing-patterns.md) - Comprehensive collection of testing patterns and strategies
