@@ -225,6 +225,18 @@ jobs:
 - [ ] Flaky test rate < 5%
 - [ ] Test execution time < 10 minutes (CI)
 
+## Rationalizations
+| Rationalization | Reality |
+|-----------------|---------|
+| "Testing takes too long, I need to ship now" | Skipping tests creates technical debt and leads to regressions that take longer to fix. |
+| "The code is self-explanatory, it doesn't need tests" | Tests document behavior and ensure it stays consistent as code evolves. |
+| "I'll add tests once the feature is 'finished'" | Tests should be written alongside code (TDD/BDD) to ensure the implementation is correct. |
+
+## Red Flags
+- [ ] Declining code coverage on new features
+- [ ] Committing code with failing or bypassed tests
+- [ ] Ignoring flaky tests instead of identifying and fixing the root cause
+
 ## References
 
 - `references/property-testing-patterns.md` - Advanced property-based testing
