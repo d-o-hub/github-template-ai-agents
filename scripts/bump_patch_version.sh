@@ -4,15 +4,15 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-if [ ! -f "VERSION" ]; then
-    echo "Error: VERSION file not found"
+if [[ ! -f "VERSION" ]]; then
+    echo "Error: VERSION file not found" >&2
     exit 1
 fi
 
-CURRENT_VERSION=$(cat VERSION | tr -d "[:space:]")
+CURRENT_VERSION=$(tr -d "[:space:]" < VERSION)
 
 # Strictly validate semantic version format
 if [[ ! "$CURRENT_VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
@@ -29,9 +29,6 @@ NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
 CURRENT_DATE=$(date +"%Y-%m-%d")
 
 echo "Bumping version from $CURRENT_VERSION to $NEW_VERSION"
-
-# Write new version
-echo "$NEW_VERSION" > VERSION
 
 # Generate changelog summary from git log
 # Fetch recent commits to use for the changelog (e.g. last 15, ignoring merge commits and version bumps)
@@ -67,17 +64,17 @@ for line in logs:
 
 output = ""
 if added:
-    output += "### Added\n" + "\n".join(sorted(added)) + "\n\n"
+    output += "### Added\\n\\n" + "\\n".join(sorted(added)) + "\\n\\n"
 if fixed:
-    output += "### Fixed\n" + "\n".join(sorted(fixed)) + "\n\n"
+    output += "### Fixed\\n\\n" + "\\n".join(sorted(fixed)) + "\\n\\n"
 if changed:
-    output += "### Changed\n" + "\n".join(sorted(changed)) + "\n\n"
+    output += "### Changed\\n\\n" + "\\n".join(sorted(changed)) + "\\n\\n"
 
 print(output.strip())
 ' || true)
 
 if [ -z "$COMMITS" ]; then
-    COMMITS="### Changed\n- Assorted internal updates and fixes."
+    COMMITS="### Changed\n\n- Assorted internal updates and fixes."
 fi
 
 # Prepare the new changelog entry
@@ -85,6 +82,7 @@ NEW_ENTRY="## [$NEW_VERSION] - $CURRENT_DATE\n\n$COMMITS\n"
 
 # Insert the new entry into CHANGELOG-TEMPLATE.md right after ## [Unreleased]
 if grep -q "^## \[Unreleased\]" CHANGELOG-TEMPLATE.md; then
+    TMP_FILE=$(mktemp)
     # Use awk to insert after Unreleased section
     awk -v new_entry="$NEW_ENTRY" '
     /^## \[Unreleased\]/ {
@@ -94,12 +92,15 @@ if grep -q "^## \[Unreleased\]" CHANGELOG-TEMPLATE.md; then
         next
     }
     {print}
-    ' CHANGELOG-TEMPLATE.md > CHANGELOG-TEMPLATE.md.tmp
-    mv CHANGELOG-TEMPLATE.md.tmp CHANGELOG-TEMPLATE.md
+    ' CHANGELOG-TEMPLATE.md > "$TMP_FILE"
+    mv "$TMP_FILE" CHANGELOG-TEMPLATE.md
     echo "Updated CHANGELOG-TEMPLATE.md"
 else
-    echo "Warning: ## [Unreleased] not found in CHANGELOG-TEMPLATE.md"
+    echo "Warning: ## \[Unreleased\] not found in CHANGELOG-TEMPLATE.md"
 fi
+
+# Write new version to single source of truth right before propagation
+echo "$NEW_VERSION" > VERSION
 
 # Propagate the new version using the existing script
 echo "Running scripts/propagate-version.sh..."
