@@ -27,13 +27,14 @@ PATCH="${BASH_REMATCH[3]}"
 NEW_PATCH=$((PATCH + 1))
 NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
 CURRENT_DATE=$(date +"%Y-%m-%d")
+RECENT_COMMIT_COUNT=15
 
 echo "Bumping version from $CURRENT_VERSION to $NEW_VERSION"
 
 # Generate changelog summary from git log
 # Fetch recent commits to use for the changelog (e.g. last 15, ignoring merge commits and version bumps)
 echo "Fetching recent commits..."
-COMMITS=$(git log --no-merges --oneline -n 15 | grep -iv "bump version" | grep -iv "chore: release" | python3 -c '
+COMMITS=$(git log --no-merges --oneline -n "$RECENT_COMMIT_COUNT" | grep -iv "bump version" | grep -iv "chore: release" | python3 -c '
 import sys
 import re
 
@@ -73,7 +74,7 @@ if changed:
 print(output.strip())
 ' || true)
 
-if [ -z "$COMMITS" ]; then
+if [[ -z "$COMMITS" ]]; then
     COMMITS="### Changed\n\n- Assorted internal updates and fixes."
 fi
 
@@ -83,6 +84,7 @@ NEW_ENTRY="## [$NEW_VERSION] - $CURRENT_DATE\n\n$COMMITS\n"
 # Insert the new entry into CHANGELOG-TEMPLATE.md right after ## [Unreleased]
 if grep -q "^## \[Unreleased\]" CHANGELOG-TEMPLATE.md; then
     TMP_FILE=$(mktemp)
+    trap 'rm -f "$TMP_FILE"' EXIT ERR
     # Use awk to insert after Unreleased section
     awk -v new_entry="$NEW_ENTRY" '
     /^## \[Unreleased\]/ {
@@ -96,7 +98,8 @@ if grep -q "^## \[Unreleased\]" CHANGELOG-TEMPLATE.md; then
     mv "$TMP_FILE" CHANGELOG-TEMPLATE.md
     echo "Updated CHANGELOG-TEMPLATE.md"
 else
-    echo "Warning: ## \[Unreleased\] not found in CHANGELOG-TEMPLATE.md"
+    echo "Error: ## [Unreleased] not found in CHANGELOG-TEMPLATE.md" >&2
+    exit 1
 fi
 
 # Write new version to single source of truth right before propagation
