@@ -5,12 +5,13 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT" || exit 1
 if [ -f "$REPO_ROOT/scripts/lib/lint_cache.sh" ]; then
     # shellcheck source=scripts/lib/lint_cache.sh
+# shellcheck source=scripts/lib/lint_cache.sh
     source "$REPO_ROOT/scripts/lib/lint_cache.sh"
 fi
 if [[ -t 1 ]] && [[ "${FORCE_COLOR:-}" != "0" ]]; then
     RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; NC='\033[0m'
 else
-    RED=''; GREEN=''; YELLOW=''; BLUE=''; NC=''
+    RED=''; GREEN=''; BLUE=''; NC=''
 fi
 FAILED=0
 DETECTED_LANGUAGES=()
