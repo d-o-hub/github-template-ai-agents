@@ -1,0 +1,9 @@
+description = "Start ADR-driven development — perform TRIZ analysis and write an Architecture Decision Record (ADR) before planning tasks via GOAP"
+prompt = """
+Invoke the adr-driven-development approach.
+Begin by understanding what the user wants to build. Execute Phase 1 (ANALYZE & STRATEGIZE):
+1. Ask clarifying questions about the objective, constraints, and architecture.
+2. Use TRIZ concepts (triz-analysis/triz-solver) to evaluate the problem and resolve architectural contradictions.
+3. Draft an Architecture Decision Record (ADR) detailing the Context, Decision, and Consequences.
+Save the ADR in the appropriate documentation directory (e.g., `agents-docs/adr/` or project root) and confirm with the user before proceeding to Phase 2 (DECOMPOSE & PLAN) via the goap-agent.
+"""

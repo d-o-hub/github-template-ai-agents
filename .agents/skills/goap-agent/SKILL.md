@@ -30,7 +30,12 @@ Use this skill when facing:
 1. ANALYZE → 2. DECOMPOSE → 3. STRATEGIZE → 4. COORDINATE → 5. EXECUTE → 6. SYNTHESIZE
 ```
 
-## Phase 1: Task Analysis
+## Phase 1: Task Analysis (Analyze & Strategize)
+
+Before decomposing tasks, ensure architectural decisions are sound:
+1. **Analyze**: Use `triz-analysis` or `triz-solver` to evaluate the problem and resolve contradictions.
+2. **Decide**: Formulate an **ADR** (Architecture Decision Record) detailing Context, Decision, and Consequences.
+3. **Gate**: Wait for human approval of the ADR before proceeding to decomposition.
 
 ```markdown
 ## Task Analysis
@@ -38,9 +43,10 @@ Use this skill when facing:
 **Primary Goal**: [Clear statement of what success looks like]
 **Constraints**: [Time, Resources]
 **Complexity**: Simple/Medium/Complex
+**ADR Link**: [Link to approved Architecture Decision Record]
 ```
 
-Context: Use Explore agent, check past patterns, identify available agents.
+Context: Use Explore agent, check past patterns, perform TRIZ analysis, and record architectural decisions.
 
 ## Phase 2: Task Decomposition
 
