@@ -1,6 +1,6 @@
-**Version:** 0.2.7
-
 # Swarm Analysis Report
+
+**Version:** 0.2.8
 
 > Generated: 2026-04-04
 > Repository: github-template-ai-agents
@@ -28,7 +28,6 @@ The codebase is architecturally sound with good progressive disclosure patterns,
 - 2 BATS test files
 - 1 Python evaluation framework (`run-evals.py`)
 
-**Version:** 0.2.7
 
 ---
 
