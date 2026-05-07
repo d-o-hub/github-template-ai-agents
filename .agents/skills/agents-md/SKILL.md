@@ -48,6 +48,16 @@ readonly MAX_RETRIES=3
 - [ ] Security vulnerabilities
 ```
 
+### 4. Development Workflow Rules
+```markdown
+## Development Workflow
+**Prerequisite**: Always fetch and pull the latest default remote branch before analyzing or making changes.
+**Phase 1 (ANALYZE)**: Use TRIZ, write an ADR in `plans/`. (Human review required for ADR only)
+**Phase 2 (DECOMPOSE)**: Plan tasks in `plans/GOAP_STATE.md`
+**Phase 3 (EXECUTE)**: Implement using atomic commits. Loop until all GitHub Actions (CI checks) pass.
+**Phase 4 (SYNTHESIZE)**: Update context using existing learnings.
+```
+
 ### 3. Quality Gate
 ```markdown
 ## Quality Gate
