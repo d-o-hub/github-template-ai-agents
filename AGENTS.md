@@ -47,6 +47,15 @@ See `agents-docs/VERSION.md` for full workflow details.
 ./scripts/quality_gate.sh # Always run before committing. Fix all errors.
 ./scripts/update-all-docs.sh # Verify and update documentation
 ```
+## Development Phases (Human-Gated)
+
+1. **SPECIFY**: Define objective/scope. **Artifact**: `SPEC.md`. **Gate**: Human approval.
+2. **PLAN**: Design technical approach. **Artifact**: `PLAN.md`. **Gate**: Human approval.
+3. **TASKS**: Atomic decomposition. **Artifact**: `TASKS.md`. **Gate**: Human approval.
+4. **IMPLEMENT**: TDD + Incremental. **Artifact**: Code/Tests. **Gate**: Human approval.
+
+Track progress in `PHASES.md`. Never skip phases or gates.
+
 **Guard Rails:**
 - **Temporary Files**: NEVER create temporary files or debug outputs in the repository root or source directories. Always use system temporary directories (e.g., `/tmp` or via `mktemp`).
 - **Secret Scanning**: Gitleaks is enforced via CI only to prevent credential leakage.
@@ -127,12 +136,14 @@ Do not invent new types. Do not skip linting.
 | `github-pr-sentinel` | Monitor a GitHub pull request until it's merged, green, or b | ContinuousPRmonitoringandCIauto-fix |
 | `github-workflow` | Complete GitHub workflow automation - push, create branch/PR | General |
 | `goap-agent` | Invoke for complex multi-step tasks requiring intelligent pl | Coordination |
+| `incremental-implementation` | Implement tasks one by one using TDD and thin vertical slice | General |
 | `intent-classifier` | Classify user intents and route to appropriate skills, comma | Coordination |
 | `iterative-refinement` | Execute iterative refinement workflows with validation loops | General |
 | `learn` | Extract non-obvious session learnings into scoped AGENTS.md | General |
 | `memory-context` | Retrieve semantically relevant past learnings and analysis o | General |
 | `migration-refactoring` | Automate complex code migrations and refactorings with safet | Migration |
 | `parallel-execution` | Execute multiple independent tasks simultaneously using para | Coordination |
+| `planning-and-task-breakdown` | Design the technical approach (PLAN.md) and decompose it int | General |
 | `privacy-first` | Prevent email addresses and personal data from entering the | PreventPII/emailleaksinthecodebase |
 | `pwa-offline-sync` | Design Cache Storage + IndexedDB strategy and sync queue. Ac | General |
 | `reader-ui-ux` | Build localized, accessible reader/admin UI with responsive | UI/UX |
@@ -143,10 +154,12 @@ Do not invent new types. Do not skip linting.
 | `shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use w | Quality |
 | `skill-creator` | Create new skills, modify and improve existing skills, and m | Meta-skillforcreatingandoptimizingagentskills |
 | `skill-evaluator` | "Reusable skill for evaluating other skills with structure c | Meta |
+| `spec-driven-development` | Write a structured specification (SPEC.md) before any code. | General |
 | `task-decomposition` | Break down complex tasks into atomic, actionable goals with | Coordination |
+| `test-driven-development` | Red-Green-Refactor workflow. Triggers during implementation | Quality |
 | `test-runner` | Execute tests, analyze results, and diagnose failures across | Quality |
 | `testdata-builders` | Maintain deterministic builders/factories for test entities. | Quality |
-| `testing-strategy` | Design comprehensive testing strategies with modern techniqu | Quality |
+| `testing-strategy` | Design and implement comprehensive testing strategies for so | Quality |
 | `triz-analysis` | Run a systematic TRIZ contradiction audit against a codebase | General |
 | `triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive P | General |
 | `turso-db` | Use this skill for Turso (LibSQL/Limbo) database development | DevOps |

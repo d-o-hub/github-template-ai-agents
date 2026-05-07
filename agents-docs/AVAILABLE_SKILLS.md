@@ -71,6 +71,7 @@
 | Skill | Description |
 |-------|-------------|
 | `dogfood` | Systematically explore and test a web application to find bugs, UX issues, and other problems. Use when asked to "dogfood", "QA", "exploratory test", "find issues", "bug hunt", "test this app/site/platform", or review the quality of a web application. Produces a structured report with full reproduction evidence. |
+| `test-driven-development` | Red-Green-Refactor workflow. Triggers during implementation or bug fixing. |
 | `testdata-builders` | Maintain deterministic builders/factories for test entities. Activate when authoring tests, extending test utilities, or adding schema fields that affect fixtures. |
 
 ## Workflow
@@ -80,9 +81,12 @@
 | `cloudflare-worker-api` | Structure Worker API routes and handlers. Activate for route definition, response helpers, and typed handler patterns. Auth belongs to secure-invite-and-access. |
 | `database-schema-migrations` | Design database schema and write migrations. Activate for table design, migration scripts, or schema changes. Generic pattern adaptable to any SQL database. |
 | `document-rendering-and-locators` | Implement resilient document rendering and annotation anchoring. Activate for reader-core, TOC, locator, or highlight anchoring changes. Generic pattern applicable to EPUB, PDF, or any document format. |
+| `incremental-implementation` | Implement tasks one by one using TDD and thin vertical slices. Triggers after TASKS.md is approved. |
+| `planning-and-task-breakdown` | Design the technical approach (PLAN.md) and decompose it into tasks (TASKS.md). Triggers after SPEC.md is approved. |
 | `pwa-offline-sync` | Design Cache Storage + IndexedDB strategy and sync queue. Activate for service worker, cache, or offline bug investigation. Generic pattern for any offline-first application. |
 | `reader-ui-ux` | Build localized, accessible reader/admin UI with responsive layouts, telemetry, and state management. Activate for React screens or UX polish. Generic pattern for any document reader application. |
 | `secure-invite-and-access` | Implement access control, authentication, and authorization patterns. Activate for auth endpoints, permission management, session/token logic, or signed URL generation. Generic template adaptable to any project's auth needs. |
+| `spec-driven-development` | Write a structured specification (SPEC.md) before any code. Triggers on "new feature", "start project", "redesign", or when scope is unclear. |
 
 ## Usage
 

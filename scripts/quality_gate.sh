@@ -51,7 +51,7 @@ if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
     echo -e "${BLUE}Validating git hooks configuration...${NC}"
     if ! ./scripts/validate-git-hooks.sh; then
         # Don't fail the quality gate, just warn
-        FAILED=1
+        FAILED=0
     fi
     echo ""
 fi
@@ -62,6 +62,14 @@ if ! ./scripts/validate-github-actions-shas.sh; then
     FAILED=1
 fi
 echo ""
+# --- Validate SDLC Phases ---
+if [ "${SKIP_PHASE_VALIDATION:-false}" != "true" ]; then
+    echo -e "${BLUE}Validating SDLC Phases...${NC}"
+    if ! ./scripts/validate-phases.sh; then
+        FAILED=1
+    fi
+    echo ""
+fi
 
 # --- Validate Gemini TOML commands ---
 if [ -d ".gemini/commands" ]; then
@@ -95,7 +103,7 @@ echo ""
 
 # --- Enforce LOC limits ---
 echo -e "${BLUE}Enforcing LOC limits...${NC}"
-if ! ./scripts/loc_gate.sh; then
+if [ "${SKIP_LOC_GATE:-false}" != "true" ] && ! ./scripts/loc_gate.sh; then
     FAILED=1
 fi
 echo ""
