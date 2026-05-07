@@ -72,7 +72,7 @@ This document catalogs all new skills, commands, and changes that have been succ
 ### Symlinks Created
 All new skills have symlinks for:
 - Claude Code (`.claude/skills/`)
-- Gemini CLI (`.agents/skills/`)
+- Qwen Code (`.qwen/skills/`)
 
 ---
 
@@ -300,7 +300,7 @@ scripts/
 ### Symlinks (All Agents)
 ```
 .claude/skills/    [6 new symlinks]
-
+.qwen/skills/      [6 new symlinks]
 ```
 
 ---

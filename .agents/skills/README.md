@@ -2,12 +2,13 @@
 
 This is the **single canonical location** for all skills in this repository.
 
-Claude Code, Gemini CLI, and Qwen Code use symlinks; OpenCode reads directly from `.agents/skills/`:
+Claude Code and Qwen Code use symlinks; Gemini CLI and OpenCode read directly from `.agents/skills/`:
 
 ```
 .claude/skills/<name>      -> ../../.agents/skills/<name>
-
 .qwen/skills/<name>        -> ../../.agents/skills/<name>
+Gemini CLI natively uses   -> .agents/skills/
+OpenCode natively uses     -> .agents/skills/
 ```
 
 ## Setup
