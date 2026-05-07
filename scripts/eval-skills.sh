@@ -78,7 +78,7 @@ fi
 # We also need to check if the file is empty, which awk skips.
 # Fast path check for 0-byte files which would fail all field validations
 while IFS= read -r -d '' eval_file; do
-  if [ ! -s "$eval_file" ]; then
+  if [[ ! -s "$eval_file" ]]; then
     skill_name=$(basename "$(dirname "$eval_file")")
     echo " [FAIL] $skill_name: evals missing 'expected_output' field"
     echo " [FAIL] $skill_name: evals missing 'id' field"
