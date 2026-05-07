@@ -38,47 +38,7 @@ Perform security audits on code, configurations, and repositories to identify vu
 - Review outdated packages
 - Validate license compliance
 
-## Common Vulnerability Patterns
-
-### Injection Flaws
-```python
-# BAD: Direct string concatenation
-query = "SELECT * FROM users WHERE id = " + user_id
-
-# GOOD: Parameterized queries
-cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
-```
-
-### Secrets Management
-- Never hardcode credentials in source code
-- Use environment variables or secure vaults
-- Rotate keys regularly
-- Use placeholders like `[REDACTED]` or `example-token` in examples
-
-### Authentication Issues
-- Enforce strong password policies
-- Implement multi-factor authentication
-- Use secure session tokens with proper expiration
-- Validate all authenticated endpoints
-
-## Severity Classification
-
-| Level | Criteria | Response Time |
-|-------|----------|---------------|
-| Critical | Remote code execution, authentication bypass | Immediate |
-| High | Data exposure, privilege escalation | 24 hours |
-| Medium | Information disclosure, CSRF | 1 week |
-| Low | Best practice violations | Next sprint |
-
-## Remediation Priorities
-
-1. **Fix critical vulnerabilities immediately**
-2. **Validate all user inputs**
-3. **Implement defense in depth**
-4. **Add security monitoring and logging**
-
 ## References
 
-- `references/owasp-guidelines.md` - OWASP Top 10 and secure coding practices
-- `references/audit-checklist.md` - Comprehensive security audit checklist
+- [Security Checklist](../../../agents-docs/references/security-checklist.md) - Comprehensive security audit checklist, OWASP Top 10, and CI/CD security scanning.
 - `references/remediation-guide.md` - Step-by-step vulnerability remediation
