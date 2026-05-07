@@ -1,0 +1,10 @@
+description = "Create a structured plan for a complex task"
+prompt = """
+Invoke the task-decomposition skill.
+Analyze the user request and break it down into atomic, actionable steps.
+For each step, specify:
+1. The goal and success criteria
+2. Dependencies on other steps
+3. The suggested agent or skill to use
+Present the plan clearly in Markdown format and wait for user approval before starting implementation.
+"""
