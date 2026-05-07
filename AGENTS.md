@@ -28,19 +28,21 @@ readonly MAX_PR_TITLE_LENGTH=72
 
 ## Development Phases
 
-We use a GOAP (Goal-Oriented Action Planning) approach combined with ADRs (Architecture Decision Records) and TRIZ for structured development, ensuring human verification gates at each step:
+We use a GOAP (Goal-Oriented Action Planning) approach combined with ADRs (Architecture Decision Records) and TRIZ for structured development.
+
+**Prerequisite**: Always fetch and pull the latest default remote branch before beginning analysis or making changes.
 
 1. **ANALYZE & STRATEGIZE (Phase 1)**
    - **Action**: Use `triz-analysis` or `triz-solver` to evaluate the problem, resolve contradictions, and identify architecture requirements. Write an **ADR** (Architecture Decision Record) detailing the context, decision, and consequences.
-   - **Human Gate**: Review and approve the ADR and analysis before proceeding.
+   - **Storage**: Save the ADR in the `plans/` directory.
+   - **Human Gate**: Review and approve the ADR and analysis before proceeding. *This is the only human review gate.*
 
 2. **DECOMPOSE & PLAN (Phase 2)**
-   - **Action**: Use the `goap-agent` to break down the problem into atomic, testable tasks. Record these in `templates/GOAP_STATE.md` (or the `plans/` directory).
-   - **Human Gate**: Review and approve the `GOAP_STATE.md` task breakdown.
+   - **Action**: Use the `goap-agent` to break down the problem into atomic, testable tasks. Record these in `plans/GOAP_STATE.md`.
 
 3. **EXECUTE & COORDINATE (Phase 3)**
-   - **Action**: Agents execute tasks systematically based on the `GOAP_STATE.md` using the atomic commit workflow.
-   - **Human Gate**: Code review on Pull Requests and validation via `scripts/quality_gate.sh`.
+   - **Action**: Agents execute tasks systematically based on the `plans/GOAP_STATE.md` using the atomic commit workflow.
+   - **Action**: Use the `self-fix-loop` skill or equivalent to loop until all GitHub Actions (CI checks) pass.
 
 4. **SYNTHESIZE (Phase 4)**
    - **Action**: Run the `learn` skill to extract discoveries and update project-specific `AGENTS.md` contexts.

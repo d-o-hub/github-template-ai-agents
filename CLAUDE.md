@@ -19,11 +19,7 @@ See `agents-docs/SUB-AGENTS.md`.
 
 ### Skills
 Skills live canonically in `.agents/skills/`. The `.claude/skills/` folder contains
-only symlinks.
-
-**Installation**:
-- **One-click**: `claude skills install d-o-hub/github-template-ai-agents`
-- **Manual**: Run `./scripts/setup-skills.sh` once after cloning.
+only symlinks. Run `./scripts/setup-skills.sh` once after cloning.
 
 Skills use progressive disclosure - `SKILL.md` is injected only when the agent
 decides the skill is needed. Do not pre-load all skills at session start.
