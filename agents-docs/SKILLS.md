@@ -46,7 +46,7 @@ name: skill-name
 description: One-line description
 category: coordination|quality|documentation|workflow|research|knowledge-management
 version: "1.0"
-template_version: "0.2"
+template_version: "0.3"
 ---
 
 # Skill Name
@@ -58,6 +58,14 @@ Activate when: [specific triggers]
 
 ## Instructions
 [Concise, universally applicable instructions]
+
+## Rationalizations
+| Rationalization | Reality |
+|-----------------|---------|
+| "Excuse goes here" | "Rebuttal goes here" |
+
+## Red Flags
+- [ ] List of early warning behaviors that signal cutting corners
 
 ## Reference Files
 - `references/guide.md` - [when to read]
