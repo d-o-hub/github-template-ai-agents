@@ -91,6 +91,5 @@ cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
 
 ## References
 
-- `references/owasp-guidelines.md` - OWASP Top 10 and secure coding practices
-- `references/audit-checklist.md` - Comprehensive security audit checklist
+- [Security Checklist](../../../agents-docs/references/security-checklist.md) - Comprehensive security audit checklist, OWASP Top 10, and CI/CD security scanning.
 - `references/remediation-guide.md` - Step-by-step vulnerability remediation
