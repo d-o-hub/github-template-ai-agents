@@ -40,9 +40,9 @@ These visual patterns define the 2024–2026 AI aesthetic monoculture. Flag ever
 | **Empty states with illustration + button** | Lottie animation or SVG blob person | Cute once. Now patronizing. |
 | **Skeleton loaders for everything** | Gray pulse bars | Often used to mask poor performance instead of fix it |
 | **Dark mode = black bg + purple accent** | `#0f0f0f` + `#8b5cf6` | The "hacker aesthetic" as sold by Vercel clones |
-| **Animated gradient text** | Moving rainbow or purple-blue sweep on headline text | Peak 2023 AI startup energy. Looks desperate |
-| **"Powered by AI" badge** | Small badge or chip somewhere on the UI | Adds nothing. Trust signal that signals nothing |
-| **Dashboard with 6+ metric cards** | Big number, small label, trend arrow | Data theater. Usually none of it is actionable |
+| **Animated gradient text** | Moving rainbow/sweep on headline | Peak 2023 AI startup energy. Looks desperate |
+| **"Powered by AI" badge** | Small badge on the UI | Adds nothing. Trust signal that signals nothing |
+| **Dashboard with 6+ metric cards** | Big number, small label | Data theater. Usually none of it is actionable |
 
 ### What to Do Instead
 
@@ -63,48 +63,39 @@ These visual patterns define the 2024–2026 AI aesthetic monoculture. Flag ever
 
 | Pattern | What it looks like | Why it's slop |
 |---|---|---|
-| **Onboarding modal on first load** | "Welcome to [Product]! Let's get you set up 🎉" | Interrupts before the user has context. Nobody reads it. |
-| **5-step onboarding wizard** | Progress bar, next/back, confetti at end | Treats users as suspects who need to be processed |
-| **Tooltip tours** | Floating box pointing at UI elements in sequence | Teaches the wrong interface instead of fixing the interface |
-| **"Are you sure?" confirm dialogs** | Modal for every delete action | Trust issues. Use undo instead. |
-| **Generic empty states** | "No data yet! Click + to add your first item" | Zero help. Doesn't explain what the item IS or why I'd want one |
-| **Toast notifications for everything** | "Saved!", "Deleted!", "Updated!" | Noise. Users learn to ignore them in 2 sessions |
-| **Infinite scroll + load more button** | Both at the same time | Design indecision shipped as a feature |
-| **Search that requires exact match** | Typo → no results → dead end | Punishes the user for trusting the product |
-| **Form with 8+ fields to get started** | Sign up → giant form → submit → maybe enter | Commitment before value. Backwards. |
-| **"Loading..." with no progress cue** | Spinner, no ETA, no context | I don't know if this is taking 1 second or 1 minute |
-| **Every action requires a reload** | Click save → full page refresh → scroll lost | 2012 called |
-| **Hamburger menu on desktop** | Hidden navigation because mobile-first was misread | Discovery failure. Punishes exploration. |
-| **Hover states only** | Functionality only revealed on hover | Mobile users, keyboard users, discoverers all fail |
+| **Onboarding modal** | "Welcome to [Product]!" | Interrupts before context. Nobody reads it. |
+| **5-step wizard** | Progress bar, confetti at end | Treats users as suspects to be processed |
+| **Tooltip tours** | Floating box at UI elements | Teaches wrong interface instead of fixing it |
+| **"Are you sure?"** | Modal for every delete action | Trust issues. Use undo instead. |
+| **Generic empty states** | "No data yet! Click + to add" | Doesn't explain what item IS or why I'd want it |
+| **Toast notifications** | "Saved!", "Deleted!", "Updated!" | Noise. Users learn to ignore them in 2 sessions |
+| **Infinite scroll + button** | Both at the same time | Design indecision shipped as a feature |
+| **Exact match search** | Typo → no results → dead end | Punishes the user for trusting the product |
+| **8+ field form** | Sign up → giant form → maybe enter | Commitment before value. Backwards. |
+| **"Loading..."** | Spinner, no ETA, no context | I don't know if it's 1 second or 1 minute |
+| **Action reload** | Full page refresh → scroll lost | 2012 called |
+| **Hamburger menu** | Hidden navigation on desktop | Discovery failure. Punishes exploration. |
+| **Hover states only** | Revealed only on hover | Mobile, keyboard, discoverers all fail |
 
-### Responsive Anti-Patterns
+### Responsive Anti-Patterns & Best Practices
 
-| Pattern | What it looks like | Why it's slop |
+| Pattern | Slop Cue | Fix |
 |---|---|---|
-| **Hamburger menu on desktop** | Hidden navigation on large screens | Discovery failure. Users can't explore. |
-| **Tiny touch targets on mobile** | Buttons/links < 44px | Frustrating, accessibility fail |
-| **Desktop-only layout** | Fixed-width container, horizontal scroll on mobile | Unusable, forces pinch-zoom |
-| **Hidden primary actions** | Important buttons only visible on hover/desktop | Mobile users can't complete tasks |
-| **Intrusive popups on mobile** | Modal that covers entire screen, hard to dismiss | Blocks content, frustrating |
-| **Inconsistent navigation** | Different nav structure per viewport | Users get lost when resizing |
+| **Hamburger** | Hidden nav on desktop | Discovery failure. Use persistent nav. |
+| **Touch targets** | Buttons/links < 44px | Frustrating. Use 44px+ targets. |
+| **Fixed layout** | Horizontal scroll on mobile | Unusable. Use responsive stacks. |
+| **Hidden actions** | Desktop-only visibility | Mobile fail. Keep primary visible. |
+| **Popups** | Hard-to-dismiss modals | Frustrating. Use inline feedback. |
 
-### Responsive Best Practices
-
-| Viewport | Navigation | Layout |
-|---|---|---|
-| **Mobile (< 640px)** | Bottom tab bar OR slide-out drawer | Stacked, full-width |
-| **Tablet (640-1024px)** | Horizontal nav, collapsible sidebar | Hybrid, 2-column max |
-| **Desktop (> 1024px)** | Persistent sidebar OR top nav | Full sidebar (280px) |
-
-**Always verify:**
-1. Touch targets ≥ 44px on mobile
-2. Primary actions visible without scrolling
-3. Navigation accessible at all sizes
-4. Content readable without horizontal scroll
+**Guidelines:**
+- **Mobile (<640px):** Bottom tab bar or drawer; stacked layout.
+- **Tablet (640-1024px):** Collapsible sidebar; 2-column max.
+- **Desktop (>1024px):** Persistent sidebar (280px).
+- **Verify:** ≥44px touch targets; no horizontal scroll; accessible nav.
 
 ### What to Do Instead
 
-- **Don't teach the UI — fix the UI.** If users need a tour, the interface is unclear. Redesign instead.
+- **Don't teach the UI — fix the UI.** Tour needed = unclear. Redesign.
 - **Undo over confirm.** Give users a 5–10 second undo window on destructive actions. Way less friction.
 - **Empty states with one specific next action.** Tell users what they'll get, why it matters, exactly what to do.
 - **Progressive disclosure.** Start with the minimum viable form. Add fields only when the user needs them.
@@ -232,6 +223,20 @@ Anti-slop isn't just negation. These are the affirmative principles:
 - **Short > long.** Read the sentence aloud. Cut every word that doesn't earn its place.
 - **Voice = point of view.** Have one. Don't round off all the edges trying to please everyone.
 - **Write for one person.** Not "users". Not "teams". The specific human who will read this specific sentence.
+
+---
+
+## Rationalizations
+| Rationalization | Reality |
+|-----------------|---------|
+| "Users are used to this kind of UI anyway" | Familiarity with mediocrity isn't an excuse to propagate it. |
+| "It's faster to use the default AI-generated copy" | Fast slop is still slop. Quality requires human-like consideration and editing. |
+| "This doesn't need to be unique, it just needs to work" | Distinctiveness is part of 'working'. It builds brand trust and memorability. |
+
+## Red Flags
+- [ ] Over-reliance on "modern" sans-serif fonts without stylistic justification
+- [ ] Using generic affirmations like "Absolutely!" in UX copy
+- [ ] Defaulting to 3-column feature grids for all content types
 
 ---
 
