@@ -39,6 +39,14 @@ cd your-project
 
 ### Setup
 
+#### Option A: One-Click Install (Claude Code Only)
+
+```bash
+claude skills install d-o-hub/github-template-ai-agents
+```
+
+#### Option B: Manual Setup (All Agents)
+
 ```bash
 # Create skill symlinks (run once)
 ./scripts/setup-skills.sh

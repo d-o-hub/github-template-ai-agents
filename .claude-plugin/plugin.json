@@ -1,0 +1,20 @@
+{
+  "name": "github-template-ai-agents",
+  "description": "Production-ready template for AI agent-powered development with Claude Code, Gemini CLI, and more.",
+  "version": "0.2.8",
+  "author": {
+    "name": "d-o-hub"
+  },
+  "homepage": "https://github.com/d-o-hub/github-template-ai-agents",
+  "repository": "https://github.com/d-o-hub/github-template-ai-agents",
+  "license": "MIT",
+  "commands": "./.claude/commands",
+  "skills": "./.agents/skills",
+  "agents": [
+    "./.claude/agents/agent-creator.md",
+    "./.claude/agents/analysis-swarm.md",
+    "./.claude/agents/goap-agent.md",
+    "./.claude/agents/loop-agent.md"
+  ],
+  "hooks": "./.claude/hooks"
+}
