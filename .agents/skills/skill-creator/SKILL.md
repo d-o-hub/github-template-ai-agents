@@ -49,6 +49,8 @@ skill-name/
 - Keep under **250 lines**
 - Use progressive disclosure: move detailed content to `references/`
 - Include step-by-step instructions, examples, and common edge cases
+- **Mandatory**: Include `## Rationalizations` table to counter common agent excuses
+- **Mandatory**: Include `## Red Flags` checklist for early warning behaviors
 
 ---
 

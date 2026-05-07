@@ -172,6 +172,18 @@ Workflow succeeds when:
 7. ✓ Post-merge validation passes
 8. ✓ All files and docs validated
 
+## Rationalizations
+| Rationalization | Reality |
+|-----------------|---------|
+| "The post-merge validation is redundant since CI passed" | Post-merge validation ensures the merge itself didn't introduce integration issues. |
+| "I don't need to check GitHub issues for this tiny fix" | Issues might contain critical context or reveal that the "tiny fix" is part of a larger problem. |
+| "Atomic commits are too much work for small changes" | Atomic commits make debugging and rollbacks easier, regardless of change size. |
+
+## Red Flags
+- [ ] Skipping the issue-check phase for "quick" changes
+- [ ] Merging even when pre-existing Actions are still failing
+- [ ] Skipping post-merge validation on the `main` branch
+
 ## See Also
 
 - `references/SWARM.md` - Agent coordination details

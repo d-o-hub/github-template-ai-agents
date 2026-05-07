@@ -34,6 +34,17 @@ Define systematic, portable verification checklists for common operations within
 4. **Test Checklist**: Run through the checks on a real instance.
 5. **Iterate**: Refine the checklist based on discovered edge cases.
 
+## Rationalizations
+| Rationalization | Reality |
+|-----------------|---------|
+| "This is a minor change, full verification is overkill" | Every change needs verification to prevent regressions. |
+| "I've tested this manually already" | Manual testing is prone to oversight; structured checklists ensure consistency. |
+
+## Red Flags
+- [ ] Skipping verification steps for "simple" changes
+- [ ] Marking items as complete without actually performing the check
+- [ ] Relying solely on successful build/lint without functional verification
+
 ## References
 - `AGENTS.md` - Repository standards and quality gates
 - `scripts/quality_gate.sh` - Automated verification entry point

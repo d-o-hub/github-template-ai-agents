@@ -55,7 +55,8 @@ See `agents-docs/VERSION.md` for full workflow details.
 ## Code Style
 
 - Max `${MAX_LINES_PER_SOURCE_FILE}` lines/file; `${MAX_LINES_PER_SKILL_MD}`/`SKILL.md`; `${MAX_LINES_AGENTS_MD}`/`AGENTS.md`
-- `SKILL.md` must start with frontmatter; No magic numbers - use named constants
+- `SKILL.md` must start with frontmatter and include **Rationalizations** and **Red Flags** sections
+- No magic numbers - use named constants
 - **Reference format**: `` `references/filename.md` - Description ``
 - Shell: `shellcheck` (severity=error); Markdown: `markdownlint`; Diagrams: `mermaid`
 
@@ -161,6 +162,7 @@ Do not invent new types. Do not skip linting.
 
 ## Agent Guidance
 
+- **Rationalizations & Red Flags**: Every skill must include a `## Rationalizations` table to preemptively counter common excuses for cutting corners, and a `## Red Flags` checklist to identify early warning behaviors. Review these whenever using a skill to ensure high standards.
 - **Plan**: Produce written plan, wait for confirmation for non-trivial tasks.
 - **Policies**: See `agents-docs/WORKFLOW.md` for Atomic Commit & Pre-Existing Issue resolution.
 - **Learning**: After work, run `learn` or append discoveries to nearest `AGENTS.md`.
