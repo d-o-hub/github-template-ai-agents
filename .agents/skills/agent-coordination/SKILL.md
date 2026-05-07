@@ -9,13 +9,13 @@ Coordinate multiple agents efficiently for complex development tasks across any 
 
 ## Quick Start
 
-Choose your coordination strategy:
+Choose your coordination strategy from the [Orchestration Patterns](../../../agents-docs/references/orchestration-patterns.md):
 
-**Parallel** - Independent tasks → See [PARALLEL.md](PARALLEL.md)
-**Sequential** - Dependent tasks → See [SEQUENTIAL.md](SEQUENTIAL.md)  
-**Swarm** - Multi-perspective analysis → See [SWARM.md](SWARM.md)
-**Hybrid** - Multi-phase workflows → See [HYBRID.md](HYBRID.md)
-**Iterative** - Progressive refinement → See [ITERATIVE.md](ITERATIVE.md)
+- **Parallel** - Independent tasks
+- **Sequential** - Dependent tasks
+- **Swarm** - Multi-perspective analysis
+- **Hybrid** - Multi-phase workflows
+- **Iterative** - Progressive refinement
 
 ## Available Agents
 
@@ -30,48 +30,11 @@ Choose your coordination strategy:
 | performance-optimizer | Speed and efficiency |
 | loop-agent | Orchestrate iterations |
 
-## Basic Workflow
-
-1. **Choose strategy** based on task structure
-2. **Select agents** matching required capabilities
-3. **Execute** with quality gates between phases
-4. **Validate** outputs before proceeding
-5. **Synthesize** results
-
 ## Language Support
 
-This coordination skill works with:
 - Python (Django, Flask, FastAPI)
 - JavaScript/TypeScript (Node.js, React, Vue)
-- Java (Spring, Jakarta EE)
-- Go (Gin, Echo)
-- Rust (Actix, Rocket)
-- C# (.NET, ASP.NET Core)
-
-## Common Patterns
-
-**Analysis + Execution**:
-```
-1. Swarm analysis (parallel agents gather insights)
-2. Sequential execution (apply findings)
-3. Parallel validation (verify results)
-```
-
-**Test-Driven Workflow**:
-```
-1. test-runner: Run existing tests
-2. feature-implementer: Add functionality
-3. test-runner: Verify implementation
-4. code-reviewer: Quality check
-```
-
-**Performance Optimization**:
-```
-Loop with performance-optimizer until:
-- Metrics meet targets
-- No more optimizations found
-- Max iterations reached
-```
+- Java, Go, Rust, C#
 
 ## Quality Gates
 
@@ -80,8 +43,7 @@ Between each phase, verify:
 - Tests pass with adequate coverage
 - Security scans clean
 - Performance acceptable
-- No regressions introduced
 
-## Next Steps
+## References
 
-Read the specific coordination pattern that matches your task structure. Each pattern includes detailed workflows, examples, and quality criteria.
+- [Orchestration Patterns](../../../agents-docs/references/orchestration-patterns.md) - Detailed guide for all coordination strategies including parallel, sequential, swarm, hybrid, and iterative.
