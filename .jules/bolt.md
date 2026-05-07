@@ -45,3 +45,7 @@
 ## 2026-05-06 - [Subshell elimination in setup-skills]
 **Learning:** Significant performance gains in repository setup scripts can be achieved by eliminating O(N) process forks in loops. Replacing `basename` with Bash parameter expansion and pre-calculating `realpath --relative-to` base paths outside of the skills iteration loop reduced `setup-skills.sh` execution time by ~27x (from ~0.8s to ~0.03s).
 **Action:** Avoid calling external utilities like `realpath` or `basename` inside loops that iterate over many files or directories; pre-calculate static path components and use native Bash string manipulation.
+
+## 2026-05-27 - [Batching file validation with awk]
+**Learning:** Re-running `grep` and `basename` iteratively inside a bash loop to validate properties across multiple subdirectories (e.g. 50+ skill directories) incurs immense subshell overhead and significantly slows down scripts. Transitioning to a batched validation approach using single-pass `awk` parsing eliminates hundreds of process forks. In this codebase, it reduced the execution time of extra eval validation checks from ~1.5s to ~0.02s.
+**Action:** Always prefer batched `awk` parsing across file arrays via `find -print0` and `xargs -0` or `awk ... "${files[@]}"` over multiple looped `grep` invocations to check properties within small text files. Use FNR to handle file transitions seamlessly.
