@@ -85,22 +85,25 @@ SKILL_DATA=$(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" |
     echo ""
 
     # Get sorted categories first to match original script's outer loop
-    CATEGORIES=$(echo "$SKILL_DATA" | cut -d'|' -f1 | sort -u)
+    # Use printf instead of echo to prevent option injection if SKILL_DATA starts with -
+    CATEGORIES=$(printf "%s\n" "$SKILL_DATA" | cut -d'|' -f1 | sort -u)
 
     for category in $CATEGORIES; do
         # Capitalize category for display
-        category_display=$(echo "$category" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
+        # Use printf to prevent option injection for categories starting with -
+        category_display=$(printf "%s\n" "$category" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
 
-        echo "## $category_display"
-        echo ""
-        echo "| Skill | Description |"
-        echo "|-------|-------------|"
+        printf "## %s\n" "$category_display"
+        printf "\n"
+        printf "| Skill | Description |\n"
+        printf "|-------|-------------|\n"
 
         # Filter skills for this category and sort by name
-        echo "$SKILL_DATA" | grep "^$category|" | sort -t'|' -k2,2 | while IFS="|" read -r _ name description; do
-            echo "| \`$name\` | $description |"
+        # Use -- separator with grep to prevent option injection if category starts with -
+        printf "%s\n" "$SKILL_DATA" | grep -- "^$category|" | sort -t'|' -k2,2 | while IFS="|" read -r _ name description; do
+            printf "| \`%s\` | %s |\n" "$name" "$description"
         done
-        echo ""
+        printf "\n"
     done
 
     echo "## Usage"
@@ -115,5 +118,6 @@ SKILL_DATA=$(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" |
 } > "$OUTPUT_FILE"
 
 # Count skills processed
-SKILL_COUNT=$(echo "$SKILL_DATA" | grep -c "^" || echo 0)
+# Use printf to prevent option injection if SKILL_DATA starts with -
+SKILL_COUNT=$(printf "%s\n" "$SKILL_DATA" | grep -c "^" || echo 0)
 echo "Generated $OUTPUT_FILE with $SKILL_COUNT skills"

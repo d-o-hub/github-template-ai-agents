@@ -28,3 +28,8 @@
 **Vulnerability:** Associative array keys in Bash arithmetic expansion contexts (`$((MAP[$key]))`) were evaluated as expressions. If `$key` was derived from an untrusted source (like a cache file), it allowed arbitrary command execution.
 **Learning:** Bash treats array indices in arithmetic contexts as expressions. Maliciously crafted keys containing `$(...)` or `a[$(...)0]` are executed during expansion.
 **Prevention:** Strictly validate keys against a whitelist (e.g., `^(safe|conditional|dangerous|unknown)$`) before use in arithmetic contexts and use `jq -n --arg` for secure JSON serialization of commands.
+
+## 2026-05-07 - Option Injection in Utility Scripts
+**Vulnerability:** Use of `echo "$VAR"` and `grep "$VAR"` in utility scripts allowed variables derived from `SKILL.md` (e.g., categories or skill names) to be interpreted as command-line options if they started with a hyphen.
+**Learning:** `echo` behavior is inconsistent when its first argument looks like a flag (e.g., `-e`). `grep` interprets patterns starting with `-` as options unless explicitly told not to.
+**Prevention:** Always use `printf "%s\n" "$VAR"` instead of `echo` for printing variables. Use the `--` separator with `grep` and other commands to terminate option processing before passing variables.
