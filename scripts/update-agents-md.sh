@@ -70,7 +70,8 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
         
         # Extract category from AGENTS.md if it exists, otherwise default to "General"
         # Look for this skill in the existing table to preserve its category
-        category=$(grep "| \`${skill_name}\` |" "$AGENTS_FILE" 2>/dev/null | \
+        # Use -- separator with grep to prevent option injection if skill_name starts with -
+        category=$(grep -- "| \`${skill_name}\` |" "$AGENTS_FILE" 2>/dev/null | \
             sed 's/.*| \([^|]*\) |$/\1/' | \
             tr -d ' ' || echo "")
         
@@ -97,7 +98,8 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
         # Clean up description
         description=${description%% }
         
-        echo "| \`${skill_name}\` | ${description} | ${category} |" >> "$TEMP_FILE"
+        # Use printf to prevent option injection if skill_name or description starts with -
+        printf "| \`%s\` | %s | %s |\n" "${skill_name}" "${description}" "${category}" >> "$TEMP_FILE"
     done
 fi
 
