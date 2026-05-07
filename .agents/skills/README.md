@@ -6,7 +6,7 @@ Claude Code, Gemini CLI, and Qwen Code use symlinks; OpenCode reads directly fro
 
 ```
 .claude/skills/<name>      -> ../../.agents/skills/<name>
-.gemini/skills/<name>      -> ../../.agents/skills/<name>
+
 .qwen/skills/<name>        -> ../../.agents/skills/<name>
 ```
 

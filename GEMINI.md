@@ -11,7 +11,7 @@ Delegate context-heavy research to sub-agents to keep the parent session focused
 See `agents-docs/SUB-AGENTS.md`.
 
 ### Skills
-Skills live canonically in `.agents/skills/`. The `.gemini/skills/` folder contains
+Skills live canonically in `.agents/skills/`. Gemini CLI uses the `.agents/skills/` folder directly.
 only symlinks. Run `./scripts/setup-skills.sh` once after cloning.
 
 Skills use progressive disclosure - `SKILL.md` is injected only when the agent
