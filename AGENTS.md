@@ -107,14 +107,14 @@ Do not invent new types. Do not skip linting.
 | `agent-coordination` | Coordinate multiple agents for software development across a | Coordination |
 | `agents-md` | Create AGENTS.md files with production-ready best practices. | General |
 | `anti-ai-slop` | Apply this skill whenever the user wants to audit, fix, rede | QualityenforcementforUI,UX,andcopy |
-| `api-design-first` | Design and document RESTful APIs using design-first principl | API Development |
+| `api-design-first` | Design and document RESTful APIs using design-first principl | APIDevelopment |
 | `architecture-diagram` | Generate or update a project architecture SVG diagram by sca | General |
 | `atomic-commit` | Atomic git workflow - validates, commits, pushes, creates PR | General |
 | `cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, Gi | DevOps |
-| `cloudflare-worker-api` | Structure Worker API routes and handlers. Activate for route | API Development |
+| `cloudflare-worker-api` | Structure Worker API routes and handlers. Activate for route | APIDevelopment |
 | `code-quality` | Review and improve code quality across any programming langu | Quality |
 | `code-review-assistant` | Automated code review with PR analysis, change summaries, an | General |
-| `codeberg-api` | - Interact with Forgejo/Codeberg repositories via the REST A | API Development |
+| `codeberg-api` | - Interact with Forgejo/Codeberg repositories via the REST A | APIDevelopment |
 | `css-render-performance` | Guide CSS render performance analysis and optimization. Use | General |
 | `database-devops` | Database design, migration, and DevOps automation with safet | DevOps |
 | `database-schema-migrations` | Design database schema and write migrations. Activate for ta | DevOps |
@@ -129,6 +129,7 @@ Do not invent new types. Do not skip linting.
 | `goap-agent` | Invoke for complex multi-step tasks requiring intelligent pl | Coordination |
 | `intent-classifier` | Classify user intents and route to appropriate skills, comma | Coordination |
 | `iterative-refinement` | Execute iterative refinement workflows with validation loops | General |
+| `jules-delegator` | Use this skill to delegate complex coding tasks by creating | General |
 | `learn` | Extract non-obvious session learnings into scoped AGENTS.md | General |
 | `memory-context` | Retrieve semantically relevant past learnings and analysis o | General |
 | `migration-refactoring` | Automate complex code migrations and refactorings with safet | Migration |
@@ -146,7 +147,7 @@ Do not invent new types. Do not skip linting.
 | `task-decomposition` | Break down complex tasks into atomic, actionable goals with | Coordination |
 | `test-runner` | Execute tests, analyze results, and diagnose failures across | Quality |
 | `testdata-builders` | Maintain deterministic builders/factories for test entities. | Quality |
-| `testing-strategy` | Design comprehensive testing strategies with modern techniqu | Quality |
+| `testing-strategy` | Design and implement comprehensive testing strategies for so | Quality |
 | `triz-analysis` | Run a systematic TRIZ contradiction audit against a codebase | General |
 | `triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive P | General |
 | `turso-db` | Use this skill for Turso (LibSQL/Limbo) database development | DevOps |
