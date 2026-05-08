@@ -22,12 +22,12 @@ def main():
         type_str = "DIR " if item.is_dir() else "FILE"
         print(f"  [{{type_str}}] {{item.name}}")
 
-if __name__ == \"__main__\":
+if __name__ == "__main__":
     main()
 """
 
 def main():
-    \"\"\"Main entry point for the skill initialization script.\"\"\"
+    """Main entry point for the skill initialization script."""
     parser = argparse.ArgumentParser(description="Initialize a new agent skill structure")
     parser.add_argument("skill_name", type=str, help="Name of the skill to initialize")
     parser.add_argument("--base-path", type=str, default=".", help="Base path for the new skill")
@@ -49,11 +49,13 @@ def main():
     if not skill_md.exists():
         skill_md.write_text(f"---\nname: {skill_name}\ndescription: Auto-generated skill\n---\n\n# {skill_name}\n")
 
-    # Write the example script
+    # Write the example script (idempotent)
     example_py = scripts_path / "example.py"
-    example_py.write_text(EXAMPLE_SCRIPT.format(skill_name=skill_name))
-
-    print(f"✓ Created {example_py}")
+    if not example_py.exists():
+        example_py.write_text(EXAMPLE_SCRIPT.format(skill_name=skill_name))
+        print(f"✓ Created {example_py}")
+    else:
+        print(f"  skip (exists): {example_py}")
     print(f"✓ Skill structure initialized successfully.")
 
 if __name__ == "__main__":
