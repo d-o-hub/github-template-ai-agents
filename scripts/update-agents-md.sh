@@ -76,7 +76,7 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
         # Use -- separator with grep to prevent option injection if skill_name starts with -
         category=$(grep -- "| \`${skill_name}\` |" "$AGENTS_FILE" 2>/dev/null | \
             sed 's/.*| \([^|]*\) |$/\1/' | \
-            sed 's/^ *//;s/ *$//' || echo "")
+            tr -d ' ' || echo "")
         
         # If no category found, try to infer from skill name or use "General"
         if [ -z "$category" ]; then

@@ -22,6 +22,7 @@ find "$REPO_ROOT" -type f -name "*.md" \
     -not -path "*/.git/*" \
     -not -path "*/.cache/*" \
     -not -path "*/.claude/skills/*" \
+    -not -path "*/.gemini/skills/*" \
     -not -path "*/.qwen/skills/*" \
     -print0 | \
     xargs -0 awk -v root="$REPO_ROOT/" '
