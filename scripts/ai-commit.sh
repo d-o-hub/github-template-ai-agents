@@ -44,26 +44,29 @@ if [ ${#SUBJECT} -gt 72 ]; then
     exit 1
 fi
 
-# Build message
-MSG="${TYPE}"
+# Build subject line
+SUBJECT_LINE="${TYPE}"
 if [ -n "$SCOPE" ]; then
-    MSG="${MSG}(${SCOPE})"
+    SUBJECT_LINE="${SUBJECT_LINE}(${SCOPE})"
 fi
-MSG="${MSG}: ${SUBJECT}"
-
-# Add blank line and bodies
-if [ ${#BODIES[@]} -gt 0 ]; then
-    MSG="${MSG}\n"
-    for BODY in "${BODIES[@]}"; do
-        # Wrap body to 100 chars
-        WRAPPED_BODY=$(echo "$BODY" | fold -s -w 100)
-        MSG="${MSG}\n${WRAPPED_BODY}\n"
-    done
-fi
+SUBJECT_LINE="${SUBJECT_LINE}: ${SUBJECT}"
 
 # Create temp file
 TMP_MSG=$(mktemp)
-echo -e "$MSG" > "$TMP_MSG"
+
+# Use printf to write the subject line literally (preventing escape sequence expansion)
+printf "%s\n" "$SUBJECT_LINE" > "$TMP_MSG"
+
+# Add bodies if present
+if [ ${#BODIES[@]} -gt 0 ]; then
+    # Add mandatory blank line after subject
+    printf "\n" >> "$TMP_MSG"
+    for BODY in "${BODIES[@]}"; do
+        # Wrap body to 100 chars - use printf to handle variables safely
+        WRAPPED_BODY=$(printf "%s" "$BODY" | fold -s -w 100)
+        printf "%s\n\n" "$WRAPPED_BODY" >> "$TMP_MSG"
+    done
+fi
 
 # Validate
 REPO_ROOT="$(git rev-parse --show-toplevel)"

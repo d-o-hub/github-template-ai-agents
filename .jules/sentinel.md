@@ -33,3 +33,8 @@
 **Vulnerability:** Use of `echo "$VAR"` and `grep "$VAR"` in utility scripts allowed variables derived from `SKILL.md` (e.g., categories or skill names) to be interpreted as command-line options if they started with a hyphen.
 **Learning:** `echo` behavior is inconsistent when its first argument looks like a flag (e.g., `-e`). `grep` interprets patterns starting with `-` as options unless explicitly told not to.
 **Prevention:** Always use `printf "%s\n" "$VAR"` instead of `echo` for printing variables. Use the `--` separator with `grep` and other commands to terminate option processing before passing variables.
+
+## 2026-05-08 - Commit Message Injection via echo -e
+**Vulnerability:** Using `echo -e` in `scripts/ai-commit.sh` to construct commit messages allowed structural injection. A maliciously crafted or accidentally malformed subject containing `\n` would be expanded into multiple lines, bypassing subject line length checks and injecting content into the commit body.
+**Learning:** `echo -e` interprets backslash escape sequences, making it unsuitable for printing variables that may contain untrusted or literal backslash characters. It also risks option injection if variables start with a hyphen.
+**Prevention:** Use `printf "%s\n"` for all variable printing in Bash to ensure content is treated as literal text and to avoid option injection.
