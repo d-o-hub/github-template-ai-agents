@@ -32,6 +32,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - perf(synthesis): optimize pairwise similarity in conflict check (#278)
 - perf: optimize link validation via batched awk processing (#279)
 
+## [0.2.7] - 2026-04-29
+
+### Added
+- feat(testing): add language-agnostic contract testing layer
+- feat(security): add Gitleaks for secret scanning and pre-commit hooks
+- feat(security): add explicit agent permission boundaries
+- Create gh-jules-setup.sh
+
+### Fixed
+- fix(security): prevent path traversal in evaluation framework
+- fix(quality-gate): remove duplicate headers and handle Windows symlinks
+- fix(security): implement fail-closed policy for SSRF DNS resolution
+- fix(security): prevent command injection in docling and ocr providers
+- fix(security): harden gh-labels-creator against argument injection
+
+### Changed
+- refactor(agents-md): prioritize instructions to overcome compliance ceiling
+- perf(scripts): optimize command discovery with awk and batched jq
+- perf(scripts): optimize validate-links.sh with single-pass awk
+- ci: bump actions and commitlint-github-action
+
 ## [0.2.6] - 2026-04-26
 
 ### Added
