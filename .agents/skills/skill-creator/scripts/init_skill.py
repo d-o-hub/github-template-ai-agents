@@ -22,12 +22,12 @@ def main():
         type_str = "DIR " if item.is_dir() else "FILE"
         print(f"  [{{type_str}}] {{item.name}}")
 
-if __name__ == "__main__":
+if __name__ == \"__main__\":
     main()
 """
 
 def main():
-    """Main entry point for the skill initialization script."""
+    \"\"\"Main entry point for the skill initialization script.\"\"\"
     parser = argparse.ArgumentParser(description="Initialize a new agent skill structure")
     parser.add_argument("skill_name", type=str, help="Name of the skill to initialize")
     parser.add_argument("--base-path", type=str, default=".", help="Base path for the new skill")

@@ -16,6 +16,7 @@ skills:
       - any-glob-to-any-file:
           - '.agents/skills/**/*'
           - '.claude/skills/**/*'
+          - '.gemini/skills/**/*'
           - '.qwen/skills/**/*'
           - '.cursor/skills/**/*'
           - '.windsurf/skills/**/*'
