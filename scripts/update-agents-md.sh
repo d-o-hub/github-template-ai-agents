@@ -11,10 +11,10 @@ cd "$REPO_ROOT"
 
 AGENTS_FILE="$REPO_ROOT/AGENTS.md"
 TEMP_FILE=$(mktemp /tmp/agents-md-XXXXXX)
-temp_table=$(mktemp /tmp/temp-table-XXXXXX)  # Define before trap
+UPDATE_AGENTS_TEMP_TABLE=$(mktemp /tmp/temp-table-XXXXXX)  # Define before trap
 
 # Trap to clean up temp files on exit or error
-trap 'rm -f "$TEMP_FILE" "$temp_table"' EXIT ERR
+trap 'rm -f "$TEMP_FILE" "$UPDATE_AGENTS_TEMP_TABLE"' EXIT ERR
 
 # Check if AGENTS.md exists
 if [ ! -f "$AGENTS_FILE" ]; then
@@ -76,7 +76,7 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
         # Use -- separator with grep to prevent option injection if skill_name starts with -
         category=$(grep -- "| \`${skill_name}\` |" "$AGENTS_FILE" 2>/dev/null | \
             sed 's/.*| \([^|]*\) |$/\1/' | \
-            tr -d ' ' || echo "")
+            sed 's/^ *//;s/ *$//' || echo "")
         
         # If no category found, try to infer from skill name or use "General"
         if [ -z "$category" ]; then
@@ -107,9 +107,9 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
 fi
 
 # Sort the table rows (excluding header) alphabetically by skill name
-head -n $((SKILLS_SECTION_LINE + 3)) "$TEMP_FILE" > "$temp_table"
-tail -n +$((SKILLS_SECTION_LINE + 4)) "$TEMP_FILE" | sort >> "$temp_table"
-mv "$temp_table" "$TEMP_FILE"
+head -n $((SKILLS_SECTION_LINE + 3)) "$TEMP_FILE" > "$UPDATE_AGENTS_TEMP_TABLE"
+tail -n +$((SKILLS_SECTION_LINE + 4)) "$TEMP_FILE" | sort >> "$UPDATE_AGENTS_TEMP_TABLE"
+mv "$UPDATE_AGENTS_TEMP_TABLE" "$TEMP_FILE"
 
 # Add empty line before next section
 echo "" >> "$TEMP_FILE"
