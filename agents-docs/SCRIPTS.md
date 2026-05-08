@@ -85,6 +85,7 @@ graph TD
     G --> I[validate-git-hooks.sh]
     H --> A
     J[setup-skills.sh] --> K[.claude/skills symlinks]
+    J --> L[.gemini/skills symlinks]
     J --> M[.qwen/skills symlinks]
     B --> K
     B --> L

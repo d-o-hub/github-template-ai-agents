@@ -12,6 +12,7 @@ SKILLS_SRC="$REPO_ROOT/.agents/skills"
 # (Qwen CLI also reads directly from .agents/skills/ - directory created for consistency)
 CLI_SKILL_DIRS=(
   ".claude/skills"
+  ".gemini/skills"
   ".qwen/skills"
 )
 
