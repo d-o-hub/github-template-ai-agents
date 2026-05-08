@@ -81,7 +81,7 @@ if [ -d "$REPO_ROOT/.claude/agents" ]; then
     
     for agent_file in "$REPO_ROOT/.claude/agents"/*.md; do
         [ -f "$agent_file" ] || continue
-        ((CLAUDE_COUNT++))
+        ((++CLAUDE_COUNT))
         extract_agent_info "$agent_file" "Claude Code" >> "$TEMP_FILE"
     done
 fi
@@ -94,7 +94,7 @@ if [ -d "$REPO_ROOT/.opencode/agents" ]; then
         [ -f "$agent_file" ] || continue
         # Skip symlinks to .agents/skills
         [ -L "$agent_file" ] && continue
-        ((OPENCODE_COUNT++))
+        ((++OPENCODE_COUNT))
         extract_agent_info "$agent_file" "OpenCode" >> "$TEMP_FILE"
     done
 fi
@@ -126,7 +126,7 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
         # Skip if no SKILL.md exists
         skill_file="$skill_dir/SKILL.md"
         [ -f "$skill_file" ] || continue
-        ((SKILL_COUNT++))
+        ((++SKILL_COUNT))
         
         # Optimized extraction using a single awk pass
         awk -v name="$skill_name" '
