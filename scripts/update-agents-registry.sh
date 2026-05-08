@@ -59,7 +59,7 @@ extract_agent_info() {
                 if (length(desc) > 60) desc = substr(desc, 1, 60);
                 printf("| `%s` | %s | %s | %s |\n", name, cli_type, desc, tools);
             }
-            exit;
+
         }
         next;
     }
@@ -137,7 +137,7 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
                 # Trim description to 60 chars
                 if (length(desc) > 60) desc = substr(desc, 1, 60);
                 printf("| `%s` | `.agents/skills/%s` | %s |\n", display_name, name, desc);
-                exit;
+
             }
             next;
         }
@@ -159,7 +159,7 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
                         # Trim description to 60 chars
                         if (length(desc) > 60) desc = substr(desc, 1, 60);
                         printf("| `%s` | `.agents/skills/%s` | %s |\n", display_name, name, desc);
-                        exit;
+
                     }
                     line = $0; sub(/^ +/, "", line);
                     if (line != "") desc = (desc == "" ? line : desc " " line);

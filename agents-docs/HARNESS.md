@@ -22,8 +22,8 @@ Throw away what does not help - more config is not always better.
 
 ## Skills (Single Canonical Source)
 
-All skills live in `.agents/skills/`. Claude Code, Gemini CLI, and Qwen Code use symlinks
-(`.claude/skills/`, `.gemini/skills/`, `.qwen/skills/`) created by `./scripts/setup-skills.sh`.
+All skills live in `.agents/skills/`. Claude Code and Qwen Code use symlinks
+(`.claude/skills/`, `.qwen/skills/`) created by `./scripts/setup-skills.sh`, while Gemini CLI reads skills directly from `.agents/skills/`.
 OpenCode reads skills directly from `.agents/skills/` - no symlinks needed.
 See `agents-docs/SKILLS.md`.
 
@@ -40,7 +40,7 @@ See `agents-docs/SKILLS.md`.
 | Agent | Skills Location | Sub-agents |
 |-------|-----------------|------------|
 | Claude Code | `.claude/skills/` (symlinks) | `.claude/agents/` |
-| Gemini CLI | `.gemini/skills/` (symlinks) | - |
+| Gemini CLI | `.agents/skills/` | - |
 | OpenCode | `.agents/skills/` (direct) | `.opencode/agents/` |
 | Qwen Code | `.qwen/skills/` (symlinks) | - |
 
