@@ -95,7 +95,6 @@ symlinks; OpenCode reads directly from `.agents/skills/`:
 └── github-readme/
 
 .claude/skills/           # Symlinks → ../../.agents/skills/
-.gemini/skills/           # Symlinks → ../../.agents/skills/
 .qwen/skills/             # Symlinks → ../../.agents/skills/
 ```
 
