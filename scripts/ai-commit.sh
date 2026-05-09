@@ -53,17 +53,19 @@ MSG="${MSG}: ${SUBJECT}"
 
 # Add blank line and bodies
 if [ ${#BODIES[@]} -gt 0 ]; then
-    MSG="${MSG}\n"
+    MSG="${MSG}"$'\n'
     for BODY in "${BODIES[@]}"; do
         # Wrap body to 100 chars
-        WRAPPED_BODY=$(echo "$BODY" | fold -s -w 100)
-        MSG="${MSG}\n${WRAPPED_BODY}\n"
+        # Use printf to prevent option injection if BODY starts with -
+        WRAPPED_BODY=$(printf "%s\n" "$BODY" | fold -s -w 100)
+        MSG="${MSG}"$'\n'"${WRAPPED_BODY}"$'\n'
     done
 fi
 
 # Create temp file
 TMP_MSG=$(mktemp)
-echo -e "$MSG" > "$TMP_MSG"
+# Use printf %s to prevent interpretation of backslash escapes in user content
+printf "%s\n" "$MSG" > "$TMP_MSG"
 
 # Validate
 REPO_ROOT="$(git rev-parse --show-toplevel)"
