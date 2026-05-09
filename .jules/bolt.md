@@ -49,3 +49,7 @@
 ## 2026-05-27 - [Batching file validation with awk]
 **Learning:** Re-running `grep` and `basename` iteratively inside a bash loop to validate properties across multiple subdirectories (e.g. 50+ skill directories) incurs immense subshell overhead and significantly slows down scripts. Transitioning to a batched validation approach using single-pass `awk` parsing eliminates hundreds of process forks. In this codebase, it reduced the execution time of extra eval validation checks from ~1.5s to ~0.02s.
 **Action:** Always prefer batched `awk` parsing across file arrays via `find -print0` and `xargs -0` or `awk ... "${files[@]}"` over multiple looped `grep` invocations to check properties within small text files. Use FNR to handle file transitions seamlessly.
+
+## 2026-05-28 - [Batched file reading with AWK vs Loop with sed/grep/cut]
+**Learning:** Extracting data across many small files inside a Bash `for` loop with external tools like `sed`, `grep`, and `cut` introduces immense subshell overhead and drastically slows down execution. By replacing the loop with a single `awk` process that processes an array of all files, execution time is greatly reduced. In this codebase, optimizing `scripts/update-agents-md.sh` resulted in a >10x speedup (from ~0.74s to ~0.06s).
+**Action:** Use a single `awk` pass for scanning multiple files and formatting the results instead of spawning processes iteratively.

@@ -55,55 +55,92 @@ TABLE_HEADER
 
 # Generate skill rows by scanning .agents/skills/
 if [ -d "$REPO_ROOT/.agents/skills" ]; then
-    # Get list of skill directories (excluding files like README.md and skill-rules.json)
-    for skill_dir in "$REPO_ROOT/.agents/skills"/*/; do
-        [ -d "$skill_dir" ] || continue
-        
-        skill_name=$(basename "$skill_dir")
-        
-        # Skip non-skill items (files, etc.)
-        [ -f "$skill_dir/SKILL.md" ] || continue
-        
-        # Extract description from frontmatter (handling block scalars)
-        description=$(sed -n '/^description:/,/^[a-z-]*:/p' "$skill_dir/SKILL.md" 2>/dev/null | \
-            sed '1s/^description: *//;$d' | \
-            tr '\n' ' ' | \
-            sed 's/  */ /g;s/^[>-] *//' | \
-            cut -c1-60 || echo "No description")
-        
-        # Extract category from AGENTS.md if it exists, otherwise default to "General"
-        # Look for this skill in the existing table to preserve its category
-        # Use -- separator with grep to prevent option injection if skill_name starts with -
-        category=$(grep -- "| \`${skill_name}\` |" "$AGENTS_FILE" 2>/dev/null | \
-            sed 's/.*| \([^|]*\) |$/\1/' | \
-            sed 's/^ *//;s/ *$//' || echo "")
-        
-        # If no category found, try to infer from skill name or use "General"
-        if [ -z "$category" ]; then
-            case "$skill_name" in
-                *security*|*privacy*|*audit*) category="Security" ;;
-                *test*|*quality*|*check*) category="Quality" ;;
-                *doc*|*readme*) category="Documentation" ;;
-                *api*) category="API Development" ;;
-                *coordination*|*parallel*|*goap*|*decomposition*) category="Coordination" ;;
-                *db*|*database*|*devops*|*cicd*|*pipeline*) category="DevOps" ;;
-                *ui*|*ux*) category="UI/UX" ;;
-                *skill*) category="Meta" ;;
-                *search*|*web*) category="Research" ;;
-                *migration*|*refactor*) category="Migration" ;;
-                *intent*|*classifier*) category="Coordination" ;;
-                *accessibility*) category="Accessibility" ;;
-                *shell*|*script*) category="Code Quality" ;;
-                *) category="General" ;;
-            esac
-        fi
-        
-        # Clean up description
-        description=${description%% }
-        
-        # Use printf to prevent option injection if skill_name or description starts with -
-        printf "| \`%s\` | %s | %s |\n" "${skill_name}" "${description}" "${category}" >> "$TEMP_FILE"
-    done
+    # Use array to hold valid SKILL.md paths
+    shopt -s nullglob
+    SKILL_MD_FILES=("$REPO_ROOT/.agents/skills"/*/"SKILL.md")
+    shopt -u nullglob
+
+    if [ ${#SKILL_MD_FILES[@]} -gt 0 ]; then
+        # Use a single awk process to parse all SKILL.md files, extract descriptions,
+        # infer categories, and lookup existing categories from AGENTS.md.
+        awk -v agents_file="$AGENTS_FILE" '
+            BEGIN {
+                # Pre-load categories from AGENTS.md
+                while ((getline < agents_file) > 0) {
+                    if ($0 ~ /^\| `.*` \|/) {
+                        split($0, parts, "|");
+                        skill = parts[2];
+                        gsub(/^ `/, "", skill);
+                        gsub(/` $/, "", skill);
+                        gsub(/ /, "", skill);
+
+                        cat = parts[4];
+                        gsub(/^ */, "", cat);
+                        gsub(/ *$/, "", cat);
+
+                        if (skill != "" && cat != "") {
+                            categories[skill] = cat;
+                        }
+                    }
+                }
+                close(agents_file);
+            }
+
+            function infer_category(name) {
+                if (name ~ /security|privacy|audit/) return "Security";
+                if (name ~ /test|quality|check/) return "Quality";
+                if (name ~ /doc|readme/) return "Documentation";
+                if (name ~ /api/) return "API Development";
+                if (name ~ /coordination|parallel|goap|decomposition/) return "Coordination";
+                if (name ~ /db|database|devops|cicd|pipeline/) return "DevOps";
+                if (name ~ /ui|ux/) return "UI/UX";
+                if (name ~ /skill/) return "Meta";
+                if (name ~ /search|web/) return "Research";
+                if (name ~ /migration|refactor/) return "Migration";
+                if (name ~ /intent|classifier/) return "Coordination";
+                if (name ~ /accessibility/) return "Accessibility";
+                if (name ~ /shell|script/) return "Code Quality";
+                return "General";
+            }
+
+            function print_desc() {
+                if (skill_name != "") {
+                    if (has_desc) {
+                        gsub(/^[>-] */, "", desc);
+                        gsub(/  */, " ", desc);
+                        sub(/ *$/, "", desc);
+                        if (desc == "") desc = "No description";
+                        desc_final = substr(desc, 1, 60);
+                        sub(/ $/, "", desc_final);
+                    } else {
+                        desc_final = "No description";
+                    }
+
+                    cat = categories[skill_name];
+                    if (cat == "") cat = infer_category(skill_name);
+
+                    printf "| `%s` | %s | %s |\n", skill_name, desc_final, cat;
+                }
+            }
+
+            FNR == 1 {
+                print_desc();
+                n = split(FILENAME, parts, "/");
+                skill_name = parts[n-1];
+                in_desc = 0;
+                has_desc = 0;
+                desc = "";
+            }
+
+            /^description:/ { in_desc = 1; has_desc = 1; desc = $0; sub(/^description: */, "", desc); next }
+            in_desc && /^[a-z-]*:/ { in_desc = 0 }
+            in_desc { desc = desc " " $0 }
+
+            END {
+                print_desc();
+            }
+        ' "${SKILL_MD_FILES[@]}" >> "$TEMP_FILE"
+    fi
 fi
 
 # Sort the table rows (excluding header) alphabetically by skill name
