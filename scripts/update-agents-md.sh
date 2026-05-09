@@ -60,10 +60,10 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
     SKILL_MD_FILES=("$REPO_ROOT/.agents/skills"/*/"SKILL.md")
     shopt -u nullglob
 
-    if [ ${#SKILL_MD_FILES[@]} -gt 0 ]; then
+    if [[ ${#SKILL_MD_FILES[@]} -gt 0 ]]; then
         # Use a single awk process to parse all SKILL.md files, extract descriptions,
         # infer categories, and lookup existing categories from AGENTS.md.
-        awk -v agents_file="$AGENTS_FILE" '
+        awk -v agents_file="$AGENTS_FILE" -v MAX_DESC_LEN=60 '
             BEGIN {
                 # Pre-load categories from AGENTS.md
                 while ((getline < agents_file) > 0) {
@@ -110,7 +110,8 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
                         gsub(/  */, " ", desc);
                         sub(/ *$/, "", desc);
                         if (desc == "") desc = "No description";
-                        desc_final = substr(desc, 1, 60);
+                        # MAX_DESC_LEN determines the maximum length of the description
+                        desc_final = substr(desc, 1, MAX_DESC_LEN);
                         sub(/ $/, "", desc_final);
                     } else {
                         desc_final = "No description";

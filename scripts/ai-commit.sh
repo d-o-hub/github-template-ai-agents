@@ -4,9 +4,6 @@
 
 set -euo pipefail
 
-# Configuration
-BODY_WRAP_WIDTH=100
-
 TYPE=""
 SCOPE=""
 SUBJECT=""
@@ -56,28 +53,26 @@ MSG="${MSG}: ${SUBJECT}"
 
 # Add blank line and bodies
 if [ ${#BODIES[@]} -gt 0 ]; then
-    MSG="${MSG}"$'\n'
+    MSG="${MSG}\n"
     for BODY in "${BODIES[@]}"; do
-        # Wrap body to prevent long lines in commit message
-        # Use printf to prevent option injection if BODY starts with -
-        WRAPPED_BODY=$(printf "%s\n" "$BODY" | fold -s -w "$BODY_WRAP_WIDTH")
-        MSG="${MSG}"$'\n'"${WRAPPED_BODY}"$'\n'
+        # Wrap body to 100 chars
+        WRAPPED_BODY=$(echo "$BODY" | fold -s -w 100)
+        MSG="${MSG}\n${WRAPPED_BODY}\n"
     done
 fi
 
-# Create temp file and ensure cleanup
+# Create temp file
 TMP_MSG=$(mktemp)
-trap 'rm -f "$TMP_MSG"' EXIT ERR
-
-# Use printf %s to prevent interpretation of backslash escapes in user content
-printf "%s\n" "$MSG" > "$TMP_MSG"
+echo -e "$MSG" > "$TMP_MSG"
 
 # Validate
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 if ! "$REPO_ROOT/scripts/validate-commit-message.sh" "$TMP_MSG"; then
     echo "Commit message validation failed."
+    rm "$TMP_MSG"
     exit 1
 fi
 
 # Commit
 git commit -F "$TMP_MSG"
+rm "$TMP_MSG"
