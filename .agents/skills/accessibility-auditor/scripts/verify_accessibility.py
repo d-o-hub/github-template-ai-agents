@@ -56,21 +56,22 @@ def check_form_labels(html: str) -> List[Dict]:
         has_placeholder = 'placeholder=' in tag.lower()
         
         if not has_label and not has_aria_label:
-            issues.append({
-                'criterion': '3.3.2',
-                'severity': 'high',
-                'message': f'Form input missing accessible label (ID: {input_id})',
-                'context': tag[:80] + '...' if len(tag) > 80 else tag,
-                'fix': 'Add <label for="id"> or aria-label attribute'
-            })
-        elif has_placeholder and not has_label and not has_aria_label:
-            issues.append({
-                'criterion': '1.3.1',
-                'severity': 'medium',
-                'message': 'Input using placeholder as label (bad practice)',
-                'context': tag[:80] + '...' if len(tag) > 80 else tag,
-                'fix': 'Add explicit <label> element'
-            })
+            if not has_placeholder:
+                issues.append({
+                    'criterion': '3.3.2',
+                    'severity': 'high',
+                    'message': 'Form input missing accessible label',
+                    'context': tag[:80] + '...' if len(tag) > 80 else tag,
+                    'fix': 'Add <label for="id"> or aria-label attribute'
+                })
+            else:
+                issues.append({
+                    'criterion': '1.3.1',
+                    'severity': 'medium',
+                    'message': 'Input using placeholder as label (bad practice)',
+                    'context': tag[:80] + '...' if len(tag) > 80 else tag,
+                    'fix': 'Add explicit <label> element'
+                })
     return issues
 
 
