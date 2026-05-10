@@ -74,7 +74,7 @@ trap 'rm -f "$TMP_MSG"' EXIT ERR
 printf "%s\n" "$MSG" > "$TMP_MSG"
 
 # Validate
-REPO_ROOT="$(git rev-parse --show-toplevel)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 if ! "$REPO_ROOT/scripts/validate-commit-message.sh" "$TMP_MSG"; then
     echo "Commit message validation failed."
     exit 1

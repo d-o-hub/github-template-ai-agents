@@ -34,7 +34,8 @@
 **Learning:** `echo` behavior is inconsistent when its first argument looks like a flag (e.g., `-e`). `grep` interprets patterns starting with `-` as options unless explicitly told not to.
 **Prevention:** Always use `printf "%s\n" "$VAR"` instead of `echo` for printing variables. Use the `--` separator with `grep` and other commands to terminate option processing before passing variables.
 
-## 2026-05-14 - Structural and Option Injection in Commit Tooling
+## 2026-05-10 - Structural and Option Injection in Commit Tooling
+
 **Vulnerability:** `scripts/ai-commit.sh` used `echo -e` to write commit messages to temporary files, allowing backslash escape sequences in agent-generated input to manipulate message structure. It also used `echo` for variable wrapping, susceptible to option injection.
 **Learning:** `echo -e` interprets escapes like `\n` in the variable content itself, not just the format string. This can lead to structural injection when the output is written to a file or piped.
 **Prevention:** Use `printf "%s\n"` for all variable output. Use literal newlines (`$'\n'`) for intentional line breaks in variables. Always implement `trap` cleanup for temporary files.
