@@ -41,7 +41,17 @@ def check_form_labels(html: str) -> List[Dict]:
     input_pattern = r'<input[^>]*?>'
     for match in re.finditer(input_pattern, html, re.IGNORECASE):
         tag = match.group(0)
-        has_label = 'id=' in tag.lower() and re.search(r'<label[^>]*?for=', html, re.IGNORECASE)
+
+        # Extract id from input tag
+        id_match = re.search(r'\bid\s*=\s*["\']([^"\']+)["\']', tag, re.IGNORECASE)
+        has_label = False
+        if id_match:
+            input_id = id_match.group(1)
+            # Search for a label with a matching 'for' attribute
+            label_pattern = rf'<label[^>]*\bfor\s*=\s*["\']{re.escape(input_id)}["\']'
+            if re.search(label_pattern, html, re.IGNORECASE):
+                has_label = True
+
         has_aria_label = 'aria-label=' in tag.lower() or 'aria-labelledby=' in tag.lower()
         has_placeholder = 'placeholder=' in tag.lower()
         
