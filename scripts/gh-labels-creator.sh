@@ -30,9 +30,10 @@ else
         label_names=$(gh label list --json name --jq '.[].name')
 
         if [[ -n "$label_names" ]]; then
-            echo "$label_names" | while IFS= read -r label; do
+            # Security: Use printf for safe variable expansion and prevent option injection
+            printf "%s\n" "$label_names" | while IFS= read -r label; do
                 if [[ -n "$label" ]]; then
-                    echo "Deleting label: $label"
+                    printf "Deleting label: %s\n" "$label"
                     # Place flags before -- to ensure they are correctly parsed
                     gh label delete --yes -- "$label" || echo "Failed to delete: $label"
                 fi
