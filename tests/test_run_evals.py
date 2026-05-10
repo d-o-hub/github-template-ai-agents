@@ -1,7 +1,6 @@
 import sys
 import importlib.util
 from pathlib import Path
-import pytest
 
 # Add scripts directory to path for internal imports
 REPO_ROOT = Path(__file__).parent.parent
@@ -15,7 +14,7 @@ spec.loader.exec_module(run_evals)
 
 generate_text_report = run_evals.generate_text_report
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 # Import types for testing
 from lib.eval_types import EvalReport, SkillEvalResult, EvalResult, EvalStatus, EvalType
