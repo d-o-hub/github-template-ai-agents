@@ -19,6 +19,10 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
+# Boolean sentinels
+readonly TRUE=1
+readonly FALSE=0
+
 # Cache for VERSION file content
 REPO_VERSION=""
 # Shared variable to return line count without extra subshell
@@ -46,36 +50,39 @@ validate_skill_file() {
     # Single pass to gather info via awk for performance
     # Outputs a single line: line_count:err_no_dash:has_name:has_desc:has_version:template_version
     local awk_result
-    awk_result=$(awk '
-        BEGIN { has_name=0; has_desc=0; has_version=0; template_version=""; err_no_dash=0 }
-        NR==1 && $0 != "---" { err_no_dash=1 }
-        /^name:/ { has_name=1 }
-        /^description:/ { has_desc=1 }
-        /^version:/ { has_version=1 }
+    if ! awk_result=$(awk -v true_val="$TRUE" -v false_val="$FALSE" '
+        BEGIN { has_name=false_val; has_desc=false_val; has_version=false_val; template_version=""; err_no_dash=false_val }
+        NR==1 && $0 != "---" { err_no_dash=true_val }
+        /^name:/ { has_name=true_val }
+        /^description:/ { has_desc=true_val }
+        /^version:/ { has_version=true_val }
         /^template_version:/ {
             val=$0; sub(/^template_version:[ \t]*"?/, "", val); sub(/"?[ \t]*$/, "", val);
             template_version=val
         }
         END { print NR ":" err_no_dash ":" has_name ":" has_desc ":" has_version ":" template_version }
-    ' "$skill_file")
+    ' "$skill_file"); then
+        echo -e "  ${RED}✗${NC} $skill_name: Internal validation error (awk failed)" >&2
+        return 1
+    fi
 
     local line_count err_no_dash has_name has_description has_version template_version
     IFS=':' read -r line_count err_no_dash has_name has_description has_version template_version <<< "$awk_result"
 
-    if [[ "$err_no_dash" == "1" ]]; then
+    if [[ "$err_no_dash" -eq $TRUE ]]; then
         echo -e "  ${RED}✗${NC} $skill_name: Must start with '---'" >&2
         ((errors++))
     fi
 
-    if [[ $has_name -eq 0 ]]; then
+    if [[ "$has_name" -eq $FALSE ]]; then
         echo -e "  ${RED}✗${NC} $skill_name: Missing 'name:' field" >&2
         ((errors++))
     fi
-    if [[ $has_description -eq 0 ]]; then
+    if [[ "$has_description" -eq $FALSE ]]; then
         echo -e "  ${RED}✗${NC} $skill_name: Missing 'description:' field" >&2
         ((errors++))
     fi
-    if [[ $has_version -eq 0 ]]; then
+    if [[ "$has_version" -eq $FALSE ]]; then
         echo -e "  ${YELLOW}⚠${NC} $skill_name: Missing 'version:' field (recommended)" >&2
     fi
 
