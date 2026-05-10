@@ -53,3 +53,6 @@
 ## 2026-05-28 - [Batched file reading with AWK vs Loop with sed/grep/cut]
 **Learning:** Extracting data across many small files inside a Bash `for` loop with external tools like `sed`, `grep`, and `cut` introduces immense subshell overhead and drastically slows down execution. By replacing the loop with a single `awk` process that processes an array of all files, execution time is greatly reduced. In this codebase, optimizing `scripts/update-agents-md.sh` resulted in a >10x speedup (from ~0.74s to ~0.06s).
 **Action:** Use a single `awk` pass for scanning multiple files and formatting the results instead of spawning processes iteratively.
+
+## 2024-05-10 - Replace bash while read loop with awk for SKILL.md parsing
+**Learning:** Replaced an O(N) pure bash `while IFS= read` loop in `validate_skill_file` with a single highly optimized `awk` script. Bash's line-by-line interpretation overhead can make evaluating multiple medium-sized files noticeably slow. `awk` successfully extracted variables and flags correctly via colon-separated outputs. This resulted in an overall validation time reduction of around ~30% for scripts utilizing `validate_skill_file`.

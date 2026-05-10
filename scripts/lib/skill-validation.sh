@@ -43,30 +43,29 @@ validate_skill_file() {
     # Optimization: Read file once and parse with internal Bash logic or a single awk call
     # instead of multiple grep/head/sed/cut calls.
 
-    local has_name=0
-    local has_description=0
-    local has_version=0
-    local template_version=""
-    local line_count=0
-    local first_line=""
+    # Single pass to gather info via awk for performance
+    # Outputs a single line: line_count:err_no_dash:has_name:has_desc:has_version:template_version
+    local awk_result
+    awk_result=$(awk '
+        BEGIN { has_name=0; has_desc=0; has_version=0; template_version=""; err_no_dash=0 }
+        NR==1 && $0 != "---" { err_no_dash=1 }
+        /^name:/ { has_name=1 }
+        /^description:/ { has_desc=1 }
+        /^version:/ { has_version=1 }
+        /^template_version:/ {
+            val=$0; sub(/^template_version:[ \t]*"?/, "", val); sub(/"?[ \t]*$/, "", val);
+            template_version=val
+        }
+        END { print NR ":" err_no_dash ":" has_name ":" has_desc ":" has_version ":" template_version }
+    ' "$skill_file")
 
-    # Single pass to gather info
-    while IFS= read -r line || [[ -n "$line" ]]; do
-        ((line_count++))
-        if [[ $line_count -eq 1 && "$line" != "---" ]]; then
-            echo -e "  ${RED}✗${NC} $skill_name: Must start with '---'" >&2
-            ((errors++))
-        fi
-        if [[ $line == "name:"* ]]; then has_name=1; fi
-        if [[ $line == "description:"* ]]; then has_description=1; fi
-        if [[ $line == "version:"* ]]; then has_version=1; fi
-        if [[ $line == "template_version:"* ]]; then
-            template_version="${line#template_version:}"
-            template_version="${template_version//\"/}" # remove quotes
-            template_version="${template_version#"${template_version%%[![:space:]]*}"}" # trim leading
-            template_version="${template_version%"${template_version##*[![:space:]]}"}" # trim trailing
-        fi
-    done < "$skill_file"
+    local line_count err_no_dash has_name has_description has_version template_version
+    IFS=':' read -r line_count err_no_dash has_name has_description has_version template_version <<< "$awk_result"
+
+    if [[ "$err_no_dash" == "1" ]]; then
+        echo -e "  ${RED}✗${NC} $skill_name: Must start with '---'" >&2
+        ((errors++))
+    fi
 
     if [[ $has_name -eq 0 ]]; then
         echo -e "  ${RED}✗${NC} $skill_name: Missing 'name:' field" >&2
