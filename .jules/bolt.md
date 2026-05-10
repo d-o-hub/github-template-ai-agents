@@ -57,7 +57,3 @@
 ## 2024-05-10 - Replace bash while read loop with awk for SKILL.md parsing
 
 **Learning:** Replaced an O(N) pure bash `while IFS= read` loop in `validate_skill_file` with a single highly optimized `awk` script. Bash's line-by-line interpretation overhead can make evaluating multiple medium-sized files noticeably slow. `awk` successfully extracted variables and flags correctly via colon-separated outputs. This resulted in an overall validation time reduction of around ~30% for scripts utilizing `validate_skill_file`.
-
-## 2026-05-10 - [Python Regex search optimization in loops]
-**Learning:** Performing a whole-document regex search (`re.search`) inside a loop that iterates over many small matches (like HTML tags) creates $O(N \cdot M)$ complexity. Moving the document-wide search outside the loop and pre-compiling regex patterns can achieve dramatic performance gains (e.g., ~325x speedup).
-**Action:** Always hoist invariant regex searches out of loops. Pre-compile all regex patterns at the module level for reuse. Cache results of string operations (like `.lower()`) when used multiple times in a loop iteration.
