@@ -41,7 +41,16 @@ def check_form_labels(html: str) -> List[Dict]:
     input_pattern = r'<input[^>]*?>'
     for match in re.finditer(input_pattern, html, re.IGNORECASE):
         tag = match.group(0)
-        has_label = 'id=' in tag.lower() and re.search(r'<label[^>]*?for=', html, re.IGNORECASE)
+
+        # Extract ID to check for matching label
+        id_match = re.search(r'id\s*=\s*["\']([^"\']+)["\']', tag, re.IGNORECASE)
+        input_id = id_match.group(1) if id_match else None
+
+        has_label = False
+        if input_id:
+            label_pattern = f'<label[^>]*for\\s*=\\s*["\']{re.escape(input_id)}["\']'
+            has_label = bool(re.search(label_pattern, html, re.IGNORECASE))
+
         has_aria_label = 'aria-label=' in tag.lower() or 'aria-labelledby=' in tag.lower()
         has_placeholder = 'placeholder=' in tag.lower()
         
@@ -49,7 +58,7 @@ def check_form_labels(html: str) -> List[Dict]:
             issues.append({
                 'criterion': '3.3.2',
                 'severity': 'high',
-                'message': 'Form input missing accessible label',
+                'message': f'Form input missing accessible label (ID: {input_id})',
                 'context': tag[:80] + '...' if len(tag) > 80 else tag,
                 'fix': 'Add <label for="id"> or aria-label attribute'
             })
