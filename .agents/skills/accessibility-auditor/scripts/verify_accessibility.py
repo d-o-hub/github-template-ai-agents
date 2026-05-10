@@ -59,7 +59,7 @@ def check_form_labels(html: str) -> List[Dict]:
             issues.append({
                 'criterion': '3.3.2',
                 'severity': 'high',
-                'message': 'Form input missing accessible label',
+                'message': f'Form input missing accessible label (ID: {input_id})',
                 'context': tag[:80] + '...' if len(tag) > 80 else tag,
                 'fix': 'Add <label for="id"> or aria-label attribute'
             })
