@@ -142,6 +142,7 @@ class TestQualityScoreDataclass:
         assert hasattr(result, "duplicate_heavy")
         assert hasattr(result, "noisy")
         assert hasattr(result, "acceptable")
+        assert hasattr(result, "reasons")
 
     def test_quality_score_types(self):
         """All QualityScore fields should have correct types."""
@@ -152,3 +153,81 @@ class TestQualityScoreDataclass:
         assert isinstance(result.duplicate_heavy, bool)
         assert isinstance(result.noisy, bool)
         assert isinstance(result.acceptable, bool)
+        assert isinstance(result.reasons, list)
+
+    def test_reasons_content(self):
+        """Reasons should contain descriptive strings."""
+        result = score_content("Short content", [])
+        assert any("too short" in r.lower() for r in result.reasons)
+        assert any("missing references" in r.lower() for r in result.reasons)
+
+        content = "A" * 600
+        result = score_content(content, ["http://link1"])
+        assert any("length requirement met" in r.lower() for r in result.reasons)
+        assert any("found 1 references" in r.lower() for r in result.reasons)
+
+    def test_length_boundary_499(self):
+        """Content at 499 chars should be too_short."""
+        content = "A" * 499
+        result = score_content(content)
+        assert result.too_short is True
+
+    def test_length_boundary_500(self):
+        """Content at 500 chars should NOT be too_short."""
+        content = "A" * 500
+        result = score_content(content)
+        assert result.too_short is False
+
+    def test_duplicate_heavy_boundary(self):
+        """Test the duplicate_heavy threshold (unique_lines < max(5, num_lines // 2))."""
+        # 10 lines, 4 unique: 4 < max(5, 5) -> True
+        # Note: range(3) gives 0, 1, 2. Plus "Duplicate" makes 4 unique lines.
+        content = "\n".join([f"Unique {i}" for i in range(3)] + ["Duplicate"] * 7)
+        result = score_content(content, ["http://link"])
+        assert result.duplicate_heavy is True
+
+        # 10 lines, 5 unique: 5 < max(5, 5) -> False
+        # Note: range(4) gives 0, 1, 2, 3. Plus "Duplicate" makes 5 unique lines.
+        content = "\n".join([f"Unique {i}" for i in range(4)] + ["Duplicate"] * 6)
+        result = score_content(content, ["http://link"])
+        assert result.duplicate_heavy is False
+
+        # 20 lines, 9 unique: 9 < max(5, 10) -> True
+        # Note: range(8) gives 8 lines. Plus "Duplicate" makes 9 unique lines.
+        content = "\n".join([f"Unique {i}" for i in range(8)] + ["Duplicate"] * 12)
+        result = score_content(content, ["http://link"])
+        assert result.duplicate_heavy is True
+
+        # 20 lines, 10 unique: 10 < max(5, 10) -> False
+        # Note: range(9) gives 9 lines. Plus "Duplicate" makes 10 unique lines.
+        content = "\n".join([f"Unique {i}" for i in range(9)] + ["Duplicate"] * 11)
+        result = score_content(content, ["http://link"])
+        assert result.duplicate_heavy is False
+
+    def test_noisy_boundary(self):
+        """Test noisy threshold (noise_count > 6)."""
+        content = "cookie " * 6
+        result = score_content(content, ["http://link"])
+        assert result.noisy is False
+
+        content = "cookie " * 7
+        result = score_content(content, ["http://link"])
+        assert result.noisy is True
+
+    def test_none_markdown_input(self):
+        """None markdown input should be handled gracefully as empty string."""
+        result = score_content(None)
+        assert result.too_short is True
+        assert any("too short" in r.lower() for r in result.reasons)
+
+    def test_non_string_input(self):
+        """Non-string input should be handled gracefully by string operations."""
+        result = score_content(123)
+        assert result.too_short is True
+
+    def test_none_links_input(self):
+        """None links input should be treated as empty list."""
+        content = "A" * 600
+        result = score_content(content, None)
+        assert result.missing_links is True
+        assert any("missing references" in r.lower() for r in result.reasons)

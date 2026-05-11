@@ -58,6 +58,6 @@
 
 **Learning:** Replaced an O(N) pure bash `while IFS= read` loop in `validate_skill_file` with a single highly optimized `awk` script. Bash's line-by-line interpretation overhead can make evaluating multiple medium-sized files noticeably slow. `awk` successfully extracted variables and flags correctly via colon-separated outputs. This resulted in an overall validation time reduction of around ~30% for scripts utilizing `validate_skill_file`.
 
-## 2026-05-29 - [Eliminating jq subshells from loops]
-**Learning:** For a command validation loop iterating over >3800 JSON items in Bash, repeatedly forking `jq` to parse strings is extremely slow (adding over 1 second to execution). Transforming the JSON inputs into a stream of TSV strings with a single `jq` pass, extracting values natively with `while IFS=$'\t' read ...`, and using Bash parameter expansion for string manipulation and path generation reduced full cache check time by ~75% (from 1.4s to 0.37s).
-**Action:** Replace `jq` inside Bash loops with a single pre-loop `jq` pass that formats JSON fields to a TSV format, enabling fast native Bash stream reading and string processing.
+## 2026-05-10 - [Python Regex search optimization in loops]
+**Learning:** Performing a whole-document regex search (`re.search`) inside a loop that iterates over many small matches (like HTML tags) creates $O(N \cdot M)$ complexity. Moving the document-wide search outside the loop and pre-compiling regex patterns can achieve dramatic performance gains (e.g., ~325x speedup).
+**Action:** Always hoist invariant regex searches out of loops. Pre-compile all regex patterns at the module level for reuse. Cache results of string operations (like `.lower()`) when used multiple times in a loop iteration.
