@@ -132,42 +132,65 @@ declare -a FAILED_COMMANDS=()
 declare -A CATEGORY_COUNT=(["safe"]=0 ["conditional"]=0 ["dangerous"]=0 ["$UNKNOWN_CATEGORY"]=0)
 
 if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
-    while IFS= read -r cmd_entry; do
-        [ -z "$cmd_entry" ] && continue
+    # Optimization: Use jq once to create a TSV stream instead of calling jq in a loop
+    TSV_COMMANDS=$(echo "$DISCOVERED_COMMANDS" | jq -r '[.file, .line, .command, .type] | @tsv' 2>/dev/null || echo "")
 
-        # Extract command from JSON
-        cmd=$(echo "$cmd_entry" | jq -r '.command' 2>/dev/null || echo "")
+    while IFS=$'\t' read -r file line cmd type; do
         [ -z "$cmd" ] || [ "$cmd" = "null" ] && continue
 
-        # Check cache first
+        # We still need a valid JSON string for functions that expect it,
+        # but we can construct it minimally or use the file/line for cache checking.
+        # However, to avoid another jq call per line, we reconstruct it cleanly:
+        # Note: cmd might contain quotes, so direct string manipulation for complex commands is risky,
+        # but here we use it primarily as an identifier for should_invalidate_command and save_cached_result.
+        # Wait, should_invalidate_command only needs cmd and file!
+        # We can implement a fast cache check directly without calling get_cached_result
+        # which itself calls get_cache_path which uses jq.
+
+        # Fast path cache path generation
+        safe_file="${file#./}"
+        safe_file="${safe_file//\//_}"
+        cache_file="$CACHE_DIR/commands/${safe_file}_line_${line}.json"
+
         CACHED=false
-        if ! $FORCE && type get_cached_result &> /dev/null; then
-            cached_result=$(get_cached_result "$cmd_entry" 2>/dev/null || echo "")
-            if [ -n "$cached_result" ]; then
-                # Check if this command needs invalidation
-                if type should_invalidate_command &> /dev/null; then
-                    if ! should_invalidate_command "$cmd_entry" "$CHANGED_FILES" 2>/dev/null; then
-                        ((CACHE_HITS++))
-                        CACHED=true
-
-                        # Extract category from cached result
-                        cached_cat=$(echo "$cached_result" | jq -r --arg unknown "$UNKNOWN_CATEGORY" '.category // $unknown' 2>/dev/null || echo "$UNKNOWN_CATEGORY")
-
-                        # Security: Validate category against whitelist to prevent injection in arithmetic expansion
-                        if [[ ! "$cached_cat" =~ ^(safe|conditional|dangerous|$UNKNOWN_CATEGORY)$ ]]; then
-                            cached_cat="$UNKNOWN_CATEGORY"
-                        fi
-
-                        if [ -n "$cached_cat" ]; then
-                            CATEGORY_COUNT[$cached_cat]=$((CATEGORY_COUNT[$cached_cat]+1))
-                        fi
-                        continue
-                    fi
-                else
-                    ((CACHE_HITS++))
-                    CACHED=true
-                    continue
+        if ! $FORCE && [ -f "$cache_file" ]; then
+            # Check if this command needs invalidation inline (dependency check)
+            needs_invalidation=false
+            for changed in $CHANGED_FILES; do
+                if [[ "$changed" == "$file" ]]; then
+                    needs_invalidation=true
+                    break
                 fi
+                case "${changed##*/}" in
+                    package.json) [[ "$cmd" =~ ^(npm|yarn|pnpm|npx|node) ]] && needs_invalidation=true; break ;;
+                    Cargo.toml|Cargo.lock) [[ "$cmd" =~ ^(cargo|rustc) ]] && needs_invalidation=true; break ;;
+                    requirements*.txt|pyproject.toml|setup.py) [[ "$cmd" =~ ^(pip|python) ]] && needs_invalidation=true; break ;;
+                    go.mod|go.sum) [[ "$cmd" =~ ^go ]] && needs_invalidation=true; break ;;
+                    Gemfile*) [[ "$cmd" =~ ^(bundle|gem) ]] && needs_invalidation=true; break ;;
+                esac
+            done
+
+            if ! $needs_invalidation; then
+                ((CACHE_HITS++))
+                CACHED=true
+
+                cached_result=$(<"$cache_file")
+                # Fast path category extraction without jq subshell
+                if [[ "$cached_result" =~ \"category\":\"([^\"]+)\" ]]; then
+                    cached_cat="${BASH_REMATCH[1]}"
+                else
+                    cached_cat="$UNKNOWN_CATEGORY"
+                fi
+
+                # Security: Validate category against whitelist to prevent injection in arithmetic expansion
+                if [[ ! "$cached_cat" =~ ^(safe|conditional|dangerous|$UNKNOWN_CATEGORY)$ ]]; then
+                    cached_cat="$UNKNOWN_CATEGORY"
+                fi
+
+                if [ -n "$cached_cat" ]; then
+                    CATEGORY_COUNT[$cached_cat]=$((CATEGORY_COUNT[$cached_cat]+1))
+                fi
+                continue
             fi
         fi
 
@@ -186,12 +209,11 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
         CATEGORY_COUNT[$category]=$((CATEGORY_COUNT[$category]+1))
 
         # Save to cache
-        if type save_cached_result &> /dev/null; then
-            # Security: Use jq to safely generate JSON and prevent injection
-            result=$(jq -n --arg cat "$category" --arg cmd "$cmd" \
-                '{"valid":true, "category":$cat, "command":$cmd}')
-            save_cached_result "$cmd_entry" "$result" 2>/dev/null || true
-        fi
+        # Security: Use jq to safely generate JSON and prevent injection for arbitrary commands
+        result=$(jq -n --arg cat "$category" --arg cmd "$cmd" '{"valid":true, "category":$cat, "command":$cmd}')
+        mkdir -p "$(dirname "$cache_file")"
+        echo "$result" > "$cache_file"
+        echo "$(date -Iseconds) CACHED: $cmd" >> "$CACHE_DIR/audit.log"
 
         ((VALIDATED++))
 
@@ -199,7 +221,12 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
         if [ "$category" = "dangerous" ]; then
             FAILED_COMMANDS+=("$cmd")
         fi
-    done <<< "$DISCOVERED_COMMANDS"
+    done <<< "$TSV_COMMANDS"
+
+    # Rotate audit log
+    if [ -f "$CACHE_DIR/audit.log" ] && [ "$(wc -l < "$CACHE_DIR/audit.log")" -gt 1000 ]; then
+        tail -n 1000 "$CACHE_DIR/audit.log" > "${CACHE_DIR}/audit.log.tmp" && mv "${CACHE_DIR}/audit.log.tmp" "$CACHE_DIR/audit.log"
+    fi
 fi
 
 # Calculate totals from cache + validated
