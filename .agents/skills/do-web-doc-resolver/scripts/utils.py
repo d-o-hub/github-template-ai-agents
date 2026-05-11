@@ -8,6 +8,7 @@ import logging
 import os
 import re
 import socket
+import tempfile
 from html.parser import HTMLParser
 from typing import Any
 from urllib.parse import urljoin, urlparse
@@ -100,6 +101,40 @@ def _request_with_safe_redirects(
             return response
 
     raise requests.exceptions.TooManyRedirects(f"Exceeded {max_redirs} redirects")
+
+
+def download_to_temp_file(url: str, timeout: int = DEFAULT_TIMEOUT) -> str | None:
+    """
+    Safely download a URL to a temporary file.
+    Returns the path to the temporary file, or None if the download failed.
+    The caller is responsible for deleting the file.
+    """
+    if not is_safe_url(url):
+        logger.error(f"SSRF blocked for URL: {url}")
+        return None
+
+    tmp_path = None
+    try:
+        response = _request_with_safe_redirects("GET", url, timeout=timeout, stream=True)
+        if response.status_code != 200:
+            logger.error(f"Failed to download {url}: HTTP {response.status_code}")
+            return None
+
+        # Use NamedTemporaryFile but don't delete automatically as we need to return the path
+        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+            tmp_path = tmp_file.name
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    tmp_file.write(chunk)
+            return tmp_path
+    except Exception as e:
+        logger.error(f"Error downloading {url}: {e}")
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.unlink(tmp_path)
+            except Exception:
+                pass
+        return None
 
 
 def is_shell_safe_url(url: str) -> bool:
