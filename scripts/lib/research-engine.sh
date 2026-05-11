@@ -55,7 +55,8 @@ print(json.dumps(output, indent=2))
     local score
     score=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.stdin).get('score', 0))" 2>/dev/null || echo "0")
 
-    if (( $(echo "$score > 0.7" | bc -l 2>/dev/null || echo "0") )); then
+    # Portability: Use python3 for floating point comparison as bc may be missing
+    if python3 -c "import sys; sys.exit(0 if float(sys.argv[1]) > 0.7 else 1)" "$score" 2>/dev/null; then
         return 0
     else
         return 1
