@@ -3,6 +3,7 @@ Heuristics for scoring the quality of resolved content.
 """
 
 from dataclasses import dataclass, field
+from typing import Any
 
 from scripts.docs_validation import DocsValidationResult
 
@@ -19,7 +20,7 @@ class QualityScore:
     docs_validation: DocsValidationResult | None = None
 
 
-def score_content(markdown: str, links: list[str] | None = None) -> QualityScore:
+def score_content(markdown: Any, links: list[str] | None = None) -> QualityScore:
     text = str(markdown or "").strip()
     links = links or []
     reasons = []
