@@ -42,34 +42,36 @@ def check_form_labels(html: str) -> List[Dict]:
     for match in re.finditer(input_pattern, html, re.IGNORECASE):
         tag = match.group(0)
 
-        # Extract ID to check for matching label
-        id_match = re.search(r'id\s*=\s*["\']([^"\']+)["\']', tag, re.IGNORECASE)
-        input_id = id_match.group(1) if id_match else None
-
+        # Extract id from input tag
+        id_match = re.search(r'\bid\s*=\s*["\']([^"\']+)["\']', tag, re.IGNORECASE)
         has_label = False
-        if input_id:
-            label_pattern = f'<label[^>]*for\\s*=\\s*["\']{re.escape(input_id)}["\']'
-            has_label = bool(re.search(label_pattern, html, re.IGNORECASE))
+        if id_match:
+            input_id = id_match.group(1)
+            # Search for a label with a matching 'for' attribute
+            label_pattern = rf'<label[^>]*\bfor\s*=\s*["\']{re.escape(input_id)}["\']'
+            if re.search(label_pattern, html, re.IGNORECASE):
+                has_label = True
 
         has_aria_label = 'aria-label=' in tag.lower() or 'aria-labelledby=' in tag.lower()
         has_placeholder = 'placeholder=' in tag.lower()
         
         if not has_label and not has_aria_label:
-            issues.append({
-                'criterion': '3.3.2',
-                'severity': 'high',
-                'message': f'Form input missing accessible label (ID: {input_id})',
-                'context': tag[:80] + '...' if len(tag) > 80 else tag,
-                'fix': 'Add <label for="id"> or aria-label attribute'
-            })
-        elif has_placeholder and not has_label and not has_aria_label:
-            issues.append({
-                'criterion': '1.3.1',
-                'severity': 'medium',
-                'message': 'Input using placeholder as label (bad practice)',
-                'context': tag[:80] + '...' if len(tag) > 80 else tag,
-                'fix': 'Add explicit <label> element'
-            })
+            if not has_placeholder:
+                issues.append({
+                    'criterion': '3.3.2',
+                    'severity': 'high',
+                    'message': 'Form input missing accessible label',
+                    'context': tag[:80] + '...' if len(tag) > 80 else tag,
+                    'fix': 'Add <label for="id"> or aria-label attribute'
+                })
+            else:
+                issues.append({
+                    'criterion': '1.3.1',
+                    'severity': 'medium',
+                    'message': 'Input using placeholder as label (bad practice)',
+                    'context': tag[:80] + '...' if len(tag) > 80 else tag,
+                    'fix': 'Add explicit <label> element'
+                })
     return issues
 
 
