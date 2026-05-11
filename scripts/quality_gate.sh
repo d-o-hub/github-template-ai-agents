@@ -346,13 +346,11 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " python " ]]; then
 fi
 
 # Go checks
-# Standard Go toolchain provides everything needed: gofmt, go vet, go test
 if [[ " ${DETECTED_LANGUAGES[*]} " =~ " go " ]]; then
     echo -e "${BLUE}Running Go checks...${NC}"
 
     if command -v go &> /dev/null; then
         # gofmt: Standard Go formatter
-        # -l lists files that would change (we want empty output = all formatted)
         if ! OUTPUT=$(gofmt -l . 2>&1); then
             echo -e "${RED}  ✗ gofmt found unformatted files${NC}"
             echo "$OUTPUT" >&2
@@ -361,8 +359,6 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " go " ]]; then
             echo -e "${GREEN}  ✓ gofmt passed${NC}"
         fi
 
-        # go vet: Static analysis tool that catches suspicious constructs
-        # ./... means check all packages recursively
         if ! OUTPUT=$(go vet ./... 2>&1); then
             echo -e "${RED}  ✗ go vet failed${NC}"
             echo "$OUTPUT" >&2
@@ -371,7 +367,6 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " go " ]]; then
             echo -e "${GREEN}  ✓ go vet passed${NC}"
         fi
 
-        # Tests: Run all tests in all packages
         if [ "${SKIP_TESTS:-false}" != "true" ]; then
             if ! OUTPUT=$(go test ./... 2>&1); then
                 echo -e "${RED}  ✗ go test failed${NC}"
@@ -473,8 +468,6 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
     echo ""
 fi
 
-# --- Final result aggregation ---
-# We use FAILED flag to accumulate errors across all checks
 # Benefits of this pattern:
 #   1. Users see ALL failures at once (not just the first)
 #   2. Each check is independent - one failure doesn't skip others

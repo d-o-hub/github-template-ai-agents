@@ -1,0 +1,145 @@
+---
+name: Close Resolved Issues
+
+# yamllint disable-line rule:truthy
+on:
+  pull_request_target:
+    types: [closed]
+
+permissions:
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: close-resolved-issues-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  close-on-pr-merge:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Close referenced issues
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            if (!pr) {
+              core.setFailed('Missing pull_request payload.');
+              return;
+            }
+
+            const prNumber = pr.number;
+            const prTitle = pr.title ?? '';
+            const prBody = pr.body ?? '';
+            const prUrl = pr.html_url ?? '';
+            const mergedBy = pr.merged_by?.login ?? 'unknown';
+            const text = `${prTitle}\n${prBody}`.trim();
+
+            if (!text) {
+              core.info('PR title/body are empty. Nothing to process.');
+              return;
+            }
+
+            // Conservative matching: only explicit closing keywords.
+            // Examples: "closes #12", "fixed #34", "resolve #56"
+            const closingPattern = /\b(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+#(\d+)\b/gi;
+
+            const found = new Set();
+            for (const match of text.matchAll(closingPattern)) {
+              const n = Number.parseInt(match[1], 10);
+              if (Number.isInteger(n) && n > 0 && n !== prNumber) {
+                found.add(n);
+              }
+            }
+
+            const issueNumbers = [...found].sort((a, b) => a - b);
+
+            if (issueNumbers.length === 0) {
+              core.info('No explicit closing issue references found in PR title or body.');
+              return;
+            }
+
+            core.info(`Found issue references: ${issueNumbers.map(n => `#${n}`).join(', ')}`);
+
+            const closed = [];
+            const skipped = [];
+            const failed = [];
+
+            for (const issue_number of issueNumbers) {
+              try {
+                const { data: issue } = await github.rest.issues.get({
+                  owner,
+                  repo,
+                  issue_number
+                });
+
+                if (issue.pull_request) {
+                  skipped.push(`#${issue_number} is a pull request, not an issue`);
+                  continue;
+                }
+
+                if (issue.state === 'closed') {
+                  skipped.push(`#${issue_number} already closed`);
+                  continue;
+                }
+
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number,
+                  state: 'closed',
+                  state_reason: 'completed'
+                });
+
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number,
+                  body: `✅ Closed automatically via PR #${prNumber}${prUrl ? ` (${prUrl})` : ''}.`
+                });
+
+                closed.push(issue_number);
+                core.info(`Closed issue #${issue_number}`);
+              } catch (error) {
+                const message = error instanceof Error ? error.message : String(error);
+                failed.push(`#${issue_number}: ${message}`);
+                core.warning(`Could not process issue #${issue_number}: ${message}`);
+              }
+            }
+
+            await core.summary
+              .addHeading('Issue closure result')
+              .addTable([
+                [
+                  { data: 'Status', header: true },
+                  { data: 'Items', header: true }
+                ],
+                [
+                  'Closed',
+                  closed.length ? closed.map(n => `#${n}`).join(', ') : 'None'
+                ],
+                [
+                  'Skipped',
+                  skipped.length ? skipped.join('; ') : 'None'
+                ],
+                [
+                  'Failed',
+                  failed.length ? failed.join('; ') : 'None'
+                ]
+              ])
+              .write();
+
+            if (failed.length === issueNumbers.length) {
+              core.setFailed('All referenced issues failed to process.');
+              return;
+            }
+
+            if (failed.length > 0) {
+              core.warning(`Some issues failed to process: ${failed.join('; ')}`);
+            }

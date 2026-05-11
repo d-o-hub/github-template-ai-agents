@@ -12,7 +12,6 @@ from .models import ProviderMeta, ProviderResult, ResolvedResult
 from .utils import (
     _get_from_cache,
     _save_to_cache,
-    download_to_temp_file,
     get_session,
     is_safe_url,
     is_shell_safe_url,
@@ -347,19 +346,9 @@ def resolve_with_docling(url: str, max_chars: int) -> ProviderResult:
     if not is_shell_safe_url(url):
         meta = ProviderMeta(tool="docling", duration_ms=0, error_type="injection_blocked")
         return ProviderResult(ok=False, error="injection_blocked", meta=meta, url=url, source="docling")
-
-    tmp_file_path = None
     try:
-        tmp_file_path = download_to_temp_file(url, timeout=30)
-        if not tmp_file_path:
-            meta = ProviderMeta(tool="docling", duration_ms=0, error_type="network_error")
-            return ProviderResult(ok=False, error="download_failed", meta=meta, url=url, source="docling")
-
         res = subprocess.run(
-            ["docling", "--format", "markdown", "--", tmp_file_path],
-            capture_output=True,
-            text=True,
-            timeout=60,
+            ["docling", "--format", "markdown", "--", url], capture_output=True, text=True, timeout=60
         )
         duration = int((time.time() - start) * 1000)
         if res.returncode == 0:
@@ -372,9 +361,6 @@ def resolve_with_docling(url: str, max_chars: int) -> ProviderResult:
         duration = int((time.time() - start) * 1000)
         meta = ProviderMeta(tool="docling", duration_ms=duration, error_type="unknown")
         return ProviderResult(ok=False, error=str(e), meta=meta, url=url, source="docling")
-    finally:
-        if tmp_file_path and os.path.exists(tmp_file_path):
-            os.unlink(tmp_file_path)
 
 
 def resolve_with_ocr(url: str, max_chars: int) -> ProviderResult:
@@ -385,16 +371,9 @@ def resolve_with_ocr(url: str, max_chars: int) -> ProviderResult:
     if not is_shell_safe_url(url):
         meta = ProviderMeta(tool="ocr", duration_ms=0, error_type="injection_blocked")
         return ProviderResult(ok=False, error="injection_blocked", meta=meta, url=url, source="ocr-tesseract")
-
-    tmp_file_path = None
     try:
-        tmp_file_path = download_to_temp_file(url, timeout=20)
-        if not tmp_file_path:
-            meta = ProviderMeta(tool="ocr", duration_ms=0, error_type="network_error")
-            return ProviderResult(ok=False, error="download_failed", meta=meta, url=url, source="ocr-tesseract")
-
         res = subprocess.run(
-            ["tesseract", "--", tmp_file_path, "stdout"], capture_output=True, text=True, timeout=30
+            ["tesseract", "--", url, "stdout"], capture_output=True, text=True, timeout=30
         )
         duration = int((time.time() - start) * 1000)
         if res.returncode == 0:
@@ -407,6 +386,3 @@ def resolve_with_ocr(url: str, max_chars: int) -> ProviderResult:
         duration = int((time.time() - start) * 1000)
         meta = ProviderMeta(tool="ocr", duration_ms=duration, error_type="unknown")
         return ProviderResult(ok=False, error=str(e), meta=meta, url=url, source="ocr-tesseract")
-    finally:
-        if tmp_file_path and os.path.exists(tmp_file_path):
-            os.unlink(tmp_file_path)
