@@ -40,7 +40,7 @@
 **Learning:** `echo -e` interprets escapes like `\n` in the variable content itself, not just the format string. This can lead to structural injection when the output is written to a file or piped.
 **Prevention:** Use `printf "%s\n"` for all variable output. Use literal newlines (`$'\n'`) for intentional line breaks in variables. Always implement `trap` cleanup for temporary files.
 
-## 2026-05-15 - Portability and Defense-in-Depth for Numeric Comparisons
+## 2026-05-11 - Portability and Defense-in-Depth for Numeric Comparisons
 
 **Vulnerability:** Use of `bc` for floating-point comparisons in `scripts/lib/research-engine.sh` introduced a dependency that is often missing in minimal or containerized environments (like the current sandbox), leading to script failures. While not a direct exploit in the observed context, piping unvalidated variables to `bc` is less robust than using typed comparison in a language like Python.
 **Learning:** Shell scripts should prioritize tools like `python3` (already a project dependency) for complex numeric operations to ensure portability across different environments.
