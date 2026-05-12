@@ -132,3 +132,76 @@ def deterministic_merge(results: list[ResolvedResult]) -> str:
             merged.append(f"### Source {i + 1}: {source_label}\n{content}")
 
     return "\n\n---\n\n".join(merged)
+
+import datetime
+
+import requests
+
+
+def synthesize_results(query: str, results: list[ResolvedResult], api_key: str, model: str) -> str:
+    """
+    Synthesize multiple results into a cohesive, LLM-ready markdown document.
+    Follows 2026 LLM-Readable-Doc standards.
+    """
+    if not results:
+        return "No results to synthesize."
+
+    if not should_call_llm_synthesis(results):
+        return deterministic_merge(results)
+
+    context = "".join(
+        [
+            f"\nResult {i + 1}:\nURL: {res.url or 'unk'}\nContent: {res.content}\n---\n"
+            for i, res in enumerate(results)
+        ]
+    )
+
+    current_date = datetime.date.today().isoformat()
+
+    system_prompt = (
+        "You are an expert research assistant. Synthesize the provided context into a high-quality, "
+        "LLM-ready markdown document following the 2026 LLM-Readable-Doc standards.\n\n"
+        "REQUIRED FORMAT:\n"
+        "1. Include Token-Efficiency Headers (YAML frontmatter):\n"
+        "---\n"
+        "relevance_score: <0.0-1.0>\n"
+        "intent_category: <Technical|Informational|Comparative|Debugging>\n"
+        "token_estimate: <int>\n"
+        f"last_updated: {current_date}\n"
+        "---\n\n"
+        "2. Use Structural Anchors to partition the content for RAG performance:\n"
+        "- [ANCHOR: SUMMARY] - High-level synthesis of findings.\n"
+        "- [ANCHOR: TECHNICAL_DETAILS] - Specs, code, or architecture details.\n"
+        "- [ANCHOR: COMPARISON] - Trade-offs and alternatives (if applicable).\n"
+        "- [ANCHOR: CITATIONS] - Source URL mapping.\n\n"
+        "3. Adhere to strict formatting requirements:\n"
+        "- Use strict CommonMark for maximum compatibility.\n"
+        "- Aggressively deduplicate redundant information across sources.\n"
+        "- Ensure citation precision: follow claims with bracketed indices (e.g., [1]) matching the CITATIONS anchor."
+    )
+
+    user_prompt = f"Query: '{query}'\n\nContext:\n{context}"
+
+    try:
+        resp = requests.post(
+            "https://api.mistral.ai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                "temperature": 0.3,
+            },
+            timeout=30,
+        )
+        resp.raise_for_status()
+        content = resp.json()["choices"][0]["message"]["content"]
+        return str(content)
+    except Exception as e:
+        logger.error(f"LLM Synthesis failed: {e}")
+        return deterministic_merge(results)

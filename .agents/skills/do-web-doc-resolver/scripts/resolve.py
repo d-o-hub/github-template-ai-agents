@@ -59,8 +59,8 @@ from .utils import (
     fetch_url_content,
     get_cache,
     get_session,
-    is_url,
     is_safe_url,
+    is_url,
     validate_links,
     validate_url,
 )
@@ -116,10 +116,7 @@ __all__ = [
 
 
 def synthesize_results(query: str, results: list[ResolvedResult], api_key: str, model: str) -> str:
-    if not results:
-        return "No results to synthesize."
-    if not synthesis.should_call_llm_synthesis(results):
-        return synthesis.deterministic_merge(results)
+    return synthesis.synthesize_results(query, results, api_key, model)
     context = "".join(
         [
             f"\nResult {i+1}:\nURL: {res.url or 'unk'}\nContent: {res.content}\n---\n"

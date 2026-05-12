@@ -197,7 +197,7 @@ def resolve_query_stream(
                             break
                         else:
                             scripts.cache_negative.write_negative_cache(
-                                cache, query, p_name_done, "thin_content", 1800
+                                cache, query, p_name_done, "thin_content"
                             )
                             _routing_memory.record(
                                 "query", p_name_done, False, latency, q_score.score

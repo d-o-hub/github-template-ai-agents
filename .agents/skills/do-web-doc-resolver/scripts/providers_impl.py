@@ -12,6 +12,7 @@ from .models import ProviderMeta, ProviderResult, ResolvedResult
 from .utils import (
     _get_from_cache,
     _save_to_cache,
+    get_config_data,
     get_session,
     is_safe_url,
     is_shell_safe_url,
@@ -19,12 +20,15 @@ from .utils import (
 
 logger = logging.getLogger(__name__)
 
-MAX_CHARS = int(os.getenv("WEB_RESOLVER_MAX_CHARS", "8000"))
-MIN_CHARS = int(os.getenv("WEB_RESOLVER_MIN_CHARS", "200"))
+# Load from config or env
+_config = get_config_data()
+
+MAX_CHARS = int(os.getenv("WEB_RESOLVER_MAX_CHARS", _config.get("max_chars", 8000)))
+MIN_CHARS = int(os.getenv("WEB_RESOLVER_MIN_CHARS", _config.get("min_chars", 200)))
 DEFAULT_TIMEOUT = int(os.getenv("WEB_RESOLVER_TIMEOUT", "30"))
-EXA_RESULTS = int(os.getenv("WEB_RESOLVER_EXA_RESULTS", "5"))
-TAVILY_RESULTS = int(os.getenv("WEB_RESOLVER_TAVILY_RESULTS", "5"))
-DDG_RESULTS = int(os.getenv("WEB_RESOLVER_DDG_RESULTS", "5"))
+EXA_RESULTS = int(os.getenv("WEB_RESOLVER_EXA_RESULTS", _config.get("exa_results", 5)))
+TAVILY_RESULTS = int(os.getenv("WEB_RESOLVER_TAVILY_RESULTS", _config.get("tavily_results", 5)))
+DDG_RESULTS = int(os.getenv("WEB_RESOLVER_DDG_RESULTS", _config.get("ddg_results", 5)))
 
 _rate_limits: dict[str, float] = {}
 
@@ -202,6 +206,63 @@ def resolve_with_tavily(query: str, max_chars: int = MAX_CHARS) -> ProviderResul
         meta = ProviderMeta(tool="tavily", duration_ms=duration, error_type="unknown")
         return ProviderResult(ok=False, error=str(e), meta=meta, query=query, source="tavily")
 
+
+
+def resolve_with_serper(query: str, max_chars: int = MAX_CHARS) -> ProviderResult | None:
+    """Search via Serper (Google Search API). Free tier: 2500 credits."""
+    start = time.time()
+    cached = _get_from_cache(query, "serper")
+    if cached:
+        duration = int((time.time() - start) * 1000)
+        meta = ProviderMeta(tool="serper", duration_ms=duration, cache_hit=True)
+        return ProviderResult(ok=True, content=cached.get("content", ""), meta=meta, query=query, source="serper")
+
+    api_key = os.getenv("SERPER_API_KEY")
+    if not api_key or _is_rate_limited("serper"):
+        return None
+    try:
+        session = get_session()
+        response = session.post(
+            "https://google.serper.dev/search",
+            headers={
+                "X-API-KEY": api_key,
+                "Content-Type": "application/json",
+            },
+            json={"q": query, "num": 5},
+            timeout=DEFAULT_TIMEOUT,
+        )
+        if response.status_code == 429:
+            _set_rate_limit("serper", 3600)  # 1 hour cooldown
+            meta = ProviderMeta(tool="serper", duration_ms=int((time.time() - start) * 1000), error_type="rate_limit")
+            return ProviderResult(ok=False, error="rate_limit", meta=meta, query=query, source="serper")
+
+        response.raise_for_status()
+        data = response.json()
+
+        organic_results = data.get("organic", [])
+        if not organic_results:
+            meta = ProviderMeta(tool="serper", duration_ms=int((time.time() - start) * 1000), error_type="not_found")
+            return ProviderResult(ok=False, error="not_found", meta=meta, query=query, source="serper")
+
+        content_parts = []
+        for item in organic_results[:5]:
+            title = item.get("title", "")
+            snippet = item.get("snippet", "")
+            link = item.get("link", "")
+            if title and snippet:
+                content_parts.append(f"### {title}\n{snippet}\nURL: {link}\n")
+
+        content = "\n".join(content_parts)
+        result = ProviderResult(
+            ok=True, content=content[:max_chars], query=query, source="serper",
+            meta=ProviderMeta(tool="serper", duration_ms=int((time.time() - start) * 1000))
+        )
+        _save_to_cache(query, "serper", result.__dict__)
+        return result
+    except Exception as e:
+        logger.warning(f"Serper resolution failed: {e}")
+        meta = ProviderMeta(tool="serper", duration_ms=int((time.time() - start) * 1000), error_type="unknown")
+        return ProviderResult(ok=False, error=str(e), meta=meta, query=query, source="serper")
 
 def resolve_with_duckduckgo(query: str, max_chars: int = MAX_CHARS) -> ProviderResult:
     start = time.time()

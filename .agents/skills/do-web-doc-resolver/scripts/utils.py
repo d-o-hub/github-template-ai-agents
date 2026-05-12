@@ -24,6 +24,48 @@ MAX_CHARS = int(os.getenv("WEB_RESOLVER_MAX_CHARS", "8000"))
 DEFAULT_TIMEOUT = int(os.getenv("WEB_RESOLVER_TIMEOUT", "30"))
 CACHE_DIR = os.path.expanduser(os.getenv("WEB_RESOLVER_CACHE_DIR", "~/.cache/do-web-doc-resolver"))
 CACHE_TTL = int(os.getenv("WEB_RESOLVER_CACHE_TTL", str(3600 * 24)))
+
+# Tiered TTL defaults
+TIERED_TTL = {
+    "firecrawl": 21600,
+    "exa": 14400,
+    "exa_mcp": 14400,
+    "tavily": 14400,
+    "serper": 7200,
+    "jina": 7200,
+    "mistral": 28800,
+    "duckduckgo": 3600,
+    "llms_txt": 28800,
+    "synthesis": 43200,
+    "default": 3600,
+}
+
+_CONFIG_DATA: dict[str, Any] | None = None
+
+
+def get_config_data() -> dict[str, Any]:
+    """Load configuration from config.toml if available."""
+    global _CONFIG_DATA
+    if _CONFIG_DATA is not None:
+        return _CONFIG_DATA
+
+    _CONFIG_DATA = {}
+    config_path = os.getenv("DO_WDR_CONFIG") or "config.toml"
+    if os.path.exists(config_path):
+        try:
+            try:
+                import tomllib
+            except ImportError:
+                import tomli as tomllib  # type: ignore
+
+            with open(config_path, "rb") as f:
+                _CONFIG_DATA = tomllib.load(f)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to load {config_path}: {e}")
+
+    return _CONFIG_DATA
+
 MAX_REDIRECTS = 5
 
 USER_AGENT = (
