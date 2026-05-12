@@ -10,9 +10,9 @@ echo "Syncing docs $LAST_COMMIT → $CURRENT"
 
 diff_output=$(git diff --name-only "$LAST_COMMIT" "$CURRENT" -- '*.md' 2>/dev/null || true)
 
-printf "%s\n" "$diff_output" | while IFS= read -r file; do
-  [ -n "$file" ] && [ -f "$REPO_ROOT/$file" ] && echo "Updated: $file"
-done
+while IFS= read -r file; do
+  [[ -n "$file" && -f "$REPO_ROOT/$file" ]] && echo "Updated: $file"
+done <<< "$diff_output"
 
 if [ -z "$diff_output" ]; then
     count=0
