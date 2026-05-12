@@ -241,7 +241,7 @@ def resolve_url_stream(
                             break
                         else:
                             scripts.cache_negative.write_negative_cache(
-                                cache, url, p_name_done, "thin_content"
+                                cache, url, p_name_done, "thin_content", 1800
                             )
                             if domain:
                                 _routing_memory.record(

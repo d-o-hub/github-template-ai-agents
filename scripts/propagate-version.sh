@@ -13,7 +13,7 @@ if [ ! -f "VERSION" ]; then
     exit 1
 fi
 
-VERSION=$(tr -d '[:space:]' < VERSION)
+VERSION=$(cat VERSION | tr -d '[:space:]')
 
 if [ -z "$VERSION" ]; then
     echo "Error: VERSION file is empty"

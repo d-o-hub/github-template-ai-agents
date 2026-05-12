@@ -40,6 +40,11 @@ TIERED_TTL = {
     "default": 3600,
 }
 
+
+def get_ttl(provider: str) -> int:
+    """Get TTL for a given provider, defaulting to 1 hour."""
+    return TIERED_TTL.get(provider, TIERED_TTL.get("default", 3600))
+
 _CONFIG_DATA: dict[str, Any] | None = None
 
 

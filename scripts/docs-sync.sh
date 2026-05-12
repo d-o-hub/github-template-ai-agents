@@ -8,15 +8,9 @@ CURRENT="${2:-HEAD}"
 
 echo "Syncing docs $LAST_COMMIT → $CURRENT"
 
-diff_output=$(git diff --name-only "$LAST_COMMIT" "$CURRENT" -- '*.md' 2>/dev/null || true)
+git diff --name-only "$LAST_COMMIT" "$CURRENT" -- '*.md' 2>/dev/null | while read -r file; do
+  [ -f "$REPO_ROOT/$file" ] && echo "Updated: $file"
+done
 
-while IFS= read -r file; do
-  [[ -n "$file" && -f "$REPO_ROOT/$file" ]] && echo "Updated: $file"
-done <<< "$diff_output"
-
-if [ -z "$diff_output" ]; then
-    count=0
-else
-    count=$(printf "%s\n" "$diff_output" | wc -l || true)
-fi
+count=$(git diff --name-only "$LAST_COMMIT" "$CURRENT" -- '*.md' 2>/dev/null | wc -l)
 echo "Done. $count files."
