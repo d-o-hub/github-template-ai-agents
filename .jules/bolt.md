@@ -61,3 +61,7 @@
 ## 2026-05-10 - [Python Regex search optimization in loops]
 **Learning:** Performing a whole-document regex search (`re.search`) inside a loop that iterates over many small matches (like HTML tags) creates $O(N \cdot M)$ complexity. Moving the document-wide search outside the loop and pre-compiling regex patterns can achieve dramatic performance gains (e.g., ~325x speedup).
 **Action:** Always hoist invariant regex searches out of loops. Pre-compile all regex patterns at the module level for reuse. Cache results of string operations (like `.lower()`) when used multiple times in a loop iteration.
+
+## 2026-05-12 - [Eliminating redundant git diff and cat process forks]
+**Learning:** Running an expensive process like `git diff` multiple times (e.g., once for processing and once for counting) significantly slows down shell scripts. Additionally, piping `cat` to another command inside a subshell creates unnecessary processes. In this codebase, avoiding the second `git diff` by storing the output in a variable and replacing `$(cat FILE | tr...)` with `$(tr... < FILE)` provided a small but measurable speedup, aligning with Bolt's philosophy.
+**Action:** Always capture the output of expensive commands in a variable if the result needs to be used multiple times, and prefer file redirection (`<`) over `cat | `.
