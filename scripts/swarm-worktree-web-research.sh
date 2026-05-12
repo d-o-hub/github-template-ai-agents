@@ -47,10 +47,10 @@ readonly GITHUB_MERGE_METHOD="${GITHUB_MERGE_METHOD:-squash}"
 readonly GITHUB_FAIL_ON_WARNING="${GITHUB_FAIL_ON_WARNING:-1}"
 
 # Logging
-log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
-log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+log_info() { printf "%b[INFO]%b %s\n" "${BLUE}" "${NC}" "$1"; }
+log_success() { printf "%b[SUCCESS]%b %s\n" "${GREEN}" "${NC}" "$1"; }
+log_warn() { printf "%b[WARN]%b %s\n" "${YELLOW}" "${NC}" "$1"; }
+log_error() { printf "%b[ERROR]%b %s\n" "${RED}" "${NC}" "$1"; }
 
 # ==============================================================================
 # PHASE 1: Setup and Validation
