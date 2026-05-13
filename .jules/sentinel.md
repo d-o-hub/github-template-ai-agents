@@ -39,3 +39,11 @@
 **Vulnerability:** `scripts/ai-commit.sh` used `echo -e` to write commit messages to temporary files, allowing backslash escape sequences in agent-generated input to manipulate message structure. It also used `echo` for variable wrapping, susceptible to option injection.
 **Learning:** `echo -e` interprets escapes like `\n` in the variable content itself, not just the format string. This can lead to structural injection when the output is written to a file or piped.
 **Prevention:** Use `printf "%s\n"` for all variable output. Use literal newlines (`$'\n'`) for intentional line breaks in variables. Always implement `trap` cleanup for temporary files.
+
+## 2026-05-11 - Command Substitution via Unquoted Heredocs and Option Injection in Utility Scripts
+
+**Vulnerability:** `scripts/lib/research-engine.sh` used an unquoted heredoc (`<< EOF`) to generate research queries, allowing command substitution (e.g., `$(...)`) embedded in the `topic` variable to be executed. Multiple utility scripts also used `echo "$VAR"`, leading to option injection risks.
+
+**Learning:** Unquoted heredocs in Bash are treated like double-quoted strings, performing expansion and substitution on their content. Using `echo` with untrusted variables allows those variables to be interpreted as command flags.
+
+**Prevention:** Use `printf` or quoted heredocs (`<< 'EOF'`) when incorporating variables into multi-line output to prevent shell expansion. Replace all `echo "$VAR"` with `printf "%s\n" "$VAR"` to ensure variables are treated as literal data.
