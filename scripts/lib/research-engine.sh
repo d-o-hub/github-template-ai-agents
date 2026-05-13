@@ -66,7 +66,16 @@ generate_research_queries() {
     local topic="$1"
     local output_file="$2"
 
-    # Security: Use printf instead of unquoted heredoc to prevent unintended shell expansion
-    printf "# Research Queries for: %s\n# Format: query|context\n\n%s best practices|api-docs\n%s official documentation|reference\n%s getting started tutorial|tutorial\n%s implementation examples|tutorial\n%s common patterns|reference\n%s security considerations|api-docs\n%s performance optimization|reference\n" \
-        "$topic" "$topic" "$topic" "$topic" "$topic" "$topic" "$topic" "$topic" > "$output_file"
+    cat > "$output_file" << EOF
+# Research Queries for: ${topic}
+# Format: query|context
+
+${topic} best practices|api-docs
+${topic} official documentation|reference
+${topic} getting started tutorial|tutorial
+${topic} implementation examples|tutorial
+${topic} common patterns|reference
+${topic} security considerations|api-docs
+${topic} performance optimization|reference
+EOF
 }
