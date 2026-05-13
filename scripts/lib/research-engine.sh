@@ -55,7 +55,8 @@ print(json.dumps(output, indent=2))
     local score
     score=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.stdin).get('score', 0))" 2>/dev/null || echo "0")
 
-    if (( $(echo "$score > 0.7" | bc -l 2>/dev/null || echo "0") )); then
+    # Security: Use python3 for floating-point comparison to improve portability and safety (replaces bc)
+    if python3 -c "import sys; sys.exit(0 if float(sys.argv[1]) > 0.7 else 1)" "$score" 2>/dev/null; then
         return 0
     else
         return 1
@@ -66,16 +67,7 @@ generate_research_queries() {
     local topic="$1"
     local output_file="$2"
 
-    cat > "$output_file" << EOF
-# Research Queries for: ${topic}
-# Format: query|context
-
-${topic} best practices|api-docs
-${topic} official documentation|reference
-${topic} getting started tutorial|tutorial
-${topic} implementation examples|tutorial
-${topic} common patterns|reference
-${topic} security considerations|api-docs
-${topic} performance optimization|reference
-EOF
+    # Security: Use printf instead of unquoted heredoc to prevent unintended shell expansion
+    printf "# Research Queries for: %s\n# Format: query|context\n\n%s best practices|api-docs\n%s official documentation|reference\n%s getting started tutorial|tutorial\n%s implementation examples|tutorial\n%s common patterns|reference\n%s security considerations|api-docs\n%s performance optimization|reference\n" \
+        "$topic" "$topic" "$topic" "$topic" "$topic" "$topic" "$topic" "$topic" > "$output_file"
 }
