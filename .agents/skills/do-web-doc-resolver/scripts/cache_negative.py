@@ -39,12 +39,18 @@ def should_skip_from_negative_cache(cache, key: str, provider: str) -> bool:
 
 
 def write_negative_cache(
-    cache, key: str, provider: str, reason: str, ttl_seconds: int, **metadata
+    cache, key: str, provider: str, reason: str, ttl_seconds: int | None = None, **metadata
 ) -> None:
     if cache is None:
         return
     if not hasattr(cache, "set"):
         return
+
+    if ttl_seconds is None:
+        from scripts.utils import get_ttl
+
+        ttl_seconds = get_ttl(provider)
+
     now = datetime.now(timezone.utc)
     entry = {
         "key": key,
