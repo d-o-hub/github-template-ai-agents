@@ -400,7 +400,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
                 # Use --severity=error to only fail on actual errors, not style warnings
                 # Use -f quiet to reduce output volume in CI environments
                 # lint_if_changed handles hashing and caching
-                if ! lint_if_changed "$script" "shellcheck" ".shellcheckrc" shellcheck --severity=error -f quiet "$script" 2>/dev/null; then
+                if ! lint_if_changed "$script" "shellcheck" ".shellcheckrc" shellcheck --severity=error -f quiet "$script" >/dev/null 2>&1; then
                     echo -e "${RED}  ✗ shellcheck failed: $script${NC}"
                     sc_failed=1
                 fi
@@ -446,15 +446,17 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
         MD_FILES=$(find . -name "*.md" -not -path "./node_modules/*" -not -path "./target/*" -not -path "./.git/*" 2>/dev/null || true)
         if [ -n "$MD_FILES" ]; then
             md_failed=0
+            TMP_MD_OUT=$(mktemp)
             while IFS= read -r md_file; do
                 [ -n "$md_file" ] || continue
                 # lint_if_changed handles hashing and caching
-                if ! OUTPUT=$(lint_if_changed "$md_file" "markdownlint" "markdownlint.toml" markdownlint "$md_file" 2>&1); then
+                if ! lint_if_changed "$md_file" "markdownlint" "markdownlint.toml" markdownlint "$md_file" >"$TMP_MD_OUT" 2>&1; then
                     echo -e "${RED}  ✗ markdownlint failed: $md_file${NC}"
-                    echo "$OUTPUT" >&2
+                    cat "$TMP_MD_OUT" >&2
                     md_failed=1
                 fi
             done <<< "$MD_FILES"
+            rm -f "$TMP_MD_OUT"
 
             if [ $md_failed -eq 0 ]; then
                 echo -e "${GREEN}  ✓ markdownlint passed${NC}"
