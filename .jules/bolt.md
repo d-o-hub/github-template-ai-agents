@@ -69,3 +69,7 @@
 ## 2026-05-13 - [Eliminate subshells in bash while read loops]
 **Learning:** Reassigning variables using external command pipelines (e.g., `key=$(echo "$key" | tr -d ' ' | sed 's/export//g')`) within high-frequency `while read` loops introduces severe subshell overhead. Replacing these pipelines with native Bash parameter expansion (`key="${key// /}"; key="${key//export/}"`) drastically improves performance. In `scripts/validate-config.sh`, this optimization reduced execution time from ~27ms to ~6ms.
 **Action:** Avoid spawning external subshells like `echo`, `tr`, and `sed` inside tight Bash loops. Prefer native Bash string manipulation (parameter expansion) whenever possible.
+
+## 2026-05-30 - [Safe temp file usage and output redirection over subshells]
+**Learning:** Process substitution (`< <(...)`) and `OUTPUT=$(...)` both spawn subshells, adding fork overhead. A fast and safe pattern in bash loops is generating the file list as a string via `find` and reading from it with `while ...; do ...; done <<< "$FILES"`, while replacing internal loop subshells (`OUTPUT=$(command)`) with standard file redirection (`command >"$TMP_OUT" 2>&1`) to capture output without forking.
+**Action:** When capturing output in a loop, write to a temporary file (`mktemp`) and use `cat` instead of command substitution. Ensure the temporary file is removed afterwards, using a simple `rm -f "$TMP_OUT"` when safe.
