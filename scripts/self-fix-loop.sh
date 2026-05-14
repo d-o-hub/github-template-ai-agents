@@ -32,12 +32,12 @@ else
     RED=''; GREEN=''; YELLOW=''; BLUE=''; CYAN=''; MAGENTA=''; NC=''
 fi
 
-log() { echo -e "${BLUE}[$(date +%H:%M:%S)]${NC} $*"; }
-info() { echo -e "${CYAN}[$(date +%H:%M:%S)] INFO:${NC} $*"; }
-error() { echo -e "${RED}[$(date +%H:%M:%S)] ERROR:${NC} $*" >&2; }
-success() { echo -e "${GREEN}[$(date +%H:%M:%S)]${NC} $*"; }
-warn() { echo -e "${YELLOW}[$(date +%H:%M:%S)] WARNING:${NC} $*"; }
-phase() { echo -e "${MAGENTA}[$(date +%H:%M:%S)] PHASE $1:${NC} $2"; }
+log() { printf "${BLUE}[$(date +%H:%M:%S)]${NC} %s\n" "$*"; }
+info() { printf "${CYAN}[$(date +%H:%M:%S)] INFO:${NC} %s\n" "$*"; }
+error() { printf "${RED}[$(date +%H:%M:%S)] ERROR:${NC} %s\n" "$*" >&2; }
+success() { printf "${GREEN}[$(date +%H:%M:%S)]${NC} %s\n" "$*"; }
+warn() { printf "${YELLOW}[$(date +%H:%M:%S)] WARNING:${NC} %s\n" "$*"; }
+phase() { printf "${MAGENTA}[$(date +%H:%M:%S)] PHASE %s:${NC} %s\n" "$1" "$2"; }
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
