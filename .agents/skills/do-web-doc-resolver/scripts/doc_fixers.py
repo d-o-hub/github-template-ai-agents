@@ -2,7 +2,7 @@ from pathlib import Path
 
 from scripts.doc_models import Report
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[4]
 
 
 def fix_python_cli(report: Report) -> int:
@@ -15,16 +15,27 @@ def fix_cargo_features(report: Report) -> int:
     fixed = 0
     issues = [i for i in report.issues if i.category == "feature-sync"]
     if not issues:
-        raise NotImplementedError("Not implemented")
+        return 0
 
     cargo_toml = REPO_ROOT / "cli/Cargo.toml"
     rust_cli_md = REPO_ROOT / ".agents/skills/do-web-doc-resolver/references/RUST_CLI.md"
 
     toml_content = cargo_toml.read_text()
-    features_section = toml_content.split("[features]")[1].split("[")[0]
-    all_features = [
-        f.split("=")[0].strip() for f in features_section.strip().splitlines() if "=" in f
-    ]
+
+    all_features = []
+    if "[features]" in toml_content:
+        in_features = False
+        for line in toml_content.splitlines():
+            line = line.strip()
+            if line.startswith("["):
+                if line == "[features]":
+                    in_features = True
+                    continue
+                elif in_features:
+                    break
+
+            if in_features and "=" in line:
+                all_features.append(line.split("=")[0].strip())
 
     md_content = rust_cli_md.read_text()
     if "## Features" in md_content:
@@ -63,7 +74,7 @@ def fix_rust_architecture(report: Report) -> int:
     fixed = 0
     issues = [i for i in report.issues if i.category == "arch-sync"]
     if not issues:
-        raise NotImplementedError("Not implemented")
+        return 0
 
     # Logic to update module descriptions based on filesystem
     return fixed

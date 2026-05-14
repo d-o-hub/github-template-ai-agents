@@ -197,8 +197,9 @@ def resolve_direct(
             res_str = fetch_llms_txt(input_str)
             res = ResolvedResult(source="llms.txt", url=input_str, content=res_str[:max_chars] if res_str else "") if res_str else None
         elif provider == ProviderType.DIRECT_FETCH:
-            res_str = fetch_url_content(input_str)
-            res = ResolvedResult(source="direct_fetch", url=input_str, content=res_str[:max_chars] if res_str else "") if res_str else None
+            res = fetch_url_content(input_str)
+            if res and res.content:
+                res.content = res.content[:max_chars]
         else:
             res = funcs[provider](input_str, max_chars)
         return res.to_dict() if res else {"source": "none", "error": "Provider failed"}

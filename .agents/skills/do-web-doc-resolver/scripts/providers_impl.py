@@ -392,7 +392,7 @@ def resolve_with_ocr(url: str, max_chars: int) -> ResolvedResult | None:
     import tempfile
     from scripts.utils import _safe_request
     try:
-        resp = _safe_request(url, timeout=30)
+        resp = _safe_request("GET", url, get_session(), timeout=30)
         if not resp:
             return None
         with tempfile.NamedTemporaryFile() as tmp:
