@@ -168,7 +168,7 @@ def main() -> None:
             print("Usage: sync_versions.py --set <version>")
             sys.exit(1)
         version = args[idx + 1]
-        if not re.match(r"^\d+\.\d+\.\d+", version):
+        if not re.match(r"^\d+\.\d+\.\d+$", version):
             print(f"Invalid version format: {version}")
             sys.exit(1)
         ok = fix_versions(version)

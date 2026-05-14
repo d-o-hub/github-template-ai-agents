@@ -62,7 +62,7 @@ def extract_markdown_links(content: str) -> list[tuple[int, str, str]]:
 
 def extract_code_blocks(content: str) -> list[tuple[int, str, str]]:
     blocks = []
-    for match in re.finditer(r"```(\w+)?\n(.*?)\n```", content, re.DOTALL):
-        start_pos = content[: match.start()].count("\n") + 1
-        blocks.append((start_pos, match.group(1) or "", match.group(2)))
+    for match in re.finditer(r"```([^\n`]*)\n(.*?)\n```", content, re.DOTALL):
+        start_pos = content[: match.start()].count("\n") + 2
+        blocks.append((start_pos, (match.group(1) or "").strip(), match.group(2)))
     return blocks

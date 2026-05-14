@@ -7,7 +7,7 @@ from pathlib import Path
 
 def validate_skill_symlinks():
     """Ensure all skill directory symlinks point to .agents/skills/."""
-    root_dir = Path(__file__).parent.parent
+    root_dir = Path(__file__).resolve().parents[4]
     canonical_skills = root_dir / ".agents" / "skills"
 
     if not canonical_skills.exists():
@@ -23,7 +23,9 @@ def validate_skill_symlinks():
         name = f"{symlink_dir_name}/skills"
 
         if not skills_dir.exists() and not skills_dir.is_symlink():
-            print(f"⚠️  {name}: Not found at {skills_dir}")
+            print(f\"❌  {name}: Not found at {skills_dir}\")
+            all_valid = False
+            total_checked += 1
             continue
 
         if not skills_dir.is_symlink():

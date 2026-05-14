@@ -126,12 +126,28 @@ def synthesize_results(query: str, results: list[ResolvedResult], api_key: str, 
     if not should_call_llm_synthesis(results):
         return deterministic_merge(results)
 
-    context = "".join(
-        [
-            f"\nResult {i + 1}:\nURL: {res.url or 'unk'}\nContent: {res.content}\n---\n"
-            for i, res in enumerate(results)
-        ]
-    )
+    MAX_CONTEXT_CHARS = 100_000
+    current_len = 0
+    context_parts = []
+
+    for i, res in enumerate(results):
+        part = f"\nResult {i + 1}:\nURL: {res.url or 'unk'}\nContent: "
+        if current_len + len(part) >= MAX_CONTEXT_CHARS:
+            break
+
+        remaining = MAX_CONTEXT_CHARS - current_len - len(part) - len("\n---\n")
+
+        if res.content and len(res.content) > remaining:
+            part += res.content[:remaining] + "...[TRUNCATED]"
+            current_len += MAX_CONTEXT_CHARS
+        else:
+            part += res.content or ""
+            current_len += len(part)
+
+        part += "\n---\n"
+        context_parts.append(part)
+
+    context = "".join(context_parts)
 
     current_date = datetime.date.today().isoformat()
 

@@ -193,7 +193,14 @@ def resolve_direct(
         ProviderType.OCR: resolve_with_ocr,
     }
     if provider in funcs:
-        res = funcs[provider](input_str, max_chars)
+        if provider == ProviderType.LLMS_TXT:
+            res_str = fetch_llms_txt(input_str)
+            res = ResolvedResult(source="llms.txt", url=input_str, content=res_str[:max_chars] if res_str else "") if res_str else None
+        elif provider == ProviderType.DIRECT_FETCH:
+            res_str = fetch_url_content(input_str)
+            res = ResolvedResult(source="direct_fetch", url=input_str, content=res_str[:max_chars] if res_str else "") if res_str else None
+        else:
+            res = funcs[provider](input_str, max_chars)
         return res.to_dict() if res else {"source": "none", "error": "Provider failed"}
     return {"source": "none", "error": "Unknown provider"}
 

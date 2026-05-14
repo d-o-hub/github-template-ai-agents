@@ -7,7 +7,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 def fix_python_cli(report: Report) -> int:
     """Example fixer for Python CLI docs."""
-    return 0
+    raise NotImplementedError("Not implemented")
 
 
 def fix_cargo_features(report: Report) -> int:
@@ -15,7 +15,7 @@ def fix_cargo_features(report: Report) -> int:
     fixed = 0
     issues = [i for i in report.issues if i.category == "feature-sync"]
     if not issues:
-        return 0
+        raise NotImplementedError("Not implemented")
 
     cargo_toml = REPO_ROOT / "cli/Cargo.toml"
     rust_cli_md = REPO_ROOT / ".agents/skills/do-web-doc-resolver/references/RUST_CLI.md"
@@ -50,12 +50,12 @@ def fix_cargo_features(report: Report) -> int:
 
 def fix_duplicate_links(report: Report) -> int:
     """Remove duplicate links from README.md."""
-    return 0
+    raise NotImplementedError("Not implemented")
 
 
 def fix_repo_trees(report: Report) -> int:
     """Auto-fix repository trees in documentation."""
-    return 0
+    raise NotImplementedError("Not implemented")
 
 
 def fix_rust_architecture(report: Report) -> int:
@@ -63,7 +63,7 @@ def fix_rust_architecture(report: Report) -> int:
     fixed = 0
     issues = [i for i in report.issues if i.category == "arch-sync"]
     if not issues:
-        return 0
+        raise NotImplementedError("Not implemented")
 
     # Logic to update module descriptions based on filesystem
     return fixed

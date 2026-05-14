@@ -162,7 +162,7 @@ cython_debug/
 # Marimo
 marimo/_static/
 marimo/_lsp/
-__marmo__/
+__marimo__/
 
 # Blackbox
 .blackboxcli/

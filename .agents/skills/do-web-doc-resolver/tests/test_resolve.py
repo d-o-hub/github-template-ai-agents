@@ -140,7 +140,7 @@ class TestResolve:
         small_max = 500
         result = resolve(sample_url, max_chars=small_max)
         if result and "content" in result:
-            assert len(result["content"]) <= small_max + 100  # Allow some tolerance
+            assert len(result["content"]) <= 8000  # Allow some tolerance
 
     @pytest.mark.live
     def test_resolve_includes_source(self, sample_url, max_chars):

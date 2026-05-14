@@ -371,6 +371,9 @@ def resolve_with_mistral_websearch(query: str, max_chars: int = MAX_CHARS) -> Re
 
 
 def resolve_with_docling(url: str, max_chars: int) -> ResolvedResult | None:
+    if not is_safe_url(url):
+        logger.warning(f"SSRF: blocked URL {url}")
+        return None
     try:
         res = subprocess.run(
             ["docling", "--format", "markdown", url], capture_output=True, text=True, timeout=60
@@ -383,12 +386,23 @@ def resolve_with_docling(url: str, max_chars: int) -> ResolvedResult | None:
 
 
 def resolve_with_ocr(url: str, max_chars: int) -> ResolvedResult | None:
+    if not is_safe_url(url):
+        logger.warning(f"SSRF: blocked URL {url}")
+        return None
+    import tempfile
+    from scripts.utils import _safe_request
     try:
-        res = subprocess.run(
-            ["tesseract", url, "stdout"], capture_output=True, text=True, timeout=30
-        )
-        if res.returncode == 0:
-            return ResolvedResult(source="ocr-tesseract", content=res.stdout[:max_chars], url=url)
+        resp = _safe_request(url, timeout=30)
+        if not resp:
+            return None
+        with tempfile.NamedTemporaryFile() as tmp:
+            tmp.write(resp.content)
+            tmp.flush()
+            res = subprocess.run(
+                ["tesseract", tmp.name, "stdout"], capture_output=True, text=True, timeout=30
+            )
+            if res.returncode == 0:
+                return ResolvedResult(source="ocr-tesseract", content=res.stdout[:max_chars], url=url)
     except Exception:
         pass
     return None

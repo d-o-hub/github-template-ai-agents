@@ -432,27 +432,24 @@ def get_semantic_cache() -> SemanticCache | None:
     """
     global _semantic_cache_instance
 
-    if _semantic_cache_instance is None:
-        with _semantic_cache_lock:
-            if _semantic_cache_instance is None:
-                enabled = os.environ.get("DO_WDR_SEMANTIC_CACHE", "1") == "1"
-                if not enabled:
-                    logger.debug("Semantic cache disabled via DO_WDR_SEMANTIC_CACHE=0")
-                    return None
+    with _semantic_cache_lock:
+        if _semantic_cache_instance is None:
+            enabled = os.environ.get("DO_WDR_SEMANTIC_CACHE", "1") == "1"
+            if not enabled:
+                logger.debug("Semantic cache disabled via DO_WDR_SEMANTIC_CACHE=0")
+                return None
 
-                try:
-                    threshold = float(os.environ.get("DO_WDR_CACHE_THRESHOLD", "0.85"))
-                    max_entries = int(os.environ.get("DO_WDR_CACHE_MAX_ENTRIES", "10000"))
-                    _semantic_cache_instance = SemanticCache(
-                        threshold=threshold, max_entries=max_entries
-                    )
-                    if not _semantic_cache_instance.enabled:
-                        return None
-                except Exception as e:
-                    logger.warning("Failed to initialize semantic cache: %s", e)
-                    return None
+            try:
+                threshold = float(os.environ.get("DO_WDR_CACHE_THRESHOLD", "0.85"))
+                max_entries = int(os.environ.get("DO_WDR_CACHE_MAX_ENTRIES", "10000"))
+                _semantic_cache_instance = SemanticCache(
+                    threshold=threshold, max_entries=max_entries
+                )
+            except Exception as e:
+                logger.warning("Failed to initialize semantic cache: %s", e)
+                return None
 
-    return _semantic_cache_instance if _semantic_cache_instance.enabled else None
+        return _semantic_cache_instance if _semantic_cache_instance and _semantic_cache_instance.enabled else None
 
 
 def reset_semantic_cache() -> None:

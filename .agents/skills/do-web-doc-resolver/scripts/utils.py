@@ -621,25 +621,23 @@ def get_ttl(provider: str, config: dict | None = None) -> int:
 def _get_from_cache(input_str: str, source: str) -> dict[str, Any] | None:
     with _cache_lock:
         cache = _get_cache()
-    if not cache:
-        return None
-    with _cache_lock:
+        if not cache:
+            return None
         result = cache.get(_cache_key(input_str, source))
-    if result is None:
-        return None
-    return dict(result)
+        if result is None:
+            return None
+        return dict(result)
 
 
 def _save_to_cache(input_str: str, source: str, result: dict[str, Any], ttl: int | None = None):
     with _cache_lock:
         cache = _get_cache()
-    if not cache:
-        return
+        if not cache:
+            return
 
-    if ttl is None:
-        ttl = get_ttl(source)
+        if ttl is None:
+            ttl = get_ttl(source)
 
-    with _cache_lock:
         cache.set(_cache_key(input_str, source), result, expire=ttl)
 
 

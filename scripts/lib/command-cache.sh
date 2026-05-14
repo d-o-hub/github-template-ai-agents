@@ -24,7 +24,7 @@ get_last_commit() {
     if [ -f "$LAST_COMMIT_FILE" ]; then
         cat "$LAST_COMMIT_FILE"
     else
-        printf ""
+        echo ""
     fi
 }
 
@@ -33,7 +33,7 @@ save_current_commit() {
     if command -v git &> /dev/null && git rev-parse --git-dir &> /dev/null; then
         git rev-parse HEAD > "$LAST_COMMIT_FILE"
     else
-        printf "no-git-repo\n" > "$LAST_COMMIT_FILE"
+        echo "no-git-repo" > "$LAST_COMMIT_FILE"
     fi
 }
 
@@ -59,9 +59,9 @@ should_invalidate_command() {
     local changed_files="$2"
 
     local cmd
-    cmd=$(printf "%s\n" "$cmd_json" | jq -r '.command')
+    cmd=$(echo "$cmd_json" | jq -r '.command')
     local file
-    file=$(printf "%s\n" "$cmd_json" | jq -r '.file')
+    file=$(echo "$cmd_json" | jq -r '.file')
 
     # Use a loop that handles spaces in filenames if needed, though here changed_files is space-separated
     for changed in $changed_files; do
@@ -85,15 +85,15 @@ should_invalidate_command() {
 get_cache_path() {
     local cmd_json="$1"
     local file
-    file=$(printf "%s\n" "$cmd_json" | jq -r '.file // "unknown"')
+    file=$(echo "$cmd_json" | jq -r '.file // "unknown"')
     local line
-    line=$(printf "%s\n" "$cmd_json" | jq -r '.line // 0')
+    line=$(echo "$cmd_json" | jq -r '.line // 0')
 
     # Sanitize file path for use in directory structure
     local safe_file
-    safe_file=$(printf "%s\n" "$file" | sed 's|^./||' | tr '/' '_')
+    safe_file=$(echo "$file" | sed 's|^./||' | tr '/' '_')
 
-    printf "%s/%s_line_%s.json\n" "$COMMANDS_CACHE_DIR" "$safe_file" "$line"
+    echo "$COMMANDS_CACHE_DIR/${safe_file}_line_${line}.json"
 }
 
 # Get cached validation result
@@ -104,7 +104,7 @@ get_cached_result() {
     if [ -f "$cache_file" ]; then
         cat "$cache_file"
     else
-        printf ""
+        echo ""
     fi
 }
 
@@ -116,12 +116,12 @@ save_cached_result() {
     local cache_file
     cache_file=$(get_cache_path "$cmd_json")
     mkdir -p "$(dirname "$cache_file")"
-    printf "%s\n" "$result" > "$cache_file"
+    echo "$result" > "$cache_file"
 
     # Log to audit trail and rotate
     local cmd
-    cmd=$(printf "%s\n" "$cmd_json" | jq -r '.command')
-    printf "%s CACHED: %s\n" "$(date -Iseconds)" "$cmd" >> "$AUDIT_LOG"
+    cmd=$(echo "$cmd_json" | jq -r '.command')
+    echo "$(date -Iseconds) CACHED: $cmd" >> "$AUDIT_LOG"
 
     if [ "$(wc -l < "$AUDIT_LOG")" -gt "$MAX_AUDIT_LOG_LINES" ]; then
         tail -n "$MAX_AUDIT_LOG_LINES" "$AUDIT_LOG" > "${AUDIT_LOG}.tmp" && mv "${AUDIT_LOG}.tmp" "$AUDIT_LOG"
@@ -133,7 +133,7 @@ clear_cache() {
     rm -rf "$COMMANDS_CACHE_DIR"/*
     rm -f "$LAST_COMMIT_FILE"
     rm -f "$MANIFEST_FILE"
-    printf "%s CACHE_CLEARED\n" "$(date -Iseconds)" >> "$AUDIT_LOG"
+    echo "$(date -Iseconds) CACHE_CLEARED" >> "$AUDIT_LOG"
 }
 
 export -f init_cache get_last_commit save_current_commit get_changed_files should_invalidate_command get_cached_result save_cached_result clear_cache
