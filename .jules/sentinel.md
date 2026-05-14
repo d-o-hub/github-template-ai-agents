@@ -47,3 +47,11 @@
 **Learning:** Unquoted heredocs in Bash are treated like double-quoted strings, performing expansion and substitution on their content. Using `echo` with untrusted variables allows those variables to be interpreted as command flags.
 
 **Prevention:** Use `printf` or quoted heredocs (`<< 'EOF'`) when incorporating variables into multi-line output to prevent shell expansion. Replace all `echo "$VAR"` with `printf "%s\n" "$VAR"` to ensure variables are treated as literal data.
+
+## 2026-05-14 - Structural and Option Injection in Utility Scripts
+
+**Vulnerability:** `scripts/health-check.sh`, `scripts/self-fix-loop.sh`, and `scripts/discover-commands.sh` used `echo -e` or `echo` with untrusted variables, allowing structural injection (via newlines/ANSI escapes) and option injection (via leading hyphens).
+
+**Learning:** `echo -e` behaves inconsistently across shells and interprets escape sequences within the variable content itself, not just the format string. This allows malicious input to spoof script output or manipulate logging. `echo` also interprets arguments starting with `-` as options.
+
+**Prevention:** Always use `printf` with a literal format string (e.g., `printf "%s\n" "$VAR"`) to ensure variables are treated as literal data and cannot be interpreted as command options or escape sequences.
