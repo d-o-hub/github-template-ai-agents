@@ -13,7 +13,6 @@ source "$REPO_ROOT/scripts/lib/skill-validation.sh"
 
 CLI_SKILL_DIRS=(
   ".claude/skills"
-  ".gemini/skills"
   ".qwen/skills"
 )
 

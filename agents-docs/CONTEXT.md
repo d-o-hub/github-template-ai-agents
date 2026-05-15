@@ -44,8 +44,8 @@ AGENTS.md (concise, universal)
 For efficient retrieval of past project knowledge, use the `memory-context` skill (`csm` CLI) instead of loading the entire `LESSONS.md` file.
 
 All skills are canonical in `.agents/skills/`.
-Claude Code, Gemini CLI, and Qwen Code use symlinks (`.claude/skills/`, `.gemini/skills/`, `.qwen/skills/`);
-OpenCode reads directly from `.agents/skills/`.
+Claude Code and Qwen Code use symlinks (`.claude/skills/`, `.qwen/skills/`);
+OpenCode and Gemini CLI read directly from `.agents/skills/`.
 Run `./scripts/setup-skills.sh` to create symlinks for Claude Code, Gemini CLI, and Qwen Code.
 
 ## Anti-Patterns

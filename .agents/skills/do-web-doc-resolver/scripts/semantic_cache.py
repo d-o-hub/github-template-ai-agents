@@ -9,7 +9,6 @@ import json
 import logging
 import os
 import struct
-import threading
 import time
 from dataclasses import dataclass, field
 from typing import Any, cast
@@ -94,7 +93,6 @@ class SemanticCache:
         os.makedirs(self.cache_dir, exist_ok=True)
 
         self.db_path = os.path.join(self.cache_dir, "semantic_cache.db")
-        self._conn_lock = threading.RLock()
 
         # Try to initialize - failures disable the cache gracefully
         try:
@@ -108,7 +106,7 @@ class SemanticCache:
 
     def _init_db(self) -> None:
         """Initialize sqlite-vec extension and database schema."""
-        self._conn = sqlite3.connect(self.db_path, check_same_thread=False)
+        self._conn = sqlite3.connect(self.db_path)
         self._conn.row_factory = sqlite3.Row
 
         # Try to load sqlite-vec extension
@@ -200,13 +198,14 @@ class SemanticCache:
         if self._embedding_dimension is None:
             return
 
-        with self._conn_lock:
-            self._conn.execute(f"""
-                CREATE VIRTUAL TABLE IF NOT EXISTS vec_cache USING vec0(
-                    embedding float[{self._embedding_dimension}]
-                )
-            """)
-            self._conn.commit()
+        # Create virtual table with float32 embeddings
+        # We use the implicit rowid to link to cache_entries.id
+        self._conn.execute(f"""
+            CREATE VIRTUAL TABLE IF NOT EXISTS vec_cache USING vec0(
+                embedding float[{self._embedding_dimension}]
+            )
+        """)
+        self._conn.commit()
 
     def _embedding_to_blob(self, embedding: list[float]) -> bytes:
         """Convert list of floats to binary blob for sqlite-vec."""
@@ -231,47 +230,64 @@ class SemanticCache:
         return cast(list[float], embedding.tolist())
 
     def query(self, query_str: str) -> SemanticCacheEntry | None:
+        """
+        Query the semantic cache for similar entries.
+
+        Args:
+            query_str: Query string to search for
+
+        Returns:
+            SemanticCacheEntry if similar entry found above threshold, None otherwise
+        """
         if not self.enabled:
             return None
 
         try:
+            # Compute query embedding
             query_embedding = self._compute_embedding(query_str)
             embedding_blob = self._embedding_to_blob(query_embedding)
 
-            with self._conn_lock:
-                cursor = self._conn.execute(
-                    """
-                    SELECT ce.id, ce.query, ce.result_json, ce.timestamp, vc.distance
-                    FROM vec_cache vc
-                    JOIN cache_entries ce ON ce.id = vc.rowid
-                    WHERE embedding MATCH ?
-                    AND k = 1
-                """,
-                    (embedding_blob,),
+            # Search for similar vectors using cosine similarity
+            # sqlite-vec returns distance (1 - similarity for cosine)
+            cursor = self._conn.execute(
+                """
+                SELECT ce.id, ce.query, ce.result_json, ce.timestamp, vc.distance
+                FROM vec_cache vc
+                JOIN cache_entries ce ON ce.id = vc.rowid
+                WHERE embedding MATCH ?
+                AND k = 1
+            """,
+                (embedding_blob,),
+            )
+
+            row = cursor.fetchone()
+            if row is None:
+                return None
+
+            # Convert distance to similarity
+            # Since we use normalized embeddings, sqlite-vec uses L2 distance by default
+            # cosine_similarity = 1 - (L2_distance^2 / 2)
+            distance = row["distance"]
+            if distance is None:
+                distance = (
+                    2.0  # Max L2 distance for normalized vectors is sqrt(2^2) = 2.0? No, it's 2.
                 )
 
-                row = cursor.fetchone()
-                if row is None:
-                    return None
+            similarity = 1.0 - (distance * distance / 2.0)
 
-                distance = row["distance"]
-                if distance is None:
-                    distance = 2.0
+            if similarity < self.threshold:
+                return None
 
-                similarity = 1.0 - (distance * distance / 2.0)
-
-                if similarity < self.threshold:
-                    return None
-
-                self._conn.execute(
-                    """
-                    UPDATE cache_entries
-                    SET access_count = access_count + 1, last_accessed = ?
-                    WHERE id = ?
-                """,
-                    (time.time(), row["id"]),
-                )
-                self._conn.commit()
+            # Update access stats
+            self._conn.execute(
+                """
+                UPDATE cache_entries
+                SET access_count = access_count + 1, last_accessed = ?
+                WHERE id = ?
+            """,
+                (time.time(), row["id"]),
+            )
+            self._conn.commit()
 
             result = json.loads(row["result_json"])
 
@@ -287,45 +303,60 @@ class SemanticCache:
             return None
 
     def store(self, query_str: str, result: dict[str, Any]) -> bool:
+        """
+        Store a result in the semantic cache.
+
+        Args:
+            query_str: Original query string
+            result: Result dictionary to cache
+
+        Returns:
+            True if stored successfully, False otherwise
+        """
         if not self.enabled:
             return False
 
         try:
+            # Compute embedding
             embedding = self._compute_embedding(query_str)
             embedding_blob = self._embedding_to_blob(embedding)
 
-            with self._conn_lock:
-                cursor = self._conn.execute(
-                    "SELECT id FROM cache_entries WHERE query = ?",
-                    (query_str,),
-                )
-                old_row = cursor.fetchone()
-                if old_row:
-                    old_id = old_row["id"]
-                    self._conn.execute("DELETE FROM vec_cache WHERE rowid = ?", (old_id,))
-                    self._conn.execute("DELETE FROM cache_entries WHERE id = ?", (old_id,))
+            # Check for existing entry and delete if present
+            # Virtual tables (vec0) don't support REPLACE well, so we delete manually
+            cursor = self._conn.execute(
+                "SELECT id FROM cache_entries WHERE query = ?",
+                (query_str,),
+            )
+            old_row = cursor.fetchone()
+            if old_row:
+                old_id = old_row["id"]
+                self._conn.execute("DELETE FROM vec_cache WHERE rowid = ?", (old_id,))
+                self._conn.execute("DELETE FROM cache_entries WHERE id = ?", (old_id,))
 
-                cursor = self._conn.execute(
-                    """
-                    INSERT INTO cache_entries
-                    (query, result_json, timestamp, last_accessed)
-                    VALUES (?, ?, ?, ?)
-                """,
-                    (query_str, json.dumps(result), time.time(), time.time()),
-                )
-                entry_id = cursor.lastrowid
+            # Insert into main table
+            cursor = self._conn.execute(
+                """
+                INSERT INTO cache_entries
+                (query, result_json, timestamp, last_accessed)
+                VALUES (?, ?, ?, ?)
+            """,
+                (query_str, json.dumps(result), time.time(), time.time()),
+            )
+            entry_id = cursor.lastrowid
 
-                self._conn.execute(
-                    """
-                    INSERT INTO vec_cache (rowid, embedding)
-                    VALUES (?, ?)
-                """,
-                    (entry_id, embedding_blob),
-                )
+            # Insert into vector table using the same ID as rowid
+            self._conn.execute(
+                """
+                INSERT INTO vec_cache (rowid, embedding)
+                VALUES (?, ?)
+            """,
+                (entry_id, embedding_blob),
+            )
 
-                self._conn.commit()
+            self._conn.commit()
 
-                self._maybe_evict()
+            # Evict old entries if over limit
+            self._maybe_evict()
 
             return True
 
@@ -334,11 +365,14 @@ class SemanticCache:
             return False
 
     def _maybe_evict(self) -> None:
+        """Evict oldest entries if cache exceeds max_entries limit."""
         try:
+            # Count entries
             cursor = self._conn.execute("SELECT COUNT(*) as count FROM cache_entries")
             count = cursor.fetchone()["count"]
 
             if count > self.max_entries:
+                # Delete oldest entries (by last_accessed)
                 to_delete = count - self.max_entries
                 cursor = self._conn.execute(
                     """
@@ -361,20 +395,25 @@ class SemanticCache:
             logger.warning("Cache eviction failed: %s", e)
 
     def close(self) -> None:
+        """Close database connection."""
         if hasattr(self, "_conn") and self._conn:
-            with self._conn_lock:
-                self._conn.close()
-                self._conn = None
+            self._conn.close()
+            self._conn = None
 
     def clear(self) -> bool:
+        """
+        Clear all cached entries.
+
+        Returns:
+            True if cleared successfully, False otherwise
+        """
         if not self.enabled:
             return False
 
         try:
-            with self._conn_lock:
-                self._conn.execute("DELETE FROM vec_cache")
-                self._conn.execute("DELETE FROM cache_entries")
-                self._conn.commit()
+            self._conn.execute("DELETE FROM vec_cache")
+            self._conn.execute("DELETE FROM cache_entries")
+            self._conn.commit()
             logger.info("Semantic cache cleared")
             return True
         except Exception as e:
@@ -382,18 +421,21 @@ class SemanticCache:
             return False
 
     def stats(self) -> dict[str, Any]:
+        """
+        Get cache statistics.
+
+        Returns:
+            Dictionary with cache statistics
+        """
         if not self.enabled:
             return {"enabled": False}
 
         try:
-            with self._conn_lock:
-                cursor = self._conn.execute("SELECT COUNT(*) as count FROM cache_entries")
-                total_entries = cursor.fetchone()["count"]
+            cursor = self._conn.execute("SELECT COUNT(*) as count FROM cache_entries")
+            total_entries = cursor.fetchone()["count"]
 
-                cursor = self._conn.execute(
-                    "SELECT AVG(access_count) as avg_access FROM cache_entries"
-                )
-                avg_access = cursor.fetchone()["avg_access"] or 0
+            cursor = self._conn.execute("SELECT AVG(access_count) as avg_access FROM cache_entries")
+            avg_access = cursor.fetchone()["avg_access"] or 0
 
             return {
                 "enabled": True,
@@ -420,7 +462,6 @@ class SemanticCache:
 
 # Global singleton instance
 _semantic_cache_instance: SemanticCache | None = None
-_semantic_cache_lock = threading.Lock()
 
 
 def get_semantic_cache() -> SemanticCache | None:
@@ -432,30 +473,29 @@ def get_semantic_cache() -> SemanticCache | None:
     """
     global _semantic_cache_instance
 
-    with _semantic_cache_lock:
-        if _semantic_cache_instance is None:
-            enabled = os.environ.get("DO_WDR_SEMANTIC_CACHE", "1") == "1"
-            if not enabled:
-                logger.debug("Semantic cache disabled via DO_WDR_SEMANTIC_CACHE=0")
-                return None
+    if _semantic_cache_instance is None:
+        # Check if enabled via environment
+        enabled = os.environ.get("DO_WDR_SEMANTIC_CACHE", "1") == "1"
+        if not enabled:
+            logger.debug("Semantic cache disabled via DO_WDR_SEMANTIC_CACHE=0")
+            return None
 
-            try:
-                threshold = float(os.environ.get("DO_WDR_CACHE_THRESHOLD", "0.85"))
-                max_entries = int(os.environ.get("DO_WDR_CACHE_MAX_ENTRIES", "10000"))
-                _semantic_cache_instance = SemanticCache(
-                    threshold=threshold, max_entries=max_entries
-                )
-            except Exception as e:
-                logger.warning("Failed to initialize semantic cache: %s", e)
+        try:
+            threshold = float(os.environ.get("DO_WDR_CACHE_THRESHOLD", "0.85"))
+            max_entries = int(os.environ.get("DO_WDR_CACHE_MAX_ENTRIES", "10000"))
+            _semantic_cache_instance = SemanticCache(threshold=threshold, max_entries=max_entries)
+            if not _semantic_cache_instance.enabled:
                 return None
+        except Exception as e:
+            logger.warning("Failed to initialize semantic cache: %s", e)
+            return None
 
-        return _semantic_cache_instance if _semantic_cache_instance and _semantic_cache_instance.enabled else None
+    return _semantic_cache_instance if _semantic_cache_instance.enabled else None
 
 
 def reset_semantic_cache() -> None:
     """Reset the global semantic cache instance (mainly for testing)."""
     global _semantic_cache_instance
-    with _semantic_cache_lock:
-        if _semantic_cache_instance:
-            _semantic_cache_instance.close()
-        _semantic_cache_instance = None
+    if _semantic_cache_instance:
+        _semantic_cache_instance.close()
+    _semantic_cache_instance = None

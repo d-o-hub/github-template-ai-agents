@@ -72,7 +72,6 @@ This document catalogs all new skills, commands, and changes that have been succ
 ### Symlinks Created
 All new skills have symlinks for:
 - Claude Code (`.claude/skills/`)
-- Gemini CLI (`.gemini/skills/`)
 
 ---
 
@@ -300,7 +299,6 @@ scripts/
 ### Symlinks (All Agents)
 ```
 .claude/skills/    [6 new symlinks]
-.gemini/skills/    [6 new symlinks]
 ```
 
 ---

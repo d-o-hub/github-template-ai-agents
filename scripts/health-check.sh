@@ -47,7 +47,7 @@ check_command() {
             *) version="installed" ;;
         esac
 
-        echo -e "${GREEN}✓${NC} $cmd: $version"
+        printf "${GREEN}✓${NC} %s: %s\n" "$cmd" "$version"
 
         if [[ -n "$min_version" ]]; then
             # Version comparison would go here
@@ -56,10 +56,10 @@ check_command() {
         return 0
     else
         if [[ "$required" == "true" ]]; then
-            echo -e "${RED}✗${NC} $cmd: ${RED}REQUIRED but not found${NC}"
+            printf "${RED}✗${NC} %s: ${RED}REQUIRED but not found${NC}\n" "$cmd"
             ((REQUIRED_MISSING++))
         else
-            echo -e "${YELLOW}⚠${NC} $cmd: ${YELLOW}optional, not found${NC}"
+            printf "${YELLOW}⚠${NC} %s: ${YELLOW}optional, not found${NC}\n" "$cmd"
             ((OPTIONAL_MISSING++))
         fi
         return 1
@@ -74,9 +74,9 @@ echo ""
 
 # Check Bash version
 echo "Shell Environment:"
-echo "  Bash version: ${BASH_VERSION}"
+printf "  Bash version: %s\n" "${BASH_VERSION}"
 if [[ "${BASH_VERSINFO[0]}" -lt 4 ]]; then
-    echo -e "  ${YELLOW}⚠ Warning: Bash 4.0+ recommended${NC}"
+    printf "  ${YELLOW}⚠ Warning: Bash 4.0+ recommended${NC}\n"
 fi
 echo ""
 
@@ -98,15 +98,15 @@ check_command "yamllint" "false"
 echo ""
 echo "Git Configuration:"
 if git config --global user.name &>/dev/null; then
-    echo -e "  ${GREEN}✓${NC} user.name: $(git config --global user.name)"
+    printf "  ${GREEN}✓${NC} user.name: %s\n" "$(git config --global user.name)"
 else
-    echo -e "  ${YELLOW}⚠${NC} user.name: ${YELLOW}not set${NC}"
+    printf "  ${YELLOW}⚠${NC} user.name: ${YELLOW}not set${NC}\n"
 fi
 
 if git config --global user.email &>/dev/null; then
-    echo -e "  ${GREEN}✓${NC} user.email: $(git config --global user.email)"
+    printf "  ${GREEN}✓${NC} user.email: %s\n" "$(git config --global user.email)"
 else
-    echo -e "  ${YELLOW}⚠${NC} user.email: ${YELLOW}not set${NC}"
+    printf "  ${YELLOW}⚠${NC} user.email: ${YELLOW}not set${NC}\n"
 fi
 
 # Check for global hooks that might conflict
@@ -114,10 +114,10 @@ echo ""
 echo "Git Hooks Configuration:"
 if git config --global core.hooksPath &>/dev/null; then
     hooks_path=$(git config --global core.hooksPath)
-    echo -e "  ${YELLOW}⚠${NC} Global hooks detected: $hooks_path"
-    echo -e "     Run: git config --global --unset core.hooksPath"
+    printf "  ${YELLOW}⚠${NC} Global hooks detected: %s\n" "$hooks_path"
+    printf "     Run: git config --global --unset core.hooksPath\n"
 else
-    echo -e "  ${GREEN}✓${NC} No conflicting global hooks"
+    printf "  ${GREEN}✓${NC} No conflicting global hooks\n"
 fi
 
 # Check template setup
@@ -125,35 +125,30 @@ echo ""
 echo "Template Setup:"
 if [[ -d ".agents/skills" ]]; then
     skill_count=$(find .agents/skills -maxdepth 1 -type d | wc -l)
-    echo -e "  ${GREEN}✓${NC} Skills directory exists ($skill_count skills)"
+    printf "  ${GREEN}✓${NC} Skills directory exists (%s skills)\n" "$skill_count"
 else
-    echo -e "  ${RED}✗${NC} Skills directory not found - run ./scripts/setup-skills.sh"
+    printf "  ${RED}✗${NC} Skills directory not found - run ./scripts/setup-skills.sh\n"
 fi
 
 if [[ -L ".claude/skills" ]]; then
-    echo -e "  ${GREEN}✓${NC} Claude symlinks configured"
+    printf "  ${GREEN}✓${NC} Claude symlinks configured\n"
 else
-    echo -e "  ${YELLOW}⚠${NC} Claude symlinks missing - run ./scripts/setup-skills.sh"
+    printf "  ${YELLOW}⚠${NC} Claude symlinks missing - run ./scripts/setup-skills.sh\n"
 fi
 
-if [[ -L ".gemini/skills" ]]; then
-    echo -e "  ${GREEN}✓${NC} Gemini symlinks configured"
-else
-    echo -e "  ${YELLOW}⚠${NC} Gemini symlinks missing - run ./scripts/setup-skills.sh"
-fi
 
 if [[ -f ".git/hooks/pre-commit" ]]; then
-    echo -e "  ${GREEN}✓${NC} Pre-commit hook installed"
+    printf "  ${GREEN}✓${NC} Pre-commit hook installed\n"
 else
-    echo -e "  ${YELLOW}⚠${NC} Pre-commit hook not installed"
-    echo -e "     Run: cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit"
+    printf "  ${YELLOW}⚠${NC} Pre-commit hook not installed\n"
+    printf "     Run: cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit\n"
 fi
 
 # Summary
 echo ""
 echo "════════════════════════════════════════════════════════════════"
 if [[ $REQUIRED_MISSING -gt 0 ]]; then
-    echo -e "${RED}Status: FAILED - $REQUIRED_MISSING required tool(s) missing${NC}"
+    printf "${RED}Status: FAILED - %s required tool(s) missing${NC}\n" "$REQUIRED_MISSING"
     echo ""
     echo "Install missing tools:"
     echo "  Ubuntu/Debian: sudo apt-get install git bash"
@@ -161,7 +156,7 @@ if [[ $REQUIRED_MISSING -gt 0 ]]; then
     echo ""
     exit 2
 elif [[ $OPTIONAL_MISSING -gt 0 ]]; then
-    echo -e "${YELLOW}Status: WARNING - $OPTIONAL_MISSING optional tool(s) missing${NC}"
+    printf "${YELLOW}Status: WARNING - %s optional tool(s) missing${NC}\n" "$OPTIONAL_MISSING"
     echo ""
     echo "To install optional tools:"
     echo "  Ubuntu/Debian:"
@@ -174,7 +169,7 @@ elif [[ $OPTIONAL_MISSING -gt 0 ]]; then
     echo ""
     exit 1
 else
-    echo -e "${GREEN}Status: HEALTHY - All tools present${NC}"
+    printf "${GREEN}Status: HEALTHY - All tools present${NC}\n"
     echo ""
     echo "You're ready to use the template! Next steps:"
     echo "  1. Run: ./scripts/setup-skills.sh"
