@@ -81,32 +81,32 @@ init_cache 2>/dev/null || true
 
 # PHASE 1: Command Discovery
 if ! $SILENT; then
-    echo -e "${BLUE}📚 PHASE 1: Command Discovery${NC}"
+    printf "${BLUE}📚 PHASE 1: Command Discovery${NC}\n"
 fi
 
 DISCOVERED_COMMANDS=""
 if [ -x "./scripts/discover-commands.sh" ]; then
-    DISCOVERED_COMMANDS=$(./scripts/discover-commands.sh 2>/dev/null | grep -v "^Discovering\|^Command\|^─\|^\$" || echo "")
+    DISCOVERED_COMMANDS=$(./scripts/discover-commands.sh 2>/dev/null | grep -v "^Discovering\|^Command\|^─\|^\$" || printf "")
 fi
 
 COMMAND_COUNT=0
 if [ -n "$DISCOVERED_COMMANDS" ]; then
-    COMMAND_COUNT=$(echo "$DISCOVERED_COMMANDS" | grep -c . || echo 0)
+    COMMAND_COUNT=$(printf "%s\n" "$DISCOVERED_COMMANDS" | grep -c . || printf "0")
 fi
 
 if ! $SILENT; then
-    echo -e "${GREEN}✓ Discovered $COMMAND_COUNT commands${NC}"
-    echo ""
+    printf "${GREEN}✓ Discovered %s commands${NC}\n" "$COMMAND_COUNT"
+    printf "\n"
 fi
 
 # PHASE 2: Cache Check
 if ! $SILENT; then
-    echo -e "${BLUE}🔄 PHASE 2: Cache Check${NC}"
+    printf "${BLUE}🔄 PHASE 2: Cache Check${NC}\n"
 fi
 
 if $FORCE; then
     if ! $SILENT; then
-        echo -e "${YELLOW}⚡ Force mode: Clearing cache...${NC}"
+        printf "${YELLOW}⚡ Force mode: Clearing cache...${NC}\n"
     fi
     clear_cache 2>/dev/null || true
 fi
@@ -114,15 +114,15 @@ fi
 # Get changed files
 CHANGED_FILES=""
 if type get_changed_files &> /dev/null; then
-    CHANGED_FILES=$(get_changed_files 2>/dev/null || echo "")
+    CHANGED_FILES=$(get_changed_files 2>/dev/null || printf "")
 fi
 CHANGED_COUNT=0
 if [ -n "$CHANGED_FILES" ]; then
-    CHANGED_COUNT=$(echo "$CHANGED_FILES" | grep -c . || echo 0)
+    CHANGED_COUNT=$(printf "%s\n" "$CHANGED_FILES" | grep -c . || printf "0")
 fi
 
 if ! $SILENT; then
-    echo -e "${GREEN}✓ Changed files since last validation: $CHANGED_COUNT${NC}"
+    printf "${GREEN}✓ Changed files since last validation: %s${NC}\n" "$CHANGED_COUNT"
 fi
 
 # PHASE 3: Validation
@@ -136,13 +136,13 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
         [ -z "$cmd_entry" ] && continue
 
         # Extract command from JSON
-        cmd=$(echo "$cmd_entry" | jq -r '.command' 2>/dev/null || echo "")
+        cmd=$(printf "%s\n" "$cmd_entry" | jq -r '.command' 2>/dev/null || printf "")
         [ -z "$cmd" ] || [ "$cmd" = "null" ] && continue
 
         # Check cache first
         CACHED=false
         if ! $FORCE && type get_cached_result &> /dev/null; then
-            cached_result=$(get_cached_result "$cmd_entry" 2>/dev/null || echo "")
+            cached_result=$(get_cached_result "$cmd_entry" 2>/dev/null || printf "")
             if [ -n "$cached_result" ]; then
                 # Check if this command needs invalidation
                 if type should_invalidate_command &> /dev/null; then
@@ -151,7 +151,7 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
                         CACHED=true
 
                         # Extract category from cached result
-                        cached_cat=$(echo "$cached_result" | jq -r --arg unknown "$UNKNOWN_CATEGORY" '.category // $unknown' 2>/dev/null || echo "$UNKNOWN_CATEGORY")
+                        cached_cat=$(printf "%s\n" "$cached_result" | jq -r --arg unknown "$UNKNOWN_CATEGORY" '.category // $unknown' 2>/dev/null || printf "%s\n" "$UNKNOWN_CATEGORY")
 
                         # Security: Validate category against whitelist to prevent injection in arithmetic expansion
                         if [[ ! "$cached_cat" =~ ^(safe|conditional|dangerous|$UNKNOWN_CATEGORY)$ ]]; then
@@ -174,7 +174,7 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
         # Validate command (categorize only, don't execute)
         category="$UNKNOWN_CATEGORY"
         if type categorize_command &> /dev/null; then
-            category=$(categorize_command "$cmd" 2>/dev/null || echo "$UNKNOWN_CATEGORY")
+            category=$(categorize_command "$cmd" 2>/dev/null || printf "%s\n" "$UNKNOWN_CATEGORY")
         fi
 
         # Security: Validate category against whitelist to prevent injection in arithmetic expansion
@@ -227,45 +227,45 @@ if $JSON_OUTPUT; then
 EOF
 else
     if ! $SILENT; then
-        echo ""
-        echo -e "${BLUE}📊 Results:${NC}"
-        echo "  Total commands:    $COMMAND_COUNT"
-        echo "  Validated now:     $VALIDATED"
-        echo "  From cache:        $CACHE_HITS"
-        echo ""
-        echo "  Categories:"
-        echo -e "    Safe:          ${GREEN}$TOTAL_SAFE${NC}"
-        echo -e "    Conditional:   ${YELLOW}$TOTAL_CONDITIONAL${NC}"
-        echo -e "    Dangerous:     ${RED}$TOTAL_DANGEROUS${NC}"
-        echo -e "    Unknown:       $TOTAL_UNKNOWN"
+        printf "\n"
+        printf "${BLUE}📊 Results:${NC}\n"
+        printf "  Total commands:    %s\n" "$COMMAND_COUNT"
+        printf "  Validated now:     %s\n" "$VALIDATED"
+        printf "  From cache:        %s\n" "$CACHE_HITS"
+        printf "\n"
+        printf "  Categories:\n"
+        printf "    Safe:          ${GREEN}%s${NC}\n" "$TOTAL_SAFE"
+        printf "    Conditional:   ${YELLOW}%s${NC}\n" "$TOTAL_CONDITIONAL"
+        printf "    Dangerous:     ${RED}%s${NC}\n" "$TOTAL_DANGEROUS"
+        printf "    Unknown:       %s\n" "$TOTAL_UNKNOWN"
 
         if [ ${#FAILED_COMMANDS[@]} -gt 0 ]; then
-            echo ""
-            echo -e "${RED}⚠️  Dangerous commands found:${NC}"
+            printf "\n"
+            printf "${RED}⚠️  Dangerous commands found:${NC}\n"
             for cmd in "${FAILED_COMMANDS[@]}"; do
-                echo -e "  ${RED}- $cmd${NC}"
+                printf "  ${RED}- %s${NC}\n" "$cmd"
             done
         fi
 
-        echo ""
+        printf "\n"
         if [ ${#FAILED_COMMANDS[@]} -eq 0 ]; then
-            echo -e "${GREEN}✅ All commands validated successfully${NC}"
+            printf "${GREEN}✅ All commands validated successfully${NC}\n"
         else
-            echo -e "${YELLOW}❌ Review required for ${#FAILED_COMMANDS[@]} dangerous commands${NC}"
+            printf "${YELLOW}❌ Review required for %s dangerous commands${NC}\n" "${#FAILED_COMMANDS[@]}"
         fi
     fi
 fi
 
 # Show stats if requested
 if $STATS && ! $JSON_OUTPUT; then
-    echo ""
-    echo -e "${BLUE}=== Cache Statistics ===${NC}"
+    printf "\n"
+    printf "${BLUE}=== Cache Statistics ===${NC}\n"
     if type get_cache_stats &> /dev/null; then
-        get_cache_stats 2>/dev/null || echo "Cache stats unavailable"
+        get_cache_stats 2>/dev/null || printf "Cache stats unavailable\n"
     fi
-    echo ""
+    printf "\n"
     # Security: Pass variables to awk using -v to prevent injection
-    echo "Cache hit rate: $(awk -v count="$COMMAND_COUNT" -v hits="$CACHE_HITS" 'BEGIN {if (count > 0) printf "%.1f", (hits/count)*100; else print "0.0"}')%"
+    printf "Cache hit rate: %s%%\n" "$(awk -v count="$COMMAND_COUNT" -v hits="$CACHE_HITS" 'BEGIN {if (count > 0) printf "%.1f", (hits/count)*100; else print "0.0"}')"
 fi
 
 # Save current commit
