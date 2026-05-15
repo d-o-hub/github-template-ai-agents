@@ -140,7 +140,7 @@ class TestResolve:
         small_max = 500
         result = resolve(sample_url, max_chars=small_max)
         if result and "content" in result:
-            assert len(result["content"]) <= 8000  # Allow some tolerance
+            assert len(result["content"]) <= 8000  # Providers may fall back to MAX_CHARS
 
     @pytest.mark.live
     def test_resolve_includes_source(self, sample_url, max_chars):
@@ -179,9 +179,12 @@ class TestResolveQuality:
     def test_resolved_content_above_min_chars(self, sample_url, max_chars):
         """Resolved content should typically be above MIN_CHARS."""
         result = resolve(sample_url, max_chars=max_chars)
-        if result and "content" in result:
-            # Most successful resolutions should exceed MIN_CHARS
-            assert len(result["content"]) >= MIN_CHARS or result["content"] == "" or result["content"] == "Failed" or "error" in result
+        assert result and "content" in result
+        if result["content"] in ("", "Failed") or "error" in result:
+            import pytest
+            pytest.skip("Known failure case")
+        else:
+            assert len(result["content"]) >= MIN_CHARS
 
     @pytest.mark.live
     def test_resolved_content_has_structure(self, sample_query, max_chars):
