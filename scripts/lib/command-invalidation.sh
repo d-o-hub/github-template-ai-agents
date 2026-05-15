@@ -31,9 +31,10 @@ if [ -f ".command-verify.conf" ]; then
 fi
 
 # Use configured rules or defaults
-# Security: Store rules as array to prevent word splitting/globbing issues
-# Ensure variable is defined and initialized to avoid unbound variable error with set -u
-if ! declare -p INVALIDATION_RULES &>/dev/null; then
+# Security: Store rules as array to prevent word splitting/globbing issues.
+# Ensure INVALIDATION_RULES is defined as an array to avoid unbound variable errors with set -u
+# and prevent "bad array subscript" errors.
+if ! declare -p INVALIDATION_RULES 2>/dev/null | grep -q 'declare -a'; then
     declare -a INVALIDATION_RULES=("${DEFAULT_INVALIDATION_RULES[@]}")
 fi
 
@@ -118,7 +119,9 @@ build_invalidation_report() {
         local affected
         affected=$(get_affected_commands "$file" "$commands_json")
         local count
-        count=$(printf "%s\n" "$affected" | grep -c . || printf "0")
+        # Security: Ignore grep's nonzero exit and ensure count has a default value to prevent duplicate zeros or empty values.
+        count=$(printf "%s\n" "$affected" | grep -c . || true)
+        count=${count:-0}
 
         if [ "$count" -gt 0 ]; then
             printf "File: %s → %s commands to revalidate\n" "$file" "$count"
