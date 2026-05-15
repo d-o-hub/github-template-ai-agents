@@ -119,7 +119,7 @@ The codebase is architecturally sound with good progressive disclosure patterns,
 
 ### IC-04: `scripts/validate-skills.sh` Doesn't Validate `.qwen/skills` Symlinks
 
-**What:** The `CLI_SKILL_DIRS` array only includes `.claude/skills` , but `setup-skills.sh` also creates `.qwen/skills` symlinks.
+**What:** The `CLI_SKILL_DIRS` array only includes `.claude/skills`, but `setup-skills.sh` also creates `.qwen/skills` symlinks.
 
 **Why it matters:** Broken or missing Qwen Code symlinks go undetected by the quality gate. Qwen Code users get a degraded experience with no validation feedback.
 
