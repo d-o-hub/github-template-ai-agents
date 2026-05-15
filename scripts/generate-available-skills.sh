@@ -84,46 +84,27 @@ SKILL_DATA=$(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" |
     echo "> Do not edit manually. Run \`./scripts/generate-available-skills.sh\` to regenerate."
     echo ""
 
-    # Optimization: Use a single awk process to format and sort the entire table.
-    # This eliminates a bash loop containing multiple piped external processes (grep, sed).
-    printf "%s\n" "$SKILL_DATA" | sort -t'|' -k1,1 -k2,2 | awk -F'|' '
-    function format_category(cat) {
-        gsub(/-/, " ", cat)
-        # Capitalize first letter of each word
-        n = split(cat, words, " ")
-        res = ""
-        for (i = 1; i <= n; i++) {
-            w = words[i]
-            res = res (res==""?"":" ") toupper(substr(w,1,1)) substr(w,2)
-        }
-        return res
-    }
-    {
-        if ($0 == "") next
-        cat = $1
-        name = $2
-        # Reconstruct the remainder as description to handle internal pipes
-        desc = $3
-        for (i = 4; i <= NF; i++) {
-            desc = desc "|" $i
-        }
+    # Get sorted categories first to match original script's outer loop
+    # Use printf instead of echo to prevent option injection if SKILL_DATA starts with -
+    CATEGORIES=$(printf "%s\n" "$SKILL_DATA" | cut -d'|' -f1 | sort -u)
 
-        if (cat != last_cat) {
-            if (last_cat != "") {
-                printf "\n"
-            }
-            printf "## %s\n\n", format_category(cat)
-            printf "| Skill | Description |\n"
-            printf "|-------|-------------|\n"
-            last_cat = cat
-        }
-        printf "| `%s` | %s |\n", name, desc
-    }
-    END {
-        if (last_cat != "") {
-            printf "\n"
-        }
-    }'
+    for category in $CATEGORIES; do
+        # Capitalize category for display
+        # Use printf to prevent option injection for categories starting with -
+        category_display=$(printf "%s\n" "$category" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
+
+        printf "## %s\n" "$category_display"
+        printf "\n"
+        printf "| Skill | Description |\n"
+        printf "|-------|-------------|\n"
+
+        # Filter skills for this category and sort by name
+        # Use -- separator with grep to prevent option injection if category starts with -
+        printf "%s\n" "$SKILL_DATA" | grep -- "^$category|" | sort -t'|' -k2,2 | while IFS="|" read -r _ name description; do
+            printf "| \`%s\` | %s |\n" "$name" "$description"
+        done
+        printf "\n"
+    done
 
     echo "## Usage"
     echo ""

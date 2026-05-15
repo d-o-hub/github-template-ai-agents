@@ -73,7 +73,3 @@
 ## 2026-05-30 - [Safe temp file usage and output redirection over subshells]
 **Learning:** Process substitution (`< <(...)`) and `OUTPUT=$(...)` both spawn subshells, adding fork overhead. A fast and safe pattern in bash loops is generating the file list as a string via `find` and reading from it with `while ...; do ...; done <<< "$FILES"`, while replacing internal loop subshells (`OUTPUT=$(command)`) with standard file redirection (`command >"$TMP_OUT" 2>&1`) to capture output without forking.
 **Action:** When capturing output in a loop, write to a temporary file (`mktemp`) and use `cat` instead of command substitution. Ensure the temporary file is removed afterwards, using a simple `rm -f "$TMP_OUT"` when safe.
-
-## 2026-05-31 - [Batched file reading with AWK vs Loop with sed/grep/cut]
-**Learning:** Extracting data across many small files inside a Bash `for` loop with external tools like `sed`, `grep`, and `cut` introduces immense subshell overhead and drastically slows down execution. By replacing the loop with a single `awk` process that processes an array of all files, execution time is greatly reduced. In this codebase, optimizing `scripts/generate-available-skills.sh` resulted in a >3x speedup (from ~100ms to ~35ms) by avoiding bash loops to format and extract the table.
-**Action:** Use a single `awk` pass for formatting multiline datasets with multiple properties instead of spawning processes iteratively or looping over the dataset multiple times with external binaries.
