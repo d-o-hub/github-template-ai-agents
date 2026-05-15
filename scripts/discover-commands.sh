@@ -9,7 +9,7 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --output|-o) OUTPUT_FILE="$2"; shift 2 ;;
         --format|-f) FORMAT="$2"; shift 2 ;;
-        *) printf "Unknown option: %s\n" "$1" >&2; exit 1 ;;
+        *) echo "Unknown option: $1" >&2; exit 1 ;;
     esac
 done
 

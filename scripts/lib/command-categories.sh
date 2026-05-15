@@ -23,14 +23,13 @@ fi
 categorize_command() {
     local cmd="$1"
     local cmd_lower
-    # Security: Use printf for safe variable expansion and to prevent option injection
-    cmd_lower=$(printf "%s\n" "$cmd" | tr '[:upper:]' '[:lower:]')
+    cmd_lower=$(echo "$cmd" | tr '[:upper:]' '[:lower:]')
 
     # Check custom dangerous patterns first (E3)
     for pattern in "${DANGEROUS_PATTERNS[@]:-}"; do
         [ -z "$pattern" ] && continue
         if [[ "$cmd_lower" == *"$pattern"* ]]; then
-            printf "dangerous\n"
+            echo "dangerous"
             return 0
         fi
     done
@@ -40,7 +39,7 @@ categorize_command() {
     for keyword in "${keywords[@]}"; do
         [ -z "$keyword" ] && continue
         if [[ "$cmd_lower" == *"$keyword"* ]]; then
-            printf "dangerous\n"
+            echo "dangerous"
             return 0
         fi
     done
@@ -49,7 +48,7 @@ categorize_command() {
     for pattern in "${CONDITIONAL_PATTERNS[@]:-}"; do
         [ -z "$pattern" ] && continue
         if [[ "$cmd_lower" == *"$pattern"* ]]; then
-            printf "conditional\n"
+            echo "conditional"
             return 0
         fi
     done
@@ -59,7 +58,7 @@ categorize_command() {
     for keyword in "${keywords[@]}"; do
         [ -z "$keyword" ] && continue
         if [[ "$cmd_lower" == *"$keyword"* ]]; then
-            printf "conditional\n"
+            echo "conditional"
             return 0
         fi
     done
@@ -68,7 +67,7 @@ categorize_command() {
     for pattern in "${SAFE_PATTERNS[@]:-}"; do
         [ -z "$pattern" ] && continue
         if [[ "$cmd_lower" == *"$pattern"* ]]; then
-            printf "safe\n"
+            echo "safe"
             return 0
         fi
     done
@@ -78,24 +77,24 @@ categorize_command() {
     for keyword in "${keywords[@]}"; do
         [ -z "$keyword" ] && continue
         if [[ "$cmd_lower" == *"$keyword"* ]]; then
-            printf "safe\n"
+            echo "safe"
             return 0
         fi
     done
 
     # Unknown category
-    printf "unknown\n"
+    echo "unknown"
     return 0
 }
 
 # Get description for a category
 get_category_description() {
     case "$1" in
-        safe) printf "No side effects - can run without modifications\n" ;;
-        conditional) printf "May modify files - review before running\n" ;;
-        dangerous) printf "Potentially destructive - requires careful review\n" ;;
-        unknown) printf "Category not determined - manual review recommended\n" ;;
-        *) printf "Unknown category: %s\n" "$1" ;;
+        safe) echo "No side effects - can run without modifications" ;;
+        conditional) echo "May modify files - review before running" ;;
+        dangerous) echo "Potentially destructive - requires careful review" ;;
+        unknown) echo "Category not determined - manual review recommended" ;;
+        *) echo "Unknown category: $1" ;;
     esac
 }
 
@@ -121,8 +120,7 @@ print_category_badge() {
         unknown) color='\033[0;36m' ;;
         *) color='\033[0m' ;;
     esac
-    # Security: Use printf for safe variable output
-    printf "${color}[%s]${NC}\n" "$category"
+    echo -e "${color}[${category}]${NC}"
 }
 
 export -f categorize_command get_category_description is_safe_to_run requires_warning print_category_badge

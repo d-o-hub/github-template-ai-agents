@@ -17,8 +17,7 @@ else
         [[ "$key" =~ ^#.* ]] && continue
         [[ -z "$key" ]] && continue
 
-        key="${key// /}"
-        key="${key//export/}"
+        key=$(echo "$key" | tr -d ' ' | sed 's/export//g')
 
         found=false
         for known in "${KNOWN_KEYS[@]}"; do
