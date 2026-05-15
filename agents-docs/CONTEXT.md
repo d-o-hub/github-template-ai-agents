@@ -46,7 +46,7 @@ For efficient retrieval of past project knowledge, use the `memory-context` skil
 All skills are canonical in `.agents/skills/`.
 Claude Code and Qwen Code use symlinks (`.claude/skills/`, `.qwen/skills/`);
 OpenCode and Gemini CLI read directly from `.agents/skills/`.
-Run `./scripts/setup-skills.sh` to create symlinks for Claude Code, Gemini CLI, and Qwen Code.
+Run `./scripts/setup-skills.sh` to create symlinks for Claude Code and Qwen Code.
 
 ## Anti-Patterns
 

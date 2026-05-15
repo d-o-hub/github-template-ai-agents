@@ -87,6 +87,5 @@ graph TD
     J[setup-skills.sh] --> K[.claude/skills symlinks]
     J --> M[.qwen/skills symlinks]
     B --> K
-    B --> L
     B --> M
 ```
