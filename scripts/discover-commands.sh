@@ -17,6 +17,9 @@ done
 # This is much faster than a bash loop with per-file awk/sed and per-command jq calls
 # We also exclude symlinked skill directories to avoid redundant processing
 results_file=$(mktemp)
+# Security: Ensure cleanup of temporary results file
+trap 'rm -f "$results_file"' EXIT ERR
+
 find "$REPO_ROOT" -type f -name "*.md" \
     -not -path "*/node_modules/*" \
     -not -path "*/.git/*" \
