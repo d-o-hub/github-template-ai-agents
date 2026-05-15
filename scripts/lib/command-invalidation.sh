@@ -32,8 +32,9 @@ fi
 
 # Use configured rules or defaults
 # Security: Store rules as array to prevent word splitting/globbing issues
-if [ "${#INVALIDATION_RULES[@]:-0}" -eq 0 ]; then
-    INVALIDATION_RULES=("${DEFAULT_INVALIDATION_RULES[@]}")
+# Ensure variable is defined and initialized to avoid unbound variable error with set -u
+if ! declare -p INVALIDATION_RULES &>/dev/null; then
+    declare -a INVALIDATION_RULES=("${DEFAULT_INVALIDATION_RULES[@]}")
 fi
 
 # Check if a file matches a glob pattern
