@@ -57,13 +57,13 @@ for skill_path in "$SKILLS_SRC"/*/; do
         FAILED=1
     else
         # If valid, print the success line like validate-skill-format.sh does
-        echo -e "  ${GREEN}✓${NC} $skill_name: $SKILL_LINE_COUNT lines"
+        printf "  ${GREEN}✓${NC} %s: %s lines\n" "$skill_name" "$SKILL_LINE_COUNT"
     fi
 
     # Check 2: Circular symlink detection for the skill directory
     # On Windows, we skip this check as MSYS/Cygwin symlinks appear as files
     if [ "$IS_WINDOWS" = "false" ] && [ -L "$skill_path" ]; then
-        echo -e "  ${RED}✗${NC} $skill_name: Circular symlink detected" >&2
+        printf "  ${RED}✗${NC} %s: Circular symlink detected\n" "$skill_name" >&2
         FAILED=1
     fi
 
@@ -71,7 +71,7 @@ for skill_path in "$SKILLS_SRC"/*/; do
     # Performance optimization: Pre-calculate expected target once per skill
     expected_target=""
     if { [ "${CHECK_SYMLINK_TARGETS:-false}" = "true" ] || [ -n "${CI:-}" ]; } && [ "$HAS_READLINK_F" -eq 1 ]; then
-        expected_target=$(readlink -f "$skill_path" 2>/dev/null || echo "")
+        expected_target=$(readlink -f "$skill_path" 2>/dev/null || printf "")
     fi
 
     for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
@@ -80,27 +80,27 @@ for skill_path in "$SKILLS_SRC"/*/; do
         # .qwen/skills may be real dirs (not symlinks) - accept either
         if [[ "$cli_dir" == ".qwen/skills" ]]; then
             if [ ! -d "$link" ]; then
-                echo -e "  ${RED}✗${NC} MISSING: $cli_dir/$skill_name" >&2
+                printf "  ${RED}✗${NC} MISSING: %s/%s\n" "$cli_dir" "$skill_name" >&2
                 FAILED=1
             fi
         elif [ ! -L "$link" ] && { [ "$IS_WINDOWS" = "false" ] || [ ! -f "$link" ]; }; then
-            echo -e "  ${RED}✗${NC} MISSING symlink: $cli_dir/$skill_name" >&2
+            printf "  ${RED}✗${NC} MISSING symlink: %s/%s\n" "$cli_dir" "$skill_name" >&2
             FAILED=1
         elif [ ! -d "$link" ] && { [ "$IS_WINDOWS" = "false" ] || [ ! -f "$link" ]; }; then
             # Optimized: check if target exists without subshell if possible
             # -d on a symlink already checks target existence
-            echo -e "  ${RED}✗${NC} BROKEN symlink: $cli_dir/$skill_name" >&2
+            printf "  ${RED}✗${NC} BROKEN symlink: %s/%s\n" "$cli_dir" "$skill_name" >&2
             FAILED=1
         else
             # Verify symlink points to correct location
             # Only do this expensive check if explicitly requested or in CI
             if [ -n "$expected_target" ]; then
-                target=$(readlink -f "$link" 2>/dev/null || echo "")
+                target=$(readlink -f "$link" 2>/dev/null || printf "")
 
                 if [ -n "$target" ] && [ "$target" != "$expected_target" ]; then
-                    echo -e "  ${YELLOW}⚠${NC} WRONG target: $cli_dir/$skill_name" >&2
-                    echo "      Expected: $expected_target" >&2
-                    echo "      Actual:   $target" >&2
+                    printf "  ${YELLOW}⚠${NC} WRONG target: %s/%s\n" "$cli_dir" "$skill_name" >&2
+                    printf "      Expected: %s\n" "$expected_target" >&2
+                    printf "      Actual:   %s\n" "$target" >&2
                     WARNINGS=1
                 fi
             fi
@@ -117,17 +117,17 @@ if [ -f "$SKILLS_SRC/skill-rules.json" ]; then
     # Check JSON validity
     if command -v jq &> /dev/null; then
         if ! jq empty "$SKILLS_SRC/skill-rules.json" 2>/dev/null; then
-            echo -e "  ${RED}✗${NC} skill-rules.json: Invalid JSON" >&2
+            printf "  ${RED}✗${NC} skill-rules.json: Invalid JSON\n" >&2
             FAILED=1
         else
-            echo -e "  ${GREEN}✓${NC} skill-rules.json: Valid JSON"
+            printf "  ${GREEN}✓${NC} skill-rules.json: Valid JSON\n"
 
             # Check for required fields in rules
             rule_count=$(jq '.rules | length' "$SKILLS_SRC/skill-rules.json")
-            echo -e "  ${GREEN}✓${NC} skill-rules.json: $rule_count rules defined"
+            printf "  ${GREEN}✓${NC} skill-rules.json: %s rules defined\n" "$rule_count"
         fi
     else
-        echo -e "  ${YELLOW}⚠${NC} jq not installed - skipping JSON validation"
+        printf "  ${YELLOW}⚠${NC} jq not installed - skipping JSON validation\n"
     fi
     echo ""
 fi

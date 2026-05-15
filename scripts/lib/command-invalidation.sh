@@ -31,7 +31,10 @@ if [ -f ".command-verify.conf" ]; then
 fi
 
 # Use configured rules or defaults
-INVALIDATION_RULES="${INVALIDATION_RULES[@]:-${DEFAULT_INVALIDATION_RULES[@]}}"
+# Security: Store rules as array to prevent word splitting/globbing issues
+if [ "${#INVALIDATION_RULES[@]:-0}" -eq 0 ]; then
+    INVALIDATION_RULES=("${DEFAULT_INVALIDATION_RULES[@]}")
+fi
 
 # Check if a file matches a glob pattern
 # Usage: matches_pattern "package.json" "*.json"
@@ -62,7 +65,8 @@ get_affected_commands() {
     local commands_json="$2"
     local affected=()
 
-    for rule in $INVALIDATION_RULES; do
+    # Security: Iterate over array safely
+    for rule in "${INVALIDATION_RULES[@]}"; do
         IFS=':' read -r file_pattern cmd_prefix <<< "$rule"
 
         # Check if changed file matches the pattern
@@ -71,13 +75,14 @@ get_affected_commands() {
             while IFS= read -r line; do
                 [ -z "$line" ] && continue
                 local cmd
-                cmd=$(echo "$line" | jq -r '.command')
+                # Security: Use printf instead of echo to prevent option injection
+                cmd=$(printf "%s\n" "$line" | jq -r '.command' 2>/dev/null || printf "")
                 [ -z "$cmd" ] || [ "$cmd" = "null" ] && continue
 
                 # Special case: *.md means commands in that specific file
                 if [[ "$file_pattern" == "*.md" ]] && [[ "$changed_file" == *.md ]]; then
                     local cmd_file
-                    cmd_file=$(echo "$line" | jq -r '.file')
+                    cmd_file=$(printf "%s\n" "$line" | jq -r '.file' 2>/dev/null || printf "")
                     if [[ "$cmd_file" == "$changed_file" ]]; then
                         affected+=("$cmd")
                     fi
@@ -89,38 +94,38 @@ get_affected_commands() {
     done
 
     # Output unique affected commands
-    printf '%s\n' "${affected[@]}" | sort -u
+    if [ ${#affected[@]} -gt 0 ]; then
+        printf '%s\n' "${affected[@]}" | sort -u
+    fi
 }
 
 # Build invalidation report
-# Usage: build_invalidation_report "commit1 commit2" "$commands_json"
+# Usage: build_invalidation_report "file1 file2" "$commands_json"
 build_invalidation_report() {
     local changed_files="$1"
     local commands_json="$2"
 
-    echo "=== Invalidation Report ==="
-    echo ""
-    echo "Changed files:"
+    printf "=== Invalidation Report ===\n\n"
+    printf "Changed files:\n"
     for file in $changed_files; do
-        echo "  - $file"
+        printf "  - %s\n" "$file"
     done
-    echo ""
+    printf "\n"
 
     local total_affected=0
     for file in $changed_files; do
         local affected
         affected=$(get_affected_commands "$file" "$commands_json")
         local count
-        count=$(echo "$affected" | grep -c . || echo 0)
+        count=$(printf "%s\n" "$affected" | grep -c . || printf "0")
 
         if [ "$count" -gt 0 ]; then
-            echo "File: $file → $count commands to revalidate"
+            printf "File: %s → %s commands to revalidate\n" "$file" "$count"
             total_affected=$((total_affected + count))
         fi
     done
 
-    echo ""
-    echo "Total commands to revalidate: $total_affected"
+    printf "\nTotal commands to revalidate: %s\n" "$total_affected"
 }
 
 # Export functions

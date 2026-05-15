@@ -109,9 +109,9 @@ check_link() {
 
     # Security check: Reject absolute paths (Path Traversal prevention)
     if [[ "$clean_path" == /* ]]; then
-        echo -e "  ${RED}✗${NC} Security Error: Absolute path detected at line $line_num: \`${clean_path}'" >&2
-        echo -e "     Links must be relative to the skill directory or repository root." >&2
-        echo -e "     in: $skill_file" >&2
+        printf "  ${RED}✗${NC} Security Error: Absolute path detected at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
+        printf "     Links must be relative to the skill directory or repository root.\n" >&2
+        printf "     in: %s\n" "$skill_file" >&2
         return 1
     fi
 
@@ -138,9 +138,9 @@ check_link() {
 
         # Ensure trailing slash for robust prefix matching
         if [[ "$resolved_path/" != "$RESOLVED_ROOT/"* ]]; then
-            echo -e "  ${RED}✗${NC} Security Error: Path traversal detected at line $line_num: \`${clean_path}'" >&2
-            echo -e "     Link attempts to reference a file outside the repository boundary." >&2
-            echo -e "     in: $skill_file" >&2
+            printf "  ${RED}✗${NC} Security Error: Path traversal detected at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
+            printf "     Link attempts to reference a file outside the repository boundary.\n" >&2
+            printf "     in: %s\n" "$skill_file" >&2
             return 1
         fi
 
@@ -155,8 +155,8 @@ check_link() {
         fi
     fi
 
-    echo -e "  ${RED}✗${NC} Broken link at line $line_num: \`${clean_path}'" >&2
-    echo -e "     in: $skill_file" >&2
+    printf "  ${RED}✗${NC} Broken link at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
+    printf "     in: %s\n" "$skill_file" >&2
     return 1
 }
 
@@ -175,10 +175,10 @@ check_reference_format() {
     # Check for @references (deprecated format)
     if [[ "$line" =~ $AT_REF_REGEX ]]; then
         local bad_ref="${BASH_REMATCH[0]}"
-        echo -e "  ${RED}✗${NC} Invalid reference format at line $line_num" >&2
-        echo -e "     Found: $bad_ref" >&2
-        echo -e "     Use: \`references?/filename.md\` - Description" >&2
-        echo -e "     in: $skill_file" >&2
+        printf "  ${RED}✗${NC} Invalid reference format at line %s\n" "$line_num" >&2
+        printf "     Found: %s\n" "$bad_ref" >&2
+        printf "     Use: \`references?/filename.md\` - Description\n" >&2
+        printf "     in: %s\n" "$skill_file" >&2
         return 1
     fi
 
@@ -189,10 +189,10 @@ check_reference_format() {
             # Check if it has markdown link format [text](path)
             if [[ "$line" =~ \[.+\]\((references?/.+)\) ]]; then
                 local link_path="${BASH_REMATCH[1]}"
-                echo -e "  ${RED}✗${NC} Invalid reference format at line $line_num" >&2
-                echo -e "     Found: Markdown link [text]($link_path)" >&2
-                echo -e "     Use: \`$link_path\` - Description" >&2
-                echo -e "     in: $skill_file" >&2
+                printf "  ${RED}✗${NC} Invalid reference format at line %s\n" "$line_num" >&2
+                printf "     Found: Markdown link [text](%s)\n" "$link_path" >&2
+                printf "     Use: \`%s\` - Description\n" "$link_path" >&2
+                printf "     in: %s\n" "$skill_file" >&2
                 return 1
             fi
         fi
@@ -206,7 +206,7 @@ check_reference_format() {
 # This eliminates per-file process forks, providing significant speedup.
 
 if [[ ! -d "$SKILLS_DIR" ]]; then
-    echo -e "${YELLOW}⚠${NC} Skills directory not found: $SKILLS_DIR"
+    printf "${YELLOW}⚠${NC} Skills directory not found: %s\n" "$SKILLS_DIR"
     exit 0
 fi
 
@@ -233,7 +233,7 @@ while IFS=: read -r skill_file line_num in_references line; do
         if [[ -n "$current_file" ]]; then
             if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
                 skill_dir="${current_file%/*}"
-                echo -e "  ${GREEN}✓${NC} ${skill_dir##*/}: All links valid"
+                printf "  ${GREEN}✓${NC} %s: All links valid\n" "${skill_dir##*/}"
             fi
         fi
         current_file="$skill_file"
@@ -301,9 +301,9 @@ while IFS=: read -r skill_file line_num in_references line; do
     # Check for deprecated @references
     if [[ "$line" =~ @(references?/[a-zA-Z0-9_-]+\.md) ]]; then
         at_ref="${BASH_REMATCH[1]}"
-        echo -e "  ${RED}✗${NC} Broken @reference at line $line_num: @$at_ref" >&2
-        echo -e "     @ prefix is deprecated. Use: \`reference/filename.md\` or \`references/filename.md\`" >&2
-        echo -e "     in: $skill_file" >&2
+        printf "  ${RED}✗${NC} Broken @reference at line %s: @%s\n" "$line_num" "$at_ref" >&2
+        printf "     @ prefix is deprecated. Use: \`reference/filename.md\` or \`references/filename.md\`\n" >&2
+        printf "     in: %s\n" "$skill_file" >&2
         BROKEN_COUNT=$((BROKEN_COUNT + 1))
         file_broken=1
     fi
@@ -321,23 +321,23 @@ done < <(awk '
 if [[ -n "$current_file" ]]; then
     if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
         skill_dir="${current_file%/*}"
-        echo -e "  ${GREEN}✓${NC} ${skill_dir##*/}: All links valid"
+        printf "  ${GREEN}✓${NC} %s: All links valid\n" "${skill_dir##*/}"
     fi
 fi
 
-echo ""
-echo "─────────────────────────────────────────────────────────────────"
+printf "\n"
+printf "─────────────────────────────────────────────────────────────────\n"
 
 TOTAL_ERRORS=$((BROKEN_COUNT + FORMAT_ERRORS))
 
 if [[ $TOTAL_ERRORS -gt 0 ]]; then
-    echo -e "│ ${RED}✗ Link Validation FAILED${NC}                                      │" >&2
-    echo "─────────────────────────────────────────────────────────────────" >&2
-    echo "" >&2
-    echo "  Files checked: $FILES_CHECKED" >&2
-    echo "  Links checked: $LINKS_CHECKED" >&2
-    echo -e "  ${RED}Broken links: $BROKEN_COUNT${NC}" >&2
-    echo -e "  ${RED}Format errors: $FORMAT_ERRORS${NC}" >&2
+    printf "│ ${RED}✗ Link Validation FAILED${NC}                                      │\n" >&2
+    printf "─────────────────────────────────────────────────────────────────\n" >&2
+    printf "\n" >&2
+    printf "  Files checked: %s\n" "$FILES_CHECKED" >&2
+    printf "  Links checked: %s\n" "$LINKS_CHECKED" >&2
+    printf "  ${RED}Broken links: %s${NC}\n" "$BROKEN_COUNT" >&2
+    printf "  ${RED}Format errors: %s${NC}\n" "$FORMAT_ERRORS" >&2
     echo "" >&2
     echo "  Fix broken links by:" >&2
     echo "    1. Creating missing reference files" >&2
@@ -348,11 +348,11 @@ if [[ $TOTAL_ERRORS -gt 0 ]]; then
     echo "    - \`references?/filename.md\` - Description" >&2
     exit 1
 else
-    echo -e "│ ${GREEN}✓ All reference links valid${NC}                                   │"
-    echo "─────────────────────────────────────────────────────────────────"
-    echo ""
-    echo "  Files checked: $FILES_CHECKED"
-    echo "  Links checked: $LINKS_CHECKED"
-    echo "  Broken links: 0"
+    printf "│ ${GREEN}✓ All reference links valid${NC}                                   │\n"
+    printf "─────────────────────────────────────────────────────────────────\n"
+    printf "\n"
+    printf "  Files checked: %s\n" "$FILES_CHECKED"
+    printf "  Links checked: %s\n" "$LINKS_CHECKED"
+    printf "  Broken links: 0\n"
     exit 0
 fi
