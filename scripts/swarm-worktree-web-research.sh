@@ -47,10 +47,10 @@ readonly GITHUB_MERGE_METHOD="${GITHUB_MERGE_METHOD:-squash}"
 readonly GITHUB_FAIL_ON_WARNING="${GITHUB_FAIL_ON_WARNING:-1}"
 
 # Logging
-log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
-log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+log_info() { printf "${BLUE}[INFO]${NC} %s\n" "$1"; }
+log_success() { printf "${GREEN}[SUCCESS]${NC} %s\n" "$1"; }
+log_warn() { printf "${YELLOW}[WARN]${NC} %s\n" "$1"; }
+log_error() { printf "${RED}[ERROR]${NC} %s\n" "$1"; }
 
 # ==============================================================================
 # PHASE 1: Setup and Validation
@@ -108,13 +108,16 @@ batch_resolve() {
     while IFS= read -r line; do
         [[ -z "$line" || "$line" =~ ^# ]] && continue
 
-        local query context
-        query=$(echo "$line" | cut -d'|' -f1 | xargs)
-        context=$(echo "$line" | cut -d'|' -f2 | xargs)
+        local query="${line%%|*}"
+        local context="${line#*|}"
+
+        # Trim whitespace
+        query=$(printf "%s\n" "$query" | xargs)
+        context=$(printf "%s\n" "$context" | xargs)
         context="${context:-general}"
 
         local sanitized_query
-        sanitized_query=$(echo "$query" | tr -c '[:alnum:]' '_')
+        sanitized_query=$(printf "%s\n" "$query" | tr -c '[:alnum:]' '_')
         local output_file="${output_dir}/${sanitized_query}.json"
 
         if [[ ${#pids[@]} -ge $max_parallel ]]; then
@@ -219,7 +222,7 @@ run_swarm_with_research() {
         "$worktree_path" "$analysis_topic" "$ANALYSIS_DIR" "$REPORTS_DIR")
 
     log_success "Swarm analysis setup complete"
-    echo "$synthesis_file"
+    printf "%s\n" "$synthesis_file"
 }
 
 # ==============================================================================
@@ -277,7 +280,7 @@ Analysis: ${ANALYSIS_DIR}/SWARM_SYNTHESIS.md"
             --title "feat: swarm analysis - ${1:-topic}" \
             --body "Swarm analysis with optimized web research" \
             --base main \
-            --head "$branch_name" 2>/dev/null || echo "")
+            --head "$branch_name" 2>/dev/null || printf "")
 
         if [[ -n "$pr_url" ]]; then
             log_success "PR created: ${pr_url}"
