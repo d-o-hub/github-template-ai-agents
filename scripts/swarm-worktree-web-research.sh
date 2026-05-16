@@ -108,9 +108,12 @@ batch_resolve() {
     while IFS= read -r line; do
         [[ -z "$line" || "$line" =~ ^# ]] && continue
 
-        local query context
-        query=$(printf "%s\n" "$line" | cut -d'|' -f1 | xargs)
-        context=$(printf "%s\n" "$line" | cut -d'|' -f2 | xargs)
+        local query="${line%%|*}"
+        local context="${line#*|}"
+
+        # Trim whitespace
+        query=$(printf "%s\n" "$query" | xargs)
+        context=$(printf "%s\n" "$context" | xargs)
         context="${context:-general}"
 
         local sanitized_query
@@ -219,7 +222,7 @@ run_swarm_with_research() {
         "$worktree_path" "$analysis_topic" "$ANALYSIS_DIR" "$REPORTS_DIR")
 
     log_success "Swarm analysis setup complete"
-    echo "$synthesis_file"
+    printf "%s\n" "$synthesis_file"
 }
 
 # ==============================================================================
@@ -277,7 +280,7 @@ Analysis: ${ANALYSIS_DIR}/SWARM_SYNTHESIS.md"
             --title "feat: swarm analysis - ${1:-topic}" \
             --body "Swarm analysis with optimized web research" \
             --base main \
-            --head "$branch_name" 2>/dev/null || echo "")
+            --head "$branch_name" 2>/dev/null || printf "")
 
         if [[ -n "$pr_url" ]]; then
             log_success "PR created: ${pr_url}"
