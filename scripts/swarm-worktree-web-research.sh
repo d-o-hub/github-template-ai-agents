@@ -47,10 +47,10 @@ readonly GITHUB_MERGE_METHOD="${GITHUB_MERGE_METHOD:-squash}"
 readonly GITHUB_FAIL_ON_WARNING="${GITHUB_FAIL_ON_WARNING:-1}"
 
 # Logging
-log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
-log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+log_info() { printf "${BLUE}[INFO]${NC} %s\n" "$1"; }
+log_success() { printf "${GREEN}[SUCCESS]${NC} %s\n" "$1"; }
+log_warn() { printf "${YELLOW}[WARN]${NC} %s\n" "$1"; }
+log_error() { printf "${RED}[ERROR]${NC} %s\n" "$1"; }
 
 # ==============================================================================
 # PHASE 1: Setup and Validation
@@ -109,12 +109,12 @@ batch_resolve() {
         [[ -z "$line" || "$line" =~ ^# ]] && continue
 
         local query context
-        query=$(echo "$line" | cut -d'|' -f1 | xargs)
-        context=$(echo "$line" | cut -d'|' -f2 | xargs)
+        query=$(printf "%s\n" "$line" | cut -d'|' -f1 | xargs)
+        context=$(printf "%s\n" "$line" | cut -d'|' -f2 | xargs)
         context="${context:-general}"
 
         local sanitized_query
-        sanitized_query=$(echo "$query" | tr -c '[:alnum:]' '_')
+        sanitized_query=$(printf "%s\n" "$query" | tr -c '[:alnum:]' '_')
         local output_file="${output_dir}/${sanitized_query}.json"
 
         if [[ ${#pids[@]} -ge $max_parallel ]]; then
