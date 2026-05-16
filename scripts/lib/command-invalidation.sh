@@ -67,6 +67,14 @@ get_affected_commands() {
     local commands_json="$2"
     local affected=()
 
+    # Pre-parse JSON once
+    local extracted
+    extracted=$(printf "%s\n" "$commands_json" | jq -r 'select(.command != null and .command != "null") | "\(.file)\t\(.command)"' 2>/dev/null || printf "")
+
+    if [ -z "$extracted" ]; then
+        return 0
+    fi
+
     # Security: Iterate over array safely
     for rule in "${INVALIDATION_RULES[@]}"; do
         IFS=':' read -r file_pattern cmd_prefix <<< "$rule"
@@ -74,24 +82,18 @@ get_affected_commands() {
         # Check if changed file matches the pattern
         if matches_pattern "$changed_file" "$file_pattern"; then
             # Find commands matching the prefix
-            while IFS= read -r line; do
-                [ -z "$line" ] && continue
-                local cmd
-                # Security: Use printf instead of echo to prevent option injection
-                cmd=$(printf "%s\n" "$line" | jq -r '.command' 2>/dev/null || printf "")
-                [ -z "$cmd" ] || [ "$cmd" = "null" ] && continue
+            while IFS=$'\t' read -r cmd_file cmd; do
+                [ -z "$cmd" ] && continue
 
                 # Special case: *.md means commands in that specific file
                 if [[ "$file_pattern" == "*.md" ]] && [[ "$changed_file" == *.md ]]; then
-                    local cmd_file
-                    cmd_file=$(printf "%s\n" "$line" | jq -r '.file' 2>/dev/null || printf "")
                     if [[ "$cmd_file" == "$changed_file" ]]; then
                         affected+=("$cmd")
                     fi
                 elif [[ "$cmd_prefix" == "*" ]] || [[ "$cmd" == "$cmd_prefix"* ]]; then
                     affected+=("$cmd")
                 fi
-            done <<< "$commands_json"
+            done <<< "$extracted"
         fi
     done
 

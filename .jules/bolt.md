@@ -73,3 +73,7 @@
 ## 2026-05-30 - [Safe temp file usage and output redirection over subshells]
 **Learning:** Process substitution (`< <(...)`) and `OUTPUT=$(...)` both spawn subshells, adding fork overhead. A fast and safe pattern in bash loops is generating the file list as a string via `find` and reading from it with `while ...; do ...; done <<< "$FILES"`, while replacing internal loop subshells (`OUTPUT=$(command)`) with standard file redirection (`command >"$TMP_OUT" 2>&1`) to capture output without forking.
 **Action:** When capturing output in a loop, write to a temporary file (`mktemp`) and use `cat` instead of command substitution. Ensure the temporary file is removed afterwards, using a simple `rm -f "$TMP_OUT"` when safe.
+
+## 2026-05-31 - [Pre-parsing JSON with jq to avoid nested subshells]
+**Learning:** Using `jq` inside a `while read` loop for every line to extract fields from JSON creates a massive performance bottleneck due to thousands of subshell process forks. Pre-parsing the JSON once with `jq` into a tab-separated format outside the loop and reading it efficiently using `IFS=$'\t' read -r var1 var2 <<< "$parsed"` yields dramatic speedups (from ~4s to ~0.04s for 160 elements).
+**Action:** Never run `jq` iteratively inside Bash loops. Always parse the full JSON payload once, extract the necessary properties into delimited plaintext (using tabs or pipes), and iterate over the plain string using `read`.
