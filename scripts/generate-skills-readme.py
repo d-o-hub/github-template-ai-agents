@@ -71,7 +71,6 @@ def main() -> int:
         "",
         "```",
         ".claude/skills/<name>      -> ../../.agents/skills/<name>",
-        ".gemini/skills/<name>      -> ../../.agents/skills/<name>",
         ".qwen/skills/<name>        -> ../../.agents/skills/<name>",
         "```",
         "",

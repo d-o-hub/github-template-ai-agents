@@ -4,7 +4,6 @@ import concurrent.futures
 import logging
 import time
 from collections.abc import Generator
-from dataclasses import asdict
 from typing import Any
 
 import scripts.cache_negative
@@ -115,10 +114,9 @@ def resolve_url_stream(
         profile.value, scripts.routing.PROFILE_BUDGETS["balanced"]
     )
     budget = scripts.routing.ResolutionBudget(
-        max_provider_attempts=int(budget_data["max_provider_attempts"]),
-        max_paid_attempts=int(budget_data["max_paid_attempts"]),
-        max_total_latency_ms=int(budget_data["max_total_latency_ms"]),
-        min_free_quality_to_skip_paid=float(budget_data.get("min_free_quality_to_skip_paid", 0.70)),
+        max_provider_attempts=budget_data["max_provider_attempts"],
+        max_paid_attempts=budget_data["max_paid_attempts"],
+        max_total_latency_ms=budget_data["max_total_latency_ms"],
         allow_paid=bool(budget_data["allow_paid"]),
     )
 
@@ -157,7 +155,6 @@ def resolve_url_stream(
     domain = scripts.routing.extract_domain(url)
     eligible = [p for p in provider_names if p in cascade_map]
     active_futures = {}
-    best_free_result: dict[str, Any] | None = None
 
     from scripts import resolve as resolve_module
 
@@ -165,16 +162,6 @@ def resolve_url_stream(
     try:
         for i, p_name in enumerate(eligible):
             pt, func = cascade_map[p_name]
-
-            if pt.is_paid() and best_free_result:
-                score = best_free_result.get("score", 0.0)
-                if score >= budget.min_free_quality_to_skip_paid:
-                    metrics.quality_gate = {"passed": True, "score": score}
-                    best_free_result["metrics"] = asdict(metrics)
-                    _store_in_semantic_cache(url, best_free_result)
-                    yield best_free_result
-                    return
-
             if not budget.can_try(is_paid=pt.is_paid()):
                 if budget.stop_reason in ("paid_disabled", "max_paid_attempts"):
                     continue
@@ -203,7 +190,7 @@ def resolve_url_stream(
                     return_when=concurrent.futures.FIRST_COMPLETED,
                 )
 
-                found_final = False
+                found_acceptable = False
                 for f in list(done):
                     if f not in active_futures:
                         continue
@@ -233,50 +220,28 @@ def resolve_url_stream(
                                     domain, p_name_done, True, latency, q_score.score
                                 )
 
+                            found_acceptable = True
                             if pt_done == ProviderType.LLMS_TXT:
                                 result_dict = {
                                     "source": "llms.txt",
                                     "url": url,
                                     "content": compact_content(content, max_chars),
-                                    "metrics": asdict(metrics),
-                                    "score": q_score.score,
+                                    "metrics": metrics,
                                 }
+                                _store_in_semantic_cache(url, result_dict)
+                                yield result_dict
                             elif isinstance(res_or_content, ResolvedResult):
                                 res_or_content.metrics, res_or_content.score = (
                                     metrics,
                                     q_score.score,
                                 )
                                 result_dict = res_or_content.to_dict()
-                            else:
-                                result_dict = {
-                                    "source": p_name_done,
-                                    "url": url,
-                                    "content": content,
-                                    "metrics": asdict(metrics),
-                                    "score": q_score.score,
-                                }
-
-                            if pt_done.is_paid():
                                 _store_in_semantic_cache(url, result_dict)
                                 yield result_dict
-                                found_final = True
-                                break
-                            else:
-                                if not best_free_result or q_score.score > best_free_result.get(
-                                    "score", 0.0
-                                ):
-                                    best_free_result = result_dict
-
-                                if q_score.score >= budget.min_free_quality_to_skip_paid:
-                                    metrics.quality_gate = {"passed": True, "score": q_score.score}
-                                    result_dict["metrics"] = asdict(metrics)
-                                    _store_in_semantic_cache(url, result_dict)
-                                    yield result_dict
-                                    found_final = True
-                                    break
+                            break
                         else:
                             scripts.cache_negative.write_negative_cache(
-                                cache, url, p_name_done, "thin_content"
+                                cache, url, p_name_done, "thin_content", 1800
                             )
                             if domain:
                                 _routing_memory.record(
@@ -286,7 +251,7 @@ def resolve_url_stream(
                         _circuit_breakers.record_failure(p_name_done)
                         metrics.record_provider(pt_done, latency, False)
 
-                if found_final:
+                if found_acceptable:
                     return
                 if done:
                     break
@@ -297,14 +262,9 @@ def resolve_url_stream(
         for f in active_futures:
             f.cancel()
 
-    if best_free_result:
-        best_free_result["metrics"] = asdict(metrics)
-        _store_in_semantic_cache(url, best_free_result)
-        yield best_free_result
-    else:
-        yield {
-            "source": "none",
-            "url": url,
-            "content": "Failed",
-            "error": f"No resolution method available. Stop reason: {budget.stop_reason}",
-        }
+    yield {
+        "source": "none",
+        "url": url,
+        "content": "Failed",
+        "error": f"No resolution method available. Stop reason: {budget.stop_reason}",
+    }

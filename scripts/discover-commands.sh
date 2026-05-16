@@ -9,7 +9,7 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --output|-o) OUTPUT_FILE="$2"; shift 2 ;;
         --format|-f) FORMAT="$2"; shift 2 ;;
-        *) echo "Unknown option: $1" >&2; exit 1 ;;
+        *) printf "Unknown option: %s\n" "$1" >&2; exit 1 ;;
     esac
 done
 
@@ -25,7 +25,6 @@ find "$REPO_ROOT" -type f -name "*.md" \
     -not -path "*/.git/*" \
     -not -path "*/.cache/*" \
     -not -path "*/.claude/skills/*" \
-    -not -path "*/.gemini/skills/*" \
     -not -path "*/.qwen/skills/*" \
     -print0 | \
     xargs -0 awk -v root="$REPO_ROOT/" '
