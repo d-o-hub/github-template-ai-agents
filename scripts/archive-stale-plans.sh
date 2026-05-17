@@ -13,8 +13,8 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-PLANS_DIR="$SCRIPT_DIR/plans"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
+PLANS_DIR="$REPO_ROOT/plans"
 ARCHIVE_DIR="$PLANS_DIR/archive"
 MOVED_COUNT=0
 NOW_SECONDS=$(date +%s)
@@ -35,8 +35,11 @@ while IFS= read -r -d '' file; do
   age_seconds=$((NOW_SECONDS - file_seconds))
 
   if [[ $age_seconds -gt $SIXTY_DAYS_SECONDS ]]; then
-    mv -n "$file" "$ARCHIVE_DIR/$filename" 2>/dev/null || echo "  ~ $filename already exists in archive, skipped"
-    MOVED_COUNT=$((MOVED_COUNT + 1))
+    if mv -n "$file" "$ARCHIVE_DIR/$filename" 2>/dev/null; then
+      MOVED_COUNT=$((MOVED_COUNT + 1))
+    else
+      echo "  ~ $filename already exists in archive, skipped"
+    fi
   fi
 done < <(find "$PLANS_DIR" -maxdepth 1 -name '*-progress-update-*.md' -print0)
 

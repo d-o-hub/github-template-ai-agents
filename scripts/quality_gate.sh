@@ -94,7 +94,7 @@ fi
 echo ""
 
 # --- ADR compliance check ---
-if [ -f "./scripts/check-adr-compliance.sh" ]; then
+if [[ -f "./scripts/check-adr-compliance.sh" ]]; then
     echo -e "${BLUE}Checking ADR compliance...${NC}"
     if ! ./scripts/check-adr-compliance.sh; then
         FAILED=1
@@ -103,7 +103,7 @@ if [ -f "./scripts/check-adr-compliance.sh" ]; then
 fi
 
 # --- Plan numbering check ---
-if [ -f "./scripts/check-plan-numbering.sh" ]; then
+if [[ -f "./scripts/check-plan-numbering.sh" ]]; then
     echo -e "${BLUE}Checking plan numbering...${NC}"
     if ! ./scripts/check-plan-numbering.sh; then
         FAILED=1

@@ -11,11 +11,11 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
 EXIT_CODE=0
 
-STATUS_FILE="$SCRIPT_DIR/plans/_status.json"
-README_FILE="$SCRIPT_DIR/plans/README.md"
+STATUS_FILE="$REPO_ROOT/plans/_status.json"
+README_FILE="$REPO_ROOT/plans/README.md"
 
 if [[ ! -f "$STATUS_FILE" ]] || [[ ! -f "$README_FILE" ]]; then
   echo "  (Skipping check: plans/_status.json or plans/README.md not found)"

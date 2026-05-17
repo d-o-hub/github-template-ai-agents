@@ -14,7 +14,7 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
 EXIT_CODE=0
 
 log_ok() { echo "  ✓ $1"; }
@@ -25,13 +25,13 @@ echo "=== Phase 1: ADR File Inventory ==="
 declare -a ADR_FILES=()
 while IFS= read -r -d '' file; do
   ADR_FILES+=("$(basename "$file")")
-done < <(find "$SCRIPT_DIR/plans" -maxdepth 1 -name 'adr-*.md' -print0 | sort -z)
+done < <(find "$REPO_ROOT/plans" -maxdepth 1 -name 'adr-*.md' -print0 | sort -z)
 
 for f in "${ADR_FILES[@]}"; do echo "  - $f"; done
 
 # --- Phase 2: Status Registration ---
 echo -e "\n=== Phase 2: _status.json Registration ==="
-STATUS_FILE="$SCRIPT_DIR/plans/_status.json"
+STATUS_FILE="$REPO_ROOT/plans/_status.json"
 if [[ ! -f "$STATUS_FILE" ]]; then
   log_fail "plans/_status.json not found!"
 else
@@ -45,7 +45,7 @@ fi
 echo -e "\n=== Phase 3: Basic Pattern Compliance ==="
 # Users should add project-specific checks here.
 # Example:
-# if grep -rq "pattern" "$SCRIPT_DIR/src/"; then log_ok "Pattern found"; else log_fail "Pattern missing"; fi
+# if grep -rq "pattern" "$REPO_ROOT/src/"; then log_ok "Pattern found"; else log_fail "Pattern missing"; fi
 echo "  (No project-specific patterns defined in template)"
 
 if [[ $EXIT_CODE -eq 0 ]]; then

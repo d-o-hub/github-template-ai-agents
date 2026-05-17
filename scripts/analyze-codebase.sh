@@ -4,9 +4,8 @@ set -euo pipefail
 # Codebase Optimizer - Autonomous Analysis and Self-Learning Script (Template Version)
 # Analyzes code, detects issues, suggests fixes, and learns from corrections.
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(dirname "$SCRIPT_DIR")"
-AGENT_DOCS="$ROOT_DIR/agents-docs"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
+AGENT_DOCS="$REPO_ROOT/agents-docs"
 DATE=$(date +%Y-%m-%d)
 
 # Colors
@@ -52,9 +51,17 @@ analyze_patterns() {
 }
 
 update_agents_md() {
-    local agents_file="$ROOT_DIR/AGENTS.md"
+    local agents_file="$REPO_ROOT/AGENTS.md"
     if [[ ! -f "$agents_file" ]]; then return; fi
-    
+
+    local max_lines=200
+    local current_lines
+    current_lines=$(wc -l < "$agents_file")
+    if (( current_lines >= max_lines )); then
+        log_warn "Skipping AGENTS.md update: line limit reached ($current_lines/$max_lines)"
+        return
+    fi
+
     if ! grep -q "Self-Learning Rules" "$agents_file"; then
         log "Adding Self-Learning Rules section to AGENTS.md"
         cat >> "$agents_file" << 'EOM'

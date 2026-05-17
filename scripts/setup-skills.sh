@@ -8,9 +8,11 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
 SKILLS_SRC="$REPO_ROOT/.agents/skills"
 
 # CLI folders that should contain symlinks to canonical skills
-# (OpenCode reads directly from .agents/skills/ - no symlinks needed)
+# (OpenCode reads directly from .agents/skills/ - not included here)
+# (Qwen CLI also reads directly from .agents/skills/ - directory created for consistency)
 CLI_SKILL_DIRS=(
   ".claude/skills"
+  ".qwen/skills"
 )
 
 if [ ! -d "$SKILLS_SRC" ]; then
