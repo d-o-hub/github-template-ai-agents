@@ -22,8 +22,8 @@ GLOBAL_HOOKS_PATH=$(git config --global core.hooksPath 2>/dev/null || true)
 LOCAL_HOOKS_PATH=$(git config --local core.hooksPath 2>/dev/null || true)
 
 if [ -n "$GLOBAL_HOOKS_PATH" ]; then
-    echo -e "${RED}✗ ERROR: Global git hooks path is set!${NC}"
-    echo -e "   Global hooks path: ${YELLOW}$GLOBAL_HOOKS_PATH${NC}"
+    printf "%b\n" "${RED}✗ ERROR: Global git hooks path is set!${NC}"
+    printf "   Global hooks path: ${YELLOW}%s${NC}\n" "$GLOBAL_HOOKS_PATH"
     echo ""
     echo "This can prevent local pre-commit hooks from running."
     echo ""
@@ -43,8 +43,8 @@ fi
 
 # Check if local hooks path is correctly set
 if [ -n "$LOCAL_HOOKS_PATH" ] && [ "$LOCAL_HOOKS_PATH" != ".git/hooks" ] && [ "$LOCAL_HOOKS_PATH" != ".githooks" ]; then
-    echo -e "${RED}✗ ERROR: Local hooks path is non-standard!${NC}"
-    echo -e "   Local hooks path: ${YELLOW}$LOCAL_HOOKS_PATH${NC}"
+    printf "%b\n" "${RED}✗ ERROR: Local hooks path is non-standard!${NC}"
+    printf "   Local hooks path: ${YELLOW}%s${NC}\n" "$LOCAL_HOOKS_PATH"
     echo ""
     echo "To reset to standard path:"
     echo "    git config --local core.hooksPath .git/hooks"
@@ -54,5 +54,5 @@ if [ -n "$LOCAL_HOOKS_PATH" ] && [ "$LOCAL_HOOKS_PATH" != ".git/hooks" ] && [ "$
     exit 1
 fi
 
-echo -e "${GREEN}✓ Git hooks configuration validated${NC}"
+printf "%b\n" "${GREEN}✓ Git hooks configuration validated${NC}"
 exit 0

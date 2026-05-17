@@ -189,7 +189,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " rust " ]]; then
         # This enforces consistent formatting without modifying files
         if ! OUTPUT=$(cargo fmt --check 2>&1); then
             echo -e "${RED}  ✗ cargo fmt failed${NC}"
-            echo "$OUTPUT" >&2
+            printf "%s\n" "$OUTPUT" >&2
             FAILED=1
         else
             echo -e "${GREEN}  ✓ cargo fmt passed${NC}"
@@ -200,7 +200,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " rust " ]]; then
         if [ "${SKIP_CLIPPY:-false}" != "true" ]; then
             if ! OUTPUT=$(cargo clippy --all-targets -- -D warnings 2>&1); then
                 echo -e "${RED}  ✗ cargo clippy failed${NC}"
-                echo "$OUTPUT" >&2
+                printf "%s\n" "$OUTPUT" >&2
                 FAILED=1
             else
                 echo -e "${GREEN}  ✓ cargo clippy passed${NC}"
@@ -212,7 +212,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " rust " ]]; then
         if [ "${SKIP_TESTS:-false}" != "true" ]; then
             if ! OUTPUT=$(cargo test --lib 2>&1); then
                 echo -e "${RED}  ✗ cargo test failed${NC}"
-                echo "$OUTPUT" >&2
+                printf "%s\n" "$OUTPUT" >&2
                 FAILED=1
             else
                 echo -e "${GREEN}  ✓ cargo test passed${NC}"
@@ -234,7 +234,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
         # Lint: Runs ESLint or configured linter via "pnpm lint" script
         if ! OUTPUT=$(pnpm lint 2>&1); then
             echo -e "${RED}  ✗ pnpm lint failed${NC}"
-            echo "$OUTPUT" >&2
+            printf "%s\n" "$OUTPUT" >&2
             FAILED=1
         else
             echo -e "${GREEN}  ✓ pnpm lint passed${NC}"
@@ -244,7 +244,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
         # Catches type errors that might not appear in tests
         if ! OUTPUT=$(pnpm typecheck 2>&1); then
             echo -e "${RED}  ✗ pnpm typecheck failed${NC}"
-            echo "$OUTPUT" >&2
+            printf "%s\n" "$OUTPUT" >&2
             FAILED=1
         else
             echo -e "${GREEN}  ✓ pnpm typecheck passed${NC}"
@@ -254,7 +254,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
         if [ "${SKIP_TESTS:-false}" != "true" ]; then
             if ! OUTPUT=$(pnpm test 2>&1); then
                 echo -e "${RED}  ✗ pnpm test failed${NC}"
-                echo "$OUTPUT" >&2
+                printf "%s\n" "$OUTPUT" >&2
                 FAILED=1
             else
                 echo -e "${GREEN}  ✓ pnpm test passed${NC}"
@@ -264,7 +264,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
         # Fallback to npm - runs same checks via "npm run <script>" syntax
         if ! OUTPUT=$(npm run lint 2>&1); then
             echo -e "${RED}  ✗ npm lint failed${NC}"
-            echo "$OUTPUT" >&2
+            printf "%s\n" "$OUTPUT" >&2
             FAILED=1
         else
             echo -e "${GREEN}  ✓ npm lint passed${NC}"
@@ -272,7 +272,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
 
         if ! OUTPUT=$(npm run typecheck 2>&1); then
             echo -e "${RED}  ✗ npm typecheck failed${NC}"
-            echo "$OUTPUT" >&2
+            printf "%s\n" "$OUTPUT" >&2
             FAILED=1
         else
             echo -e "${GREEN}  ✓ npm typecheck passed${NC}"
@@ -281,7 +281,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
         if [ "${SKIP_TESTS:-false}" != "true" ]; then
             if ! OUTPUT=$(npm test 2>&1); then
                 echo -e "${RED}  ✗ npm test failed${NC}"
-                echo "$OUTPUT" >&2
+                printf "%s\n" "$OUTPUT" >&2
                 FAILED=1
             else
                 echo -e "${GREEN}  ✓ npm test passed${NC}"
@@ -304,7 +304,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " python " ]]; then
     if command -v ruff &> /dev/null; then
         if ! OUTPUT=$(ruff check . 2>&1); then
             echo -e "${RED}  ✗ ruff check failed${NC}"
-            echo "$OUTPUT" >&2
+            printf "%s\n" "$OUTPUT" >&2
             FAILED=1
         else
             echo -e "${GREEN}  ✓ ruff check passed${NC}"
@@ -318,7 +318,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " python " ]]; then
     if command -v black &> /dev/null; then
         if ! OUTPUT=$(black --check . 2>&1); then
             echo -e "${RED}  ✗ black check failed${NC}"
-            echo "$OUTPUT" >&2
+            printf "%s\n" "$OUTPUT" >&2
             FAILED=1
         else
             echo -e "${GREEN}  ✓ black check passed${NC}"
@@ -333,7 +333,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " python " ]]; then
         if command -v pytest &> /dev/null; then
             if ! OUTPUT=$(pytest tests/ -q 2>&1); then
                 echo -e "${RED}  ✗ pytest failed${NC}"
-                echo "$OUTPUT" >&2
+                printf "%s\n" "$OUTPUT" >&2
                 FAILED=1
             else
                 echo -e "${GREEN}  ✓ pytest passed${NC}"
@@ -353,7 +353,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " go " ]]; then
         # gofmt: Standard Go formatter
         if ! OUTPUT=$(gofmt -l . 2>&1); then
             echo -e "${RED}  ✗ gofmt found unformatted files${NC}"
-            echo "$OUTPUT" >&2
+            printf "%s\n" "$OUTPUT" >&2
             FAILED=1
         else
             echo -e "${GREEN}  ✓ gofmt passed${NC}"
@@ -361,7 +361,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " go " ]]; then
 
         if ! OUTPUT=$(go vet ./... 2>&1); then
             echo -e "${RED}  ✗ go vet failed${NC}"
-            echo "$OUTPUT" >&2
+            printf "%s\n" "$OUTPUT" >&2
             FAILED=1
         else
             echo -e "${GREEN}  ✓ go vet passed${NC}"
@@ -370,7 +370,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " go " ]]; then
         if [ "${SKIP_TESTS:-false}" != "true" ]; then
             if ! OUTPUT=$(go test ./... 2>&1); then
                 echo -e "${RED}  ✗ go test failed${NC}"
-                echo "$OUTPUT" >&2
+                printf "%s\n" "$OUTPUT" >&2
                 FAILED=1
             else
                 echo -e "${GREEN}  ✓ go test passed${NC}"
@@ -423,7 +423,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
         if command -v bats &> /dev/null; then
             if ! OUTPUT=$(bats tests/ 2>&1); then
                 echo -e "${RED}  ✗ bats tests failed${NC}"
-                echo "$OUTPUT" >&2
+                printf "%s\n" "$OUTPUT" >&2
                 FAILED=1
             else
                 echo -e "${GREEN}  ✓ bats tests passed${NC}"
