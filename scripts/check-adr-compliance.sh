@@ -33,7 +33,11 @@ for f in "${ADR_FILES[@]}"; do echo "  - $f"; done
 echo -e "\n=== Phase 2: _status.json Registration ==="
 STATUS_FILE="$REPO_ROOT/plans/_status.json"
 if [[ ! -f "$STATUS_FILE" ]]; then
-  log_fail "plans/_status.json not found!"
+  if [[ ${#ADR_FILES[@]} -eq 0 ]]; then
+    echo "  (Skipping check: plans/_status.json not found and no ADR files exist)"
+  else
+    log_fail "plans/_status.json not found but ADR files exist!"
+  fi
 else
   for f in "${ADR_FILES[@]}"; do
     if grep -q "\"$f\"" "$STATUS_FILE"; then :
