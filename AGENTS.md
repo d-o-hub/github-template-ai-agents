@@ -22,7 +22,6 @@ readonly DEFAULT_TIMEOUT_SECONDS=1800
 # Git/PR configuration
 readonly MAX_COMMIT_SUBJECT_LENGTH=72
 readonly MAX_PR_TITLE_LENGTH=72
-
 ```
 
 
@@ -69,6 +68,16 @@ See `agents-docs/VERSION.md` for full workflow details.
 ./scripts/quality_gate.sh # Always run before committing. Fix all errors.
 ./scripts/update-all-docs.sh # Verify and update documentation
 ```
+
+## Maintenance & Verification
+
+```bash
+./scripts/analyze-codebase.sh   # Autonomous analysis and self-learning
+./scripts/check-adr-compliance.sh # Verify ADR registration and patterns
+./scripts/check-plan-numbering.sh # Ensure plan counters are consistent
+./scripts/archive-stale-plans.sh # Archive plans older than 60 days
+```
+
 **Guard Rails:**
 - **Temporary Files**: NEVER create temporary files or debug outputs in the repository root or source directories. Always use system temporary directories (e.g., `/tmp` or via `mktemp`).
 - **Secret Scanning**: Gitleaks is enforced via CI only to prevent credential leakage.
@@ -86,7 +95,8 @@ See `agents-docs/VERSION.md` for full workflow details.
 
 - `agents-docs/`: Detailed reference; `.agents/skills/`: Canonical skills
 - `scripts/`: Setup/validation; `analysis/` & `reports/`: Generated outputs
-- `.claude/`, `.gemini/`, `.qwen/`: Agent-specific symlinks
+- `.claude/`: Agent-specific symlinks (see `scripts/setup-skills.sh`)
+- `plans/`: ADRs define decisions; progress updates track implementation status.
 
 ## PR & Commit Instructions
 
@@ -98,8 +108,6 @@ See `agents-docs/VERSION.md` for full workflow details.
 1. **Use Helper (Preferred)**: Run `./scripts/ai-commit.sh --type <type> --subject <subject> --body <body>`
 2. **Manual Commits**: Validated via `.githooks/commit-msg` (requires `./scripts/install-git-hooks.sh`)
 3. **If Validation Fails**: Identify violation, then `git commit --amend` to fix message.
-
-**Valid Example:**
 
 ### Commit Type Mapping
 
@@ -194,5 +202,9 @@ Do not invent new types. Do not skip linting.
 #### Recent Project-Wide Learnings
 - **Action SHA Pinning**: Pin to 40-char SHAs for security (LESSON-016)
 - **Worktree Cleanup**: Use `trap cleanup EXIT ERR` and `CREATED_WORKTREES` (LESSON-010)
+
+## Self-Learning Rules (Auto-Generated)
+
+This section is automatically updated by `./scripts/analyze-codebase.sh`.
 
 See `agents-docs/` for detailed reference documentation.
