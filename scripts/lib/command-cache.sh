@@ -22,7 +22,7 @@ init_cache() {
 # Get the last validated commit hash
 get_last_commit() {
     if [ -f "$LAST_COMMIT_FILE" ]; then
-        cat "$LAST_COMMIT_FILE"
+        cat -- "$LAST_COMMIT_FILE"
     else
         printf ""
     fi
@@ -102,7 +102,7 @@ get_cached_result() {
     cache_file=$(get_cache_path "$1")
 
     if [ -f "$cache_file" ]; then
-        cat "$cache_file"
+        cat -- "$cache_file"
     else
         printf ""
     fi
@@ -130,9 +130,12 @@ save_cached_result() {
 
 # Clear entire cache
 clear_cache() {
-    rm -rf "$COMMANDS_CACHE_DIR"/*
-    rm -f "$LAST_COMMIT_FILE"
-    rm -f "$MANIFEST_FILE"
+    # Using -- with rm -rf and ensuring path is not empty
+    if [[ -n "$COMMANDS_CACHE_DIR" ]]; then
+        rm -rf -- "$COMMANDS_CACHE_DIR"/*
+    fi
+    rm -f -- "$LAST_COMMIT_FILE"
+    rm -f -- "$MANIFEST_FILE"
     printf "%s CACHE_CLEARED\n" "$(date -Iseconds)" >> "$AUDIT_LOG"
 }
 
