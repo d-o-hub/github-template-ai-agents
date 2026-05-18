@@ -11,8 +11,8 @@ CREATED_WORKTREES=()
 # Cleanup trap function - call from trap in main script
 cleanup_worktrees() {
     for wt in "${CREATED_WORKTREES[@]}"; do
-        if git worktree list --porcelain 2>/dev/null | grep -q "worktree ${wt}"; then
-            git worktree remove --force "$wt" 2>/dev/null || true
+        if git worktree list --porcelain 2>/dev/null | grep -q -- "worktree ${wt}"; then
+            git worktree remove --force -- "$wt" 2>/dev/null || true
         fi
     done
 }
@@ -21,27 +21,43 @@ setup_worktree() {
     local branch_name="$1"
     local worktree_path="${WORKTREE_BASE}/${branch_name}"
 
-    mkdir -p "$WORKTREE_BASE"
+    mkdir -p -- "$WORKTREE_BASE"
 
-    if git worktree list | grep -q "${worktree_path}"; then
-        git worktree remove "$worktree_path" --force 2>/dev/null || true
+    if git worktree list | grep -q -- "${worktree_path}"; then
+        git worktree remove --force -- "$worktree_path" 2>/dev/null || true
     fi
 
-    if git branch --list "$branch_name" | grep -q "$branch_name"; then
-        git worktree add "$worktree_path" "$branch_name"
+    if git rev-parse --verify --quiet "refs/heads/$branch_name" >/dev/null; then
+        git worktree add -- "$worktree_path" "$branch_name"
     else
-        git worktree add -b "$branch_name" "$worktree_path" main
+        git worktree add -b "$branch_name" -- "$worktree_path" main
     fi
 
     CREATED_WORKTREES+=("$worktree_path")
-    echo "$worktree_path"
+    printf "%s\n" "$worktree_path"
 }
 
 cleanup_worktree() {
     local worktree_path="$1"
-    if git worktree list | grep -q "${worktree_path}"; then
-        git worktree remove "$worktree_path" --force 2>/dev/null || {
-            rm -rf "$worktree_path"
+    if git worktree list | grep -q -- "${worktree_path}"; then
+        git worktree remove --force -- "${worktree_path}" 2>/dev/null || {
+            local resolved
+            resolved=$(realpath -m -- "$worktree_path" 2>/dev/null || echo "$worktree_path")
+
+            if [[ -z "$resolved" ]] || [[ "$resolved" == "/" ]] || [[ "$resolved" == "." ]] || [[ "$resolved" == "~" ]]; then
+                printf "Error: Dangerous or invalid worktree_path: %s\n" "$worktree_path" >&2
+                exit 1
+            fi
+
+            # Resides under WORKTREE_BASE
+            local base_resolved
+            base_resolved=$(realpath -m -- "$WORKTREE_BASE" 2>/dev/null || echo "$WORKTREE_BASE")
+            if [[ "$resolved/" != "$base_resolved/"* ]]; then
+                printf "Error: worktree_path %s is not under %s\n" "$resolved" "$base_resolved" >&2
+                exit 1
+            fi
+
+            rm -rf -- "$resolved"
             git worktree prune
         }
     fi

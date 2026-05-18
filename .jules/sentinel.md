@@ -55,3 +55,11 @@
 **Learning:** `echo -e` behaves inconsistently across shells and interprets escape sequences within the variable content itself, not just the format string. This allows malicious input to spoof script output or manipulate logging. `echo` also interprets arguments starting with `-` as options.
 
 **Prevention:** Always use `printf` with a literal format string (e.g., `printf "%s\n" "$VAR"`) to ensure variables are treated as literal data and cannot be interpreted as command options or escape sequences.
+
+## 2026-05-15 - Option Injection in Library Scripts
+
+**Vulnerability:** Shell scripts in `scripts/lib/` were vulnerable to option injection because they passed variables (like branch names or file paths) to commands like `git`, `mkdir`, `rm`, and `cat` without the `--` separator.
+
+**Learning:** Even internal library functions are vulnerable if they handle variables that might be influenced by external input (e.g., branch names from git, or cached file names).
+
+**Prevention:** Always use the `--` separator before positional arguments in shell commands to terminate option processing. Use `printf` instead of `echo`. Implement strict path validation (canonicalization with `realpath -m`, root/dangerous path rejection, and boundary checks) before recursive deletions. Use exact ref checks (`git rev-parse`) instead of partial string matching for branch verification.
