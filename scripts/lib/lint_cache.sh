@@ -22,7 +22,7 @@ else
     CACHE_DIR="$REPO_ROOT/.lint-cache"
 fi
 
-mkdir -p "$CACHE_DIR"
+mkdir -p -- "$CACHE_DIR"
 
 # Global associative array for config hash caching (Bash 4+)
 # This avoids re-hashing the same config file hundreds of times
@@ -32,7 +32,7 @@ declare -A _CONFIG_HASH_CACHE
 _get_hash_internal() {
     local file="$1"
     if [ ! -f "$file" ]; then
-        echo "none"
+        printf "none\n"
         return
     fi
     # Optimization: Use internal Bash variables if we can avoid external tools
@@ -40,11 +40,11 @@ _get_hash_internal() {
     if command -v sha256sum &> /dev/null; then
         local res
         res=$(sha256sum -- "$file")
-        echo "${res%% *}"
+        printf "%s\n" "${res%% *}"
     elif command -v shasum &> /dev/null; then
         local res
         res=$(shasum -a 256 -- "$file")
-        echo "${res%% *}"
+        printf "%s\n" "${res%% *}"
     else
         # Fallback to just timestamp + size if no shasum tool
         # Security: Use -- to prevent option injection
@@ -128,12 +128,12 @@ lint_if_changed() {
 
     # Run the command
     if "$@"; then
-        echo "$cache_value" > "$cache_key"
+        printf "%s\n" "$cache_value" > "$cache_key"
         return 0
     else
         # If it failed, we don't update the cache, so it runs again next time
         # Also remove existing cache entry to be safe
-        rm -f "$cache_key"
+        rm -f -- "$cache_key"
         return 1
     fi
 }

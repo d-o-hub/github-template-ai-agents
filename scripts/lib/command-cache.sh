@@ -22,7 +22,7 @@ init_cache() {
 # Get the last validated commit hash
 get_last_commit() {
     if [ -f "$LAST_COMMIT_FILE" ]; then
-        cat "$LAST_COMMIT_FILE"
+        cat -- "$LAST_COMMIT_FILE"
     else
         printf ""
     fi
@@ -102,7 +102,7 @@ get_cached_result() {
     cache_file=$(get_cache_path "$1")
 
     if [ -f "$cache_file" ]; then
-        cat "$cache_file"
+        cat -- "$cache_file"
     else
         printf ""
     fi
@@ -130,9 +130,17 @@ save_cached_result() {
 
 # Clear entire cache
 clear_cache() {
-    rm -rf "$COMMANDS_CACHE_DIR"/*
-    rm -f "$LAST_COMMIT_FILE"
-    rm -f "$MANIFEST_FILE"
+    local resolved
+    resolved=$(realpath -m -- "$COMMANDS_CACHE_DIR" 2>/dev/null || echo "$COMMANDS_CACHE_DIR")
+
+    if [[ -z "$resolved" ]] || [[ "$resolved" == "/" ]] || [[ "$resolved" == "." ]] || [[ "$resolved" == "~" ]]; then
+        printf "Error: Dangerous or invalid COMMANDS_CACHE_DIR: %s (resolved: %s)\n" "$COMMANDS_CACHE_DIR" "$resolved" >&2
+        exit 1
+    fi
+
+    rm -rf -- "$resolved"/*
+    rm -f -- "$LAST_COMMIT_FILE"
+    rm -f -- "$MANIFEST_FILE"
     printf "%s CACHE_CLEARED\n" "$(date -Iseconds)" >> "$AUDIT_LOG"
 }
 
