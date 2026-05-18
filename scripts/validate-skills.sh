@@ -13,7 +13,6 @@ source "$REPO_ROOT/scripts/lib/skill-validation.sh"
 
 CLI_SKILL_DIRS=(
   ".claude/skills"
-  ".qwen/skills"
 )
 
 FAILED=0
@@ -76,13 +75,7 @@ for skill_path in "$SKILLS_SRC"/*/; do
     for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
         link="$REPO_ROOT/$cli_dir/$skill_name"
 
-        # .qwen/skills may be real dirs (not symlinks) - accept either
-        if [[ "$cli_dir" == ".qwen/skills" ]]; then
-            if [ ! -d "$link" ]; then
-                printf "  ${RED}✗${NC} MISSING: %s/%s\n" "$cli_dir" "$skill_name" >&2
-                FAILED=1
-            fi
-        elif [ ! -L "$link" ] && { [ "$IS_WINDOWS" = "false" ] || [ ! -f "$link" ]; }; then
+        if [ ! -L "$link" ] && { [ "$IS_WINDOWS" = "false" ] || [ ! -f "$link" ]; }; then
             printf "  ${RED}✗${NC} MISSING symlink: %s/%s\n" "$cli_dir" "$skill_name" >&2
             FAILED=1
         elif [ ! -d "$link" ] && { [ "$IS_WINDOWS" = "false" ] || [ ! -f "$link" ]; }; then
@@ -98,8 +91,8 @@ for skill_path in "$SKILLS_SRC"/*/; do
 
                 if [ -n "$target" ] && [ "$target" != "$expected_target" ]; then
                     printf "  ${YELLOW}⚠${NC} WRONG target: %s/%s\n" "$cli_dir" "$skill_name" >&2
-                    printf "      Expected: %s\n" "$expected_target" >&2
-                    printf "      Actual:   %s\n" "$target" >&2
+                    printf "     expected: %s\n" "$expected_target"
+                    printf "     actual:   %s\n" "$target"
                     WARNINGS=1
                 fi
             fi
@@ -107,49 +100,36 @@ for skill_path in "$SKILLS_SRC"/*/; do
     done
 done
 
+# Check 4: skill-rules.json if it exists
 echo ""
-
-# --- Validate skill-rules.json if it exists ---
-if [ -f "$SKILLS_SRC/skill-rules.json" ]; then
-    echo "Checking skill-rules.json..."
-    
-    # Check JSON validity
-    if command -v jq &> /dev/null; then
-        if ! jq empty "$SKILLS_SRC/skill-rules.json" 2>/dev/null; then
-            printf "  ${RED}✗${NC} skill-rules.json: Invalid JSON\n" >&2
-            FAILED=1
-        else
-            printf "  ${GREEN}✓${NC} skill-rules.json: Valid JSON\n"
-
-            # Check for required fields in rules
-            rule_count=$(jq '.rules | length' "$SKILLS_SRC/skill-rules.json")
-            printf "  ${GREEN}✓${NC} skill-rules.json: %s rules defined\n" "$rule_count"
-        fi
+echo "Checking skill-rules.json..."
+RULES_FILE="$REPO_ROOT/.agents/skill-rules.json"
+if [ -f "$RULES_FILE" ]; then
+    if ! python3 -c "import json; json.load(open('$RULES_FILE'))" 2>/dev/null; then
+        printf "  ${RED}✗${NC} skill-rules.json: Invalid JSON\n" >&2
+        FAILED=1
     else
-        printf "  ${YELLOW}⚠${NC} jq not installed - skipping JSON validation\n"
+        RULES_COUNT=$(python3 -c "import json; print(len(json.load(open('$RULES_FILE'))))")
+        printf "  ${GREEN}✓${NC} skill-rules.json: Valid JSON\n"
+        printf "  ${GREEN}✓${NC} skill-rules.json: %s rules defined\n" "$RULES_COUNT"
     fi
-    echo ""
+else
+    echo "  (No skill-rules.json found)"
 fi
 
-# --- Summary ---
 if [ $FAILED -ne 0 ]; then
-    echo "─────────────────────────────────────────────────────────────────" >&2
-    echo "│ ✗ Skill Validation FAILED                                     │" >&2
-    echo "─────────────────────────────────────────────────────────────────" >&2
-    echo "" >&2
-    echo "Run: ./scripts/setup-skills.sh to fix missing symlinks." >&2
-    echo "See: agents-docs/SKILLS.md for skill authoring guide." >&2
+    echo ""
+    echo -e "${RED}─────────────────────────────────────────────────────────────────${NC}"
+    echo -e "${RED}│ ✗ Skill Validation FAILED                                     │${NC}"
+    echo -e "${RED}─────────────────────────────────────────────────────────────────${NC}"
+    echo ""
+    echo "Run: ./scripts/setup-skills.sh to fix missing symlinks."
+    echo "See: agents-docs/SKILLS.md for skill authoring guide."
     exit 2
 fi
 
-if [ $WARNINGS -ne 0 ]; then
-    echo "─────────────────────────────────────────────────────────────────"
-    echo "│ ⚠ Skill Validation completed with warnings                    │"
-    echo "─────────────────────────────────────────────────────────────────"
-    echo ""
-    echo "Consider fixing warnings for optimal setup."
-fi
-
-echo "─────────────────────────────────────────────────────────────────"
-echo "│ ✓ All skill validations passed                                │"
-echo "─────────────────────────────────────────────────────────────────"
+echo ""
+echo -e "${GREEN}─────────────────────────────────────────────────────────────────${NC}"
+echo -e "${GREEN}│ ✓ All skills valid                                            │${NC}"
+echo -e "${GREEN}─────────────────────────────────────────────────────────────────${NC}"
+exit 0
