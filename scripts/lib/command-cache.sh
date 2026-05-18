@@ -130,10 +130,15 @@ save_cached_result() {
 
 # Clear entire cache
 clear_cache() {
-    # Using -- with rm -rf and ensuring path is not empty
-    if [[ -n "$COMMANDS_CACHE_DIR" ]]; then
-        rm -rf -- "$COMMANDS_CACHE_DIR"/*
+    local resolved
+    resolved=$(realpath -m -- "$COMMANDS_CACHE_DIR" 2>/dev/null || echo "$COMMANDS_CACHE_DIR")
+
+    if [[ -z "$resolved" ]] || [[ "$resolved" == "/" ]] || [[ "$resolved" == "." ]] || [[ "$resolved" == "~" ]]; then
+        printf "Error: Dangerous or invalid COMMANDS_CACHE_DIR: %s (resolved: %s)\n" "$COMMANDS_CACHE_DIR" "$resolved" >&2
+        exit 1
     fi
+
+    rm -rf -- "$resolved"/*
     rm -f -- "$LAST_COMMIT_FILE"
     rm -f -- "$MANIFEST_FILE"
     printf "%s CACHE_CLEARED\n" "$(date -Iseconds)" >> "$AUDIT_LOG"

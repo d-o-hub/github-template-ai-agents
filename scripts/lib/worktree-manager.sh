@@ -27,7 +27,7 @@ setup_worktree() {
         git worktree remove --force -- "$worktree_path" 2>/dev/null || true
     fi
 
-    if git branch --list -- "$branch_name" | grep -q -- "$branch_name"; then
+    if git rev-parse --verify --quiet "refs/heads/$branch_name" >/dev/null; then
         git worktree add -- "$worktree_path" "$branch_name"
     else
         git worktree add -b "$branch_name" -- "$worktree_path" main
@@ -41,7 +41,23 @@ cleanup_worktree() {
     local worktree_path="$1"
     if git worktree list | grep -q -- "${worktree_path}"; then
         git worktree remove --force -- "${worktree_path}" 2>/dev/null || {
-            rm -rf -- "$worktree_path"
+            local resolved
+            resolved=$(realpath -m -- "$worktree_path" 2>/dev/null || echo "$worktree_path")
+
+            if [[ -z "$resolved" ]] || [[ "$resolved" == "/" ]] || [[ "$resolved" == "." ]] || [[ "$resolved" == "~" ]]; then
+                printf "Error: Dangerous or invalid worktree_path: %s\n" "$worktree_path" >&2
+                exit 1
+            fi
+
+            # Resides under WORKTREE_BASE
+            local base_resolved
+            base_resolved=$(realpath -m -- "$WORKTREE_BASE" 2>/dev/null || echo "$WORKTREE_BASE")
+            if [[ "$resolved/" != "$base_resolved/"* ]]; then
+                printf "Error: worktree_path %s is not under %s\n" "$resolved" "$base_resolved" >&2
+                exit 1
+            fi
+
+            rm -rf -- "$resolved"
             git worktree prune
         }
     fi

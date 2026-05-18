@@ -62,4 +62,4 @@
 
 **Learning:** Even internal library functions are vulnerable if they handle variables that might be influenced by external input (e.g., branch names from git, or cached file names).
 
-**Prevention:** Always use the `--` separator before positional arguments in shell commands to terminate option processing, especially when arguments start with a variable. Use `printf` instead of `echo`.
+**Prevention:** Always use the `--` separator before positional arguments in shell commands to terminate option processing. Use `printf` instead of `echo`. Implement strict path validation (canonicalization with `realpath -m`, root/dangerous path rejection, and boundary checks) before recursive deletions. Use exact ref checks (`git rev-parse`) instead of partial string matching for branch verification.
