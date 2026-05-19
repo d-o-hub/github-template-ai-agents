@@ -16,7 +16,7 @@ TMP_JS_FILE=$(mktemp /tmp/workflow-script-XXXXXX.js)
 
 # Ensure cleanup on exit
 cleanup() {
-    rm -f "$TMP_JS_FILE"
+    rm -f -- "$TMP_JS_FILE"
 }
 trap cleanup EXIT
 
@@ -33,9 +33,9 @@ for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
     # Process output of awk directly to avoid intermediate temp file
     while IFS= read -r line; do
         if [[ "$line" == "---INJECTION_RISK---"* ]]; then
-            echo -e "  ${RED}⚠ Potential script injection risk detected:${NC}"
-            echo -e "    ${line#---INJECTION_RISK---}"
-            echo -e "    Use environment variables instead of direct \${{ }} interpolation."
+            printf "  ${RED}⚠ Potential script injection risk detected:${NC}\n"
+            printf "    %s\n" "${line#---INJECTION_RISK---}"
+            printf "    Use environment variables instead of direct \${{ }} interpolation.\n"
             FAILED=1
             continue
         fi
@@ -48,11 +48,11 @@ for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
 
                 # node -c only checks syntax, which is what we want
                 if ! node -c "$TMP_JS_FILE" 2>/dev/null; then
-                    echo -e "  ${RED}✗ Syntax error in script block${NC}"
+                    printf "  ${RED}✗ Syntax error in script block${NC}\n"
                     node -c "$TMP_JS_FILE" 2>&1 | sed 's/^/    /'
                     FAILED=1
                 else
-                    echo -e "  ${GREEN}✓ Script block syntax OK${NC}"
+                    printf "  ${GREEN}✓ Script block syntax OK${NC}\n"
                 fi
                 current_block=""
             fi
@@ -89,9 +89,9 @@ for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
 done
 
 if [ $FAILED -ne 0 ]; then
-    echo -e "\n${RED}Validation FAILED${NC}"
+    printf "\n${RED}Validation FAILED${NC}\n"
     exit 1
 else
-    echo -e "\n${GREEN}Validation PASSED${NC}"
+    printf "\n${GREEN}Validation PASSED${NC}\n"
     exit 0
 fi
