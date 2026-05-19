@@ -34,10 +34,10 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-log() { echo -e "${BLUE}[$(date +%H:%M:%S)]${NC} $1"; }
-log_ok() { echo -e "${GREEN}✓${NC} $1"; }
-log_warn() { echo -e "${YELLOW}⚠${NC} $1"; }
-log_err() { echo -e "${RED}✗${NC} $1"; }
+log() { printf "${BLUE}[$(date +%H:%M:%S)]${NC} %s\n" "$1"; }
+log_ok() { printf "${GREEN}✓${NC} %s\n" "$1"; }
+log_warn() { printf "${YELLOW}⚠${NC} %s\n" "$1"; }
+log_err() { printf "${RED}✗${NC} %s\n" "$1"; }
 
 init_docs() {
     mkdir -p "$AGENT_DOCS"/{patterns,issues,fixes,detected,resolved,references}
