@@ -7,6 +7,84 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.9] - 2026-05-19
+
+### Added
+
+- feat(turso-db): sync with latest Turso docs (v0.6.0) (#338)
+- feat(do-web-doc-resolver): integrate optimizations and bugfixes from reference repository (#329)
+- feat: adopt template practices from do-web-doc-resolver (#320)
+- feat: add jules-delegator skill for task delegation (#304)
+- feat: add .claude-plugin/ manifest for Claude Code marketplace (#300)
+- feat(docs): centralize reference checklists in agents-docs/ (#299)
+
+### Fixed
+
+- fix: harden shell scripts against option injection (#339)
+- fix(security): harden utility scripts and address review feedback
+- fix(security): harden utility scripts and fix bash compatibility
+- fix(security): harden utility scripts against injection
+- fix: harden utility scripts against structural and option injection
+- fix: harden shell scripts against injection and improve portability
+- 🔒 [security fix] Unsafe command execution via tesseract and docling (#317)
+- fix(security): harden scripts against injection and improve portability
+- fix(security): harden scripts against injection
+- fix(security): address PR feedback on ai-commit.sh and sentinel.md
+- fix(security): prevent structural and option injection in ai-commit.sh
+- fix: explicitly add missing 0.2.7 entry to CHANGELOG-TEMPLATE.md
+- fix: resolve jules-delegator CI issues and harden doc scripts
+- fix: resolve jules-delegator CI issues and harden doc scripts
+- fix(security): prevent message injection in ai-commit.sh (#307)
+- 🛡️ Sentinel: Fix option injection in utility scripts (#290)
+- fix: address further PR feedback for patch version bump script
+- fix: address PR feedback for patch version bump script
+
+### Changed
+
+- Fix badge link for template version in README
+- Update README.md
+- Remove template version badge
+- Update version from 0.2.8 to 0.0.0
+- Add Changelog link to Quick Links section
+- CodeRabbit Generated Unit Tests: Add unit tests (#344)
+- ci: bump the github-actions group with 2 updates (#342)
+- 🛡️ Sentinel: [security improvement] harden scripts against structural and option injection (#343)
+- sync orchestration and management tools from do-gist-hub (#340)
+- 🛡️ Sentinel: [security improvement] (#341)
+- Enhance sync-turso-skill workflow with error handling
+- 🛡️ Sentinel: [security improvement] Harden swarm-worktree-web-research script (#337)
+- perf: optimize command invalidation by pre-parsing JSON (#336)
+- chore: remove .gemini/skills symlinks (#335)
+- Hi, Jules here! I've optimized the performance by eliminating subshells in the `generate-available-skills.sh` loop.
+- chore: [Jules Audit] 2026-05-14 — no actionable findings\n\nIncludes a test patch to stabilize do-web-doc-resolver tests.
+- perf: remove subshells in quality gate linting loops
+- perf: eliminate subshells in validate-config.sh loop
+- Bolt: Eliminate redundant process forks and subshells (#325)
+- ci: bump the github-actions group with 2 updates (#323)
+- 🛡️ Sentinel: [security improvement] (#324)
+- ⚡ Bolt: eliminate jq subshells in verify-commands loop (#322)
+- 🛡️ Sentinel: [security improvement] Harden research engine score comparison (#321)
+- test: improve content quality scoring tests and observability (#319)
+- refactor: cleanup imports and fix accessibility
+- refactor(tests): remove unused MagicMock and pytest imports
+- 🧹 remove unused MagicMock and pytest imports in tests/test_run_evals.py
+- 🧪 Improve content quality scoring tests and observability
+- perf: optimize form label accessibility check
+- perf: eliminate subshells and bash loop in validate_skill_file
+- perf: eliminate subshells and bash loop in validate_skill_file
+- perf: address review comments in update-agents-md.sh
+- perf: replace bash loop with batched awk in update-agents-md.sh
+- refactor(agents): replace spec-driven dev with GOAP/ADR
+- refactor(agents): replace spec-driven dev with GOAP/ADR
+- refactor(agents): replace spec-driven development with GOAP and ADRs
+- ci: update github actions to node 24
+- ci: update github actions to support node.js 24 and eliminate deprecation warnings
+- refactor(gemini): use direct .agents/skills/ instead of symlinks (#305)
+- Migrate Gemini commands to TOML format (#298)
+- Add anti-rationalization tables to SKILL.md template (#297)
+- ⚡ Bolt: Optimize eval-skills.sh validation via single-pass AWK (#289)
+- chore: update script to use semantic commit formatting without emojis
+
 ## [0.2.8] - 2026-05-07
 
 ### Added
