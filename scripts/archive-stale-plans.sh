@@ -35,10 +35,10 @@ while IFS= read -r -d '' file; do
   age_seconds=$((NOW_SECONDS - file_seconds))
 
   if [[ $age_seconds -gt $SIXTY_DAYS_SECONDS ]]; then
-    if mv -n "$file" "$ARCHIVE_DIR/$filename" 2>/dev/null; then
+    if mv -n -- "$file" "$ARCHIVE_DIR/$filename" 2>/dev/null; then
       MOVED_COUNT=$((MOVED_COUNT + 1))
     else
-      echo "  ~ $filename already exists in archive, skipped"
+      printf "  ~ %s already exists in archive, skipped\n" "$filename"
     fi
   fi
 done < <(find "$PLANS_DIR" -maxdepth 1 -name '*-progress-update-*.md' -print0)

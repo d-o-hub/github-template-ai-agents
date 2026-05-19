@@ -29,7 +29,7 @@ else
         done
 
         if [ "$found" = false ]; then
-            echo "Warning: Unknown configuration key found: $key"
+            printf "Warning: Unknown configuration key found: %s\n" "$key"
         fi
     done < "$CONFIG_FILE"
     echo "Validation complete."
