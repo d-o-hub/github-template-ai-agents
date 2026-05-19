@@ -14,7 +14,7 @@ echo "Validating GitHub Actions JavaScript blocks..."
 # We use a fixed name in /tmp to avoid repeated mktemp calls
 TMP_JS_FILE=$(mktemp /tmp/workflow-script-XXXXXX.js)
 
-# Ensure cleanup on exit
+# cleanup removes the temporary JavaScript file referenced by TMP_JS_FILE.
 cleanup() {
     rm -f -- "$TMP_JS_FILE"
 }
