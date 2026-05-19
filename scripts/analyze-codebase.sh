@@ -34,17 +34,11 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-# log prints a timestamped message prefixed with the current HH:MM:SS in blue to stdout.
 log() { printf "${BLUE}[$(date +%H:%M:%S)]${NC} %s\n" "$1"; }
-# log_ok prints a green checkmark-prefixed message to stdout.
-# The first positional argument is used as the message text.
 log_ok() { printf "${GREEN}✓${NC} %s\n" "$1"; }
-# log_warn prints a yellow warning message prefixed with "⚠" to stdout.
 log_warn() { printf "${YELLOW}⚠${NC} %s\n" "$1"; }
-# log_err prints a red failure line prefixed with a cross and the given message.
 log_err() { printf "${RED}✗${NC} %s\n" "$1"; }
 
-# init_docs creates the agents documentation directory tree under "$AGENT_DOCS" with subdirectories: patterns, issues, fixes, detected, resolved, and references.
 init_docs() {
     mkdir -p "$AGENT_DOCS"/{patterns,issues,fixes,detected,resolved,references}
 }
