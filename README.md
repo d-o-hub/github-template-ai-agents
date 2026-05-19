@@ -6,7 +6,7 @@
 [![Template Version](https://img.shields.io/badge/version-0.2.8-blue)](VERSION)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**Quick Links**: [Quick Start](#-quick-start) · [Documentation](#-documentation) · [Contributing](#-contributing)
+**Quick Links**: [Quick Start](#-quick-start) · [Documentation](#-documentation) · [Changelog](CHANGELOG-TEMPLATE.md) · [Contributing](#-contributing)
 
 ---
 
