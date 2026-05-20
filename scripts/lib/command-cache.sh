@@ -91,8 +91,8 @@ get_cache_path() {
     elif command -v shasum >/dev/null 2>&1; then
         safe_file=$(printf "%s" "$file" | shasum -a 256 | cut -d' ' -f1)
     else
-        # Fallback to simple tr if no hashing tool is available
-        safe_file=$(printf "%s\n" "$file" | sed 's|^./||' | tr '/' '_')
+        printf "Error: Neither sha256sum nor shasum is available. Cannot generate secure cache keys.\n" >&2
+        exit 1
     fi
 
     printf "%s/%s_line_%s.json\n" "$COMMANDS_CACHE_DIR" "$safe_file" "$line"
