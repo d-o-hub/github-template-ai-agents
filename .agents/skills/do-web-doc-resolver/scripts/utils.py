@@ -8,6 +8,11 @@ import logging
 import os
 import re
 import socket
+import threading
+import time
+import typing
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 from html.parser import HTMLParser
 from typing import Any
 from urllib.parse import urljoin, urlparse
@@ -24,7 +29,16 @@ MAX_CHARS = int(os.getenv("WEB_RESOLVER_MAX_CHARS", "8000"))
 DEFAULT_TIMEOUT = int(os.getenv("WEB_RESOLVER_TIMEOUT", "30"))
 CACHE_DIR = os.path.expanduser(os.getenv("WEB_RESOLVER_CACHE_DIR", "~/.cache/do-web-doc-resolver"))
 CACHE_TTL = int(os.getenv("WEB_RESOLVER_CACHE_TTL", str(3600 * 24)))
-MAX_REDIRECTS = 5
+BLOCKED_NETWORKS = [
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("169.254.0.0/16"),
+    ipaddress.ip_network("::1/128"),
+    ipaddress.ip_network("fc00::/7"),
+    ipaddress.ip_network("fe80::/10"),
+]
 
 USER_AGENT = (
     "Mozilla/5.0 (compatible; WebDocResolver/2.0; +https://github.com/d-oit/do-web-doc-resolver)"
@@ -34,7 +48,9 @@ USER_AGENT = (
 BLOCKED_SCHEMES: set[str] = {"file", "javascript", "data", "vbscript"}
 
 _global_session: requests.Session | None = None
+_session_lock = threading.Lock()
 _cache = None
+_cache_lock = threading.RLock()
 
 
 def create_session_with_retry() -> requests.Session:
@@ -61,8 +77,9 @@ def create_session_with_retry() -> requests.Session:
 
 def get_session() -> requests.Session:
     global _global_session
-    if _global_session is None:
-        _global_session = create_session_with_retry()
+    with _session_lock:
+        if _global_session is None:
+            _global_session = create_session_with_retry()
     return _global_session
 
 
