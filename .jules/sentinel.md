@@ -63,10 +63,3 @@
 **Learning:** Even internal library functions are vulnerable if they handle variables that might be influenced by external input (e.g., branch names from git, or cached file names).
 
 **Prevention:** Always use the `--` separator before positional arguments in shell commands to terminate option processing. Use `printf` instead of `echo`. Implement strict path validation (canonicalization with `realpath -m`, root/dangerous path rejection, and boundary checks) before recursive deletions. Use exact ref checks (`git rev-parse`) instead of partial string matching for branch verification.
-## 2026-05-20 - Multi-section printf for Secure Heredoc Replacement
-
-**Vulnerability:** Unquoted heredocs incorporating untrusted variables (like analysis topics) allowed command substitution injection. Replacing them with a single massive printf string degraded maintainability.
-
-**Learning:** Security fixes must balance protection with readability. A single printf with many escaped newlines is error-prone and hard to audit.
-
-**Prevention:** Use a braced block with multiple printf statements to replace unquoted heredocs. This maintains the structural layout of the document while ensuring all dynamic content is safely handled as literal arguments to printf format specifiers.
