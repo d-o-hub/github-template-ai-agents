@@ -22,7 +22,7 @@ fi
 
 # Security: Strictly validate semantic version format to prevent sed injection
 if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    printf "Error: VERSION must be a strict semantic version (e.g., 1.2.3)\n" >&2
+    echo "Error: VERSION must be a strict semantic version (e.g., 1.2.3)" >&2
     exit 1
 fi
 
