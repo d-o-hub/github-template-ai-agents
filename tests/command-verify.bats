@@ -33,11 +33,13 @@ setup() {
     AUDIT_LOG="$CACHE_DIR/audit.log"
     init_cache
 
-    cmd='{"command":"test","file":"test.md","line":1}'
-    save_cached_result "$cmd" '{"valid":true}'
-    [ -n "$(get_cached_result "$cmd")" ]
+    cmd="test"
+    file="test.md"
+    line="1"
+    save_cached_result "$cmd" "$file" "$line" '{"valid":true}'
+    [ -n "$(get_cached_result "$file" "$line")" ]
     clear_cache
-    [ -z "$(get_cached_result "$cmd")" ]
+    [ -z "$(get_cached_result "$file" "$line")" ]
     rm -rf "$CACHE_DIR"
 }
 
