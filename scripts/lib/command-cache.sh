@@ -60,7 +60,8 @@ should_invalidate_command() {
     local changed_files="$3"
 
     # Use a loop that handles spaces in filenames if needed, though here changed_files is space-separated
-    for changed in $changed_files; do
+    while IFS= read -r changed; do
+        [ -z "$changed" ] && continue
         if [[ "$changed" == "$file" ]]; then
             return 0
         fi
@@ -73,7 +74,7 @@ should_invalidate_command() {
             go.mod|go.sum) [[ "$cmd" =~ ^go ]] && return 0 ;;
             Gemfile*) [[ "$cmd" =~ ^(bundle|gem) ]] && return 0 ;;
         esac
-    done
+    done <<< "$changed_files"
     return 1
 }
 
@@ -83,9 +84,16 @@ get_cache_path() {
     local line="${2:-0}"
     [ -z "$file" ] && file="unknown"
 
-    # Sanitize file path for use in directory structure
+    # Sanitize file path for use in directory structure using sha256 to avoid collisions
     local safe_file
-    safe_file=$(printf "%s\n" "$file" | sed 's|^./||' | tr '/' '_')
+    if command -v sha256sum >/dev/null 2>&1; then
+        safe_file=$(printf "%s" "$file" | sha256sum | cut -d' ' -f1)
+    elif command -v shasum >/dev/null 2>&1; then
+        safe_file=$(printf "%s" "$file" | shasum -a 256 | cut -d' ' -f1)
+    else
+        # Fallback to simple tr if no hashing tool is available
+        safe_file=$(printf "%s\n" "$file" | sed 's|^./||' | tr '/' '_')
+    fi
 
     printf "%s/%s_line_%s.json\n" "$COMMANDS_CACHE_DIR" "$safe_file" "$line"
 }
