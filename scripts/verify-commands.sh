@@ -132,25 +132,30 @@ declare -a FAILED_COMMANDS=()
 declare -A CATEGORY_COUNT=(["safe"]=0 ["conditional"]=0 ["dangerous"]=0 ["$UNKNOWN_CATEGORY"]=0)
 
 if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
-    while IFS= read -r cmd_entry; do
-        [ -z "$cmd_entry" ] && continue
+    # Pre-parse JSON to avoid O(N) jq subshells inside the loop
+    # Use NUL delimiter to safely handle multiline commands
+    # Format: file\0line\0command\0
+    TMP_PARSED_COMMANDS=$(mktemp)
+    trap 'rm -f "$TMP_PARSED_COMMANDS"' EXIT ERR
+    printf "%s\n" "$DISCOVERED_COMMANDS" | jq -j 'select(.command != null and .command != "null") | "\(.file // "unknown")\u0000\(.line // 0)\u0000\(.command)\u0000"' 2>/dev/null > "$TMP_PARSED_COMMANDS"
 
-        # Extract command from JSON
-        cmd=$(printf "%s\n" "$cmd_entry" | jq -r '.command' 2>/dev/null || printf "")
-        [ -z "$cmd" ] || [ "$cmd" = "null" ] && continue
+    while IFS= read -r -d '' file && \
+          IFS= read -r -d '' line && \
+          IFS= read -r -d '' cmd; do
+        [ -z "$cmd" ] && continue
 
         # Check cache first
         CACHED=false
         if ! $FORCE && type get_cached_result &> /dev/null; then
-            cached_result=$(get_cached_result "$cmd_entry" 2>/dev/null || printf "")
+            cached_result=$(get_cached_result "$file" "$line" 2>/dev/null || printf "")
             if [ -n "$cached_result" ]; then
                 # Check if this command needs invalidation
                 if type should_invalidate_command &> /dev/null; then
-                    if ! should_invalidate_command "$cmd_entry" "$CHANGED_FILES" 2>/dev/null; then
+                    if ! should_invalidate_command "$cmd" "$file" "$CHANGED_FILES" 2>/dev/null; then
                         ((CACHE_HITS++))
                         CACHED=true
 
-                        # Extract category from cached result
+                        # Extract category from cached result using jq to handle formatting variations safely
                         cached_cat=$(printf "%s\n" "$cached_result" | jq -r --arg unknown "$UNKNOWN_CATEGORY" '.category // $unknown' 2>/dev/null || printf "%s\n" "$UNKNOWN_CATEGORY")
 
                         # Security: Validate category against whitelist to prevent injection in arithmetic expansion
@@ -188,9 +193,10 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
         # Save to cache
         if type save_cached_result &> /dev/null; then
             # Security: Use jq to safely generate JSON and prevent injection
-            result=$(jq -n --arg cat "$category" --arg cmd "$cmd" \
+            # Note: We use -c to produce compact JSON. This is crucial for avoiding multi-line issues later
+            result=$(jq -n -c --arg cat "$category" --arg cmd "$cmd" \
                 '{"valid":true, "category":$cat, "command":$cmd}')
-            save_cached_result "$cmd_entry" "$result" 2>/dev/null || true
+            save_cached_result "$cmd" "$file" "$line" "$result" 2>/dev/null || true
         fi
 
         ((VALIDATED++))
@@ -199,7 +205,8 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
         if [ "$category" = "dangerous" ]; then
             FAILED_COMMANDS+=("$cmd")
         fi
-    done <<< "$DISCOVERED_COMMANDS"
+    done < "$TMP_PARSED_COMMANDS"
+    rm -f "$TMP_PARSED_COMMANDS"
 fi
 
 # Calculate totals from cache + validated

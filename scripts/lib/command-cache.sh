@@ -55,16 +55,13 @@ get_changed_files() {
 
 # Check if a command needs revalidation
 should_invalidate_command() {
-    local cmd_json="$1"
-    local changed_files="$2"
-
-    local cmd
-    cmd=$(printf "%s\n" "$cmd_json" | jq -r '.command')
-    local file
-    file=$(printf "%s\n" "$cmd_json" | jq -r '.file')
+    local cmd="$1"
+    local file="$2"
+    local changed_files="$3"
 
     # Use a loop that handles spaces in filenames if needed, though here changed_files is space-separated
-    for changed in $changed_files; do
+    while IFS= read -r changed; do
+        [ -z "$changed" ] && continue
         if [[ "$changed" == "$file" ]]; then
             return 0
         fi
@@ -77,21 +74,26 @@ should_invalidate_command() {
             go.mod|go.sum) [[ "$cmd" =~ ^go ]] && return 0 ;;
             Gemfile*) [[ "$cmd" =~ ^(bundle|gem) ]] && return 0 ;;
         esac
-    done
+    done <<< "$changed_files"
     return 1
 }
 
 # Get structured cache path (E1)
 get_cache_path() {
-    local cmd_json="$1"
-    local file
-    file=$(printf "%s\n" "$cmd_json" | jq -r '.file // "unknown"')
-    local line
-    line=$(printf "%s\n" "$cmd_json" | jq -r '.line // 0')
+    local file="$1"
+    local line="${2:-0}"
+    [ -z "$file" ] && file="unknown"
 
-    # Sanitize file path for use in directory structure
+    # Sanitize file path for use in directory structure using sha256 to avoid collisions
     local safe_file
-    safe_file=$(printf "%s\n" "$file" | sed 's|^./||' | tr '/' '_')
+    if command -v sha256sum >/dev/null 2>&1; then
+        safe_file=$(printf "%s" "$file" | sha256sum | cut -d' ' -f1)
+    elif command -v shasum >/dev/null 2>&1; then
+        safe_file=$(printf "%s" "$file" | shasum -a 256 | cut -d' ' -f1)
+    else
+        printf "Error: Neither sha256sum nor shasum is available. Cannot generate secure cache keys.\n" >&2
+        exit 1
+    fi
 
     printf "%s/%s_line_%s.json\n" "$COMMANDS_CACHE_DIR" "$safe_file" "$line"
 }
@@ -99,7 +101,7 @@ get_cache_path() {
 # Get cached validation result
 get_cached_result() {
     local cache_file
-    cache_file=$(get_cache_path "$1")
+    cache_file=$(get_cache_path "$1" "$2")
 
     if [ -f "$cache_file" ]; then
         cat -- "$cache_file"
@@ -110,20 +112,20 @@ get_cached_result() {
 
 # Save validation result to cache and rotate audit log (E5)
 save_cached_result() {
-    local cmd_json="$1"
-    local result="$2"
+    local cmd="$1"
+    local file="$2"
+    local line="$3"
+    local result="$4"
 
     local cache_file
-    cache_file=$(get_cache_path "$cmd_json")
+    cache_file=$(get_cache_path "$file" "$line")
     mkdir -p "$(dirname "$cache_file")"
     printf "%s\n" "$result" > "$cache_file"
 
     # Log to audit trail and rotate
-    local cmd
-    cmd=$(printf "%s\n" "$cmd_json" | jq -r '.command')
     printf "%s CACHED: %s\n" "$(date -Iseconds)" "$cmd" >> "$AUDIT_LOG"
 
-    if [ "$(wc -l < "$AUDIT_LOG")" -gt "$MAX_AUDIT_LOG_LINES" ]; then
+    if [ "$(grep -c . "$AUDIT_LOG" || true)" -gt "$MAX_AUDIT_LOG_LINES" ]; then
         tail -n "$MAX_AUDIT_LOG_LINES" "$AUDIT_LOG" > "${AUDIT_LOG}.tmp" && mv "${AUDIT_LOG}.tmp" "$AUDIT_LOG"
     fi
 }

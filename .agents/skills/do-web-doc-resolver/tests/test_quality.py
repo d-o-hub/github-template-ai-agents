@@ -21,7 +21,7 @@ class TestScoreContent:
         result = score_content(short_text)
         assert result.too_short is True
         # too_short (-0.35) + missing_links (-0.15) + duplicate_heavy (-0.25) = 0.25
-        assert result.score == 0.50
+        assert result.score == 0.25
         assert result.acceptable is False
 
     def test_min_acceptable_length(self):
@@ -72,7 +72,7 @@ for file I/O, system calls, sockets, and many other interfaces.
         content = "\n".join([f"Unique line number {i} with some text" for i in range(50)])
         result = score_content(content, [])
         assert result.missing_links is True
-        assert result.score == 0.90
+        assert result.score == 0.85  # 1.0 - 0.15
         assert result.acceptable is True
 
     def test_duplicate_heavy_content(self):
@@ -82,7 +82,7 @@ for file I/O, system calls, sockets, and many other interfaces.
         result = score_content(content, ["https://example.com"])
         assert result.duplicate_heavy is True
         # too_short (-0.35) + duplicate_heavy (-0.25) = 0.40
-        assert result.score == 0.60
+        assert result.score == 0.40
 
     def test_noisy_content(self):
         """Too many noise signals should trigger noisy flag."""
@@ -102,7 +102,7 @@ Subscribe to updates. Log in with credentials. Sign up free today.
         # Content with missing_links penalty only
         content = "\n".join([f"Unique line number {i} with some text" for i in range(50)])
         result = score_content(content, [])
-        assert result.score == 0.90
+        assert result.score == 0.85
         assert result.acceptable is True
 
     def test_threshold_below_0_65_not_acceptable(self):
@@ -111,7 +111,7 @@ Subscribe to updates. Log in with credentials. Sign up free today.
         content = "short"
         result = score_content(content, [])
         # too_short (-0.35) + missing_links (-0.15) + duplicate_heavy (-0.25) = 0.25
-        assert result.score == 0.50
+        assert result.score == 0.25
         assert result.acceptable is False
 
     def test_multiple_penalties(self):
@@ -193,8 +193,8 @@ class TestQualityScoreDataclass:
         assert result.duplicate_heavy is False
 
         # 20 lines, 9 unique: 9 < max(5, 10) -> True
-        # Note: range(2) gives 8 lines. Plus "Duplicate" makes 9 unique lines.
-        content = "\n".join([f"Unique {i}" for i in range(2)] + ["Duplicate"] * 12)
+        # Note: range(8) gives 8 lines. Plus "Duplicate" makes 9 unique lines.
+        content = "\n".join([f"Unique {i}" for i in range(8)] + ["Duplicate"] * 12)
         result = score_content(content, ["http://link"])
         assert result.duplicate_heavy is True
 
