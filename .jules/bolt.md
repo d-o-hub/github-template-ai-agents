@@ -77,3 +77,7 @@
 ## 2026-05-31 - [Pre-parsing JSON with jq to avoid nested subshells]
 **Learning:** Using `jq` inside a `while read` loop for every line to extract fields from JSON creates a massive performance bottleneck due to thousands of subshell process forks. Pre-parsing the JSON once with `jq` into a tab-separated format outside the loop and reading it efficiently using `IFS=$'\t' read -r var1 var2 <<< "$parsed"` yields dramatic speedups (from ~4s to ~0.04s for 160 elements).
 **Action:** Never run `jq` iteratively inside Bash loops. Always parse the full JSON payload once, extract the necessary properties into delimited plaintext (using tabs or pipes), and iterate over the plain string using `read`.
+
+## 2026-06-01 - [Pre-parsing JSON with jq to avoid nested subshells]
+**Learning:** Using `jq` iteratively inside Bash loops introduces a massive performance bottleneck due to subshell forks. Pre-parsing JSON into delimited string arrays or files and reading them sequentially with `while read` significantly improves performance. Utilizing `jq -c` ensures compact JSON serialization, preventing multi-line corruption during text processing in bash loops.
+**Action:** Replace iterative `jq` calls inside `while read` loops with a single pre-parsing `jq` command that outputs compact JSON (`-c`).
