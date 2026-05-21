@@ -20,7 +20,7 @@ for skill_dir in "$SKILLS_SRC"/*/; do
 
         if validate_skill_file "${skill_dir}SKILL.md"; then
             # Use SKILL_LINE_COUNT from library instead of wc -l subshell
-            echo -e "  ${GREEN}[OK]${NC} $skill_name: Valid ($SKILL_LINE_COUNT lines)"
+            printf "  %b[OK]%b %s: Valid (%d lines)\n" "${GREEN}" "${NC}" "$skill_name" "$SKILL_LINE_COUNT"
         else
             ERRORS=$((ERRORS + 1))
         fi

@@ -35,7 +35,7 @@ else
                 if [[ -n "$label" ]]; then
                     printf "Deleting label: %s\n" "$label"
                     # Place flags before -- to ensure they are correctly parsed
-                    gh label delete --yes -- "$label" || echo "Failed to delete: $label"
+                    gh label delete --yes -- "$label" || printf "Failed to delete: %s\n" "$label"
                 fi
             done
             echo "Label deletion completed."

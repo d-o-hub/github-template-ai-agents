@@ -40,7 +40,7 @@ validate_skill_file() {
 
     # Check exists
     if [[ ! -f "$skill_file" ]]; then
-        echo -e "  ${RED}✗${NC} $skill_name: Missing SKILL.md" >&2
+        printf "  %b✗%b %s: Missing SKILL.md\n" "${RED}" "${NC}" "$skill_name" >&2
         return 1
     fi
 
@@ -62,7 +62,7 @@ validate_skill_file() {
         }
         END { print NR ":" err_no_dash ":" has_name ":" has_desc ":" has_version ":" template_version }
     ' "$skill_file"); then
-        echo -e "  ${RED}✗${NC} $skill_name: Internal validation error (awk failed)" >&2
+        printf "  %b✗%b %s: Internal validation error (awk failed)\n" "${RED}" "${NC}" "$skill_name" >&2
         return 1
     fi
 
@@ -70,20 +70,20 @@ validate_skill_file() {
     IFS=':' read -r line_count err_no_dash has_name has_description has_version template_version <<< "$awk_result"
 
     if [[ "$err_no_dash" -eq $TRUE ]]; then
-        echo -e "  ${RED}✗${NC} $skill_name: Must start with '---'" >&2
+        printf "  %b✗%b %s: Must start with '---'\n" "${RED}" "${NC}" "$skill_name" >&2
         ((errors++))
     fi
 
     if [[ "$has_name" -eq $FALSE ]]; then
-        echo -e "  ${RED}✗${NC} $skill_name: Missing 'name:' field" >&2
+        printf "  %b✗%b %s: Missing 'name:' field\n" "${RED}" "${NC}" "$skill_name" >&2
         ((errors++))
     fi
     if [[ "$has_description" -eq $FALSE ]]; then
-        echo -e "  ${RED}✗${NC} $skill_name: Missing 'description:' field" >&2
+        printf "  %b✗%b %s: Missing 'description:' field\n" "${RED}" "${NC}" "$skill_name" >&2
         ((errors++))
     fi
     if [[ "$has_version" -eq $FALSE ]]; then
-        echo -e "  ${YELLOW}⚠${NC} $skill_name: Missing 'version:' field (recommended)" >&2
+        printf "  %b⚠%b %s: Missing 'version:' field (recommended)\n" "${YELLOW}" "${NC}" "$skill_name" >&2
     fi
 
     if [[ -n "$template_version" ]]; then
@@ -114,13 +114,13 @@ validate_skill_file() {
 
             if [[ "$s_major" -lt "$c_major" ]] || \
                { [[ "$s_major" -eq "$c_major" ]] && [[ $((c_minor - s_minor)) -gt 1 ]]; }; then
-                echo -e "  ${YELLOW}⚠${NC} $skill_name: template_version $template_version is >1 minor behind current $current_version" >&2
+                printf "  %b⚠%b %s: template_version %s is >1 minor behind current %s\n" "${YELLOW}" "${NC}" "$skill_name" "$template_version" "$current_version" >&2
             fi
         fi
     fi
 
     if [[ "$line_count" -gt "$MAX_SKILL_LINES" ]]; then
-        echo -e "  ${RED}✗${NC} $skill_name: SKILL.md exceeds $MAX_SKILL_LINES lines ($line_count lines)" >&2
+        printf "  %b✗%b %s: SKILL.md exceeds %d lines (%d lines)\n" "${RED}" "${NC}" "$skill_name" "$MAX_SKILL_LINES" "$line_count" >&2
         ((errors++))
     fi
 
