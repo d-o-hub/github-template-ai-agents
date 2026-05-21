@@ -16,15 +16,15 @@ CLI_SKILL_DIRS=(
 )
 
 if [ ! -d "$SKILLS_SRC" ]; then
-  echo "No skills found at .agents/skills/ - nothing to symlink."
+  printf "No skills found at .agents/skills/ - nothing to symlink.\n"
   exit 0
 fi
 
-echo "Setting up skill symlinks from .agents/skills/..."
+printf "Setting up skill symlinks from .agents/skills/...\n"
 
 for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
   target_dir="$REPO_ROOT/$cli_dir"
-  mkdir -p "$target_dir"
+  mkdir -p -- "$target_dir"
 
   # Performance optimization: Pre-calculate relative path base once per target dir
   # to avoid O(N) subshell calls in the inner loop.
@@ -42,15 +42,15 @@ for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
     rel="$rel_base/$skill_name"
 
     if [ -L "$link" ]; then
-      echo "  skip (exists): $cli_dir/$skill_name"
+      printf "  skip (exists): %s/%s\n" "$cli_dir" "$skill_name"
     elif [ -d "$link" ]; then
-      echo "  WARN: real dir exists at $cli_dir/$skill_name - skipping"
+      printf "  WARN: real dir exists at %s/%s - skipping\n" "$cli_dir" "$skill_name"
     else
-      ln -s "$rel" "$link"
-      echo "  linked: $cli_dir/$skill_name -> $rel"
+      ln -s -- "$rel" "$link"
+      printf "  linked: %s/%s -> %s\n" "$cli_dir" "$skill_name" "$rel"
     fi
   done
 done
 
-echo ""
-echo "Skill symlinks created. Run scripts/validate-skills.sh to verify."
+printf "\n"
+printf "Skill symlinks created. Run scripts/validate-skills.sh to verify.\n"
