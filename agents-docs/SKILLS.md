@@ -13,13 +13,16 @@ Claude Code and Qwen Code use symlinks; Gemini CLI and OpenCode read directly:
 .qwen/skills/<name>             -> symlink -> ../../.agents/skills/<name>
 ```
 
-Run `./scripts/setup-skills.sh` after cloning to create symlinks for Claude Code and Qwen Code.
+Run `./scripts/setup-skills.sh` after cloning to create symlinks
+for Claude Code and Qwen Code.
 Run `./scripts/validate-skills.sh` to verify integrity.
 
 ## Why .agents/ as Canonical?
 
-`.claude/` is Claude Code-specific. `.agents/` is tool-agnostic - it works when you
-add Gemini CLI, OpenCode, Codex, or any future harness without moving files.
+`.claude/` is Claude Code-specific. `.agents/` is tool-agnostic -
+it works when you
+add Gemini CLI, OpenCode, Codex, or any future harness without moving
+files.
 
 ## Progressive Disclosure
 
@@ -77,12 +80,12 @@ Activate when: [specific triggers]
 ## Frontmatter Fields
 
 | Field | Required | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | `name` | Yes | Skill identifier (lowercase, hyphens) |
 | `description` | Yes | One-line description with trigger keywords |
-| `category` | Yes | One of: coordination, quality, documentation, workflow, research, knowledge-management |
+| `category` | Yes | One of: coordination, quality, documentation, |
 | `version` | Recommended | Semantic version of the skill itself (e.g., "1.0") |
-| `template_version` | Recommended | Minimum template version this skill requires (matches VERSION file) |
+| `template_version` | Recommended | Min template version this skill requires |
 
 `version` and `template_version` enable `validate-skills.sh` to detect stale skills
 and help template consumers know which template version a skill was authored for.
@@ -98,7 +101,7 @@ and help template consumers know which template version a skill was authored for
 ## Agent vs Skill
 
 | Use a Skill | Use a Sub-Agent |
-|---|---|
+| --- | --- |
 | Reusable reference knowledge | Complex multi-step execution |
 | Main agent executes with guidance | Needs isolated context window |
 | No context isolation needed | Different tool access than parent |

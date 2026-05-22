@@ -2,9 +2,10 @@
 
 This is the **single canonical location** for all skills in this repository.
 
-Claude Code and Qwen Code use symlinks; Gemini CLI and OpenCode read directly from `.agents/skills/`:
+Claude Code and Qwen Code use symlinks;
+Gemini CLI and OpenCode read directly from `.agents/skills/`:
 
-```
+```text
 .claude/skills/<name>      -> ../../.agents/skills/<name>
 .qwen/skills/<name>        -> ../../.agents/skills/<name>
 ```
@@ -28,14 +29,16 @@ Validate symlinks are intact:
 1. Create `.agents/skills/<skill-name>/SKILL.md` (see `agents-docs/SKILLS.md`)
 2. Add `reference/` folder for detailed content (optional)
 3. Run `./scripts/setup-skills.sh` to create symlinks for all CLI tools
-4. The skill is now available in Claude Code, OpenCode, Gemini CLI, and Qwen Code
+4. The skill is now available in Claude Code, OpenCode, Gemini CLI,
+   and Qwen Code
 
 ## Skills in This Repository
 
-> Auto-generated from skill definitions. Run `./scripts/generate-skills-readme.py` to regenerate.
+> Auto-generated from skill definitions.
+> Run `./scripts/generate-skills-readme.py` to regenerate.
 
 | Skill | Description |
-|---|---|
+| --- | --- |
 | [`accessibility-auditor/`](accessibility-auditor/) | Audit web applications for WCAG 2.2 compliance, screen reader compatibility, keyboard navigation, and color contrast. Triggers on "accessibility audit", "a11y check", "WCAG compliance", "screen reader test", "keyboard navigation", "color contrast check", "ARIA validation", "wcag", " Section 508", "ADA compliance". |
 | [`agent-browser/`](agent-browser/) | Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. Triggers include requests to "open a website", "fill out a form", "click a button", "take a screenshot", "scrape data from a page", "test this web app", "login to a site", "automate browser actions", or any task requiring programmatic web interaction. |
 | [`agent-coordination/`](agent-coordination/) | Coordinate multiple agents for software development across any language. Use for parallel execution of independent tasks, sequential chains with dependencies, swarm analysis from multiple perspectives, or iterative refinement loops. Handles Python, JavaScript, Java, Go, Rust, C#, and other languages. |
@@ -83,4 +86,3 @@ Validate symlinks are intact:
 | [`turso-db/`](turso-db/) | Use this skill for Turso (LibSQL/Limbo) database development, including scaffolding, querying, migrations, and maintenance. Supports vector search, full-text search, CDC, MVCC, encryption, and bidirectional remote sync. Use when working with Turso SDKs for JavaScript, Rust, Python, Go, and React Native. Provides current API guidance to avoid stale "libsql" legacy knowledge. |
 | [`ui-ux-optimize/`](ui-ux-optimize/) | Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination, confidence-scored autoresearch loops, and backpressure quality gates. Use for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, and any screen-based product. |
 | [`web-search-researcher/`](web-search-researcher/) | Research topics using web search to find accurate, current information. Use when you need modern information, official documentation, best practices, or technical solutions beyond training data. |
-
