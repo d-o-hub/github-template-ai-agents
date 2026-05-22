@@ -63,3 +63,8 @@
 **Learning:** Even internal library functions are vulnerable if they handle variables that might be influenced by external input (e.g., branch names from git, or cached file names).
 
 **Prevention:** Always use the `--` separator before positional arguments in shell commands to terminate option processing. Use `printf` instead of `echo`. Implement strict path validation (canonicalization with `realpath -m`, root/dangerous path rejection, and boundary checks) before recursive deletions. Use exact ref checks (`git rev-parse`) instead of partial string matching for branch verification.
+
+## 2026-05-22 - Octal Interpretation Errors in Bash Arithmetic
+**Vulnerability:** Arithmetic expansion in Bash ($(( ))) interprets numbers with leading zeros as octal, causing errors for values like '08' or '09'.
+**Learning:** Logic for version comparison or numeric validation can crash if it handles version strings or numeric input with leading zeros without specifying the base.
+**Prevention:** Use the 10# prefix (e.g., $((10#$var))) to force decimal interpretation in Bash arithmetic expansion when dealing with potentially padded numbers.
