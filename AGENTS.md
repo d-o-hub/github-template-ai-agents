@@ -101,7 +101,9 @@ See `agents-docs/VERSION.md` for full workflow details.
 
 ## PR & Commit Instructions
 
-- Title/Commit: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
+- PR Title: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
+- Commit Header: `type(scope): subject` (max `${MAX_COMMIT_SUBJECT_LENGTH}` chars total, including type and scope)
+- Commit Body: wrap at 100 chars per line
 - Branch per feature; One concern per PR; Never commit to `main`
 
 ### Commit Workflow (Mandatory)
