@@ -25,6 +25,7 @@ This plan outlines how to integrate automated documentation updates and command 
 - Multiple doc folders: `agents-docs/`, `analysis/`, `examples/`
 
 **Existing Scripts:**
+
 | Script | Purpose | Status |
 |--------|---------|--------|
 | `scripts/discover-commands.sh` | Command discovery | ✅ Exists, needs fixes |
@@ -45,14 +46,16 @@ This plan outlines how to integrate automated documentation updates and command 
 
 ## command-verify Approach (Key Features to Adopt)
 
-From analyzing https://github.com/d-oit/command-verify:
+From analyzing <https://github.com/d-oit/command-verify>:
 
 ### 1. **Zero-Token Operation**
+
 - After initial setup, uses only git + file operations
 - No LLM API calls needed for routine checks
 - Cache stored in `.cache/command-validations/`
 
 ### 2. **Git Diff-Based Caching**
+
 ```javascript
 // Core concept:
 - Store last validation commit hash
@@ -62,6 +65,7 @@ From analyzing https://github.com/d-oit/command-verify:
 ```
 
 ### 3. **Smart Invalidation Rules**
+
 | File Changed | Commands to Revalidate |
 |--------------|----------------------|
 | `package.json` | All npm/yarn/pnpm/npx commands |
@@ -71,6 +75,7 @@ From analyzing https://github.com/d-oit/command-verify:
 | `src/**` | Test-related commands |
 
 ### 4. **Command Categorization**
+
 ```javascript
 SAFE_COMMANDS = ['build', 'test', 'lint', 'git status', 'cargo fmt --check']
 CONDITIONAL = ['npm install', 'format', 'clean']
@@ -78,6 +83,7 @@ DANGEROUS = ['rm -rf', 'git push --force', 'DROP TABLE']
 ```
 
 ### 5. **Cross-Platform Awareness**
+
 - Detect OS-specific command variants
 - Windows: `dir`, `copy`, PowerShell commands
 - Unix: `ls`, `cp`, bash commands
@@ -135,6 +141,7 @@ DANGEROUS = ['rm -rf', 'git push --force', 'DROP TABLE']
 3. Need to filter out non-command lines
 
 **Solution:**
+
 ```bash
 # Improved extraction logic
 extract_commands() {
@@ -338,6 +345,7 @@ When using Claude Code:
 - `/verify` - Quick verification with cache
 - `/verify-force` - Full revalidation
 - `/verify-stats` - Detailed statistics
+
 ```
 
 **Deliverables:**

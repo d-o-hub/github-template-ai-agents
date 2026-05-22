@@ -3,14 +3,12 @@ name: Markdown Lint
 
 on:
   push:
-    branches:
-      - '**'
+    branches: ['**']
     paths:
       - '**.md'
       - '.markdownlintrc'
   pull_request:
-    branches:
-      - '**'
+    branches: ['**']
     paths:
       - '**.md'
       - '.markdownlintrc'

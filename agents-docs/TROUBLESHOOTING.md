@@ -19,6 +19,7 @@ Common issues and solutions for the AI agent template.
 **Symptom**: `bash: ./scripts/setup-skills.sh: Permission denied`
 
 **Solution**:
+
 ```bash
 chmod +x scripts/*.sh
 chmod +x scripts/atomic-commit/*.sh
@@ -30,17 +31,20 @@ chmod +x scripts/atomic-commit/*.sh
 
 **Solution**:
 1. Check if hook is installed:
+
    ```bash
    ls -la .git/hooks/pre-commit
    ```
 
 2. If not present, install it:
+
    ```bash
    cp scripts/pre-commit-hook.sh .git/hooks/pre-commit
    chmod +x .git/hooks/pre-commit
    ```
 
 3. Check for conflicting global hooks:
+
    ```bash
    git config --global core.hooksPath
    # If set, unset it:
@@ -53,6 +57,7 @@ chmod +x scripts/atomic-commit/*.sh
 
 **Solution**:
 1. Re-run setup:
+
    ```bash
    ./scripts/setup-skills.sh
    ```
@@ -88,6 +93,7 @@ chmod +x scripts/atomic-commit/*.sh
 
 **Solution**:
 - Ensure workflow has correct permissions:
+
   ```yaml
   permissions:
     contents: write
@@ -99,6 +105,7 @@ chmod +x scripts/atomic-commit/*.sh
 **Symptom**: You need to debug workflow behavior without waiting for remote CI.
 
 **Solution**:
+
 ```bash
 # Requires Docker + act
 ./scripts/run_act_local.sh
@@ -130,6 +137,7 @@ ACT_JOB=quality-gate ./scripts/run_act_local.sh
 **Symptom**: Skill evaluation fails silently
 
 **Solution**:
+
 ```bash
 # Validate JSON syntax
 cat .agents/skills/<skill>/evals/evals.json | jq empty
@@ -166,6 +174,7 @@ cat .agents/skills/<skill>/evals/evals.json | jq empty
 **Solution**:
 - Atomic-commit handles this automatically with rebase
 - If manual fix needed:
+
   ```bash
   git fetch origin
   git rebase origin/main
@@ -189,7 +198,7 @@ cat .agents/skills/<skill>/evals/evals.json | jq empty
 **Symptom**: `shellcheck failed` with specific error codes
 
 **Solution**:
-- Look up error code: https://github.com/koalaman/shellcheck/wiki/
+- Look up error code: <https://github.com/koalaman/shellcheck/wiki/>
 - Common fixes:
   - SC2086: Quote variables
   - SC2002: Don't use cat unnecessarily
@@ -209,6 +218,7 @@ cat .agents/skills/<skill>/evals/evals.json | jq empty
 **Symptom**: `⚠ bats not installed - skipping shell tests`
 
 **Solution**:
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get install bats

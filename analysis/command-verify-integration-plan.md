@@ -415,6 +415,7 @@ setup() {
 npm run build
 cargo test
 ```
+
 EOF
 
     # Run discovery
@@ -458,6 +459,7 @@ EOF
     cached_after_clear=$(get_cached_result "test-cmd")
     [ -z "$cached_after_clear" ]
 }
+
 ```
 
 ---
@@ -595,6 +597,7 @@ Typical cache size for 847 commands:
 ### For Existing Users of `discover-commands.sh`
 
 1. **Backup current script:**
+
    ```bash
    cp scripts/discover-commands.sh scripts/discover-commands.sh.backup
    ```
@@ -602,12 +605,14 @@ Typical cache size for 847 commands:
 2. **Apply fixes from Phase 1**
 
 3. **Test with small subset:**
+
    ```bash
    ./scripts/discover-commands.sh --output /tmp/test.json
    head /tmp/test.json
    ```
 
 4. **Deploy full solution:**
+
    ```bash
    ./scripts/verify-commands.sh --stats
    ```
@@ -615,21 +620,25 @@ Typical cache size for 847 commands:
 ### For New Repositories Using Template
 
 1. **Clone template:**
+
    ```bash
    git clone <your-repo>/templates/command-verify-template.git /tmp/cv-template
    ```
 
 2. **Run installer:**
+
    ```bash
    bash /tmp/cv-template/install.sh
    ```
 
 3. **Customize configuration:**
+
    ```bash
    editor .command-verify.conf
    ```
 
 4. **Verify installation:**
+
    ```bash
    ./scripts/verify-commands.sh --stats
    ```
