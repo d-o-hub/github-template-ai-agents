@@ -51,14 +51,16 @@ This coordination skill works with:
 ## Common Patterns
 
 **Analysis + Execution**:
-```
+
+```text
 1. Swarm analysis (parallel agents gather insights)
 2. Sequential execution (apply findings)
 3. Parallel validation (verify results)
 ```
 
 **Test-Driven Workflow**:
-```
+
+```text
 1. test-runner: Run existing tests
 2. feature-implementer: Add functionality
 3. test-runner: Verify implementation
@@ -66,7 +68,8 @@ This coordination skill works with:
 ```
 
 **Performance Optimization**:
-```
+
+```text
 Loop with performance-optimizer until:
 - Metrics meet targets
 - No more optimizations found
