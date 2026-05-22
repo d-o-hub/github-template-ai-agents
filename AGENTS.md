@@ -2,7 +2,7 @@
 
 > Single source of truth for all AI coding agents in this repository.
 > Supported by: Claude Code, Windsurf, Gemini CLI, Codex, Copilot, OpenCode, Devin, Amp, Zed, Warp, RooCode, Jules or reference with @AGENTS.md in cli .md
-> See the open spec: <https://agents.md>
+> See the open spec: https://agents.md
 
 ## Project Overview
 
@@ -40,7 +40,7 @@ Always run the full quality gate before committing. Fix all errors before finish
 
 ## Repository Structure
 
-```text
+```
 <project-root>/
 ├── AGENTS.md              # This file - agent instructions (single source of truth)
 ├── CLAUDE.md              # Claude Code-specific overrides only (@AGENTS.md)
@@ -100,25 +100,21 @@ Always run the full quality gate before committing. Fix all errors before finish
 ## Agent Guidance
 
 ### Plan Before Executing
-
 For non-trivial tasks: produce a written plan first, pause, and wait for confirmation
 before writing code.
 
 ### Skills: Single Source in .agents/skills/
-
 All skills live canonically in `.agents/skills/`. Claude Code and Gemini CLI use
 symlinks pointing back to `.agents/skills/`. OpenCode reads skills directly from
 `.agents/skills/` - no symlinks needed. Run `./scripts/setup-skills.sh` after
 cloning to create symlinks for Claude Code and Gemini CLI. See `agents-docs/SKILLS.md`.
 
 ### Context Discipline
-
 - Delegate isolated research and analysis to sub-agents
 - Use `/clear` between unrelated tasks
 - Load skills only when needed, not upfront
 
 ### Nested AGENTS.md
-
 For monorepos, place an additional `AGENTS.md` inside each sub-package.
 The agent reads the nearest file in the directory tree - closest one takes precedence.
 

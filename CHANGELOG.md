@@ -1,50 +1,32 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this template will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [0.2.0] - 2026-03-15
-
-### Fixed
-
-- GitHub Actions workflows using non-existent action versions (checkout@v5, setup-python@v6)
-- yaml-lint.yml using unstable actionlint version tag
-- ci-and-labels.yml using deprecated actions-rust-lang action
-- gh-labels-creator.sh interactive prompt blocking CI execution
-- Inconsistent branch references between workflow files
-- Documentation inconsistencies across multiple files
+### Added
+- Auto-update script for AGENTS_REGISTRY.md (`scripts/update-agents-registry.sh`)
+- Skill rules configuration (`.agents/skills/skill-rules.json`)
+- Web documentation resolver skill (`.agents/skills/web-doc-resolver/`)
+- Multi-language auto-detection in quality gate
+- Enhanced skill validation (line count, frontmatter checks)
 
 ### Changed
+- Comprehensive README.md with feature matrix and usage examples
+- Quality gate with auto-detection for Rust, TypeScript, Python, Go, Shell
+- validate-skills.sh now validates SKILL.md format and line limits
 
-- Standardized action versions to stable releases (checkout@v4, setup-python@v5)
-- Replaced deprecated rust-toolchain action with dtolnay/rust-toolchain@stable
-- Added --ci flag support to gh-labels-creator.sh for non-interactive CI runs
-- Updated README.md version badge to 0.2.0
-- Updated all documentation to reference Qwen Code support
-- Improved CONTRIBUTING.md with comprehensive guide
-- Cleaned up AGENTS_REGISTRY.md formatting
-
-### Added
-
-- develop branch support in ci-and-labels.yml workflow
-- .qwen/skills/ symlinks for Qwen Code support
-- .github/dependabot.yml with 2026 best practices:
-  - GitHub Actions weekly updates (grouped)
-  - Docker weekly updates (exclude pre-releases)
-  - Terraform monthly updates (grouped providers)
-  - Docker Compose and pre-commit monthly updates
-- Dependabot security updates auto-merge support
-- OpenCode agent format documentation in SUB-AGENTS.md
-- Supported AI Agents table in HARNESS.md
+### Documentation
+- QUICKSTART.md - 5-minute setup guide
+- MIGRATION.md - Adoption guide for existing projects
+- AGENTS_REGISTRY.md - Auto-generated agent/skill registry
 
 ## [0.1.0] - 2026-03-14
 
 ### Added
-
 - Initial template release
 - Core skills:
   - `task-decomposition` - Break complex tasks into atomic goals
@@ -80,7 +62,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - OpenCode (`.opencode/`)
 
 ### Changed
-
 - Skills use canonical source in `.agents/skills/` with symlinks
 - Quality gate exits with code 2 to surface errors to agent
 - Progressive disclosure for skills (load on demand)
