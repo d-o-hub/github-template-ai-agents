@@ -7,7 +7,7 @@
 All skills live in `.agents/skills/` (the canonical source).
 Claude Code, Gemini CLI, and Qwen Code use symlinks; OpenCode reads directly:
 
-```
+```text
 .agents/skills/<name>/          <- CANONICAL (all agents read from here)
 .claude/skills/<name>           -> symlink -> ../../.agents/skills/<name>
 .qwen/skills/<name>             -> symlink -> ../../.agents/skills/<name>
@@ -28,7 +28,7 @@ when the agent decides it is needed. Do not pre-load all skills at session start
 
 ## Directory Structure
 
-```
+```text
 .agents/skills/
 +-- skill-name/
     +-- SKILL.md          # Primary instructions (<= 250 lines)

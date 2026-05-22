@@ -1,0 +1,46 @@
+---
+name: Markdown Lint
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - '**.md'
+      - '.markdownlintrc'
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - '**.md'
+      - '.markdownlintrc'
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  markdownlint:
+    name: Markdown Lint Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install markdownlint-cli
+        run: npm install -g markdownlint-cli@latest
+
+      - name: Run markdownlint
+        run: |
+          markdownlint '**/*.md' \
+            --ignore node_modules \
+            --ignore target \
+            --ignore vendor \
+            --config .markdownlintrc 2>&1 || \
+            (echo "❌ Markdown lint failed. Fix errors with: markdownlint --fix '**/*.md'" && exit 1)

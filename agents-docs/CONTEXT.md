@@ -34,19 +34,17 @@ Swallow passing output - surface only failures.
 
 ## Skills Architecture (Progressive Disclosure)
 
-```
+```text
 AGENTS.md (concise, universal)
   +-- agents-docs/ (detailed reference, loaded on demand)
        +-- Skills with SKILL.md (loaded when agent needs them)
-            +-- references/ within each skill (read only what is needed)
+            +-- reference/ within each skill (read only what is needed)
 ```
 
-For efficient retrieval of past project knowledge, use the `memory-context` skill (`csm` CLI) instead of loading the entire `LESSONS.md` file.
-
 All skills are canonical in `.agents/skills/`.
-Claude Code and Qwen Code use symlinks (`.claude/skills/`, `.qwen/skills/`);
-OpenCode and Gemini CLI read directly from `.agents/skills/`.
-Run `./scripts/setup-skills.sh` to create symlinks for Claude Code and Qwen Code.
+Claude Code, Gemini CLI, and Qwen Code use symlinks (`.claude/skills/`, `.gemini/skills/`, `.qwen/skills/`);
+OpenCode reads directly from `.agents/skills/`.
+Run `./scripts/setup-skills.sh` to create symlinks for Claude Code, Gemini CLI, and Qwen Code.
 
 ## Anti-Patterns
 
@@ -56,5 +54,3 @@ Run `./scripts/setup-skills.sh` to create symlinks for Claude Code and Qwen Code
 - One very long session for a multi-day project
 - Using larger context windows as a substitute for context isolation
 - Auto-generating AGENTS.md (hurts performance; always human-written)
-- Loading the entire `LESSONS.md` or `analysis/` directory into context manually (use `memory-context` / `csm query` instead)
-- Running `csm index-*` on every session — index once, query many times
