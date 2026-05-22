@@ -67,7 +67,8 @@ Always run the full quality gate before committing. Fix all errors before finish
 │   ├── agents/            # OpenCode-specific agents (real files, not symlinks)
 │   └── commands/
 ├── .gemini/
-│   └── skills/            # Symlinks -> ../../.agents/skills/<name>
+│   ├── agents/
+│   └── commands/
 ├── scripts/
 │   ├── setup-skills.sh    # Creates all symlinks (run on clone)
 │   ├── validate-skills.sh # Validates all symlinks are intact
@@ -104,10 +105,10 @@ For non-trivial tasks: produce a written plan first, pause, and wait for confirm
 before writing code.
 
 ### Skills: Single Source in .agents/skills/
-All skills live canonically in `.agents/skills/`. Claude Code and Gemini CLI use
-symlinks pointing back to `.agents/skills/`. OpenCode reads skills directly from
-`.agents/skills/` - no symlinks needed. Run `./scripts/setup-skills.sh` after
-cloning to create symlinks for Claude Code and Gemini CLI. See `agents-docs/SKILLS.md`.
+All skills live canonically in `.agents/skills/`. Claude Code and Qwen Code use
+symlinks pointing back to `.agents/skills/`. Gemini CLI and OpenCode read skills
+directly from `.agents/skills/` - no symlinks needed. Run `./scripts/setup-skills.sh`
+after cloning to create symlinks for Claude Code and Qwen Code. See `agents-docs/SKILLS.md`.
 
 ### Context Discipline
 - Delegate isolated research and analysis to sub-agents
