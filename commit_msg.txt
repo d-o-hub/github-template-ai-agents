@@ -1,7 +1,0 @@
-perf: eliminate subshell in command-cache.sh
-
-Replace `$(basename "$changed")` with bash parameter expansion
-`${changed##*/}` inside the high-frequency `while read` loop in
-`should_invalidate_command`. This eliminates the O(N) subshell
-overhead of spawning an external executable on every iteration,
-leading to a ~100x speedup for 1000 items (from ~4s to ~0.04s).
