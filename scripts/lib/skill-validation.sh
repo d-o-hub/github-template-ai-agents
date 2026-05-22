@@ -113,7 +113,7 @@ validate_skill_file() {
             fi
 
             if [[ "$s_major" -lt "$c_major" ]] || \
-               { [[ "$s_major" -eq "$c_major" ]] && [[ $((c_minor - s_minor)) -gt 1 ]]; }; then
+               { [[ "$s_major" -eq "$c_major" ]] && [[ $((10#$c_minor - 10#$s_minor)) -gt 1 ]]; }; then
                 printf "  %b⚠%b %s: template_version %s is >1 minor behind current %s\n" "${YELLOW}" "${NC}" "$skill_name" "$template_version" "$current_version" >&2
             fi
         fi
