@@ -25,6 +25,8 @@ Full catalog of available skills in this repository.
 | `docs-hook` | Lightweight git hook integration for updating agents-docs wi | Documentation |
 | `document-rendering-and-locators` | Implement resilient document rendering and annotation anchor | Documentation |
 | `dogfood` | Systematically explore and test a web application to find bu | General |
+| `durable-objects` | Create and review Cloudflare Durable Objects for stateful co | Cloudflare |
+| `eu-ai-act-compliance` | EU AI Act compliance logging and requirements for AI system | Compliance & Governance |
 | `git-github-workflow` | Unified atomic git workflow with GitHub integration - commit | General |
 | `github-pr-sentinel` | Monitor a GitHub pull request until it's merged, green, or b | Continuous PR monitoring and CI auto-fix |
 | `github-workflow` | Complete GitHub workflow automation - push, create branch/PR | General |
