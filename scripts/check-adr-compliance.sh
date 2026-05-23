@@ -40,7 +40,7 @@ if [[ ! -f "$STATUS_FILE" ]]; then
   fi
 else
   for f in "${ADR_FILES[@]}"; do
-    if grep -q -- "\"$f\"" "$STATUS_FILE"; then :
+    if grep -qF -- "\"$f\"" "$STATUS_FILE"; then :
     else log_fail "$f NOT registered in _status.json"; fi
   done
 fi
