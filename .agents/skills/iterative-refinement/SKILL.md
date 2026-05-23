@@ -19,23 +19,9 @@ Don't use for single-pass tasks, purely parallel work, or simple linear workflow
 
 ## Pre-Usage Research (Optional)
 
-Before starting iterations, consider researching:
-- Current best practices for your validation tools (search "[tool] best practices 2025")
-- Known issues with your tech stack (search "[language] [tool] common issues")
-- Optimal configuration for your validators (search "[tool] configuration production")
-- Recent improvements or alternatives (search "[tool] vs alternatives 2025")
+Before starting iterations, consider researching current best practices, known issues, optimal configurations, or recent alternatives for your validation tools.
 
-Benefits:
-- Better validators from the start
-- Avoid known issues
-- Use current best practices
-- Save iteration cycles
-
-When to research first:
-- Unfamiliar validation tools
-- New tech stack
-- Complex quality criteria
-- High-stakes optimization
+Research first when: unfamiliar tools, new tech stack, complex quality criteria, or high-stakes optimization.
 
 ## Core Loop Pattern
 
@@ -62,7 +48,8 @@ Establish before starting:
 - Min iterations: (optional)
 
 **Termination Mode**:
-- Fixed: Run exactly N iterations; Criteria: Stop when success criteria met
+- Fixed: Run exactly N iterations
+- Criteria: Stop when success criteria met
 - Convergence: Stop when improvements < threshold (e.g., <10% over 3 iterations)
 - Hybrid: Combine multiple conditions
 
@@ -73,13 +60,15 @@ For each iteration:
 1. **Take action** - Apply fixes or implement changes
 2. **Run validator** - Execute tests, linters, or measurements
 3. **Record progress**:
-   ```
+
+   ```text
    Iteration N:
    - Action: [what was done]
    - Results: [metrics/outcomes]
    - Issues remaining: [count/description]
    - Decision: [Continue/Success/Stop]
    ```
+
 4. **Assess termination**:
    - All criteria met? → SUCCESS
    - Improvement < threshold? → CONVERGED
@@ -98,8 +87,6 @@ This prevents repeating failed approaches.
 
 ### Step 4: Handle Stuck States
 
-**Self-Fix Threshold**: If 2+ similar errors occur during iterations, pause and diagnose the root cause before attempting another fix.
-
 If no progress for 2-3 iterations:
 1. Analyze why progress stopped
 2. Try different approach
@@ -108,7 +95,7 @@ If no progress for 2-3 iterations:
 
 ### Step 5: Report Results
 
-```
+```text
 Loop Summary:
 - Iterations: N
 - Termination: [Success/Converged/Max/Stuck]
@@ -155,7 +142,8 @@ Configuration:
 - Max iterations: 8
 
 Execution:
-```
+
+```text
 I1: 42/50 → Fix 8 failures → Continue
 I2: 48/50 → Fix 2 failures → Continue
 I3: 50/50 → SUCCESS ✓
@@ -170,7 +158,8 @@ Configuration:
 - Max iterations: 5
 
 Execution:
-```
+
+```text
 I1: 15 warnings → Fix → 6 warnings
 I2: 6 warnings → Fix → 1 warning
 I3: 1 warning → Fix → 0 warnings ✓
@@ -186,7 +175,8 @@ Configuration:
 - Convergence: <10% over 3 iterations
 
 Execution:
-```
+
+```text
 I1: 320ms → Optimize → 180ms (44%)
 I2: 180ms → Optimize → 95ms (47%)
 I3: 95ms → Optimize → 48ms (49%)
@@ -202,7 +192,8 @@ Configuration:
 - Max iterations: 12
 
 Execution:
-```
+
+```text
 I1: 65% → Write tests → 72%
 I2: 72% → Write tests → 81%
 I3: 81% → Write tests → 88%
@@ -211,16 +202,8 @@ I4: 88% → Write tests → 91% ✓
 
 ## Language-Specific Tools
 
-For validation tools and commands for your language:
-- Python: See tools/python.md
-- JavaScript/TypeScript: See tools/javascript.md
-- Rust: See tools/rust.md
-- Java: See tools/java.md
-- Go: See tools/go.md
-- C/C++: See tools/cpp.md
-- Ruby: See tools/ruby.md
-- PHP: See tools/php.md
-- C#/.NET: See tools/dotnet.md
+For validation tools and commands for your language, see:
+`tools/python.md` · `tools/javascript.md` · `tools/rust.md` · `tools/java.md` · `tools/go.md` · `tools/cpp.md` · `tools/ruby.md` · `tools/php.md` · `tools/dotnet.md`
 
 ## Advanced Usage
 
@@ -230,6 +213,7 @@ See patterns.md
 ## Best Practices
 
 ### DO:
+
 ✓ Define clear, measurable success criteria
 ✓ Set reasonable max limits (5-15)
 ✓ Use automated validators
@@ -240,6 +224,7 @@ See patterns.md
 ✓ Document changes
 
 ### DON'T:
+
 ✗ Use loops for single-pass tasks
 ✗ Set high limits (>20) without justification
 ✗ Skip validation between iterations

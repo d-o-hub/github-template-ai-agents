@@ -9,7 +9,7 @@ Coordinate multiple agents efficiently for complex development tasks across any 
 
 ## Quick Start
 
-Choose your coordination strategy from the [Orchestration Patterns](../../../agents-docs/references/orchestration-patterns.md):
+Choose your coordination strategy:
 
 - **Parallel** - Independent tasks
 - **Sequential** - Dependent tasks
@@ -30,11 +30,51 @@ Choose your coordination strategy from the [Orchestration Patterns](../../../age
 | performance-optimizer | Speed and efficiency |
 | loop-agent | Orchestrate iterations |
 
+## Basic Workflow
+
+1. **Choose strategy** based on task structure
+2. **Select agents** matching required capabilities
+3. **Execute** with quality gates between phases
+4. **Validate** outputs before proceeding
+5. **Synthesize** results
+
 ## Language Support
 
+This coordination skill works with:
 - Python (Django, Flask, FastAPI)
 - JavaScript/TypeScript (Node.js, React, Vue)
-- Java, Go, Rust, C#
+- Java (Spring, Jakarta EE)
+- Go (Gin, Echo)
+- Rust (Actix, Rocket)
+- C# (.NET, ASP.NET Core)
+
+## Common Patterns
+
+**Analysis + Execution**:
+
+```text
+1. Swarm analysis (parallel agents gather insights)
+2. Sequential execution (apply findings)
+3. Parallel validation (verify results)
+```
+
+**Test-Driven Workflow**:
+
+```text
+1. test-runner: Run existing tests
+2. feature-implementer: Add functionality
+3. test-runner: Verify implementation
+4. code-reviewer: Quality check
+```
+
+**Performance Optimization**:
+
+```text
+Loop with performance-optimizer until:
+- Metrics meet targets
+- No more optimizations found
+- Max iterations reached
+```
 
 ## Quality Gates
 
@@ -43,7 +83,8 @@ Between each phase, verify:
 - Tests pass with adequate coverage
 - Security scans clean
 - Performance acceptable
+- No regressions introduced
 
-## References
+## Next Steps
 
-- [Orchestration Patterns](../../../agents-docs/references/orchestration-patterns.md) - Detailed guide for all coordination strategies including parallel, sequential, swarm, hybrid, and iterative.
+Read the specific coordination pattern that matches your task structure. Each pattern includes detailed workflows, examples, and quality criteria.

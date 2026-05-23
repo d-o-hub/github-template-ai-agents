@@ -6,10 +6,10 @@ This guide explains how to use [`nektos/act`](https://github.com/nektos/act) to 
 
 To run workflows locally, you need the following tools installed:
 
-1.  **Docker**: `act` requires Docker to run the workflow containers.
+1. **Docker**: `act` requires Docker to run the workflow containers.
     - [Install Docker Desktop](https://www.docker.com/products/docker-desktop/) or [Docker Engine](https://docs.docker.com/engine/install/).
     - Ensure Docker is running before starting `act`.
-2.  **act**: The local GitHub Actions runner.
+2. **act**: The local GitHub Actions runner.
     - **macOS (Homebrew)**: `brew install act`
     - **Linux**: `curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash`
     - **Windows (Chocolatey)**: `choco install act-cli`
@@ -34,18 +34,23 @@ You can control the script's behavior using environment variables:
 ## Common Usage Examples
 
 ### Run the Default Workflow
+
 Simulates a `pull_request` event for the main CI workflow.
+
 ```bash
 ./scripts/run_act_local.sh
 ```
 
 ### Run a Specific Job
+
 Run only the `quality-gate` job for faster feedback.
+
 ```bash
 ACT_JOB=quality-gate ./scripts/run_act_local.sh
 ```
 
 ### Run with Local Secrets
+
 If your workflow requires secrets (e.g., API keys), create a `.secrets` file in the root directory:
 
 ```text
@@ -55,6 +60,7 @@ MY_API_KEY=example_value
 ```
 
 Then run `act`:
+
 ```bash
 ./scripts/run_act_local.sh --secret-file .secrets
 ```
@@ -62,7 +68,9 @@ Then run `act`:
 > **Warning**: Never commit your `.secrets` file. It is added to `.gitignore` by default in this template.
 
 ### Dry Run
+
 See what would be executed without actually running the steps.
+
 ```bash
 ./scripts/run_act_local.sh -n
 ```
@@ -77,10 +85,13 @@ Default mapping:
 ## Troubleshooting
 
 ### Docker Not Running
+
 If you see an error like `docker daemon is not running`, ensure Docker is started.
 
 ### Missing Secrets
+
 If a job fails because a secret is missing, ensure you have provided it via a `.secrets` file or the `--secret` flag.
 
 ### Platform Mismatches
+
 If `act` prompts you to choose an image, it means the `.actrc` mapping is missing or ignored. Use the "Medium" image if unsure.

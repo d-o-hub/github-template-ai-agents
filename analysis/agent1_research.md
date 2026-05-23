@@ -30,6 +30,7 @@
 - Firecrawl (paid): ~2-3s, quality score 0.85-0.95 for JS-heavy sites
 
 **Cascade Order (Recommended)**:
+
 ```
 URL: Cache → llms.txt → Jina → Direct Fetch → Firecrawl → Mistral Browser
 Query: Cache → Exa MCP → DuckDuckGo → Exa/Tavily → Serper
@@ -42,6 +43,7 @@ Query: Cache → Exa MCP → DuckDuckGo → Exa/Tavily → Serper
 **Finding**: There's a logarithmic relationship between content size and information density.
 
 **Data Points**:
+
 | Max Chars | Tokens (est.) | Quality Score | Info Density |
 |-----------|---------------|---------------|--------------|
 | 4,000 | ~1,000 | 0.72 | High |
@@ -68,6 +70,7 @@ Query: Cache → Exa MCP → DuckDuckGo → Exa/Tavily → Serper
 ### 4. Quality Scoring Heuristics
 
 **Base Algorithm**:
+
 ```python
 score = 1.0
 if content_length < MIN_CHARS:
@@ -90,6 +93,7 @@ if noise_ratio > 0.20:
 **Finding**: Controlled parallelism with rate limiting prevents quota exhaustion.
 
 **Optimal Settings**:
+
 | Provider Type | Max Parallel | Delay Between |
 |---------------|--------------|---------------|
 | Free tier | 5 | 0ms |
@@ -144,16 +148,19 @@ if noise_ratio > 0.20:
 ## Knowledge Gaps Identified
 
 ### Gap 1: Real-time Quality Feedback
+
 **Issue**: Current systems don't adjust profiles mid-resolution based on early quality signals
 **Impact**: May over-pay for quality when free tier is sufficient
 **Recommendation**: Implement streaming quality assessment with early termination
 
 ### Gap 2: Domain-Specific Optimization
+
 **Issue**: No specialized handling for common doc platforms (GitBook, ReadTheDocs, etc.)
 **Impact**: Generic extraction misses platform-specific optimizations
 **Recommendation**: Add platform detection and specialized extractors
 
 ### Gap 3: Dynamic TTL Adjustment
+
 **Issue**: Fixed TTL doesn't account for content volatility
 **Impact**: Stable docs use same TTL as frequently-updating docs
 **Recommendation**: Implement content-change detection for dynamic TTL
