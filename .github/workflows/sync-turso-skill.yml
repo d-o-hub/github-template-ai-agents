@@ -1,5 +1,7 @@
+---
 name: Sync Turso Skill
 
+# yamllint disable-line rule:truthy
 on:
   schedule:
     - cron: '0 6 * * 1'
@@ -19,15 +21,16 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
       - name: Fetch latest Turso release and llms.txt
         run: |
           set -euo pipefail
-          LATEST_RELEASE="$(curl -fsSL https://api.github.com/repos/tursodatabase/turso/releases/latest | jq -r '.tag_name')"
+          REPO="tursodatabase/turso"
+          LATEST_RELEASE="$(curl -fsSL https://api.github.com/repos/$REPO/releases/latest | jq -r '.tag_name')"
           test -n "$LATEST_RELEASE" && test "$LATEST_RELEASE" != "null"
           curl -fsSL https://docs.turso.tech/llms.txt -o /tmp/llms.txt
-          echo "LATEST_RELEASE=$LATEST_RELEASE" >> "$GITHUB_ENV"
+          printf "LATEST_RELEASE=%s\n" "$LATEST_RELEASE" >> "$GITHUB_ENV"
 
       - name: Compare llms.txt with cached version
         id: check_changes
@@ -60,7 +63,7 @@ jobs:
 
       - name: Create Pull Request
         if: steps.check_changes.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1  # v8.1.1
         with:
           token: ${{ github.token }}
           branch: sync-turso-skill
