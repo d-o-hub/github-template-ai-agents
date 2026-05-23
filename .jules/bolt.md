@@ -85,3 +85,4 @@ When archiving files, subshells inside loops drastically slow down scripts. Repl
 ## 2024-05-22 - [Optimization] parameter expansion instead of subshell in loops
 Learning: Using `$(basename "$var")` inside a `while read` loop for large inputs spawns an external process for every single line, leading to severe performance bottlenecks (O(N) subshell overhead).
 Action: Replace it with native Bash parameter expansion `${var##*/}`. This achieves the same result locally within the current Bash process, reducing execution time from ~4.1s to ~0.04s for 1000 items.
+## 2026-05-23 - [Optional Skills Implementation] Learning: Standardized a way to include specialized or regulatory skills as optional in the template by using a SKILLS_OPTIONAL array in setup scripts. Action: Use this pattern for future specialized skill contributions to keep the default context clean.

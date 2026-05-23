@@ -4,7 +4,7 @@
 > Claude Code, Gemini CLI, OpenCode, Qwen Code, and more.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Template Version](https://img.shields.io/badge/version-0.2.9-blue)](CHANGELOG-TEMPLATE.md)
+[![Template Version](https://img.shields.io/badge/version-0.3.0-blue)](CHANGELOG-TEMPLATE.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Quick Links**: [Quick Start](#quick-start-2-minutes)
@@ -160,6 +160,8 @@ git commit -m "feat: add user registration"
 | [`agent-coordination`](.agents/skills/agent-coordination/) | Multi-agent orchestration patterns |
 | [`goap-agent`](.agents/skills/goap-agent/) | Goal-oriented action planning |
 | [`web-search-researcher`](.agents/skills/web-search-researcher/) | Web research and synthesis |
+| [`eu-ai-act-compliance`](.agents/skills/eu-ai-act-compliance/) | ⚙️ EU AI Act regulatory adherence |
+| [`durable-objects`](.agents/skills/durable-objects/) | ⚙️ Cloudflare Durable Objects coordination |
 
 ## Contributing
 

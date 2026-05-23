@@ -10,6 +10,11 @@ SKILLS_SRC="$REPO_ROOT/.agents/skills"
 # CLI folders that should contain symlinks to canonical skills
 # (OpenCode reads directly from .agents/skills/ - not included here)
 # (Qwen CLI also reads directly from .agents/skills/ - directory created for consistency)
+SKILLS_OPTIONAL=(
+  "eu-ai-act-compliance"
+  "durable-objects"
+)
+
 CLI_SKILL_DIRS=(
   ".claude/skills"
   ".qwen/skills"
@@ -36,6 +41,20 @@ for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
     # Performance optimization: Use Bash parameter expansion instead of basename
     skill_name="${skill_path%/}"
     skill_name="${skill_name##*/}"
+
+    # Check if skill is optional
+    is_optional=false
+    for opt in "${SKILLS_OPTIONAL[@]}"; do
+      if [[ "$skill_name" == "$opt" ]]; then
+        is_optional=true
+        break
+      fi
+    done
+
+    if [[ "$is_optional" == true ]] && [[ "${LINK_OPTIONAL:-false}" != "true" ]]; then
+      printf "  skip (optional): %s/%s\n" "$cli_dir" "$skill_name"
+      continue
+    fi
 
     link="$target_dir/$skill_name"
     # Performance optimization: Use pre-calculated base

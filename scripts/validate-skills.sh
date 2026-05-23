@@ -11,6 +11,11 @@ SKILLS_SRC="$REPO_ROOT/.agents/skills"
 # shellcheck source=lib/skill-validation.sh
 source "$REPO_ROOT/scripts/lib/skill-validation.sh"
 
+SKILLS_OPTIONAL=(
+  "eu-ai-act-compliance"
+  "durable-objects"
+)
+
 CLI_SKILL_DIRS=(
   ".claude/skills"
 )
@@ -74,6 +79,18 @@ for skill_path in "$SKILLS_SRC"/*/; do
 
     for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
         link="$REPO_ROOT/$cli_dir/$skill_name"
+
+        # Skip optional skills that are not linked
+        is_optional=false
+        for opt in "${SKILLS_OPTIONAL[@]}"; do
+            if [[ "$skill_name" == "$opt" ]]; then
+                is_optional=true
+                break
+            fi
+        done
+        if [[ "$is_optional" == true ]] && [ ! -L "$link" ] && [ ! -f "$link" ]; then
+            continue
+        fi
 
         if [ ! -L "$link" ] && { [ "$IS_WINDOWS" = "false" ] || [ ! -f "$link" ]; }; then
             printf "  ${RED}✗${NC} MISSING symlink: %s/%s\n" "$cli_dir" "$skill_name" >&2
