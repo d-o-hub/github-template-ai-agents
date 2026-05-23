@@ -77,8 +77,8 @@ AGENTS.md → Single source of truth
 
 ### Skills with Progressive Disclosure
 
-Skills live canonically in `.agents/skills/`. Claude Code, Gemini CLI, and Qwen Code use
-symlinks; OpenCode reads directly from `.agents/skills/`:
+Skills live canonically in `.agents/skills/`. Claude Code and Qwen Code use
+symlinks; OpenCode and Gemini CLI read directly from `.agents/skills/`:
 
 ```
 .agents/skills/           # Canonical source (single location)
