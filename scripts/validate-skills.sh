@@ -79,6 +79,11 @@ for skill_path in "$SKILLS_SRC"/*/; do
     fi
 
     for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
+        # Skip validation if the CLI skill directory doesn't exist
+        if [ ! -d "$REPO_ROOT/$cli_dir" ]; then
+            continue
+        fi
+
         link="$REPO_ROOT/$cli_dir/$skill_name"
 
         # Skip optional skills that are not linked
