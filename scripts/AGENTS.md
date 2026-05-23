@@ -17,9 +17,11 @@ Scripts use `snake_case.sh`. New scripts must follow this convention.
 ## REPO_ROOT Detection
 
 Every script must detect repo root portably:
+
 ```bash
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ```
+
 Never hardcode paths.
 
 ## Non-Obvious Lessons

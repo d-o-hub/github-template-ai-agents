@@ -40,6 +40,7 @@ For machine-readable index, see `lessons.jsonl`.
 5. **TTY/Color Detection**: `test -t 1` returns true locally, false in non-TTY CI
 
 **Solution**:
+
 ```bash
 # Don't use set -e - it's unreliable in CI
 set -uo pipefail
@@ -320,6 +321,7 @@ exit $EXIT_CODE
 3. **No progress indication**: Hanging operations are silent
 
 **Solution**:
+
 ```bash
 # Add timeout to all external commands
 MAX_OPERATION_SECONDS=300
@@ -369,6 +371,7 @@ timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
    - Forbidden: Duplicating AGENTS.md content, changing procedures
 
 2. **Standardize minimal pattern**:
+
    ```markdown
    @AGENTS.md
    
@@ -413,6 +416,7 @@ timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
 
 **Solution**:
 1. **Create shared library** `scripts/lib/docs-utils.sh`:
+
    ```bash
    extract_frontmatter_field() { ... }
    generate_markdown_table() { ... }
@@ -420,6 +424,7 @@ timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
    ```
 
 2. **Refactor scripts** to use library:
+
    ```bash
    source "$(dirname "$0")/../scripts/lib/docs-utils.sh"
    ```
@@ -481,6 +486,7 @@ timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
 2. **No Central Registration**: No shared array to track created worktrees for bulk cleanup
 
 **Solution**:
+
 ```bash
 # Register worktrees in a shared array
 CREATED_WORKTREES=()
@@ -525,6 +531,7 @@ CREATED_WORKTREES+=("$path")
 2. **Incompatible with Error Accumulation**: Manual error tracking (e.g., `FAILED=1`) is bypassed by `set -e` if a command fails inside a loop
 
 **Solution**:
+
 ```bash
 # Explicitly disable errexit to allow manual error tracking
 set +e
@@ -568,6 +575,7 @@ exit $((FAILED))
 3. **Trap Execution Context**: Traps run in the global scope and may see modified or unset variables
 
 **Solution**:
+
 ```bash
 # Define unique, descriptive names for temporary files
 # Use REPO_ROOT and script-specific prefixes
@@ -608,6 +616,7 @@ trap 'rm -f "$UPDATE_MD_TEMP_TABLE"' EXIT
 4. **No Recursion Guard**: Script has no mechanism to detect it's already running inside BATS
 
 **Solution**:
+
 ```bash
 # In quality_gate.sh - add recursion guard
 if [ -d "tests" ] && [ "${SKIP_TESTS:-false}" != "true" ] && [ -z "${BATS_TEST_FILENAME:-}" ]; then
@@ -659,6 +668,7 @@ quality-gate:
 4. **CI Blocking**: Quality gate treats warnings as failures
 
 **Solution**:
+
 ```bash
 # Use --severity=error to only fail on actual problems
 shellcheck --severity=error -f quiet "$script"
@@ -700,6 +710,7 @@ shellcheck --severity=error -f quiet "$script"
 3. **Operation Requirements**: Creating labels via API requires `issues: write` permission (not just `pull-requests: write`)
 
 **Solution** (Verified Working):
+
 ```yaml
 # Add explicit permissions at job level
 jobs:
@@ -721,7 +732,7 @@ jobs:
 **Prevention**:
 - Always check GitHub API permission requirements for operations
 - Use `permissions:` key to explicitly request needed scopes
-- Reference official docs: https://docs.github.com/en/rest/issues/labels
+- Reference official docs: <https://docs.github.com/en/rest/issues/labels>
 - Test workflows in PR before merging to main
 
 **Tags**: #github-api #permissions #token #issues-write #ci
@@ -755,5 +766,5 @@ jobs:
 - `.github/workflows/resolve-outdated-comments.yml`
 
 **References**:
-- GitHub Security Best Practices: https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions
+- GitHub Security Best Practices: <https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions>
 ---

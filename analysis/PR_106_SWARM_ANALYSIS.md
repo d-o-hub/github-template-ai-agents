@@ -1,7 +1,7 @@
 # Swarm Analysis Report: PR #106
 
 **PR:** feat: swarm web research optimization with git worktree workflow  
-**URL:** https://github.com/d-o-hub/github-template-ai-agents/pull/106  
+**URL:** <https://github.com/d-o-hub/github-template-ai-agents/pull/106>  
 **Date:** 2026-04-04  
 **Analysis Type:** Multi-Agent Swarm Review  
 
@@ -48,6 +48,7 @@ While the PR introduces valuable functionality for swarm-based web research opti
 | `WEB_RESEARCH_OPTIMIZATION.md` | **530** | 500 | +30 (6%) | Architecture, Code Quality |
 
 **AGENTS.md Reference:**
+
 ```bash
 readonly MAX_LINES_PER_SOURCE_FILE=500  # Line 11
 readonly MAX_LINES_PER_SKILL_MD=250       # Line 12
@@ -65,6 +66,7 @@ readonly MAX_LINES_PER_SKILL_MD=250       # Line 12
 > "Shell scripts: `shellcheck` for linting, `bats` for testing" (line 58)
 
 **Repository Pattern:**
+
 ```bash
 tests/quality-gate.bats      # 153 lines, 13 tests (existing)
 tests/validate-skills.bats   # 51 lines, 5 tests (existing)
@@ -178,6 +180,7 @@ git commit -F - <<< "$commit_msg"
 
 **Recommendation:**
 Split the 686-line script into modular components:
+
 ```
 scripts/swarm-worktree/
 ├── main.sh                 # Entry point (~100 lines)

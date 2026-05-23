@@ -51,6 +51,7 @@
 ## 2. Workflow Impact Analysis
 
 ### ci-and-labels.yml
+
 **Purpose:** Main CI pipeline for skill validation and quality gates
 
 **Trigger Events:**
@@ -69,6 +70,7 @@
 - **Runtime impact:** Negligible (same execution time)
 
 ### security-scan.yml
+
 **Purpose:** Comprehensive security scanning pipeline
 
 **Trigger Events:**
@@ -87,7 +89,7 @@
 - **Before fix:** SC2046 (word splitting risk) + SC2016 (quote style)
   - Word splitting could cause issues with paths containing spaces
   - Single quote preference is mostly stylistic
-- **After fix:** 
+- **After fix:**
   - xargs pattern prevents word splitting entirely
   - More robust for edge cases (spaces, special chars in paths)
 - **Runtime impact:** Slightly slower due to xargs overhead (~10-50ms)
@@ -99,6 +101,7 @@
 ### Current State
 
 **Existing Evals Structure:**
+
 ```
 .agents/skills/
 ├── cicd-pipeline/evals/evals.json      ✅ Evaluates CI/CD skill
