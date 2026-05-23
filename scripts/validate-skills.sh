@@ -18,6 +18,7 @@ SKILLS_OPTIONAL=(
 
 CLI_SKILL_DIRS=(
   ".claude/skills"
+  ".qwen/skills"
 )
 
 FAILED=0
