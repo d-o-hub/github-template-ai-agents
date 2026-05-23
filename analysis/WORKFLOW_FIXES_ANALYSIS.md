@@ -51,7 +51,6 @@
 ## 2. Workflow Impact Analysis
 
 ### ci-and-labels.yml
-
 **Purpose:** Main CI pipeline for skill validation and quality gates
 
 **Trigger Events:**
@@ -70,7 +69,6 @@
 - **Runtime impact:** Negligible (same execution time)
 
 ### security-scan.yml
-
 **Purpose:** Comprehensive security scanning pipeline
 
 **Trigger Events:**
@@ -101,7 +99,6 @@
 ### Current State
 
 **Existing Evals Structure:**
-
 ```
 .agents/skills/
 ├── cicd-pipeline/evals/evals.json      ✅ Evaluates CI/CD skill

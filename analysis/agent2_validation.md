@@ -73,7 +73,6 @@ Validated Output
 ### Content Drift Detection
 
 **Method**: Hash-based content fingerprinting
-
 ```python
 def detect_drift(url: str, stored_hash: str) -> DriftResult:
     current_content = fetch(url)
@@ -132,7 +131,6 @@ def score_citation_completeness(content: str) -> float:
 4. Flag inconsistencies for review
 
 **Example**:
-
 ```
 Claim: "Framework X supports Y feature"
 Source A: Confirms (primary)
@@ -307,21 +305,18 @@ class QualityGate:
 ## Validation Checklist
 
 ### Pre-Research
-
 - [ ] Define validation level for context
 - [ ] Set quality thresholds
 - [ ] Configure batch sizes
 - [ ] Enable appropriate logging
 
 ### During Research
-
 - [ ] Monitor link health in real-time
 - [ ] Track quality scores
 - [ ] Flag low-quality sources
 - [ ] Cache validation results
 
 ### Post-Research
-
 - [ ] Run full validation on critical sources
 - [ ] Cross-reference key facts
 - [ ] Generate validation report

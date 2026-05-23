@@ -8,7 +8,6 @@
 ## Web Research Optimization Strategy
 
 ### Profile Configuration
-
 - **Primary Profile**: `quality` (10 providers, 5 paid attempts max)
 - **Fallback Profile**: `balanced` (6 providers, 2 paid attempts)
 - **Exploration Profile**: `free` (3 providers, 0 paid)
@@ -19,7 +18,6 @@
 ### Token Optimization Strategy
 
 1. **Cascade Priority** (Free-First):
-
    ```
    URL: Cache → llms.txt → Jina → Direct Fetch → Firecrawl → Mistral
    Query: Cache → Exa MCP → DuckDuckGo → Exa/Tavily → Serper
@@ -39,7 +37,6 @@
 ### Quality Scoring Configuration
 
 **Thresholds by Context**:
-
 | Context | Min Score | Action on Low |
 |---------|-----------|---------------|
 | api-docs | 0.85 | Reject, retry with quality profile |
@@ -109,20 +106,17 @@
 ## Execution Plan
 
 ### Phase 1: Parallel Investigation (60 min target)
-
 - [ ] Agent 1: Execute batch web research
 - [ ] Agent 2: Pre-validate seed sources
 - [ ] Agent 3: Baseline metrics capture
 
 ### Phase 2: Synthesis (30 min target)
-
 - [ ] Consolidate findings across agents
 - [ ] Identify consensus and conflicts
 - [ ] Determine root causes
 - [ ] Prioritize recommendations
 
 ### Phase 3: Resolution (30 min target)
-
 - [ ] Generate optimization guide
 - [ ] Update workflow documentation
 - [ ] Validate final outputs

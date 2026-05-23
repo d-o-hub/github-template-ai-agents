@@ -22,7 +22,6 @@
 ### 1. Cascade Optimization
 
 **Current Waste Sources**:
-
 | Issue | Impact | Solution |
 |-------|--------|----------|
 | Using paid providers first | +200% cost | Free-first cascade |
@@ -31,7 +30,6 @@
 | Single-profile usage | Over/under-spending | Dynamic profile selection |
 
 **Optimized Cascade**:
-
 ```
 Attempt 1: Cache (0 tokens, ~1ms)
 Attempt 2: llms.txt (0 tokens, ~100ms)
@@ -347,28 +345,24 @@ Track these KPIs:
 ## Implementation Checklist
 
 ### Week 1: Configuration
-
 - [ ] Set WEB_RESOLVER_PROFILE=balanced
 - [ ] Configure 30-day cache TTL
 - [ ] Set 8,000 char default limit
 - [ ] Enable routing memory
 
 ### Week 2: Integration
-
 - [ ] Update swarm workflow script
 - [ ] Add profile selection logic
 - [ ] Implement batch processing
 - [ ] Add monitoring hooks
 
 ### Week 3: Optimization
-
 - [ ] Implement semantic deduplication
 - [ ] Add circuit breaker logging
 - [ ] Configure rate limiting
 - [ ] A/B test cascade ordering
 
 ### Week 4: Monitoring
-
 - [ ] Deploy metrics dashboard
 - [ ] Set up alerting
 - [ ] Generate cost reports

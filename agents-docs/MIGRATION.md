@@ -157,17 +157,14 @@ cat > your-project/AGENTS.md << 'EOF'
 ## Agent Guidance
 
 ### Plan Before Executing
-
 For non-trivial tasks: produce a written plan first, pause, and wait for confirmation
 before writing code.
 
 ### Context Discipline
-
 - Delegate isolated research and analysis to sub-agents
 - Use `/clear` between unrelated tasks
 - Load skills only when needed, not upfront
 EOF
-
 ```
 
 ### Step 4: Setup Skills
@@ -197,7 +194,6 @@ Verify the setup:
 ```
 
 Expected output:
-
 ```
 ✓ All skill symlinks intact
 ✓ SKILL.md files valid
@@ -525,30 +521,24 @@ Each package has its own AGENTS.md for package-specific instructions:
 ## Code Style
 
 ### Global
-
 - Conventional commits required
 - PRs must pass quality gate
 
 ### Frontend (TypeScript)
-
 - Strict mode, ESModules
 - pnpm lint, pnpm typecheck
 
 ### Backend (Python)
-
 - ruff + black
 - pytest with coverage
 
 ### Shared (Rust)
-
 - cargo fmt + cargo clippy
 EOF
 
 # 4. Create per-package AGENTS.md files
-
 for pkg in packages/frontend packages/backend packages/shared; do
   cat > "$pkg/AGENTS.md" << EOF
-
 # AGENTS.md for $pkg
 
 @../../AGENTS.md
@@ -560,14 +550,11 @@ EOF
 done
 
 # 5. Customize quality_gate.sh for all languages
-
 # Edit scripts/quality_gate.sh to include all language checks
 
 # 6. Setup
-
 ./scripts/setup-skills.sh
 ./scripts/quality_gate.sh
-
 ```
 
 ### Scenario 5: Minimal Setup (Documentation Only)
@@ -595,9 +582,7 @@ cat > AGENTS.md << 'EOF'
 EOF
 
 # 2. Test
-
 claude "What does this project do?"
-
 ```
 
 ---
@@ -608,9 +593,7 @@ claude "What does this project do?"
 
 **Symptom:**
 ```
-
 Error: No skills in .agents/skills/
-
 ```
 
 **Solution:**
@@ -628,13 +611,11 @@ cp -r /tmp/ai-agent-template/.agents/skills/task-decomposition .agents/skills/
 ### Issue: Broken Symlinks After Move
 
 **Symptom:**
-
 ```
 Error: MISSING symlink: .claude/skills/task-decomposition
 ```
 
 **Solution:**
-
 ```bash
 # Re-create all symlinks
 ./scripts/setup-skills.sh
@@ -646,13 +627,11 @@ Error: MISSING symlink: .claude/skills/task-decomposition
 ### Issue: Quality Gate Always Fails
 
 **Symptom:**
-
 ```
 Error: cargo fmt failed
 ```
 
 **Solution:**
-
 ```bash
 # Run the formatter manually first
 cargo fmt  # for Rust
@@ -680,7 +659,6 @@ Agent doesn't follow instructions from AGENTS.md
 Git commits without running quality gate
 
 **Solution:**
-
 ```bash
 # Check hook is installed
 ls -la .git/hooks/pre-commit
@@ -695,13 +673,11 @@ cat .git/hooks/pre-commit
 ### Issue: Permission Denied on Scripts
 
 **Symptom:**
-
 ```
 bash: ./scripts/setup-skills.sh: Permission denied
 ```
 
 **Solution:**
-
 ```bash
 chmod +x scripts/*.sh
 ```
@@ -709,20 +685,17 @@ chmod +x scripts/*.sh
 ### Issue: realpath Command Not Found
 
 **Symptom:**
-
 ```
 realpath: command not found
 ```
 
 **Solution:**
 On macOS, install coreutils:
-
 ```bash
 brew install coreutils
 ```
 
 Or modify `scripts/setup-skills.sh` to use `readlink -f` instead:
-
 ```bash
 # Replace realpath --relative-to with:
 rel=$(python3 -c "import os.path; print(os.path.relpath('$skill_path', '$target_dir'))")
@@ -731,7 +704,6 @@ rel=$(python3 -c "import os.path; print(os.path.relpath('$skill_path', '$target_
 ### Issue: Agent Can't Read Skills
 
 **Symptom:**
-
 ```
 Error: Skill not accessible
 ```

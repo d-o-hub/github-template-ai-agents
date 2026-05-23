@@ -4,21 +4,26 @@
 
 # Hybrid Coordination
 
+
 ---
 
 # Iterative Coordination
+
 
 ---
 
 # Parallel Coordination
 
+
 ---
 
 # Sequential Coordination
 
+
 ---
 
 # Swarm Coordination
+
 
 ---
 

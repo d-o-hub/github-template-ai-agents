@@ -23,7 +23,6 @@ Complete reference for all environment variables used across the AI agent templa
 **Default**: `false`
 
 **Example Usage**:
-
 ```bash
 SKIP_TESTS=true ./scripts/quality_gate.sh
 ```
@@ -42,7 +41,6 @@ SKIP_TESTS=true ./scripts/quality_gate.sh
 **Default**: `false`
 
 **Example Usage**:
-
 ```bash
 SKIP_CLIPPY=true ./scripts/quality_gate.sh
 ```
@@ -61,7 +59,6 @@ SKIP_CLIPPY=true ./scripts/quality_gate.sh
 **Default**: `false`
 
 **Example Usage**:
-
 ```bash
 SKIP_GLOBAL_HOOKS_CHECK=true git commit -m "feat: add feature"
 ./scripts/install-hooks.sh  # During setup
@@ -83,7 +80,6 @@ SKIP_GLOBAL_HOOKS_CHECK=true git commit -m "feat: add feature"
 **Default**: `1800` (30 minutes)
 
 **Example Usage**:
-
 ```bash
 ATOMIC_COMMIT_TIMEOUT=3600 ./scripts/atomic-commit/run.sh
 ```
@@ -102,7 +98,6 @@ ATOMIC_COMMIT_TIMEOUT=3600 ./scripts/atomic-commit/run.sh
 **Default**: `0` (rollback enabled)
 
 **Example Usage**:
-
 ```bash
 ATOMIC_COMMIT_NO_ROLLBACK=1 ./scripts/atomic-commit/run.sh
 ```
@@ -121,7 +116,6 @@ ATOMIC_COMMIT_NO_ROLLBACK=1 ./scripts/atomic-commit/run.sh
 **Default**: Not set (interactive mode)
 
 **Example Usage**:
-
 ```bash
 ATOMIC_COMMIT_CI_MODE=true ./scripts/atomic-commit/run.sh
 ```
@@ -142,7 +136,6 @@ ATOMIC_COMMIT_CI_MODE=true ./scripts/atomic-commit/run.sh
 **Default**: `250`
 
 **Example Usage**:
-
 ```bash
 MAX_SKILL_LINES=300 ./scripts/quality_gate.sh
 ```
@@ -166,7 +159,6 @@ MAX_SKILL_LINES=300 ./scripts/quality_gate.sh
 - `true` - Running in CI environment
 
 **Example Usage**:
-
 ```bash
 if [ "${CI:-}" == "true" ]; then
     echo "Running in CI mode"
@@ -197,7 +189,6 @@ fi
 - Any non-empty value indicates GitHub Actions
 
 **Example Usage**:
-
 ```bash
 if [ -n "${GITHUB_ACTIONS:-}" ]; then
     echo "Running in GitHub Actions"
@@ -224,7 +215,6 @@ fi
 - `0` - Force colors off
 
 **Example Usage**:
-
 ```bash
 FORCE_COLOR=1 ./scripts/quality_gate.sh | cat  # Force colors through pipe
 FORCE_COLOR=0 ./scripts/quality_gate.sh        # Disable colors in terminal

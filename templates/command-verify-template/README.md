@@ -36,13 +36,13 @@ cp templates/command-verify-template/.opencode/commands/*.md .opencode/commands/
 chmod +x scripts/*.sh
 ```
 
-1. **Create configuration file:**
+2. **Create configuration file:**
 
 ```bash
 cp templates/command-verify-template/.command-verify.conf.example .command-verify.conf
 ```
 
-1. **Run verification:**
+3. **Run verification:**
 
 ```bash
 ./scripts/verify-commands.sh
@@ -237,7 +237,6 @@ your-repo/
 │
 └── .command-verify.conf          # Configuration
 ```
-
 ## Troubleshooting
 
 ### "Not a git repository"

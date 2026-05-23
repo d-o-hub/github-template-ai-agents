@@ -28,6 +28,7 @@ The codebase is architecturally sound with good progressive disclosure patterns,
 - 2 BATS test files
 - 1 Python evaluation framework (`run-evals.py`)
 
+
 ---
 
 ## 1. Feature Gaps
@@ -589,7 +590,6 @@ Phase 5: Features (depends on Phase 4)
 ## Recommended Action Plan
 
 ### Sprint 1: Critical Fixes (Day 1)
-
 1. **Fix `scripts/health-check.sh` shebang** — `#!/usr/bash` → `#!/usr/bin/env bash`
 2. **Remove stray `# Test` from README.md** — one-line fix, high visibility
 3. **Add `.qwen/skills` to validate-skills.sh** — one-line array addition
@@ -597,37 +597,32 @@ Phase 5: Features (depends on Phase 4)
 5. **Move `import time` in run-evals.py** — one-line fix
 
 ### Sprint 2: Documentation & Safety (Day 2-3)
-
 6. **Update README.md skill table** — run `update-agents-md.sh` and sync to README
-2. **Create `agents-docs/SCRIPTS.md`** — document all 17 scripts
-3. **Make gh-labels-creator.sh default to --ci** — prevent accidental label deletion
-4. **Add `--help` to quality_gate.sh** — improve usability
-5. **Fix install-hooks.sh duplication** — single source for pre-commit hook
+7. **Create `agents-docs/SCRIPTS.md`** — document all 17 scripts
+8. **Make gh-labels-creator.sh default to --ci** — prevent accidental label deletion
+9. **Add `--help` to quality_gate.sh** — improve usability
+10. **Fix install-hooks.sh duplication** — single source for pre-commit hook
 
 ### Sprint 3: Code Quality (Day 4-5)
-
 11. **Split run-evals.py** — into discovery, runner, validators, reporter modules
-2. **Split swarm-worktree-web-research.sh** — extract phases into lib scripts
-3. **Consolidate validators** — merge validate-skills.sh and validate-skill-format.sh logic
-4. **Expand .agents/config.sh** — make it the actual shared library
+12. **Split swarm-worktree-web-research.sh** — extract phases into lib scripts
+13. **Consolidate validators** — merge validate-skills.sh and validate-skill-format.sh logic
+14. **Expand .agents/config.sh** — make it the actual shared library
 
 ### Sprint 4: Testing (Day 6-8)
-
 15. **Add BATS tests** for validate-links.sh, update-agents-md.sh, validate-git-hooks.sh
-2. **Add pytest tests** for run-evals.py
-3. **Enable tests in CI** — remove SKIP_TESTS=true
-4. **Add integration tests** for multi-script workflows
-5. **Add coverage reporting** — bashcov for shell, coverage.py for Python
+16. **Add pytest tests** for run-evals.py
+17. **Enable tests in CI** — remove SKIP_TESTS=true
+18. **Add integration tests** for multi-script workflows
+19. **Add coverage reporting** — bashcov for shell, coverage.py for Python
 
 ### Sprint 5: Features & Polish (Day 9-10)
-
 20. **Create init-template.sh** — template initialization wizard
-2. **Add secret scanning to pre-commit hook** — lightweight grep-based check
-3. **Create script dependency map** — agents-docs/SCRIPT_DEPENDENCIES.md
-4. **Add rate limiting to self-fix-loop.sh** — exponential backoff
+21. **Add secret scanning to pre-commit hook** — lightweight grep-based check
+22. **Create script dependency map** — agents-docs/SCRIPT_DEPENDENCIES.md
+23. **Add rate limiting to self-fix-loop.sh** — exponential backoff
 
 ### Validation Criteria
-
 - [ ] All scripts use `#!/usr/bin/env bash`
 - [ ] No script exceeds 500 lines
 - [ ] README.md skill table lists all 34 skills
@@ -640,7 +635,6 @@ Phase 5: Features (depends on Phase 4)
 - [ ] validate-skills.sh checks .qwen/skills
 
 ### Monitoring Plan
-
 - Track CI pass rate weekly (target: 100%)
 - Monitor quality gate execution time (target: <60 seconds)
 - Track test coverage percentage (target: 80%+)

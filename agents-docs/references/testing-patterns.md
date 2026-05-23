@@ -4,6 +4,7 @@
 
 # Load Testing Scenarios
 
+
 Pre-built load test scenarios for common use cases.
 
 ## Overview
@@ -1092,6 +1093,7 @@ jobs:
 
 # Mutation Testing
 
+
 Mutation testing tools and strategies. Updated with 2026 best practices and latest tool versions.
 
 ## Overview
@@ -1834,7 +1836,7 @@ def test_age_verification():
     assert is_adult(19) is True    # Just above
 ```
 
-1. **Exception Testing**
+2. **Exception Testing**
 
 ```python
 # Bad - no exception testing
@@ -1850,7 +1852,7 @@ def test_divide():
         divide("10", 2)
 ```
 
-1. **State Verification (Not Just Return Values)**
+3. **State Verification (Not Just Return Values)**
 
 ```python
 # Bad - only tests return value
@@ -1867,7 +1869,7 @@ def test_add_item():
     assert cart.total > 0
 ```
 
-1. **Negative Testing**
+4. **Negative Testing**
 
 ```python
 # Test what shouldn't happen
@@ -1905,7 +1907,7 @@ def calculate(a, b):  # mutmut: ignore
     return (a + b) * 2  # This mutant is equivalent
 ```
 
-1. **Configure Mutators:**
+2. **Configure Mutators:**
 
 ```json
 {
@@ -1918,7 +1920,7 @@ def calculate(a, b):  # mutmut: ignore
 }
 ```
 
-1. **Accept Imperfection**:
+3. **Accept Imperfection**:
    - 100% mutation score is not realistic
    - Focus on improving over time
    - Document known equivalent mutants
@@ -1967,6 +1969,7 @@ Features:
 
 # Property-Based Testing Patterns
 
+
 Advanced patterns for property-based testing with Hypothesis, QuickCheck, and fast-check.
 
 ## Stateful Testing
@@ -1974,7 +1977,6 @@ Advanced patterns for property-based testing with Hypothesis, QuickCheck, and fa
 Test stateful systems with model-based testing.
 
 ### Python with Hypothesis
-
 ```python
 from hypothesis import given, strategies as st, settings
 from hypothesis.stateful import RuleBasedStateMachine, rule, invariant, precondition
@@ -2011,7 +2013,6 @@ TestDatabase = DatabaseMachine.TestCase
 ## Custom Strategies
 
 ### Composite Strategies
-
 ```python
 from hypothesis import given, strategies as st
 
@@ -2029,7 +2030,6 @@ date_range_strategy = st.tuples(
 ```
 
 ### Recursive Data Structures
-
 ```python
 from hypothesis import given, strategies as st
 
@@ -2052,7 +2052,6 @@ def test_json_handling(data):
 ## Common Properties
 
 ### Roundtrip Properties
-
 ```python
 @given(st.text())
 def test_serialization_roundtrip(text):
@@ -2063,7 +2062,6 @@ def test_serialization_roundtrip(text):
 ```
 
 ### Idempotence
-
 ```python
 @given(st.lists(st.integers()))
 def test_sorting_idempotent(lst):
@@ -2074,7 +2072,6 @@ def test_sorting_idempotent(lst):
 ```
 
 ### Commutativity
-
 ```python
 @given(st.integers(), st.integers())
 def test_addition_commutative(a, b):
@@ -2083,7 +2080,6 @@ def test_addition_commutative(a, b):
 ```
 
 ### Associativity
-
 ```python
 @given(st.lists(st.integers()), st.lists(st.integers()), st.lists(st.integers()))
 def test_list_concat_associative(a, b, c):
@@ -2094,7 +2090,6 @@ def test_list_concat_associative(a, b, c):
 ```
 
 ### Inverses
-
 ```python
 @given(st.integers())
 def test_increment_decrement_inverse(x):
@@ -2131,6 +2126,7 @@ test('should handle async code', async () => {
 ---
 
 # Test Maintenance
+
 
 Test health monitoring and maintenance strategies. Updated with 2026 best practices for flaky test management and test suite health monitoring.
 
@@ -3124,12 +3120,12 @@ jobs:
 
 # Visual Testing Guide
 
+
 Comprehensive guide to visual regression testing.
 
 ## Playwright Visual Testing
 
 ### Basic Screenshot Comparison
-
 ```javascript
 const { test, expect } = require('@playwright/test');
 
@@ -3149,7 +3145,6 @@ test('component visual test', async ({ page }) => {
 ```
 
 ### Masking Dynamic Content
-
 ```javascript
 test('dashboard with masked dates', async ({ page }) => {
   await page.goto('/dashboard');
@@ -3163,7 +3158,6 @@ test('dashboard with masked dates', async ({ page }) => {
 ```
 
 ### Multi-Viewport Testing
-
 ```javascript
 test.describe('responsive design', () => {
   test.use({ viewport: { width: 1280, height: 720 }});
@@ -3183,14 +3177,12 @@ test.describe('responsive design', () => {
 ## Storybook + Chromatic
 
 ### Setup
-
 ```bash
 npm install --save-dev chromatic
 npx chromatic --project-token=<your-token>
 ```
 
 ### CI Integration
-
 ```yaml
 - name: Publish to Chromatic
   uses: chromaui/action@v1

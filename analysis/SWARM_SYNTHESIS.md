@@ -112,7 +112,6 @@ This analysis used a **multi-agent swarm pattern** with parallel investigation a
 ## Action Items
 
 ### Priority 1: Configuration (Week 1)
-
 - [ ] Set `WEB_RESOLVER_PROFILE=balanced` as default
 - [ ] Configure 30-day cache TTL
 - [ ] Set 8,000 char content limit
@@ -122,7 +121,6 @@ This analysis used a **multi-agent swarm pattern** with parallel investigation a
 **Expected Impact**: 50-60% cost reduction immediately
 
 ### Priority 2: Workflow Integration (Week 2)
-
 - [ ] Update `scripts/swarm-worktree-web-research.sh`
 - [ ] Add profile selection logic (FREE → BALANCED → QUALITY)
 - [ ] Implement batch processing with backpressure
@@ -132,7 +130,6 @@ This analysis used a **multi-agent swarm pattern** with parallel investigation a
 **Expected Impact**: Consistent quality, reduced manual review
 
 ### Priority 3: Optimization (Week 3)
-
 - [ ] Implement semantic deduplication (40% token savings)
 - [ ] Add circuit breaker logging and monitoring
 - [ ] Configure rate limiting (2s between batches)
@@ -142,7 +139,6 @@ This analysis used a **multi-agent swarm pattern** with parallel investigation a
 **Expected Impact**: Additional 10-15% savings, improved stability
 
 ### Priority 4: Monitoring (Week 4)
-
 - [ ] Deploy metrics dashboard tracking:
   - Cache hit rate (target: >65%)
   - Average quality score (target: >0.75)
@@ -160,7 +156,6 @@ This analysis used a **multi-agent swarm pattern** with parallel investigation a
 ## Token Optimization Summary
 
 ### Before Optimization
-
 - Profile: Always QUALITY
 - Cache: Minimal or none
 - Parallelism: Unlimited (rate limit issues)
@@ -170,7 +165,6 @@ This analysis used a **multi-agent swarm pattern** with parallel investigation a
 **Estimated cost**: $80/day for 1000 resolutions
 
 ### After Optimization
-
 - Profile: Dynamic (FREE → BALANCED → QUALITY)
 - Cache: 30-day TTL, routing memory
 - Parallelism: Controlled (5 free, 3 paid max)
@@ -180,7 +174,6 @@ This analysis used a **multi-agent swarm pattern** with parallel investigation a
 **Estimated cost**: $24/day for 1000 resolutions
 
 ### Savings
-
 - **70% cost reduction**
 - **$1,232/month saved**
 - **ROI <1 month** (8 hours implementation @ $100/hr = $800 cost)
@@ -202,7 +195,6 @@ This analysis used a **multi-agent swarm pattern** with parallel investigation a
 ## Implementation Files
 
 ### New Files Created
-
 1. `scripts/swarm-worktree-web-research.sh` - Main workflow
 2. `agents-docs/WEB_RESEARCH_OPTIMIZATION.md` - Optimization guide
 3. `analysis/agent1_research.md` - Deep researcher findings
@@ -212,7 +204,6 @@ This analysis used a **multi-agent swarm pattern** with parallel investigation a
 7. `analysis/SWARM_SYNTHESIS.md` - This file
 
 ### Modified Files
-
 1. `.github/workflows/cleanup.yml` - Safety improvements (already committed)
 
 ---
@@ -220,7 +211,6 @@ This analysis used a **multi-agent swarm pattern** with parallel investigation a
 ## Validation
 
 ### All GitHub Actions Checks
-
 - [ ] Lint checks pass
 - [ ] Shell script validation passes
 - [ ] Markdown formatting passes
@@ -228,7 +218,6 @@ This analysis used a **multi-agent swarm pattern** with parallel investigation a
 - [ ] No security vulnerabilities
 
 ### Quality Gates
-
 - [ ] All agent outputs complete
 - [ ] Synthesis document generated
 - [ ] Web research summary created

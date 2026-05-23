@@ -62,7 +62,7 @@ git checkout -b fix/issue-123-bug-description
 
 Use [Conventional Commits](https://www.conventionalcommits.org/) format. **Note: Conventional Commits are enforced via CI.**
 
-```text
+```
 type(scope): Brief description (50 chars max)
 
 - Why this change was necessary
@@ -80,8 +80,7 @@ type(scope): Brief description (50 chars max)
 - `chore`: Build/dependency updates
 
 **Examples:**
-
-```text
+```
 feat(skills): Add web-doc-resolver skill for documentation fetching
 
 Users needed reliable documentation access without manual searches.
@@ -90,7 +89,7 @@ This skill provides automatic doc resolution with fallback chain.
 Fixes #45
 ```
 
-```text
+```
 fix(workflows): Update action versions to stable releases
 
 actions/checkout@v5 doesn't exist yet, causing CI failures.
@@ -219,8 +218,7 @@ SKIP_TESTS=true ./scripts/quality_gate.sh   # Skip tests
 - Update `README.md` for feature additions
 
 **Documentation structure:**
-
-```text
+```
 AGENTS.md (single source of truth, concise)
 ├── agents-docs/ (detailed reference docs)
 │   ├── HARNESS.md

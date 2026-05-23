@@ -2,7 +2,7 @@
 
 > Single source of truth for all AI coding agents in this repository.
 > Supported by: Claude Code, Windsurf, Gemini CLI, Codex, Copilot, OpenCode, Devin, Amp, Zed, Warp, RooCode, Jules
-> See: <https://agents.md>
+> See: https://agents.md
 
 ## Named Constants
 
@@ -23,6 +23,7 @@ readonly DEFAULT_TIMEOUT_SECONDS=1800
 readonly MAX_COMMIT_SUBJECT_LENGTH=72
 readonly MAX_PR_TITLE_LENGTH=72
 ```
+
 
 ## Development Phases
 
@@ -56,11 +57,9 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 ## Version Management
 
 **Single source of truth**: `VERSION` file at root. Never edit version strings elsewhere.
-
 ```bash
 echo "0.3.0" > VERSION && git add VERSION && git commit -m "chore: bump version to 0.3.0"
 ```
-
 See `agents-docs/VERSION.md` for full workflow details.
 
 ## Quality Gate (Required Before Commit)
@@ -101,9 +100,7 @@ See `agents-docs/VERSION.md` for full workflow details.
 
 ## PR & Commit Instructions
 
-- PR Title: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
-- Commit Header: `type(scope): subject` (max `${MAX_COMMIT_SUBJECT_LENGTH}` chars total, including type and scope)
-- Commit Body: wrap at 100 chars per line
+- Title/Commit: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
 - Branch per feature; One concern per PR; Never commit to `main`
 
 ### Commit Workflow (Mandatory)
@@ -152,7 +149,6 @@ See `agents-docs/skills-reference.md` for the full skill catalog (50+ skills).
 - **Context**: Delegate to sub-agents; Use `/clear`; Load skills only when needed.
 
 #### Recent Project-Wide Learnings
-
 - **Action SHA Pinning**: Pin to 40-char SHAs for security (LESSON-016)
 - **Worktree Cleanup**: Use `trap cleanup EXIT ERR` and `CREATED_WORKTREES` (LESSON-010)
 

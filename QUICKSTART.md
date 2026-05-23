@@ -3,7 +3,6 @@
 > Get started with AI agent-powered development in 5 minutes.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Template Version](https://img.shields.io/badge/version-0.2.0-blue)](VERSION)
 
 ## Prerequisites
 
@@ -50,8 +49,7 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 ```
 
 Expected output:
-
-```text
+```
 ✓ All skill validations passed
 ```
 
@@ -71,20 +69,36 @@ Primary stack: [frameworks, libraries, tools]
 
 ### 2. Update Setup Commands
 
-```markdown
-## Setup
+Replace the commands below with your project's actual setup steps:
 
+**Node.js / TypeScript projects:**
 ```bash
 # Install dependencies
-# TODO: Replace with your commands
-pnpm install | cargo build | pip install -r requirements.txt
+pnpm install
 
 # Start dev server
-# TODO: Replace with your commands
-pnpm dev | cargo run | python main.py
+pnpm dev
 ```
 
-```text
+**Rust projects:**
+```bash
+# Build the project
+cargo build
+
+# Run the application
+cargo run
+```
+
+**Python projects:**
+```bash
+# Install dependencies (virtual environment recommended)
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# Run the application
+python main.py
+```
 
 ### 3. Add Language-Specific Style
 
@@ -164,6 +178,28 @@ claude "Refactor the authentication module to improve readability"
 # Expected: All checks pass
 ```
 
+## Optional: Test GitHub Actions Locally
+
+You can rehearse CI workflows locally using [`act`](https://github.com/nektos/act)
+and **Docker** to catch errors before pushing.
+
+### 1. Install Prerequisites
+
+- **Docker**: [Install Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- **act**: `brew install act` (macOS) or see [Installation Guide](https://nektosact.com/installation/)
+
+### 2. Run Workflows
+
+```bash
+# Run CI workflow locally (default: pull_request event)
+./scripts/run_act_local.sh
+
+# Run only the quality-gate job for faster feedback
+ACT_JOB=quality-gate ./scripts/run_act_local.sh
+```
+
+See [**Local Actions Guide**](agents-docs/ACT.md) for secrets handling and more examples.
+
 ## Next Steps
 
 | Topic | Resource |
@@ -178,7 +214,7 @@ claude "Refactor the authentication module to improve readability"
 
 ### Skills Not Found
 
-```text
+```
 Error: MISSING symlink: .claude/skills/task-decomposition
 ```
 
@@ -186,7 +222,7 @@ Error: MISSING symlink: .claude/skills/task-decomposition
 
 ### Quality Gate Fails
 
-```text
+```
 Error: cargo fmt failed
 ```
 

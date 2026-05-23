@@ -23,8 +23,9 @@ log_fail() { printf "  ✗ %s\n" "$1"; EXIT_CODE=1; }
 # --- Phase 1: ADR File Inventory ---
 printf "=== Phase 1: ADR File Inventory ===\n"
 declare -a ADR_FILES=()
+# Optimization: Use native bash parameter expansion instead of basename in a loop.
 while IFS= read -r -d '' file; do
-  ADR_FILES+=("$(basename "$file")")
+  ADR_FILES+=("${file##*/}")
 done < <(find "$REPO_ROOT/plans" -maxdepth 1 -name 'adr-*.md' -print0 | sort -z)
 
 for f in "${ADR_FILES[@]}"; do printf "  - %s\n" "$f"; done
@@ -39,8 +40,13 @@ if [[ ! -f "$STATUS_FILE" ]]; then
     log_fail "plans/_status.json not found but ADR files exist!"
   fi
 else
+  # Optimization: Use a single grep pass to check all files if possible,
+  # but here we need to know WHICH one failed.
+  # We can read the status file once into a variable for faster checking if it is small.
+  STATUS_CONTENT=$(cat "$STATUS_FILE")
   for f in "${ADR_FILES[@]}"; do
-    if grep -qF -- "\"$f\"" "$STATUS_FILE"; then :
+    # Use native bash regex for faster check instead of spawning grep for every file.
+    if [[ "$STATUS_CONTENT" =~ \"$f\" ]]; then :
     else log_fail "$f NOT registered in _status.json"; fi
   done
 fi
