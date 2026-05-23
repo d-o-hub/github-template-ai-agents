@@ -135,7 +135,7 @@ Do not invent new types. Do not skip linting.
 
 See `agents-docs/skills-reference.md` for the full skill catalog (50+ skills).
 
-**Categories**: Coordination · DevOps · Documentation · General · Quality · Security · UI/UX
+**Categories**: Coordination · DevOps · Documentation · General · Quality · Security · UI/UX · Compliance & Governance
 
 ## Security
 
@@ -162,3 +162,8 @@ This section is automatically updated by `./scripts/analyze-codebase.sh`.
 See `agents-docs/self-learning-rules.md` for details and `./scripts/analyze-codebase.sh` for regeneration.
 
 See `agents-docs/` for detailed reference documentation.
+
+#### Integration Learnings
+
+- **Optional Skills Pattern**: Implemented `SKILLS_OPTIONAL` in `setup-skills.sh` to allow opt-in for specialized knowledge like `eu-ai-act-compliance` and `durable-objects`.
+- **Compliance Category**: Established "Compliance & Governance" as a new skill category for regulatory adherence patterns.

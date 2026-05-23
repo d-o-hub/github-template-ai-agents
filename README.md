@@ -160,6 +160,8 @@ git commit -m "feat: add user registration"
 | [`agent-coordination`](.agents/skills/agent-coordination/) | Multi-agent orchestration patterns |
 | [`goap-agent`](.agents/skills/goap-agent/) | Goal-oriented action planning |
 | [`web-search-researcher`](.agents/skills/web-search-researcher/) | Web research and synthesis |
+| [`eu-ai-act-compliance`](.agents/skills/eu-ai-act-compliance/) | ⚙️ EU AI Act regulatory adherence |
+| [`durable-objects`](.agents/skills/durable-objects/) | ⚙️ Cloudflare Durable Objects coordination |
 
 ## Contributing
 
