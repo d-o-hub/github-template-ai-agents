@@ -163,6 +163,7 @@ See `agents-docs/self-learning-rules.md` for details and `./scripts/analyze-code
 
 See `agents-docs/` for detailed reference documentation.
 
-#### v0.3.0 Integration Learnings
+#### Integration Learnings
+
 - **Optional Skills Pattern**: Implemented `SKILLS_OPTIONAL` in `setup-skills.sh` to allow opt-in for specialized knowledge like `eu-ai-act-compliance` and `durable-objects`.
 - **Compliance Category**: Established "Compliance & Governance" as a new skill category for regulatory adherence patterns.
