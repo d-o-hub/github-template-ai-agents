@@ -68,3 +68,8 @@
 **Vulnerability:** Arithmetic expansion in Bash ($(( ))) interprets numbers with leading zeros as octal, causing errors for values like '08' or '09'.
 **Learning:** Logic for version comparison or numeric validation can crash if it handles version strings or numeric input with leading zeros without specifying the base.
 **Prevention:** Use the 10# prefix (e.g., $((10#$var))) to force decimal interpretation in Bash arithmetic expansion when dealing with potentially padded numbers.
+
+## 2026-05-24 - Python Command Injection via Shell Variable Interpolation
+**Vulnerability:** Directly interpolating shell variables into `python3 -c` command strings in `scripts/check-plan-numbering.sh` and `scripts/validate-skills.sh` allowed for arbitrary Python code execution.
+**Learning:** Shell variables expanded inside a Python command string are treated as part of the code. If a variable contains characters like `'`, it can break out of the string literal and execute arbitrary Python commands.
+**Prevention:** Always pass shell variables as positional arguments to `python3 -c` and access them via `sys.argv`. This ensures the variables are treated as data rather than code.

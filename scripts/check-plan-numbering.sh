@@ -23,8 +23,8 @@ if [[ ! -f "$STATUS_FILE" ]] || [[ ! -f "$README_FILE" ]]; then
 fi
 
 # Get next plan number from _status.json
-NEXT_PLAN=$(python3 -c "import json; d=json.load(open('$STATUS_FILE')); print(d['nextAvailable']['plan'])")
-NEXT_ADR=$(python3 -c "import json; d=json.load(open('$STATUS_FILE')); print(d['nextAvailable']['adr'])")
+NEXT_PLAN=$(python3 -c "import json, sys; d=json.load(open(sys.argv[1])); print(d['nextAvailable']['plan'])" "$STATUS_FILE")
+NEXT_ADR=$(python3 -c "import json, sys; d=json.load(open(sys.argv[1])); print(d['nextAvailable']['adr'])" "$STATUS_FILE")
 
 echo "→ Checking plan numbering..."
 
