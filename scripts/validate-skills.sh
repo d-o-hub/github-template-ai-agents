@@ -128,11 +128,11 @@ echo ""
 echo "Checking skill-rules.json..."
 RULES_FILE="$REPO_ROOT/.agents/skill-rules.json"
 if [ -f "$RULES_FILE" ]; then
-    if ! python3 -c "import json; json.load(open('$RULES_FILE'))" 2>/dev/null; then
+    if ! python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$RULES_FILE" 2>/dev/null; then
         printf "  ${RED}✗${NC} skill-rules.json: Invalid JSON\n" >&2
         FAILED=1
     else
-        RULES_COUNT=$(python3 -c "import json; print(len(json.load(open('$RULES_FILE'))))")
+        RULES_COUNT=$(python3 -c "import json, sys; print(len(json.load(open(sys.argv[1]))))" "$RULES_FILE")
         printf "  ${GREEN}✓${NC} skill-rules.json: Valid JSON\n"
         printf "  ${GREEN}✓${NC} skill-rules.json: %s rules defined\n" "$RULES_COUNT"
     fi
