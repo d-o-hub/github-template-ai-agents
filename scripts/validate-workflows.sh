@@ -81,13 +81,14 @@ for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
             temp = substr(temp, RSTART + RLENGTH)
         }
     }
-    BEGIN { in_block = 0; indent = 0; is_script = 0 }
+    BEGIN { in_block = 0; indent = 0; is_script = 0; block_indent = -1 }
     /^[[:space:]]*(-[[:space:]]*)?(run|script):[[:space:]]*[|>]-?$/ {
         if (in_block && is_script) print "---END_SCRIPT---"
         in_block = 1
         is_script = ($0 ~ /script:/)
         match($0, /^[ ]*/)
         indent = RLENGTH
+        block_indent = -1
         next
     }
     /^[[:space:]]*(-[[:space:]]*)?(run|script):/ {
@@ -108,8 +109,12 @@ for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
         if (RLENGTH > indent || length($0) == 0) {
             check_injection($0)
             if (is_script) {
-                if (length($0) > indent + 2) print substr($0, indent + 3)
-                else print ""
+                if (length($0) == 0) {
+                    print ""
+                } else {
+                    if (block_indent == -1) block_indent = RLENGTH
+                    print substr($0, block_indent + 1)
+                }
             }
         } else {
             if (is_script) print "---END_SCRIPT---"
