@@ -283,7 +283,7 @@ phase_monitor_ci() {
         error "CI CHECKS FAILED"
         LAST_FAILURES=()
         mapfile -t LAST_FAILURES < <(printf "%s\n" "$checks_output" | grep -iE "(fail|error)" | head -20)
-        if [ ${#LAST_FAILURES[@]} -eq 0 ]; then
+        if [[ ${#LAST_FAILURES[@]} -eq 0 ]]; then
             LAST_FAILURES=("Unknown failure")
         fi
 
