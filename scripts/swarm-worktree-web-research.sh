@@ -112,12 +112,11 @@ batch_resolve() {
         local context="${line#*|}"
 
         # Trim whitespace
-        query=$(printf "%s\n" "$query" | xargs)
-        context=$(printf "%s\n" "$context" | xargs)
+        query="${query#"${query%%[![:space:]]*}"}"; query="${query%"${query##*[![:space:]]}"}"
+        context="${context#"${context%%[![:space:]]*}"}"; context="${context%"${context##*[![:space:]]}"}"
         context="${context:-general}"
 
-        local sanitized_query
-        sanitized_query=$(printf "%s\n" "$query" | tr -c '[:alnum:]' '_')
+        local sanitized_query="${query//[^[:alnum:]]/_}"
         local output_file="${output_dir}/${sanitized_query}.json"
 
         if [[ ${#pids[@]} -ge $max_parallel ]]; then

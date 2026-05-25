@@ -13,6 +13,7 @@ else
     echo "Validating $CONFIG_FILE..."
     KNOWN_KEYS=("SAFE_KEYWORDS" "CONDITIONAL_KEYWORDS" "DANGEROUS_KEYWORDS" "SAFE_PATTERNS" "CONDITIONAL_PATTERNS" "DANGEROUS_PATTERNS" "INVALIDATION_RULES")
 
+    local file_content=$(cat "$CONFIG_FILE")
     while IFS='=' read -r key value || [ -n "$key" ]; do
         [[ "$key" =~ ^#.* ]] && continue
         [[ -z "$key" ]] && continue
@@ -31,6 +32,6 @@ else
         if [ "$found" = false ]; then
             printf "Warning: Unknown configuration key found: %s\n" "$key"
         fi
-    done < "$CONFIG_FILE"
+    done <<< "$file_content"
     echo "Validation complete."
 fi

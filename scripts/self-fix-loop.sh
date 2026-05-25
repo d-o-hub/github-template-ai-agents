@@ -282,9 +282,10 @@ phase_monitor_ci() {
         # Failures detected - capture them
         error "CI CHECKS FAILED"
         LAST_FAILURES=()
-        while IFS= read -r line; do
-            LAST_FAILURES+=("$line")
-        done < <(printf "%s\n" "$checks_output" | grep -iE "(fail|error)" | head -20)
+        mapfile -t LAST_FAILURES < <(printf "%s\n" "$checks_output" | grep -iE "(fail|error)" | head -20)
+        if [ ${#LAST_FAILURES[@]} -eq 0 ]; then
+            LAST_FAILURES=("Unknown failure")
+        fi
 
         log "Failures:"
         for f in "${LAST_FAILURES[@]}"; do
@@ -323,11 +324,11 @@ phase_analyze_fix() {
                 local shell_scripts
                 shell_scripts=$(find . -name "*.sh" -not -path "./.git/*" -not -path "./target/*" 2>/dev/null || true)
                 if [[ -n "$shell_scripts" ]]; then
-                    while IFS= read -r script; do
+                    for script in $shell_scripts; do
                         [ -n "$script" ] || continue
                         log "  Checking: $script"
                         shellcheck --severity=error "$script" 2>&1 || true
-                    done <<< "$shell_scripts"
+                    done
                 fi
                 fix_applied=true
             fi
