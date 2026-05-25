@@ -82,7 +82,7 @@ for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
         }
     }
     BEGIN { in_block = 0; indent = 0; is_script = 0 }
-    /^[[:space:]]*(run|script):[[:space:]]*[|>]-?$/ {
+    /^[[:space:]]*(-[[:space:]]*)?(run|script):[[:space:]]*[|>]-?$/ {
         if (in_block && is_script) print "---END_SCRIPT---"
         in_block = 1
         is_script = ($0 ~ /script:/)
@@ -90,14 +90,14 @@ for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
         indent = RLENGTH
         next
     }
-    /^[[:space:]]*(run|script):/ {
+    /^[[:space:]]*(-[[:space:]]*)?(run|script):/ {
         if (in_block && is_script) print "---END_SCRIPT---"
         in_block = 0
         is_script = ($0 ~ /script:/)
         check_injection($0)
         if (is_script) {
             line = $0
-            sub(/^[[:space:]]*script:[[:space:]]*/, "", line)
+            sub(/^[[:space:]]*(-[[:space:]]*)?script:[[:space:]]*/, "", line)
             print line
             print "---END_SCRIPT---"
         }
@@ -117,6 +117,20 @@ for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
         }
     }
     ' "$wf")
+
+    # Ensure any trailing script block is finalized
+    if [[ -n "$current_block" ]]; then
+        # shellcheck disable=SC2059
+        printf "(async () => {\n%s\n})()" "$current_block" > "$TMP_JS_FILE"
+        if ! node -c "$TMP_JS_FILE" 2>/dev/null; then
+            printf "  ${RED}✗ Syntax error in script block${NC}\n"
+            node -c "$TMP_JS_FILE" 2>&1 | sed 's/^/    /'
+            FAILED=1
+        else
+            printf "  ${GREEN}✓ Script block syntax OK${NC}\n"
+        fi
+        current_block=""
+    fi
 done
 
 if [ $FAILED -ne 0 ]; then
