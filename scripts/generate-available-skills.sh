@@ -100,10 +100,9 @@ SKILL_DATA=$(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" |
 
         # Filter skills for this category and sort by name
         # Use -- separator with grep to prevent option injection if category starts with -
-        filtered_data=$(printf "%s\n" "$SKILL_DATA" | grep -- "^$category|" | sort -t'|' -k2,2 || true)
-        while IFS="|" read -r _ name description || [ -n "$name" ]; do
+        printf "%s\n" "$SKILL_DATA" | grep -- "^$category|" | sort -t'|' -k2,2 | while IFS="|" read -r _ name description; do
             printf "| \`%s\` | %s |\n" "$name" "$description"
-        done <<< "$filtered_data"
+        done
         printf "\n"
     done
 

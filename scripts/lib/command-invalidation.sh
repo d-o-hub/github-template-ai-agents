@@ -82,8 +82,7 @@ get_affected_commands() {
         # Check if changed file matches the pattern
         if matches_pattern "$changed_file" "$file_pattern"; then
             # Find commands matching the prefix
-            local tmp_extracted="$extracted"
-            while IFS=$'\t' read -r cmd_file cmd || [ -n "$cmd_file" ]; do
+            while IFS=$'\t' read -r cmd_file cmd; do
                 [ -z "$cmd" ] && continue
 
                 # Special case: *.md means commands in that specific file
@@ -94,7 +93,7 @@ get_affected_commands() {
                 elif [[ "$cmd_prefix" == "*" ]] || [[ "$cmd" == "$cmd_prefix"* ]]; then
                     affected+=("$cmd")
                 fi
-            done <<< "$tmp_extracted"
+            done <<< "$extracted"
         fi
     done
 

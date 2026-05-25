@@ -60,12 +60,9 @@ should_invalidate_command() {
     local changed_files="$3"
 
     # Use a loop that handles spaces in filenames if needed, though here changed_files is space-separated
-    local old_IFS="$IFS"
-    IFS=$'\n'
-    for changed in $changed_files; do
+    while IFS= read -r changed; do
         [ -z "$changed" ] && continue
         if [[ "$changed" == "$file" ]]; then
-            IFS="$old_IFS"
             return 0
         fi
 

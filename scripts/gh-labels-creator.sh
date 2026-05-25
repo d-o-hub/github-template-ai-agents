@@ -31,13 +31,13 @@ else
 
         if [[ -n "$label_names" ]]; then
             # Security: Use printf for safe variable expansion and prevent option injection
-            while IFS= read -r label; do
+            printf "%s\n" "$label_names" | while IFS= read -r label; do
                 if [[ -n "$label" ]]; then
                     printf "Deleting label: %s\n" "$label"
                     # Place flags before -- to ensure they are correctly parsed
                     gh label delete --yes -- "$label" || printf "Failed to delete: %s\n" "$label"
                 fi
-            done <<< "$label_names"
+            done
             echo "Label deletion completed."
         else
             echo "No labels found to delete."
