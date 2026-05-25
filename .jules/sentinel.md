@@ -73,3 +73,8 @@
 **Vulnerability:** Directly interpolating shell variables into `python3 -c` command strings in `scripts/check-plan-numbering.sh` and `scripts/validate-skills.sh` allowed for arbitrary Python code execution.
 **Learning:** Shell variables expanded inside a Python command string are treated as part of the code. If a variable contains characters like `'`, it can break out of the string literal and execute arbitrary Python commands.
 **Prevention:** Always pass shell variables as positional arguments to `python3 -c` and access them via `sys.argv`. This ensures the variables are treated as data rather than code.
+
+## 2026-05-25 - GitHub Actions Expression Injection Detection
+**Vulnerability:** Direct interpolation of untrusted GitHub context variables (e.g., `github.event.issue.title`) into `run:` or `script:` blocks allows for command or script injection.
+**Learning:** Simple regex matching for `${{ }}` is insufficient. A whitelist of safe contexts (env, secrets, needs, etc.) and specific GitHub properties is required to differentiate between safe and dangerous interpolations.
+**Prevention:** Use environment variables to pass untrusted GitHub context data to shell scripts. Enhance validation tooling to enforce this pattern by flagging non-whitelisted direct interpolations in workflow files.
