@@ -23,9 +23,9 @@ log_fail() { echo "  ✗ $1"; EXIT_CODE=1; }
 # --- Phase 1: ADR File Inventory ---
 echo "=== Phase 1: ADR File Inventory ==="
 declare -a ADR_FILES=()
-while IFS= read -r -d '' file; do
-  ADR_FILES+=("$(basename "$file")")
-done < <(find "$REPO_ROOT/plans" -maxdepth 1 -name 'adr-*.md' -print0 | sort -z)
+for file in "$REPO_ROOT/plans"/adr-*.md; do
+  [[ -f "$file" ]] && ADR_FILES+=("${file##*/}")
+done
 
 for f in "${ADR_FILES[@]}"; do echo "  - $f"; done
 
