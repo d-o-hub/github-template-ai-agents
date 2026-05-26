@@ -13,16 +13,20 @@ def validate_schema():
     except ImportError:
         print("jsonschema not found, skipping deep validation. Just checking JSON syntax.")
         try:
-            with open(schema_path, 'r') as f:
+            with open(schema_path, 'r', encoding='utf-8') as f:
                 json.load(f)
             print("Schema JSON syntax OK")
             return
-        except Exception as e:
-            print(f"Error: Invalid JSON syntax in schema: {e}")
+        except (json.JSONDecodeError, OSError) as e:
+            print(f"Error: Invalid JSON syntax or OS error in schema: {e}")
             sys.exit(1)
 
-    with open(schema_path, 'r') as f:
-        schema = json.load(f)
+    try:
+        with open(schema_path, 'r', encoding='utf-8') as f:
+            schema = json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"Error: Failed to load schema: {e}")
+        sys.exit(1)
 
     valid_payload = {
         "version": "1.0.0",

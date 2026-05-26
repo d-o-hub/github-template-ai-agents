@@ -50,6 +50,7 @@ Use `AbortController` signal for all `addEventListener` calls where possible to 
 const controller = new AbortController();
 const { signal } = controller;
 
+// handleResize must be defined in your component or module
 window.addEventListener('resize', handleResize, { signal });
 
 // Later, to remove all listeners associated with this controller:

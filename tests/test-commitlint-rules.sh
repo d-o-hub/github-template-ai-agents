@@ -4,16 +4,16 @@ set -euo pipefail
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-echo "Verifying commitlint configuration syntax..."
+printf "Verifying commitlint configuration syntax...\n"
 
 # Since we don't have node_modules or a local commitlint setup easily testable without npm install,
 # and we want to avoid environment changes, we'll do a basic JS syntax check on the config file.
 
 if command -v node >/dev/null; then
     node --check commitlint.config.cjs
-    echo "✓ commitlint.config.cjs syntax OK"
+    printf "✓ commitlint.config.cjs syntax OK\n"
 else
-    echo "node not found, skipping syntax check."
+    printf "node not found, skipping syntax check.\n"
 fi
 
 # Also check for consistency with AGENTS.md
@@ -27,23 +27,24 @@ check_consistency() {
 
     if grep -q "$pattern" "$CONFIG_FILE"; then
         if grep -q "$value" "$CONFIG_FILE"; then
-            echo "✓ $name matches: $value"
+            printf "✓ %s matches: %s\n" "$name" "$value"
         else
-            echo "✗ Error: $name does not match expected value: $value"
+            printf "✗ Error: %s does not match expected value: %s\n" "$name" "$value" >&2
             grep "$pattern" "$CONFIG_FILE"
             exit 1
         fi
     else
-        echo "✗ Error: $name pattern not found in $CONFIG_FILE"
+        printf "✗ Error: %s pattern not found in %s\n" "$name" "$CONFIG_FILE" >&2
         exit 1
     fi
 }
 
-echo "Checking consistency with AGENTS.md..."
+printf "Checking consistency with AGENTS.md...\n"
 check_consistency "'header-max-length'" "150" "Header max length"
 check_consistency "'body-max-length'" "1000" "Body max length"
 check_consistency "'body-max-line-length'" "100" "Body max line length"
 check_consistency "'footer-max-length'" "1000" "Footer max length"
+check_consistency "'footer-max-line-length'" "100" "Footer max line length"
 check_consistency "'subject-case'" "'lower-case'" "Subject case"
 
 exit 0
