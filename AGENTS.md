@@ -20,8 +20,8 @@ readonly DEFAULT_MAX_POLL_ATTEMPTS=12
 readonly DEFAULT_TIMEOUT_SECONDS=1800
 
 # Git/PR configuration
-readonly MAX_COMMIT_SUBJECT_LENGTH=72
-readonly MAX_PR_TITLE_LENGTH=72
+readonly MAX_COMMIT_SUBJECT_LENGTH=150
+readonly MAX_PR_TITLE_LENGTH=150
 ```
 
 ## Development Phases
@@ -44,6 +44,15 @@ We use a GOAP (Goal-Oriented Action Planning) approach combined with ADRs (Archi
 
 4. **SYNTHESIZE (Phase 4)**
    - **Action**: Run the `learn` skill to extract discoveries and update project-specific `AGENTS.md` contexts.
+
+## ADR Status Convention
+
+Downstream projects should use the following statuses for ADRs:
+
+- **accepted**: Architectural decision defining an ongoing pattern (e.g., AbortController, IndexedDB, token system).
+- **complete**: Feature implementation with clear completion criteria (e.g., ambient light sensor, UI modernization).
+
+This helps distinguish between permanent architectural conventions and completed feature work.
 
 ## Setup
 
@@ -88,7 +97,7 @@ See `agents-docs/VERSION.md` for full workflow details.
 
 - Max `${MAX_LINES_PER_SOURCE_FILE}` lines/file; `${MAX_LINES_PER_SKILL_MD}`/`SKILL.md`; `${MAX_LINES_AGENTS_MD}`/`AGENTS.md`
 - `SKILL.md` must start with frontmatter and include **Rationalizations** and **Red Flags** sections
-- No magic numbers - use named constants
+- **No hardcoded values / Magic numbers**: Never hardcode deployment-specific paths, port numbers, API versions, or magic numeric literals. Use relative paths (base: "./"), runtime derivation (self.location), environment variables, or named constants with clear intent.
 - **Reference format**: `` `references/filename.md` - Description ``
 - Shell: `shellcheck` (severity=error); Markdown: `markdownlint`; Diagrams: `mermaid`
 
@@ -103,7 +112,9 @@ See `agents-docs/VERSION.md` for full workflow details.
 
 - PR Title: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
 - Commit Header: `type(scope): subject` (max `${MAX_COMMIT_SUBJECT_LENGTH}` chars total, including type and scope)
-- Commit Body: wrap at 100 chars per line
+- Commit Subject: MUST be lowercase (not sentence-case, start-case, or upper-case)
+- Commit Body: max 200 chars; wrap at 100 chars per line
+- Commit Footer: max 200 chars
 - Branch per feature; One concern per PR; Never commit to `main`
 
 ### Commit Workflow (Mandatory)
