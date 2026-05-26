@@ -10,7 +10,7 @@ printf "Extracting JS examples from %s...\n" "$SKILL_FILE"
 # Extract JS code blocks and save to a temporary file
 sed -n '/^```javascript$/,/^```$/p' "$SKILL_FILE" | grep -v '```' > "$TMP_DIR/extracted.js"
 
-if [ ! -s "$TMP_DIR/extracted.js" ]; then
+if [[ ! -s "$TMP_DIR/extracted.js" ]]; then
     printf "Error: No JS examples found in %s\n" "$SKILL_FILE"
     exit 1
 fi
