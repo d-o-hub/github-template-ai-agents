@@ -115,4 +115,4 @@ jobs:
         run: echo \"\${{ github.event.issue.title }}\"
 " "true"
 
-echo -e "\n${GREEN}All workflow validation tests passed!${NC}"
+echo -e \"\n\${GREEN}All workflow validation tests passed!\${NC}\"

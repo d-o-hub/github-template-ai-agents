@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bash
 # Validates JavaScript blocks in GitHub Actions workflows.
 # Checks syntax using node -c and scans for script injection risks.
 
