@@ -10,7 +10,7 @@ CURRENT="${2:-HEAD}"
 printf "Syncing docs %s → %s\n" "$LAST_COMMIT" "$CURRENT"
 
 # Security: Use -- separator to prevent option injection from malicious branch names
-diff_output=$(git diff --name-only "$LAST_COMMIT" "$CURRENT" -- '*.md' 2>/dev/null || true)
+diff_output=$(git diff --name-only -- "$LAST_COMMIT" "$CURRENT" -- '*.md' 2>/dev/null || true)
 
 while IFS= read -r file; do
   # Security: Use printf for safe variable output
