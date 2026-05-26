@@ -41,9 +41,9 @@ check_consistency() {
 
 echo "Checking consistency with AGENTS.md..."
 check_consistency "'header-max-length'" "150" "Header max length"
-check_consistency "'body-max-length'" "200" "Body max length"
+check_consistency "'body-max-length'" "1000" "Body max length"
 check_consistency "'body-max-line-length'" "100" "Body max line length"
-check_consistency "'footer-max-length'" "200" "Footer max length"
+check_consistency "'footer-max-length'" "1000" "Footer max length"
 check_consistency "'subject-case'" "'lower-case'" "Subject case"
 
 exit 0
