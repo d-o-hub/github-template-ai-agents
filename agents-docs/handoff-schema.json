@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Swarm Handoff Schema",
+  "description": "Formal JSON Schema for agent-to-agent communication handoffs.",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version (e.g., 1.0.0)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of the handoff"
+    },
+    "sourceAgent": {
+      "type": "string",
+      "description": "The agent initiating the handoff"
+    },
+    "targetAgent": {
+      "type": "string",
+      "description": "The agent receiving the handoff"
+    },
+    "context": {
+      "type": "object",
+      "description": "Arbitrary key-value pairs representing the shared state"
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["created", "modified", "deleted", "reference"]
+          },
+          "summary": {
+            "type": "string"
+          }
+        },
+        "required": ["path", "type", "summary"]
+      },
+      "description": "Files or data created, modified, or referenced"
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "rationale": {
+            "type": "string"
+          }
+        },
+        "required": ["topic", "decision", "rationale"]
+      },
+      "description": "Key decisions made by the source agent"
+    },
+    "nextSteps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Specific tasks for the target agent to perform"
+    }
+  },
+  "required": ["version", "timestamp", "sourceAgent", "targetAgent", "context", "artifacts", "decisions", "nextSteps"]
+}
