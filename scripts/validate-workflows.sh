@@ -11,7 +11,6 @@ FAILED=0
 echo "Validating GitHub Actions JavaScript blocks..."
 
 # Create temporary file for script validation once
-# We use a fixed name in /tmp to avoid repeated mktemp calls
 TMP_JS_FILE=$(mktemp /tmp/workflow-script-XXXXXX.js)
 
 # Ensure cleanup on exit
@@ -20,17 +19,27 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# Support both .yml and .yaml extensions
-for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
+# Allow passing specific files or directories to check
+CHECK_PATHS=("$@")
+if [ ${#CHECK_PATHS[@]} -eq 0 ]; then
+    # Support both .yml and .yaml extensions
+    shopt -s nullglob
+    CHECK_PATHS=(.github/workflows/*.yml .github/workflows/*.yaml)
+    shopt -u nullglob
+fi
+
+if [ ${#CHECK_PATHS[@]} -eq 0 ]; then
+    echo "No workflow files found to validate."
+    exit 0
+fi
+
+for wf in "${CHECK_PATHS[@]}"; do
     [ -e "$wf" ] || continue
     echo "Checking $wf..."
 
-    # Use a variable to accumulate the current script block to avoid line-by-line file I/O
     current_block=""
 
     # Extract script blocks and detect script injection risks
-    # Handles various YAML block scalar types: |, |#, >, >-
-    # Process output of awk directly to avoid intermediate temp file
     while IFS= read -r line; do
         if [[ "$line" == "---INJECTION_RISK---"* ]]; then
             printf "  ${RED}⚠ Potential script injection risk detected:${NC}\n"
@@ -42,11 +51,8 @@ for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
 
         if [[ "$line" == "---END_SCRIPT---" ]]; then
             if [[ -n "$current_block" ]]; then
-                # Wrap in async function to allow await and write to file in one go
-                # shellcheck disable=SC2059
                 printf "(async () => {\n%s\n})()" "$current_block" > "$TMP_JS_FILE"
 
-                # node -c only checks syntax, which is what we want
                 if ! node -c "$TMP_JS_FILE" 2>/dev/null; then
                     printf "  ${RED}✗ Syntax error in script block${NC}\n"
                     node -c "$TMP_JS_FILE" 2>&1 | sed 's/^/    /'
@@ -57,7 +63,6 @@ for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
                 current_block=""
             fi
         else
-            # Accumulate line in variable with a newline
             if [[ -z "$current_block" ]]; then
                 current_block="$line"
             else
@@ -65,26 +70,55 @@ for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
             fi
         fi
     done < <(awk '
-    /script: [|>]-?/ {
-        match($0, /^[ ]*/)
-        indent = RLENGTH
-        while (getline > 0) {
-            match($0, /^[ ]*/)
-            if (RLENGTH > indent && length($0) > 0 && $0 !~ /^[ ]*$/) {
-                line = $0
-                gsub(/secrets\./, "SAFE_SECRET", line)
-                if (line ~ /\$\{\{/ && line !~ /\$\{\{.*(env|steps|jobs|inputs|matrix).*/ ) {
-                    print "---INJECTION_RISK---" $0
-                }
-                print substr($0, indent + 3)
-            } else if (length($0) == 0) {
-                print ""
+    function is_injection_risk(line) {
+        if (line !~ /\$\{\{/) return 0
+        # Whitelist safe contexts and safe github properties
+        safe = "^\\$\\{\\{[[:space:]]*(env|steps|jobs|inputs|matrix|strategy|secrets|needs|github\\.(repository|actor|sha|workflow|run_id|run_number|event_name|job|token))[.[:alnum:]_-]*[[:space:]]*\\}\\}"
+        temp = line
+        while (match(temp, /\$\{\{[^}]+\}\}/)) {
+            m = substr(temp, RSTART, RLENGTH)
+            if (m !~ safe) return 1
+            temp = substr(temp, RSTART + RLENGTH)
+        }
+        return 0
+    }
+    function process_line(line) {
+        if (line ~ /^[[:space:]]*(-[[:space:]]*)?(run|script):/) {
+            if (line ~ /: [|>]-?/) {
+                in_block = 1
+                is_script = (line ~ /script:/)
+                match(line, /^[ ]*/)
+                indent = RLENGTH
+                return
             } else {
-                print "---END_SCRIPT---"
-                break
+                if (is_injection_risk(line)) print "---INJECTION_RISK---" line
+                if (line ~ /script:/) {
+                    l = line
+                    sub(/^[[:space:]]*(-[[:space:]]*)?script:[[:space:]]*/, "", l)
+                    print l
+                    print "---END_SCRIPT---"
+                }
+                return
             }
         }
     }
+    BEGIN { in_block = 0; indent = 0; is_script = 0 }
+    in_block {
+        match($0, /^[ ]*/)
+        if (RLENGTH > indent || length($0) == 0) {
+            if (is_injection_risk($0)) print "---INJECTION_RISK---" $0
+            if (is_script) {
+                if (length($0) == 0) print ""
+                else print substr($0, indent + 3)
+            }
+        } else {
+            if (is_script) print "---END_SCRIPT---"
+            in_block = 0
+            process_line($0)
+        }
+        next
+    }
+    { process_line($0) }
     ' "$wf")
 done
 
