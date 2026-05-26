@@ -65,23 +65,48 @@ for wf in .github/workflows/*.yml .github/workflows/*.yaml; do
             fi
         fi
     done < <(awk '
-    /script: [|>]-?/ {
+    function is_injection_risk(line) {
+        if (line !~ /\$\{\{/) return 0
+        # Whitelist safe contexts and safe github properties
+        # Safe: env, steps, jobs, inputs, matrix, strategy, secrets, needs
+        # Safe github properties: repository, actor, sha, workflow, run_id, run_number, event_name, job, ref, head_ref, base_ref, token
+        safe = "^\\$\\{\\{[[:space:]]*(env|steps|jobs|inputs|matrix|strategy|secrets|needs|github\\.(repository|actor|sha|workflow|run_id|run_number|event_name|job|ref|head_ref|base_ref|token))[.[:alnum:]_-]*[[:space:]]*\\}\\}"
+        temp = line
+        while (match(temp, /\$\{\{[^}]+\}\}/)) {
+            m = substr(temp, RSTART, RLENGTH)
+            if (m !~ safe) return 1
+            temp = substr(temp, RSTART + RLENGTH)
+        }
+        return 0
+    }
+    BEGIN { in_block = 0; indent = 0; is_script = 0 }
+    in_block {
         match($0, /^[ ]*/)
-        indent = RLENGTH
-        while (getline > 0) {
+        if (RLENGTH > indent || length($0) == 0) {
+            if (is_injection_risk($0)) print "---INJECTION_RISK---" $0
+            if (is_script) {
+                if (length($0) == 0) print ""
+                else print substr($0, indent + 3)
+            }
+            next
+        } else {
+            if (is_script) print "---END_SCRIPT---"
+            in_block = 0
+        }
+    }
+    /^[[:space:]]*(-[[:space:]]*)?(run|script):/ {
+        if ($0 ~ /: [|>]-?/) {
+            in_block = 1
+            is_script = ($0 ~ /script:/)
             match($0, /^[ ]*/)
-            if (RLENGTH > indent && length($0) > 0 && $0 !~ /^[ ]*$/) {
+            indent = RLENGTH
+        } else {
+            if (is_injection_risk($0)) print "---INJECTION_RISK---" $0
+            if ($0 ~ /script:/) {
                 line = $0
-                gsub(/secrets\./, "SAFE_SECRET", line)
-                if (line ~ /\$\{\{/ && line !~ /\$\{\{.*(env|steps|jobs|inputs|matrix).*/ ) {
-                    print "---INJECTION_RISK---" $0
-                }
-                print substr($0, indent + 3)
-            } else if (length($0) == 0) {
-                print ""
-            } else {
+                sub(/^[[:space:]]*(-[[:space:]]*)?script:[[:space:]]*/, "", line)
+                print line
                 print "---END_SCRIPT---"
-                break
             }
         }
     }
