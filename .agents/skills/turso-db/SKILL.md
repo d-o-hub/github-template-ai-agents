@@ -1,7 +1,7 @@
 ---
 name: turso-db
 description: Use this skill for Turso (LibSQL/Limbo) database development, including scaffolding, querying, migrations, and maintenance. Supports vector search, full-text search, CDC, MVCC, encryption, and bidirectional remote sync. Use when working with Turso SDKs for JavaScript, Rust, Python, Go, and React Native. Provides current API guidance to avoid stale "libsql" legacy knowledge.
-version: 0.5.3
+version: 0.6.1
 license: MIT
 ---
 
@@ -18,9 +18,9 @@ For the latest details or topics not covered locally, search the official docs o
 Before writing any Turso code, you MUST know these constraints:
 
 - **BETA software** — not all SQLite features are implemented yet.
-- **No multi-process access** — only one process can open a database file at a time.
+- **Multi-process access is experimental** — use the experimental multiprocess WAL coordinator for sharing a database between processes. See [Turso docs](https://docs.turso.tech/sql-reference/multiprocess-access.md).
 - **No WITHOUT ROWID tables** — all tables must have a rowid.
-- **No vacuum** — VACUUM is not supported.
+- **VACUUM is now supported** — use VACUUM to rebuild the database file and reclaim unused space. See [Turso docs](https://docs.turso.tech/sql-reference/statements/vacuum.md).
 - **UTF-8 only** — the only supported character encoding.
 - **WAL is the default journal mode** — legacy SQLite modes (delete, truncate, persist) are not supported.
 - **FTS requires compile-time `fts` feature** — not available in all builds.
