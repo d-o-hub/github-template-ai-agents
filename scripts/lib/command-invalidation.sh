@@ -79,8 +79,7 @@ get_affected_commands() {
     for rule in "${INVALIDATION_RULES[@]}"; do
         # Performance optimization: Native bash string expansion instead of IFS read <<<
         local file_pattern="${rule%%:*}"
-        local cmd_prefix=""
-        [[ "$rule" == *:* ]] && cmd_prefix="${rule#*:}"
+        local cmd_prefix="${rule#*:}"
 
         # Check if changed file matches the pattern
         if matches_pattern "$changed_file" "$file_pattern"; then
