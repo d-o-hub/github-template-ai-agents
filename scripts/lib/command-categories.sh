@@ -19,11 +19,17 @@ if [ -f ".command-verify.conf" ]; then
     source ".command-verify.conf"
 fi
 
+# Pre-parse keywords into arrays to avoid redundant read <<< parsing on every call
+IFS=':' read -ra _DANGEROUS_KEYWORDS_ARRAY <<< "$DANGEROUS_KEYWORDS"
+IFS=':' read -ra _CONDITIONAL_KEYWORDS_ARRAY <<< "$CONDITIONAL_KEYWORDS"
+IFS=':' read -ra _SAFE_KEYWORDS_ARRAY <<< "$SAFE_KEYWORDS"
+
 # Categorize a command as safe, conditional, dangerous, or unknown
 categorize_command() {
     local cmd="$1"
     local cmd_lower
     # Security: Use printf for safe variable expansion and to prevent option injection
+    # Note: Using tr instead of ${cmd,,} to maintain compatibility with Bash 3.2 (e.g. macOS default)
     cmd_lower=$(printf "%s\n" "$cmd" | tr '[:upper:]' '[:lower:]')
 
     # Check custom dangerous patterns first (E3)
@@ -36,8 +42,7 @@ categorize_command() {
     done
 
     # Check dangerous keywords
-    IFS=':' read -ra keywords <<< "$DANGEROUS_KEYWORDS"
-    for keyword in "${keywords[@]}"; do
+    for keyword in "${_DANGEROUS_KEYWORDS_ARRAY[@]}"; do
         [ -z "$keyword" ] && continue
         if [[ "$cmd_lower" == *"$keyword"* ]]; then
             printf "dangerous\n"
@@ -55,8 +60,7 @@ categorize_command() {
     done
 
     # Check conditional keywords
-    IFS=':' read -ra keywords <<< "$CONDITIONAL_KEYWORDS"
-    for keyword in "${keywords[@]}"; do
+    for keyword in "${_CONDITIONAL_KEYWORDS_ARRAY[@]}"; do
         [ -z "$keyword" ] && continue
         if [[ "$cmd_lower" == *"$keyword"* ]]; then
             printf "conditional\n"
@@ -74,8 +78,7 @@ categorize_command() {
     done
 
     # Check safe keywords
-    IFS=':' read -ra keywords <<< "$SAFE_KEYWORDS"
-    for keyword in "${keywords[@]}"; do
+    for keyword in "${_SAFE_KEYWORDS_ARRAY[@]}"; do
         [ -z "$keyword" ] && continue
         if [[ "$cmd_lower" == *"$keyword"* ]]; then
             printf "safe\n"
