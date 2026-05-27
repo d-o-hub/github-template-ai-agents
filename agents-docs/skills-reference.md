@@ -15,6 +15,7 @@ Full catalog of available skills in this repository.
 | `cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, Gi | DevOps |
 | `cloudflare-worker-api` | Structure Worker API routes and handlers. Activate for route | API Development |
 | `code-quality` | Review and improve code quality across any programming langu | Quality |
+| `codacy` | Use Codacy static analysis CLIs to query PR analysis, triage issues, suppress false positives, and run local analysis. | Quality |
 | `code-review-assistant` | Automated code review with PR analysis, change summaries, an | General |
 | `codeberg-api` | - Interact with Forgejo/Codeberg repositories via the REST A | API Development |
 | `css-render-performance` | Guide CSS render performance analysis and optimization. Use | General |
