@@ -16,7 +16,7 @@ Orchestrate static analysis using Codacy Analysis CLI (local) and Codacy Cloud C
 
 ```bash
 npm i -g @codacy/analysis-cli @codacy/codacy-cloud-cli
-codacy login --token <your-api-token>
+export CODACY_API_TOKEN=<your-api-token>
 ```
 
 ## PR Triage Workflow
