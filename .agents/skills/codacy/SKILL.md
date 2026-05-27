@@ -35,7 +35,7 @@ codacy login --token <your-api-token>
 
 ```bash
 codacy-analysis init --default
-codacy-analysis analyze --pr --install-dependencies --output-format json
+codacy-analysis analyze --pr --output-format json
 ```
 
 ## Known Limitations
