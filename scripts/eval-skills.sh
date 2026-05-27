@@ -32,7 +32,7 @@ echo ""
 FAILED=0
 
 # Optimization: Use batched awk pass via xargs for evals.json validation instead of loop with grep
-if ! find "$SKILLS_DIR" -type f -name "evals.json" -print0 2>/dev/null | xargs -0 -r awk '
+if ! find "$SKILLS_DIR" -type f -name "evals.json" -print0 2>/dev/null | xargs -0 -r awk -- '
     BEGIN { failed = 0 }
     FNR == 1 {
       if (NR > 1) {
@@ -89,7 +89,7 @@ done < <(find "$SKILLS_DIR" -type f -name "evals.json" -empty -print0 2>/dev/nul
 
 
 # Optimization: Use batched awk pass via xargs for SKILL.md validation instead of loop with grep
-if ! find "$SKILLS_DIR" -maxdepth 2 -type f -name "SKILL.md" -print0 2>/dev/null | xargs -0 -r awk '
+if ! find "$SKILLS_DIR" -maxdepth 2 -type f -name "SKILL.md" -print0 2>/dev/null | xargs -0 -r awk -- '
     BEGIN { failed = 0 }
     FNR == 1 {
       n = split(FILENAME, parts, "/")

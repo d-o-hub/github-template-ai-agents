@@ -14,7 +14,7 @@ OUTPUT_FILE="$REPO_ROOT/agents-docs/AVAILABLE_SKILLS.md"
 
 # Optimization: Use a single awk process to extract data from all SKILL.md files.
 # This eliminates the O(N) process forks where N is the number of skills.
-SKILL_DATA=$(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" | xargs awk '
+SKILL_DATA=$(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" | xargs awk -- '
     BEGINFILE {
         category = "general"
         description = ""

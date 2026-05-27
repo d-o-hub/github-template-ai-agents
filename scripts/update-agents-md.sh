@@ -35,7 +35,7 @@ fi
 
 # Find the line number of the next section (end of skills table)
 # Supports both "### Context Discipline" and "## Security"
-NEXT_SECTION_LINE=$(grep -nE "^(### Context Discipline|## Security)" "$AGENTS_FILE" | cut -d: -f1 | awk -v start="$SKILLS_SECTION_LINE" '$1 > start { print $1; exit }')
+NEXT_SECTION_LINE=$(grep -nE "^(### Context Discipline|## Security)" "$AGENTS_FILE" | cut -d: -f1 | awk -v start="$SKILLS_SECTION_LINE" -- '$1 > start { print $1; exit }')
 
 if [ -z "$NEXT_SECTION_LINE" ]; then
     # Fallback to end of file if no next section found
@@ -63,7 +63,7 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
     if [[ ${#SKILL_MD_FILES[@]} -gt 0 ]]; then
         # Use a single awk process to parse all SKILL.md files, extract descriptions,
         # infer categories, and lookup existing categories from AGENTS.md.
-        awk -v agents_file="$AGENTS_FILE" -v MAX_DESC_LEN=60 '
+        awk -v agents_file="$AGENTS_FILE" -v MAX_DESC_LEN=60 -- '
             BEGIN {
                 # Pre-load categories from AGENTS.md
                 while ((getline < agents_file) > 0) {

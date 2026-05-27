@@ -27,7 +27,7 @@ find "$REPO_ROOT" -type f -name "*.md" \
     -not -path "*/.claude/skills/*" \
     -not -path "*/.qwen/skills/*" \
     -print0 | \
-    xargs -0 awk -v root="$REPO_ROOT/" '
+    xargs -0 -r awk -v root="$REPO_ROOT/" -- '
     BEGIN {
         valid_types["bash"] = 1
         valid_types["sh"] = 1

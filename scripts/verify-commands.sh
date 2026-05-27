@@ -272,7 +272,7 @@ if $STATS && ! $JSON_OUTPUT; then
     fi
     printf "\n"
     # Security: Pass variables to awk using -v to prevent injection
-    printf "Cache hit rate: %s%%\n" "$(awk -v count="$COMMAND_COUNT" -v hits="$CACHE_HITS" 'BEGIN {if (count > 0) printf "%.1f", (hits/count)*100; else print "0.0"}')"
+    printf "Cache hit rate: %s%%\n" "$(awk -v count="$COMMAND_COUNT" -v hits="$CACHE_HITS" -- 'BEGIN {if (count > 0) printf "%.1f", (hits/count)*100; else print "0.0"}')"
 fi
 
 # Save current commit

@@ -86,7 +86,7 @@ if grep -q "^## \[Unreleased\]" CHANGELOG-TEMPLATE.md; then
     TMP_FILE=$(mktemp)
     trap 'rm -f "$TMP_FILE"' EXIT ERR
     # Use awk to insert after Unreleased section
-    awk -v new_entry="$NEW_ENTRY" '
+    awk -v new_entry="$NEW_ENTRY" -- '
     /^## \[Unreleased\]/ {
         print
         print ""

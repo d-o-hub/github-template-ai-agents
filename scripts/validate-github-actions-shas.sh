@@ -41,7 +41,7 @@ main() {
     # This optimization reduces execution time significantly (~0.77s to ~0.02s)
     # Using FNR for file-relative line numbers as per review feedback
     # Using length check instead of interval regex {40} for maximum awk portability
-    if ! awk -v RED="$RED" -v NC="$NC" '
+    if ! awk -v RED="$RED" -v NC="$NC" -- '
         BEGIN { failed = 0 }
         /^[[:space:]]*(-[[:space:]]*)?uses:/ {
             line = $0

@@ -46,7 +46,7 @@ extract_agent_info() {
     local cli_type="$2"
     
     # Optimized extraction using a single awk pass to avoid multiple process spawns
-    awk -v cli_type="$cli_type" '
+    awk -v cli_type="$cli_type" -- '
     BEGIN { name=""; desc="No description"; tools="Inherited"; in_fm=0 }
     /^---$/ {
         in_fm++;
@@ -129,7 +129,7 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
         ((++SKILL_COUNT))
         
         # Optimized extraction using a single awk pass
-        awk -v name="$skill_name" '
+        awk -v name="$skill_name" -- '
         BEGIN { display_name=name; desc="No description"; in_fm=0 }
         /^---$/ {
             in_fm++;

@@ -307,7 +307,7 @@ while IFS=: read -r skill_file line_num in_references line; do
         BROKEN_COUNT=$((BROKEN_COUNT + 1))
         file_broken=1
     fi
-done < <(awk '
+done < <(awk -- '
     BEGIN { in_ref = 0 }
     FNR == 1 { in_ref = 0; print FILENAME ":0:0:__START__" }
     /^##[[:space:]]+[Rr]eferences/ { in_ref = 1; print FILENAME ":" FNR ":" in_ref ":" $0; next }
