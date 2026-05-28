@@ -105,7 +105,7 @@ get_affected_commands() {
                     affected+=("$cmd")
                     break
                 fi
-            elif [[ "$cmd_prefix" == "*" ]] || [[ "$cmd" == "$cmd_prefix"* ]]; then
+            elif [[ "$cmd_prefix" == "*" ]] || [[ "$cmd" == "${cmd_prefix}"* ]]; then
                 affected+=("$cmd")
                 break
             fi
