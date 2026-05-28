@@ -78,6 +78,7 @@ get_affected_commands() {
     # Optimization: Pre-filter matched rules for the changed file to avoid redundant loops
     local matched_rules=()
     for rule in "${INVALIDATION_RULES[@]}"; do
+        IFS=':' read -r file_pattern cmd_prefix <<< "$rule"
         local file_pattern="${rule%%:*}"
         if matches_pattern "$changed_file" "$file_pattern"; then
             matched_rules+=("$rule")

@@ -50,7 +50,7 @@ validate_skill_file() {
     # Single pass to gather info via awk for performance
     # Outputs a single line: line_count:err_no_dash:has_name:has_desc:has_version:template_version
     local awk_result
-    if ! awk_result=$(awk -v true_val="$TRUE" -v false_val="$FALSE" '
+    if ! awk_result=$(awk -v true_val="$TRUE" -v false_val="$FALSE" -- '
         BEGIN { has_name=false_val; has_desc=false_val; has_version=false_val; template_version=""; err_no_dash=false_val }
         NR==1 && $0 != "---" { err_no_dash=true_val }
         /^name:/ { has_name=true_val }

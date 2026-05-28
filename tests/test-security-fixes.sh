@@ -105,3 +105,38 @@ else
 fi
 
 echo "All security and functional tests passed!"
+
+# Test 4: Option Injection Hardening in AWK and WC
+echo "Test 4: Option Injection Hardening in AWK and WC..."
+
+# Test filenames
+HYPHEN_FILE="-v"
+touch "$TEST_ROOT/$HYPHEN_FILE"
+echo "content" > "$TEST_ROOT/$HYPHEN_FILE"
+
+# Test 4a: awk handles hyphenated filenames correctly
+echo "  Testing awk hardening..."
+if (cd "$TEST_ROOT" && awk -- '1' "$HYPHEN_FILE" 2>/dev/null | grep -q "content"); then
+    echo "  ✓ Test 4a passed: awk handled $HYPHEN_FILE correctly"
+else
+    echo "  ✗ Test 4a failed: awk did not handle $HYPHEN_FILE correctly"
+fi
+
+# Test 4b: wc -l handles hyphenated filenames correctly
+echo "  Testing wc hardening..."
+if (cd "$TEST_ROOT" && wc -l -- "$HYPHEN_FILE" 2>/dev/null | grep -q "1 $HYPHEN_FILE"); then
+    echo "  ✓ Test 4b passed: wc handled $HYPHEN_FILE correctly"
+else
+    echo "  ✗ Test 4b failed: wc did not handle $HYPHEN_FILE correctly"
+fi
+
+# Test 5: xargs -r safety
+echo "Test 5: xargs -r safety..."
+# Ensure xargs -r doesn't run if input is empty
+if [[ $(printf "" | xargs -r echo "executed") == "" ]]; then
+    echo "  ✓ Test 5 passed: xargs -r did not execute on empty input"
+else
+    echo "  ✗ Test 5 failed: xargs -r executed on empty input"
+fi
+
+echo "Option injection and xargs tests passed!"

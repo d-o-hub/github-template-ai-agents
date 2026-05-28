@@ -69,7 +69,7 @@ for wf in "${CHECK_PATHS[@]}"; do
                 current_block="$current_block"$'\n'"$line"
             fi
         fi
-    done < <(awk '
+    done < <(awk -- '
     function is_injection_risk(line) {
         if (line !~ /\$\{\{/) return 0
         # Whitelist safe contexts and safe github properties

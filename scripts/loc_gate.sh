@@ -39,8 +39,8 @@ fi
 # 2. Check SKILL.md files
 # Optimization: Use xargs wc -l and awk for single-pass validation to avoid per-file process forks
 if ! find .agents/skills -name "SKILL.md" -not -path "*/node_modules/*" -print0 | \
-    xargs -0 -r wc -l | \
-    awk -v max="${MAX_SKILL_OVERRIDE:-$MAX_SKILL}" '
+    xargs -0 -r wc -l -- | \
+    awk -v max="${MAX_SKILL_OVERRIDE:-$MAX_SKILL}" -- '
     BEGIN { err = 0 }
     $NF == "total" { next }
     $1 > max {
@@ -64,8 +64,8 @@ if ! find . -type f \( -name "*.py" -o -name "*.rs" -o -name "*.ts" -o -name "*.
     -not -path "./dist/*" \
     -not -path "./build/*" \
     -not -path "./.agents/skills/*" -print0 | \
-    xargs -0 -r wc -l | \
-    awk -v max="${MAX_SOURCE_OVERRIDE:-$MAX_SOURCE}" '
+    xargs -0 -r wc -l -- | \
+    awk -v max="${MAX_SOURCE_OVERRIDE:-$MAX_SOURCE}" -- '
     BEGIN { err = 0 }
     $NF == "total" { next }
     $1 > max {
