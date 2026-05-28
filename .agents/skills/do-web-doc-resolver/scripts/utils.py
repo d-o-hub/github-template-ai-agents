@@ -10,7 +10,7 @@ import re
 import socket
 from html.parser import HTMLParser
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -24,21 +24,12 @@ MAX_CHARS = int(os.getenv("WEB_RESOLVER_MAX_CHARS", "8000"))
 DEFAULT_TIMEOUT = int(os.getenv("WEB_RESOLVER_TIMEOUT", "30"))
 CACHE_DIR = os.path.expanduser(os.getenv("WEB_RESOLVER_CACHE_DIR", "~/.cache/do-web-doc-resolver"))
 CACHE_TTL = int(os.getenv("WEB_RESOLVER_CACHE_TTL", str(3600 * 24)))
+MAX_REDIRECTS = 5
 
 USER_AGENT = (
     "Mozilla/5.0 (compatible; WebDocResolver/2.0; +https://github.com/d-oit/do-web-doc-resolver)"
 )
 
-BLOCKED_NETWORKS = [
-    ipaddress.ip_network("127.0.0.0/8"),
-    ipaddress.ip_network("10.0.0.0/8"),
-    ipaddress.ip_network("172.16.0.0/12"),
-    ipaddress.ip_network("192.168.0.0/16"),
-    ipaddress.ip_network("169.254.0.0/16"),
-    ipaddress.ip_network("::1/128"),
-    ipaddress.ip_network("fc00::/7"),
-    ipaddress.ip_network("fe80::/10"),
-]
 
 BLOCKED_SCHEMES: set[str] = {"file", "javascript", "data", "vbscript"}
 
@@ -82,6 +73,49 @@ def close_session() -> None:
         _global_session = None
 
 
+def _request_with_safe_redirects(
+    method: str, url: str, timeout: int, check_ssrf: bool = True, **kwargs
+) -> requests.Response:
+    """Perform a request while manually following and validating redirects."""
+    session = get_session()
+    current_url = url
+    history = []
+    max_redirs = MAX_REDIRECTS
+
+    for _ in range(max_redirs + 1):
+        if check_ssrf and not is_safe_url(current_url):
+            raise requests.exceptions.RequestException(f"URL blocked (SSRF): {current_url}")
+
+        # Ensure we don't follow redirects automatically
+        kwargs["allow_redirects"] = False
+        response = session.request(method, current_url, timeout=timeout, **kwargs)
+
+        if response.is_redirect or (
+            300 <= response.status_code < 400 and "Location" in response.headers
+        ):
+            history.append(response)
+            current_url = urljoin(current_url, response.headers["Location"])
+        else:
+            response.history = history
+            return response
+
+    raise requests.exceptions.TooManyRedirects(f"Exceeded {max_redirs} redirects")
+
+
+def is_shell_safe_url(url: str) -> bool:
+    """
+    Check if a URL contains dangerous shell characters.
+    Provides defense-in-depth against command injection for CLI-based providers.
+    Denylists dangerous characters (whitespace, pipes, backticks, redirects, etc.)
+    but allows characters common in legitimate URLs like &, ;, and parentheses.
+    """
+    # Denylist: whitespace, quotes, backticks, pipes, redirects, dollar sign, backslash, etc.
+    # Note: & and ; are allowed as they are common in URL query strings.
+    dangerous_pattern = r'[\s|`<>"\'\\\$\[\]\{\}\*!]'
+    if re.search(dangerous_pattern, url):
+        return False
+    return True
+
 def is_safe_url(url: str) -> bool:
     try:
         parsed = urlparse(url)
@@ -89,7 +123,11 @@ def is_safe_url(url: str) -> bool:
             return False
         if parsed.scheme not in ("http", "https"):
             return False
-        hostname = parsed.netloc.split(":")[0]
+        # Use .hostname instead of .netloc to correctly handle credentials
+        # (e.g., http://user@localhost) and avoid SSRF bypasses.
+        hostname = parsed.hostname
+        if hostname is None:
+            return False
         if hostname.lower() in (
             "localhost",
             "localhost.localdomain",
@@ -100,20 +138,24 @@ def is_safe_url(url: str) -> bool:
             return False
         try:
             ip = ipaddress.ip_address(hostname)
-            if any(ip in network for network in BLOCKED_NETWORKS):
+            if not ip.is_global:
                 return False
         except ValueError:
+            orig_timeout = socket.getdefaulttimeout()
             try:
                 socket.setdefaulttimeout(5)
                 infos = socket.getaddrinfo(hostname, None)
+                if not infos:
+                    return False
                 for _family, _socktype, _proto, _canonname, sockaddr in infos:
                     ip = ipaddress.ip_address(sockaddr[0])
-                    if any(ip in network for network in BLOCKED_NETWORKS):
+                    if not ip.is_global:
                         return False
             except Exception:
-                pass
+                # If DNS resolution fails, fail-closed for security
+                return False
             finally:
-                socket.setdefaulttimeout(None)
+                socket.setdefaulttimeout(orig_timeout)
         return True
     except Exception:
         return False
@@ -137,9 +179,10 @@ def validate_url(url: str, timeout: int = 10, check_ssrf: bool = True) -> Valida
     if check_ssrf and not is_safe_url(url):
         return ValidationResult(is_valid=False, error="URL blocked (SSRF)")
 
-    session = get_session()
     try:
-        response = session.head(url, timeout=timeout, allow_redirects=True, verify=True)
+        response = _request_with_safe_redirects(
+            "HEAD", url, timeout=timeout, check_ssrf=check_ssrf, verify=True
+        )
         redirect_chain = [h.url for h in response.history] + [response.url]
         if response.status_code >= 400:
             return ValidationResult(
@@ -162,12 +205,9 @@ def validate_url(url: str, timeout: int = 10, check_ssrf: bool = True) -> Valida
 
 def validate_links(links: list[str], timeout: int = 5) -> list[str]:
     valid_links = []
-    session = get_session()
     for link in links:
         try:
-            if not is_safe_url(link):
-                continue
-            response = session.head(link, timeout=timeout, allow_redirects=True)
+            response = _request_with_safe_redirects("HEAD", link, timeout=timeout)
             if response.status_code < 400:
                 valid_links.append(link)
         except Exception:
@@ -179,11 +219,13 @@ def score_result(url: str | None, content: str) -> float:
     score = 0.5
     if url:
         try:
-            domain = urlparse(url).netloc.lower()
-            if any(domain.endswith(tld) for tld in [".edu", ".gov", ".org", ".rs", ".io"]):
+            # Use .hostname to avoid credential-based masquerading (e.g., github.com@evil.com)
+            parsed = urlparse(url)
+            domain = (parsed.hostname or "").lower()
+            if any(domain == tld[1:] or domain.endswith(tld) for tld in [".edu", ".gov", ".org", ".rs", ".io"]):
                 score += 0.2
             if any(
-                site in domain
+                domain == site or domain.endswith("." + site)
                 for site in ["github.com", "stackoverflow.com", "docs.rs", "mozilla.org"]
             ):
                 score += 0.2
@@ -245,9 +287,11 @@ def fetch_url_content(
     validation = validate_url(url, timeout=timeout // 2)
     if not validation.is_valid:
         return None
-    session = get_session()
+
     try:
-        response = session.get(url, timeout=timeout, allow_redirects=True, verify=True)
+        response = _request_with_safe_redirects(
+            "GET", url, timeout=timeout, check_ssrf=True, verify=True
+        )
         if response.status_code >= 400:
             return None
         content = (
@@ -266,17 +310,20 @@ def fetch_url_content(
 
 
 def fetch_llms_txt(url: str) -> str | None:
+    if not is_safe_url(url):
+        return None
     try:
         parsed = urlparse(url)
-        base_url = f"{parsed.scheme}://{parsed.netloc}"
+        # Reconstruct base_url without credentials to ensure safety
+        netloc = _reconstruct_safe_netloc(parsed)
+        base_url = f"{parsed.scheme}://{netloc}"
         llms_url = f"{base_url}/llms.txt"
         cached = _get_from_cache(base_url, "llms_txt")
         if cached is not None:
             if cached.get("found"):
                 return str(cached.get("content", ""))
             return None
-        session = get_session()
-        response = session.get(llms_url, timeout=10, allow_redirects=True)
+        response = _request_with_safe_redirects("GET", llms_url, timeout=10)
         if response.status_code == 200:
             content_type = response.headers.get("Content-Type", "")
             if "text" in content_type or "markdown" in content_type:
@@ -332,6 +379,22 @@ _TRACKING_PARAMS = {
 }
 
 
+def _reconstruct_safe_netloc(parsed) -> str:
+    """Reconstruct netloc from parsed URL, stripping credentials and default ports."""
+    host = (parsed.hostname or "").lower()
+    port = parsed.port
+    if port:
+        if (port == 80 and parsed.scheme == "http") or (
+            port == 443 and parsed.scheme == "https"
+        ):
+            port_str = ""
+        else:
+            port_str = f":{port}"
+    else:
+        port_str = ""
+    return f"{host}{port_str}"
+
+
 def normalize_url(url: str) -> str:
     """Normalize URL by stripping tracking params, anchors, and common aliases."""
     try:
@@ -358,16 +421,16 @@ def normalize_url(url: str) -> str:
         if path and path != "/" and path.endswith("/"):
             path = path.rstrip("/")
 
-        # Normalize netloc: lowercase, strip default ports
-        netloc = parsed.netloc.lower()
-        if netloc.endswith(":80") and parsed.scheme == "http":
-            netloc = netloc[:-3]
-        elif netloc.endswith(":443") and parsed.scheme == "https":
-            netloc = netloc[:-4]
+        # Normalize netloc: lowercase, strip credentials and default ports
+        netloc = _reconstruct_safe_netloc(parsed)
 
         # Reconstruct
         normalized = parsed._replace(
-            scheme=parsed.scheme.lower(), netloc=netloc, path=path, query=query, fragment=fragment
+            scheme=parsed.scheme.lower(),
+            netloc=netloc,
+            path=path,
+            query=query,
+            fragment=fragment,
         ).geturl()
         return normalized.strip()
     except Exception:

@@ -77,8 +77,19 @@ cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
 3. **Implement defense in depth**
 4. **Add security monitoring and logging**
 
+## Rationalizations
+| Rationalization | Reality |
+|-----------------|---------|
+| "This is just internal code, security doesn't matter as much" | Internal tools are common entry points for lateral movement. |
+| "I'll fix the security issues in a follow-up PR" | Security is a prerequisite, not an afterthought. Never ship known vulnerabilities. |
+| "A security review will slow us down" | 1 hour of review > 1 week of incident response and data breach cleanup. |
+
+## Red Flags
+- [ ] Dismissing vulnerabilities as "unlikely to be exploited" without evidence
+- [ ] Skipping dependency scans for "trusted" third-party libraries
+- [ ] Hardcoding "temporary" secrets with the intent to remove them later
+
 ## References
 
-- `references/owasp-guidelines.md` - OWASP Top 10 and secure coding practices
-- `references/audit-checklist.md` - Comprehensive security audit checklist
+- [Security Checklist](../../../agents-docs/references/security-checklist.md) - Comprehensive security audit checklist, OWASP Top 10, and CI/CD security scanning.
 - `references/remediation-guide.md` - Step-by-step vulnerability remediation

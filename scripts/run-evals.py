@@ -100,6 +100,10 @@ def evaluate_skill(
 def discover_skills(skills_dir: Path, specific_skill: str | None = None) -> list[Path]:
     """Discover all skills with evals/evals.json files."""
     if specific_skill:
+        # Prevent path traversal
+        skill_path = Path(specific_skill)
+        if ".." in specific_skill or skill_path.is_absolute():
+            return []
         skill_path = skills_dir / specific_skill
         evals_path = skill_path / "evals" / "evals.json"
         if skill_path.is_dir() and evals_path.exists():

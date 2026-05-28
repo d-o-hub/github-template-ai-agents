@@ -92,7 +92,7 @@
 > "Are you sure you want to delete this item? This action cannot be undone. Click OK to confirm."
 
 **After:**
-> **Delete "Q4 Campaign Plan"?**  
+> **Delete "Q4 Campaign Plan"?**
 > This removes the file and all its history. [Delete permanently] [Cancel]
 
 ---

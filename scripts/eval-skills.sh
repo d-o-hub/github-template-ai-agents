@@ -31,45 +31,82 @@ echo ""
 
 FAILED=0
 
-# Check that evals use expected_output (not should_trigger)
-for eval_file in "$SKILLS_DIR"/*/evals/evals.json; do
-  [ -f "$eval_file" ] || continue
-  skill_name=$(basename "$(dirname "$eval_file")")
+# Optimization: Use batched awk pass via xargs for evals.json validation instead of loop with grep
+if ! find "$SKILLS_DIR" -type f -name "evals.json" -print0 2>/dev/null | xargs -0 -r awk '
+    BEGIN { failed = 0 }
+    FNR == 1 {
+      if (NR > 1) {
+        if (!has_expected_output) { print " [FAIL] " skill_name ": evals missing \x27expected_output\x27 field"; failed = 1 }
+        if (!has_id) { print " [FAIL] " skill_name ": evals missing \x27id\x27 field"; failed = 1 }
+        if (!has_prompt) { print " [FAIL] " skill_name ": evals missing \x27prompt\x27 field"; failed = 1 }
+        if (!has_assertions) { print " [FAIL] " skill_name ": evals missing \x27assertions\x27 field"; failed = 1 }
+      }
 
-  if grep -q '"should_trigger"' "$eval_file"; then
-    echo " [FAIL] $skill_name: evals use 'expected_output' not 'should_trigger'"
-    FAILED=1
-  fi
+      n = split(FILENAME, parts, "/")
+      skill_name = parts[n-2]
 
-  if ! grep -q '"expected_output"' "$eval_file"; then
-    echo " [FAIL] $skill_name: evals missing 'expected_output' field"
-    FAILED=1
-  fi
+      has_should_trigger = 0
+      has_expected_output = 0
+      has_id = 0
+      has_prompt = 0
+      has_assertions = 0
+      has_path = 0
+    }
+    /"should_trigger"/ {
+      if (!has_should_trigger) { print " [FAIL] " skill_name ": evals use \x27expected_output\x27 not \x27should_trigger\x27"; failed = 1; has_should_trigger = 1 }
+    }
+    /"expected_output"/ { has_expected_output = 1 }
+    /"id"/ { has_id = 1 }
+    /"prompt"/ { has_prompt = 1 }
+    /"assertions"/ { has_assertions = 1 }
+    /"path"/ {
+      if (!has_path) { print " [FAIL] " skill_name ": evals \x27files\x27 must be string array of paths, not objects with \x27path\x27/\x27content\x27"; failed = 1; has_path = 1 }
+    }
+    END {
+      if (NR > 0) {
+        if (!has_expected_output) { print " [FAIL] " skill_name ": evals missing \x27expected_output\x27 field"; failed = 1 }
+        if (!has_id) { print " [FAIL] " skill_name ": evals missing \x27id\x27 field"; failed = 1 }
+        if (!has_prompt) { print " [FAIL] " skill_name ": evals missing \x27prompt\x27 field"; failed = 1 }
+        if (!has_assertions) { print " [FAIL] " skill_name ": evals missing \x27assertions\x27 field"; failed = 1 }
+      }
+      if (failed) exit(1)
+    }
+  '; then
+  FAILED=1
+fi
 
-  # Verify required eval fields
-  for field in id prompt expected_output assertions; do
-    if ! grep -q "\"$field\"" "$eval_file"; then
-      echo " [FAIL] $skill_name: evals missing '$field' field"
-      FAILED=1
-    fi
-  done
+# We also need to check if the file is empty, which awk skips.
+# Fast path check for 0-byte files which would fail all field validations
+while IFS= read -r -d '' eval_file; do
+  dir_path="${eval_file%/*/*}"
+  skill_name="${dir_path##*/}"
+  echo " [FAIL] $skill_name: evals missing 'expected_output' field"
+  echo " [FAIL] $skill_name: evals missing 'id' field"
+  echo " [FAIL] $skill_name: evals missing 'prompt' field"
+  echo " [FAIL] $skill_name: evals missing 'assertions' field"
+  FAILED=1
+done < <(find "$SKILLS_DIR" -type f -name "evals.json" -empty -print0 2>/dev/null || true)
 
-  # Verify files is a string array, not object array
-  if grep -q '"path"' "$eval_file" 2>/dev/null; then
-    echo " [FAIL] $skill_name: evals 'files' must be string array of paths, not objects with 'path'/'content'"
-    FAILED=1
-  fi
-done
 
-# Check no SKILL.md has should_trigger references
-for skill_md in "$SKILLS_DIR"/*/SKILL.md; do
-  [ -f "$skill_md" ] || continue
-  skill_name=$(basename "$(dirname "$skill_md")")
-  if grep -q 'should_trigger' "$skill_md"; then
-    echo " [FAIL] $skill_name: SKILL.md references non-existent 'should_trigger'"
-    FAILED=1
-  fi
-done
+# Optimization: Use batched awk pass via xargs for SKILL.md validation instead of loop with grep
+if ! find "$SKILLS_DIR" -maxdepth 2 -type f -name "SKILL.md" -print0 2>/dev/null | xargs -0 -r awk '
+    BEGIN { failed = 0 }
+    FNR == 1 {
+      n = split(FILENAME, parts, "/")
+      skill_name = parts[n-1]
+      has_should_trigger = 0
+    }
+    /should_trigger/ {
+      if (!has_should_trigger) {
+        print " [FAIL] " skill_name ": SKILL.md references non-existent \x27should_trigger\x27"
+        failed = 1
+        has_should_trigger = 1
+      }
+    }
+    END { if (failed) exit(1) }
+  '; then
+  FAILED=1
+fi
 
 echo ""
 if [ $FAILED -eq 0 ]; then

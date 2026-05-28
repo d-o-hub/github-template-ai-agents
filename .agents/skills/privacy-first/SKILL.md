@@ -9,7 +9,6 @@ compatibility: Works with Claude Code, OpenCode, and similar agents. No external
 metadata:
   author: d-oit
   version: "1.0"
-  project: do-web-doc-resolver
   tags: privacy security email lint quality personal-data
 ---
 

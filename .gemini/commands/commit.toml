@@ -1,0 +1,11 @@
+description = "Atomic git workflow - commit, create PR, and monitor CI"
+prompt = """
+Invoke the git-github-workflow skill.
+Follow the unified atomic git workflow:
+1. Stage all relevant changes
+2. Create an atomic commit with a clear, user-focused message
+3. Create or update a GitHub Pull Request
+4. Monitor the CI pipeline (GitHub Actions)
+5. If failures occur, analyze logs and suggest or apply fixes
+6. Ensure all quality gates and documentation requirements are met before finishing
+"""

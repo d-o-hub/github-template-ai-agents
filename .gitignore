@@ -1,48 +1,51 @@
-# OS files
-.DS_Store
-Thumbs.db
-
-# Editor files
-*.swp
-*.swo
-*~
-.idea/
-.vscode/
-
-# Node modules
+# Dependencies
 node_modules/
-
-# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.egg-info/
 .venv/
 venv/
-.pytest_cache/
-.coverage
-*.egg-info/
-
-# Rust
-target/
-*.o
-*.a
-
-# Logs
-*.log
-
-# Temporary files
-temp/
-*.tmp
-
-# Reports
-reports/
-
-# Environment
 .env
-.env.*
-!.env.example
+.env.local
+*.env.*
 
-# OS
+# Build artifacts
+dist/
+build/
+target/
+*.pyc
+*.class
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Logs and temporary files
+.secrets
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System files
 .DS_Store
 Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Cache directories
+.mypy_cache/
+.pytest_cache/
+.gradle/
+.cache/
