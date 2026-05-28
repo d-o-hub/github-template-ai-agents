@@ -12,7 +12,7 @@ echo "=== Evaluating Skills (agentskills.io spec) ==="
 echo ""
 
 if [ ! -f "$EVAL_SCRIPT" ]; then
-  printf "ERROR: check_structure.py not found at %s\n" "$EVAL_SCRIPT" >&2
+  echo "ERROR: check_structure.py not found at $EVAL_SCRIPT"
   exit 1
 fi
 
@@ -80,11 +80,10 @@ fi
 while IFS= read -r -d '' eval_file; do
   dir_path="${eval_file%/*/*}"
   skill_name="${dir_path##*/}"
-  # Security: Use printf instead of echo to prevent structural injection if skill_name is untrusted
-  printf " [FAIL] %s: evals missing 'expected_output' field\n" "$skill_name"
-  printf " [FAIL] %s: evals missing 'id' field\n" "$skill_name"
-  printf " [FAIL] %s: evals missing 'prompt' field\n" "$skill_name"
-  printf " [FAIL] %s: evals missing 'assertions' field\n" "$skill_name"
+  echo " [FAIL] $skill_name: evals missing 'expected_output' field"
+  echo " [FAIL] $skill_name: evals missing 'id' field"
+  echo " [FAIL] $skill_name: evals missing 'prompt' field"
+  echo " [FAIL] $skill_name: evals missing 'assertions' field"
   FAILED=1
 done < <(find "$SKILLS_DIR" -type f -name "evals.json" -empty -print0 2>/dev/null || true)
 

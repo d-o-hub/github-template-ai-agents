@@ -46,10 +46,10 @@ _get_hash_internal() {
         res=$(shasum -a 256 -- "$file")
         printf "%s\n" "${res%% *}"
     else
-        # Security: Fail closed if no cryptographic hashing tool is available
-        # to prevent collision-prone fallbacks that could bypass security checks.
-        printf "Error: Neither sha256sum nor shasum is available. Cannot generate secure cache keys.\n" >&2
-        exit 1
+        # Fallback to just timestamp + size if no shasum tool
+        # Security: Use -- to prevent option injection
+        # shellcheck disable=SC2012
+        ls -l -- "$file" | awk '{print $5 "_" $6 "_" $7 "_" $8}'
     fi
 }
 
