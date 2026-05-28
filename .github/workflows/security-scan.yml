@@ -164,7 +164,7 @@ jobs:
         uses: github/codeql-action/analyze@9e0d7b8d25671d64c341c19c0152d693099fb5ba  # v4.35
         continue-on-error: true
         with:
-          category: "/language:javascript"
+          category: "/language:shell-scripts"
 
       - name: Generate empty CodeQL SARIF (no supported files found)
         if: steps.check_files.outputs.has_codeql_files == 'false'
@@ -175,7 +175,6 @@ jobs:
           # no upload).
           cat > codeql-empty-results.sarif << 'EOF'
           {
-            # yamllint disable-line rule:line-length
             "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
             "version": "2.1.0",
             "runs": [
@@ -202,7 +201,7 @@ jobs:
         continue-on-error: true
         with:
           sarif_file: codeql-empty-results.sarif
-          category: "/language:javascript"
+          category: "/language:shell-scripts"
 
   # ============================================================================
   # INFRASTRUCTURE AS CODE SCAN
