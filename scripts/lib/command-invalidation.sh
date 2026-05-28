@@ -75,33 +75,42 @@ get_affected_commands() {
         return 0
     fi
 
-    # Security: Iterate over array safely
+    # Optimization: Pre-filter matched rules for the changed file to avoid redundant loops
+    local matched_rules=()
     for rule in "${INVALIDATION_RULES[@]}"; do
-        # Performance optimization: Native bash string expansion instead of IFS read <<<
         local file_pattern="${rule%%:*}"
-        local cmd_prefix=""
-        # Only extract cmd_prefix if a colon is present to mirror IFS read logic precisely
-        if [[ "$rule" == *":"* ]]; then
-            cmd_prefix="${rule#*:}"
-        fi
-
-        # Check if changed file matches the pattern
         if matches_pattern "$changed_file" "$file_pattern"; then
-            # Find commands matching the prefix
-            while IFS=$'\t' read -r cmd_file cmd; do
-                [ -z "$cmd" ] && continue
-
-                # Special case: *.md means commands in that specific file
-                if [[ "$file_pattern" == "*.md" ]] && [[ "$changed_file" == *.md ]]; then
-                    if [[ "$cmd_file" == "$changed_file" ]]; then
-                        affected+=("$cmd")
-                    fi
-                elif [[ "$cmd_prefix" == "*" ]] || [[ "$cmd" == "$cmd_prefix"* ]]; then
-                    affected+=("$cmd")
-                fi
-            done <<< "$extracted"
+            matched_rules+=("$rule")
         fi
     done
+
+    if [[ ${#matched_rules[@]} -eq 0 ]]; then
+        return 0
+    fi
+
+    # Read extracted commands once and check against matched rules
+    while IFS=$'\t' read -r cmd_file cmd; do
+        [ -z "$cmd" ] && continue
+
+        for rule in "${matched_rules[@]}"; do
+            local file_pattern="${rule%%:*}"
+            local cmd_prefix=""
+            if [[ "$rule" == *":"* ]]; then
+                cmd_prefix="${rule#*:}"
+            fi
+
+            # Special case: *.md means commands in that specific file
+            if [[ "$file_pattern" == "*.md" ]] && [[ "$changed_file" == *.md ]]; then
+                if [[ "$cmd_file" == "$changed_file" ]]; then
+                    affected+=("$cmd")
+                    break
+                fi
+            elif [[ "$cmd_prefix" == "*" ]] || [[ "$cmd" == "$cmd_prefix"* ]]; then
+                affected+=("$cmd")
+                break
+            fi
+        done
+    done <<< "$extracted"
 
     # Output unique affected commands
     if [ ${#affected[@]} -gt 0 ]; then
