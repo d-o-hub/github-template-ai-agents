@@ -1,0 +1,13 @@
+# Gitleaks configuration file
+# For more information, see https://github.com/gitleaks/gitleaks
+
+[extend]
+# Inherit Gitleaks default rules
+useDefault = true
+
+[allowlist]
+description = "Allow known false positives and non-sensitive files"
+paths = [
+    '''examples/.*''',
+    '''.pre-commit-config.yaml'''
+]

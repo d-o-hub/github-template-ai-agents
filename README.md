@@ -1,20 +1,26 @@
 # GitHub Template AI Agents
 
-> Production-ready template for AI agent-powered development with Claude Code, Gemini CLI, OpenCode, Qwen Code, and more.
+> Production-ready template for AI agent-powered development with
+> Claude Code, Gemini CLI, OpenCode, Qwen Code, and more.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Template Version](https://img.shields.io/badge/version-0.2.4-blue)](VERSION)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Template Version](https://img.shields.io/badge/version-0.2.9-blue)](CHANGELOG-TEMPLATE.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**Quick Links**: [Quick Start](#-quick-start) · [Documentation](#-documentation) · [Contributing](#-contributing)
+**Quick Links**: [Quick Start](#quick-start-2-minutes)
+· [Documentation](#documentation) · [Contributing](#contributing)
 
 ---
 
 ## What Is This?
 
-A unified harness for AI coding agents that provides consistent workflows across Claude Code, Gemini CLI, OpenCode, Qwen Code, Windsurf, Cursor, and Copilot Chat. Built for teams who want to scale AI-assisted development with quality gates, skills, and sub-agent patterns.
+A unified harness for AI coding agents that provides consistent workflows
+across Claude Code, Gemini CLI, OpenCode, Qwen Code, Windsurf, Cursor,
+and Copilot Chat. Built for teams who want to scale AI-assisted development
+with quality gates, skills, and sub-agent patterns.
 
 **Key Features**:
+
 - ✓ **Multi-Agent Support**: Works with 6+ AI coding tools simultaneously
 - ✓ **Skills System**: Reusable knowledge modules in canonical location
 - ✓ **Quality Gates**: Automatic lint, test, format before commits
@@ -25,7 +31,11 @@ A unified harness for AI coding agents that provides consistent workflows across
 
 ### Prerequisites
 
-- One or more AI coding CLI tools ([Claude Code](https://claude.ai/code), [Gemini CLI](https://gemini.google.com), [OpenCode](https://opencode.ai), [Qwen Code](https://github.com/QwenLM/Qwen-Coder))
+- One or more AI coding CLI tools
+  ([Claude Code](https://claude.ai/code),
+  [Gemini CLI](https://gemini.google.com),
+  [OpenCode](https://opencode.ai),
+  [Qwen Code](https://github.com/QwenLM/Qwen-Coder))
 - Git 2.30+ ([install](https://git-scm.com))
 
 ### Installation
@@ -53,7 +63,8 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 ```
 
 Expected output:
-```
+
+```text
 ✓ All skill symlinks intact
 ✓ SKILL.md files valid
 ```
@@ -62,9 +73,10 @@ Expected output:
 
 ### Single Source of Truth
 
-All agents read from `AGENTS.md` - CLI-specific files (`.claude.md`, `.gemini.md`) contain only overrides.
+All agents read from `AGENTS.md` - CLI-specific files
+(`.claude.md`, `.gemini.md`) contain only overrides.
 
-```
+```text
 AGENTS.md → Single source of truth
 ├── CLAUDE.md → Overrides only (@AGENTS.md)
 ├── GEMINI.md → Overrides only (@AGENTS.md)
@@ -73,17 +85,16 @@ AGENTS.md → Single source of truth
 
 ### Skills with Progressive Disclosure
 
-Skills live canonically in `.agents/skills/`. Claude Code, Gemini CLI, and Qwen Code use
-symlinks; OpenCode reads directly from `.agents/skills/`:
+Skills live canonically in `.agents/skills/`. Claude Code and Qwen Code use
+symlinks; Gemini CLI and OpenCode read directly from `.agents/skills/`:
 
-```
+```text
 .agents/skills/           # Canonical source (single location)
 ├── task-decomposition/
 ├── shell-script-quality/
 └── github-readme/
 
 .claude/skills/           # Symlinks → ../../.agents/skills/
-.gemini/skills/           # Symlinks → ../../.agents/skills/
 .qwen/skills/             # Symlinks → ../../.agents/skills/
 ```
 
@@ -135,18 +146,27 @@ git commit -m "feat: add user registration"
 - 🤖 **[Sub-Agents](agents-docs/SUB-AGENTS.md)** - Context isolation patterns
 - 🔧 **[Hooks](agents-docs/HOOKS.md)** - Pre/post tool hooks
 - 📊 **[Context](agents-docs/CONTEXT.md)** - Back-pressure mechanisms
-- ⚙️ **[Configuration](agents-docs/CONFIG.md)** - Repository constants and utilities
-- 🔄 **[Migration](agents-docs/MIGRATION.md)** - Adopting in existing projects
+- 🔄 **[Migration](MIGRATION.md)** - Adopting in existing projects
 
 ## Available Skills
 
-See `agents-docs/AVAILABLE_SKILLS.md` for the full auto-generated list of all available skills.
-
-Run `ls .agents/skills/` to see all skill directories, or check the [Available Skills](agents-docs/AVAILABLE_SKILLS.md) reference.
+| Skill | Description |
+| --- | --- |
+| [`task-decomposition`](.agents/skills/task-decomposition/) | Break complex tasks into atomic goals |
+| [`shell-script-quality`](.agents/skills/shell-script-quality/) | Lint/test shell scripts (ShellCheck + BATS) |
+| [`github-readme`](.agents/skills/github-readme/) | Create human-focused README.md files |
+| [`parallel-execution`](.agents/skills/parallel-execution/) | Coordinate parallel agent execution |
+| [`iterative-refinement`](.agents/skills/iterative-refinement/) | Progressive improvement loops |
+| [`agent-coordination`](.agents/skills/agent-coordination/) | Multi-agent orchestration patterns |
+| [`goap-agent`](.agents/skills/goap-agent/) | Goal-oriented action planning |
+| [`web-search-researcher`](.agents/skills/web-search-researcher/) | Web research and synthesis |
+| [`eu-ai-act-compliance`](.agents/skills/eu-ai-act-compliance/) | ⚙️ EU AI Act regulatory adherence |
+| [`durable-objects`](.agents/skills/durable-objects/) | ⚙️ Cloudflare Durable Objects coordination |
 
 ## Contributing
 
 We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for:
+
 - Development environment setup
 - Good first issues
 - Code style and testing requirements
@@ -154,12 +174,15 @@ We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for:
 
 ## Community
 
-- 🐛 [Issue Tracker](../../issues) - Report bugs
-- 📝 [Discussions](../../discussions) - Ask questions
+- 🐛 [Issue Tracker](https://github.com/d-o-hub/github-template-ai-agents/issues)
+  - Report bugs
+- 📝 [Discussions](https://github.com/d-o-hub/github-template-ai-agents/discussions)
+  - Ask questions
 
 ## License
 
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT) - see the LICENSE file for details.
+This project is licensed under the [MIT License](LICENSE) - see the LICENSE file
+for details.
 
 ---
 

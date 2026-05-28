@@ -7,6 +7,8 @@ description: Break down complex tasks into atomic, actionable goals with clear d
 
 Decompose high-level objectives into manageable, testable sub-tasks.
 
+**Session Start Protocol**: Identify parallelizable work and spawn task agents immediately at the start of a session to maximize efficiency.
+
 ## When to Use
 
 - Complex requests with multiple components

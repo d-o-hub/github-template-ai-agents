@@ -40,6 +40,7 @@ original version tag should be included on the same line to allow Dependabot
 to track and propose updates.
 
 Example:
+
 ```yaml
 - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 ```

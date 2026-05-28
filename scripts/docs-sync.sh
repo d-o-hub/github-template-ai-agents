@@ -6,11 +6,21 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
 LAST_COMMIT="${1:-HEAD~1}"
 CURRENT="${2:-HEAD}"
 
-echo "Syncing docs $LAST_COMMIT → $CURRENT"
+# Security: Use printf for safe variable output
+printf "Syncing docs %s → %s\n" "$LAST_COMMIT" "$CURRENT"
 
-git diff --name-only "$LAST_COMMIT" "$CURRENT" -- '*.md' 2>/dev/null | while read -r file; do
-  [ -f "$REPO_ROOT/$file" ] && echo "Updated: $file"
-done
+# Security: Use -- separator BEFORE revisions to prevent option injection from malicious revision names
+diff_output=$(git diff --name-only -- "$LAST_COMMIT" "$CURRENT" -- '*.md' 2>/dev/null || true)
 
-count=$(git diff --name-only "$LAST_COMMIT" "$CURRENT" -- '*.md' 2>/dev/null | wc -l)
-echo "Done. $count files."
+while IFS= read -r file; do
+  # Security: Use printf for safe variable output
+  [[ -n "$file" && -f "$REPO_ROOT/$file" ]] && printf "Updated: %s\n" "$file"
+done <<< "$diff_output"
+
+if [ -z "$diff_output" ]; then
+    count=0
+else
+    # Security: Use printf to pipe variable content safely
+    count=$(printf "%s\n" "$diff_output" | wc -l || true)
+fi
+printf "Done. %s files.\n" "$count"

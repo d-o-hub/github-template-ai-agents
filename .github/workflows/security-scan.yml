@@ -75,7 +75,7 @@ jobs:
 
       - name: Upload ShellCheck SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/upload-sarif@9e0d7b8d25671d64c341c19c0152d693099fb5ba  # v4.35
         continue-on-error: true
         with:
           sarif_file: shellcheck-results.sarif
@@ -95,7 +95,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1  # v0.35.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # v0.36.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -107,41 +107,10 @@ jobs:
 
       - name: Upload Trivy SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/upload-sarif@9e0d7b8d25671d64c341c19c0152d693099fb5ba  # v4.35
         with:
           sarif_file: trivy-results.sarif
           category: trivy-fs
-
-  # ============================================================================
-  # SECRET DETECTION
-  # Scan for leaked secrets, API keys, and credentials
-  # ============================================================================
-  secret-detection:
-    name: Secret Detection
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
-        with:
-          fetch-depth: 0
-
-      - name: Secret Detection with GitLeaks
-        id: gitleaks
-        uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc  # v2
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}  # Optional
-
-      - name: Fallback Secret Scan with TruffleHog
-        if: steps.gitleaks.outcome == 'failure'
-        uses: trufflesecurity/trufflehog@6bd2d14f7a4bc1e569fa3550efa7ec632a4fa67b  # v3.94.2
-        with:
-          path: ./
-          base: ""
-          head: HEAD
-          extra_args: --debug --only-verified
-        continue-on-error: true
 
   # ============================================================================
   # CODEQL ANALYSIS
@@ -179,7 +148,7 @@ jobs:
 
       - name: Initialize CodeQL
         if: steps.check_files.outputs.has_codeql_files == 'true'
-        uses: github/codeql-action/init@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/init@9e0d7b8d25671d64c341c19c0152d693099fb5ba  # v4.35
         continue-on-error: true
         with:
           languages: javascript,python
@@ -187,12 +156,12 @@ jobs:
 
       - name: Autobuild
         if: steps.check_files.outputs.has_codeql_files == 'true'
-        uses: github/codeql-action/autobuild@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/autobuild@9e0d7b8d25671d64c341c19c0152d693099fb5ba  # v4.35
         continue-on-error: true
 
       - name: Perform CodeQL Analysis
         if: steps.check_files.outputs.has_codeql_files == 'true'
-        uses: github/codeql-action/analyze@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/analyze@9e0d7b8d25671d64c341c19c0152d693099fb5ba  # v4.35
         continue-on-error: true
         with:
           category: "/language:javascript"
@@ -229,7 +198,7 @@ jobs:
 
       - name: Upload empty CodeQL SARIF (no supported files found)
         if: steps.check_files.outputs.has_codeql_files == 'false'
-        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/upload-sarif@9e0d7b8d25671d64c341c19c0152d693099fb5ba  # v4.35
         continue-on-error: true
         with:
           sarif_file: codeql-empty-results.sarif
@@ -249,7 +218,7 @@ jobs:
           fetch-depth: 0
 
       - name: Scan GitHub Actions with Trivy
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1  # v0.35.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # v0.36.0
         with:
           scan-type: 'config'
           scan-ref: '.github/workflows/'
@@ -261,7 +230,7 @@ jobs:
 
       - name: Upload IaC Scan SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c  # v3
+        uses: github/codeql-action/upload-sarif@9e0d7b8d25671d64c341c19c0152d693099fb5ba  # v4.35
         with:
           sarif_file: trivy-config-results.sarif
           category: trivy-config
@@ -276,7 +245,6 @@ jobs:
     needs:
       - shellcheck-security
       - trivy-fs
-      - secret-detection
       - codeql
       - iac-scan
     if: always()
@@ -291,7 +259,6 @@ jobs:
           # yamllint disable-line rule:line-length
           echo "  • ShellCheck Security: ${{ needs.shellcheck-security.result }}"
           echo "  • Trivy Filesystem: ${{ needs.trivy-fs.result }}"
-          echo "  • Secret Detection: ${{ needs.secret-detection.result }}"
           echo "  • CodeQL Analysis: ${{ needs.codeql.result }}"
           echo "  • IaC Scan: ${{ needs.iac-scan.result }}"
           echo ""
@@ -299,14 +266,12 @@ jobs:
           # Check for failures (treat skipped as success)
           shellcheck_result="${{ needs.shellcheck-security.result }}"
           trivy_result="${{ needs.trivy-fs.result }}"
-          secret_result="${{ needs.secret-detection.result }}"
           codeql_result="${{ needs.codeql.result }}"
 
           # Normalize results (treat skipped and codeql as OK for shell repos)
           # This is a shell script repo, so CodeQL will not find analyzable code
           if [[ "$shellcheck_result" == "failure" ]] || \
-             [[ "$trivy_result" == "failure" ]] || \
-             [[ "$secret_result" == "failure" ]]; then
+             [[ "$trivy_result" == "failure" ]]; then
             echo "❌ CRITICAL/HIGH vulnerabilities detected!"
             echo "   Review the Security tab for details."
             exit 1

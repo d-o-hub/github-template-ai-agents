@@ -13,12 +13,14 @@ ERRORS=0
 
 for skill_dir in "$SKILLS_SRC"/*/; do
     if [[ -d "$skill_dir" ]]; then
-        skill_name=$(basename "$skill_dir")
+        # Performance optimization: Use Bash parameter expansion instead of basename
+        skill_name="${skill_dir%/}"
+        skill_name="${skill_name##*/}"
         [[ "$skill_name" == _* ]] && continue
 
         if validate_skill_file "${skill_dir}SKILL.md"; then
-            lines=$(wc -l < "${skill_dir}SKILL.md" | tr -d ' ')
-            echo -e "  ${GREEN}[OK]${NC} $skill_name: Valid ($lines lines)"
+            # Use SKILL_LINE_COUNT from library instead of wc -l subshell
+            printf "  %b[OK]%b %s: Valid (%d lines)\n" "${GREEN}" "${NC}" "$skill_name" "$SKILL_LINE_COUNT"
         else
             ERRORS=$((ERRORS + 1))
         fi

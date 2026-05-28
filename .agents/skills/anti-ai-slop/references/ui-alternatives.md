@@ -28,7 +28,8 @@
 - Bricolage Grotesque (variable, wide range)
 - Instrument Serif (pairs well with sans)
 
-**Rule:** Pair something with high contrast or personality as the display face. Let the body face be quieter.
+**Rule:** Pair something with high contrast or personality as the display face.
+Let the body face be quieter.
 
 ---
 

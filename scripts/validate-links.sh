@@ -22,6 +22,13 @@ NC='\033[0m' # No Color
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$REPO_ROOT/.agents/skills"
 
+# Performance optimization: Pre-resolve REPO_ROOT once
+# This avoids hundreds of realpath/subshell calls during link validation
+RESOLVED_ROOT=""
+if command -v realpath &> /dev/null; then
+    RESOLVED_ROOT=$(realpath -m "$REPO_ROOT")
+fi
+
 # Counters for the final summary report
 # We track these across all files to provide actionable statistics
 BROKEN_COUNT=0
@@ -72,31 +79,8 @@ is_url() {
     [[ "$1" =~ ^https?:// ]] || [[ "$1" =~ ^ftp:// ]] || [[ "$1" =~ ^mailto: ]]
 }
 
-# Function to resolve a relative path from a base directory
-# This handles path normalization to avoid "../" and "./" in resolved paths
-# Why use realpath? It handles edge cases like:
-#   - Multiple slashes: foo//bar -> foo/bar
-#   - Dot directories: foo/./bar -> foo/bar
-#   - Parent references: foo/../bar -> bar
-# Fallback to simple concatenation if realpath unavailable (macOS compatibility)
-resolve_path() {
-    local base_dir="$1"
-    local link_path="$2"
-
-    # Handle absolute paths (shouldn't happen but be safe)
-    if [[ "$link_path" == /* ]]; then
-        echo "$link_path"
-        return
-    fi
-
-    # Normalize path by removing redundant components
-    # realpath -m (mock mode) doesn't require path to exist - we check existence separately
-    if command -v realpath &> /dev/null; then
-        realpath -m "$base_dir/$link_path"
-    else
-        echo "$base_dir/$link_path"
-    fi
-}
+# Cache for realpath existence check
+HAS_REALPATH=""
 
 # Function to check if a link target exists
 check_link() {
@@ -123,18 +107,57 @@ check_link() {
     # Remove any anchor from the path (file.md#section -> file.md)
     local clean_path="${link_path%%#*}"
 
-    # Resolve the full path
-    local full_path
-    full_path="$(resolve_path "$skill_dir" "$clean_path")"
-
-    # Check if file or directory exists
-    if [[ ! -e "$full_path" && ! -L "$full_path" ]]; then
-        echo -e "  ${RED}✗${NC} Broken link at line $line_num: \`${clean_path}'" >&2
-        echo -e "     in: $skill_file" >&2
+    # Security check: Reject absolute paths (Path Traversal prevention)
+    if [[ "$clean_path" == /* ]]; then
+        printf "  ${RED}✗${NC} Security Error: Absolute path detected at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
+        printf "     Links must be relative to the skill directory or repository root.\n" >&2
+        printf "     in: %s\n" "$skill_file" >&2
         return 1
     fi
 
-    return 0
+    # Resolve the full path
+    local full_path="$skill_dir/$clean_path"
+
+    # Security check: Ensure the path is within REPO_ROOT (Path Traversal prevention)
+    if [ -z "$HAS_REALPATH" ]; then
+        if command -v realpath &> /dev/null; then HAS_REALPATH=1; else HAS_REALPATH=0; fi
+    fi
+
+    # Performance optimization: skip realpath subshell if path has no '..'
+    # Absolute paths are already rejected, and simple relative paths can't escape
+    if [[ "$clean_path" != *".."* ]]; then
+        if [[ -e "$full_path" || -L "$full_path" ]]; then
+            return 0
+        fi
+    fi
+
+    if [ "$HAS_REALPATH" -eq 1 ] && [ -n "$RESOLVED_ROOT" ]; then
+        # Performance optimization: Use pre-resolved root to avoid subshell
+        local resolved_path
+        resolved_path=$(realpath -m "$full_path" 2>/dev/null)
+
+        # Ensure trailing slash for robust prefix matching
+        if [[ "$resolved_path/" != "$RESOLVED_ROOT/"* ]]; then
+            printf "  ${RED}✗${NC} Security Error: Path traversal detected at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
+            printf "     Link attempts to reference a file outside the repository boundary.\n" >&2
+            printf "     in: %s\n" "$skill_file" >&2
+            return 1
+        fi
+
+        # Check if file or directory exists within the boundary
+        if [[ -e "$resolved_path" || -L "$resolved_path" ]]; then
+            return 0
+        fi
+    else
+        # Fallback if realpath not available: basic existence check
+        if [[ -e "$full_path" || -L "$full_path" ]]; then
+            return 0
+        fi
+    fi
+
+    printf "  ${RED}✗${NC} Broken link at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
+    printf "     in: %s\n" "$skill_file" >&2
+    return 1
 }
 
 # Function to check reference format in References section
@@ -152,10 +175,10 @@ check_reference_format() {
     # Check for @references (deprecated format)
     if [[ "$line" =~ $AT_REF_REGEX ]]; then
         local bad_ref="${BASH_REMATCH[0]}"
-        echo -e "  ${RED}✗${NC} Invalid reference format at line $line_num" >&2
-        echo -e "     Found: $bad_ref" >&2
-        echo -e "     Use: \`references?/filename.md\` - Description" >&2
-        echo -e "     in: $skill_file" >&2
+        printf "  ${RED}✗${NC} Invalid reference format at line %s\n" "$line_num" >&2
+        printf "     Found: %s\n" "$bad_ref" >&2
+        printf "     Use: \`references?/filename.md\` - Description\n" >&2
+        printf "     in: %s\n" "$skill_file" >&2
         return 1
     fi
 
@@ -166,10 +189,10 @@ check_reference_format() {
             # Check if it has markdown link format [text](path)
             if [[ "$line" =~ \[.+\]\((references?/.+)\) ]]; then
                 local link_path="${BASH_REMATCH[1]}"
-                echo -e "  ${RED}✗${NC} Invalid reference format at line $line_num" >&2
-                echo -e "     Found: Markdown link [text]($link_path)" >&2
-                echo -e "     Use: \`$link_path\` - Description" >&2
-                echo -e "     in: $skill_file" >&2
+                printf "  ${RED}✗${NC} Invalid reference format at line %s\n" "$line_num" >&2
+                printf "     Found: Markdown link [text](%s)\n" "$link_path" >&2
+                printf "     Use: \`%s\` - Description\n" "$link_path" >&2
+                printf "     in: %s\n" "$skill_file" >&2
                 return 1
             fi
         fi
@@ -178,162 +201,143 @@ check_reference_format() {
     return 0
 }
 
-# Function to process a single SKILL.md file
-# Uses a state machine pattern to track whether we're in the References section
-# The logic flow per line:
-#   1. Track if we enter/exit References section (in_references flag)
-#   2. If in References: validate format of reference entries
-#   3. Always: find all markdown links and check if targets exist
-#   4. Always: check backtick-wrapped paths (alternative link syntax)
-#   5. Always: flag deprecated @references
-process_skill_file() {
-    local skill_file="$1"
-    local skill_dir
-    skill_dir="$(dirname "$skill_file")"
-
-    FILES_CHECKED=$((FILES_CHECKED + 1))
-
-    local line_num=0
-    local file_broken=0
-    local file_format_errors=0
-    local in_references=0
-
-    while IFS= read -r line; do
-        line_num=$((line_num + 1))
-
-        # Track if we're in the References section
-        # State transitions: out -> in when see "## References", in -> out when see any other "##"
-        if is_references_header "$line"; then
-            in_references=1
-            continue
-        elif is_section_header "$line"; then
-            in_references=0
-        fi
-
-        # Check reference format (only in References section)
-        # We enforce strict format rules here because this section is machine-parsed
-        if [[ $in_references -eq 1 ]]; then
-            if ! check_reference_format "$line" "$line_num" "$skill_file" "$skill_dir"; then
-                FORMAT_ERRORS=$((FORMAT_ERRORS + 1))
-                file_format_errors=1
-            fi
-        fi
-
-        # Find all markdown links in this line
-        # We use a temp_line variable because regex matching in bash is stateful
-        # Removing each match lets us find multiple links on the same line
-        local temp_line="$line"
-        while [[ "$temp_line" =~ $LINK_REGEX ]]; do
-            local full_match="${BASH_REMATCH[0]}"
-            local link_path="${BASH_REMATCH[2]}"
-
-            # Remove this match from temp_line first (to continue loop)
-            # Using ${var#*substring} removes the shortest match from start
-            temp_line="${temp_line#*"$full_match"}"
-
-            # Skip if this looks like an example (line contains "example:" or the link is in backticks)
-            # We don't want to validate links shown in documentation examples
-            if [[ "$line" =~ example[[:space:]]*[:\(] ]] || [[ "$link_path" =~ \.(svg|png|jpg|jpeg|gif)$ ]]; then
-                continue
-            fi
-
-            LINKS_CHECKED=$((LINKS_CHECKED + 1))
-
-            # Check this link
-            if ! check_link "$skill_dir" "$link_path" "$skill_file" "$line_num"; then
-                BROKEN_COUNT=$((BROKEN_COUNT + 1))
-                file_broken=1
-            fi
-        done
-
-        # Also check for backtick-wrapped paths that look like references (only .md files in reference/)
-        # This catches alternative syntax: `reference/file.md` without the "- Description" part
-        # We validate these exist but don't require full format (allows inline references)
-        if [[ "$line" =~ \`(references?/[a-zA-Z0-9_-]+\.md)\` ]]; then
-            local ref_path="${BASH_REMATCH[1]}"
-            LINKS_CHECKED=$((LINKS_CHECKED + 1))
-
-            if ! check_link "$skill_dir" "$ref_path" "$skill_file" "$line_num"; then
-                BROKEN_COUNT=$((BROKEN_COUNT + 1))
-                file_broken=1
-            fi
-        fi
-
-        # Check for backtick-wrapped paths in docs/ - only .md files, skip .svg and others
-        # docs/ folder contains shared documentation referenced across skills
-        if [[ "$line" =~ \`(docs/[a-zA-Z0-9_/-]+\.md)\` ]]; then
-            local docs_path="${BASH_REMATCH[1]}"
-            LINKS_CHECKED=$((LINKS_CHECKED + 1))
-            if ! check_link "$skill_dir" "$docs_path" "$skill_file" "$line_num"; then
-                BROKEN_COUNT=$((BROKEN_COUNT + 1))
-                file_broken=1
-            fi
-        fi
-
-        # Check for @references (deprecated format pointing to non-existent files)
-        # These are always errors - we don't just warn, we require migration to new format
-        if [[ "$line" =~ @(references?/[a-zA-Z0-9_-]+\.md) ]]; then
-            local at_ref="${BASH_REMATCH[1]}"
-            echo -e "  ${RED}✗${NC} Broken @reference at line $line_num: @$at_ref" >&2
-            echo -e "     @ prefix is deprecated. Use: \`reference/filename.md\` or \`references/filename.md\`" >&2
-            echo -e "     in: $skill_file" >&2
-            BROKEN_COUNT=$((BROKEN_COUNT + 1))
-            file_broken=1
-        fi
-    done < "$skill_file"
-
-    if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
-        echo -e "  ${GREEN}✓${NC} $(basename "$skill_dir"): All links valid"
-    fi
-}
-
-echo "Validating reference links in SKILL.md files..."
-echo ""
-
 # Main entry point: discover and process all skill files
-# We iterate through the skills directory, skipping backup folders (underscore prefix)
-# For each skill, we look for SKILL.md and run validation
+# Uses a batched awk process to filter relevant lines across all SKILL.md files.
+# This eliminates per-file process forks, providing significant speedup.
 
-# Check if skills directory exists
 if [[ ! -d "$SKILLS_DIR" ]]; then
-    echo -e "${YELLOW}⚠${NC} Skills directory not found: $SKILLS_DIR"
+    printf "${YELLOW}⚠${NC} Skills directory not found: %s\n" "$SKILLS_DIR"
     exit 0
 fi
 
-# Find and process all SKILL.md files
-for skill_path in "$SKILLS_DIR"/*/; do
-    [[ -d "$skill_path" ]] || continue
+# Collect all SKILL.md files, skipping backup folders (underscore prefix)
+SKILL_FILES=()
+while IFS= read -r -d '' skill_file; do
+    SKILL_FILES+=("$skill_file")
+done < <(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" -print0 | sort -z)
 
-    skill_name="$(basename "$skill_path")"
+if [[ ${#SKILL_FILES[@]} -eq 0 ]]; then
+    echo "No skills found to validate."
+    exit 0
+fi
 
-    # Skip consolidated/backup folders
-    if [[ "$skill_name" == _* ]]; then
+current_file=""
+file_broken=0
+file_format_errors=0
+
+# Process all files with a single awk call.
+# Format: FILENAME:LINE_NUM:IN_REF:CONTENT
+while IFS=: read -r skill_file line_num in_references line; do
+    # Handle file transition and reporting
+    if [[ "$skill_file" != "$current_file" ]]; then
+        if [[ -n "$current_file" ]]; then
+            if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
+                skill_dir="${current_file%/*}"
+                printf "  ${GREEN}✓${NC} %s: All links valid\n" "${skill_dir##*/}"
+            fi
+        fi
+        current_file="$skill_file"
+        file_broken=0
+        file_format_errors=0
+        FILES_CHECKED=$((FILES_CHECKED + 1))
+        skill_dir="${skill_file%/*}"
+        # Skip processing for the start-of-file marker
+        [[ "$line_num" == "0" ]] && continue
+    fi
+
+    # Track if we're in the References section
+    if is_references_header "$line"; then
+        continue
+    elif is_section_header "$line"; then
         continue
     fi
 
-    skill_file="$skill_path/SKILL.md"
-
-    if [[ ! -f "$skill_file" ]]; then
-        echo -e "  ${YELLOW}⚠${NC} $skill_name: Missing SKILL.md"
-        continue
+    # Check reference format (only in References section)
+    if [[ "$in_references" -eq 1 ]]; then
+        if ! check_reference_format "$line" "$line_num" "$skill_file" "$skill_dir"; then
+            FORMAT_ERRORS=$((FORMAT_ERRORS + 1))
+            file_format_errors=1
+        fi
     fi
 
-    process_skill_file "$skill_file"
-done
+    # Find all markdown links in this line
+    temp_line="$line"
+    while [[ "$temp_line" =~ $LINK_REGEX ]]; do
+        full_match="${BASH_REMATCH[0]}"
+        link_path="${BASH_REMATCH[2]}"
+        temp_line="${temp_line#*"$full_match"}"
 
-echo ""
-echo "─────────────────────────────────────────────────────────────────"
+        if [[ "$line" =~ example[[:space:]]*[:\(] ]] || [[ "$link_path" =~ \.(svg|png|jpg|jpeg|gif)$ ]]; then
+            continue
+        fi
+
+        LINKS_CHECKED=$((LINKS_CHECKED + 1))
+        if ! check_link "$skill_dir" "$link_path" "$skill_file" "$line_num"; then
+            BROKEN_COUNT=$((BROKEN_COUNT + 1))
+            file_broken=1
+        fi
+    done
+
+    # Check for backtick-wrapped paths that look like references
+    if [[ "$line" =~ \`(references?/[a-zA-Z0-9_-]+\.md)\` ]]; then
+        ref_path="${BASH_REMATCH[1]}"
+        LINKS_CHECKED=$((LINKS_CHECKED + 1))
+        if ! check_link "$skill_dir" "$ref_path" "$skill_file" "$line_num"; then
+            BROKEN_COUNT=$((BROKEN_COUNT + 1))
+            file_broken=1
+        fi
+    fi
+
+    # Check for backtick-wrapped paths in docs/
+    if [[ "$line" =~ \`(docs/[a-zA-Z0-9_/-]+\.md)\` ]]; then
+        docs_path="${BASH_REMATCH[1]}"
+        LINKS_CHECKED=$((LINKS_CHECKED + 1))
+        if ! check_link "$skill_dir" "$docs_path" "$skill_file" "$line_num"; then
+            BROKEN_COUNT=$((BROKEN_COUNT + 1))
+            file_broken=1
+        fi
+    fi
+
+    # Check for deprecated @references
+    if [[ "$line" =~ @(references?/[a-zA-Z0-9_-]+\.md) ]]; then
+        at_ref="${BASH_REMATCH[1]}"
+        printf "  ${RED}✗${NC} Broken @reference at line %s: @%s\n" "$line_num" "$at_ref" >&2
+        printf "     @ prefix is deprecated. Use: \`reference/filename.md\` or \`references/filename.md\`\n" >&2
+        printf "     in: %s\n" "$skill_file" >&2
+        BROKEN_COUNT=$((BROKEN_COUNT + 1))
+        file_broken=1
+    fi
+done < <(awk '
+    BEGIN { in_ref = 0 }
+    FNR == 1 { in_ref = 0; print FILENAME ":0:0:__START__" }
+    /^##[[:space:]]+[Rr]eferences/ { in_ref = 1; print FILENAME ":" FNR ":" in_ref ":" $0; next }
+    /^##[[:space:]]+/ { in_ref = 0; print FILENAME ":" FNR ":" in_ref ":" $0; next }
+    /\[[^]]+\]\([^)]+\)/ || /`(references?\/|docs\/)[^`]+`/ || /@references?/ || (in_ref && /^- /) {
+        print FILENAME ":" FNR ":" in_ref ":" $0
+    }
+' "${SKILL_FILES[@]}")
+
+# Final report for the last file
+if [[ -n "$current_file" ]]; then
+    if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
+        skill_dir="${current_file%/*}"
+        printf "  ${GREEN}✓${NC} %s: All links valid\n" "${skill_dir##*/}"
+    fi
+fi
+
+printf "\n"
+printf "─────────────────────────────────────────────────────────────────\n"
 
 TOTAL_ERRORS=$((BROKEN_COUNT + FORMAT_ERRORS))
 
 if [[ $TOTAL_ERRORS -gt 0 ]]; then
-    echo -e "│ ${RED}✗ Link Validation FAILED${NC}                                      │" >&2
-    echo "─────────────────────────────────────────────────────────────────" >&2
-    echo "" >&2
-    echo "  Files checked: $FILES_CHECKED" >&2
-    echo "  Links checked: $LINKS_CHECKED" >&2
-    echo -e "  ${RED}Broken links: $BROKEN_COUNT${NC}" >&2
-    echo -e "  ${RED}Format errors: $FORMAT_ERRORS${NC}" >&2
+    printf "│ ${RED}✗ Link Validation FAILED${NC}                                      │\n" >&2
+    printf "─────────────────────────────────────────────────────────────────\n" >&2
+    printf "\n" >&2
+    printf "  Files checked: %s\n" "$FILES_CHECKED" >&2
+    printf "  Links checked: %s\n" "$LINKS_CHECKED" >&2
+    printf "  ${RED}Broken links: %s${NC}\n" "$BROKEN_COUNT" >&2
+    printf "  ${RED}Format errors: %s${NC}\n" "$FORMAT_ERRORS" >&2
     echo "" >&2
     echo "  Fix broken links by:" >&2
     echo "    1. Creating missing reference files" >&2
@@ -344,11 +348,11 @@ if [[ $TOTAL_ERRORS -gt 0 ]]; then
     echo "    - \`references?/filename.md\` - Description" >&2
     exit 1
 else
-    echo -e "│ ${GREEN}✓ All reference links valid${NC}                                   │"
-    echo "─────────────────────────────────────────────────────────────────"
-    echo ""
-    echo "  Files checked: $FILES_CHECKED"
-    echo "  Links checked: $LINKS_CHECKED"
-    echo "  Broken links: 0"
+    printf "│ ${GREEN}✓ All reference links valid${NC}                                   │\n"
+    printf "─────────────────────────────────────────────────────────────────\n"
+    printf "\n"
+    printf "  Files checked: %s\n" "$FILES_CHECKED"
+    printf "  Links checked: %s\n" "$LINKS_CHECKED"
+    printf "  Broken links: 0\n"
     exit 0
 fi

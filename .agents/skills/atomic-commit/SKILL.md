@@ -7,6 +7,8 @@ description: Atomic git workflow - validates, commits, pushes, creates PR, and v
 
 Atomic workflow: validate → commit → push → PR → verify. All changes committed as single unit with **zero warnings** policy.
 
+**Commit Granularity**: Commit after each completed feature or atomic change. Always run `./scripts/quality_gate.sh` before every commit to ensure zero warnings.
+
 ## Overview
 
 Orchestrates complete code submission as state machine with 7 phases:

@@ -13,6 +13,7 @@ TIMEOUT="${SELF_FIX_LOOP_TIMEOUT:-1800}"
 POLL_INTERVAL="${SELF_FIX_LOOP_POLL_INTERVAL:-30}"
 AUTO_RESEARCH="${SELF_FIX_LOOP_AUTO_RESEARCH:-1}"
 STRICT_VALIDATION="${SELF_FIX_LOOP_STRICT_VALIDATION:-1}"
+
 DRY_RUN=false
 FIX_ISSUES=true
 BASE_BRANCH="main"
@@ -31,12 +32,12 @@ else
     RED=''; GREEN=''; YELLOW=''; BLUE=''; CYAN=''; MAGENTA=''; NC=''
 fi
 
-log() { echo -e "${BLUE}[$(date +%H:%M:%S)]${NC} $*"; }
-info() { echo -e "${CYAN}[$(date +%H:%M:%S)] INFO:${NC} $*"; }
-error() { echo -e "${RED}[$(date +%H:%M:%S)] ERROR:${NC} $*" >&2; }
-success() { echo -e "${GREEN}[$(date +%H:%M:%S)]${NC} $*"; }
-warn() { echo -e "${YELLOW}[$(date +%H:%M:%S)] WARNING:${NC} $*"; }
-phase() { echo -e "${MAGENTA}[$(date +%H:%M:%S)] PHASE $1:${NC} $2"; }
+log() { printf "${BLUE}[$(date +%H:%M:%S)]${NC} %s\n" "$*"; }
+info() { printf "${CYAN}[$(date +%H:%M:%S)] INFO:${NC} %s\n" "$*"; }
+error() { printf "${RED}[$(date +%H:%M:%S)] ERROR:${NC} %s\n" "$*" >&2; }
+success() { printf "${GREEN}[$(date +%H:%M:%S)]${NC} %s\n" "$*"; }
+warn() { printf "${YELLOW}[$(date +%H:%M:%S)] WARNING:${NC} %s\n" "$*"; }
+phase() { printf "${MAGENTA}[$(date +%H:%M:%S)] PHASE %s:${NC} %s\n" "$1" "$2"; }
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -66,6 +67,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         *) error "Unknown option: $1"; exit 1 ;;
     esac
+done
+
+# Security: Validate numeric configuration AFTER parsing to prevent injection via CLI flags
+for var in MAX_RETRIES TIMEOUT POLL_INTERVAL AUTO_RESEARCH STRICT_VALIDATION; do
+    if [[ ! "${!var}" =~ ^[0-9]+$ ]]; then
+        error "$var must be numeric"
+        exit 1
+    fi
 done
 
 # Phase 1: Commit & Push
@@ -189,7 +198,7 @@ Automated fix loop - iteration $((RETRY_COUNT + 1))
             return 1
         fi
 
-        PR_NUMBER=$(echo "$pr_output" | grep -oE '[0-9]+$' || echo "")
+        PR_NUMBER=$(printf "%s\n" "$pr_output" | grep -oE '[0-9]+$' || echo "")
         if [[ -z "$PR_NUMBER" ]]; then
             PR_NUMBER=$(gh pr view --json number --jq '.number' 2>/dev/null || echo "")
         fi
@@ -239,20 +248,20 @@ phase_monitor_ci() {
         # Analyze status
         local has_pending=false has_failure=false
 
-        if echo "$checks_output" | grep -qiE "(pending|queued|in progress|running|waiting)"; then
+        if printf "%s\n" "$checks_output" | grep -qiE "(pending|queued|in progress|running|waiting)"; then
             has_pending=true
         fi
-        if echo "$checks_output" | grep -qiE "(fail|error|✗|×)"; then
+        if printf "%s\n" "$checks_output" | grep -qiE "(fail|error|✗|×)"; then
             has_failure=true
         fi
 
         # Check workflow runs
         local workflow_runs
         workflow_runs=$(gh run list --branch "$BRANCH_NAME" --limit 5 --json status,conclusion 2>/dev/null || echo "[]")
-        if echo "$workflow_runs" | grep -q '"status":"in_progress"'; then
+        if printf "%s\n" "$workflow_runs" | grep -q '"status":"in_progress"'; then
             has_pending=true
         fi
-        if echo "$workflow_runs" | grep -q '"conclusion":"failure"'; then
+        if printf "%s\n" "$workflow_runs" | grep -q '"conclusion":"failure"'; then
             has_failure=true
         fi
 
@@ -273,9 +282,10 @@ phase_monitor_ci() {
         # Failures detected - capture them
         error "CI CHECKS FAILED"
         LAST_FAILURES=()
-        while IFS= read -r line; do
-            LAST_FAILURES+=("$line")
-        done < <(echo "$checks_output" | grep -iE "(fail|error)" | head -20)
+        mapfile -t LAST_FAILURES < <(printf "%s\n" "$checks_output" | grep -iE "(fail|error)" | head -20)
+        if [[ ${#LAST_FAILURES[@]} -eq 0 ]]; then
+            LAST_FAILURES=("Unknown failure")
+        fi
 
         log "Failures:"
         for f in "${LAST_FAILURES[@]}"; do
@@ -308,7 +318,7 @@ phase_analyze_fix() {
         log "Analyzing: $failure"
 
         # Shell script failures
-        if echo "$failure" | grep -qiE "(shellcheck|shell|bash|sh)"; then
+        if printf "%s\n" "$failure" | grep -qiE "(shellcheck|shell|bash|sh)"; then
             log "→ Shell script issue detected"
             if command -v shellcheck &>/dev/null; then
                 local shell_scripts
@@ -325,7 +335,7 @@ phase_analyze_fix() {
         fi
 
         # YAML/Actions failures
-        if echo "$failure" | grep -qiE "(yaml|yml|action|workflow)"; then
+        if printf "%s\n" "$failure" | grep -qiE "(yaml|yml|action|workflow)"; then
             log "→ YAML/Actions issue detected"
             if command -v yamllint &>/dev/null; then
                 yamllint -d "{extends: default, rules: {line-length: {max: 120}}}" .github/ 2>&1 || true
@@ -334,7 +344,7 @@ phase_analyze_fix() {
         fi
 
         # Markdown failures
-        if echo "$failure" | grep -qiE "(markdown|md|markdownlint)"; then
+        if printf "%s\n" "$failure" | grep -qiE "(markdown|md|markdownlint)"; then
             log "→ Markdown issue detected"
             if command -v markdownlint &>/dev/null; then
                 markdownlint "**/*.md" --ignore node_modules --ignore target 2>&1 || true
@@ -343,7 +353,7 @@ phase_analyze_fix() {
         fi
 
         # Python failures
-        if echo "$failure" | grep -qiE "(python|ruff|black|pytest|flake8)"; then
+        if printf "%s\n" "$failure" | grep -qiE "(python|ruff|black|pytest|flake8)"; then
             log "→ Python issue detected"
             if command -v ruff &>/dev/null; then
                 ruff check --fix . 2>&1 || true
@@ -356,7 +366,7 @@ phase_analyze_fix() {
         fi
 
         # TypeScript/JavaScript failures
-        if echo "$failure" | grep -qiE "(typescript|javascript|eslint|tsc|npm|pnpm)"; then
+        if printf "%s\n" "$failure" | grep -qiE "(typescript|javascript|eslint|tsc|npm|pnpm)"; then
             log "→ TypeScript/JavaScript issue detected"
             if [[ -f "package.json" ]]; then
                 if command -v pnpm &>/dev/null; then
@@ -370,7 +380,7 @@ phase_analyze_fix() {
         fi
 
         # Skill validation failures
-        if echo "$failure" | grep -qiE "(skill|symlink|SKILL\.md)"; then
+        if printf "%s\n" "$failure" | grep -qiE "(skill|symlink|SKILL\.md)"; then
             log "→ Skill validation issue detected"
             "$REPO_ROOT/scripts/setup-skills.sh" 2>&1 || true
             "$REPO_ROOT/scripts/validate-skills.sh" 2>&1 || true
@@ -379,7 +389,7 @@ phase_analyze_fix() {
         fi
 
         # Link validation failures
-        if echo "$failure" | grep -qiE "(link|reference|broken)"; then
+        if printf "%s\n" "$failure" | grep -qiE "(link|reference|broken)"; then
             log "→ Link validation issue detected"
             "$REPO_ROOT/scripts/validate-links.sh" 2>&1 || true
             fix_applied=true

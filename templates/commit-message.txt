@@ -1,0 +1,11 @@
+feat(ui): add dark mode support
+
+The user can now toggle between light and dark themes in the settings panel.
+This change includes a new theme provider and updated CSS variables for all
+components to ensure consistent look and feel.
+
+- Added ThemeProvider to root
+- Updated tailwind.config.js with dark mode variants
+- Implemented toggle in SettingsDialog
+
+Closes #456

@@ -11,11 +11,11 @@ Coordinate multiple agents efficiently for complex development tasks across any 
 
 Choose your coordination strategy:
 
-**Parallel** - Independent tasks → See [PARALLEL.md](PARALLEL.md)
-**Sequential** - Dependent tasks → See [SEQUENTIAL.md](SEQUENTIAL.md)  
-**Swarm** - Multi-perspective analysis → See [SWARM.md](SWARM.md)
-**Hybrid** - Multi-phase workflows → See [HYBRID.md](HYBRID.md)
-**Iterative** - Progressive refinement → See [ITERATIVE.md](ITERATIVE.md)
+- **Parallel** - Independent tasks
+- **Sequential** - Dependent tasks
+- **Swarm** - Multi-perspective analysis
+- **Hybrid** - Multi-phase workflows
+- **Iterative** - Progressive refinement
 
 ## Available Agents
 
@@ -51,14 +51,16 @@ This coordination skill works with:
 ## Common Patterns
 
 **Analysis + Execution**:
-```
+
+```text
 1. Swarm analysis (parallel agents gather insights)
 2. Sequential execution (apply findings)
 3. Parallel validation (verify results)
 ```
 
 **Test-Driven Workflow**:
-```
+
+```text
 1. test-runner: Run existing tests
 2. feature-implementer: Add functionality
 3. test-runner: Verify implementation
@@ -66,7 +68,8 @@ This coordination skill works with:
 ```
 
 **Performance Optimization**:
-```
+
+```text
 Loop with performance-optimizer until:
 - Metrics meet targets
 - No more optimizations found

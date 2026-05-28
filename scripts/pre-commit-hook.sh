@@ -32,6 +32,7 @@ if git diff --cached --name-only | grep -q "^VERSION$"; then
 fi
 
 echo "Running pre-commit checks..."
+
 "$REPO_ROOT/scripts/quality_gate.sh"
 
 echo "Pre-commit checks passed."

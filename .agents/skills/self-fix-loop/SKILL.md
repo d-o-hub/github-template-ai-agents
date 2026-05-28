@@ -9,6 +9,8 @@ template_version: "0.2"
 
 Automated self-learning cycle: **commit → push → monitor → analyze failures → fix → retry** until all GitHub Actions pass.
 
+**Self-Fix Threshold**: If 2+ similar errors occur during the loop, pause and diagnose the root cause before attempting another fix.
+
 ## Overview
 
 Continuous improvement loop that:
