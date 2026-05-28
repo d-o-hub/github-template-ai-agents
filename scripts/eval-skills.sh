@@ -81,8 +81,7 @@ while IFS= read -r -d '' eval_file; do
   dir_path="${eval_file%/*/*}"
   skill_name="${dir_path##*/}"
   # Security: Use printf instead of echo to prevent structural injection if skill_name is untrusted
-  dir_path="${eval_file%/*}"
-  skill_name="${dir_path##*/}"
+  printf " [FAIL] %s: evals missing 'expected_output' field\n" "$skill_name"
   printf " [FAIL] %s: evals missing 'id' field\n" "$skill_name"
   printf " [FAIL] %s: evals missing 'prompt' field\n" "$skill_name"
   printf " [FAIL] %s: evals missing 'assertions' field\n" "$skill_name"
