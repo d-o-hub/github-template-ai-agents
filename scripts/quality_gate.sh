@@ -129,25 +129,25 @@ echo ""
 echo -e "${BLUE}Detecting project languages...${NC}"
 
 # Rust detection
-if [[ -f "Cargo.toml" ]]; then
+if [ -f "Cargo.toml" ]; then
     echo "  ${GREEN}✓${NC} Rust (Cargo.toml)"
     DETECTED_LANGUAGES+=("rust")
 fi
 
 # TypeScript/JavaScript detection
-if [[ -f "package.json" ]]; then
+if [ -f "package.json" ]; then
     echo "  ${GREEN}✓${NC} TypeScript/JavaScript (package.json)"
     DETECTED_LANGUAGES+=("typescript")
 fi
 
 # Python detection
-if [[ -f "requirements.txt" ]] || [[ -f "pyproject.toml" ]] || [[ -f "setup.py" ]]; then
+if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ] || [ -f "setup.py" ]; then
     echo "  ${GREEN}✓${NC} Python (requirements.txt/pyproject.toml)"
     DETECTED_LANGUAGES+=("python")
 fi
 
 # Go detection
-if [[ -f "go.mod" ]]; then
+if [ -f "go.mod" ]; then
     echo "  ${GREEN}✓${NC} Go (go.mod)"
     DETECTED_LANGUAGES+=("go")
 fi

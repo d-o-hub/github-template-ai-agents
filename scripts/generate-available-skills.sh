@@ -119,5 +119,5 @@ SKILL_DATA=$(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" |
 
 # Count skills processed
 # Use printf to prevent option injection if SKILL_DATA starts with -
-SKILL_COUNT=$(printf "%s\n" "$SKILL_DATA" | grep -c -e "^" || echo 0)
+SKILL_COUNT=$(printf "%s\n" "$SKILL_DATA" | grep -c "^" || echo 0)
 echo "Generated $OUTPUT_FILE with $SKILL_COUNT skills"

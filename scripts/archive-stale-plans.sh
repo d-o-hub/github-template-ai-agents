@@ -27,10 +27,11 @@ if [[ ! -d "$ARCHIVE_DIR" ]]; then
 fi
 
 # Performance optimization: Use a bash array to collect files to move,
-# and use bash parameter expansion and regex instead of subshells (basename, sed, date) in the loop.
+# and use bash parameter expansion, regex, and native bash globbing instead of subshells.
 files_to_move=()
 
-while IFS= read -r -d '' file; do
+shopt -s nullglob
+for file in "$PLANS_DIR"/*-progress-update-*.md; do
   # Use parameter expansion instead of basename
   filename="${file##*/}"
 
@@ -51,7 +52,8 @@ while IFS= read -r -d '' file; do
       files_to_move+=("$file")
     fi
   fi
-done < <(find "$PLANS_DIR" -maxdepth 1 -name '*-progress-update-*.md' -print0)
+done
+shopt -u nullglob
 
 # Batch move files if any
 if [[ ${#files_to_move[@]} -gt 0 ]]; then
