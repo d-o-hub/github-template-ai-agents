@@ -141,7 +141,7 @@ if [[ -f ".git/hooks/pre-commit" ]]; then
     printf "  ${GREEN}✓${NC} Pre-commit hook installed\n"
 else
     printf "  ${YELLOW}⚠${NC} Pre-commit hook not installed\n"
-    printf "     Run: cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit\n"
+    printf "     Run: cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x -- .git/hooks/pre-commit\n"
 fi
 
 # Summary
