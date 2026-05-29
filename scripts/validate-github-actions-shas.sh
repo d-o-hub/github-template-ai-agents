@@ -30,11 +30,11 @@ main() {
     # Find all workflow files
     # Performance optimization: use native bash globbing instead of find subshell
     local workflow_files=()
-    shopt -s nullglob
-    for f in .github/workflows/*.yml .github/workflows/*.yaml; do
+    shopt -s nullglob globstar
+    for f in .github/workflows/**/*.yml .github/workflows/**/*.yaml; do
         [[ -f "$f" ]] && workflow_files+=("$f")
     done
-    shopt -u nullglob
+    shopt -u nullglob globstar
 
     if [[ ${#workflow_files[@]} -eq 0 ]]; then
         echo -e "${GREEN}No workflow files found${NC}"

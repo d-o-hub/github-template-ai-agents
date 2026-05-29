@@ -24,7 +24,7 @@ if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
 fi
 
 # If VERSION is being changed, propagate to all version references
-if git diff --cached --name-only | grep -q -e "^VERSION$"; then
+if git diff --cached --name-only | grep -q "^VERSION$"; then
     echo "VERSION changed - propagating to all files..."
     "$REPO_ROOT/scripts/propagate-version.sh"
     # Re-stage files that were updated by propagation
