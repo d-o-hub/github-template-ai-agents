@@ -108,7 +108,7 @@ echo "$CHANGED_FILES" | grep -qE "\.(claude|opencode)/agents/" && {
 exit 0
 HOOK
 
-chmod +x "$HOOKS_DIR/post-commit"
+chmod +x -- "$HOOKS_DIR/post-commit"
 echo "✓ Installed post-commit hook (auto-updates docs)"
 
 # Install pre-commit hook (for quality gate)
@@ -170,7 +170,7 @@ echo "✓ Pre-commit checks passed."
 exit 0
 HOOK
 
-chmod +x "$HOOKS_DIR/pre-commit"
+chmod +x -- "$HOOKS_DIR/pre-commit"
 echo "✓ Installed pre-commit hook (runs quality gate)"
 
 echo ""
