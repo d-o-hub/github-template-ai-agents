@@ -211,10 +211,19 @@ if [[ ! -d "$SKILLS_DIR" ]]; then
 fi
 
 # Collect all SKILL.md files, skipping backup folders (underscore prefix)
+# Performance optimization: use native bash globbing instead of find/sort subshells
 SKILL_FILES=()
-while IFS= read -r -d '' skill_file; do
-    SKILL_FILES+=("$skill_file")
-done < <(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" -print0 | sort -z)
+shopt -s nullglob
+for skill_dir in "$SKILLS_DIR"/*/; do
+    skill_file="${skill_dir}SKILL.md"
+    skill_name="${skill_dir%/}"
+    skill_name="${skill_name##*/}"
+    [[ "$skill_name" == _* ]] && continue
+    if [[ -f "$skill_file" ]]; then
+        SKILL_FILES+=("$skill_file")
+    fi
+done
+shopt -u nullglob
 
 if [[ ${#SKILL_FILES[@]} -eq 0 ]]; then
     echo "No skills found to validate."

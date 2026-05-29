@@ -28,9 +28,13 @@ fi
 # Main function to encapsulate logic as per script template
 main() {
     # Find all workflow files
-    # Using mapfile to handle filenames with spaces correctly
+    # Performance optimization: use native bash globbing instead of find subshell
     local workflow_files=()
-    mapfile -t workflow_files < <(find .github/workflows -name "*.yml" -o -name "*.yaml" 2>/dev/null || true)
+    shopt -s nullglob
+    for f in .github/workflows/*.yml .github/workflows/*.yaml; do
+        [[ -f "$f" ]] && workflow_files+=("$f")
+    done
+    shopt -u nullglob
 
     if [[ ${#workflow_files[@]} -eq 0 ]]; then
         echo -e "${GREEN}No workflow files found${NC}"
