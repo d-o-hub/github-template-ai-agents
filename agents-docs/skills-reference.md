@@ -14,6 +14,7 @@ Full catalog of available skills in this repository.
 | `atomic-commit` | Atomic git workflow - validates, commits, pushes, creates PR | General |
 | `cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, Gi | DevOps |
 | `cloudflare-worker-api` | Structure Worker API routes and handlers. Activate for route | API Development |
+| `codacy` | Orchestrate static analysis using Codacy CLIs for multi-language triage. | Quality |
 | `code-quality` | Review and improve code quality across any programming langu | Quality |
 | `code-review-assistant` | Automated code review with PR analysis, change summaries, an | General |
 | `codeberg-api` | - Interact with Forgejo/Codeberg repositories via the REST A | API Development |
