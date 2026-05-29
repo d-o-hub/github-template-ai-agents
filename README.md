@@ -4,7 +4,7 @@
 > Claude Code, Gemini CLI, OpenCode, Qwen Code, and more.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Template Version](https://img.shields.io/badge/version-0.2.9-blue)](CHANGELOG-TEMPLATE.md)
+[![Template Version](https://img.shields.io/badge/version-0.2.10-blue)](CHANGELOG-TEMPLATE.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Quick Links**: [Quick Start](#quick-start-2-minutes)
