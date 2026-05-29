@@ -1,0 +1,46 @@
+---
+# Codacy Configuration Template for Multi-Language Projects
+# See: .agents/skills/codacy/references/config-format.md
+
+exclude_paths:
+  - "target/**"
+  - "node_modules/**"
+  - "vendor/**"
+  - "**/tests/**"
+  - "**/dist/**"
+  - "**/build/**"
+
+languages:
+  rust:
+    enabled: true
+  go:
+    enabled: true
+  c:
+    enabled: true
+  typescript:
+    enabled: true
+  shell:
+    enabled: true
+  python:
+    enabled: true
+
+engines:
+  duplication:
+    enabled: true
+    exclude_paths:
+      - "**/tests/**"
+      - "**/*.test.ts"
+      - "**/*_test.go"
+  metric:
+    enabled: true
+    config:
+      languages:
+        - "rust"
+        - "go"
+        - "typescript"
+        - "python"
+  shellcheck:
+    enabled: true
+  cppcheck:
+    enabled: true
+    language: c++
