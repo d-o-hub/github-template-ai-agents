@@ -84,7 +84,7 @@ CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
 
 # Update skill table if skills changed
 # The pattern matches any file under .agents/skills/ directory
-echo "$CHANGED_FILES" | grep -q ".agents/skills/" && {
+printf "%s\n" "$CHANGED_FILES" | grep -q -e ".agents/skills/" && {
     echo "Skills changed - updating AGENTS.md..."
     "$REPO_ROOT/scripts/update-agents-md.sh"
     git add AGENTS.md
@@ -96,7 +96,7 @@ echo "$CHANGED_FILES" | grep -q ".agents/skills/" && {
 
 # Update registry if agents changed  
 # The pattern matches files in .claude/, .opencode/, etc. agent directories
-echo "$CHANGED_FILES" | grep -qE "\.(claude|opencode)/agents/" && {
+printf "%s\n" "$CHANGED_FILES" | grep -q -E -e "\.(claude|opencode)/agents/" && {
     echo "Agents changed - updating AGENTS_REGISTRY.md..."
     "$REPO_ROOT/scripts/update-agents-registry.sh"
     git add agents-docs/AGENTS_REGISTRY.md

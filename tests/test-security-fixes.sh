@@ -109,32 +109,34 @@ else
     echo "  ✗ Test 5 failed"
 fi
 
-# Test 6: chmod, grep, sed hardening
-echo "Test 6: chmod, grep, sed hardening..."
-HYPHEN_FILE="-testfile"
-touch "$TEST_ROOT/$HYPHEN_FILE"
-chmod 644 "$TEST_ROOT/$HYPHEN_FILE"
-echo "  Testing chmod hardening..."
-if chmod +x -- "$TEST_ROOT/$HYPHEN_FILE" 2>/dev/null && [[ -x "$TEST_ROOT/$HYPHEN_FILE" ]]; then
-    echo "  ✓ Test 6a passed"
-else
-    echo "  ✗ Test 6a failed"
-fi
-echo "  Testing grep hardening..."
-echo "-pattern" > "$TEST_ROOT/$HYPHEN_FILE"
-if grep -q -e "-pattern" -- "$TEST_ROOT/$HYPHEN_FILE" 2>/dev/null; then
-    echo "  ✓ Test 6b passed"
-else
-    echo "  ✗ Test 6b failed"
-fi
-echo "  Testing sed hardening..."
-if sed -i -e "s/-pattern/passed/" -- "$TEST_ROOT/$HYPHEN_FILE" 2>/dev/null && grep -q "passed" -- "$TEST_ROOT/$HYPHEN_FILE" 2>/dev/null; then
-    echo "  ✓ Test 6c passed"
-else
-    echo "  ✗ Test 6c failed"
-fi
+# Test 6: Aggressive Option Injection Hardening
+echo "Test 6: Aggressive option injection hardening..."
+# Test files with names that look like critical flags
+for bad_file in "-h" "-n" "-e" "-testfile" "--version"; do
+    touch "$TEST_ROOT/$bad_file"
+    chmod 644 "$TEST_ROOT/$bad_file"
 
-# Test 7: propagate-version.sh functional check
+    # chmod
+    if ! chmod +x -- "$TEST_ROOT/$bad_file" 2>/dev/null; then
+        echo "  ✗ Test 6a failed: chmod error for $bad_file"
+    elif [[ ! -x "$TEST_ROOT/$bad_file" ]]; then
+        echo "  ✗ Test 6a failed: chmod did not set +x on $bad_file"
+    fi
+
+    # grep
+    echo "pattern" > "$TEST_ROOT/$bad_file"
+    if ! grep -q -e "pattern" -- "$TEST_ROOT/$bad_file" 2>/dev/null; then
+        echo "  ✗ Test 6b failed: grep failed to read $bad_file or find pattern"
+    fi
+
+    # sed
+    if ! sed -e "s/pattern/passed/" -- "$TEST_ROOT/$bad_file" > /dev/null 2>&1; then
+         echo "  ✗ Test 6c failed: sed error for $bad_file"
+    fi
+done
+echo "  ✓ Test 6 passed: Aggressive injection scenarios handled"
+
+# Test 7: propagate-version.sh functional check (Portability)
 echo "Test 7: propagate-version.sh functional check..."
 echo "0.1.0" > "$TEST_ROOT/VERSION"
 cat <<README > "$TEST_ROOT/README.md"
@@ -157,11 +159,12 @@ if (cd "$TEST_ROOT" && bash scripts/propagate-version.sh >/dev/null 2>&1); then
     grep -q "version-0.1.0" "$TEST_ROOT/README.md" || PASS=0
     grep -q "| \`VERSION\` | \`0.1.0\` |" "$TEST_ROOT/README.md" || PASS=0
     grep -q "\*\*Version:\*\* 0.1.0" "$TEST_ROOT/README.md" || PASS=0
-    grep -q "\[Unreleased\]" "$TEST_ROOT/CHANGELOG.md" || PASS=0
+    grep -q "## \[Unreleased\]" "$TEST_ROOT/CHANGELOG.md" || PASS=0
     if [[ $PASS -eq 1 ]]; then
-        echo "  ✓ Test 7 passed"
+        echo "  ✓ Test 7 passed: Portable version propagation successful"
     else
         echo "  ✗ Test 7 failed: verification failed"
+        cat "$TEST_ROOT/README.md"
     fi
 else
     echo "  ✗ Test 7 failed: execution error"

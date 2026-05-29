@@ -268,8 +268,9 @@ FOOTER
 
 # Update timestamp and move to final location
 TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
-sed -i "s/TIMESTAMP/$TIMESTAMP/" "$TEMP_FILE"
-mv "$TEMP_FILE" "$REGISTRY_FILE"
+tmp=$(mktemp)
+sed -e "s/TIMESTAMP/$TIMESTAMP/" < "$TEMP_FILE" > "$tmp"
+mv -- "$tmp" "$REGISTRY_FILE"
 
 echo ""
 echo "✓ agents-docs/AGENTS_REGISTRY.md updated successfully"
