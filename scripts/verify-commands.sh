@@ -86,12 +86,12 @@ fi
 
 DISCOVERED_COMMANDS=""
 if [ -x "./scripts/discover-commands.sh" ]; then
-    DISCOVERED_COMMANDS=$(./scripts/discover-commands.sh 2>/dev/null | grep -v "^Discovering\|^Command\|^─\|^\$" || printf "")
+    DISCOVERED_COMMANDS=$(./scripts/discover-commands.sh 2>/dev/null | grep -v -e "^Discovering" -e "^Command" -e "^─" -e "^\$" || printf "")
 fi
 
 COMMAND_COUNT=0
 if [ -n "$DISCOVERED_COMMANDS" ]; then
-    COMMAND_COUNT=$(printf "%s\n" "$DISCOVERED_COMMANDS" | grep -c . || printf "0")
+    COMMAND_COUNT=$(printf "%s\n" "$DISCOVERED_COMMANDS" | grep -c -e "." || printf "0")
 fi
 
 if ! $SILENT; then
@@ -118,7 +118,7 @@ if type get_changed_files &> /dev/null; then
 fi
 CHANGED_COUNT=0
 if [ -n "$CHANGED_FILES" ]; then
-    CHANGED_COUNT=$(printf "%s\n" "$CHANGED_FILES" | grep -c . || printf "0")
+    CHANGED_COUNT=$(printf "%s\n" "$CHANGED_FILES" | grep -c -e "." || printf "0")
 fi
 
 if ! $SILENT; then

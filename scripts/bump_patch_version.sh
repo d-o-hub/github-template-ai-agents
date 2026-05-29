@@ -34,7 +34,7 @@ echo "Bumping version from $CURRENT_VERSION to $NEW_VERSION"
 # Generate changelog summary from git log
 # Fetch recent commits to use for the changelog (e.g. last 15, ignoring merge commits and version bumps)
 echo "Fetching recent commits..."
-COMMITS=$(git log --no-merges --oneline -n "$RECENT_COMMIT_COUNT" | grep -iv "bump version" | grep -iv "chore: release" | python3 -c '
+COMMITS=$(git log --no-merges --oneline -n "$RECENT_COMMIT_COUNT" | grep -iv -e "bump version" | grep -iv -e "chore: release" | python3 -c '
 import sys
 import re
 
@@ -82,7 +82,7 @@ fi
 NEW_ENTRY="## [$NEW_VERSION] - $CURRENT_DATE\n\n$COMMITS\n"
 
 # Insert the new entry into CHANGELOG-TEMPLATE.md right after ## [Unreleased]
-if grep -q "^## \[Unreleased\]" CHANGELOG-TEMPLATE.md; then
+if grep -q -e "^## \[Unreleased\]" -- CHANGELOG-TEMPLATE.md; then
     TMP_FILE=$(mktemp)
     trap 'rm -f "$TMP_FILE"' EXIT ERR
     # Use awk to insert after Unreleased section
