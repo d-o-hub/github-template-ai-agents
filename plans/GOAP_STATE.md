@@ -1,26 +1,16 @@
 # GOAP_STATE
 
 ## Current State
-
-- feature_x: implemented
-- tests: passing
-- ci: green
+- Initial state
 
 ## Target State
-
-- feature_y: implemented
-- release: published
+- Target goal
 
 ## Actions Queue
-
-1. [ ] Implement feature_y (pre: feature_x, cost: 2)
-2. [ ] Run tests (pre: feature_y, cost: 1)
-3. [ ] Create release (pre: tests.passing, cost: 1)
+1. [ ] Action 1
 
 ## Blockers
-
 - None
 
 ## Deferred
-
-- wasm_optimization: deferred (reason: not needed for current release)
+- None

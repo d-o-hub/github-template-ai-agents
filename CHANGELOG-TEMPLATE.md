@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.10] - 2026-05-29
+
+### Added
+
+- feat(quality): add codacy static analysis skill (#376)
+
 ## [0.2.9] - 2026-05-19
 
 ### Added
