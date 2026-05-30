@@ -215,6 +215,8 @@ jobs:
         run: python3 scripts/update-ci-status.py
 
       - name: Commit and push changes
+        env:
+          TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -222,6 +224,8 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to CI status"
           else
-            git commit -m "ci: update CI status artifacts [skip ci]"
-            git push
+            git commit -m "ci: update ci status artifacts [skip ci]"
+            # Push to the branch that triggered the workflow
+            # Using HEAD to refer to the current detached state
+            git push origin "HEAD:$TARGET_BRANCH"
           fi
