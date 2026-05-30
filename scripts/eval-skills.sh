@@ -80,8 +80,8 @@ fi
 # Optimization: Use native bash globbing instead of find process substitution
 shopt -s nullglob
 for eval_file in "$SKILLS_DIR"/*/evals.json "$SKILLS_DIR"/*/evals/evals.json; do
-  [ -f "$eval_file" ] || continue
-  if [ ! -s "$eval_file" ]; then
+  [[ -f "$eval_file" ]] || continue
+  if [[ ! -s "$eval_file" ]]; then
     # Extract skill name safely regardless of whether it's in root or evals/ subdir
     if [[ "$eval_file" == */evals/evals.json ]]; then
       dir_path="${eval_file%/*/*}"
