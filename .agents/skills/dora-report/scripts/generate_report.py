@@ -21,6 +21,7 @@ def main():
     report_content = f"""# DORA & Agentic Metrics Report - {month_year}
 
 ## DORA Metrics
+
 | Metric | Value |
 |---|---|
 | Deployment Frequency | Daily |
@@ -29,6 +30,7 @@ def main():
 | Time to Restore Service | < 1 hour |
 
 ## Agentic Metrics
+
 | Metric | Value |
 |---|---|
 | Tasks Completed | 42 |
@@ -37,6 +39,7 @@ def main():
 | Self-Fix Success Rate | 85% |
 
 ---
+
 *Report generated automatically on {now.strftime("%Y-%m-%d %H:%M:%S")}*
 """
 

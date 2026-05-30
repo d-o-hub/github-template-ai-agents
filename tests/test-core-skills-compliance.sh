@@ -46,13 +46,19 @@ fi
 
 # 4. Verify automated generation of monthly report
 echo "Running dora-report generation script..."
-python3 "$SKILLS_DIR/dora-report/scripts/generate_report.py"
 report_file="$REPO_ROOT/agents-docs/dora-reports/$(date +%Y-%m).md"
+rm -f "$report_file" # Ensure we test fresh generation
+
+python3 "$SKILLS_DIR/dora-report/scripts/generate_report.py"
 if [[ -f "$report_file" ]]; then
     echo "✓ Monthly report generated: $report_file"
 else
     echo "✗ Monthly report NOT generated at $report_file"
     exit 1
 fi
+
+# Cleanup: Delete the generated report file to keep repo clean
+rm -f "$report_file"
+echo "✓ Cleaned up generated report file"
 
 echo "=== All Core Skills Compliance Checks Passed ==="
