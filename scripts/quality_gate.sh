@@ -142,7 +142,7 @@ fi
 
 # Python detection
 if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ] || [ -f "setup.py" ]; then
-    printf "  %b✓%b Python (requirements.txt/pyproject.toml)\n" "${GREEN}" "${NC}"
+    printf "  %b✓%b Python (requirements.txt/pyproject.toml/setup.py)\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("python")
 fi
 
