@@ -1,6 +1,6 @@
 {
-  "status": "passing",
-  "last_run": "2026-05-30T18:10:17.528417Z",
+  "status": "pending",
+  "last_run": "never",
   "failing_jobs": [],
-  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/26691159099"
+  "workflow_url": ""
 }
