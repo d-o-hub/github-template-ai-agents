@@ -28,7 +28,9 @@ readonly MAX_PR_TITLE_LENGTH=150
 
 We use a GOAP (Goal-Oriented Action Planning) approach combined with ADRs (Architecture Decision Records) and TRIZ for structured development.
 
-**Prerequisite**: Always fetch and pull the latest default remote branch before beginning analysis or making changes.
+**Prerequisites**:
+- Always fetch and pull the latest default remote branch before beginning analysis or making changes.
+- **Check CI Status**: Agents MUST check `ci-status.json` before starting any change task. If status is NOT "passing", the agent should report the issue and pause until CI is fixed.
 
 1. **ANALYZE & STRATEGIZE (Phase 1)**
    - **Action**: Use `triz-analysis` or `triz-solver` to evaluate the problem, resolve contradictions, and identify architecture requirements. Write an **ADR** (Architecture Decision Record) detailing the context, decision, and consequences.
@@ -78,6 +80,11 @@ See `agents-docs/VERSION.md` for full workflow details.
 ./scripts/quality_gate.sh # Always run before committing. Fix all errors.
 ./scripts/update-all-docs.sh # Verify and update documentation
 ```
+
+## CI State Artifacts
+
+- `ci-status.json`: Machine-readable CI state file updated by GitHub Actions after each workflow run.
+- `ci-summary.md`: Human/agent readable markdown summary of the latest CI run.
 
 ## Maintenance & Verification
 
