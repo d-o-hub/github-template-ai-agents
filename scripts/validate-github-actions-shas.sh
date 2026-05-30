@@ -9,7 +9,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$REPO_ROOT" || {
-    echo "ERROR: Could not change directory to repository root" >&2
+    printf "ERROR: Could not change directory to repository root\n" >&2
     exit 1
 }
 
@@ -37,7 +37,7 @@ main() {
     shopt -u nullglob globstar
 
     if [[ ${#workflow_files[@]} -eq 0 ]]; then
-        echo -e "${GREEN}No workflow files found${NC}"
+        printf "%bNo workflow files found%b\n" "${GREEN}" "${NC}"
         return 0
     fi
 
@@ -114,11 +114,11 @@ main() {
         }
         END { if (failed) exit 1 }
     ' "${workflow_files[@]}"; then
-        echo -e "${RED}Found unpinned actions or invalid/placeholder SHAs in workflows${NC}"
+        printf "%bFound unpinned actions or invalid/placeholder SHAs in workflows%b\n" "${RED}" "${NC}"
         return 1
     fi
 
-    echo -e "${GREEN}All GitHub Actions SHAs appear valid and pinned${NC}"
+    printf "%bAll GitHub Actions SHAs appear valid and pinned%b\n" "${GREEN}" "${NC}"
     return 0
 }
 

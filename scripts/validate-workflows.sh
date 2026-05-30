@@ -2,13 +2,13 @@
 # Validates JavaScript blocks in GitHub Actions workflows.
 # Checks syntax using node -c and scans for script injection risks.
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m'
+RED=$'\033[0;31m'
+GREEN=$'\033[0;32m'
+NC=$'\033[0m'
 
 FAILED=0
 
-echo "Validating GitHub Actions JavaScript blocks..."
+printf "Validating GitHub Actions JavaScript blocks...\n"
 
 # Create temporary file for script validation once
 TMP_JS_FILE=$(mktemp /tmp/workflow-script-XXXXXX.js)
@@ -29,20 +29,20 @@ if [ ${#CHECK_PATHS[@]} -eq 0 ]; then
 fi
 
 if [ ${#CHECK_PATHS[@]} -eq 0 ]; then
-    echo "No workflow files found to validate."
+    printf "No workflow files found to validate.\n"
     exit 0
 fi
 
 for wf in "${CHECK_PATHS[@]}"; do
     [ -e "$wf" ] || continue
-    echo "Checking $wf..."
+    printf "Checking %s...\n" "$wf"
 
     current_block=""
 
     # Extract script blocks and detect script injection risks
     while IFS= read -r line; do
         if [[ "$line" == "---INJECTION_RISK---"* ]]; then
-            printf "  ${RED}⚠ Potential script injection risk detected:${NC}\n"
+            printf "  %b⚠ Potential script injection risk detected:%b\n" "${RED}" "${NC}"
             printf "    %s\n" "${line#---INJECTION_RISK---}"
             printf "    Use environment variables instead of direct \${{ }} interpolation.\n"
             FAILED=1
@@ -54,11 +54,11 @@ for wf in "${CHECK_PATHS[@]}"; do
                 printf "(async () => {\n%s\n})()" "$current_block" > "$TMP_JS_FILE"
 
                 if ! node -c "$TMP_JS_FILE" 2>/dev/null; then
-                    printf "  ${RED}✗ Syntax error in script block${NC}\n"
+                    printf "  %b✗ Syntax error in script block%b\n" "${RED}" "${NC}"
                     node -c "$TMP_JS_FILE" 2>&1 | sed 's/^/    /'
                     FAILED=1
                 else
-                    printf "  ${GREEN}✓ Script block syntax OK${NC}\n"
+                    printf "  %b✓ Script block syntax OK%b\n" "${GREEN}" "${NC}"
                 fi
                 current_block=""
             fi
