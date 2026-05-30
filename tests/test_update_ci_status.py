@@ -25,7 +25,7 @@ class TestUpdateCIStatus(unittest.TestCase):
         os.chdir(self.old_cwd)
         self.test_dir.cleanup()
 
-    def run_script(self, needs_json, workflow_url="http://test"):
+    def run_script(self, needs_json, workflow_url="https://test"):
         env = os.environ.copy()
         env["NEEDS_JSON"] = json.dumps(needs_json)
         env["WORKFLOW_URL"] = workflow_url
