@@ -1,7 +1,8 @@
 ---
 name: anti-ai-slop
 description: >
-  Apply this skill whenever the user wants to audit, fix, redesign, write, or review UI, UX, copy, or text to avoid the generic "AI slop" aesthetic of 2025–2026. Triggers include: "make this feel less AI", "this looks too generic", "avoid AI clichés", "audit my copy", "anti-pattern review", "humanize this", "this feels soulless", "too corporate", "fix the UX writing", "why does this feel like ChatGPT made it", "anti-design", "brutalist", "raw", "intentional", "authentic", "distinctive", "not like every other AI app", "responsive", "mobile", "tablet", "desktop". Also trigger when producing new UI, copy, or UX flows and the user cares about quality and distinctiveness. Always verify mobile, tablet, and desktop views for proper navigation and layout. This skill is your checklist, diagnostic tool, and creative brief for everything that makes design feel human, considered, and real in 2026.
+  Apply this skill to avoid generic "AI slop" in UI, UX, and copy. Triggers: "make this feel less AI", "audit my copy", "humanize this", "fix the UX writing", "anti-design".
+version: "1.0"
 ---
 
 # Anti-AI-Slop Skill — 2026 Edition
@@ -39,10 +40,10 @@ These visual patterns define the 2024–2026 AI aesthetic monoculture. Flag ever
 | **CTA: "Get started for free"** | Large button, primary color | Meaningless. Says nothing specific. |
 | **Empty states with illustration + button** | Lottie animation or SVG blob person | Cute once. Now patronizing. |
 | **Skeleton loaders for everything** | Gray pulse bars | Often used to mask poor performance instead of fix it |
-| **Dark mode = black bg + purple accent** | `#0f0f0f` + `#8b5cf6` | The "hacker aesthetic" as sold by Vercel clones |
-| **Animated gradient text** | Moving rainbow/sweep on headline | Peak 2023 AI startup energy. Looks desperate |
-| **"Powered by AI" badge** | Small badge on the UI | Adds nothing. Trust signal that signals nothing |
-| **Dashboard with 6+ metric cards** | Big number, small label | Data theater. Usually none of it is actionable |
+| Dark mode: black + purple | `#0f0f0f` + `#8b5cf6` | The "hacker aesthetic" clone |
+| Animated gradient text | Peak 2023 AI startup energy | Looks desperate |
+| "Powered by AI" badge | Small badge on the UI | Trust signal that signals nothing |
+| Metric cards theater | Big number, small label | Data theater. Not actionable |
 
 ### What to Do Instead
 
@@ -59,23 +60,21 @@ These visual patterns define the 2024–2026 AI aesthetic monoculture. Flag ever
 
 ## Part 2 — AI-Slop UX Patterns (Interaction & Flow)
 
-### The Canon of Slop
-
-| Pattern | What it looks like | Why it's slop |
-|---|---|---|
-| **Onboarding modal** | "Welcome to [Product]!" | Interrupts before context. Nobody reads it. |
-| **5-step wizard** | Progress bar, confetti at end | Treats users as suspects to be processed |
-| **Tooltip tours** | Floating box at UI elements | Teaches wrong interface instead of fixing it |
-| **"Are you sure?"** | Modal for every delete action | Trust issues. Use undo instead. |
-| **Generic empty states** | "No data yet! Click + to add" | Doesn't explain what item IS or why I'd want it |
-| **Toast notifications** | "Saved!", "Deleted!", "Updated!" | Noise. Users learn to ignore them in 2 sessions |
-| **Infinite scroll + button** | Both at the same time | Design indecision shipped as a feature |
-| **Exact match search** | Typo → no results → dead end | Punishes the user for trusting the product |
-| **8+ field form** | Sign up → giant form → maybe enter | Commitment before value. Backwards. |
-| **"Loading..."** | Spinner, no ETA, no context | I don't know if it's 1 second or 1 minute |
-| **Action reload** | Full page refresh → scroll lost | 2012 called |
-| **Hamburger menu** | Hidden navigation on desktop | Discovery failure. Punishes exploration. |
-| **Hover states only** | Revealed only on hover | Mobile, keyboard, discoverers all fail |
+| Pattern | Why it's slop |
+|---|---|
+| **Onboarding modal** | Interrupts before context. |
+| **5-step wizard** | Treats users as suspects to be processed. |
+| **Tooltip tours** | Teaches wrong interface instead of fixing it. |
+| **"Are you sure?"** | Trust issues. Use undo instead. |
+| **Generic empty states** | Doesn't explain what item IS or why I'd want it. |
+| **Toast notifications** | Noise. Users learn to ignore them in 2 sessions. |
+| **Infinite scroll + button** | Design indecision shipped as a feature. |
+| **Exact match search** | Punishes the user for trusting the product. |
+| **8+ field form** | Commitment before value. Backwards. |
+| **"Loading..."** | I don't know if it's 1 second or 1 minute. |
+| **Action reload** | Full page refresh. |
+| **Hamburger menu** | Discovery failure. |
+| **Hover states only** | Mobile, keyboard, discoverers all fail. |
 
 ### Responsive Anti-Patterns & Best Practices
 
@@ -112,22 +111,10 @@ This is where AI slop is most pervasive and most invisible. By 2026, entire prod
 
 ### The Canon of Slop
 
-#### Hollow Affirmations
-Words that exist only to fill space and seem warm:
-- "Absolutely!", "Certainly!", "Of course!", "Great question!"
-- "I'd be happy to help with that"
-- "Sounds great!", "That makes sense!"
-
-**Fix:** Delete them. Start with the actual content.
-
-#### AI Corporate Superlatives
-- "Powerful", "seamless", "intuitive", "robust", "next-generation"
-- "Cutting-edge", "state-of-the-art", "best-in-class"
-- "Unlock the full potential of..."
-- "Transform the way you..."
-- "Supercharge your..."
-
-**Fix:** Replace with specific claims. What does it actually do? By how much? For whom?
+| Slop Type | Examples | Fix |
+|---|---|---|
+| **Hollow Affirmations** | Absolutely!, Certainly!, Of course! | Delete them. Start with content. |
+| **AI Superlatives** | Powerful, seamless, intuitive, robust | Use specific claims and data. |
 
 #### The Listicle Reflex
 AI defaults to bullet points for everything. Three bullets where one sentence works. Numbered lists for concepts with no actual sequence. Fake hierarchy with `**Bold:** then explanation` for everything.
@@ -184,6 +171,18 @@ This is error message theater. It performs care without providing help.
 | Success: announce the action | "Saved!" | "Changes saved — live in 30 seconds" |
 | Placeholder as label | Input with placeholder "Email" and no label | Use a real label. Always. |
 | Confirmation copy that restates the question | "Are you sure you want to delete? This will delete the item." | "Delete [Item Name]? This can't be undone." |
+
+### Code Slop Patterns (Internal Implementation)
+
+Detect and fix these generic, low-quality patterns in AI-generated code:
+
+| Pattern | Example | Fix |
+|---|---|---|
+| **Vague placeholders** | `// TODO: implement this` | Implement the logic or remove the comment if redundant. |
+| **Generic variables** | `data`, `result`, `temp`, `item` | Use descriptive names: `userProfile`, `calculationResult`. |
+| **Valueless boilerplate** | Redundant getters/setters in languages that don't need them. | Use language idiomatic features (e.g., TS properties). |
+| **Unnecessary verbosity** | Nested `if` chains where a guard clause works. | Refactor with guard clauses and early returns. |
+| **Commented-out code** | Large blocks of unused code. | Delete them. Git is your history. |
 
 ---
 

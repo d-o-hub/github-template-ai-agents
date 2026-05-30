@@ -91,6 +91,7 @@ See `agents-docs/VERSION.md` for full workflow details.
 ```bash
 ./scripts/analyze-codebase.sh   # Autonomous analysis and self-learning
 ./scripts/check-adr-compliance.sh # Verify ADR registration and patterns
+./scripts/run-evals.py --skill dora-report # Mandatory monthly DORA + agentic report
 ./scripts/check-plan-numbering.sh # Ensure plan counters are consistent
 ./scripts/archive-stale-plans.sh # Archive plans older than 60 days
 ```
