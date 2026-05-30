@@ -77,15 +77,21 @@ fi
 
 # We also need to check if the file is empty, which awk skips.
 # Fast path check for 0-byte files which would fail all field validations
-while IFS= read -r -d '' eval_file; do
-  dir_path="${eval_file%/*/*}"
-  skill_name="${dir_path##*/}"
-  echo " [FAIL] $skill_name: evals missing 'expected_output' field"
-  echo " [FAIL] $skill_name: evals missing 'id' field"
-  echo " [FAIL] $skill_name: evals missing 'prompt' field"
-  echo " [FAIL] $skill_name: evals missing 'assertions' field"
-  FAILED=1
-done < <(find "$SKILLS_DIR" -type f -name "evals.json" -empty -print0 2>/dev/null || true)
+# Optimization: Use native bash globbing instead of find process substitution
+shopt -s nullglob
+for eval_file in "$SKILLS_DIR"/*/evals.json "$SKILLS_DIR"/*/evals/evals.json; do
+  [ -f "$eval_file" ] || continue
+  if [ ! -s "$eval_file" ]; then
+    dir_path="${eval_file%/*/*}"
+    skill_name="${dir_path##*/}"
+    echo " [FAIL] $skill_name: evals missing 'expected_output' field"
+    echo " [FAIL] $skill_name: evals missing 'id' field"
+    echo " [FAIL] $skill_name: evals missing 'prompt' field"
+    echo " [FAIL] $skill_name: evals missing 'assertions' field"
+    FAILED=1
+  fi
+done
+shopt -u nullglob
 
 
 # Optimization: Use batched awk pass via xargs for SKILL.md validation instead of loop with grep
