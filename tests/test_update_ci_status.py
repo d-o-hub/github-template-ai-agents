@@ -29,7 +29,8 @@ class TestUpdateCIStatus(unittest.TestCase):
         env = os.environ.copy()
         env["NEEDS_JSON"] = json.dumps(needs_json)
         env["WORKFLOW_URL"] = workflow_url
-        result = subprocess.run([sys.executable, self.script_path], env=env, capture_output=True, text=True)
+        # Path is derived from internal test state and sys.executable is trusted
+        result = subprocess.run([sys.executable, self.script_path], env=env, capture_output=True, text=True) # nosec
         return result
 
     def test_all_passing(self):
