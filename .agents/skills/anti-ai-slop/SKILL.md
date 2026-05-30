@@ -2,7 +2,7 @@
 name: anti-ai-slop
 description: >
   Apply this skill to avoid generic "AI slop" in UI, UX, and copy. Triggers: "make this feel less AI", "audit my copy", "humanize this", "fix the UX writing", "anti-design".
-version: "1.0"
+version: "1.0.0"
 ---
 
 # Anti-AI-Slop Skill — 2026 Edition
