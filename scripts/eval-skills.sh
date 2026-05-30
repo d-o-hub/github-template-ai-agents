@@ -82,7 +82,12 @@ shopt -s nullglob
 for eval_file in "$SKILLS_DIR"/*/evals.json "$SKILLS_DIR"/*/evals/evals.json; do
   [ -f "$eval_file" ] || continue
   if [ ! -s "$eval_file" ]; then
-    dir_path="${eval_file%/*/*}"
+    # Extract skill name safely regardless of whether it's in root or evals/ subdir
+    if [[ "$eval_file" == */evals/evals.json ]]; then
+      dir_path="${eval_file%/*/*}"
+    else
+      dir_path="${eval_file%/*}"
+    fi
     skill_name="${dir_path##*/}"
     echo " [FAIL] $skill_name: evals missing 'expected_output' field"
     echo " [FAIL] $skill_name: evals missing 'id' field"
