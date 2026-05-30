@@ -1,8 +1,6 @@
 # AGENTS.md
 
 > Single source of truth for all AI coding agents in this repository.
-> Supported by: Claude Code, Windsurf, Gemini CLI, Codex, Copilot, OpenCode, Devin, Amp, Zed, Warp, RooCode, Jules
-> See: <https://agents.md>
 
 <!-- Agent-specific guidance: CLAUDE.md, GEMINI.md, QWEN.md, JULES.md -->
 
