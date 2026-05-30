@@ -1,0 +1,34 @@
+{
+  "skill_name": "dora-report",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Generate a DORA report for May 2026 based on the git history.",
+      "expected_output": "A report in agents-docs/dora-reports/2026-05.md with Deployment Frequency, Lead Time for Changes, Change Failure Rate, and Time to Restore Service.",
+      "assertions": [
+        "The file agents-docs/dora-reports/2026-05.md is created or updated",
+        "The output includes a section for 'Deployment Frequency'",
+        "The output includes a section for 'Lead Time for Changes'"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We had a production outage on 2026-05-15 that was fixed with a revert within 2 hours. Update the May 2026 report to reflect this.",
+      "expected_output": "The May 2026 report shows a Change Failure Rate > 0% and a Time to Restore Service of approximately 2 hours.",
+      "assertions": [
+        "The report includes the failure incident on 2026-05-15",
+        "Change Failure Rate is updated",
+        "Time to Restore Service is updated"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Analyze agentic metrics for the last month. How many tasks were completed?",
+      "expected_output": "A report section detailing 'Tasks Completed' and 'Skill Invocations'.",
+      "assertions": [
+        "The output includes 'Tasks Completed'",
+        "The output includes 'Skill Invocations'"
+      ]
+    }
+  ]
+}
