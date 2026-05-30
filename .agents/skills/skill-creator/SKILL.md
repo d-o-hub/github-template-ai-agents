@@ -2,6 +2,7 @@
 name: skill-creator
 description: Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.
 license: MIT
+version: "1.1.0"
 ---
 
 # Skill Creator
@@ -125,6 +126,28 @@ Use `.agents/skills/verification-template/SKILL.md` as a starting point.
 - `references/evaluating-skills.md` - Evaluating skill output quality
 - `references/output-patterns.md` - Common output patterns
 - `references/workflows.md` - Common workflow patterns
+
+## Registration and Standards
+
+### How to register a skill in AGENTS.md
+1. **Catalog Update**: Add the skill to the "Skills" section in `AGENTS.md` following the alphabetical order within its category.
+2. **Docs Sync**: Add the skill to `agents-docs/skills-reference.md`.
+3. **Registry Update**: Run `./scripts/update-agents-registry.sh` if applicable.
+4. **Maintenance**: Run `./scripts/generate-skills-readme.py` and `./scripts/generate-available-skills.sh` to update auto-generated documentation.
+
+### Acceptance Criteria Format
+Every new skill must meet these criteria before being merged:
+- [ ] `SKILL.md` is under 250 lines.
+- [ ] Frontmatter contains `name`, `description`, `category`, and `version`.
+- [ ] Includes `## Rationalizations` and `## Red Flags` sections.
+- [ ] Contains at least 3 realistic eval cases in `evals/evals.json`.
+- [ ] Successfully passes `./scripts/validate-skills.sh`.
+
+### Versioning Conventions
+- Use Semantic Versioning (SemVer) for the `version` field.
+- **Major (1.0.0)**: Breaking changes in skill interface or core logic.
+- **Minor (0.1.0)**: New instructions, sections, or eval cases that don't break existing usage.
+- **Patch (0.0.1)**: Typos, minor phrasing improvements, or metadata updates.
 
 ## Packaging
 

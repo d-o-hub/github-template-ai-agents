@@ -23,6 +23,7 @@ Full catalog of available skills in this repository.
 | `database-schema-migrations` | Design database schema and write migrations. Activate for ta | DevOps |
 | `dist-channel-selection` | Guide for selecting the correct distribution channel (npm, C | General |
 | `do-web-doc-resolver` | Python resolver for URLs and queries into compact, LLM-ready | Documentation |
+| `dora-report` | Monthly DORA + agentic metrics reporting skill. | DevOps |
 | `docs-hook` | Lightweight git hook integration for updating agents-docs wi | Documentation |
 | `document-rendering-and-locators` | Implement resilient document rendering and annotation anchor | Documentation |
 | `dogfood` | Systematically explore and test a web application to find bu | General |

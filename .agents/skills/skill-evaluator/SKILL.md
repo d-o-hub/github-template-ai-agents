@@ -2,6 +2,7 @@
 name: skill-evaluator
 description: "Reusable skill for evaluating other skills with structure checks, eval coverage review, and real usage spot checks. Use when you need to check a skill, add evals, benchmark a skill, validate outputs against assertions, or compare current skill behavior against a baseline."
 license: MIT
+version: "1.2.0"
 metadata:
   author: d.o.
   version: "1.1"
@@ -170,6 +171,29 @@ Organize eval results in a dedicated workspace directory (e.g., `<skill-name>-wo
   "another-eval-id": ""
 }
 ```
+
+## Scoring Rubric
+
+Evaluate skills across these four dimensions (Score 1-5):
+
+| Dimension | Description |
+|---|---|
+| **Clarity** | Are the instructions unambiguous and easy for an agent to follow? |
+| **Completeness** | Does it cover common edge cases and include required sections (Rationalizations/Red Flags)? |
+| **Testability** | Does it include realistic and varied eval cases in `evals/evals.json`? |
+| **Reusability** | Can the skill be applied to multiple projects/contexts without hardcoded values? |
+
+### Filing a Skill Improvement Issue
+When a skill fails evaluation:
+1. Open a GitHub Issue with the title `skill-improvement: <skill-name>`.
+2. Include the **Eval Report** in the description.
+3. Label the issue with `quality` and `skill`.
+
+### Deprecation Process
+Outdated or redundant skills should follow this lifecycle:
+1. **Deprecation Notice**: Add `[DEPRECATED]` to the `description` in `SKILL.md` and link to the replacement.
+2. **Issue Creation**: File an issue to remove the skill in the next major version.
+3. **Removal**: Delete the skill directory and update all registries after the notice period.
 
 ## Assertion Rules
 

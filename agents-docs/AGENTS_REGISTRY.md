@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-05-07 19:13 UTC
+> Last updated: 2026-05-30 16:13 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -32,12 +32,13 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `agent-browser` | `.agents/skills/agent-browser` | Browser automation CLI for AI agents. Use when the user need |
 | `agent-coordination` | `.agents/skills/agent-coordination` | Coordinate multiple agents for software development across a |
 | `agents-md` | `.agents/skills/agents-md` | Create AGENTS.md files with production-ready best practices. |
-| `anti-ai-slop` | `.agents/skills/anti-ai-slop` | Apply this skill whenever the user wants to audit, fix, rede |
+| `anti-ai-slop` | `.agents/skills/anti-ai-slop` | Apply this skill to avoid generic "AI slop" in UI, UX, and c |
 | `api-design-first` | `.agents/skills/api-design-first` | Design and document RESTful APIs using design-first principl |
 | `architecture-diagram` | `.agents/skills/architecture-diagram` | Generate or update a project architecture SVG diagram by sca |
 | `atomic-commit` | `.agents/skills/atomic-commit` | Atomic git workflow - validates, commits, pushes, creates PR |
 | `cicd-pipeline` | `.agents/skills/cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, Gi |
 | `cloudflare-worker-api` | `.agents/skills/cloudflare-worker-api` | Structure Worker API routes and handlers. Activate for route |
+| `codacy` | `.agents/skills/codacy` | Orchestrate static analysis using Codacy CLIs. Use when Coda |
 | `code-quality` | `.agents/skills/code-quality` | Review and improve code quality across any programming langu |
 | `code-review-assistant` | `.agents/skills/code-review-assistant` | Automated code review with PR analysis, change summaries, an |
 | `codeberg-api` | `.agents/skills/codeberg-api` | Interact with Forgejo/Codeberg repositories via the REST API |
@@ -49,6 +50,9 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `docs-hook` | `.agents/skills/docs-hook` | Lightweight git hook integration for updating agents-docs wi |
 | `document-rendering-and-locators` | `.agents/skills/document-rendering-and-locators` | Implement resilient document rendering and annotation anchor |
 | `dogfood` | `.agents/skills/dogfood` | Systematically explore and test a web application to find bu |
+| `dora-report` | `.agents/skills/dora-report` | Monthly DORA + agentic metrics reporting skill. Triggers on  |
+| `durable-objects` | `.agents/skills/durable-objects` | Create and review Cloudflare Durable Objects. Use when build |
+| `eu-ai-act-compliance` | `.agents/skills/eu-ai-act-compliance` | EU AI Act compliance logging and requirements. Use for ensur |
 | `git-github-workflow` | `.agents/skills/git-github-workflow` | Unified atomic git workflow with GitHub integration - commit |
 | `github-pr-sentinel` | `.agents/skills/github-pr-sentinel` | Monitor a GitHub pull request until it's merged, green, or b |
 | `github-workflow` | `.agents/skills/github-workflow` | Complete GitHub workflow automation - push, create branch/PR |
@@ -57,6 +61,7 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `iterative-refinement` | `.agents/skills/iterative-refinement` | Execute iterative refinement workflows with validation loops |
 | `jules-delegator` | `.agents/skills/jules-delegator` | Use this skill to delegate complex coding tasks by creating  |
 | `learn` | `.agents/skills/learn` | Extract non-obvious session learnings into scoped AGENTS.md  |
+| `lifecycle-management` | `.agents/skills/lifecycle-management` | Manage application lifecycle, error handling, and resource c |
 | `memory-context` | `.agents/skills/memory-context` | Retrieve semantically relevant past learnings and analysis o |
 | `migration-refactoring` | `.agents/skills/migration-refactoring` | Automate complex code migrations and refactorings with safet |
 | `parallel-execution` | `.agents/skills/parallel-execution` | Execute multiple independent tasks simultaneously using para |
