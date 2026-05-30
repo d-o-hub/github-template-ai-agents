@@ -44,4 +44,15 @@ else
     exit 1
 fi
 
+# 4. Verify automated generation of monthly report
+echo "Running dora-report generation script..."
+python3 "$SKILLS_DIR/dora-report/scripts/generate_report.py"
+report_file="$REPO_ROOT/agents-docs/dora-reports/$(date +%Y-%m).md"
+if [[ -f "$report_file" ]]; then
+    echo "✓ Monthly report generated: $report_file"
+else
+    echo "✗ Monthly report NOT generated at $report_file"
+    exit 1
+fi
+
 echo "=== All Core Skills Compliance Checks Passed ==="

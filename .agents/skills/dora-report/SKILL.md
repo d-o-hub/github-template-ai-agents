@@ -38,6 +38,11 @@ Activate when:
 4. **Identify Bottlenecks**:
    - Based on metrics, suggest one "Innovation Opportunity" using TRIZ principles to improve a lagging metric.
 
+## Instructions
+1. Run the automation script: `python3 scripts/generate_report.py`
+2. Verify the output in `agents-docs/dora-reports/YYYY-MM.md`.
+3. Add any qualitative analysis or TRIZ-based innovation opportunities to the generated file.
+
 ## Rationalizations
 | Rationalization | Reality |
 |-----------------|---------|
