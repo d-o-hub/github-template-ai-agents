@@ -56,6 +56,37 @@ if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
     printf "\n"
 fi
 
+# --- LLM Context files check ---
+printf "%bChecking LLM context files...%b\n" "${BLUE}" "${NC}"
+if [[ ! -f "llms.txt" ]] || [[ ! -f "llms-full.txt" ]]; then
+    printf "%b  ✗ llms.txt or llms-full.txt missing%b\n" "${RED}" "${NC}"
+    FAILED=1
+else
+    # Check if they are up to date by generating to temp files and comparing
+    TMP_LLMS=$(mktemp)
+    TMP_LLMS_FULL=$(mktemp)
+
+    # Run the generator but capture its output to /dev/null to keep quality gate clean
+    # We use a subshell to avoid changing LLMS_TXT variable in the current script if it were defined
+    (
+        export LLMS_TXT="$TMP_LLMS"
+        export LLMS_FULL_TXT="$TMP_LLMS_FULL"
+        ./scripts/generate-llms-txt.sh > /dev/null 2>&1
+    )
+
+    if ! diff -q llms.txt "$TMP_LLMS" > /dev/null; then
+        printf "%b  ✗ llms.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
+        FAILED=1
+    elif ! diff -q llms-full.txt "$TMP_LLMS_FULL" > /dev/null; then
+        printf "%b  ✗ llms-full.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
+        FAILED=1
+    else
+        printf "%b  ✓ llms.txt and llms-full.txt are up to date%b\n" "${GREEN}" "${NC}"
+    fi
+    rm -f "$TMP_LLMS" "$TMP_LLMS_FULL"
+fi
+printf "\n"
+
 # --- Validate GitHub Actions SHAs ---
 printf "%bValidating GitHub Actions SHAs...%b\n" "${BLUE}" "${NC}"
 if ! ./scripts/validate-github-actions-shas.sh; then

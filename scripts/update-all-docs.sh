@@ -40,8 +40,9 @@ if [ "$verify_status" -ne 0 ]; then
     exit "$verify_status"
 fi
 
-echo "[3/4] Syncing AGENTS.md..."
-echo "  ✓ Documentation synced"
+echo "[3/4] Syncing AGENTS.md and LLM context files..."
+./scripts/generate-llms-txt.sh
+echo "  ✓ Documentation and LLM context files synced"
 
 echo "[4/4] Final validation..."
 echo "  ✓ Final validation passed"

@@ -112,6 +112,7 @@ See `agents-docs/VERSION.md` for full workflow details.
 ## Repository Structure
 
 - `agents-docs/`: Detailed reference; `.agents/skills/`: Canonical skills
+- `llms.txt` & `llms-full.txt`: Machine-readable project context for LLMs
 - `scripts/`: Setup/validation; `analysis/` & `reports/`: Generated outputs
 - `.claude/`: Agent-specific symlinks (see `scripts/setup-skills.sh`)
 - `plans/`: ADRs define decisions; progress updates track implementation status.
