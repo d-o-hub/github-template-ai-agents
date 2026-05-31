@@ -47,7 +47,7 @@ repos:
         entry: ./scripts/generate-llms-txt.sh
         language: script
         pass_filenames: false
-        always_run: true
+        files: ^(README\.md|\.agents/skills/.*|scripts/generate-llms-txt\.sh|llms\.txt|llms-full\.txt)$
       - id: quality-gate
         name: Run quality gate
         entry: ./scripts/quality_gate.sh
