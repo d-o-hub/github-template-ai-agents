@@ -1,12 +1,7 @@
 {
   "status": "passing",
-<<<<<<< Updated upstream
   "last_run": "2026-05-30T21:06:20.934543Z",
   "failing_jobs": [],
   "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/26694897923"
-=======
-  "last_run": "2026-05-31T07:31:48.222490Z",
-  "failing_jobs": [],
-  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/26706547414"
->>>>>>> Stashed changes
+
 }
