@@ -45,8 +45,7 @@ jobs:
           if [[ -z $(gh pr list --head "$BRANCH" --state open --json number -q '.[0].number') ]]; then
             gh pr create --base main --head "$BRANCH" \
               --title "ci: regenerate llms.txt and llms-full.txt" \
-              --body "Automated regeneration of LLM context files triggered by source changes." \
-              --label "automated"
+              --body "Automated regeneration of LLM context files triggered by source changes."
           fi
         env:
           GH_TOKEN: ${{ github.token }}
