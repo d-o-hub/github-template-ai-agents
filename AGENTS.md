@@ -59,6 +59,8 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 
 ## Quality Gate (Required Before Commit)
 
+Use the `static-analysis` skill to triage and fix any findings before committing.
+
 ```bash
 ./scripts/quality_gate.sh # Always run before committing. Fix all errors.
 ./scripts/update-all-docs.sh # Verify and update documentation
