@@ -19,8 +19,6 @@ if [ -f "$REPO_ROOT/scripts/lib/lint_cache.sh" ]; then
 fi
 
 # Colors for output (disabled in CI via TTY check, or via FORCE_COLOR=0)
-# TTY check (-t 1): Determines if stdout is a terminal (not redirected to file/pipe)
-# This prevents ANSI codes from appearing in CI logs while keeping colors for local dev
 if [[ -t 1 ]] && [[ "${FORCE_COLOR:-}" != "0" ]]; then
     RED='\033[0;31m'
     GREEN='\033[0;32m'
@@ -36,12 +34,23 @@ else
 fi
 
 # FAILED acts as an error accumulator - any failed check sets this to 1
-# We don't exit immediately so we can report ALL issues, not just the first
 FAILED=0
 
 # DETECTED_LANGUAGES stores which language ecosystems are present in the repo
-# We use this array to conditionally run only relevant checks
 DETECTED_LANGUAGES=()
+
+# Determine the current context
+GITHUB_EVENT="${GITHUB_EVENT:-}"
+GITHUB_REF="${GITHUB_REF:-}"
+
+# Check if we're on main branch
+ON_MAIN_BRANCH=false
+if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_REF" == "refs/heads/master" ]]; then
+    ON_MAIN_BRANCH=true
+fi
+
+# Track if drift was detected
+DRIFT_DETECTED=false
 
 printf "Running quality gate...\n"
 printf "\n"
@@ -50,15 +59,12 @@ printf "\n"
 if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
     printf "%bValidating git hooks configuration...%b\n" "${BLUE}" "${NC}"
     if ! ./scripts/validate-git-hooks.sh; then
-        # Don't fail the quality gate, just warn
         FAILED=1
     fi
     printf "\n"
 fi
 
 # --- LLM Context files check ---
-# On PRs: only validate the script works (drift is auto-fixed on main by update-llms-txt.yml)
-# On main: validate files are up to date
 printf "%bChecking LLM context files...%b\n" "${BLUE}" "${NC}"
 if [[ ! -f "llms.txt" ]] || [[ ! -f "llms-full.txt" ]]; then
     printf "%b  ✗ llms.txt or llms-full.txt missing%b\n" "${RED}" "${NC}"
@@ -67,10 +73,10 @@ else
     TMP_LLMS=$(mktemp)
     TMP_LLMS_FULL=$(mktemp)
 
-    cleanup_llms() {
+    cleanup() {
         rm -f "$TMP_LLMS" "$TMP_LLMS_FULL"
     }
-    trap cleanup_llms EXIT
+    trap cleanup EXIT
 
     (
         export LLMS_TXT="$TMP_LLMS"
@@ -82,19 +88,13 @@ else
     )
 
     if ! diff -q llms.txt "$TMP_LLMS" > /dev/null; then
-        if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
-            printf "%b  ⚠ llms.txt is out of date (auto-fixed on main by workflow)%b\n" "${YELLOW}" "${NC}"
-        else
-            printf "%b  ✗ llms.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
-            FAILED=1
-        fi
+        printf "%b  ✗ llms.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
+        FAILED=1
+        DRIFT_DETECTED=true
     elif ! diff -q llms-full.txt "$TMP_LLMS_FULL" > /dev/null; then
-        if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
-            printf "%b  ⚠ llms-full.txt is out of date (auto-fixed on main by workflow)%b\n" "${YELLOW}" "${NC}"
-        else
-            printf "%b  ✗ llms-full.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
-            FAILED=1
-        fi
+        printf "%b  ✗ llms-full.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
+        FAILED=1
+        DRIFT_DETECTED=true
     else
         printf "%b  ✓ llms.txt and llms-full.txt are up to date%b\n" "${GREEN}" "${NC}"
     fi
@@ -329,6 +329,27 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
         fi
     fi
     printf "\n"
+fi
+
+# Special handling for drift detection based on context
+if [ "$DRIFT_DETECTED" = true ]; then
+    if [ "$GITHUB_EVENT" = "pull_request" ]; then
+        # During pull_request, print warning but exit 0
+        printf "%b─────────────────────────────────────────────────────────────────%b\n" "${YELLOW}" "${NC}"
+        printf "%b│ ⚠ Quality Gate: Drift detected (warning only during PR)     │%b\n" "${YELLOW}" "${NC}"
+        printf "%b─────────────────────────────────────────────────────────────────%b\n" "${YELLOW}" "${NC}"
+        printf "\n"
+        printf "Languages checked: %s\n" "${DETECTED_LANGUAGES[*]}"
+        exit 0
+    elif [ "$ON_MAIN_BRANCH" = true ]; then
+        # On main branch, exit with 1
+        printf "%b─────────────────────────────────────────────────────────────────%b\n" "${RED}" "${NC}"
+        printf "%b│ ✗ Quality Gate FAILED (drift on main branch)                │%b\n" "${RED}" "${NC}"
+        printf "%b─────────────────────────────────────────────────────────────────%b\n" "${RED}" "${NC}"
+        printf "\n"
+        printf "Languages checked: %s\n" "${DETECTED_LANGUAGES[*]}"
+        exit 1
+    fi
 fi
 
 # Final status

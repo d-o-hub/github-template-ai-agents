@@ -77,22 +77,26 @@ fi
         if [[ -f "$skill_file" ]]; then
             s_name=$(sed -n 's/^name: *//p' "$skill_file" | head -n 1 | sed 's/^["'\'']//;s/["'\'']$//')
             
-            # Extract description - handle multi-line and block scalars
+            # Parse description, handling block scalar modifiers (|, |-, |+, >, >-, >+)
             s_desc=$(awk '
             BEGIN { in_desc=0; desc="" }
             /^description: / {
                 in_desc=1
-                val = substr($0, index($0, "description: ") + 13)
+                val = substr($0, index($0, "description: ") + 14)
                 gsub(/^[\"'\'']/, "", val)
                 gsub(/[\"'\'']$/, "", val)
+                
+                # Handle block scalar modifiers (|, |-, |+, >, >-, >+)
+                # These are YAML block scalar indicators that should be stripped
+                if (substr(val, 1, 2) == "|-" || substr(val, 1, 2) == "|+" || 
+                    substr(val, 1, 2) == ">-" || substr(val, 1, 2) == ">+") {
+                    desc = substr(val, 3)
+                    gsub(/^[ \t]+/, "", desc)
+                    next
+                }
                 if (substr(val, 1, 1) == "|" || substr(val, 1, 1) == ">") {
                     desc = substr(val, 2)
                     gsub(/^[ \t]+/, "", desc)
-                    # Strip YAML block scalar modifiers (- for strip, + for keep)
-                    if (substr(desc, 1, 1) == "-" || substr(desc, 1, 1) == "+") {
-                        desc = substr(desc, 2)
-                        gsub(/^[ \t]+/, "", desc)
-                    }
                     next
                 }
                 desc = val
@@ -115,7 +119,7 @@ fi
                 print desc
             }
             ' "$skill_file")
-            
+
             if [[ -z "$s_name" ]]; then
                 s_name=$(basename "$skill_dir")
             fi
