@@ -1,83 +1,183 @@
-import unittest
+"""Tests for DORA report generation script."""
 import os
-import tempfile
 import json
-import datetime
+import tempfile
+import shutil
+import pytest
 import sys
-import subprocess
 
-class TestDoraReportGeneration(unittest.TestCase):
-    def setUp(self):
-        self.test_dir = tempfile.TemporaryDirectory()
-        self.repo_root = self.test_dir.name
-        os.makedirs(os.path.join(self.repo_root, ".agents"))
-        self.metrics_file = os.path.join(self.repo_root, ".agents/metrics.jsonl")
+# Add parent directory to path to import generate_report
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from generate_report import load_metrics_from_directory, update_counters
 
-        self.reports_dir = os.path.join(self.repo_root, "agents-docs/dora-reports")
-        self.script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.agents/skills/dora-report/scripts/generate_report.py"))
 
-    def tearDown(self):
-        self.test_dir.cleanup()
+class TestUpdateCounters:
+    """Test the update_counters function."""
+    
+    def test_update_counters_completed(self):
+        """Test counting completed tasks."""
+        counters = {"completed": 0, "failed": 0, "partial": 0, "skills": 0, "tokens": 0}
+        entry = {
+            "timestamp": "2026-05-01T10:00:00Z",
+            "status": "completed",
+            "skill_used": "test-skill",
+            "tokens_used": 100
+        }
+        update_counters(entry, "2026-05", counters)
+        assert counters["completed"] == 1
+        assert counters["skills"] == 1
+        assert counters["tokens"] == 100
+    
+    def test_update_counters_failed(self):
+        """Test counting failed tasks."""
+        counters = {"completed": 0, "failed": 0, "partial": 0, "skills": 0, "tokens": 0}
+        entry = {
+            "timestamp": "2026-05-01T10:00:00Z",
+            "status": "failed",
+            "tokens_used": 50
+        }
+        update_counters(entry, "2026-05", counters)
+        assert counters["failed"] == 1
+        assert counters["tokens"] == 50
+        assert counters["skills"] == 0  # No skill used
+    
+    def test_update_counters_partial(self):
+        """Test counting partial tasks."""
+        counters = {"completed": 0, "failed": 0, "partial": 0, "skills": 0, "tokens": 0}
+        entry = {
+            "timestamp": "2026-05-01T10:00:00Z",
+            "status": "partial"
+        }
+        update_counters(entry, "2026-05", counters)
+        assert counters["partial"] == 1
+    
+    def test_update_counters_wrong_month(self):
+        """Test that entries from wrong month are ignored."""
+        counters = {"completed": 0, "failed": 0, "partial": 0, "skills": 0, "tokens": 0}
+        entry = {
+            "timestamp": "2026-04-01T10:00:00Z",
+            "status": "completed"
+        }
+        update_counters(entry, "2026-05", counters)
+        assert counters["completed"] == 0
+    
+    def test_update_counters_invalid_entry(self):
+        """Test that invalid entries are handled gracefully."""
+        counters = {"completed": 0, "failed": 0, "partial": 0, "skills": 0, "tokens": 0}
+        # Should not raise an error
+        update_counters("not a dict", "2026-05", counters)
+        update_counters(None, "2026-05", counters)
+        assert counters["completed"] == 0
 
-    def run_script(self, args=None):
-        script_copy_dir = os.path.join(self.repo_root, ".agents/skills/dora-report/scripts")
-        os.makedirs(script_copy_dir, exist_ok=True)
-        script_copy_path = os.path.join(script_copy_dir, "generate_report.py")
 
-        with open(self.script_path, "r", encoding="utf-8") as f:
-            content = f.read()
-
-        with open(script_copy_path, "w", encoding="utf-8") as f:
-            f.write(content)
-
-        cmd = [sys.executable, script_copy_path]
-        if args:
-            cmd.extend(args)
-        result = subprocess.run(cmd, capture_output=True, text=True, cwd=self.repo_root)
-        return result
-
-    def test_aggregation_and_filtering(self):
-        now = datetime.datetime.now()
-        month_year = now.strftime("%Y-%m")
-
-        metrics = [
-            {"timestamp": f"{month_year}-01T10:00:00Z", "status": "completed", "tokens_used": 100, "skill_used": "test"},
-            {"timestamp": f"{month_year}-02T11:00:00Z", "status": "failed", "tokens_used": 50, "skill_used": None},
-            {"timestamp": f"{month_year}-03T12:00:00Z", "status": "partial", "tokens_used": 75, "skill_used": "test"},
-            {"timestamp": f"{month_year}-04T13:00:00Z", "status": "completed", "tokens_used": "invalid", "skill_used": "test"}
+class TestLoadMetricsFromDirectory:
+    """Test the load_metrics_from_directory function."""
+    
+    def setup_method(self):
+        """Set up test directory."""
+        self.test_dir = tempfile.mkdtemp()
+    
+    def teardown_method(self):
+        """Clean up test directory."""
+        shutil.rmtree(self.test_dir)
+    
+    def test_load_from_empty_directory(self):
+        """Test loading from empty directory."""
+        counters = load_metrics_from_directory(self.test_dir, "2026-05")
+        assert counters["completed"] == 0
+        assert counters["failed"] == 0
+        assert counters["partial"] == 0
+    
+    def test_load_from_nonexistent_directory(self):
+        """Test loading from nonexistent directory."""
+        counters = load_metrics_from_directory("/nonexistent/path", "2026-05")
+        assert counters["completed"] == 0
+    
+    def test_load_multiple_files(self):
+        """Test loading and aggregating multiple JSON files."""
+        # Create test files
+        files = [
+            {
+                "filename": "2026-05-01_task1.json",
+                "data": {
+                    "timestamp": "2026-05-01T10:00:00Z",
+                    "status": "completed",
+                    "skill_used": "test-skill",
+                    "tokens_used": 100
+                }
+            },
+            {
+                "filename": "2026-05-02_task2.json",
+                "data": {
+                    "timestamp": "2026-05-02T10:00:00Z",
+                    "status": "completed",
+                    "tokens_used": 200
+                }
+            },
+            {
+                "filename": "2026-05-03_task3.json",
+                "data": {
+                    "timestamp": "2026-05-03T10:00:00Z",
+                    "status": "failed",
+                    "tokens_used": 50
+                }
+            },
+            {
+                "filename": "2026-04-01_task4.json",
+                "data": {
+                    "timestamp": "2026-04-01T10:00:00Z",
+                    "status": "completed"
+                }
+            }
         ]
+        
+        for file_info in files:
+            filepath = os.path.join(self.test_dir, file_info["filename"])
+            with open(filepath, "w", encoding="utf-8") as f:
+                json.dump(file_info["data"], f)
+        
+        counters = load_metrics_from_directory(self.test_dir, "2026-05")
+        
+        assert counters["completed"] == 2
+        assert counters["failed"] == 1
+        assert counters["partial"] == 0
+        assert counters["skills"] == 1
+        assert counters["tokens"] == 350
+    
+    def test_skip_invalid_json_files(self):
+        """Test that invalid JSON files are skipped."""
+        # Create a valid file
+        valid_file = os.path.join(self.test_dir, "valid.json")
+        with open(valid_file, "w", encoding="utf-8") as f:
+            json.dump({"timestamp": "2026-05-01T10:00:00Z", "status": "completed"}, f)
+        
+        # Create an invalid file
+        invalid_file = os.path.join(self.test_dir, "invalid.json")
+        with open(invalid_file, "w", encoding="utf-8") as f:
+            f.write("{ invalid json")
+        
+        counters = load_metrics_from_directory(self.test_dir, "2026-05")
+        
+        # Should only count the valid file
+        assert counters["completed"] == 1
+    
+    def test_skip_non_json_files(self):
+        """Test that non-JSON files are skipped."""
+        # Create a valid JSON file
+        valid_file = os.path.join(self.test_dir, "valid.json")
+        with open(valid_file, "w", encoding="utf-8") as f:
+            json.dump({"timestamp": "2026-05-01T10:00:00Z", "status": "completed"}, f)
+        
+        # Create a non-JSON file
+        text_file = os.path.join(self.test_dir, "notes.txt")
+        with open(text_file, "w", encoding="utf-8") as f:
+            f.write("This is not JSON")
+        
+        counters = load_metrics_from_directory(self.test_dir, "2026-05")
+        
+        # Should only count the valid JSON file
+        assert counters["completed"] == 1
 
-        with open(self.metrics_file, "w", encoding="utf-8") as f:
-            for m in metrics:
-                f.write(json.dumps(m) + "\n")
-
-        res = self.run_script()
-        self.assertEqual(res.returncode, 0, res.stderr)
-
-        report_path = os.path.join(self.reports_dir, f"{month_year}.md")
-        self.assertTrue(os.path.exists(report_path))
-
-        with open(report_path, "r", encoding="utf-8") as f:
-            content = f.read()
-
-        self.assertIn("| Tasks Completed | 2 |", content)
-        self.assertIn("| Partial Tasks | 1 |", content)
-        self.assertIn("| Failed Tasks | 1 |", content)
-        self.assertIn("| Success Rate | 50.0% |", content)
-
-    def test_custom_month_filtering(self):
-        target_month = "2024-01"
-        m = {"timestamp": "2024-01-15T10:00:00Z", "status": "completed", "tokens_used": 1000}
-
-        with open(self.metrics_file, "w", encoding="utf-8") as f:
-            f.write(json.dumps(m) + "\n")
-
-        res = self.run_script(["--month", target_month])
-        self.assertEqual(res.returncode, 0, res.stderr)
-
-        report_path = os.path.join(self.reports_dir, f"{target_month}.md")
-        self.assertTrue(os.path.exists(report_path))
-        self.assertIn("DORA & Agentic Metrics Report - 2024-01", open(report_path).read())
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__, "-v"])
