@@ -324,11 +324,8 @@ phase_analyze_fix() {
                 local shell_scripts
                 shell_scripts=$(find . -name "*.sh" -not -path "./.git/*" -not -path "./target/*" 2>/dev/null || true)
                 if [[ -n "$shell_scripts" ]]; then
-                    while IFS= read -r script; do
-                        [ -n "$script" ] || continue
-                        log "  Checking: $script"
-                        shellcheck --severity=error "$script" 2>&1 || true
-                    done <<< "$shell_scripts"
+                    log "  Checking all shell scripts (batched)"
+                    printf "%s\n" "$shell_scripts" | tr '\n' '\0' | xargs -0 shellcheck --severity=error 2>&1 || true
                 fi
                 fix_applied=true
             fi
