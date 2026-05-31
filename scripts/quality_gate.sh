@@ -62,21 +62,16 @@ if [[ ! -f "llms.txt" ]] || [[ ! -f "llms-full.txt" ]]; then
     printf "%b  ✗ llms.txt or llms-full.txt missing%b\n" "${RED}" "${NC}"
     FAILED=1
 else
+    # Check if they are up to date by generating to temp files and comparing
     TMP_LLMS=$(mktemp)
     TMP_LLMS_FULL=$(mktemp)
 
-    cleanup() {
-        rm -f "$TMP_LLMS" "$TMP_LLMS_FULL"
-    }
-    trap cleanup EXIT
-
+    # Run the generator but capture its output to /dev/null to keep quality gate clean
+    # We use a subshell to avoid changing LLMS_TXT variable in the current script if it were defined
     (
         export LLMS_TXT="$TMP_LLMS"
         export LLMS_FULL_TXT="$TMP_LLMS_FULL"
-        if ! ./scripts/generate-llms-txt.sh > /dev/null 2>&1; then
-            printf "%b  ✗ Failed to generate LLM context files%b\n" "${RED}" "${NC}"
-            exit 1
-        fi
+        ./scripts/generate-llms-txt.sh > /dev/null 2>&1
     )
 
     if ! diff -q llms.txt "$TMP_LLMS" > /dev/null; then
@@ -88,9 +83,11 @@ else
     else
         printf "%b  ✓ llms.txt and llms-full.txt are up to date%b\n" "${GREEN}" "${NC}"
     fi
+    rm -f "$TMP_LLMS" "$TMP_LLMS_FULL"
 fi
 printf "\n"
 
+# --- Validate GitHub Actions SHAs ---
 printf "%bValidating GitHub Actions SHAs...%b\n" "${BLUE}" "${NC}"
 if ! ./scripts/validate-github-actions-shas.sh; then
     FAILED=1
@@ -164,37 +161,37 @@ printf "%bDetecting project languages...%b\n" "${BLUE}" "${NC}"
 
 # Rust detection
 if [ -f "Cargo.toml" ]; then
-    printf "  %bâ%b Rust (Cargo.toml)\n" "${GREEN}" "${NC}"
+    printf "  %b✓%b Rust (Cargo.toml)\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("rust")
 fi
 
 # TypeScript/JavaScript detection
 if [ -f "package.json" ]; then
-    printf "  %bâ%b TypeScript/JavaScript (package.json)\n" "${GREEN}" "${NC}"
+    printf "  %b✓%b TypeScript/JavaScript (package.json)\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("typescript")
 fi
 
 # Python detection
 if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ] || [ -f "setup.py" ]; then
-    printf "  %bâ%b Python (requirements.txt/pyproject.toml)\n" "${GREEN}" "${NC}"
+    printf "  %b✓%b Python (requirements.txt/pyproject.toml)\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("python")
 fi
 
 # Go detection
 if [ -f "go.mod" ]; then
-    printf "  %bâ%b Go (go.mod)\n" "${GREEN}" "${NC}"
+    printf "  %b✓%b Go (go.mod)\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("go")
 fi
 
 # Shell script detection
 if find . -name "*.sh" -not -path "./.git/*" -print -quit | grep -q .; then
-    printf "  %bâ%b Shell scripts detected\n" "${GREEN}" "${NC}"
+    printf "  %b✓%b Shell scripts detected\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("shell")
 fi
 
 # Markdown detection
 if find . -name "*.md" -not -path "./.git/*" -print -quit | grep -q .; then
-    printf "  %bâ%b Markdown files detected\n" "${GREEN}" "${NC}"
+    printf "  %b✓%b Markdown files detected\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("markdown")
 fi
 
@@ -210,28 +207,28 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " rust " ]]; then
     printf "%bRunning Rust checks...%b\n" "${BLUE}" "${NC}"
     if command -v cargo &> /dev/null; then
         if ! OUTPUT=$(cargo fmt --check 2>&1); then
-            printf "%b  â cargo fmt failed%b\n" "${RED}" "${NC}"
+            printf "%b  ✗ cargo fmt failed%b\n" "${RED}" "${NC}"
             printf "%s\n" "$OUTPUT" >&2
             FAILED=1
         else
-            printf "%b  â cargo fmt passed%b\n" "${GREEN}" "${NC}"
+            printf "%b  ✓ cargo fmt passed%b\n" "${GREEN}" "${NC}"
         fi
         if [ "${SKIP_CLIPPY:-false}" != "true" ]; then
             if ! OUTPUT=$(cargo clippy --all-targets -- -D warnings 2>&1); then
-                printf "%b  â cargo clippy failed%b\n" "${RED}" "${NC}"
+                printf "%b  ✗ cargo clippy failed%b\n" "${RED}" "${NC}"
                 printf "%s\n" "$OUTPUT" >&2
                 FAILED=1
             else
-                printf "%b  â cargo clippy passed%b\n" "${GREEN}" "${NC}"
+                printf "%b  ✓ cargo clippy passed%b\n" "${GREEN}" "${NC}"
             fi
         fi
         if [ "${SKIP_TESTS:-false}" != "true" ]; then
             if ! OUTPUT=$(cargo test --lib 2>&1); then
-                printf "%b  â cargo test failed%b\n" "${RED}" "${NC}"
+                printf "%b  ✗ cargo test failed%b\n" "${RED}" "${NC}"
                 printf "%s\n" "$OUTPUT" >&2
                 FAILED=1
             else
-                printf "%b  â cargo test passed%b\n" "${GREEN}" "${NC}"
+                printf "%b  ✓ cargo test passed%b\n" "${GREEN}" "${NC}"
             fi
         fi
     fi
@@ -243,26 +240,26 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
     printf "%bRunning TypeScript/JavaScript checks...%b\n" "${BLUE}" "${NC}"
     if command -v pnpm &> /dev/null; then
         if ! OUTPUT=$(pnpm lint 2>&1); then
-            printf "%b  â pnpm lint failed%b\n" "${RED}" "${NC}"
+            printf "%b  ✗ pnpm lint failed%b\n" "${RED}" "${NC}"
             printf "%s\n" "$OUTPUT" >&2
             FAILED=1
         else
-            printf "%b  â pnpm lint passed%b\n" "${GREEN}" "${NC}"
+            printf "%b  ✓ pnpm lint passed%b\n" "${GREEN}" "${NC}"
         fi
         if ! OUTPUT=$(pnpm typecheck 2>&1); then
-            printf "%b  â pnpm typecheck failed%b\n" "${RED}" "${NC}"
+            printf "%b  ✗ pnpm typecheck failed%b\n" "${RED}" "${NC}"
             printf "%s\n" "$OUTPUT" >&2
             FAILED=1
         else
-            printf "%b  â pnpm typecheck passed%b\n" "${GREEN}" "${NC}"
+            printf "%b  ✓ pnpm typecheck passed%b\n" "${GREEN}" "${NC}"
         fi
         if [ "${SKIP_TESTS:-false}" != "true" ]; then
             if ! OUTPUT=$(pnpm test 2>&1); then
-                printf "%b  â pnpm test failed%b\n" "${RED}" "${NC}"
+                printf "%b  ✗ pnpm test failed%b\n" "${RED}" "${NC}"
                 printf "%s\n" "$OUTPUT" >&2
                 FAILED=1
             else
-                printf "%b  â pnpm test passed%b\n" "${GREEN}" "${NC}"
+                printf "%b  ✓ pnpm test passed%b\n" "${GREEN}" "${NC}"
             fi
         fi
     fi
@@ -279,12 +276,12 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
             while IFS= read -r script; do
                 [ -n "$script" ] || continue
                 if ! lint_if_changed "$script" "shellcheck" ".shellcheckrc" shellcheck --severity=error -f quiet -- "$script" >/dev/null 2>&1; then
-                    printf "%b  â shellcheck failed: %s%b\n" "${RED}" "$script" "${NC}"
+                    printf "%b  ✗ shellcheck failed: %s%b\n" "${RED}" "$script" "${NC}"
                     sc_failed=1
                 fi
             done <<< "$SHELL_SCRIPTS"
             if [ $sc_failed -eq 0 ]; then
-                printf "%b  â shellcheck passed%b\n" "${GREEN}" "${NC}"
+                printf "%b  ✓ shellcheck passed%b\n" "${GREEN}" "${NC}"
             else
                 FAILED=1
             fi
@@ -304,14 +301,14 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
             while IFS= read -r md_file; do
                 [ -n "$md_file" ] || continue
                 if ! lint_if_changed "$md_file" "markdownlint" "markdownlint.toml" markdownlint -- "$md_file" >"$TMP_MD_OUT" 2>&1; then
-                    printf "%b  â markdownlint failed: %s%b\n" "${RED}" "$md_file" "${NC}"
+                    printf "%b  ✗ markdownlint failed: %s%b\n" "${RED}" "$md_file" "${NC}"
                     cat "$TMP_MD_OUT" >&2
                     md_failed=1
                 fi
             done <<< "$MD_FILES"
             rm -f "$TMP_MD_OUT"
             if [ $md_failed -eq 0 ]; then
-                printf "%b  â markdownlint passed%b\n" "${GREEN}" "${NC}"
+                printf "%b  ✓ markdownlint passed%b\n" "${GREEN}" "${NC}"
             else
                 FAILED=1
             fi
@@ -322,15 +319,14 @@ fi
 
 # Final status
 if [ $FAILED -ne 0 ]; then
-    printf "%bâââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ%b\n" "${RED}" "${NC}"
-    printf "%bâ â Quality Gate FAILED                                         â%b\n" "${RED}" "${NC}"
-    printf "%bâââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ%b\n" "${RED}" "${NC}"
+    printf "%b─────────────────────────────────────────────────────────────────%b\n" "${RED}" "${NC}"
+    printf "%b│ ✗ Quality Gate FAILED                                         │%b\n" "${RED}" "${NC}"
+    printf "%b─────────────────────────────────────────────────────────────────%b\n" "${RED}" "${NC}"
     exit 2
 fi
 
-printf "%bâââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ%b\n" "${GREEN}" "${NC}"
-printf "%bâ â All Quality Gates PASSED                                    â%b\n" "${GREEN}" "${NC}"
-printf "%bâââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ%b\n" "${GREEN}" "${NC}"
+printf "%b─────────────────────────────────────────────────────────────────%b\n" "${GREEN}" "${NC}"
+printf "%b│ ✓ All Quality Gates PASSED                                    │%b\n" "${GREEN}" "${NC}"
+printf "%b─────────────────────────────────────────────────────────────────%b\n" "${GREEN}" "${NC}"
 printf "\n"
 printf "Languages checked: %s\n" "${DETECTED_LANGUAGES[*]}"
-
