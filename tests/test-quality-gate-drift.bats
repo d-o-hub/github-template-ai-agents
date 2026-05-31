@@ -24,6 +24,11 @@ setup() {
     # Copy necessary scripts
     cp scripts/quality_gate.sh "$TEMP_DIR/scripts/"
     cp scripts/generate-llms-txt.sh "$TEMP_DIR/scripts/"
+    # Copy lint_cache.sh library (needed for shellcheck checks in quality gate)
+    mkdir -p "$TEMP_DIR/scripts/lib"
+    if [ -f scripts/lib/lint_cache.sh ]; then
+        cp scripts/lib/lint_cache.sh "$TEMP_DIR/scripts/lib/"
+    fi
     chmod +x "$TEMP_DIR/scripts/"*.sh
     
     # Create minimal required files
@@ -61,6 +66,11 @@ setup() {
     # Copy necessary scripts
     cp scripts/quality_gate.sh "$TEMP_DIR/scripts/"
     cp scripts/generate-llms-txt.sh "$TEMP_DIR/scripts/"
+    # Copy lint_cache.sh library (needed for shellcheck checks in quality gate)
+    mkdir -p "$TEMP_DIR/scripts/lib"
+    if [ -f scripts/lib/lint_cache.sh ]; then
+        cp scripts/lib/lint_cache.sh "$TEMP_DIR/scripts/lib/"
+    fi
     chmod +x "$TEMP_DIR/scripts/"*.sh
     
     # Create minimal required files
@@ -95,7 +105,19 @@ setup() {
     # Copy necessary scripts
     cp scripts/quality_gate.sh "$TEMP_DIR/scripts/"
     cp scripts/generate-llms-txt.sh "$TEMP_DIR/scripts/"
+    # Copy lint_cache.sh library (needed for shellcheck checks)
+    mkdir -p "$TEMP_DIR/scripts/lib"
+    if [ -f scripts/lib/lint_cache.sh ]; then
+        cp scripts/lib/lint_cache.sh "$TEMP_DIR/scripts/lib/"
+    fi
     chmod +x "$TEMP_DIR/scripts/"*.sh
+    
+    # Create stub scripts for all checks quality_gate.sh runs
+    # Use valid shell that passes shellcheck --severity=error
+    for s in validate-git-hooks.sh validate-github-actions-shas.sh validate-workflows.sh validate-skills.sh validate-links.sh loc_gate.sh wasm_size_gate.sh check-adr-compliance.sh check-plan-numbering.sh; do
+        printf '#!/usr/bin/env bash\n# stub script\ntrue\n' > "$TEMP_DIR/scripts/$s"
+        chmod +x "$TEMP_DIR/scripts/$s"
+    done
     
     # Create minimal required files
     cat > "$TEMP_DIR/README.md" <<'EOF'
@@ -111,7 +133,7 @@ EOF
     ./scripts/generate-llms-txt.sh > /dev/null 2>&1
     
     # Run quality gate on main branch (should pass)
-    run env GITHUB_REF=refs/heads/main GITHUB_EVENT=push ./scripts/quality_gate.sh
+    run env SKIP_GLOBAL_HOOKS_CHECK=true GITHUB_REF=refs/heads/main GITHUB_EVENT=push ./scripts/quality_gate.sh
     
     # Should exit with 0 when no drift
     [ "$status" -eq 0 ]

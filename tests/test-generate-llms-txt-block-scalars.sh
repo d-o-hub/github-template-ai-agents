@@ -26,7 +26,7 @@ printf "Testing block scalar modifier parsing in generate-llms-txt.sh...\n\n"
 
 # Test 1: Block scalar modifier '>-' (folded style)
 printf "Test 1: Parsing '>-' block scalar modifier... "
-MOCK_README="$TEST_DIR/README-1.md"
+MOCK_README="$TEST_DIR/README.md"
 mkdir -p "$TEST_DIR/.agents/skills"
 mkdir -p "$TEST_DIR/scripts"
 mkdir -p "$TEST_DIR/agents-docs"
@@ -58,7 +58,7 @@ printf "%bPASSED%b\n" "$GREEN" "$NC"
 
 # Test 2: Block scalar modifier '|+' (literal style)
 printf "Test 2: Parsing '|+' block scalar modifier... "
-MOCK_README="$TEST_DIR/README-2.md"
+MOCK_README="$TEST_DIR/README.md"
 cat > "$MOCK_README" <<'EOF'
 # Test Project 2
 
@@ -85,7 +85,7 @@ printf "%bPASSED%b\n" "$GREEN" "$NC"
 
 # Test 3: Block scalar modifier with inline content
 printf "Test 3: Parsing '>-' with inline content... "
-MOCK_README="$TEST_DIR/README-3.md"
+MOCK_README="$TEST_DIR/README.md"
 cat > "$MOCK_README" <<'EOF'
 # Test Project 3
 
@@ -108,7 +108,7 @@ printf "%bPASSED%b\n" "$GREEN" "$NC"
 
 # Test 4: Block scalar modifier with inline content
 printf "Test 4: Parsing '|+' with inline content... "
-MOCK_README="$TEST_DIR/README-4.md"
+MOCK_README="$TEST_DIR/README.md"
 cat > "$MOCK_README" <<'EOF'
 # Test Project 4
 
