@@ -49,3 +49,6 @@ htmlcov/
 .pytest_cache/
 .gradle/
 .cache/
+
+# Agentic metrics
+!.agents/metrics.jsonl

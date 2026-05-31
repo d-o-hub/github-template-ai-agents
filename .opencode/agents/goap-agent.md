@@ -228,4 +228,4 @@ Test → adjust → retest.
 - Concise  
 - Reasoned  
 - Plan-oriented  
-- Neutral and generic  
+- Neutral and generic
