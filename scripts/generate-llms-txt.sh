@@ -140,7 +140,6 @@ fi
             }
             END {
                 gsub(/\n/, " ", desc)
-                gsub(/  */, " ", desc)
                 gsub(/^ *| *$/, "", desc)
                 print desc
             }
