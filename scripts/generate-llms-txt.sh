@@ -82,12 +82,17 @@ fi
             BEGIN { in_desc=0; desc="" }
             /^description: / {
                 in_desc=1
-                val = substr($0, index($0, "description: ") + 14)
+                val = substr($0, index($0, "description: ") + 13)
                 gsub(/^[\"'\'']/, "", val)
                 gsub(/[\"'\'']$/, "", val)
                 if (substr(val, 1, 1) == "|" || substr(val, 1, 1) == ">") {
                     desc = substr(val, 2)
                     gsub(/^[ \t]+/, "", desc)
+                    # Strip YAML block scalar modifiers (- for strip, + for keep)
+                    if (substr(desc, 1, 1) == "-" || substr(desc, 1, 1) == "+") {
+                        desc = substr(desc, 2)
+                        gsub(/^[ \t]+/, "", desc)
+                    }
                     next
                 }
                 desc = val

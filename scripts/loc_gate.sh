@@ -60,7 +60,7 @@ fi
 if ! find . -type f \( -name "*.py" -o -name "*.rs" -o -name "*.ts" -o -name "*.js" -o -name "*.go" -o -name "*.sh" \) \
     -not -path "./.git/*" \
     -not -path "./target/*" \
-    -not -path "./node_modules/*" \
+    -not -path "*/node_modules/*" \
     -not -path "./dist/*" \
     -not -path "./build/*" \
     -not -path "./.agents/skills/*" -print0 | \
