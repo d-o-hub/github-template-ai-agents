@@ -50,5 +50,5 @@ htmlcov/
 .gradle/
 .cache/
 
-# Agentic metrics
-!.agents/metrics.jsonl
+# Agentic metrics directory (track all files within)
+!.agents/metrics/
