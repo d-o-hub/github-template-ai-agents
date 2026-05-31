@@ -88,8 +88,10 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 
 ## Repository Structure
 
+- `agents-docs/`: Detailed reference; `.agents/skills/`: Canonical skills
 - `llms.txt` & `llms-full.txt`: Machine-readable project context for LLMs
-- `agents-docs/`: Reference; `.agents/skills/`: Canonical skills; `scripts/`: Setup/validation.
+- `scripts/`: Setup/validation; `analysis/` & `reports/`: Generated outputs
+- `.claude/`: Agent-specific symlinks (see `scripts/setup-skills.sh`)
 - `plans/`: ADRs define decisions; progress updates track implementation status.
 
 ## PR & Commit Instructions
@@ -150,4 +152,3 @@ Updated by `./scripts/analyze-codebase.sh`. See `agents-docs/self-learning-rules
 
 - **Optional Skills**: Implemented `SKILLS_OPTIONAL` in `setup-skills.sh` for opt-in knowledge.
 - **Compliance Category**: Established "Compliance & Governance" for regulatory patterns.
-
