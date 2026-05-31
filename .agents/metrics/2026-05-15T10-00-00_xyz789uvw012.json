@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-05-15T10:00:00Z",
+  "task_id": "xyz789uvw012",
+  "parent_task_id": null,
+  "task": "test task with dora-report skill",
+  "agents": ["jules"],
+  "skills_used": ["dora-report"],
+  "status": "completed",
+  "tokens_used": 100,
+  "duration_seconds": 60,
+  "handoff_count": 0,
+  "agent_metrics": [
+    { "agent": "jules", "tokens": 100, "duration_seconds": 60 }
+  ],
+  "notes": "Test entry with enhanced schema"
+}
