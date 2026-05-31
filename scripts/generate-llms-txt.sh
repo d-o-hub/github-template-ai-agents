@@ -74,8 +74,10 @@ fi
 
     # Use globbing instead of find to avoid process forking overhead
     # Compatible with Bash 3.2
+    # Sort to ensure deterministic output across different filesystems
     shopt -s nullglob
-    for skill_dir in .agents/skills/*/; do
+    SKILL_DIRS=$(printf "%s\n" .agents/skills/*/ | sort)
+    for skill_dir in $SKILL_DIRS; do
         skill_file="${skill_dir}SKILL.md"
         if [[ -f "$skill_file" ]]; then
             # Extract name and description from frontmatter
