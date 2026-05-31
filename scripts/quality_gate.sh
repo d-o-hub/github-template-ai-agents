@@ -19,8 +19,6 @@ if [ -f "$REPO_ROOT/scripts/lib/lint_cache.sh" ]; then
 fi
 
 # Colors for output (disabled in CI via TTY check, or via FORCE_COLOR=0)
-# TTY check (-t 1): Determines if stdout is a terminal (not redirected to file/pipe)
-# This prevents ANSI codes from appearing in CI logs while keeping colors for local dev
 if [[ -t 1 ]] && [[ "${FORCE_COLOR:-}" != "0" ]]; then
     RED='\033[0;31m'
     GREEN='\033[0;32m'
@@ -36,11 +34,9 @@ else
 fi
 
 # FAILED acts as an error accumulator - any failed check sets this to 1
-# We don't exit immediately so we can report ALL issues, not just the first
 FAILED=0
 
 # DETECTED_LANGUAGES stores which language ecosystems are present in the repo
-# We use this array to conditionally run only relevant checks
 DETECTED_LANGUAGES=()
 
 printf "Running quality gate...\n"
@@ -50,11 +46,45 @@ printf "\n"
 if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
     printf "%bValidating git hooks configuration...%b\n" "${BLUE}" "${NC}"
     if ! ./scripts/validate-git-hooks.sh; then
-        # Don't fail the quality gate, just warn
         FAILED=1
     fi
     printf "\n"
 fi
+
+# --- LLM Context files check ---
+printf "%bChecking LLM context files...%b\n" "${BLUE}" "${NC}"
+if [[ ! -f "llms.txt" ]] || [[ ! -f "llms-full.txt" ]]; then
+    printf "%b  ✗ llms.txt or llms-full.txt missing%b\n" "${RED}" "${NC}"
+    FAILED=1
+else
+    TMP_LLMS=$(mktemp)
+    TMP_LLMS_FULL=$(mktemp)
+
+    cleanup() {
+        rm -f "$TMP_LLMS" "$TMP_LLMS_FULL"
+    }
+    trap cleanup EXIT
+
+    (
+        export LLMS_TXT="$TMP_LLMS"
+        export LLMS_FULL_TXT="$TMP_LLMS_FULL"
+        if ! ./scripts/generate-llms-txt.sh > /dev/null 2>&1; then
+            printf "%b  ✗ Failed to generate LLM context files%b\n" "${RED}" "${NC}"
+            exit 1
+        fi
+    )
+
+    if ! diff -q llms.txt "$TMP_LLMS" > /dev/null; then
+        printf "%b  ✗ llms.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
+        FAILED=1
+    elif ! diff -q llms-full.txt "$TMP_LLMS_FULL" > /dev/null; then
+        printf "%b  ✗ llms-full.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
+        FAILED=1
+    else
+        printf "%b  ✓ llms.txt and llms-full.txt are up to date%b\n" "${GREEN}" "${NC}"
+    fi
+fi
+printf "\n"
 
 # --- Validate GitHub Actions SHAs ---
 printf "%bValidating GitHub Actions SHAs...%b\n" "${BLUE}" "${NC}"
