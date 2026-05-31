@@ -1,8 +1,8 @@
 {
   "status": "failing",
-  "last_run": "2026-05-31T17:48:27.538829Z",
+  "last_run": "2026-05-31T18:01:54.537481Z",
   "failing_jobs": [
     "quality-gate"
   ],
-  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/26719907095"
+  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/26720222945"
 }
