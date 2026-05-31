@@ -11,6 +11,7 @@ on:
       - 'README.md'
       - '.agents/skills/*/SKILL.md'
       - 'scripts/generate-llms-txt.sh'
+  workflow_dispatch:
 
 permissions:
   contents: write
