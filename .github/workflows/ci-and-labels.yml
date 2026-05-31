@@ -220,14 +220,18 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+
+          # Fetch and checkout the target branch directly to avoid rebasing the PR merge commit
+          git stash push ci-status.json ci-summary.md
+          git fetch origin "$TARGET_BRANCH"
+          git checkout "origin/$TARGET_BRANCH"
+          git stash pop || true
+
           git add ci-status.json ci-summary.md
           if git diff --staged --quiet; then
             echo "No changes to CI status"
           else
             git commit -m "ci: update ci status artifacts [skip ci]"
-            # Pull latest changes from the branch to avoid rejected pushes
-            git fetch origin "$TARGET_BRANCH"
-            git rebase "origin/$TARGET_BRANCH"
             # Push to the branch that triggered the workflow
             git push origin "HEAD:$TARGET_BRANCH"
           fi
