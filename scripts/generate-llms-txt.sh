@@ -76,7 +76,7 @@ fi
         skill_file="${skill_dir}SKILL.md"
         if [[ -f "$skill_file" ]]; then
             s_name=$(sed -n 's/^name: *//p' "$skill_file" | head -n 1 | sed 's/^["'\'']//;s/["'\'']$//')
-            
+
             s_desc=$(awk '
             BEGIN { in_desc=0; desc="" }
             /^description: / {

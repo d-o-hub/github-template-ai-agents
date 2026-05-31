@@ -80,11 +80,11 @@ If `codacy.yml` or a Codacy project exists:
 When suppressing a linter finding (e.g., via `eslint-disable`, `noqa`, or `# shellcheck disable`), you **MUST** include a comment in the following format:
 
 `[tool-disable] <rule-id>: <reason> -- <agent-id> (<date>)`
-`[tool-disable] <rule-id> -- <reason> -- <agent-id> (<date>)`
+
 **Example:**
 ```bash
 # shellcheck disable=SC2034: Variable is used in sourced lib -- Jules (2025-05-15)
-# shellcheck disable=SC2034 -- Variable is used in sourced lib -- Jules (2025-05-15)
+UNUSED_VAR="internal"
 ```
 
 ## Rationalizations
