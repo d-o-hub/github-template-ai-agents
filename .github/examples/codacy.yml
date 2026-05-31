@@ -1,0 +1,35 @@
+# Codacy Configuration File
+# Documentation: https://docs.codacy.com/repositories-configure/codacy-configuration-file/
+
+# To enable this configuration, move this file to the repository root and rename it to .codacy.yml
+
+# ---
+# engines:
+#   # Enable or disable specific analysis engines
+#   eslint:
+#     enabled: true
+#   shellcheck:
+#     enabled: true
+#   markdownlint:
+#     enabled: true
+#   # To use a custom configuration file for an engine:
+#   # stylelint:
+#   #   enabled: true
+#   #   config_file: ".stylelintrc"
+
+# exclude_paths:
+#   - "dist/**"
+#   - "build/**"
+#   - "vendor/**"
+#   - "assets/fonts/**"
+#   - "tests/fixtures/**"
+
+# ---
+# Example: Ignore specific rules globally
+# engines:
+#   eslint:
+#     rules:
+#       "no-unused-vars": "off"
+#       "max-len":
+#         - "warn"
+#         - 120

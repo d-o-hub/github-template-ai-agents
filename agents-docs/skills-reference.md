@@ -50,6 +50,7 @@ Full catalog of available skills in this repository.
 | `shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use w | Quality |
 | `skill-creator` | Create new skills, modify and improve existing skills, and m | Meta-skillforcreatingandoptimizingagentskills |
 | `skill-evaluator` | "Reusable skill for evaluating other skills with structure c | Meta |
+| `static-analysis` | Language-agnostic static analysis and linter triage skill for cross-language projects. | Quality |
 | `task-decomposition` | Break down complex tasks into atomic, actionable goals with | Coordination |
 | `test-runner` | Execute tests, analyze results, and diagnose failures across | Quality |
 | `testdata-builders` | Maintain deterministic builders/factories for test entities. | Quality |
