@@ -22,6 +22,7 @@ def main():
     skill_invocations = 0
     total_tokens = 0
     failed_tasks = 0
+    partial_tasks = 0
 
     if os.path.exists(metrics_file):
         with open(metrics_file, "r") as f:
@@ -32,10 +33,13 @@ def main():
                     entry = json.loads(line)
                     # Simple filter for current month based on timestamp string
                     if entry.get("timestamp", "").startswith(month_year):
-                        if entry.get("status") == "completed":
+                        status = entry.get("status")
+                        if status == "completed":
                             tasks_completed += 1
-                        elif entry.get("status") == "failed":
+                        elif status == "failed":
                             failed_tasks += 1
+                        elif status == "partial":
+                            partial_tasks += 1
 
                         if entry.get("skill_used"):
                             skill_invocations += 1
@@ -47,7 +51,8 @@ def main():
                     continue
 
     # Calculate success rate
-    total_tasks = tasks_completed + failed_tasks
+    # We include partial tasks in the denominator to be conservative
+    total_tasks = tasks_completed + failed_tasks + partial_tasks
     success_rate = (tasks_completed / total_tasks * 100) if total_tasks > 0 else 0
 
     # Mock DORA data (as per original script, would need git analysis for real values)
@@ -67,6 +72,8 @@ def main():
 | Metric | Value |
 |---|---|
 | Tasks Completed | {tasks_completed} |
+| Partial Tasks | {partial_tasks} |
+| Failed Tasks | {failed_tasks} |
 | Skill Invocations | {skill_invocations} |
 | Total Tokens Used | {total_tokens} |
 | Success Rate | {success_rate:.1f}% |
