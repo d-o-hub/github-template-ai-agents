@@ -62,16 +62,21 @@ if [[ ! -f "llms.txt" ]] || [[ ! -f "llms-full.txt" ]]; then
     printf "%b  ✗ llms.txt or llms-full.txt missing%b\n" "${RED}" "${NC}"
     FAILED=1
 else
-    # Check if they are up to date by generating to temp files and comparing
     TMP_LLMS=$(mktemp)
     TMP_LLMS_FULL=$(mktemp)
 
-    # Run the generator but capture its output to /dev/null to keep quality gate clean
-    # We use a subshell to avoid changing LLMS_TXT variable in the current script if it were defined
+    cleanup() {
+        rm -f "$TMP_LLMS" "$TMP_LLMS_FULL"
+    }
+    trap cleanup EXIT
+
     (
         export LLMS_TXT="$TMP_LLMS"
         export LLMS_FULL_TXT="$TMP_LLMS_FULL"
-        ./scripts/generate-llms-txt.sh > /dev/null 2>&1
+        if ! ./scripts/generate-llms-txt.sh > /dev/null 2>&1; then
+            printf "%b  ✗ Failed to generate LLM context files%b\n" "${RED}" "${NC}"
+            exit 1
+        fi
     )
 
     if ! diff -q llms.txt "$TMP_LLMS" > /dev/null; then
@@ -83,7 +88,6 @@ else
     else
         printf "%b  ✓ llms.txt and llms-full.txt are up to date%b\n" "${GREEN}" "${NC}"
     fi
-    rm -f "$TMP_LLMS" "$TMP_LLMS_FULL"
 fi
 printf "\n"
 
