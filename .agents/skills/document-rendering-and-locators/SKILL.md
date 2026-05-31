@@ -1,5 +1,5 @@
 ---
-version: "1.0.0"
+version: "0.2.10"
 name: document-rendering-and-locators
 description: >
   Implement resilient document rendering and annotation anchoring. Activate for reader-core, TOC, locator, or highlight anchoring changes. Generic pattern applicable to EPUB, PDF, or any document format.

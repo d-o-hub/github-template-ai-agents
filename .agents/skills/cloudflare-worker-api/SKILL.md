@@ -1,5 +1,5 @@
 ---
-version: "1.0.0"
+version: "0.2.10"
 name: cloudflare-worker-api
 description: >
   Structure Worker API routes and handlers. Activate for route definition, response helpers, and typed handler patterns. Auth belongs to secure-invite-and-access.

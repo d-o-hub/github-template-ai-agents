@@ -1,6 +1,6 @@
 ---
 name: database-devops
-version: "0.0.0"
+version: "0.2.10"
 description: Database design, migration, and DevOps automation with safety patterns. Use for schema design, migration planning, query optimization, multi-database orchestration, and Infrastructure-as-Code. Includes rollback strategies, performance analysis, and cross-database synchronization.
 license: MIT
 ---

@@ -1,6 +1,6 @@
 ---
 name: iterative-refinement
-version: "0.0.0"
+version: "0.2.10"
 description: Execute iterative refinement workflows with validation loops until quality criteria are met. Use for test-fix cycles, code quality improvement, performance optimization, or any task requiring repeated action-validate-improve cycles.
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: goap-agent
-version: "0.0.0"
+version: "0.2.10"
 description: Invoke for complex multi-step tasks requiring intelligent planning and multi-agent coordination. Use when tasks need decomposition, dependency mapping, parallel/sequential/swarm/iterative execution strategies, or coordination of multiple specialized agents with quality gates.
 ---
 

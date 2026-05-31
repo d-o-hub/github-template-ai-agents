@@ -1,6 +1,6 @@
 ---
 name: dist-channel-selection
-version: "0.0.0"
+version: "0.2.10"
 description: Guide for selecting the correct distribution channel (npm, Cargo, etc.) based on artifact type and target audience. Use when preparing to publish or release a new version of a package.
 ---
 

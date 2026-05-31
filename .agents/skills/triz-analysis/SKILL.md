@@ -1,6 +1,6 @@
 ---
 name: triz-analysis
-version: "0.0.0"
+version: "0.2.10"
 description: Run a systematic TRIZ contradiction audit against a codebase, architecture, or workflow to identify hidden trade-offs and innovation opportunities.
 category: analysis
 ---
