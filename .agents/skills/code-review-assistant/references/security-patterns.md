@@ -27,6 +27,7 @@ GOOD: private_key = load_from_secure_storage()
 ```
 
 **Detection Regex:**
+
 ```python
 HARDCODED_SECRET_PATTERNS = [
     r'(password|passwd|pwd)\s*=\s*["\'][^"\']+',
@@ -51,6 +52,7 @@ cursor.execute(query, (user_id,))
 ```
 
 **Detection Patterns:**
+
 ```python
 SQL_INJECTION_PATTERNS = [
     r'execute\s*\([^)]*%\s*',  # String formatting in execute
@@ -116,6 +118,7 @@ data = json.loads(untrusted_input)
 - [ ] Is there proper authorization before data access?
 
 **Example Issue:**
+
 ```python
 # BAD: No permission check
 @app.route('/api/documents/<id>')
@@ -274,6 +277,7 @@ security_checks:
 **References**:
 - OWASP: {owasp_link}
 - CWE: {cwe_id}
+
 ```
 
 ## False Positives

@@ -16,22 +16,26 @@ See `references/SWARM.md` for detailed agent definitions and coordination patter
 ## Workflow Phases
 
 ### Phase 1: ATOMIC COMMIT (Agent: commit-agent)
+
 - Stage ALL changes (`git add -A`)
 - Validate with quality gate
 - Create atomic commit with conventional format
 - Generate meaningful commit message
 
 ### Phase 2: CHECK GITHUB ISSUES (Agent: issue-agent)
+
 - List open issues in repository
 - Check if issues relate to current changes
 - Identify blocking issues
 - Determine if issues need fixing before merge
 
 ### Phase 3: CREATE PR (Agent: pr-agent)
+
 - Push to new feature branch
 - Create comprehensive PR with commit summary and context
 
 ### Phase 4: MONITOR ALL ACTIONS (Agent: monitor-agent)
+
 **CRITICAL:** ALL GitHub Actions must pass, including pre-existing issues
 - Monitor PR checks continuously
 - Check ALL repository workflows
@@ -39,6 +43,7 @@ See `references/SWARM.md` for detailed agent definitions and coordination patter
 - Wait for ALL checks to be green
 
 ### Phase 5: ISSUE RESOLUTION (Agent: fix-agent) [If needed]
+
 If ANY check fails:
 - Trigger web research with doc-resolver skill
 - Use available skills to fix issues
@@ -46,12 +51,14 @@ If ANY check fails:
 - Coordinate with handoff pattern (see `references/HANDOFF.md`)
 
 ### Phase 6: MERGE (Agent: merge-agent)
+
 - Verify ALL checks passing
 - Merge with squash (default)
 - Delete feature branch
 - Update related issues
 
 ### Phase 7: POST-MERGE VALIDATION (Agent: validate-agent)
+
 - Checkout main branch
 - Verify ALL files present
 - Validate documentation complete
@@ -61,11 +68,13 @@ If ANY check fails:
 ## Usage
 
 ### Basic (Full Workflow)
+
 ```bash
 bash .agents/skills/git-github-workflow/run.sh
 ```
 
 ### With Options
+
 ```bash
 bash .agents/skills/git-github-workflow/run.sh \
   --message "feat: implement feature" \
@@ -74,11 +83,13 @@ bash .agents/skills/git-github-workflow/run.sh \
 ```
 
 ### Check Issues Only
+
 ```bash
 bash .agents/skills/git-github-workflow/run.sh --check-issues-only
 ```
 
 ### Validate Main After Merge
+
 ```bash
 bash .agents/skills/git-github-workflow/run.sh --validate-main-only
 ```
@@ -115,6 +126,7 @@ bash .agents/skills/git-github-workflow/run.sh --validate-main-only
 ## Web Research Integration
 
 On ANY failure:
+
 ```
 Failure Detected
       ↓
@@ -174,6 +186,7 @@ Workflow succeeds when:
 8. ✓ All files and docs validated
 
 ## Rationalizations
+
 | Rationalization | Reality |
 |-----------------|---------|
 | "The post-merge validation is redundant since CI passed" | Post-merge validation ensures the merge itself didn't introduce integration issues. |
@@ -181,6 +194,7 @@ Workflow succeeds when:
 | "Atomic commits are too much work for small changes" | Atomic commits make debugging and rollbacks easier, regardless of change size. |
 
 ## Red Flags
+
 - [ ] Skipping the issue-check phase for "quick" changes
 - [ ] Merging even when pre-existing Actions are still failing
 - [ ] Skipping post-merge validation on the `main` branch

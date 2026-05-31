@@ -7,6 +7,7 @@ Detailed implementations of deployment strategies for CI/CD pipelines.
 Blue-green deployment maintains two identical production environments. Only one is live at a time, allowing instant rollback by switching traffic.
 
 ### GitHub Actions with AWS
+
 ```yaml
 jobs:
   deploy:
@@ -36,6 +37,7 @@ jobs:
 ```
 
 ### Kubernetes with Services
+
 ```yaml
 apiVersion: v1
 kind: Service
@@ -55,6 +57,7 @@ spec:
 Gradually shift traffic to new version while monitoring metrics. Automatic rollback if error rate increases.
 
 ### Kubernetes with Flagger
+
 ```yaml
 # Kubernetes with Flagger
 jobs:
@@ -75,6 +78,7 @@ jobs:
 ```
 
 ### Istio Canary with Traffic Splitting
+
 ```yaml
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
@@ -100,6 +104,7 @@ spec:
 Replace instances one at a time with zero downtime.
 
 ### Kubernetes Rolling Update
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -126,6 +131,7 @@ spec:
 ```
 
 ### AWS Auto Scaling Rolling Update
+
 ```bash
 aws autoscaling start-instance-refresh \
     --auto-scaling-group-name myapp-asg \
@@ -137,6 +143,7 @@ aws autoscaling start-instance-refresh \
 Deploy code disabled by default, enable gradually.
 
 ### LaunchDarkly Integration
+
 ```yaml
 jobs:
   deploy:
@@ -155,6 +162,7 @@ jobs:
 ```
 
 ### Environment Variable Flags
+
 ```yaml
 jobs:
   deploy:

@@ -7,6 +7,7 @@ Test scenarios for the github-workflow skill.
 **Goal**: Verify dry run simulates without making changes
 
 **Setup**:
+
 ```bash
 git checkout -b eval-dry-run
 echo "test" > test.txt
@@ -27,6 +28,7 @@ echo "test" > test.txt
 **Goal**: Verify --push-only stops after push
 
 **Setup**:
+
 ```bash
 git checkout -b eval-push-only
 echo "feature" > feature.txt
@@ -45,6 +47,7 @@ echo "feature" > feature.txt
 **Goal**: Verify --no-merge creates PR but doesn't merge
 
 **Setup**:
+
 ```bash
 git checkout -b eval-no-merge
 echo "fix" > fix.txt
@@ -64,6 +67,7 @@ echo "fix" > fix.txt
 **Goal**: Verify branch creation when on main/master
 
 **Setup**:
+
 ```bash
 git checkout main
 echo "change" > change.txt
@@ -83,6 +87,7 @@ echo "change" > change.txt
 **Goal**: Verify --monitor-only tracks existing PR
 
 **Setup**:
+
 ```bash
 git checkout -b eval-monitor
 echo "monitor" > monitor.txt
@@ -104,6 +109,7 @@ gh pr create --title "Test PR" --body "Test" --base main
 **Goal**: Verify auto-rebase when behind base branch
 
 **Setup**:
+
 ```bash
 # On branch, origin/main has new commits
 git checkout -b eval-rebase
@@ -124,6 +130,7 @@ git reset --hard origin/main~5
 **Goal**: Verify conflict detection and failure
 
 **Setup**:
+
 ```bash
 # Create conflicting changes
 git checkout -b eval-conflict
@@ -143,6 +150,7 @@ git checkout -b eval-conflict
 **Goal**: Verify successful monitoring and merge
 
 **Setup**:
+
 ```bash
 git checkout -b eval-checks-pass
 echo "pass" > pass.txt
@@ -163,6 +171,7 @@ echo "pass" > pass.txt
 **Goal**: Verify failure detection and no merge
 
 **Setup**:
+
 ```bash
 # Push code that will fail CI
 git checkout -b eval-checks-fail
@@ -182,6 +191,7 @@ git checkout -b eval-checks-fail
 **Goal**: Verify handling of base branch issues
 
 **Setup**:
+
 ```bash
 # When base branch already has failing checks
 git checkout -b eval-pre-existing
@@ -201,6 +211,7 @@ echo "change" > change.txt
 **Goal**: Verify squash merge method
 
 **Setup**:
+
 ```bash
 git checkout -b eval-squash
 echo "squash" > squash.txt
@@ -218,6 +229,7 @@ echo "squash" > squash.txt
 **Goal**: Verify rebase merge method
 
 **Setup**:
+
 ```bash
 git checkout -b eval-rebase-merge
 echo "rebase" > rebase.txt
@@ -235,6 +247,7 @@ echo "rebase" > rebase.txt
 **Goal**: Verify --cleanup-branch deletes after merge
 
 **Setup**:
+
 ```bash
 git checkout -b eval-cleanup
 echo "cleanup" > cleanup.txt
@@ -253,6 +266,7 @@ echo "cleanup" > cleanup.txt
 **Goal**: Verify --fail-on-warning and --no-fail-on-warning
 
 **Setup**:
+
 ```bash
 # Push code with warnings
 git checkout -b eval-warnings
@@ -277,6 +291,7 @@ git checkout -b eval-warnings
 **Goal**: Verify --branch-name overrides auto-generation
 
 **Setup**:
+
 ```bash
 git checkout main
 echo "custom" > custom.txt
@@ -295,6 +310,7 @@ echo "custom" > custom.txt
 **Goal**: Verify --timeout limits monitoring
 
 **Setup**:
+
 ```bash
 git checkout -b eval-timeout
 echo "slow" > slow.txt
@@ -314,6 +330,7 @@ echo "slow" > slow.txt
 **Goal**: Verify --check-all-actions monitors repo Actions
 
 **Setup**:
+
 ```bash
 git checkout -b eval-all-actions
 echo "actions" > actions.txt
@@ -332,6 +349,7 @@ echo "actions" > actions.txt
 **Goal**: Verify --base-branch targets different branch
 
 **Setup**:
+
 ```bash
 git checkout -b eval-base-branch
 echo "develop" > develop.txt
@@ -350,6 +368,7 @@ echo "develop" > develop.txt
 **Goal**: Verify handling of externally merged PR
 
 **Setup**:
+
 ```bash
 git checkout -b eval-already-merged
 echo "merged" > merged.txt
@@ -371,6 +390,7 @@ gh pr create --title "Will merge manually" --body "Test"
 **Goal**: Verify handling of closed (not merged) PR
 
 **Setup**:
+
 ```bash
 git checkout -b eval-closed
 echo "closed" > closed.txt

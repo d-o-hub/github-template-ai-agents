@@ -31,6 +31,7 @@ Test Checklist:
 ## Framework Commands
 
 ### JavaScript
+
 ```bash
 jest                    # Run all
 jest path/to/test.ts    # Specific file
@@ -39,6 +40,7 @@ jest --watch          # Watch mode
 ```
 
 ### Python
+
 ```bash
 pytest                  # Run all
 pytest tests/test.py    # Specific file
@@ -47,6 +49,7 @@ pytest -v              # Verbose
 ```
 
 ### Rust
+
 ```bash
 cargo test              # Run all
 cargo test test_name    # Specific test
@@ -54,6 +57,7 @@ cargo test -- --nocapture  # Show output
 ```
 
 ### Go
+
 ```bash
 go test ./...           # Run all
 go test -v ./...        # Verbose
@@ -61,6 +65,7 @@ go test -cover ./...    # With coverage
 ```
 
 ### Bash
+
 ```bash
 bats tests/             # Run all
 bats tests/file.bats    # Specific file
@@ -78,6 +83,7 @@ bats tests/file.bats    # Specific file
 | `panic: runtime error` | Go panic | Check nil/bounds |
 
 ### Step 2: Isolate Test
+
 ```bash
 pytest test.py::test_func -v     # Python
 jest --testNamePattern="test"     # Jest
@@ -85,6 +91,7 @@ cargo test test_name               # Rust
 ```
 
 ### Step 3: Check Environment
+
 ```bash
 pip list | grep pytest            # Python
 npm list jest                      # Node
@@ -94,6 +101,7 @@ npm list jest                      # Node
 ## Coverage Analysis
 
 ### Generate Reports
+
 ```bash
 # Jest
 jest --coverage --coverageReporters=text-summary
@@ -132,6 +140,7 @@ for i in {1..10}; do pytest || echo "Failed run $i"; done
 ## Best Practices
 
 ### DO:
+
 - Run tests locally before commit
 - Write edge case tests
 - Mock external dependencies
@@ -140,6 +149,7 @@ for i in {1..10}; do pytest || echo "Failed run $i"; done
 - Use descriptive names
 
 ### DON'T:
+
 - Skip tests without TODO
 - Hardcode timeouts
 - Test implementation details

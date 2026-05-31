@@ -109,24 +109,17 @@ End with one of:
 Organize eval results in a dedicated workspace directory (e.g., `<skill-name>-workspace/`). Each iteration of the eval loop produces structured artifacts.
 
 ```text
-<skill-name>-workspace/
-└── iteration-N/
-    ├── eval-<id>/
-    │   ├── with_skill/
-    │   │   ├── outputs/       # Files produced by the run
-    │   │   ├── timing.json    # total_tokens and duration_ms
-    │   │   └── grading.json   # Assertion results with evidence
-    │   └── without_skill/
-    │       ├── outputs/
-    │       ├── timing.json
-    │       └── grading.json
-    ├── benchmark.json         # Aggregated pass rates and deltas
-    └── feedback.json          # Human review notes for next iteration
+<skill-name>-workspace/iteration-N/eval-<id>/
+├── with_skill/          # outputs/, timing.json, grading.json
+└── without_skill/       # outputs/, timing.json, grading.json
 ```
+
+Plus `benchmark.json` and `feedback.json` at the iteration level.
 
 ## Artifact Schemas
 
 ### timing.json
+
 ```json
 {
   "total_tokens": 84852,
@@ -135,6 +128,7 @@ Organize eval results in a dedicated workspace directory (e.g., `<skill-name>-wo
 ```
 
 ### grading.json
+
 ```json
 {
   "assertion_results": [
@@ -154,6 +148,7 @@ Organize eval results in a dedicated workspace directory (e.g., `<skill-name>-wo
 ```
 
 ### benchmark.json
+
 ```json
 {
   "run_summary": {
@@ -165,6 +160,7 @@ Organize eval results in a dedicated workspace directory (e.g., `<skill-name>-wo
 ```
 
 ### feedback.json
+
 ```json
 {
   "eval-case-id": "Actionable feedback message from human review",
@@ -184,12 +180,14 @@ Evaluate skills across these four dimensions (Score 1-5):
 | **Reusability** | Can the skill be applied to multiple projects/contexts without hardcoded values? |
 
 ### Filing a Skill Improvement Issue
+
 When a skill fails evaluation:
 1. Open a GitHub Issue with the title `skill-improvement: <skill-name>`.
 2. Include the **Eval Report** in the description.
 3. Label the issue with `quality` and `skill`.
 
 ### Deprecation Process
+
 Outdated or redundant skills should follow this lifecycle:
 1. **Deprecation Notice**: Add `[DEPRECATED]` to the `description` in `SKILL.md` and link to the replacement.
 2. **Issue Creation**: File an issue to remove the skill in the next major version.

@@ -80,9 +80,11 @@ Implement secure user authentication with JWT tokens and session management
 
 ### Dependency Graph
 ```
+
 Task 1.1 → Task 1.2 → Task 1.3
                       ↓
 Task 2.1 → Task 2.2 → Task 3.1 → Task 4.1 → Task 5.1
+
 ```
 ```
 

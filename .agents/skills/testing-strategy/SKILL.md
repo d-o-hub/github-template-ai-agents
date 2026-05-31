@@ -41,6 +41,7 @@ Integrate testing into CI/CD:
 - Auto-quarantine flaky tests.
 
 ## Rationalizations
+
 | Rationalization | Reality |
 |-----------------|---------|
 | "Testing takes too long, I need to ship now" | Skipping tests creates technical debt and leads to regressions that take longer to fix. |
@@ -48,6 +49,7 @@ Integrate testing into CI/CD:
 | "I'll add tests once the feature is 'finished'" | Tests should be written alongside code (TDD/BDD) to ensure the implementation is correct. |
 
 ## Red Flags
+
 - [ ] Declining code coverage on new features
 - [ ] Committing code with failing or bypassed tests
 - [ ] Ignoring flaky tests instead of identifying and fixing the root cause

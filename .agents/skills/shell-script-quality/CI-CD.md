@@ -147,6 +147,7 @@ printf "\n🎉 All quality checks PASSED!\n"
 ## Multi-Stage Pipelines
 
 ### Fast Lint (PR check)
+
 ```yaml
 lint-fast:
   runs-on: ubuntu-latest
@@ -158,6 +159,7 @@ lint-fast:
 ```
 
 ### Full Test Suite (Main branch)
+
 ```yaml
 full-test:
   if: github.ref == 'refs/heads/main'

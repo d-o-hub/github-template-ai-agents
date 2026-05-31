@@ -25,6 +25,7 @@ The **Game-Specific** section applies only to game products. For non-game produc
 | Non-game | 57 | 9 (skip Game-Specific) | 52 | 57 |
 
 **Always report both `score` and `max_applicable`.** Use effective percentage for keep/revert decisions:
+
 ```
 effective = score / max_applicable
 keep if effective ≥ 0.91 AND confidence ≥ 2.0×

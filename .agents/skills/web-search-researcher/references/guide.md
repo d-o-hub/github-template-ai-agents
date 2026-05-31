@@ -28,6 +28,7 @@ Break down the user's request to identify:
 - Multiple search angles to ensure comprehensive coverage
 
 **Query Analysis Template**:
+
 ```markdown
 ## Query Analysis
 
@@ -63,24 +64,28 @@ Break down the user's request to identify:
 **Search Strategy Examples**:
 
 For API documentation:
+
 ```
 "[library name] official documentation [specific feature]"
 site:docs.stripe.com webhook signature
 ```
 
 For best practices:
+
 ```
 "Rust async best practices" 2026
 "Tokio performance anti-patterns" 2026
 ```
 
 For technical solutions:
+
 ```
 "tokio runtime panic" redb write transaction
 site:github.com tokio blocking write transaction
 ```
 
 For comparisons:
+
 ```
 "redb vs sled" performance comparison
 "SQLite vs Turso" migration guide
@@ -109,6 +114,7 @@ For comparisons:
 - Note any gaps in available information
 
 **Synthesis Template**:
+
 ```markdown
 ## Summary
 [2-3 sentence overview of key findings]
@@ -147,6 +153,7 @@ For comparisons:
 3. Find code examples in official repositories
 
 **Example Searches**:
+
 ```
 "Stripe webhook signature verification" official documentation
 site:stripe.com webhook signature validation
@@ -168,6 +175,7 @@ site:stripe.com webhook signature validation
 4. Search for both "best practices" and "anti-patterns"
 
 **Example Searches**:
+
 ```
 "Rust async best practices" 2026
 "Tokio performance anti-patterns" 2026
@@ -190,6 +198,7 @@ site:blog.rust-lang.org async errors
 4. Find blog posts describing similar implementations
 
 **Example Searches**:
+
 ```
 "tokio runtime panic" redb write transaction
 site:github.com tokio spawn_blocking database
@@ -212,6 +221,7 @@ site:github.com tokio spawn_blocking database
 4. Search for decision matrices or evaluation criteria
 
 **Example Searches**:
+
 ```
 "redb vs sled" performance comparison
 "SQLite vs Turso" migration guide
@@ -241,6 +251,7 @@ site:github.com tokio spawn_blocking database
 - Otherwise → Continue to Round 2
 
 **Example**:
+
 ```
 Search: "Rust async best practices"
 Results: Scan for official Rust blog, well-known experts
@@ -261,6 +272,7 @@ Decision: Found official async book → Fetch, may stop
 - Otherwise → Continue to Round 3
 
 **Example**:
+
 ```
 Search 1: site:docs.rust-lang.org async
 Search 2: "tokio" best practices 2026
@@ -283,6 +295,7 @@ Decision: Found 3 sources with consensus → Synthesize
 - Note limitations clearly
 
 **Example**:
+
 ```
 Search 1: "tokio blocking" production case study
 Search 2: async database write patterns GitHub
@@ -422,6 +435,7 @@ intitle:"async" OR intitle:"concurrent" rust
 **Example Query**: "What's the signature for Stripe webhook verification?"
 
 **Expected Output**:
+
 ```markdown
 ## Summary
 Stripe provides `Stripe.Webhook.construct_event()` for signature verification.
@@ -435,6 +449,7 @@ event = stripe.Webhook.construct_event(
     payload, sig_header, endpoint_secret
 )
 ```
+
 ```
 
 ### Standard Research (30-45 minutes)
@@ -487,6 +502,7 @@ Use tokio::task::spawn_blocking for redb write operations to avoid blocking asyn
 **Example Query**: "Should we use redb vs sled vs SQLite for our memory system?"
 
 **Expected Output**:
+
 ```markdown
 ## Summary
 For embedded Rust memory systems, redb offers best type safety, sled has most features, SQLite has broadest ecosystem.
@@ -530,6 +546,7 @@ Before starting, decide which depth level (Quick/Standard/Deep/Exhaustive) is ap
 - Information availability
 
 **Depth Decision Matrix**:
+
 ```
 Task Impact: Low → Quick Research
 Task Impact: Medium → Standard Research
@@ -684,6 +701,7 @@ Recognize these signals that you have sufficient information:
 - Look for recent updates or newer alternatives
 
 **Freshness Guidelines**:
+
 | Tech Type | Acceptable Age | Priority |
 |-----------|----------------|----------|
 | Fast-moving (AI, frameworks) | <12 months | Current year only |
@@ -742,6 +760,7 @@ Recognize these signals that you have sufficient information:
 3. `"Stripe webhook" signature example code`
 
 **Expected Output**:
+
 ```markdown
 ## Summary
 Stripe provides a library method `Stripe.Webhook.construct_event()` to verify webhook signatures using the endpoint secret.
@@ -761,6 +780,7 @@ event = stripe.Webhook.construct_event(
 ```
 
 ### Implementation Example
+
 **Source**: [Stripe GitHub Examples](https://github.com/stripe/stripe-python)
 **Key Information**:
 - Payload must be raw request body
@@ -768,11 +788,14 @@ event = stripe.Webhook.construct_event(
 - Handle `SignatureVerificationError`
 
 ## Additional Resources
+
 - [Stripe CLI for testing](https://stripe.com/docs/stripe-cli)
 - [Webhook security best practices](https://stripe.com/docs/webhooks/best-practices)
 
 ## Gaps or Limitations
+
 None - comprehensive official documentation available.
+
 ```
 
 ### Example 2: Best Practices Research
@@ -829,6 +852,7 @@ Specific patterns for 2026 edition may have evolved - check latest Rust release 
 4. `"database write blocking async runtime"`
 
 **Expected Output**:
+
 ```markdown
 ## Summary
 redb write transactions are blocking operations that must be wrapped in `tokio::task::spawn_blocking` to avoid blocking the async runtime.
@@ -856,6 +880,7 @@ handle.await.unwrap();
 ```
 
 ### Community Discussion
+
 **Source**: [Rust Users Forum](https://users.rust-lang.org)
 **Relevance**: Real-world implementation patterns
 **Key Information**:
@@ -864,11 +889,14 @@ handle.await.unwrap();
 - Consider connection pooling for high concurrency
 
 ## Additional Resources
+
 - [Tokio async tutorial](https://tokio.rs/tokio/tutorial)
 - [redb examples](https://github.com/redb)
 
 ## Gaps or Limitations
+
 Performance characteristics may vary - benchmark for your specific workload.
+
 ```
 
 ## Troubleshooting
@@ -885,9 +913,11 @@ Performance characteristics may vary - benchmark for your specific workload.
 
 **Example**:
 ```
+
 Poor: "rust database"
 Better: "redb embedded database Rust"
 Better: "Rust ACID database library"
+
 ```
 
 ### If Sources Are Outdated
@@ -903,9 +933,11 @@ Better: "Rust ACID database library"
 
 **Example**:
 ```
+
 Outdated: "Rust async patterns"
 Updated: "Rust async patterns 2026"
 Updated: "Rust async patterns latest"
+
 ```
 
 ### If Information Conflicts
@@ -940,6 +972,7 @@ Updated: "Rust async patterns latest"
 4. Clearly report the gap in findings
 
 **Example**:
+
 ```markdown
 ## Gaps or Limitations
 
@@ -959,6 +992,7 @@ Recommendation: Consult project maintainers or experiment empirically.
 ## Best Practices Summary
 
 ### DO:
+
 ✓ Check environment context for current date before starting
 ✓ Use current year in searches for best practices and evolving tech
 ✓ Use specific, technical search terms
@@ -971,6 +1005,7 @@ Recommendation: Consult project maintainers or experiment empirically.
 ✓ Indicate source authority
 
 ### DON'T:
+
 ✗ Stop at the first search result
 ✗ Trust unverified sources
 ✗ Ignore publication dates

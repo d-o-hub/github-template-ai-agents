@@ -53,6 +53,7 @@ Set `FORGEJO_TOKEN` (or `CODEBERG_TOKEN`) in your environment or `.env` file.
 Generate at: **Forgejo/Codeberg → Settings → Applications → Generate Token**.
 
 Required scopes per operation:
+
 | Operation | Scope needed |
 |-----------|-------------|
 | Read public repos | (none, token optional) |
@@ -170,6 +171,7 @@ curl "https://codeberg.org/api/v1/repos/{owner}/{repo}/branches"
 Forgejo uses **Forgejo Actions** for CI/CD, fully compatible with GitHub Actions.
 
 ### Workflow Location
+
 Place workflows in `.forgejo/workflows/` directory.
 
 ### Example: Build Workflow
@@ -190,6 +192,7 @@ jobs:
 ```
 
 ### Best Practices (2026)
+
 - Use **matrix builds** for parallel testing
 - Enable **caching** for dependencies
 - Use **branch protection** with required workflows

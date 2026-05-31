@@ -13,6 +13,7 @@
 **Accessibility → Measurable:** "Accessible" → "text.primary on bg.base ≥7:1. Tap targets ≥44px. Focus ring 2px solid border.focus"
 
 ## Output Schema
+
 ```
 PRODUCT: [type] with [feature]
 TARGET USER: [audience], [platform], [context]

@@ -17,6 +17,7 @@ The workflow uses 7 specialized agents that coordinate via structured handoffs:
 ## Agent Definitions
 
 ### Agent 1: commit-agent
+
 ```yaml
 role: Create atomic commit
 skills: [shell-script-quality, git]
@@ -28,6 +29,7 @@ output: commit_sha, branch_name
 ```
 
 ### Agent 2: issue-agent
+
 ```yaml
 role: Check GitHub issues
 skills: [codeberg-api, github]
@@ -39,6 +41,7 @@ output: issues_list, blocking_count
 ```
 
 ### Agent 3: pr-agent
+
 ```yaml
 role: Create pull request
 skills: [github]
@@ -50,6 +53,7 @@ output: pr_number, pr_url
 ```
 
 ### Agent 4: monitor-agent
+
 ```yaml
 role: Monitor ALL GitHub Actions
 skills: [github, iterative-refinement]
@@ -62,6 +66,7 @@ output: checks_status, failures_list
 ```
 
 ### Agent 5: fix-agent (Conditional)
+
 ```yaml
 role: Fix issues using skills
 skills: [web-search-researcher, do-web-doc-resolver, all-available]
@@ -74,6 +79,7 @@ trigger: ANY check failure
 ```
 
 ### Agent 6: merge-agent
+
 ```yaml
 role: Merge PR
 skills: [github]
@@ -86,6 +92,7 @@ output: merge_status
 ```
 
 ### Agent 7: validate-agent
+
 ```yaml
 role: Post-merge validation
 skills: [shell-script-quality, all-available]
@@ -119,15 +126,19 @@ Agents communicate via structured handoffs:
 ## Coordination Strategy
 
 ### Sequential Execution
+
 Agents execute in sequence, with each agent's output becoming the next agent's input.
 
 ### Conditional Branching
+
 The fix-agent only activates when checks fail, creating a feedback loop.
 
 ### Error Propagation
+
 Errors bubble up through the chain, with each agent able to abort the workflow.
 
 ### Retry Logic
+
 The monitor→fix loop retries up to 3 times before failing the workflow.
 
 ## Configuration

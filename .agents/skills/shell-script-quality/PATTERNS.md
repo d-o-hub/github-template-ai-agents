@@ -19,6 +19,7 @@ SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
 ## Error Handling
 
 ### Basic Error Handler
+
 ```bash
 error_exit() {
     echo "ERROR: $1" >&2
@@ -30,6 +31,7 @@ error_exit() {
 ```
 
 ### Trap Error Handler
+
 ```bash
 cleanup() {
     local exit_code=$?
@@ -42,6 +44,7 @@ trap 'error_exit "Script interrupted" 130' INT TERM
 ```
 
 ### Validation Pattern
+
 ```bash
 validate_inputs() {
     [[ $# -lt 1 ]] && {
@@ -66,6 +69,7 @@ main() {
 ## Logging Patterns
 
 ### Structured Logging
+
 ```bash
 LOG_FILE="${LOG_FILE:-/tmp/${SCRIPT_NAME%.sh}.log}"
 LOG_LEVEL="${LOG_LEVEL:-INFO}"
@@ -83,6 +87,7 @@ log_error() { log "ERROR" "$@"; }
 ```
 
 ### Progress Indicator
+
 ```bash
 show_progress() {
     local current="$1" total="$2" message="${3:-Processing}"
@@ -95,6 +100,7 @@ show_progress() {
 ## Function Patterns
 
 ### Documented Functions
+
 ```bash
 # Function: process_data
 # Description: Processes input data and writes to output
@@ -118,6 +124,7 @@ process_data() {
 ```
 
 ### Optional Arguments with Defaults
+
 ```bash
 process() {
     local input="${1:?Input required}"
@@ -132,6 +139,7 @@ process() {
 ## Claude Plugin Patterns
 
 ### Plugin Root Resolution
+
 ```bash
 # Portable plugin root
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/..' && pwd)}"
@@ -142,6 +150,7 @@ DATA_DIR="$PLUGIN_ROOT/data"
 ```
 
 ### Hook Input Parsing
+
 ```bash
 parse_hook_input() {
     local input="$(cat)"
@@ -154,6 +163,7 @@ parse_hook_input() {
 ```
 
 ### JSON Output
+
 ```bash
 output_json() {
     local status="$1" message="$2"
@@ -170,6 +180,7 @@ output_json "success" "Operation completed"
 ## Safe File Operations
 
 ### Temp File Handling
+
 ```bash
 TEMP_FILE="$(mktemp)" || error_exit "Failed to create temp file"
 trap 'rm -f "$TEMP_FILE"' EXIT
@@ -179,6 +190,7 @@ echo "data" > "$TEMP_FILE"
 ```
 
 ### Safe File Updates
+
 ```bash
 update_file() {
     local file="$1" content="$2"
@@ -236,43 +248,51 @@ fi
 ## Anti-Patterns to Avoid
 
 ### ❌ Bad: Unquoted Variables
+
 ```bash
 cp $file $dest  # Word splitting!
 ```
 
 ### ✅ Good: Quoted Variables
+
 ```bash
 cp "$file" "$dest"
 ```
 
 ### ❌ Bad: Using $?
+
 ```bash
 command
 if [[ $? -ne 0 ]]; then
 ```
 
 ### ✅ Good: Direct Test
+
 ```bash
 if ! command; then
 ```
 
 ### ❌ Bad: Masked Return Values
+
 ```bash
 local result=$(failing_command)
 ```
 
 ### ✅ Good: Separate Declaration
+
 ```bash
 local result
 result=$(failing_command)
 ```
 
 ### ❌ Bad: Unsafe Loops
+
 ```bash
 for file in $(ls *.txt); do
 ```
 
 ### ✅ Good: Glob Pattern
+
 ```bash
 for file in *.txt; do
     [[ -f "$file" ]] || continue
@@ -281,6 +301,7 @@ for file in *.txt; do
 ## Performance Patterns
 
 ### Parallel Processing
+
 ```bash
 process_parallel() {
     local max_jobs=4
@@ -301,6 +322,7 @@ process_parallel() {
 ```
 
 ### Caching
+
 ```bash
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/myscript"
 mkdir -p "$CACHE_DIR"

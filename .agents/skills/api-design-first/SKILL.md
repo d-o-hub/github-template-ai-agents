@@ -13,17 +13,20 @@ Design RESTful APIs using design-first principles with comprehensive OpenAPI 3.0
 ## Design Principles
 
 ### 1. API-First Mindset
+
 - Design the API contract before implementation
 - Use OpenAPI 3.0 as the source of truth
 - Generate code from specifications, not vice versa
 
 ### 2. RESTful Design
+
 - Use nouns for resources (not verbs)
 - Leverage HTTP methods semantically
 - Implement proper status codes
 - Support filtering, pagination, and sorting
 
 ### 3. Consistency
+
 - Follow naming conventions throughout
 - Use consistent request/response formats
 - Maintain backward compatibility with versioning
@@ -59,6 +62,7 @@ GET    /users/{id}/orders  # Sub-resource collection
 ## Request/Response Patterns
 
 ### Pagination
+
 ```json
 {
   "data": [...],
@@ -77,6 +81,7 @@ GET    /users/{id}/orders  # Sub-resource collection
 ```
 
 ### Error Response
+
 ```json
 {
   "error": {

@@ -135,6 +135,7 @@ assert_output_contains() {
 ## Advanced Patterns
 
 ### Environment Variables
+
 ```bash
 @test "respects LOG_LEVEL" {
     LOG_LEVEL=DEBUG run bash scripts/logger.sh
@@ -143,6 +144,7 @@ assert_output_contains() {
 ```
 
 ### Piped Input
+
 ```bash
 @test "reads from stdin" {
     run bash scripts/processor.sh <<< "test input"
@@ -151,6 +153,7 @@ assert_output_contains() {
 ```
 
 ### Claude Plugin Testing
+
 ```bash
 @test "uses CLAUDE_PLUGIN_ROOT" {
     export CLAUDE_PLUGIN_ROOT="$BATS_TEST_DIRNAME/.."

@@ -29,6 +29,7 @@ Research before starting iterations when:
 #### Validation Tool Best Practices
 
 **Search for**:
+
 ```
 "[tool name] best practices [current year]"
 "[tool name] configuration production [current year]"
@@ -36,6 +37,7 @@ Research before starting iterations when:
 ```
 
 **Example**:
+
 ```
 Task: Set up pytest for async code testing
 
@@ -50,6 +52,7 @@ Pre-iteration research:
 #### Known Issues and Workarounds
 
 **Search for**:
+
 ```
 "[language] [tool] common issues"
 "[tool] false positives"
@@ -57,6 +60,7 @@ Pre-iteration research:
 ```
 
 **Example**:
+
 ```
 Task: Fix clippy warnings in Tokio code
 
@@ -70,6 +74,7 @@ Pre-iteration research:
 #### Version-Specific Information
 
 **Search for**:
+
 ```
 "[tool] [version] breaking changes"
 "[tool] migration guide [old version] to [new version]"
@@ -77,6 +82,7 @@ Pre-iteration research:
 ```
 
 **Example**:
+
 ```
 Task: Upgrade eslint to v9
 
@@ -91,6 +97,7 @@ Pre-iteration research:
 #### Optimal Tool Configuration
 
 **Search for**:
+
 ```
 "[tool] optimal configuration [use case]"
 "[tool] recommended settings [framework]"
@@ -98,6 +105,7 @@ Pre-iteration research:
 ```
 
 **Example**:
+
 ```
 Task: Optimize Jest test performance
 
@@ -136,6 +144,7 @@ Research questions:
 ```
 
 **Search strategy**:
+
 ```
 "[exact error message]" [tool name]
 site:github.com [tool name] [error pattern]
@@ -143,6 +152,7 @@ site:github.com [tool name] [error pattern]
 ```
 
 **Example**:
+
 ```
 Stuck on: 5 mypy errors about incompatible types
 
@@ -209,6 +219,7 @@ site:[docs] performance tuning
 ```
 
 **Expected Impact**: [how this improves iterations]
+
 ```
 
 ### Template 2: Stuck State Research
@@ -294,16 +305,19 @@ Step Final: Report Results
 ## Research Time Budget
 
 ### Quick Research (5-10 minutes)
+
 - Single tool configuration question
 - Verify syntax/usage
 - Check version compatibility
 
 ### Standard Research (15-30 minutes)
+
 - Unknown error investigation
 - Best practices lookup
 - Alternative approach exploration
 
 ### Deep Research (30-60 minutes)
+
 - Complex stuck state analysis
 - Multiple tool integration
 - Architecture decision support
@@ -313,6 +327,7 @@ Step Final: Report Results
 ## Research Quality Indicators
 
 ### Good Research Signs
+
 ✓ Found official documentation
 ✓ Recent sources (within 12-18 months)
 ✓ Multiple sources agree
@@ -320,6 +335,7 @@ Step Final: Report Results
 ✓ Version-specific information
 
 ### Poor Research Signs
+
 ✗ Only old sources (>2 years)
 ✗ Conflicting recommendations
 ✗ Vague or generic advice
@@ -390,6 +406,7 @@ Research ROI: +40% efficiency
 ## Best Practices
 
 ### DO:
+
 ✓ Check environment context for current date before searching
 ✓ Include current year in searches for best practices
 ✓ Research before starting complex iterations
@@ -400,6 +417,7 @@ Research ROI: +40% efficiency
 ✓ Set research time budgets
 
 ### DON'T:
+
 ✗ Skip research for unfamiliar tools
 ✗ Use outdated recommendations
 ✗ Continue stuck iterations without research

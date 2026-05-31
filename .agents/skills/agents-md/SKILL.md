@@ -12,6 +12,7 @@ Create production-ready AGENTS.md files following best practices below.
 ## Quick Start
 
 **Basic:**
+
 ```bash
 cat > AGENTS.md << 'EOF'
 # AGENTS.md
@@ -33,6 +34,7 @@ EOF
 ## Core Sections
 
 ### 1. Named Constants
+
 ```bash
 ## Named Constants
 readonly MAX_FILE_SIZE=500
@@ -41,6 +43,7 @@ readonly MAX_RETRIES=3
 ```
 
 ### 2. Pre-existing Issue Policy
+
 ```markdown
 ## Pre-existing Issues
 **Fix ALL before completing:**
@@ -50,6 +53,7 @@ readonly MAX_RETRIES=3
 ```
 
 ### 4. Development Workflow Rules
+
 ```markdown
 ## Development Workflow
 **Prerequisite**: Always fetch and pull the latest default remote branch before analyzing or making changes.
@@ -60,6 +64,7 @@ readonly MAX_RETRIES=3
 ```
 
 ### 3. Quality Gate
+
 ```markdown
 ## Quality Gate
 ```bash
@@ -68,6 +73,7 @@ npm run lint
 npm run test
 npm audit
 ```
+
 ```
 
 ## Tier Structure

@@ -11,11 +11,13 @@ category: workflow
 Purpose: implement resilient document rendering, locator extraction, and annotation anchoring.
 
 ## When to run
+
 - Integrating document rendering library or reader-core changes.
 - Working on TOC, locator, or highlight/comment anchoring logic.
 - Debugging annotation drift or document loading regressions.
 
 ## Workflow
+
 1. **Define data model** -- confirm multi-signal locator requirements (position + text + chapter + DOM fallback).
 2. **Design anchors** -- map DOM selections --> `{ position, selectedText, chapterRef, elementIndex, charOffset }`.
 3. **Implement** -- use rendering library APIs for annotations and navigation, ensure async cleanup.
@@ -24,6 +26,7 @@ Purpose: implement resilient document rendering, locator extraction, and annotat
 6. **Testing** -- add test cases for locator serialization + re-anchor helpers; capture regressions.
 
 ## Checklist
+
 - [ ] Position + text excerpt + chapterRef persisted together.
 - [ ] Anchor serialization uses stable casing + schema.
 - [ ] Re-anchoring warns user when falling back.
@@ -31,5 +34,6 @@ Purpose: implement resilient document rendering, locator extraction, and annotat
 - [ ] Telemetry events logged for load failures with trace IDs.
 
 ## References
+
 - `references/locator-patterns.md` - Document locator strategies
 - `references/anchoring.md` - Annotation anchoring techniques

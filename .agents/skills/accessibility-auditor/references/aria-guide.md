@@ -5,6 +5,7 @@ Comprehensive guide for implementing Accessible Rich Internet Applications (ARIA
 ## ARIA Fundamentals
 
 ### First Rule of ARIA
+>
 > No ARIA is better than bad ARIA.
 
 Use native HTML elements when available:
@@ -341,18 +342,21 @@ modal.addEventListener('keydown', (e) => {
 ## Testing with Screen Readers
 
 ### NVDA (Windows)
+
 - Free, popular
 - Insert key = NVDA modifier
 - Insert + Space = Forms mode toggle
 - Insert + F7 = Element list
 
 ### VoiceOver (macOS)
+
 - Built-in, free
 - Cmd + F5 = Toggle
 - Ctrl + Option = VO modifier
 - VO + U = Rotor (element navigation)
 
 ### JAWS (Windows)
+
 - Commercial
 - Insert key = JAWS modifier
 - Insert + F3 = Virtual HTML features
@@ -373,6 +377,7 @@ modal.addEventListener('keydown', (e) => {
 ### Common Mistakes
 
 1. **Redundant roles**
+
    ```html
    <!-- Bad: Redundant -->
    <nav role="navigation">...</nav>
@@ -382,6 +387,7 @@ modal.addEventListener('keydown', (e) => {
    ```
 
 2. **Missing labels**
+
    ```html
    <!-- Bad: No accessible name -->
    <div role="button">×</div>
@@ -391,6 +397,7 @@ modal.addEventListener('keydown', (e) => {
    ```
 
 3. **Invalid combinations**
+
    ```html
    <!-- Bad: Button can't contain interactive -->
    <div role="button">
@@ -399,6 +406,7 @@ modal.addEventListener('keydown', (e) => {
    ```
 
 4. **Missing states**
+
    ```html
    <!-- Bad: No expanded state -->
    <button>Show Details</button>

@@ -15,6 +15,7 @@ This guide provides migration paths for major framework and language upgrades, i
 The `distutils` package has been completely removed from the standard library.
 
 **Migration:**
+
 ```python
 # Before (Python 3.11)
 from distutils.core import setup
@@ -53,6 +54,7 @@ version = "1.0.0"
 More compact and explicit generics with new `type` statement for type aliases.
 
 **Migration:**
+
 ```python
 # Before (Python 3.11)
 from typing import TypeVar, Generic, Callable, ParamSpec, TypeVarTuple, Unpack
@@ -95,6 +97,7 @@ type IntOrStrSequence[T: (int, str)] = Sequence[T]
 F-strings now support any valid Python expression, including quote reuse, multi-line expressions, and backslashes.
 
 **Migration:**
+
 ```python
 # Before - Had to use workarounds
 songs = ['Take me back to Eden', 'Alkaline', 'Ascensionism']
@@ -126,6 +129,7 @@ f"Value: {"\N{BLACK HEART SUIT}"}"
 Comprehensions are now inlined, changing behavior of `locals()` and tracebacks.
 
 **Migration:**
+
 ```python
 # Before (Python 3.11) - Worked fine
 [k for k in locals()]  # OK
@@ -203,6 +207,7 @@ ruff check --target-version py312 myproject/
 New permission system for resource access control.
 
 **Migration:**
+
 ```javascript
 // Node.js 20 requires explicit permission flags
 // Run your application with permissions:
@@ -229,6 +234,7 @@ process.permission.deny('fs.write', '/etc');  // Added later
 ESM loader hooks now run in a dedicated thread.
 
 **Migration:**
+
 ```javascript
 // Custom ESM loader (loader.mjs)
 // This now runs in its own thread in Node.js 20
@@ -253,6 +259,7 @@ New JavaScript features:
 - RegExp `v` flag with set notation
 
 **Migration:**
+
 ```javascript
 // New string methods
 const str = "Hello\uD800";  // Lone surrogate
@@ -277,6 +284,7 @@ const regex = /[\p{Letter}&&[^\p{ASCII}]]/v;  // Non-ASCII letters
 WASI now requires explicit version specification.
 
 **Migration:**
+
 ```javascript
 // Before (Node.js 18) - version defaulted to preview1
 import { WASI } from 'wasi';
@@ -301,6 +309,7 @@ const wasi = new WASI({
 The built-in test runner is now stable (no longer experimental).
 
 **Migration:**
+
 ```javascript
 // Before - required --test flag
 // node --experimental-test-coverage --test app.test.js
@@ -367,6 +376,7 @@ corepack prepare yarn@stable --activate
 After multiple preview releases, pattern matching for switch is now finalized.
 
 **Migration:**
+
 ```java
 // Before (Java 17) - Chain of if-else with instanceof
 static String formatter(Object obj) {
@@ -431,6 +441,7 @@ static void exhaustiveSwitch(CardClassification c) {
 Lightweight threads for high-throughput applications - production-ready in Java 21.
 
 **Migration:**
+
 ```java
 // Before - Platform threads (limited scalability)
 try (var executor = Executors.newCachedThreadPool()) {
@@ -516,6 +527,7 @@ class GoodExample {
 Deconstruct records in pattern matching.
 
 **Migration:**
+
 ```java
 // Before
 if (obj instanceof Point p) {
@@ -548,6 +560,7 @@ static void printSum(Object obj) {
 New interfaces for collections with a defined encounter order.
 
 **Migration:**
+
 ```java
 // New interfaces: SequencedCollection, SequencedSet, SequencedMap
 // Available on: LinkedHashSet, LinkedHashMap, TreeSet, TreeMap
@@ -759,14 +772,14 @@ try {
 
 ## References
 
-- Python 3.12 What's New: https://docs.python.org/3/whatsnew/3.12.html
-- PEP 695 - Type Parameter Syntax: https://peps.python.org/pep-0695/
-- PEP 701 - Syntactic formalization of f-strings: https://peps.python.org/pep-0701/
-- PEP 709 - Comprehension inlining: https://peps.python.org/pep-0709/
-- Node.js 20 Release Notes: https://nodejs.org/en/blog/release/v20.0.0
-- Node.js Permission Model: https://nodejs.org/api/permissions.html
-- Java 21 Release Notes: https://openjdk.org/projects/jdk/21/
-- JEP 441 - Pattern Matching for switch: https://openjdk.org/jeps/441
-- JEP 444 - Virtual Threads: https://openjdk.org/jeps/444
-- JEP 440 - Record Patterns: https://openjdk.org/jeps/440
-- JEP 431 - Sequenced Collections: https://openjdk.org/jeps/431
+- Python 3.12 What's New: <https://docs.python.org/3/whatsnew/3.12.html>
+- PEP 695 - Type Parameter Syntax: <https://peps.python.org/pep-0695/>
+- PEP 701 - Syntactic formalization of f-strings: <https://peps.python.org/pep-0701/>
+- PEP 709 - Comprehension inlining: <https://peps.python.org/pep-0709/>
+- Node.js 20 Release Notes: <https://nodejs.org/en/blog/release/v20.0.0>
+- Node.js Permission Model: <https://nodejs.org/api/permissions.html>
+- Java 21 Release Notes: <https://openjdk.org/projects/jdk/21/>
+- JEP 441 - Pattern Matching for switch: <https://openjdk.org/jeps/441>
+- JEP 444 - Virtual Threads: <https://openjdk.org/jeps/444>
+- JEP 440 - Record Patterns: <https://openjdk.org/jeps/440>
+- JEP 431 - Sequenced Collections: <https://openjdk.org/jeps/431>

@@ -126,12 +126,14 @@ See **[execution-strategies.md](execution-strategies.md)** for details.
 ## Best Practices
 
 ### DO:
+
 ✓ Break tasks into atomic units
 ✓ Define clear quality gates
 ✓ Match agents to requirements
 ✓ Monitor and validate incrementally
 
 ### DON'T:
+
 ✗ Create monolithic tasks
 ✗ Skip quality gates
 ✗ Assume independence without verification

@@ -30,6 +30,7 @@ flowchart TD
 - Generate commit message if not provided
 
 **Branch Naming Convention:**
+
 ```
 <type>-<description>-<timestamp>
 ```
@@ -37,6 +38,7 @@ flowchart TD
 Example: `feat-add-login-1712217600`
 
 **Logic:**
+
 ```bash
 if on main/master:
     if has_changes:
@@ -62,6 +64,7 @@ else:
 4. If conflicts, abort and report
 
 **Conflict Detection:**
+
 ```bash
 # Create temporary test branch
 git branch temp-branch HEAD
@@ -84,6 +87,7 @@ fi
 - Verify push succeeded (SHA comparison)
 
 **Commit Message Format:**
+
 ```
 type(scope): Brief description
 
@@ -108,6 +112,7 @@ Extended description (optional)
 - Generate comprehensive PR body
 
 **PR Body Template:**
+
 ```markdown
 ## Summary
 <commit message>
@@ -153,6 +158,7 @@ The skill attempts to identify whether failures are:
 - **New**: Introduced by current changes
 
 **Algorithm:**
+
 ```bash
 # 1. Get current PR checks
 pr_checks=$(gh pr checks $PR_NUMBER)
@@ -169,6 +175,7 @@ fi
 ```
 
 **Polling Strategy:**
+
 ```
 Poll Interval: 15 seconds
 Timeout: 3600 seconds (configurable)
@@ -199,6 +206,7 @@ Max Duration: 1 hour default
 | Rebase | `gh pr merge --rebase` | Fast-forward after rebase |
 
 **Merge State Check:**
+
 ```bash
 merge_state=$(gh pr view $PR --json mergeStateStatus --jq '.mergeStateStatus')
 
@@ -321,6 +329,7 @@ The skill uses a simplified approach:
 ### Future Enhancement
 
 Compare PR checks with base branch checks:
+
 ```bash
 # Get base branch status
 base_checks=$(gh api repos/{owner}/{repo}/commits/{base-sha}/check-runs)
@@ -386,6 +395,7 @@ See `evals/README.md` for test scenarios.
 ### Logs
 
 Structured logging with timestamps:
+
 ```
 [14:30:15] PHASE 1: PREPARE
 [14:30:15] Current branch: main

@@ -7,16 +7,19 @@ Before generating any design output, research current domain trends, platform gu
 ## Search Strategy
 
 ### Round 1: Domain Trends (2 min)
+
 **Query:** `"[product type] UI design trends [current year]"`
 
 Extract: navigation conventions, component patterns, typography/color trends, interaction patterns.
 
 ### Round 2: Platform Guidelines (2 min)
+
 **Query:** `"[platform] design system guidelines [current year]"`
 
 Extract: platform-specific spacing/type/color, navigation patterns, accessibility requirements.
 
 ### Round 3: Anti-Patterns (1 min)
+
 **Query:** `"[product type] UX anti-patterns"`
 
 Extract: common failures, accessibility pitfalls specific to domain.
@@ -45,6 +48,7 @@ research_context:
 ```
 
 ## Quality Rules
+
 1. Never cite sources older than 18 months for trends
 2. Always include current year in search queries
 3. Prefer 2 focused searches over 5 broad ones

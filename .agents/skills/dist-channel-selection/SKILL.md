@@ -18,6 +18,7 @@ Ensure artifacts are published to the correct channels with appropriate verifica
 | CLI (Rust)    | GitHub/npm | `scripts/quality_gate.sh` | `cargo build --release` |
 
 ## Preconditions
+
 - [ ] Version bumped in `VERSION` file.
 - [ ] `CHANGELOG.md` updated with new version details.
 - [ ] `./scripts/quality_gate.sh` passes locally.
@@ -26,19 +27,24 @@ Ensure artifacts are published to the correct channels with appropriate verifica
 ## Publishing Process
 
 ### 1. Verification
+
 Run the domain-specific verification tools (e.g., WASM size gates, LOC enforcement).
 
 ### 2. Dry Run
+
 Always perform a dry run before the final publish to catch packaging issues.
 
 ### 3. Final Publish
+
 Use the official toolchain for the selected channel.
 
 ## Common Pitfalls
+
 - Publishing WASM binaries without size verification.
 - Forgetting to sync the `VERSION` file across sub-packages.
 - Incomplete CHANGELOG leading to consumer confusion.
 
 ## References
+
 - `AGENTS.md` - Version management policy
 - `scripts/wasm_size_gate.sh` - WASM size enforcement

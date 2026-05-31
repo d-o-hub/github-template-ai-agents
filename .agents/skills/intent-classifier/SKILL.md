@@ -12,16 +12,19 @@ Classify user requests and route them to the most appropriate skill, command, or
 ## Classification Workflow
 
 ### 1. Intent Extraction
+
 - Parse the user's natural language request
 - Identify primary action (create, update, delete, analyze, etc.)
 - Extract entities (file paths, technologies, specific terms)
 
 ### 2. Skill Matching
+
 - Compare against available skills catalog
 - Score match confidence for each candidate
 - Consider skill descriptions and keywords
 
 ### 3. Route Decision
+
 - Select highest-confidence match
 - Handle ties and ambiguous cases
 - Fall back to general assistance if no match
@@ -29,12 +32,14 @@ Classify user requests and route them to the most appropriate skill, command, or
 ## Classification Rules
 
 ### Priority Order
+
 1. **Exact keyword match** - Skill description contains exact phrase
 2. **Domain match** - Technology stack alignment
 3. **Action match** - Verb/action alignment
 4. **Context match** - File paths, extensions, surrounding context
 
 ### Confidence Scoring
+
 ```
 High (0.8-1.0):   Exact description match, multiple keyword hits
 Medium (0.5-0.7): Partial match, related domain
@@ -61,6 +66,7 @@ When a request contains multiple intents:
 ## Dynamic Catalog
 
 Update the skill catalog using:
+
 ```bash
 ./scripts/dynamic-catalog.sh
 ```

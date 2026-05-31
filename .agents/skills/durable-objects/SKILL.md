@@ -17,10 +17,10 @@ Your knowledge of Durable Objects APIs and configuration may be outdated. Prefer
 
 | Resource | URL |
 |----------|-----|
-| Docs | https://developers.cloudflare.com/durable-objects/ |
-| API Reference | https://developers.cloudflare.com/durable-objects/api/ |
-| Best Practices | https://developers.cloudflare.com/durable-objects/best-practices/ |
-| Examples | https://developers.cloudflare.com/durable-objects/examples/ |
+| Docs | <https://developers.cloudflare.com/durable-objects/> |
+| API Reference | <https://developers.cloudflare.com/durable-objects/api/> |
+| Best Practices | <https://developers.cloudflare.com/durable-objects/best-practices/> |
+| Examples | <https://developers.cloudflare.com/durable-objects/examples/> |
 
 ## When to Use
 
@@ -122,9 +122,11 @@ export default {
 - Holding `blockConcurrencyWhile()` across `fetch()` or external I/O.
 
 ## References
+
 - `references/rules.md` - Core rules, storage, concurrency, RPC, alarms
 
 ## Rationalizations
+
 | Concern | Counter-Argument |
 |---------|------------------|
 | "I can handle state in a global variable." | Durable Objects provide persistence across restarts and evictions. |
@@ -132,6 +134,7 @@ export default {
 | "I'll just use fetch() for communication." | RPC methods provide better type safety and performance (no HTTP overhead). |
 
 ## Red Flags
+
 - [ ] Using a single Durable Object for all application state.
 - [ ] Performing external API calls inside `blockConcurrencyWhile()`.
 - [ ] Lack of a migration strategy for SQLite schema updates.

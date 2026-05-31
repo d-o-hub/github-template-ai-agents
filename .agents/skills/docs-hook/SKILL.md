@@ -22,6 +22,7 @@ Ultra-lightweight documentation sync via git hooks.
 ```
 
 Or add to `.git/hooks/post-commit`:
+
 ```bash
 #!/bin/bash
 ./scripts/docs-sync.sh HEAD~1 HEAD

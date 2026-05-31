@@ -3,6 +3,7 @@
 ## Design & Sharding
 
 ### Model Around Coordination Atoms
+
 Create one DO per logical unit needing coordination: chat room, game session, document, user, tenant.
 
 ```typescript
@@ -16,12 +17,15 @@ const stub = env.CHAT_ROOM.getByName("global"); // Bottleneck!
 ## Storage
 
 ### SQLite (Recommended)
+
 Configure in wrangler:
+
 ```json
 { "migrations": [{ "tag": "v1", "new_sqlite_classes": ["MyDO"] }] }
 ```
 
 SQL API is synchronous:
+
 ```typescript
 // Write
 this.ctx.storage.sql.exec(
@@ -42,16 +46,21 @@ const rows = this.ctx.storage.sql
 ## Concurrency
 
 ### Input/Output Gates
+
 Storage operations automatically block other requests (input gates). Responses wait for writes (output gates).
 
 ### blockConcurrencyWhile()
+
 Blocks ALL concurrency. Use sparingly - only for initialization. Never hold across external I/O (fetch, R2, KV).
 
 ## RPC Methods
+
 Use RPC (compatibility date >= 2024-04-03) instead of fetch() handler.
 
 ## Alarms
+
 One alarm per DO. `setAlarm()` replaces existing. Alarms auto-retry on failure. Use idempotent handlers.
 
 ## WebSockets (Hibernation API)
+
 Durable Objects can accept WebSocket connections and hibernate while waiting for messages, reducing costs.

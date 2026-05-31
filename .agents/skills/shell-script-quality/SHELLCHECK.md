@@ -5,6 +5,7 @@ Comprehensive ShellCheck reference for shell script quality assurance.
 ## Common Warnings & Fixes
 
 ### SC2086: Double quote to prevent globbing
+
 **Problem**: Unquoted variables can cause word splitting and globbing
 
 ```bash
@@ -18,6 +19,7 @@ for arg in "$@"; do
 ```
 
 ### SC2155: Declare and assign separately
+
 **Problem**: Masks return values from commands
 
 ```bash
@@ -30,6 +32,7 @@ result=$(curl -s api.example.com)
 ```
 
 ### SC2181: Check exit code directly
+
 **Problem**: Race condition with $?
 
 ```bash
@@ -42,6 +45,7 @@ if ! command; then
 ```
 
 ### SC2068: Double quote array expansions
+
 ```bash
 # ❌ Bad
 for file in ${files[@]}; do
@@ -127,6 +131,7 @@ shellcheck -e SC2086,SC2181 script.sh
 ## Editor Integration
 
 **VS Code**:
+
 ```json
 {
   "shellcheck.enable": true,
@@ -135,6 +140,7 @@ shellcheck -e SC2086,SC2181 script.sh
 ```
 
 **Vim**:
+
 ```vim
 let g:shellcheck_enabled = 1
 ```

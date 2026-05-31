@@ -75,6 +75,7 @@ Guidelines for effective operation.
 The description determines when the agent is invoked - it must be specific and actionable.
 
 **Good Description Structure**:
+
 ```
 [What agent does]. Invoke when [specific scenarios requiring this agent].
 ```
@@ -82,21 +83,25 @@ The description determines when the agent is invoked - it must be specific and a
 **Examples**:
 
 ✅ Excellent:
+
 ```yaml
 description: Execute tests and diagnose failures in Rust projects. Invoke when you need to run test suites, debug failing tests, fix async/await issues, or verify test coverage.
 ```
 
 ✅ Good:
+
 ```yaml
 description: Review code for quality, standards compliance, and performance issues. Invoke when conducting code reviews, pre-commit checks, or quality audits.
 ```
 
 ✗ Too vague:
+
 ```yaml
 description: Helps with testing
 ```
 
 ✗ Missing invocation scenarios:
+
 ```yaml
 description: A specialized testing agent
 ```
@@ -426,6 +431,7 @@ Handle [specific scenarios]
 - Results: [details]
 - Issues: [any problems]
 ```
+
 ```
 
 ### Template 2: Analysis Agent
@@ -515,6 +521,7 @@ Analysis must be:
 1. [Priority 1 action]
 2. [Priority 2 action]
 ```
+
 ```
 
 ### Template 3: Coordination Agent
@@ -615,6 +622,7 @@ Between phases, validate:
 - Deliverables: [list]
 - Quality: [validation]
 ```
+
 ```
 
 ## Integration Guidelines
@@ -648,14 +656,18 @@ This agent works with:
 
 **Sequential**:
 ```
+
 This agent → agent-name-1 → agent-name-2
+
 ```
 
 **Parallel**:
 ```
+
 This agent launches:
 ├─ agent-name-1
 └─ agent-name-2
+
 ```
 ```
 
@@ -734,6 +746,7 @@ desc=$(grep "^description:" .claude/agents/agent-name.md | cut -d' ' -f2-)
 ## Best Practices Summary
 
 ### DO:
+
 ✓ Define clear, specific purpose for agent
 ✓ Write detailed, actionable system prompts
 ✓ Select minimal necessary tools
@@ -743,6 +756,7 @@ desc=$(grep "^description:" .claude/agents/agent-name.md | cut -d' ' -f2-)
 ✓ Update README.md to list new agent
 
 ### DON'T:
+
 ✗ Create agents for tasks that skills can handle
 ✗ Write vague or generic system prompts
 ✗ Grant unnecessary tools (security risk)

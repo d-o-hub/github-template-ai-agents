@@ -200,7 +200,6 @@ agent-browser batch --bail < commands.json
 
 Use `batch` when you have a known sequence of commands that don't depend on intermediate output. Use separate commands or `&&` chaining when you need to parse output between steps (e.g., snapshot to discover refs, then interact).
 
-
 ## Reference Files
 
 - `references/PATTERNS.md` - Common patterns, security, and advanced usage

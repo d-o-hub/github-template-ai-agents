@@ -19,6 +19,7 @@ Comprehensive guide for breaking down complex tasks into atomic, actionable goal
 - What could go wrong and how to prevent it?
 
 **Analysis Template**:
+
 ```markdown
 ## Requirements Analysis
 
@@ -46,6 +47,7 @@ Comprehensive guide for breaking down complex tasks into atomic, actionable goal
 ### 2. Goal Hierarchy
 
 **Top-Down Decomposition**:
+
 ```
 Main Goal: [High-level objective]
 ├─ Sub-goal 1: [Component 1]
@@ -75,34 +77,42 @@ Main Goal: [High-level objective]
 **Dependency Types**:
 
 #### Sequential Dependencies
+
 ```
 Task A → Task B → Task C
 (B requires A's output, C requires B's output)
 ```
+
 **Example**: Design schema → Create tables → Insert data
 
 #### Parallel Independent
+
 ```
 Task A ─┐
 Task B ─┼─ [All can run simultaneously]
 Task C ─┘
 ```
+
 **Example**: Test module A, Test module B, Test module C
 
 #### Converging Dependencies
+
 ```
 Task A ─┐
 Task B ─┼─> Task D (requires A, B, C)
 Task C ─┘
 ```
+
 **Example**: Implement features A, B, C → Integration testing
 
 #### Resource Dependencies
+
 ```
 Task A (needs resource X)
 Task B (needs resource X)
 → Sequential or resource pooling required
 ```
+
 **Example**: Two tasks writing to same database table
 
 **Dependency Identification Questions**:
@@ -132,6 +142,7 @@ For each task, define:
 - Documentation requirements
 
 **Success Criteria Template**:
+
 ```markdown
 ### Task: [Name]
 
@@ -255,6 +266,7 @@ Dependency Graph:
 - Quick wins (early validation)
 
 **Priority Assignment Template**:
+
 ```markdown
 ### Priority Assignment
 
@@ -273,6 +285,7 @@ Dependency Graph:
 ### Step 6: Estimate Complexity
 
 For each task:
+
 ```markdown
 Task: [Name]
 - Complexity: [Low/Medium/High]
@@ -291,6 +304,7 @@ Task: [Name]
 ### Pattern 1: Layer-Based Decomposition
 
 For architectural changes:
+
 ```
 1. Data/Storage layer
    - Schema design
@@ -323,6 +337,7 @@ For architectural changes:
 ### Pattern 2: Feature-Based Decomposition
 
 For new features:
+
 ```
 1. Core functionality (MVP)
    - Minimum viable implementation
@@ -360,6 +375,7 @@ For new features:
 ### Pattern 3: Phase-Based Decomposition
 
 For large projects:
+
 ```
 Phase 1: Research & Design
 - Understand requirements
@@ -403,6 +419,7 @@ Phase 6: Documentation & Release
 ### Pattern 4: Problem-Solution Decomposition
 
 For debugging/fixing:
+
 ```
 1. Reproduce issue
    - Understand symptoms
@@ -598,54 +615,60 @@ Estimated time: 1-2 days
 ### Common Pitfalls
 
 ✗ Tasks too large or vague
-  - Fix: Break down further until atomic
+- Fix: Break down further until atomic
 
 ✗ Missing dependencies
-  - Fix: Review each task for hidden dependencies
+- Fix: Review each task for hidden dependencies
 
 ✗ Unclear success criteria
-  - Fix: Define specific, measurable outcomes
+- Fix: Define specific, measurable outcomes
 
 ✗ Over-decomposition (too granular)
-  - Fix: Combine micro-tasks into meaningful units
+- Fix: Combine micro-tasks into meaningful units
 
 ✗ Missing quality/testing tasks
-  - Fix: Add explicit testing and validation tasks
+- Fix: Add explicit testing and validation tasks
 
 ✗ No consideration for error handling
-  - Fix: Include error handling in each task
+- Fix: Include error handling in each task
 
 ✗ Forgetting documentation tasks
-  - Fix: Add documentation as explicit tasks
+- Fix: Add documentation as explicit tasks
 
 ## Tips for Effective Decomposition
 
 ### 1. Start with Why
+
 - Understand the true goal behind the request
 - Identify implicit requirements
 - Consider broader context
 
 ### 2. Think Top-Down
+
 - Start with high-level components
 - Decompose each component separately
 - Stop at appropriate granularity
 
 ### 3. Consider the User
+
 - What value does each task provide?
 - Can tasks be reordered for faster feedback?
 - What's the minimum viable solution?
 
 ### 4. Plan for Quality
+
 - Include testing tasks
 - Include documentation tasks
 - Include review/validation tasks
 
 ### 5. Anticipate Issues
+
 - What could go wrong?
 - What are the unknowns?
 - Where are the risks?
 
 ### 6. Enable Parallelization
+
 - Identify truly independent tasks
 - Break dependencies where possible
 - Consider resource constraints

@@ -1,9 +1,11 @@
 # Self-Learning Loop Reference
 
 ## Capture
+
 After every run: what improved, what confused, what harmed.
 
 ## Format
+
 ```yaml
 lessons_learned:
   run_id: string
@@ -19,12 +21,15 @@ lessons_learned:
 ```
 
 ## When to Create a Rule
+
 - Same issue in 2+ runs
 - Specific technique consistently improves output
 - Translation should become standard
 
 ## Application
+
 Before new run: check prior lessons for same product type, apply matching rules, avoid prior mistakes.
 
 ## Log Format
+
 Append to `ui-ux-session.jsonl` (one JSON line per iteration) and `ui-ux-session.md` (readable summary).

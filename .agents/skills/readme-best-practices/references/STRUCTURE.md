@@ -88,6 +88,7 @@ python -m scripts.resolve "your search query"
 Or try the **[live demo →](https://demo.example.com)**
 
 ---
+
 ```
 
 ---
@@ -100,6 +101,7 @@ Or try the **[live demo →](https://demo.example.com)**
 ### Resolution Cascade
 
 ```
+
 Input
   │
   ▼
@@ -112,6 +114,7 @@ Input
 ├────────────────────────────────────────────────┤
 │ N. Fallback                   (free)           │
 └────────────────────────────────────────────────┘
+
 ```
 ```
 
@@ -159,6 +162,7 @@ cd cli && cargo build --release
 cd web && npm install && npm run dev
 # Open http://localhost:3000
 ```
+
 ```
 
 ---
@@ -182,6 +186,7 @@ export PROVIDER_API_KEY="your-key"
 # Windows PowerShell
 $env:PROVIDER_API_KEY="your-key"
 ```
+
 ```
 
 ---
@@ -192,6 +197,7 @@ $env:PROVIDER_API_KEY="your-key"
 ## Repository Structure
 
 ```
+
 repo-name/
 ├── README.md             # This file
 ├── CONTRIBUTING.md       # Contribution guidelines
@@ -202,6 +208,7 @@ repo-name/
 ├── scripts/              # Helper scripts
 ├── assets/               # Logo and screenshots
 └── .github/workflows/    # CI/CD pipelines
+
 ```
 ```
 

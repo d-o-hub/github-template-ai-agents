@@ -39,6 +39,7 @@ DELIVERABLES:
 ```
 
 ## Checklist
+
 - [ ] All placeholders filled
 - [ ] No banned adjectives
 - [ ] Colors use semantic tokens

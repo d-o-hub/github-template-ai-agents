@@ -329,13 +329,13 @@ fi
 if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
     printf "%bRunning Markdown checks...%b\n" "${BLUE}" "${NC}"
     if command -v markdownlint &> /dev/null; then
-        MD_FILES=$(find . -name "*.md" -not -path "./node_modules/*" -not -path "./target/*" -not -path "./.git/*" 2>/dev/null || true)
+        MD_FILES=$(find . -name "*.md" -not -path "*/node_modules/*" -not -path "./target/*" -not -path "./.git/*" -not -path "./vendor/*" 2>/dev/null || true)
         if [ -n "$MD_FILES" ]; then
             md_failed=0
             TMP_MD_OUT=$(mktemp)
             while IFS= read -r md_file; do
                 [ -n "$md_file" ] || continue
-                if ! lint_if_changed "$md_file" "markdownlint" "markdownlint.toml" markdownlint -- "$md_file" >"$TMP_MD_OUT" 2>&1; then
+                if ! lint_if_changed "$md_file" "markdownlint" ".markdownlintrc" markdownlint -- "$md_file" >"$TMP_MD_OUT" 2>&1; then
                     printf "%b  ✗ markdownlint failed: %s%b\n" "${RED}" "$md_file" "${NC}"
                     cat "$TMP_MD_OUT" >&2
                     md_failed=1

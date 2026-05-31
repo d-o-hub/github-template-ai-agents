@@ -39,6 +39,7 @@ gh pr diff <pr-number> --name-only
 | Security Scan | ⬜ Pass | Check security job output |
 
 **Verification Commands:**
+
 ```bash
 # List recent workflow runs for this PR
 gh run list --branch $(git branch --show-current) --limit 10
@@ -72,6 +73,7 @@ gh run view <run-id> --log-failed
 | YAML | yamllint | ⬜ Pass | `yamllint .github/` |
 
 **Auto-fix Commands:**
+
 ```bash
 # Python
 ruff check . --fix
@@ -106,6 +108,7 @@ gofmt -w .
 | Shell Tests (BATS) | ⬜ Pass/N/A | `bats tests/` | ⬜ N/A |
 
 **Test Commands by Language:**
+
 ```bash
 # Python
 pytest tests/ -v --tb=short
@@ -149,6 +152,7 @@ bats tests/
 | Container Scan | trivy | ⬜ Pass/N/A | `trivy image <image>` |
 
 **Security Commands:**
+
 ```bash
 # Python
 bandit -r . -f json -o bandit-report.json || true
@@ -179,6 +183,7 @@ git-secrets --scan
 | Architecture Review | ⬜ Approved/N/A | Required for large refactors |
 
 **Review Commands:**
+
 ```bash
 # View PR review status
 gh pr view <number> --json reviews
@@ -212,6 +217,7 @@ gh pr view <number> --json comments
 | Required Reviews | ⬜ Satisfied | See section 5 |
 
 **Branch Protection Commands:**
+
 ```bash
 # Check if branch is up to date with base
 git fetch origin
@@ -225,6 +231,7 @@ git rev-list --merges --count origin/main..HEAD | grep -q "^0$" && echo "Linear"
 ```
 
 **Rebase Commands:**
+
 ```bash
 # Rebase onto latest main
 git fetch origin

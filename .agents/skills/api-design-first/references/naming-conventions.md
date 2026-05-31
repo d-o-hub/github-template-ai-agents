@@ -10,6 +10,7 @@
 ## Resource Names
 
 ### Plural Nouns
+
 ```
 /users        (not /user)
 /orders       (not /order)
@@ -17,7 +18,9 @@
 ```
 
 ### Compound Words
+
 - Use kebab-case (hyphen-separated lowercase)
+
 ```
 /order-items
 /user-preferences
@@ -25,6 +28,7 @@
 ```
 
 ### Avoid Verbs in Paths
+
 ```
 # Bad
 /createUser
@@ -40,6 +44,7 @@ PUT    /products/{id}
 ## Field Names
 
 ### JSON Property Names
+
 - Use camelCase for JavaScript/TypeScript APIs
 - Use snake_case for Python/Ruby APIs
 - Be consistent within your ecosystem
@@ -61,7 +66,9 @@ PUT    /products/{id}
 ```
 
 ### Boolean Fields
+
 Use positive, boolean-sounding names:
+
 ```
 isActive      (not status)
 hasPermission (not permissionFlag)
@@ -70,7 +77,9 @@ canEdit       (not editAllowed)
 ```
 
 ### Date/Time Fields
+
 Include the data type in the name:
+
 ```
 createdAt   / created_at
 updatedAt   / updated_at
@@ -80,6 +89,7 @@ publishedAt / published_at
 ```
 
 ### Relationship Fields
+
 ```
 // Singular relationship
 authorId    / author_id
@@ -92,6 +102,7 @@ memberIds   / member_ids
 ## Query Parameters
 
 ### Filtering
+
 ```
 ?status=active
 ?role=admin&department=sales
@@ -99,6 +110,7 @@ memberIds   / member_ids
 ```
 
 ### Operators
+
 ```
 ?age_gt=18       (greater than)
 ?price_lt=100    (less than)
@@ -109,6 +121,7 @@ memberIds   / member_ids
 ```
 
 ### Sorting
+
 ```
 ?sort=created_at           (ascending)
 ?sort=-created_at          (descending)
@@ -118,6 +131,7 @@ memberIds   / member_ids
 ## Enums
 
 Use UPPER_SNAKE_CASE for enum values:
+
 ```json
 {
   "status": "PENDING",
@@ -126,6 +140,7 @@ Use UPPER_SNAKE_CASE for enum values:
 ```
 
 Or use lowercase if more readable:
+
 ```json
 {
   "status": "pending",
@@ -136,6 +151,7 @@ Or use lowercase if more readable:
 ## Error Codes
 
 Use UPPER_SNAKE_CASE:
+
 ```
 VALIDATION_ERROR
 AUTHENTICATION_FAILED
@@ -147,13 +163,16 @@ INSUFFICIENT_PERMISSIONS
 ## URL Patterns
 
 ### Versioning
+
 ```
 /v1/users
 /api/v2/products
 ```
 
 ### Actions on Resources
+
 For actions that don't fit CRUD:
+
 ```
 POST /users/{id}/activate
 POST /orders/{id}/cancel
@@ -161,6 +180,7 @@ POST /sessions/{id}/refresh
 ```
 
 ### Search
+
 ```
 GET /search?q=query&category=products
 POST /search (for complex queries)

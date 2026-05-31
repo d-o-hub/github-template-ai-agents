@@ -21,24 +21,28 @@ Systematic approach to complex code migrations with safety guardrails and rollba
 ## Core Workflow
 
 ### Phase 1: Analysis
+
 1. **Identify scope** - What files, modules, and dependencies are affected?
 2. **Map dependencies** - Create a dependency graph of cross-file relationships
 3. **Find breaking changes** - Analyze changelogs, migration guides, deprecation warnings
 4. **Assess risk** - Flag high-risk changes (public APIs, critical paths)
 
 ### Phase 2: Planning
+
 1. **Create migration plan** - Ordered sequence of changes
 2. **Define checkpoints** - Intermediate states that compile/work
 3. **Design rollback strategy** - How to revert if issues arise
 4. **Estimate effort** - Time and complexity assessment
 
 ### Phase 3: Execution
+
 1. **Execute in phases** - Apply changes incrementally
 2. **Validate at each checkpoint** - Test compilation, run tests, verify functionality
 3. **Document changes** - Update docs, changelogs, ADRs
 4. **Commit incrementally** - Each checkpoint is a commit
 
 ### Phase 4: Validation
+
 1. **Run full test suite** - Verify nothing broken
 2. **Performance testing** - Ensure no regressions
 3. **Code review** - Human validation of changes
@@ -47,12 +51,15 @@ Systematic approach to complex code migrations with safety guardrails and rollba
 ## Migration Patterns
 
 ### Pattern 1: Gradual Migration
+
 ```
 Old API → Compatibility Layer → New API → Remove Old
 ```
+
 **When**: Cannot change all call sites at once
 
 ### Pattern 2: Feature Flags
+
 ```javascript
 if (useNewImplementation) {
   return newImplementation();
@@ -60,19 +67,24 @@ if (useNewImplementation) {
   return oldImplementation();
 }
 ```
+
 **When**: High-risk changes needing rollback capability
 
 ### Pattern 3: Strangler Fig
+
 ```
 Monolith → Proxy → New Service
               → Old Monolith
 ```
+
 **When**: Decomposing monoliths incrementally
 
 ### Pattern 4: Parallel Implementation
+
 ```
 Old System (read-only) → Data Sync → New System (write)
 ```
+
 **When**: Zero-downtime migrations with data changes
 
 See `references/migration-patterns.md` for detailed implementations.
@@ -80,6 +92,7 @@ See `references/migration-patterns.md` for detailed implementations.
 ## Breaking Change Analysis
 
 ### Checklist for Upgrades
+
 - [ ] Review CHANGELOG for breaking changes
 - [ ] Check deprecation warnings in current version
 - [ ] Identify removed/renamed APIs
@@ -89,6 +102,7 @@ See `references/migration-patterns.md` for detailed implementations.
 - [ ] Search for known issues in community
 
 ### Common Breaking Changes
+
 | Category | Examples |
 |----------|----------|
 | API Removal | `function removed()` |
@@ -100,12 +114,14 @@ See `references/migration-patterns.md` for detailed implementations.
 ## Cross-File Dependency Tracking
 
 ### Dependency Graph Elements
+
 - **Imports/includes** - File A imports File B
 - **Inheritance** - Class A extends Class B
 - **Interface implementations** - Class implements Interface
 - **Function calls** - Function in A calls function in B
 
 ### Tools by Language
+
 - **Python**: `pydeps`, `importlab`
 - **JavaScript/TypeScript**: `dependency-cruiser`, `madge`
 - **Java**: `jdeps`, `classycle`
@@ -117,6 +133,7 @@ See `references/dependency-analysis.md` for detailed usage.
 ## Safety Patterns
 
 ### Snapshot Testing
+
 ```python
 # Before migration: capture expected outputs
 save_snapshot(test_output, "v1_expected.json")
@@ -126,6 +143,7 @@ assert_matches_snapshot(actual_output, "v1_expected.json")
 ```
 
 ### Property-Based Testing
+
 ```python
 # Verify invariants hold post-migration
 @given(st.data())
@@ -136,6 +154,7 @@ def test_migration_preserves_properties(data):
 ```
 
 ### Canary Deployments
+
 1. Deploy to 1% of traffic
 2. Monitor error rates, latency
 3. Gradually increase to 100%
@@ -146,23 +165,29 @@ See `references/safety-patterns.md` for more patterns.
 ## Rollback Strategies
 
 ### Strategy 1: Git Revert
+
 ```bash
 # If migration is in single commit
 git revert <migration-commit>
 ```
+
 **Best for**: Small, isolated migrations
 
 ### Strategy 2: Feature Flag Disable
+
 ```python
 USE_NEW_PARSER = False  # Env var or config
 ```
+
 **Best for**: Gradual rollouts
 
 ### Strategy 3: Database Rollback
+
 ```sql
 -- Migration down script
 ALTER TABLE users DROP COLUMN email_normalized;
 ```
+
 **Best for**: Schema changes with data loss concerns
 
 See `references/rollback-strategies.md` for platform-specific guides.
@@ -170,6 +195,7 @@ See `references/rollback-strategies.md` for platform-specific guides.
 ## Examples
 
 ### React Class to Hooks
+
 1. Convert `componentDidMount` + `componentWillUnmount` → `useEffect`
 2. Convert `componentDidUpdate` → `useEffect` with dependency array
 3. Convert `this.state` → `useState`
@@ -177,6 +203,7 @@ See `references/rollback-strategies.md` for platform-specific guides.
 5. Remove `this` bindings
 
 ### Python 2 to 3
+
 ```bash
 # Generate patch
 2to3 -w --output-dir=src_py3 src/

@@ -1226,8 +1226,8 @@ class MigrationHealthChecker:
 
 ## References
 
-- Martin Fowler - Feature Toggles: https://martinfowler.com/articles/feature-toggles.html
-- Martin Fowler - Circuit Breaker: https://martinfowler.com/bliki/CircuitBreaker.html
-- Google SRE Book - Error Budgets: https://sre.google/sre-book/embracing-risk/
-- AWS Well-Architected - Reliability Pillar: https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html
-- Azure Chaos Studio: https://azure.microsoft.com/en-us/services/chaos-studio/
+- Martin Fowler - Feature Toggles: <https://martinfowler.com/articles/feature-toggles.html>
+- Martin Fowler - Circuit Breaker: <https://martinfowler.com/bliki/CircuitBreaker.html>
+- Google SRE Book - Error Budgets: <https://sre.google/sre-book/embracing-risk/>
+- AWS Well-Architected - Reliability Pillar: <https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html>
+- Azure Chaos Studio: <https://azure.microsoft.com/en-us/services/chaos-studio/>

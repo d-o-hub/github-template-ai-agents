@@ -201,6 +201,7 @@ num_results = 5
 1. **Use release builds**: `cargo build --release`
 2. **Strip binary**: `strip target/release/do-wdr`
 3. **LTO**: Enable in `Cargo.toml`:
+
    ```toml
    [profile.release]
    lto = true

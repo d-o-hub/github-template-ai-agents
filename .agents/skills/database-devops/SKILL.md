@@ -21,6 +21,7 @@ Database lifecycle management with DevOps practices for safe schema evolution, q
 ## Core Workflow
 
 ### Schema Design Phase
+
 1. **Requirements gathering** - Data entities, relationships, access patterns
 2. **Conceptual design** - ERD, entity relationships, cardinality
 3. **Logical design** - Table structures, column types, constraints
@@ -28,6 +29,7 @@ Database lifecycle management with DevOps practices for safe schema evolution, q
 5. **Normalization review** - 3NF/BCNF compliance vs. denormalization needs
 
 ### Migration Planning Phase
+
 1. **Analyze current schema** - Existing tables, constraints, indexes
 2. **Define target state** - Desired schema changes
 3. **Plan migration steps** - Ordered, idempotent operations
@@ -35,6 +37,7 @@ Database lifecycle management with DevOps practices for safe schema evolution, q
 5. **Design rollback** - Reversible operations where possible
 
 ### Execution Phase
+
 1. **Test in staging** - Run migrations against production-like data
 2. **Backup data** - Full backup before destructive changes
 3. **Execute migration** - Apply changes with monitoring
@@ -44,6 +47,7 @@ Database lifecycle management with DevOps practices for safe schema evolution, q
 ## Schema Design Patterns
 
 ### Audit Trail
+
 ```sql
 ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE users ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
@@ -55,6 +59,7 @@ CREATE TRIGGER update_users_updated_at
 ```
 
 ### Soft Delete
+
 ```sql
 ALTER TABLE users ADD COLUMN deleted_at TIMESTAMP;
 ALTER TABLE users ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
@@ -64,6 +69,7 @@ SELECT * FROM users WHERE is_deleted = FALSE;
 ```
 
 ### Multi-Tenancy
+
 ```sql
 -- Shared table with tenant_id
 CREATE TABLE orders (
@@ -79,6 +85,7 @@ See `references/schema-patterns.md` for event sourcing, temporal tables, and mor
 ## Migration Safety
 
 ### Expand-Contract Pattern
+
 ```sql
 -- Phase 1: Add new column (nullable)
 ALTER TABLE users ADD COLUMN email_normalized VARCHAR(255);
@@ -91,6 +98,7 @@ ALTER TABLE users ALTER COLUMN email_normalized SET NOT NULL;
 ```
 
 ### Online Schema Change
+
 ```bash
 # Percona Toolkit for MySQL
 pt-online-schema-change \
@@ -104,6 +112,7 @@ See `references/migration-patterns.md` for gh-ost, batching strategies, and zero
 ## Query Optimization
 
 ### Indexing Strategy
+
 ```sql
 -- Composite index for multi-column queries
 CREATE INDEX idx_orders_user_date ON orders(user_id, created_at);
@@ -116,6 +125,7 @@ CREATE INDEX idx_email_lower ON users(LOWER(email));
 ```
 
 ### Query Rewriting
+
 ```sql
 -- Before: N+1 query
 -- After: JOIN to avoid N+1
@@ -130,6 +140,7 @@ See `references/query-optimization.md` for EXPLAIN analysis, covering indexes, a
 ## Infrastructure-as-Code
 
 ### Terraform Example
+
 ```hcl
 resource "aws_db_instance" "main" {
   identifier           = "myapp-db"
@@ -149,6 +160,7 @@ See `references/iac-examples.md` for Pulumi, CloudFormation, and multi-cloud exa
 ## Backup and Recovery
 
 ### Continuous Archiving
+
 ```bash
 # PostgreSQL WAL archiving
 wal_level = replica

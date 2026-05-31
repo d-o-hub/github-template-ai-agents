@@ -17,23 +17,27 @@ Perform security audits on code, configurations, and repositories to identify vu
 ## Audit Workflow
 
 ### 1. Initial Assessment
+
 - Identify the technology stack and frameworks
 - Determine the application's attack surface
 - Review authentication and authorization mechanisms
 
 ### 2. Static Analysis
+
 - Check for injection vulnerabilities (SQL, NoSQL, OS command, LDAP)
 - Identify insecure deserialization
 - Review cryptographic implementations
 - Validate input sanitization
 
 ### 3. Configuration Review
+
 - Review security headers (CSP, HSTS, X-Frame-Options)
 - Check CORS policies
 - Validate session management settings
 - Examine environment variable handling
 
 ### 4. Dependency Scanning
+
 - Check for known CVEs in dependencies
 - Review outdated packages
 - Validate license compliance
@@ -41,6 +45,7 @@ Perform security audits on code, configurations, and repositories to identify vu
 ## Common Vulnerability Patterns
 
 ### Injection Flaws
+
 ```python
 # BAD: Direct string concatenation
 query = "SELECT * FROM users WHERE id = " + user_id
@@ -50,12 +55,14 @@ cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
 ```
 
 ### Secrets Management
+
 - Never hardcode credentials in source code
 - Use environment variables or secure vaults
 - Rotate keys regularly
 - Use placeholders like `[REDACTED]` or `example-token` in examples
 
 ### Authentication Issues
+
 - Enforce strong password policies
 - Implement multi-factor authentication
 - Use secure session tokens with proper expiration
@@ -78,6 +85,7 @@ cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
 4. **Add security monitoring and logging**
 
 ## Rationalizations
+
 | Rationalization | Reality |
 |-----------------|---------|
 | "This is just internal code, security doesn't matter as much" | Internal tools are common entry points for lateral movement. |
@@ -85,6 +93,7 @@ cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
 | "A security review will slow us down" | 1 hour of review > 1 week of incident response and data breach cleanup. |
 
 ## Red Flags
+
 - [ ] Dismissing vulnerabilities as "unlikely to be exploited" without evidence
 - [ ] Skipping dependency scans for "trusted" third-party libraries
 - [ ] Hardcoding "temporary" secrets with the intent to remove them later

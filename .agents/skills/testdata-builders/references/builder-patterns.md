@@ -45,6 +45,7 @@ function makeUser(overrides = {}) {
 ## Best Practices
 
 ### DO
+
 - Use deterministic values (no randomness unless seeded)
 - Include all required fields
 - Provide `withOverrides` pattern
@@ -52,6 +53,7 @@ function makeUser(overrides = {}) {
 - Export types alongside builders
 
 ### DON'T
+
 - Use `Math.random()` - breaks snapshot tests
 - Create complex nested objects inline
 - Hard-code specific business logic

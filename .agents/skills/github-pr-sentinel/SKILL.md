@@ -210,6 +210,7 @@ Include:
 - Remaining unresolved failures or review comments
 
 ## Rationalizations
+
 | Rationalization | Reality |
 |-----------------|---------|
 | "CI is just being flaky, I'll just merge it" | Flakiness masks real bugs. Rerun or fix, never ignore. |
@@ -217,6 +218,7 @@ Include:
 | "This PR is small, I can skip the full monitoring loop" | Small PRs can have big impacts. Consistency is key to reliability. |
 
 ## Red Flags
+
 - [ ] Stopping the monitoring loop before a terminal outcome is reached
 - [ ] Ignoring actionable review feedback in favor of automated checks
 - [ ] Rerunning failed checks more than 3 times without diagnosing the root cause

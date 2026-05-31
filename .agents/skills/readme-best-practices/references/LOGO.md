@@ -103,6 +103,7 @@ To serve different logos per GitHub theme:
 ```
 
 Or use the single-file approach with GitHub's URL suffix:
+
 ```markdown
 <img src="assets/logo.svg#gh-dark-mode-only" alt="logo" width="320"/>
 <img src="assets/logo-light.svg#gh-light-mode-only" alt="logo" width="320"/>

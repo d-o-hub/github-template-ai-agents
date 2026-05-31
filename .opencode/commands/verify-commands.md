@@ -36,6 +36,7 @@ Quick verification with intelligent caching.
 - Provides cache hit rate statistics
 
 **Example output:**
+
 ```
 📚 PHASE 1: Command Discovery
 ✓ Found 267 markdown files
@@ -79,6 +80,7 @@ Show detailed verification statistics and cache performance metrics.
 - **Invalidation Analysis:** Files changed, commands affected by changes
 
 **Example insights:**
+
 ```
 Cache Performance:
 - 847 cached commands
@@ -100,9 +102,13 @@ Commands Affected: 49
 ### 1. Command Discovery
 
 Scans all `.md` files for code blocks with language identifiers:
+
 - ```bash
+
 - ```sh
+
 - ```shell
+
 - ```console
 
 Extracts:
@@ -183,12 +189,14 @@ Add to your `scripts/pre-commit-hook.sh`:
 ### CI/CD Pipeline
 
 **GitHub Actions:**
+
 ```yaml
 - name: Verify Documentation Commands
   run: ./scripts/verify-commands.sh --stats
 ```
 
 **GitLab CI:**
+
 ```yaml
 verify-docs:
   script:
@@ -265,26 +273,31 @@ Check code block language identifiers:
 ## Examples
 
 ### Basic verification
+
 ```bash
 ./scripts/verify-commands.sh
 ```
 
 ### Force full validation
+
 ```bash
 ./scripts/verify-commands.sh --force
 ```
 
 ### View statistics
+
 ```bash
 ./scripts/verify-commands.sh --stats
 ```
 
 ### JSON output for CI
+
 ```bash
 ./scripts/verify-commands.sh --json > results.json
 ```
 
 ### Quick cache check
+
 ```bash
 ./scripts/verify-commands.sh --quick
 ```

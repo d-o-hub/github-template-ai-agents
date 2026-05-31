@@ -22,6 +22,7 @@ The ui-ux-optimize skill uses a **swarm of 7 specialized agents** coordinated th
 ## Agent Definitions
 
 ### Research Scout
+
 **Phase:** 1 — Research & Translate | **Tools:** `websearch`, `webfetch`
 **Output:** `research_context`
 
@@ -45,6 +46,7 @@ handoff_to: token_architect
 ```
 
 ### Token Architect
+
 **Phase:** 2 — Token & Structure | **Output:** `design_tokens`
 
 ```yaml
@@ -64,6 +66,7 @@ handoff_to: layout_engineer
 ```
 
 ### Layout Engineer
+
 **Phase:** 2–3 | **Output:** `navigation_model`, `screen_map`, `responsive_spec`
 
 ```yaml
@@ -79,6 +82,7 @@ handoff_to: variant_generator
 ```
 
 ### Variant Generator
+
 **Phase:** 3 | **Output:** `variant_plan`
 
 ```yaml
@@ -92,6 +96,7 @@ handoff_to: browser_verifier
 ```
 
 ### Browser Verifier
+
 **Phase:** 3 | **Tools:** `bash` (Playwright) | **Output:** `browser_verification`
 
 ```yaml
@@ -108,6 +113,7 @@ handoff_to: quality_auditor
 ```
 
 ### Quality Auditor
+
 **Phase:** 4 | **Output:** `quality_score`, `lessons_learned`
 
 ```yaml
@@ -126,6 +132,7 @@ handoff_to: coordinator (loop decision)
 ```
 
 ### Anti-Slop Sentinel
+
 **Phase:** Cross-cutting | **Output:** `anti_slop_warnings`
 
 ```yaml
@@ -141,6 +148,7 @@ output_contract:
 ## Handoff Protocol
 
 ### Rules
+
 1. **Sequential by default** — agents run in phase order
 2. **Parallel when independent** — Research Scout + Anti-Slop Step 1
 3. **Full context always** — downstream agents receive ALL upstream payloads
@@ -148,6 +156,7 @@ output_contract:
 5. **No silent fixes** — agents flag problems, don't silently patch
 
 ### Revision (Autoresearch Loop)
+
 1. Identify weak section → map to agent
 2. Re-run from that agent downstream
 3. Try new approach (not repeat same)
@@ -155,6 +164,7 @@ output_contract:
 5. Max 5 iterations
 
 ### Revert
+
 1. Discard current iteration
 2. Keep previous best
 3. Try different agent strategy

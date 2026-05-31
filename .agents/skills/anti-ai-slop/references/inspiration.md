@@ -3,26 +3,32 @@
 ## Design Movements to Study
 
 ### Swiss / International Typographic Style
+
 Grids, sans-serifs, whitespace, objectivity. The origin of much of what bad design imitates without understanding.
 - Study: Josef Müller-Brockmann's grid systems
 - Typefaces born here: Helvetica, Univers, Akzidenz Grotesk
 
 ### Bauhaus (1919–1933)
+
 Form follows function. Geometry. Primary colors used for reason, not decoration.
 - Relevant now: the principle of honest materials applied to UI
 
 ### Emigre Magazine (1984–2005)
+
 Raw, political, typographically experimental. Anti-slick.
 - Typefaces: Matrix, Filosofia, Mrs Eaves — all have personality because they were made with a point of view
 
 ### Dutch Constructivism / De Stijl
+
 Mondrian isn't decoration — it's a system. Understand why before stealing it.
 
 ### Brutalist Web Design (2010s revival)
+
 Raw HTML aesthetics, visible structure, no ornament. Sites like Bloomberg Businessweek 2012–2016, Balenciaga.
 - Key principle: the medium is visible, not hidden
 
 ### Editorial Print Design
+
 Newspapers, magazines — masters of hierarchy, information density, and typographic rhythm under deadline pressure.
 - Study: NYT Magazine, The Guardian, Le Monde, Süddeutsche Zeitung
 

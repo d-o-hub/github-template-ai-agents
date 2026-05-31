@@ -14,12 +14,14 @@ Choose the appropriate execution strategy based on task characteristics:
 ## Parallel Execution Strategy
 
 ### When to Use
+
 - Tasks are **independent** (no data dependencies)
 - **Time-critical** delivery
 - Resources available for concurrent execution
 - Results can be aggregated
 
 ### Implementation Pattern
+
 ```markdown
 **Parallel Execution:**
 - Agent 1 → Task A (independent)
@@ -29,6 +31,7 @@ Choose the appropriate execution strategy based on task characteristics:
 ```
 
 ### Example
+
 ```
 Task: Implement multi-crate feature across memory-core, memory-storage-turso, memory-storage-redb
 
@@ -42,6 +45,7 @@ Benefits: 3x faster than sequential
 ```
 
 ### Considerations
+
 - Higher coordination overhead
 - Requires careful result aggregation
 - Potential for merge conflicts
@@ -50,12 +54,14 @@ Benefits: 3x faster than sequential
 ## Sequential Execution Strategy
 
 ### When to Use
+
 - Tasks have **dependencies** (output of A feeds into B)
 - **Linear workflow** (A → B → C)
 - Quality gates between steps
 - Simple coordination preferred
 
 ### Implementation Pattern
+
 ```markdown
 **Sequential Execution:**
 Agent 1 → Task A → Quality Gate
@@ -66,6 +72,7 @@ Agent 3 → Task C → Final Validation
 ```
 
 ### Example
+
 ```
 Task: Refactor storage layer
 
@@ -83,6 +90,7 @@ Benefits: Clear progression, easier to debug
 ```
 
 ### Considerations
+
 - Slower than parallel (linear time)
 - Blocked if any step fails
 - Simple to understand and monitor
@@ -91,12 +99,14 @@ Benefits: Clear progression, easier to debug
 ## Swarm Coordination Strategy
 
 ### When to Use
+
 - **Many similar tasks** to process
 - Tasks are homogeneous
 - Load balancing important
 - Results aggregated at end
 
 ### Implementation Pattern
+
 ```markdown
 **Swarm Pattern:**
 Controller Agent:
@@ -111,6 +121,7 @@ Worker Agents (1...N):
 ```
 
 ### Example
+
 ```
 Task: Refactor 50 large files (>500 LOC)
 
@@ -129,6 +140,7 @@ Benefits: Scalable, fault-tolerant, efficient
 ```
 
 ### Considerations
+
 - Requires work queue management
 - Need progress tracking
 - Results must be aggregated carefully
@@ -137,12 +149,14 @@ Benefits: Scalable, fault-tolerant, efficient
 ## Hybrid Execution Strategy
 
 ### When to Use
+
 - Complex tasks with **mixed requirements**
 - Some phases can be parallel, others must be sequential
 - Optimization for both speed and dependencies
 - Most real-world complex tasks
 
 ### Implementation Pattern
+
 ```markdown
 **Hybrid Pattern:**
 Phase 1 (Sequential): Research & Analysis
@@ -158,6 +172,7 @@ Phase 4 (Swarm): Documentation across all modules
 ```
 
 ### Example
+
 ```
 Task: Implement comprehensive error handling system
 
@@ -185,6 +200,7 @@ Benefits: Optimized for both speed and correctness
 ```
 
 ### Considerations
+
 - Most complex to coordinate
 - Requires careful phase boundaries
 - Quality gates critical between phases
@@ -216,6 +232,7 @@ Is time critical?
 ## Common Pitfalls
 
 ### Parallel Execution
+
 - ❌ Tasks actually have hidden dependencies
 - ❌ No coordination between agents
 - ❌ Results aggregated incorrectly
@@ -224,6 +241,7 @@ Is time critical?
 - ✅ Careful result aggregation
 
 ### Sequential Execution
+
 - ❌ Missing quality gates
 - ❌ No failure recovery
 - ❌ Blocking on slow tasks
@@ -232,6 +250,7 @@ Is time critical?
 - ✅ Progress visibility
 
 ### Swarm Coordination
+
 - ❌ Unbalanced work distribution
 - ❌ No progress tracking
 - ❌ Workers idle while some overloaded
@@ -240,6 +259,7 @@ Is time critical?
 - ✅ Load balancing
 
 ### Hybrid Execution
+
 - ❌ Unclear phase boundaries
 - ❌ Missing quality gates
 - ❌ Over-complication
