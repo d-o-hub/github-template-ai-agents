@@ -1,2 +1,0 @@
-{"timestamp": "2025-05-15T10:00:00Z", "agent": "jules", "task": "initial setup", "skill_used": null, "status": "completed", "tokens_used": 0, "duration_seconds": 0, "notes": "Seed entry for metrics tracking"}
-{"timestamp": "2026-05-15T10:00:00Z", "agent": "jules", "task": "test task", "skill_used": "dora-report", "status": "completed", "tokens_used": 100, "duration_seconds": 60, "notes": "Test entry"}

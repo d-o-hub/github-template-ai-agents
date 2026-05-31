@@ -24,9 +24,11 @@ fi
 printf "Generating %s and %s...\n" "$LLMS_TXT" "$LLMS_FULL_TXT"
 
 # Extract Project Info from README.md
+# Using sed to extract title and blockquote description
 PROJECT_NAME=$(grep -m 1 "^# " README.md | sed 's/^# //' || echo "Unnamed Project")
 PROJECT_DESC=$(sed -n '/^> /,/^$/p' README.md | sed 's/^> //' | tr '\n' ' ' | sed 's/  */ /g' | sed 's/^ *//;s/ *$//' || echo "No description available.")
 
+# Fallback for empty description
 if [[ -z "${PROJECT_DESC:-}" ]]; then
     PROJECT_DESC="No description available."
 fi
@@ -70,59 +72,30 @@ fi
     printf "\n---\n\n"
     printf "## Full Skill Index\n\n"
 
+    # Use globbing instead of find to avoid process forking overhead
+    # Compatible with Bash 3.2
+    # Sort to ensure deterministic output across different filesystems
     shopt -s nullglob
     SKILL_DIRS=$(printf "%s\n" .agents/skills/*/ | sort)
     for skill_dir in $SKILL_DIRS; do
         skill_file="${skill_dir}SKILL.md"
         if [[ -f "$skill_file" ]]; then
+            # Extract name and description from frontmatter
             s_name=$(sed -n 's/^name: *//p' "$skill_file" | head -n 1 | sed 's/^["'\'']//;s/["'\'']$//')
-            
-            # Extract description - handle multi-line and block scalars
-            s_desc=$(awk '
-            BEGIN { in_desc=0; desc="" }
-            /^description: / {
-                in_desc=1
-                val = substr($0, index($0, "description: ") + 14)
-                gsub(/^[\"'\'']/, "", val)
-                gsub(/[\"'\'']$/, "", val)
-                if (substr(val, 1, 1) == "|" || substr(val, 1, 1) == ">") {
-                    desc = substr(val, 2)
-                    gsub(/^[ \t]+/, "", desc)
-                    next
-                }
-                desc = val
-                in_desc=0
-                next
-            }
-            in_desc && /^[ ]/ {
-                gsub(/^[ \t]+/, "", $0)
-                if (desc != "") desc = desc " "
-                desc = desc $0
-                next
-            }
-            in_desc && !/^[ ]/ {
-                in_desc=0
-            }
-            END {
-                gsub(/\n/, " ", desc)
-                gsub(/  */, " ", desc)
-                gsub(/^ *| *$/, "", desc)
-                print desc
-            }
-            ' "$skill_file")
-            
+            s_desc=$(sed -n 's/^description: *//p' "$skill_file" | head -n 1 | sed 's/^["'\'']//;s/["'\'']$//')
+
+            # Fallback if frontmatter name is missing
             if [[ -z "$s_name" ]]; then
                 s_name=$(basename "$skill_dir")
             fi
-            if [[ -z "$s_desc" ]]; then
-                s_desc="No description available."
-            fi
-            printf -- "- [%s](%s): %s\n" "$s_name" "$skill_file" "$s_desc"
+
+            printf -- "- [%s](%s): %s\n" "$s_name" "$skill_file" "${s_desc:-No description available.}"
         fi
     done
     shopt -u nullglob
 } > "$LLMS_FULL_TXT"
 
+# Verify size of llms.txt
 size=$(wc -c < "$LLMS_TXT")
 if [[ $size -gt 4096 ]]; then
     printf "%bWarning: %s exceeds 4KB (%d bytes). Consider reducing content.%b\n" "$YELLOW" "$LLMS_TXT" "$size" "$NC"
