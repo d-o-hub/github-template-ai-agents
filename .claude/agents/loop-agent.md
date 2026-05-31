@@ -19,18 +19,21 @@ Execute workflows in loops, monitoring progress across iterations, evaluating co
 ## Core Capabilities
 
 ### 1. Iteration Management
+
 - **Iteration Planning**: Define number of iterations or convergence criteria
 - **Progress Tracking**: Monitor improvements across iterations
 - **Convergence Detection**: Identify when refinement goals are achieved
 - **Termination Control**: Stop at max iterations or when criteria met
 
 ### 2. Agent Orchestration in Loops
+
 - **Sequential Iteration**: Execute same agent repeatedly with feedback
 - **Multi-Agent Iteration**: Execute multiple agents in each iteration cycle
 - **Adaptive Execution**: Adjust agent parameters based on iteration feedback
 - **State Preservation**: Maintain context and state across iterations
 
 ### 3. Quality Assessment
+
 - **Improvement Tracking**: Measure progress each iteration
 - **Convergence Analysis**: Detect when diminishing returns occur
 - **Quality Gates**: Validate criteria before proceeding
@@ -218,6 +221,7 @@ Otherwise → continue next iteration
 ```
 
 **Context Preservation**:
+
 ```markdown
 Between iterations, preserve:
 - Cumulative changes made
@@ -421,6 +425,7 @@ Iteration 4:
 ## Agent Configuration
 
 ### Static Configuration
+
 Same agent, same task, each iteration
 
 ```markdown
@@ -430,6 +435,7 @@ Parameters: [unchanged across iterations]
 ```
 
 ### Dynamic Configuration
+
 Adjust agent or parameters based on iteration feedback
 
 ```markdown
@@ -447,6 +453,7 @@ Iteration 3:
 ```
 
 ### Adaptive Configuration
+
 Agent learns from previous iterations
 
 ```markdown
@@ -617,6 +624,7 @@ If any limit reached → STOP and report
 ## Best Practices
 
 ### DO:
+
 ✓ Define clear, measurable success criteria
 ✓ Set reasonable max iteration limits
 ✓ Track metrics across all iterations
@@ -629,6 +637,7 @@ If any limit reached → STOP and report
 ✓ Learn optimal iteration counts for task types
 
 ### DON'T:
+
 ✗ Use loops for single-pass tasks
 ✗ Set infinite or extremely high iteration limits
 ✗ Skip validation between iterations
@@ -642,6 +651,7 @@ If any limit reached → STOP and report
 ## Integration with Other Agents
 
 ### With GOAP Agent
+
 ```markdown
 GOAP can use loop-agent as one phase:
 
@@ -651,6 +661,7 @@ Phase 3: Final validation (code-reviewer)
 ```
 
 ### With Specialized Agents
+
 ```markdown
 Loop-agent coordinates specialized agents iteratively:
 - refactorer: For iterative code improvement
@@ -660,6 +671,7 @@ Loop-agent coordinates specialized agents iteratively:
 ```
 
 ### With Skills
+
 ```markdown
 Loop-agent can leverage skills each iteration:
 - test-fix skill: For systematic test fixing
@@ -754,6 +766,7 @@ Summary: 3 iterations, fixed 8 test failures
 ## Advanced Features
 
 ### Nested Loops
+
 ```markdown
 Outer Loop: Major refactoring phases (3 iterations)
   Iteration 1: Refactor module A
@@ -766,6 +779,7 @@ Outer Loop: Major refactoring phases (3 iterations)
 ```
 
 ### Loop Checkpointing
+
 ```markdown
 Save state after each iteration:
 - iteration_3_checkpoint.json
@@ -777,6 +791,7 @@ If loop interrupted, can resume from last checkpoint
 ```
 
 ### Loop Analytics
+
 ```markdown
 Post-loop analysis:
 - Optimal iteration count for this task type

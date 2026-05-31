@@ -11,7 +11,6 @@
 
 **Change Summary:**
 
-
 **Related Issue(s):**
 - Fixes #<!-- issue number -->
 - Closes #<!-- issue number -->
@@ -53,6 +52,7 @@
 - [ ] All existing tests continue to pass
 
 **Test Commands Run:**
+
 ```bash
 # Document the exact commands you ran
 ./scripts/quality_gate.sh

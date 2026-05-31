@@ -8,11 +8,13 @@ commit and push
 ## Commit Message Structure
 
 Use `./scripts/ai-commit.sh` to ensure valid commits:
+
 ```bash
 ./scripts/ai-commit.sh --type <type> --subject <subject> --body <body>
 ```
 
 Or follow this format for manual commits:
+
 ```
 type(scope): Brief description (50 chars max)
 
@@ -22,6 +24,7 @@ type(scope): Brief description (50 chars max)
 ```
 
 ## Commit Types
+
 - **feat**: New user-facing feature or capability
 - **fix**: Bug fix that resolves user issue
 - **docs**: Documentation changes
@@ -59,6 +62,7 @@ type(scope): Brief description (50 chars max)
 ## Examples
 
 Good:
+
 ```
 feat(search): Add filters to help users find documents faster
 
@@ -69,6 +73,7 @@ Fixes #123
 ```
 
 Bad:
+
 ```
 improved stuff
 ```

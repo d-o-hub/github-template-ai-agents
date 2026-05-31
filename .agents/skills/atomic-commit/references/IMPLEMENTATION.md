@@ -34,6 +34,7 @@ stateDiagram-v2
 **Entry:** Uncommitted changes, on feature branch
 
 **Operations:**
+
 ```bash
 ./scripts/quality_gate.sh          # Must pass with zero warnings
 # Secret scan via grep patterns
@@ -54,6 +55,7 @@ stateDiagram-v2
 **Entry:** Pre-commit passed
 
 **Operations:**
+
 ```bash
 git add -A
 # Auto-detect commit type from files:
@@ -71,6 +73,7 @@ git commit -m "type(scope): description"
 - Subject ≤ 72 chars
 
 **Rollback Action:**
+
 ```bash
 git reset --soft HEAD~1
 git reset HEAD
@@ -81,6 +84,7 @@ git reset HEAD
 **Entry:** Commit created
 
 **Operations:**
+
 ```bash
 git fetch origin
 # Check: remote must be ancestor of local
@@ -96,6 +100,7 @@ git merge-base --is-ancestor origin/main HEAD
 **Failure Action:** Abort with rebase instructions
 
 **Rollback Action:**
+
 ```bash
 git reset --soft HEAD~1
 git reset HEAD
@@ -106,6 +111,7 @@ git reset HEAD
 **Entry:** Pre-push passed
 
 **Operations:**
+
 ```bash
 git push -u origin HEAD
 # Verify: local SHA == remote SHA
@@ -119,6 +125,7 @@ git rev-parse origin/HEAD
 - Tracking established
 
 **Rollback Action:**
+
 ```bash
 # Best effort
 git push origin +HEAD~1:branch
@@ -129,6 +136,7 @@ git push origin +HEAD~1:branch
 **Entry:** Push succeeded, gh authenticated
 
 **Operations:**
+
 ```bash
 gh pr create \
     --title "$(git log -1 --pretty=%s)" \
@@ -137,6 +145,7 @@ gh pr create \
 ```
 
 **PR Body Template:**
+
 ```markdown
 ## Summary
 
@@ -168,6 +177,7 @@ gh pr create \
 - Correct base branch
 
 **Rollback Action:**
+
 ```bash
 gh pr close $PR_NUMBER
 ```
@@ -177,6 +187,7 @@ gh pr close $PR_NUMBER
 **Entry:** PR created
 
 **Operations:**
+
 ```bash
 gh pr checks --watch --interval 10
 # 30 min timeout
@@ -201,6 +212,7 @@ gh pr checks --watch --interval 10
 - Provide next steps
 
 **Output Format:**
+
 ```
 ═══════════════════════════════════════════════════════════════════
 ║  ATOMIC COMMIT WORKFLOW COMPLETED SUCCESSFULLY                    ║
@@ -265,6 +277,7 @@ gh[pousr]_[A-Za-z0-9_]{36,}
 ## Configuration
 
 **Environment Variables:**
+
 ```bash
 ATOMIC_COMMIT_TIMEOUT=1800          # CI wait timeout (seconds)
 ATOMIC_COMMIT_BASE_BRANCH=main      # Target branch for PR
@@ -272,6 +285,7 @@ ATOMIC_COMMIT_NO_ROLLBACK=0         # Set 1 to disable rollback
 ```
 
 **Command Line Flags:**
+
 ```bash
 --message, -m     # Commit message
 --dry-run         # Validate only
@@ -292,6 +306,7 @@ ATOMIC_COMMIT_NO_ROLLBACK=0         # Set 1 to disable rollback
 ## Testing
 
 Run evals to verify:
+
 ```bash
 # Test dry run mode
 /atomic-commit --dry-run

@@ -14,18 +14,21 @@
 | **Elevation of Privilege** | Admin access | RBAC, principle of least privilege |
 
 ### Session Security
+
 - Bind sessions to IP/user-agent fingerprint
 - Rotate on privilege change
 - Invalidate on logout/password change
 - Set appropriate timeout (absolute + idle)
 
 ### Token Security
+
 - Sign with strong algorithm (HMAC-SHA256+)
 - Include expiry (exp claim for JWT)
 - Validate signature server-side
 - Never trust client-stored tokens
 
 ### API Security
+
 - Rate limit per user/IP
 - Validate all inputs with schema validation
 - Return generic error messages

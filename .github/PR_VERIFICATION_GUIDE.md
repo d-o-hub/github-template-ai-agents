@@ -238,6 +238,7 @@ Each PR should represent a **single logical change**:
 - All commits follow conventional format: `type(scope): description`
 
 ### Example Good Commits:
+
 ```
 feat(auth): add JWT token validation
 fix(api): handle null response from downstream

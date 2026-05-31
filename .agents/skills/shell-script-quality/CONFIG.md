@@ -43,6 +43,7 @@ shellcheck --severity=style script.sh
 ### Per-Project Configs
 
 **Strict Mode**:
+
 ```bash
 cat > .shellcheckrc <<'EOF'
 shell=bash
@@ -52,6 +53,7 @@ EOF
 ```
 
 **Relaxed Mode**:
+
 ```bash
 cat > .shellcheckrc <<'EOF'
 shell=bash
@@ -64,6 +66,7 @@ EOF
 ### VS Code
 
 **.vscode/settings.json**:
+
 ```json
 {
   "shellcheck.enable": true,
@@ -78,6 +81,7 @@ EOF
 ```
 
 Install extension:
+
 ```bash
 code --install-extension timonwong.shellcheck
 ```
@@ -85,12 +89,14 @@ code --install-extension timonwong.shellcheck
 ### Vim/Neovim
 
 **Using ALE**:
+
 ```vim
 let g:ale_linters = {'sh': ['shellcheck']}
 let g:ale_sh_shellcheck_options = '-x'
 ```
 
 **Using Syntastic**:
+
 ```vim
 let g:syntastic_sh_shellcheck_args = '-x'
 ```
@@ -98,6 +104,7 @@ let g:syntastic_sh_shellcheck_args = '-x'
 ### Emacs
 
 **Flycheck**:
+
 ```elisp
 (require 'flycheck)
 (add-hook 'sh-mode-hook 'flycheck-mode)
@@ -114,12 +121,14 @@ Install ShellCheck plugin from marketplace:
 ### Installation Methods
 
 **macOS (Homebrew)**:
+
 ```bash
 brew install bats-core
 brew install bats-support bats-assert bats-file
 ```
 
 **Ubuntu/Debian**:
+
 ```bash
 sudo apt-get install bats
 
@@ -130,6 +139,7 @@ sudo ./install.sh /usr/local
 ```
 
 **From npm**:
+
 ```bash
 npm install -g bats
 ```
@@ -144,6 +154,7 @@ git clone https://github.com/bats-core/bats-file test/test_helper/bats-file
 ```
 
 **Load in tests**:
+
 ```bash
 load 'test_helper/bats-support/load'
 load 'test_helper/bats-assert/load'
@@ -155,6 +166,7 @@ load 'test_helper/bats-file/load'
 ### Development Environment
 
 **direnv (.envrc)**:
+
 ```bash
 export CLAUDE_PLUGIN_ROOT="$(pwd)"
 export LOG_LEVEL="DEBUG"
@@ -162,6 +174,7 @@ export PATH="$PWD/scripts:$PATH"
 ```
 
 **bashrc/zshrc**:
+
 ```bash
 # ShellCheck alias
 alias sc='shellcheck'
@@ -175,6 +188,7 @@ alias btv='bats -t tests/'
 ### Docker Environment
 
 **Dockerfile**:
+
 ```dockerfile
 FROM ubuntu:22.04
 
@@ -192,6 +206,7 @@ CMD ["bash", "scripts/check-quality.sh"]
 ```
 
 **docker-compose.yml**:
+
 ```yaml
 version: '3.8'
 services:
@@ -311,6 +326,7 @@ export BATS_FORMATTER="tap"
 ## Quick Setup Script
 
 **setup-quality-tools.sh**:
+
 ```bash
 #!/bin/bash
 set -euo pipefail

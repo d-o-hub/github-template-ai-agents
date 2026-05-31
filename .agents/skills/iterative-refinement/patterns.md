@@ -5,6 +5,7 @@ Advanced workflows and convergence detection strategies for iterative refinement
 ## Termination Conditions
 
 ### Success Criteria Met
+
 ```
 ✓ All tests passing (50/50)
 ✓ Zero warnings (0)
@@ -13,6 +14,7 @@ Advanced workflows and convergence detection strategies for iterative refinement
 ```
 
 ### Convergence Detected
+
 ```
 Recent improvements: 9%, 6%, 4% (avg 6.3%)
 Threshold: 10%
@@ -20,6 +22,7 @@ Threshold: 10%
 ```
 
 ### Max Iterations Reached
+
 ```
 Iteration 10 of 10
 Progress: 60% → 88% (target: 95%)
@@ -28,6 +31,7 @@ Progress: 60% → 88% (target: 95%)
 ```
 
 ### No Progress (Stuck)
+
 ```
 Iteration 5: 10 issues
 Iteration 6: 10 issues (no change)
@@ -47,6 +51,7 @@ Convergence = improvements become negligible, indicating diminishing returns.
 - Window: Number of iterations to average (typically 3)
 
 **Example**:
+
 ```
 Iterations: 150 → 120 → 100 → 88 → 80 → 75 → 72
 Improvements: 20% → 17% → 12% → 9% → 6% → 4%
@@ -361,6 +366,7 @@ Pipeline:
 ## Best Practices for Advanced Usage
 
 ### DO:
+
 ✓ Use convergence for optimization tasks
 ✓ Set minimum iterations to avoid premature convergence
 ✓ Track multiple metrics simultaneously
@@ -369,6 +375,7 @@ Pipeline:
 ✓ Use parallel validation when possible
 
 ### DON'T:
+
 ✗ Use convergence for binary pass/fail criteria
 ✗ Set convergence thresholds too low (<3%)
 ✗ Skip convergence window configuration

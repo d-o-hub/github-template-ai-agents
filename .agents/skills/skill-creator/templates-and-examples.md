@@ -114,19 +114,25 @@ Guide for effectively using [tool].
 
 ### Command Structure
 ```
+
 tool [options] [arguments]
+
 ```
 
 ### Common Operations
 
 #### Operation 1
 ```
+
 tool command1
+
 ```
 
 #### Operation 2
 ```
+
 tool command2
+
 ```
 
 ## Advanced Usage
@@ -219,6 +225,7 @@ cargo build --release
 ```
 
 ### Step 2: Deploy
+
 ```bash
 # Deploy to staging first
 ./deploy.sh staging
@@ -231,6 +238,7 @@ cargo build --release
 ```
 
 ### Step 3: Post-Deployment Verification
+
 - Monitor error rates
 - Check key metrics
 - Verify functionality
@@ -238,6 +246,7 @@ cargo build --release
 ## Rollback Procedure
 
 If deployment fails:
+
 ```bash
 ./rollback.sh production
 ```
@@ -250,6 +259,7 @@ If deployment fails:
 ✗ Never skip pre-deployment checks
 ✗ Don't deploy on Friday afternoon
 EOF
+
 ```
 
 ### Example 2: Creating a Testing Skill
@@ -284,6 +294,7 @@ assert_eq!(reverse(vec![1, 2, 3]), vec![3, 2, 1]);
 ```
 
 **Property-based test**:
+
 ```rust
 // Property: reverse(reverse(x)) == x
 proptest! {
@@ -297,12 +308,14 @@ proptest! {
 ## Implementation
 
 ### Setup
+
 ```toml
 [dev-dependencies]
 proptest = "1.0"
 ```
 
 ### Writing Properties
+
 ```rust
 use proptest::prelude::*;
 

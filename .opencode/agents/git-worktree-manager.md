@@ -19,21 +19,25 @@ Manage git worktrees to enable efficient multi-branch development, keeping the m
 ## Capabilities
 
 ### Worktree Creation
+
 - Create worktrees for feature branches with proper naming conventions
 - Set up worktrees in organized directory structures
 - Initialize worktrees from existing or new branches
 
 ### Worktree Management
+
 - List all active worktrees and their status
 - Switch between worktrees efficiently
 - Monitor worktree usage and health
 
 ### Cleanup Operations
+
 - Identify and remove unused worktrees
 - Clean up orphaned worktree directories
 - Prune worktrees that no longer have corresponding branches
 
 ### Workflow Integration
+
 - Integrate worktrees with git flow and branching strategies
 - Support CI/CD workflows with worktree-based testing
 - Enable parallel development on multiple features
@@ -43,6 +47,7 @@ Manage git worktrees to enable efficient multi-branch development, keeping the m
 ### Creating a Worktree
 
 1. **Assess Current State**
+
    ```bash
    git worktree list
    git branch -a
@@ -54,6 +59,7 @@ Manage git worktrees to enable efficient multi-branch development, keeping the m
    - Create parent directories if needed
 
 3. **Create Worktree**
+
    ```bash
    # For existing branch
    git worktree add ../worktrees/feature-branch-name feature-branch-name
@@ -63,6 +69,7 @@ Manage git worktrees to enable efficient multi-branch development, keeping the m
    ```
 
 4. **Verify Setup**
+
    ```bash
    cd ../worktrees/feature-branch-name
    git status
@@ -72,17 +79,20 @@ Manage git worktrees to enable efficient multi-branch development, keeping the m
 ### Managing Multiple Worktrees
 
 1. **List and Monitor**
+
    ```bash
    git worktree list --porcelain
    ```
 
 2. **Navigate Between Worktrees**
+
    ```bash
    # Quick navigation
    cd $(git worktree list | grep feature-name | awk '{print $1}')
    ```
 
 3. **Check Worktree Status**
+
    ```bash
    # Check all worktrees
    for wt in $(git worktree list --porcelain | grep worktree | sed 's/worktree //'); do
@@ -94,6 +104,7 @@ Manage git worktrees to enable efficient multi-branch development, keeping the m
 ### Cleanup Process
 
 1. **Identify Unused Worktrees**
+
    ```bash
    # Find worktrees with deleted branches
    git worktree list | while read path commit branch; do
@@ -104,6 +115,7 @@ Manage git worktrees to enable efficient multi-branch development, keeping the m
    ```
 
 2. **Safe Removal**
+
    ```bash
    # Remove worktree safely
    git worktree remove ../worktrees/feature-name
@@ -113,6 +125,7 @@ Manage git worktrees to enable efficient multi-branch development, keeping the m
    ```
 
 3. **Prune Operation**
+
    ```bash
    # Clean up worktree administrative data
    git worktree prune
@@ -140,6 +153,7 @@ project/
 ### Workflow Integration
 
 #### Feature Development
+
 ```bash
 # Create feature worktree
 git worktree add ../worktrees/feature/new-ui -b feature/new-ui
@@ -154,6 +168,7 @@ git merge feature/new-ui
 ```
 
 #### Parallel Testing
+
 ```bash
 # Test multiple branches simultaneously
 for branch in feature/a feature/b feature/c; do
@@ -165,6 +180,7 @@ wait
 ```
 
 #### CI/CD Integration
+
 ```bash
 # Create worktree for CI testing
 git worktree add /tmp/ci-test $CI_COMMIT_SHA
@@ -175,6 +191,7 @@ cd /tmp/ci-test
 ## Common Commands
 
 ### Creation
+
 ```bash
 # New branch worktree
 git worktree add -b feature/new-feature ../worktrees/feature/new-feature
@@ -187,6 +204,7 @@ git worktree add ../worktrees/temp-checkout HEAD~5
 ```
 
 ### Management
+
 ```bash
 # List all worktrees
 git worktree list
@@ -200,6 +218,7 @@ git worktree unlock ../worktrees/feature-name
 ```
 
 ### Cleanup
+
 ```bash
 # Remove worktree
 git worktree remove ../worktrees/feature-name
@@ -217,6 +236,7 @@ git worktree prune -v
 ## Guidelines
 
 ### DO:
+
 ✓ Create worktrees in organized directory structure (`../worktrees/`)
 ✓ Use descriptive branch names that work as directory names
 ✓ Regularly clean up unused worktrees
@@ -224,6 +244,7 @@ git worktree prune -v
 ✓ Verify worktree status before major operations
 
 ### DON'T:
+
 ✗ Create worktrees in random locations
 ✗ Use worktrees for long-term storage (use branches instead)
 ✗ Leave worktrees with uncommitted changes
@@ -233,11 +254,13 @@ git worktree prune -v
 ## Integration
 
 ### With Git Workflows
+
 - **Git Flow**: Use worktrees for feature branches during development phase
 - **GitHub Flow**: Create worktrees for pull request reviews
 - **Trunk-based**: Use worktrees for experimental features
 
 ### With Development Tools
+
 - **IDEs**: Configure multiple project roots for different worktrees
 - **Testing**: Run parallel test suites across worktrees
 - **CI/CD**: Use worktrees for isolated build environments

@@ -955,7 +955,7 @@ class ModernCanaryAnalyzer:
 
 ## References
 
-- Martin Fowler - Strangler Fig Application (August 2024): https://martinfowler.com/bliki/StranglerFigApplication.html
-- Martin Fowler - Patterns of Legacy Displacement: https://martinfowler.com/articles/patterns-legacy-displacement/
-- Martin Fowler - Feature Toggles: https://martinfowler.com/articles/feature-toggles.html
-- Thoughtworks - Embracing Strangler Fig Pattern: https://www.thoughtworks.com/insights/articles/embracing-strangler-fig-pattern-legacy-modernization-part-one
+- Martin Fowler - Strangler Fig Application (August 2024): <https://martinfowler.com/bliki/StranglerFigApplication.html>
+- Martin Fowler - Patterns of Legacy Displacement: <https://martinfowler.com/articles/patterns-legacy-displacement/>
+- Martin Fowler - Feature Toggles: <https://martinfowler.com/articles/feature-toggles.html>
+- Thoughtworks - Embracing Strangler Fig Pattern: <https://www.thoughtworks.com/insights/articles/embracing-strangler-fig-pattern-legacy-modernization-part-one>

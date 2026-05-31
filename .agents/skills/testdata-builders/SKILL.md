@@ -11,11 +11,13 @@ category: quality
 Provide consistent factories/builders for test entities to keep tests concise and deterministic.
 
 ## When to run
+
 - Authoring or refactoring tests.
 - Extending test utilities or seeding data for integration tests.
 - Adding new schema fields that affect test fixtures.
 
 ## Workflow
+
 1. **Catalog entities** -- list required builders for all domain entities.
 2. **Define defaults** -- choose realistic base values aligned with project conventions.
 3. **Implement builder** -- pure function returning object + `withOverrides` pattern for customization; ensure types exported.
@@ -24,6 +26,7 @@ Provide consistent factories/builders for test entities to keep tests concise an
 6. **Usage** -- refactor tests to import builders instead of ad-hoc inline objects.
 
 ## Checklist
+
 - [ ] Builders updated whenever schema changes (CI should fail otherwise).
 - [ ] Randomness eliminated or seeded to keep snapshots stable.
 - [ ] Builders include metadata defaults (timestamps, locale, trace IDs).
@@ -48,5 +51,6 @@ function makeUser(overrides: Partial<User> = {}): User {
 ```
 
 ## References
+
 - `references/builder-patterns.md` - Common factory/builder patterns
 - `references/test-data-strategy.md` - Test data management strategy

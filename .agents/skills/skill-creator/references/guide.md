@@ -47,13 +47,17 @@ Brief overview of skill purpose and scope.
 ### Example 1: [Name]
 
 ```
+
 [Example workflow or code]
+
 ```
 
 ### Example 2: [Name]
 
 ```
+
 [Example workflow or code]
+
 ```
 
 ## Best Practices
@@ -108,7 +112,9 @@ Overview of the domain and why this knowledge matters.
 [Description and when to use]
 
 ```
+
 [Example or diagram]
+
 ```
 
 ### Pattern 2: [Name]
@@ -182,10 +188,12 @@ Overview of the tool and its purpose.
 ## Best Practices
 
 ### DO:
+
 ✓ [Practice 1]
 ✓ [Practice 2]
 
 ### DON'T:
+
 ✗ [Anti-pattern 1]
 ✗ [Anti-pattern 2]
 
@@ -212,6 +220,7 @@ Overview of the tool and its purpose.
 ## Integration
 
 How this tool integrates with other skills and workflows.
+
 ```
 
 ## Complete Creation Examples
@@ -237,7 +246,9 @@ Manage learning episodes for the self-learning memory system.
 ## Episode Lifecycle
 
 ```
+
 START → LOG (multiple times) → COMPLETE
+
 ```
 
 ### Start Episode
@@ -276,11 +287,13 @@ python scripts/episode.py complete EPISODE_ID "Summary of learnings"
 ## Best Practices
 
 ### DO:
+
 ✓ Start episode before learning session
 ✓ Log patterns as discovered
 ✓ Complete with meaningful summary
 
 ### DON'T:
+
 ✗ Skip episode start (no tracking)
 ✗ Log after long delay (lose context)
 ✗ Complete without summary (lose value)
@@ -290,6 +303,7 @@ python scripts/episode.py complete EPISODE_ID "Summary of learnings"
 - **pattern-extraction**: Extracts patterns from logged content
 - **memory-storage**: Stores completed episodes
 - **skill-creator**: This skill format
+
 ```
 
 ### Example: Test Debugging Skill
@@ -362,15 +376,18 @@ cargo test -- --test-threads=1
 ## Best Practices
 
 ### DO:
+
 ✓ Run tests with --nocapture for output
 ✓ Isolate failing test first
 ✓ Check for async issues in Rust
 ✓ Use test-threads=1 for debugging
 
 ### DON'T:
+
 ✗ Ignore intermittent failures
 ✗ Assume test is correct (it might not be)
 ✗ Fix without understanding root cause
+
 ```
 
 ## Naming Examples
@@ -399,11 +416,13 @@ description: Debug and fix failing tests in Rust projects. Use this skill when t
 ```
 
 ✅ **Clear when-to-use**:
+
 ```yaml
 description: Implement new features systematically with proper testing and documentation. Use when adding new functionality to the codebase.
 ```
 
 ✅ **Keyword-rich**:
+
 ```yaml
 description: Create human-focused GitHub README.md files with 2026 best practices. Use when creating new projects, improving documentation, or making repositories more discoverable.
 ```
@@ -411,16 +430,19 @@ description: Create human-focused GitHub README.md files with 2026 best practice
 ### Bad Descriptions
 
 ✗ **Too vague**:
+
 ```yaml
 description: Helps with testing
 ```
 
 ✗ **Missing when-to-use**:
+
 ```yaml
 description: Provides guidance on building APIs
 ```
 
 ✗ **Too long** (over 1024 chars):
+
 ```yaml
 description: [Very long paragraph that goes on and on...]
 ```
@@ -430,18 +452,21 @@ description: [Very long paragraph that goes on and on...]
 After creating a skill, verify:
 
 ### Structure
+
 - [ ] Directory exists at `.agents/skills/skill-name/`
 - [ ] SKILL.md file present
 - [ ] YAML frontmatter valid
 - [ ] Name matches directory name
 
 ### YAML Frontmatter
+
 - [ ] `name:` field present and correct
 - [ ] `description:` field present
 - [ ] Description under 1024 characters
 - [ ] Name is lowercase with hyphens only
 
 ### Content
+
 - [ ] "When to Use" section present
 - [ ] Core process or concepts documented
 - [ ] At least one example provided
@@ -449,6 +474,7 @@ After creating a skill, verify:
 - [ ] Integration with other skills noted
 
 ### Quality
+
 - [ ] Clear, concise language
 - [ ] Actionable instructions
 - [ ] Code examples tested
@@ -467,6 +493,7 @@ After creating a skill, verify:
 ### Example Test
 
 For `test-debugging` skill:
+
 ```
 User: "My test is failing with a panic about no reactor"
 Expected: Skill invokes and provides async test guidance
@@ -486,6 +513,7 @@ When updating existing skills:
 ### Version Tracking
 
 Consider adding version info for frequently changing skills:
+
 ```markdown
 ---
 name: skill-name
@@ -524,6 +552,7 @@ If a skill becomes obsolete:
 When creating skills that work with agents:
 
 1. **Reference agents in skill**:
+
    ```markdown
    ## Integration
    Used by: feature-implementer, debugger agents
@@ -567,6 +596,7 @@ When creating skills that work with agents:
 ### Skill Dependencies
 
 Skills can reference other skills:
+
 ```markdown
 ## Related Skills
 - **[task-decomposition](../task-decomposition/SKILL.md)** - Use before implementing
@@ -576,6 +606,7 @@ Skills can reference other skills:
 ### Skill Hierarchies
 
 Organize related skills:
+
 ```
 .agents/skills/
 ├── episode-*.md (episode management skills)
@@ -586,6 +617,7 @@ Organize related skills:
 ### Cross-References
 
 Link between skills:
+
 ```markdown
 See also: **[parallel-execution](../parallel-execution/SKILL.md)** for concurrent task patterns.
 ```

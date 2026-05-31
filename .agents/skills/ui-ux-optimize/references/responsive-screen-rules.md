@@ -17,7 +17,9 @@
 **Wide (1440px):** Max-width container, generous whitespace, no edge-to-edge stretch.
 
 ## No-Overlap Validation
+
 Check critical pairs at every viewport using bounding box overlap:
+
 ```python
 def boxes_overlap(a, b):
     return (a['x'] < b['x'] + b['width'] and a['x'] + a['width'] > b['x'] and
@@ -25,6 +27,7 @@ def boxes_overlap(a, b):
 ```
 
 ## Safe Area
+
 ```css
 padding-bottom: env(safe-area-inset-bottom, 0px);
 /* Fixed bottom elements: */

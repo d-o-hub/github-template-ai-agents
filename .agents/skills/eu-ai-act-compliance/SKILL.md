@@ -45,11 +45,13 @@ await logger.logOperation({
 ## Risk Classification
 
 ### Limited Risk (Article 50)
+
 Systems interacting with natural persons must:
 - Disclose AI interaction at first contact (Art. 50.1).
 - Mark synthetic content as AI-generated (Art. 50.2).
 
 ### High Risk (Chapter III, Articles 8-17)
+
 Systems in Annex III (recruitment, credit scoring, etc.) require:
 - Risk management (Art. 9) & Data governance (Art. 10).
 - Technical documentation (Art. 11) & Automatic logging (Art. 12).
@@ -70,6 +72,7 @@ interface AIActLogEntry {
 ```
 
 ## Compliance Checklist
+
 - [ ] AI interaction disclosure implemented (Art. 50.1).
 - [ ] Synthetic content marking enabled (Art. 50.2).
 - [ ] Provider contact information published.
@@ -77,14 +80,17 @@ interface AIActLogEntry {
 - [ ] High-risk: Automatic logging & 6-month retention configured.
 
 ## References
+
 - `references/eu-ai-act-articles.md` - Key article analysis
 
 ## Rationalizations
+
 | Concern | Counter-Argument |
 |---------|------------------|
 | "Small change, no logging." | AI interactions fall under transparency (Art. 50). |
 | "Oversight later." | Oversight-by-design is mandatory for high-risk (Art. 14). |
 
 ## Red Flags
+
 - [ ] Deploying without interaction disclosure.
 - [ ] High-risk systems without automated record-keeping.

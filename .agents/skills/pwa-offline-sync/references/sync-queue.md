@@ -3,6 +3,7 @@
 Sync queue patterns for offline-first applications.
 
 ## Queue Structure
+
 ```ts
 interface SyncEntry {
   id: string;        // UUID
@@ -17,6 +18,7 @@ interface SyncEntry {
 ```
 
 ## Conflict Resolution
+
 - Mutation IDs prevent duplicate replays
 - Server timestamp for conflict detection
 - Zombie detection: stop syncing revoked data

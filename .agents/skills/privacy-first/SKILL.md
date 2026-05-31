@@ -49,6 +49,7 @@ grep -E '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}' <file> || true
 ### 3. File-Type Specific Rules
 
 **Python (pyproject.toml, setup.py)**
+
 ```toml
 # Bad
 authors = [{name = "Author", email = "author@example.com"}]
@@ -58,6 +59,7 @@ authors = [{name = "Author"}]
 ```
 
 **Markdown (README.md, CONTRIBUTING.md)**
+
 ```markdown
 <!-- Bad -->
 Contact: support@project.com

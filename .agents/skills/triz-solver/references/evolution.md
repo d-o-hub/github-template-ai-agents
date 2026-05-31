@@ -5,6 +5,7 @@ Patterns of technical evolution adapted for software engineering.
 ## Core Evolution Trends
 
 ### 1. Increasing Ideality
+
 ```
 Systems evolve toward delivering maximum benefit with minimum cost/harm
 
@@ -15,6 +16,7 @@ Agents: Prompts → Skills → Templates → Self-generating → ???
 **Application**: For any system, ask: "What would the ideal solution look like?" Work backward from there.
 
 ### 2. Transition from Macro to Micro Level
+
 ```
 Systems evolve from coarse to fine granularity
 
@@ -25,6 +27,7 @@ Agents: Monolithic prompts → Skills → Atomic primitives → ???
 **Application**: When designing, plan for 3 levels of granularity current, next, and future.
 
 ### 3. Increasing Dynamism
+
 ```
 Systems evolve from static to adaptive
 
@@ -35,6 +38,7 @@ Agents: Static instructions → Context-aware → Self-modifying → ???
 **Application**: Design for configuration over hardcoding, adaptation over static behavior.
 
 ### 4. Increasing Completeness
+
 ```
 Systems evolve to include all necessary components
 
@@ -45,6 +49,7 @@ Agents: Task execution → Validation → Recovery → Self-improvement → ???
 **Application**: Include not just happy path but error handling, monitoring, and recovery.
 
 ### 5. S-Curve Transitions
+
 ```
 Systems follow S-curves: slow growth → rapid growth → maturity → decline
 
@@ -57,6 +62,7 @@ Agents: Prototype → Production → Optimization → Replacement
 ## Software-Specific Evolution Patterns
 
 ### Increasing Segmentation
+
 ```
 1960s: Single programs
 1980s: Libraries
@@ -68,6 +74,7 @@ Future: Autonomous agents
 ```
 
 ### Increasing Abstraction
+
 ```
 Machine code → Assembly → C → Java → DSLs → Natural language
 ```
@@ -75,6 +82,7 @@ Machine code → Assembly → C → Java → DSLs → Natural language
 **Application**: Higher abstraction levels emerge regularly. Design for abstraction level changes.
 
 ### Increasing Automation
+
 ```
 Manual → Scripted → CI/CD → GitOps → AI-driven → Autonomous
 ```
@@ -84,11 +92,13 @@ Manual → Scripted → CI/CD → GitOps → AI-driven → Autonomous
 ## Evolution for Agent Instructions
 
 ### Current State (2025-2026)
+
 ```
 Monolithic AGENTS.md → Modular skills → Context-aware loading
 ```
 
 ### Next State (2026-2027)
+
 ```
 Skills with lifecycle metadata
 Ideality scoring per instruction
@@ -97,6 +107,7 @@ Evolution tracking per skill
 ```
 
 ### Future State (2027+)
+
 ```
 Self-modifying instruction templates
 Autonomous skill evolution

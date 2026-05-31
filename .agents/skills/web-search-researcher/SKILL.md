@@ -25,19 +25,23 @@ Find accurate, relevant information from web sources.
 ## Core Process
 
 ### 1. Analyze Query
+
 Identify key terms, source types, search angles.
 
 ### 2. Strategic Searches
+
 - Start broad, refine
 - Multiple variations
 - Site-specific searches
 
 ### 3. Fetch Content
+
 - WebFetch promising results
 - Prioritize official docs
 - Note publication dates
 
 ### 4. Synthesize
+
 - Organize by relevance
 - Include quotes with links
 - Note gaps/conflicts
@@ -45,23 +49,27 @@ Identify key terms, source types, search angles.
 ## Search Strategies
 
 ### API Documentation
+
 ```
 "[library] official docs [feature]"
 site:docs.stripe.com webhook
 ```
 
 ### Best Practices
+
 ```
 "Rust async" best practices 2026
 ```
 
 ### Technical Solutions
+
 ```
 "tokio panic" redb write
 site:github.com tokio spawn_blocking
 ```
 
 ### Comparisons
+
 ```
 "redb vs sled" performance
 ```
@@ -151,16 +159,19 @@ site:github.com tokio spawn_blocking
 ## Examples
 
 ### API Research
+
 **Query**: "Stripe webhook signature"
 **Searches**: Official docs, site:stripe.com
 **Output**: Docs link, code example
 
 ### Best Practices
+
 **Query**: "Rust async error handling"
 **Searches**: "best practices 2026", site:blog.rust-lang.org
 **Output**: Official book, expert blogs
 
 ### Problem Solving
+
 **Query**: "Tokio blocking redb"
 **Searches**: "tokio blocking", site:github.com
 **Output**: spawn_blocking solution
@@ -174,6 +185,7 @@ site:github.com tokio spawn_blocking
 ## Best Practices
 
 ### DO:
+
 ✓ Check date context
 ✓ Use current year
 ✓ Specific terms
@@ -182,6 +194,7 @@ site:github.com tokio spawn_blocking
 ✓ Provide links
 
 ### DON'T:
+
 ✗ Stop at first result
 ✗ Trust unverified
 ✗ Ignore dates

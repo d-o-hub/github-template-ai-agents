@@ -464,7 +464,7 @@ Supported engines:
 - `chrome` (default) -- Chrome/Chromium via CDP
 - `lightpanda` -- Lightpanda headless browser via CDP (10x faster, 10x less memory than Chrome)
 
-Lightpanda does not support `--extension`, `--profile`, `--state`, or `--allow-f-access`. Install Lightpanda from https://lightpanda.io/docs/open-source/installation.
+Lightpanda does not support `--extension`, `--profile`, `--state`, or `--allow-f-access`. Install Lightpanda from <https://lightpanda.io/docs/open-source/installation>.
 
 ## Ready-to-Use Templates
 

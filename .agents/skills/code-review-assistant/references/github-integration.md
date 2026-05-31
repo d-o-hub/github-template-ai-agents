@@ -732,7 +732,7 @@ class GitHubRateLimiter:
 
 ### Common Issues
 
-**Token permissions (403 errors)**: 
+**Token permissions (403 errors)**:
 - Verify fine-grained token has correct repository permissions
 - Check expiration dates on tokens
 - Ensure token has access to organization repositories (if applicable)
@@ -757,6 +757,7 @@ class GitHubRateLimiter:
 ### Debug Mode
 
 Enable verbose logging:
+
 ```bash
 export GITHUB_DEBUG=1
 export CODE_REVIEW_DEBUG=1

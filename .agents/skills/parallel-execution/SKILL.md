@@ -92,7 +92,9 @@ Status: ✓ Success
 ## Execution Patterns
 
 ### Homogeneous Parallel
+
 Same agent type, different inputs:
+
 ```
 ├─ test-runner: Test module A
 ├─ test-runner: Test module B
@@ -100,7 +102,9 @@ Same agent type, different inputs:
 ```
 
 ### Heterogeneous Parallel
+
 Different agent types:
+
 ```
 ├─ code-reviewer: Quality analysis
 ├─ test-runner: Test execution
@@ -108,7 +112,9 @@ Different agent types:
 ```
 
 ### Parallel with Convergence
+
 Parallel execution → Single synthesis:
+
 ```
 Phase 1: Parallel investigation
 Phase 2: Synthesize findings
@@ -123,7 +129,9 @@ Phase 2: Synthesize findings
 ## Error Handling
 
 ### Independent Failures
+
 One failing doesn't stop others:
+
 ```
 ├─ Agent A: ✓ Success
 ├─ Agent B: ✗ Failed
@@ -133,6 +141,7 @@ Collect A and C, report B failed
 ```
 
 ### Strategies
+
 1. **Fail Fast**: Stop if any fails
 2. **Best Effort**: Collect successes
 3. **Retry Failed**: Retry failures
@@ -155,6 +164,7 @@ Example: Tasks 10min, 15min, 8min
 ## Best Practices
 
 ### DO:
+
 ✓ Verify independence first
 ✓ Use single message with multiple tools
 ✓ Balance workload
@@ -162,6 +172,7 @@ Example: Tasks 10min, 15min, 8min
 ✓ Validate each result
 
 ### DON'T:
+
 ✗ Parallelize dependent tasks
 ✗ Send sequential messages
 ✗ Overload single agent
@@ -170,6 +181,7 @@ Example: Tasks 10min, 15min, 8min
 ## Examples
 
 ### Simple Parallel Review
+
 ```
 ├─ code-reviewer: Review code
 └─ test-runner: Run tests
@@ -177,6 +189,7 @@ Speedup: 2x
 ```
 
 ### Multi-Module Testing
+
 ```
 ├─ test-runner: Test module A
 ├─ test-runner: Test module B
@@ -185,6 +198,7 @@ Speedup: 3x
 ```
 
 ### Quality Check
+
 ```
 ├─ code-reviewer: Quality
 ├─ test-runner: Tests

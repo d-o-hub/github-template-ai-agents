@@ -5,6 +5,7 @@ Integrate security scanning into CI/CD pipelines.
 ## Secrets Detection
 
 ### GitLeaks
+
 ```yaml
 jobs:
   secrets-scan:
@@ -19,6 +20,7 @@ jobs:
 ```
 
 ### TruffleHog
+
 ```yaml
 jobs:
   trufflehog:
@@ -39,6 +41,7 @@ jobs:
 ## Dependency Vulnerability Scanning
 
 ### Trivy
+
 ```yaml
 jobs:
   dependency-scan:
@@ -57,6 +60,7 @@ jobs:
 ```
 
 ### Snyk
+
 ```yaml
 jobs:
   snyk:
@@ -73,6 +77,7 @@ jobs:
 ## SAST (Static Analysis)
 
 ### SonarQube
+
 ```yaml
 jobs:
   sonarqube:
@@ -89,6 +94,7 @@ jobs:
 ```
 
 ### CodeQL (GitHub)
+
 ```yaml
 name: "CodeQL"
 
@@ -131,6 +137,7 @@ jobs:
 ## Container Image Scanning
 
 ### Trivy for Docker Images
+
 ```yaml
 jobs:
   scan-image:
@@ -154,6 +161,7 @@ jobs:
 ```
 
 ### Anchore
+
 ```yaml
 jobs:
   anchore:
@@ -178,6 +186,7 @@ jobs:
 ## Compliance Checking
 
 ### Open Policy Agent (OPA)
+
 ```yaml
 jobs:
   compliance:
@@ -196,6 +205,7 @@ jobs:
 ## Security Gates
 
 ### Fail Pipeline on High Severity
+
 ```yaml
 jobs:
   security-gate:
@@ -215,6 +225,7 @@ jobs:
 ```
 
 ### Risk-Based Deployment
+
 ```yaml
 jobs:
   risk-assessment:

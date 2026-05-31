@@ -5,11 +5,13 @@
 Execute skills in dependency order, where output of one feeds into the next.
 
 ### Pattern
+
 ```
 [Skill A] → [Skill B] → [Skill C]
 ```
 
 ### Example: Create Production-Ready API
+
 ```
 1. api-design-first     → Design the API specification
 2. security-code-auditor → Review spec for security issues
@@ -17,6 +19,7 @@ Execute skills in dependency order, where output of one feeds into the next.
 ```
 
 ### Implementation
+
 ```python
 def sequential_workflow(tasks):
     context = {}
@@ -31,6 +34,7 @@ def sequential_workflow(tasks):
 Execute independent skills simultaneously.
 
 ### Pattern
+
 ```
          ┌→ [Skill A] →┐
 [Input] ─┼→ [Skill B] ─┼→ [Aggregator] → [Output]
@@ -38,6 +42,7 @@ Execute independent skills simultaneously.
 ```
 
 ### Example: Comprehensive Code Review
+
 ```
 1. security-code-auditor  → Security issues
 2. shell-script-quality    → Script quality (parallel)
@@ -45,6 +50,7 @@ Execute independent skills simultaneously.
 ```
 
 ### Implementation
+
 ```python
 import asyncio
 
@@ -60,6 +66,7 @@ async def parallel_workflow(tasks):
 Route to different skills based on classification confidence.
 
 ### Pattern
+
 ```
 [Classifier] → (confidence > 0.7) → [Skill A]
              → (confidence 0.3-0.7) → [Ask User]
@@ -67,6 +74,7 @@ Route to different skills based on classification confidence.
 ```
 
 ### Example
+
 ```python
 def conditional_workflow(request):
     matches = classify_intent(request)
@@ -85,6 +93,7 @@ def conditional_workflow(request):
 Loop until quality criteria are met.
 
 ### Pattern
+
 ```
 ┌─────────────────────────────────────┐
 │  [Skill] → [Validate] → [Pass?] ─┬─→ [Output]
@@ -93,6 +102,7 @@ Loop until quality criteria are met.
 ```
 
 ### Example: Refine API Design
+
 ```
 1. api-design-first → Generate spec
 2. Validate against requirements
@@ -101,6 +111,7 @@ Loop until quality criteria are met.
 ```
 
 ### Implementation
+
 ```python
 def iterative_workflow(skill, input_data, validator, max_iterations=5):
     for i in range(max_iterations):
@@ -123,6 +134,7 @@ def iterative_workflow(skill, input_data, validator, max_iterations=5):
 Multiple specialized agents analyze from different perspectives.
 
 ### Pattern
+
 ```
               ┌→ [Agent A: Security] →┐
 [Input] ──────┼→ [Agent B: Performance]┼→ [Synthesizer] → [Output]
@@ -130,6 +142,7 @@ Multiple specialized agents analyze from different perspectives.
 ```
 
 ### Example: UI/UX Optimization
+
 ```
 1. anti-ai-slop agent    → Authenticity review
 2. ui-ux-optimize agent  → Usability analysis
@@ -142,6 +155,7 @@ Multiple specialized agents analyze from different perspectives.
 Multiple skills orchestrated by a parent skill.
 
 ### Pattern
+
 ```
 [Composite Skill]
    ├→ [Sub-skill A]
@@ -152,6 +166,7 @@ Multiple skills orchestrated by a parent skill.
 ```
 
 ### Example: Full Security Audit
+
 ```
 security-code-auditor (parent)
   ├→ Static analysis
@@ -165,6 +180,7 @@ security-code-auditor (parent)
 ## Error Handling Patterns
 
 ### Retry with Exponential Backoff
+
 ```python
 @retry(stop=stop_after_attempt(3), wait=wait_exponential())
 def execute_with_retry(skill, input_data):
@@ -172,6 +188,7 @@ def execute_with_retry(skill, input_data):
 ```
 
 ### Circuit Breaker
+
 ```python
 if skill_failure_rate > 0.5:
     disable_skill_temporarily(skill)
@@ -179,6 +196,7 @@ if skill_failure_rate > 0.5:
 ```
 
 ### Fallback Chain
+
 ```python
 skills = [primary_skill, secondary_skill, general_assistance]
 for skill in skills:

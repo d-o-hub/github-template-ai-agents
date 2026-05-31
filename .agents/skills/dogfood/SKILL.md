@@ -132,5 +132,6 @@ Aim to find **5-10 well-documented issues**, then wrap up. Depth of evidence mat
 - **Check the console.** Many issues are invisible in the UI but show as JS errors.
 
 ## References
+
 - `references/issue-taxonomy.md` - What to look for, severity levels, exploration checklist
 - `templates/dogfood-report-template.md` - Copy into output directory as the report file

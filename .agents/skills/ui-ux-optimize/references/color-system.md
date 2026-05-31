@@ -17,6 +17,7 @@
 | interactive.primary on bg.surface | 4.5:1 |
 
 ## Restraint
+
 1. Max 3 accent colors (or named roles for games)
 2. Use opacity variants for hover/focus
 3. Status colors must pair with icons/text (never color-only)

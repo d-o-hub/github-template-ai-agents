@@ -31,42 +31,50 @@
 ## Skill Categories
 
 ### Development
+
 - agent-coordination
 - goap-agent
 - parallel-execution
 - task-decomposition
 
 ### Code Quality
+
 - security-code-auditor
 - shell-script-quality
 - iterative-refinement
 
 ### Documentation
+
 - github-readme
 - docs-hook
 - api-design-first
 
 ### Skills Engineering
+
 - skill-creator
 - skill-evaluator
 - intent-classifier
 
 ### Design/UX
+
 - anti-ai-slop
 - ui-ux-optimize
 - architecture-diagram
 
 ### External Services
+
 - codeberg-api
 - web-search-researcher
 
 ### Specialized
+
 - privacy-first
 - triz-solver
 
 ## Update Catalog
 
 To regenerate this catalog:
+
 ```bash
 ./scripts/dynamic-catalog.sh
 ```

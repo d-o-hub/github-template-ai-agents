@@ -92,24 +92,28 @@ noise_threshold = 6
 ### Profile Details
 
 #### Free Profile
+
 - No paid API calls
 - Fastest free providers first
 - Good for development/testing
 - May fail on complex/JS-heavy pages
 
 #### Fast Profile
+
 - Optimized for speed
 - 1 paid provider allowed
 - Lower quality threshold
 - Good for quick lookups
 
 #### Balanced Profile (Default)
+
 - Good cost/quality tradeoff
 - Up to 2 paid providers
 - Medium latency budget
 - Works well for most use cases
 
 #### Quality Profile
+
 - Maximum coverage
 - Up to 5 paid providers
 - Lowest quality threshold

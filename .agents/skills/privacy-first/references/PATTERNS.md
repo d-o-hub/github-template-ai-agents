@@ -3,11 +3,13 @@
 ## Regex Patterns
 
 ### Basic Email
+
 ```
 [a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}
 ```
 
 ### Common TLDs (stricter)
+
 ```
 [a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|io|net|edu|gov|co)
 ```

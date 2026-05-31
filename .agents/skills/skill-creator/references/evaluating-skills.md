@@ -3,6 +3,7 @@
 ## Designing Test Cases
 
 Store in `evals/evals.json`:
+
 ```json
 {
   "skill_name": "example-skill",
@@ -23,6 +24,7 @@ Store in `evals/evals.json`:
 Run each test case **twice**: once with the skill, once without.
 
 **Workspace structure:**
+
 ```
 <skill-name>-workspace/
 └── iteration-1/
@@ -79,6 +81,7 @@ After the skill is working well, optimize the frontmatter:
 
 1. **Generate eval queries** - 20 queries (8-10 should-trigger, 8-10 should-not-trigger)
 2. **Run optimization loop**:
+
 ```bash
 python -m scripts.run_loop \
   --eval-set <path/to/queries.json> \
@@ -87,4 +90,5 @@ python -m scripts.run_loop \
   --max-iterations 5 \
   --verbose
 ```
+
 3. **Apply best description** - Update SKILL.md frontmatter

@@ -35,6 +35,7 @@ src/routes/
 - All responses must follow consistent format.
 
 ## Checklist
+
 - [ ] All routes have input validation with Zod.
 - [ ] Error responses follow consistent format.
 - [ ] Auth middleware applied to protected routes.
@@ -42,5 +43,6 @@ src/routes/
 - [ ] CORS headers set appropriately.
 
 ## References
+
 - `references/routing-patterns.md` - Common routing patterns for Workers
 - `references/response-helpers.md` - Consistent response formatting

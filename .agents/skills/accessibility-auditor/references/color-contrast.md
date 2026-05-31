@@ -53,6 +53,7 @@ Where R, G, B are sRGB components normalized to 0-1.
 ### Safe Color Palettes
 
 #### Primary Action
+
 ```css
 .btn-primary {
   color: #FFFFFF;
@@ -61,6 +62,7 @@ Where R, G, B are sRGB components normalized to 0-1.
 ```
 
 #### Secondary/Text
+
 ```css
 .text-secondary {
   color: #6C757D; /* 4.6:1 on white */
@@ -68,6 +70,7 @@ Where R, G, B are sRGB components normalized to 0-1.
 ```
 
 #### Error/Warning
+
 ```css
 .error-text {
   color: #DC3545; /* 7.1:1 on white */
@@ -77,15 +80,18 @@ Where R, G, B are sRGB components normalized to 0-1.
 ## Testing Tools
 
 ### Online Tools
+
 - **WebAIM Contrast Checker** - webaim.org/resources/contrastchecker/
 - **Stark** - getstark.co (plugin for Figma/Sketch)
 - **Colour Contrast Analyser** - TPGi desktop app
 
 ### Browser DevTools
+
 - Chrome: DevTools → Elements → Styles → Color picker shows contrast ratio
 - Firefox: Accessibility tab shows contrast warnings
 
 ### NPM Packages
+
 ```bash
 npm install color-contrast-checker
 npm install @axe-core/cli
@@ -94,6 +100,7 @@ npm install @axe-core/cli
 ## Fixing Contrast Issues
 
 ### Issue 1: Light Gray on White
+
 ```css
 /* Bad - 2.8:1 ratio */
 .text-muted {
@@ -107,6 +114,7 @@ npm install @axe-core/cli
 ```
 
 ### Issue 2: Blue Link on Dark Background
+
 ```css
 /* Bad */
 .dark-bg a {
@@ -120,6 +128,7 @@ npm install @axe-core/cli
 ```
 
 ### Issue 3: Placeholder Text
+
 ```css
 /* Bad */
 input::placeholder {
@@ -135,12 +144,15 @@ input::placeholder {
 ## Special Cases
 
 ### Images of Text
+
 Must meet same contrast requirements as text.
 
 ### Logos and Branding
+
 Exempt from contrast requirements but should still be as accessible as possible.
 
 ### Incidental Text
+
 - Inactive/disabled elements
 - Decorative text
 - Logos
@@ -148,6 +160,7 @@ Exempt from contrast requirements but should still be as accessible as possible.
 These are exempt but consider using reduced opacity (50-60%) to indicate state.
 
 ### Gradient Backgrounds
+
 Test contrast at the lightest and darkest points of the gradient.
 
 ```css

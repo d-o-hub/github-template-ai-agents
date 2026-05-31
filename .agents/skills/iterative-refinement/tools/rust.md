@@ -5,6 +5,7 @@ Validation tools and commands for Rust iterative refinement.
 ## Test Framework
 
 ### cargo test
+
 ```bash
 # Run all tests
 cargo test
@@ -31,6 +32,7 @@ cargo test 2>&1 | grep "test result" | awk '{print $4}'
 ## Linter
 
 ### clippy
+
 ```bash
 # Run clippy
 cargo clippy
@@ -54,6 +56,7 @@ cargo clippy --fix
 ## Formatter
 
 ### rustfmt
+
 ```bash
 # Format code
 cargo fmt
@@ -71,6 +74,7 @@ cargo fmt -- --check && echo "Formatted" || echo "Not formatted"
 ## Build
 
 ### cargo build
+
 ```bash
 # Build
 cargo build
@@ -94,6 +98,7 @@ cargo check --all-targets
 ## Code Coverage
 
 ### tarpaulin
+
 ```bash
 # Install
 cargo install cargo-tarpaulin
@@ -112,6 +117,7 @@ cargo tarpaulin --out Json | jq '.files | map(.coverage) | add / length'
 ```
 
 ### llvm-cov
+
 ```bash
 # Install
 rustup component add llvm-tools-preview
@@ -130,6 +136,7 @@ cargo llvm-cov --fail-under-lines 80
 ## Security Audit
 
 ### cargo-audit
+
 ```bash
 # Install
 cargo install cargo-audit
@@ -142,6 +149,7 @@ cargo audit --json | jq '.vulnerabilities.count'
 ```
 
 ### cargo-deny
+
 ```bash
 # Install
 cargo install cargo-deny
@@ -156,6 +164,7 @@ cargo deny check advisories
 ## Documentation
 
 ### cargo doc
+
 ```bash
 # Generate docs
 cargo doc
@@ -170,6 +179,7 @@ cargo doc --no-deps 2>&1 | grep -c "warning:"
 ## Benchmarks
 
 ### criterion
+
 ```bash
 # Run benchmarks
 cargo bench
@@ -179,6 +189,7 @@ cargo bench bench_name
 ```
 
 ### cargo-criterion
+
 ```bash
 # Install
 cargo install cargo-criterion
@@ -190,6 +201,7 @@ cargo criterion
 ## Common Validation Sequences
 
 ### Basic Quality Loop
+
 ```bash
 # 1. Check compilation
 cargo check
@@ -209,6 +221,7 @@ echo "Clippy warnings: $CLIPPY_WARNINGS"
 ```
 
 ### Comprehensive Quality Loop
+
 ```bash
 # 1. Clean check
 cargo check --all-targets
@@ -230,6 +243,7 @@ cargo doc --no-deps
 ```
 
 ### Fast Iteration Loop
+
 ```bash
 # Use 'check' instead of 'build' for speed
 # 1. Quick check
@@ -244,6 +258,7 @@ echo "Warnings: $WARNINGS"
 ```
 
 ### Performance Validation
+
 ```bash
 # Build release
 cargo build --release
@@ -331,23 +346,23 @@ Create a `Makefile` for easy validation:
 .PHONY: check test lint format validate
 
 check:
-	cargo check --all-targets
+ cargo check --all-targets
 
 test:
-	cargo test
+ cargo test
 
 lint:
-	cargo clippy --all-targets -- -D warnings
+ cargo clippy --all-targets -- -D warnings
 
 format:
-	cargo fmt -- --check
+ cargo fmt -- --check
 
 validate: check test lint format
-	@echo "All validations passed!"
+ @echo "All validations passed!"
 
 fix:
-	cargo fmt
-	cargo clippy --fix --allow-dirty
+ cargo fmt
+ cargo clippy --fix --allow-dirty
 ```
 
 Then run: `make validate`
@@ -378,6 +393,7 @@ jobs:
 ## Best Practices
 
 ### DO:
+
 ✓ Use `cargo check` for fast iteration (faster than `cargo build`)
 ✓ Run `cargo fmt` before committing
 ✓ Enable clippy in CI with `-D warnings`
@@ -388,6 +404,7 @@ jobs:
 ✓ Run tests with `--nocapture` for debugging
 
 ### DON'T:
+
 ✗ Ignore clippy warnings
 ✗ Skip formatting checks
 ✗ Use `cargo build` when `cargo check` suffices
@@ -400,6 +417,7 @@ jobs:
 ## Performance Tips
 
 ### Speed Up Iteration
+
 ```bash
 # Use check instead of build (much faster)
 cargo check
@@ -417,6 +435,7 @@ export RUSTC_WRAPPER=sccache
 ```
 
 ### Cargo Watch
+
 ```bash
 # Install cargo-watch
 cargo install cargo-watch

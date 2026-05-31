@@ -87,6 +87,7 @@ skill-name/
 ## Creating Test Cases
 
 Store in `evals/evals.json`:
+
 ```json
 {
   "skill_name": "example-skill",
@@ -116,6 +117,7 @@ When creating a new domain-specific skill, always include a verification checkli
 Use `.agents/skills/verification-template/SKILL.md` as a starting point.
 
 ### Benefits
+
 - Deep domain knowledge encoded in skills.
 - Reduces onboarding time.
 - Ensures consistent debugging and verification approach.
@@ -130,12 +132,14 @@ Use `.agents/skills/verification-template/SKILL.md` as a starting point.
 ## Registration and Standards
 
 ### How to register a skill in AGENTS.md
+
 1. **Catalog Update**: Add the skill to the "Skills" section in `AGENTS.md` following the alphabetical order within its category.
 2. **Docs Sync**: Add the skill to `agents-docs/skills-reference.md`.
 3. **Registry Update**: Run `./scripts/update-agents-registry.sh` if applicable.
 4. **Maintenance**: Run `./scripts/generate-skills-readme.py` and `./scripts/generate-available-skills.sh` to update auto-generated documentation.
 
 ### Acceptance Criteria Format
+
 Every new skill must meet these criteria before being merged:
 - [ ] `SKILL.md` is under 250 lines.
 - [ ] Frontmatter contains `name`, `description`, `category`, and `version`.
@@ -144,6 +148,7 @@ Every new skill must meet these criteria before being merged:
 - [ ] Successfully passes `./scripts/validate-skills.sh`.
 
 ### Versioning Conventions
+
 - Use Semantic Versioning (SemVer) for the `version` field.
 - **Major (1.0.0)**: Breaking changes in skill interface or core logic.
 - **Minor (0.1.0)**: New instructions, sections, or eval cases that don't break existing usage.

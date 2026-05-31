@@ -14,12 +14,14 @@ source "$CONFIG_DIR/settings.sh"
 ```
 
 **Solution 1**: Add directive
+
 ```bash
 # shellcheck source=config/settings.sh
 source "$CONFIG_DIR/settings.sh"
 ```
 
 **Solution 2**: Use relative path
+
 ```bash
 # shellcheck source=./lib/utils.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib/utils.sh"
@@ -35,12 +37,14 @@ cp $files $dest
 ```
 
 **Solution**: Always quote
+
 ```bash
 # ✅ Good
 cp "$files" "$dest"
 ```
 
 **When intentional**: Use array or disable
+
 ```bash
 # shellcheck disable=SC2086
 cp $files $dest  # Intentional word splitting
@@ -56,6 +60,7 @@ local result=$(curl -s api.example.com)
 ```
 
 **Solution**: Separate declaration
+
 ```bash
 # ✅ Good
 local result
@@ -73,6 +78,7 @@ if [[ $? -ne 0 ]]; then
 ```
 
 **Solution**: Test directly
+
 ```bash
 # ✅ Good
 if ! command; then
@@ -81,18 +87,21 @@ if ! command; then
 ### False Positives
 
 **Disable specific line**:
+
 ```bash
 # shellcheck disable=SC2086
 echo $INTENTIONAL_WORD_SPLITTING
 ```
 
 **Disable entire file**:
+
 ```bash
 #!/bin/bash
 # shellcheck disable=SC2086,SC2181
 ```
 
 **Disable in .shellcheckrc**:
+
 ```bash
 disable=SC2086,SC2181
 ```
@@ -104,6 +113,7 @@ disable=SC2086,SC2181
 **Problem**: State pollution between tests
 
 **Solution**: Proper cleanup in teardown
+
 ```bash
 teardown() {
     # Reset environment
@@ -122,6 +132,7 @@ teardown() {
 **Problem**: Script executes on source
 
 **Bad script**:
+
 ```bash
 #!/bin/bash
 # Script runs immediately
@@ -130,6 +141,7 @@ main "$@"
 ```
 
 **Solution**: Add execution guard
+
 ```bash
 #!/bin/bash
 
@@ -148,6 +160,7 @@ fi
 **Problem**: Relative paths don't work
 
 **Solution**: Use BATS variables
+
 ```bash
 setup() {
     # Use BATS test directory
@@ -161,6 +174,7 @@ setup() {
 **Problem**: Tests conflict on temp files
 
 **Solution**: Unique temp directories
+
 ```bash
 setup() {
     TEST_TEMP_DIR="$(mktemp -d -t bats-test.XXXXXX)"
@@ -176,6 +190,7 @@ teardown() {
 **Problem**: Original command still runs
 
 **Solution**: Check PATH order
+
 ```bash
 create_mock() {
     local cmd="$1"
@@ -200,6 +215,7 @@ EOF
 **Problem**: Linting takes too long
 
 **Solution 1**: Exclude large files
+
 ```bash
 # .shellcheckrc
 exclude-dir=vendor
@@ -207,11 +223,13 @@ exclude-dir=node_modules
 ```
 
 **Solution 2**: Parallel execution
+
 ```bash
 find scripts -name '*.sh' | parallel shellcheck
 ```
 
 **Solution 3**: Cache in CI
+
 ```yaml
 - uses: actions/cache@v4
   with:
@@ -224,12 +242,14 @@ find scripts -name '*.sh' | parallel shellcheck
 **Problem**: Tests take too long
 
 **Solution 1**: Parallel tests
+
 ```bash
 # Run in parallel (if tests are independent)
 bats --jobs 4 tests/
 ```
 
 **Solution 2**: Skip slow tests locally
+
 ```bash
 @test "slow integration test" {
     [[ "$SKIP_SLOW" == "true" ]] && skip
@@ -238,6 +258,7 @@ bats --jobs 4 tests/
 ```
 
 **Solution 3**: Mock expensive operations
+
 ```bash
 @test "api call" {
     # Mock curl instead of real API call
@@ -252,6 +273,7 @@ bats --jobs 4 tests/
 ### Debug BATS Tests
 
 **Enable debug output**:
+
 ```bash
 @test "debug example" {
     # Show variables
@@ -266,6 +288,7 @@ bats --jobs 4 tests/
 ```
 
 **Run with debug**:
+
 ```bash
 bats -t tests/example.bats  # Show timing
 bats -x tests/example.bats  # Show trace
@@ -274,6 +297,7 @@ bats -x tests/example.bats  # Show trace
 ### Debug Shell Scripts
 
 **Enable tracing**:
+
 ```bash
 #!/bin/bash
 set -x  # Print commands before execution
@@ -283,6 +307,7 @@ set -x  # Print commands before execution
 ```
 
 **Run with debug**:
+
 ```bash
 DEBUG=true bash script.sh
 bash -x script.sh
@@ -291,11 +316,13 @@ bash -x script.sh
 ### ShellCheck Debug
 
 **See wiki page for warning**:
+
 ```bash
 shellcheck -W SC2086 script.sh
 ```
 
 **Show all checks**:
+
 ```bash
 shellcheck -a script.sh
 ```
@@ -307,6 +334,7 @@ shellcheck -a script.sh
 **Problem**: Different environments
 
 **Solution**: Match versions
+
 ```yaml
 - name: Install exact versions
   run: |
@@ -315,6 +343,7 @@ shellcheck -a script.sh
 ```
 
 **Solution**: Use containers
+
 ```yaml
 runs-on: ubuntu-latest
 container:
@@ -326,12 +355,14 @@ container:
 **Problem**: Scripts not executable
 
 **Solution**: Set permissions in CI
+
 ```yaml
 - name: Make scripts executable
   run: find scripts -name '*.sh' -exec chmod +x {} +
 ```
 
 **Solution**: Track permissions in git
+
 ```bash
 git add --chmod=+x scripts/*.sh
 ```
@@ -341,6 +372,7 @@ git add --chmod=+x scripts/*.sh
 **Problem**: Tests hang in CI
 
 **Solution**: Add timeout
+
 ```yaml
 - name: Run tests
   timeout-minutes: 5
@@ -354,6 +386,7 @@ git add --chmod=+x scripts/*.sh
 **Problem**: Different command behaviors
 
 **Solution**: Use portable commands
+
 ```bash
 # ❌ Bad - GNU-specific
 date -d "yesterday"
@@ -376,11 +409,13 @@ fi
 **Problem**: Line endings
 
 **Solution**: Configure git
+
 ```bash
 git config --global core.autocrlf input
 ```
 
 **Solution**: Add .gitattributes
+
 ```
 *.sh text eol=lf
 *.bats text eol=lf
@@ -391,6 +426,7 @@ git config --global core.autocrlf input
 ### "command not found: bats"
 
 **Solution**:
+
 ```bash
 # Install BATS
 brew install bats-core  # macOS
@@ -412,6 +448,7 @@ sudo apt install bats   # Linux
 - Line ending issues (CRLF vs LF)
 
 **Debug**:
+
 ```bash
 # Check interpreter
 head -1 script.sh
@@ -426,14 +463,17 @@ dos2unix script.sh
 ## Getting Help
 
 ### ShellCheck
-- Wiki: https://www.shellcheck.net/wiki/
-- GitHub Issues: https://github.com/koalaman/shellcheck/issues
+
+- Wiki: <https://www.shellcheck.net/wiki/>
+- GitHub Issues: <https://github.com/koalaman/shellcheck/issues>
 
 ### BATS
-- Docs: https://bats-core.readthedocs.io/
-- GitHub Issues: https://github.com/bats-core/bats-core/issues
+
+- Docs: <https://bats-core.readthedocs.io/>
+- GitHub Issues: <https://github.com/bats-core/bats-core/issues>
 
 ### Interactive Help
+
 ```bash
 # ShellCheck help
 shellcheck --help

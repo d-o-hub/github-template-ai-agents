@@ -66,30 +66,35 @@ bash .agents/skills/github-workflow/run.sh --message "feat: new feature"
 ## Workflow Phases
 
 ### Phase 1: PREPARE
+
 - Check git status
 - Validate working directory
 - Detect or create branch
 - Calculate branch name from message
 
 ### Phase 2: SYNC
+
 - Fetch from origin
 - Check if behind base branch
 - Auto-rebase if enabled and behind
 - Handle merge conflicts
 
 ### Phase 3: PUSH
+
 - Stage all changes (if any)
 - Create commit (if needed)
 - Push to remote
 - Set upstream tracking
 
 ### Phase 4: PR
+
 - Check for existing PR
 - Create PR if none exists
 - Update PR if exists
 - Generate PR body with context
 
 ### Phase 5: MONITOR
+
 - Poll GitHub Actions workflows
 - Check PR checks
 - Distinguish pre-existing vs new issues
@@ -97,6 +102,7 @@ bash .agents/skills/github-workflow/run.sh --message "feat: new feature"
 - Report status comprehensively
 
 ### Phase 6: MERGE
+
 - Wait for all checks to pass
 - Verify no new issues introduced
 - Auto-merge with configured method
@@ -131,6 +137,7 @@ Monitors:
 ## Configuration
 
 **Environment Variables:**
+
 ```bash
 GITHUB_WORKFLOW_TIMEOUT=3600         # Actions monitoring timeout
 GITHUB_WORKFLOW_BASE_BRANCH=main     # Target branch
@@ -163,24 +170,28 @@ GITHUB_WORKFLOW_CLEANUP_BRANCH=0     # Delete branch after merge
 ## Examples
 
 ### Example 1: Quick Push and PR
+
 ```bash
 bash .agents/skills/github-workflow/run.sh --message "fix: bug fix"
 # Pushes, creates PR, monitors, auto-merges when ready
 ```
 
 ### Example 2: Monitor Existing PR
+
 ```bash
 bash .agents/skills/github-workflow/run.sh --monitor-only
 # Monitors current PR, reports status
 ```
 
 ### Example 3: Push Without Merge
+
 ```bash
 bash .agents/skills/github-workflow/run.sh --no-merge
 # Creates PR but waits for manual review
 ```
 
 ### Example 4: Handle Pre-existing Issues
+
 ```bash
 bash .agents/skills/github-workflow/run.sh
 # Detects base branch has failing tests

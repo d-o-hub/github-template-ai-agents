@@ -116,24 +116,28 @@ Claude executes:
 ## Benefits of Multi-File Structure
 
 ### Token Efficiency
+
 - Only load relevant content
 - Python project doesn't load Rust tools
 - Simple iterations don't load advanced patterns
 - Significant token savings for focused tasks
 
 ### Maintainability
+
 - Add new languages without modifying core
 - Update tool guides independently
 - Each file under 200 lines (easy to read)
 - Clear separation of concerns
 
 ### Scalability
+
 - Easy to add more language tools
 - Can expand patterns without bloating core
 - Research guide independent of iteration logic
 - Support new use cases without refactoring
 
 ### User Experience
+
 - Faster responses (less context to process)
 - More relevant information shown
 - Can reference specific files when needed
@@ -196,6 +200,7 @@ Validation tools and commands for [Language] iterative refinement.
 ## Best Practices for This Skill
 
 ### DO:
+
 ✓ Reference specific files when needed ("See patterns.md for convergence")
 ✓ Load only relevant tool files
 ✓ Keep SKILL.md focused on core workflow
@@ -203,6 +208,7 @@ Validation tools and commands for [Language] iterative refinement.
 ✓ Add new languages as separate files
 
 ### DON'T:
+
 ✗ Load all files for every task
 ✗ Duplicate content across files
 ✗ Let individual files exceed 200 lines

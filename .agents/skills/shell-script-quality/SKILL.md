@@ -93,6 +93,7 @@ bats tests/example.bats
 **GitHub Actions**: See [CI-CD.md](CI-CD.md) for complete workflows
 
 Quick integration:
+
 ```yaml
 - name: ShellCheck
   uses: ludeeus/action-shellcheck@master
@@ -138,12 +139,14 @@ fi
 ## Installation
 
 **ShellCheck**:
+
 ```bash
 brew install shellcheck         # macOS
 sudo apt-get install shellcheck # Linux
 ```
 
 **BATS**:
+
 ```bash
 brew install bats-core          # macOS
 sudo apt-get install bats       # Linux
@@ -152,6 +155,7 @@ sudo apt-get install bats       # Linux
 ## Configuration
 
 **.shellcheckrc** in project root:
+
 ```bash
 shell=bash
 disable=SC1090
@@ -164,6 +168,7 @@ source-path=SCRIPTDIR
 ## Testing Claude Code Plugins
 
 **Test scripts using CLAUDE_PLUGIN_ROOT**:
+
 ```bash
 @test "plugin script works" {
     export CLAUDE_PLUGIN_ROOT="$BATS_TEST_DIRNAME/.."
@@ -173,6 +178,7 @@ source-path=SCRIPTDIR
 ```
 
 **Test hooks with JSON**:
+
 ```bash
 @test "hook provides suggestions" {
     local input='{"tool":"Edit","params":{"file_path":"test.txt"}}'

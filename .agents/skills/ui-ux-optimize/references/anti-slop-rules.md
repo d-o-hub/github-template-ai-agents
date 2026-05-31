@@ -27,6 +27,7 @@
 | "Accessible" | Define: contrast ratios, focus rings, ARIA |
 
 ## Banned Layout Clichés
+
 - Three-column feature grid → content-appropriate grid
 - Purple-blue gradient hero → semantic color roles
 - Glassmorphism cards → elevated surface with shadow
@@ -34,6 +35,7 @@
 - Inter/DM Sans/Space Grotesk → intentional font choice
 
 ## Audit Checklist
+
 - [ ] No banned adjectives remain
 - [ ] All taste words → token values
 - [ ] `anti_slop_warnings` lists every translation

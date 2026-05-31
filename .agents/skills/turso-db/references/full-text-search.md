@@ -1,6 +1,6 @@
 # Full-Text Search (FTS)
 
-Turso provides FTS powered by the [Tantivy](https://github.com/quickwit-oss/tant
+Turso provides FTS powered by the [Tantivy](<https://github.com/quickwit-oss/tant>
 ivy) search engine. Requires the `fts` feature at compile time.
 
 **Status:** Experimental — requires `--experimental-index-methods` flag when sta

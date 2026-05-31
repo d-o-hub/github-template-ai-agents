@@ -74,6 +74,7 @@ For each iteration:
 1. **Take action** - Apply fixes or implement changes
 2. **Run validator** - Execute tests, linters, or measurements
 3. **Record progress**:
+
    ```
    Iteration N:
    - Action: [what was done]
@@ -81,6 +82,7 @@ For each iteration:
    - Issues remaining: [count/description]
    - Decision: [Continue/Success/Stop]
    ```
+
 4. **Assess termination**:
    - All criteria met? → SUCCESS
    - Improvement < threshold? → CONVERGED
@@ -154,6 +156,7 @@ Configuration:
 - Max iterations: 8
 
 Execution:
+
 ```
 I1: 42/50 → Fix 8 failures → Continue
 I2: 48/50 → Fix 2 failures → Continue
@@ -169,6 +172,7 @@ Configuration:
 - Max iterations: 5
 
 Execution:
+
 ```
 I1: 15 warnings → Fix → 6 warnings
 I2: 6 warnings → Fix → 1 warning
@@ -185,6 +189,7 @@ Configuration:
 - Convergence: <10% over 3 iterations
 
 Execution:
+
 ```
 I1: 320ms → Optimize → 180ms (44%)
 I2: 180ms → Optimize → 95ms (47%)
@@ -201,6 +206,7 @@ Configuration:
 - Max iterations: 12
 
 Execution:
+
 ```
 I1: 65% → Write tests → 72%
 I2: 72% → Write tests → 81%
@@ -229,6 +235,7 @@ See patterns.md
 ## Best Practices
 
 ### DO:
+
 ✓ Define clear, measurable success criteria
 ✓ Set reasonable max limits (5-15)
 ✓ Use automated validators
@@ -239,6 +246,7 @@ See patterns.md
 ✓ Document changes
 
 ### DON'T:
+
 ✗ Use loops for single-pass tasks
 ✗ Set high limits (>20) without justification
 ✗ Skip validation between iterations

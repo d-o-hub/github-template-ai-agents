@@ -18,6 +18,7 @@ This catalog documents common breaking changes organized by technology and provi
 - WASI version now required (no default)
 
 **Migration:**
+
 ```javascript
 // Node.js 20 requires explicit permission flags
 node --experimental-permission --allow-fs-read=* --allow-fs-write=* app.js
@@ -46,6 +47,7 @@ const wasi = new WASI({
 - Changed behavior of `res.send()` with numbers
 
 **Migration:**
+
 ```javascript
 // Before (Express 4)
 app.use(function(err, req, res) {
@@ -66,6 +68,7 @@ app.use(function(err, req, res, next) {  // Must have 4 args
 - Strict Mode changes
 
 **Migration:**
+
 ```javascript
 // Before (React 17)
 import ReactDOM from 'react-dom';
@@ -88,6 +91,7 @@ root.render(<App />);
 - Use `setuptools` or alternative build backends
 
 **Migration:**
+
 ```python
 # Before (Python 3.11)
 from distutils.core import setup
@@ -103,6 +107,7 @@ from setuptools import setup, Extension
 - New `type` statement for type aliases
 
 **Migration:**
+
 ```python
 # Before (Python 3.11)
 from typing import TypeVar, Generic, Callable
@@ -125,6 +130,7 @@ type Point[T] = tuple[T, T]  # Generic alias
 - Quote reuse, multi-line expressions, comments, backslashes
 
 **Migration:**
+
 ```python
 # Python 3.12 allows these (previously SyntaxError)
 f"This is the playlist: {", ".join(songs)}"
@@ -142,6 +148,7 @@ f"Path: {value.replace("\\", "/")}"  # Backslashes now allowed
 - No separate frame in tracebacks
 
 **Migration:**
+
 ```python
 # Before - could iterate over locals() safely
 for k in locals(): ...
@@ -161,6 +168,7 @@ for k in keys: ...
 - Django 5.0: Database-generated columns, simplified password validators
 
 **Migration:**
+
 ```python
 # Before (Django 3.x)
 from django.conf.urls import url
@@ -185,6 +193,7 @@ gettext('Hello')
 - CLI changes in all versions
 
 **Migration:**
+
 ```python
 # Before (Flask 1.x)
 from flask import json
@@ -209,6 +218,7 @@ app.json = CustomJSONProvider(app)
 - GraalVM native image support changes
 
 **Migration:**
+
 ```java
 // Before (Spring Boot 2.x)
 import javax.persistence.Entity;
@@ -230,6 +240,7 @@ import jakarta.validation.constraints.NotNull;
 - Null handling in switch
 
 **Migration Example:**
+
 ```java
 // Before (Java 17)
 static String formatter(Object obj) {
@@ -260,6 +271,7 @@ static String formatter(Object obj) {
 - Considerations for thread-local variables
 
 **Migration Example:**
+
 ```java
 // Before - Platform threads
 try (var executor = Executors.newCachedThreadPool()) {
@@ -287,6 +299,7 @@ try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
 - Nested record patterns
 
 **Migration Example:**
+
 ```java
 // Before
 if (obj instanceof Point p) {
@@ -310,6 +323,7 @@ switch (obj) {
 ```
 
 **4. String Templates (Preview in Java 21, JEP 430)**
+
 ```java
 // String templates (preview)
 String name = "Joan";
@@ -317,6 +331,7 @@ String info = STR."My name is \{name}";
 ```
 
 **5. Sequenced Collections (JEP 431)**
+
 ```java
 // New interfaces for ordered collections
 SequencedCollection<String> seq = new ArrayList<>();
@@ -336,6 +351,7 @@ String last = seq.getLast();    // New method
 - Statistics changes in optimizer
 
 **Migration:**
+
 ```sql
 -- PostgreSQL 15+ - Add explicit NULL handling if needed
 SELECT COALESCE(jsonb_column -> 'key', 'null'::jsonb) FROM table;
@@ -362,6 +378,7 @@ SELECT JSON_OBJECT('key': value);  -- SQL/JSON standard
 - Gateway API v1 graduation
 
 **Migration:**
+
 ```yaml
 # Before - PodSecurityPolicy (removed in 1.25)
 apiVersion: policy/v1beta1
@@ -388,6 +405,7 @@ metadata:
 - Terraform 1.6+: `import` block for generating configuration
 
 **Migration:**
+
 ```hcl
 # Terraform 1.5+ import blocks (generates configuration)
 import {
@@ -414,18 +432,21 @@ import {
 ### API Versioning Strategies
 
 **1. URL Path Versioning**
+
 ```
 /api/v1/users
 /api/v2/users
 ```
 
 **2. Header Versioning**
+
 ```
 Accept: application/vnd.api+json;version=2
 API-Version: 2
 ```
 
 **3. Content Negotiation**
+
 ```
 Accept: application/vnd.myapi.v2+json
 ```
@@ -562,9 +583,9 @@ def test_get_user(pact):
 
 ## References
 
-- Python 3.12 What's New: https://docs.python.org/3/whatsnew/3.12.html
-- Node.js 20 Release Notes: https://nodejs.org/en/blog/release/v20.0.0
-- Java 21 Release Notes: https://openjdk.org/projects/jdk/21/
-- JEP 441 - Pattern Matching for switch: https://openjdk.org/jeps/441
-- JEP 444 - Virtual Threads: https://openjdk.org/jeps/444
-- Kubernetes Deprecation Guide: https://kubernetes.io/docs/reference/using-api/deprecation-guide/
+- Python 3.12 What's New: <https://docs.python.org/3/whatsnew/3.12.html>
+- Node.js 20 Release Notes: <https://nodejs.org/en/blog/release/v20.0.0>
+- Java 21 Release Notes: <https://openjdk.org/projects/jdk/21/>
+- JEP 441 - Pattern Matching for switch: <https://openjdk.org/jeps/441>
+- JEP 444 - Virtual Threads: <https://openjdk.org/jeps/444>
+- Kubernetes Deprecation Guide: <https://kubernetes.io/docs/reference/using-api/deprecation-guide/>

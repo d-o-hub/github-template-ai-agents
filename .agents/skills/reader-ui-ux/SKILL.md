@@ -34,5 +34,6 @@ Purpose: deliver intentional, localized, accessible reader/admin UX.
 - [ ] UI interactions include aria-labels + focus traps where applicable.
 
 ## References
+
 - `references/responsive-patterns.md` - Responsive layout patterns
 - `references/accessibility-checklist.md` - WCAG compliance checklist

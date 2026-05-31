@@ -7,6 +7,7 @@ Evaluation scenarios for the atomic-commit skill.
 **Goal**: Verify dry run only validates without making changes
 
 **Setup**:
+
 ```bash
 git checkout -b eval-dry-run
 echo "test" > eval-test.txt
@@ -27,6 +28,7 @@ echo "test" > eval-test.txt
 **Goal**: Verify cannot run on protected branches
 
 **Setup**:
+
 ```bash
 git checkout main
 ```
@@ -44,6 +46,7 @@ git checkout main
 **Goal**: Verify zero warnings policy blocks commit
 
 **Setup**:
+
 ```bash
 git checkout -b eval-quality-gate
 echo "BAD CODE" > bad-file.sh
@@ -63,6 +66,7 @@ echo "BAD CODE" > bad-file.sh
 **Goal**: Verify complete workflow succeeds
 
 **Setup**:
+
 ```bash
 git checkout -b eval-full-workflow
 echo "# Valid change" > valid-file.md
@@ -86,6 +90,7 @@ echo "# Valid change" > valid-file.md
 **Goal**: Verify rollback when PR creation fails
 
 **Setup**:
+
 ```bash
 git checkout -b eval-rollback
 echo "test" > test.txt
@@ -106,6 +111,7 @@ echo "test" > test.txt
 **Goal**: Verify secrets are detected and blocked
 
 **Setup**:
+
 ```bash
 git checkout -b eval-secrets
 echo "api_key = 'AKIAIOSFODNN7EXAMPLE'" > secrets.txt
@@ -124,6 +130,7 @@ echo "api_key = 'AKIAIOSFODNN7EXAMPLE'" > secrets.txt
 **Goal**: Verify --skip-ci bypasses CI verification
 
 **Setup**:
+
 ```bash
 git checkout -b eval-skip-ci
 echo "change" > change.txt
@@ -145,6 +152,7 @@ echo "change" > change.txt
 **Goal**: Verify custom commit message is used
 
 **Setup**:
+
 ```bash
 git checkout -b eval-message
 echo "feature" > feature.txt
@@ -163,6 +171,7 @@ echo "feature" > feature.txt
 **Goal**: Verify commit type auto-detection works
 
 **Setup**:
+
 ```bash
 git checkout -b eval-autodetect
 # Create CI file
@@ -182,6 +191,7 @@ echo "ci: change" > .github/workflows/test.yml
 **Goal**: Verify timeout after CI check wait
 
 **Setup**:
+
 ```bash
 git checkout -b eval-timeout
 echo "slow" > slow.txt

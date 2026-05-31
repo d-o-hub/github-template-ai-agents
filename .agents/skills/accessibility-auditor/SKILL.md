@@ -12,6 +12,7 @@ Audit web applications for WCAG 2.2 compliance, screen reader compatibility, key
 ## Audit Workflow
 
 ### Phase 1: Automated Scan
+
 Check these automatically using axe-core, Lighthouse, or WAVE:
 - Color contrast (1.4.3)
 - Missing alt text (1.1.1)
@@ -19,6 +20,7 @@ Check these automatically using axe-core, Lighthouse, or WAVE:
 - Heading hierarchy (1.3.1)
 
 ### Phase 2: Manual Testing
+
 - **Screen Reader**: Navigate with NVDA/VoiceOver/JAWS arrow keys.
 - **Keyboard**: Verify Tab order and focus indicators (2.4.7).
 - **Zoom**: Test reflow at 400% zoom (1.4.10).

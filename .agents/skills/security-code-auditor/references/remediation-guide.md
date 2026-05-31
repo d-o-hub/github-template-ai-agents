@@ -3,6 +3,7 @@
 ## Critical Severity
 
 ### Remote Code Execution (RCE)
+
 **Immediate Actions:**
 1. Isolate affected systems if possible
 2. Apply emergency patch or WAF rule
@@ -15,7 +16,9 @@
 - Use sandboxing where necessary
 
 ### SQL Injection
+
 **Fix Pattern:**
+
 ```python
 # Before (Vulnerable)
 cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
@@ -25,6 +28,7 @@ cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
 ```
 
 ### Authentication Bypass
+
 **Remediation:**
 - Review all authentication logic
 - Implement proper session validation
@@ -34,6 +38,7 @@ cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
 ## High Severity
 
 ### Sensitive Data Exposure
+
 **Steps:**
 1. Identify exposed data types
 2. Implement encryption at rest
@@ -41,6 +46,7 @@ cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
 4. Audit data access patterns
 
 ### Privilege Escalation
+
 **Fixes:**
 - Add authorization checks to all endpoints
 - Implement defense in depth
@@ -50,7 +56,9 @@ cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
 ## Medium Severity
 
 ### Cross-Site Scripting (XSS)
+
 **Remediation:**
+
 ```javascript
 // Use framework auto-escaping
 // Or manual encoding:
@@ -65,7 +73,9 @@ function escapeHtml(text) {
 ```
 
 ### Insecure Direct Object References (IDOR)
+
 **Fix Pattern:**
+
 ```python
 # Before
 @app.route('/orders/<id>')
@@ -85,7 +95,9 @@ def get_order(id):
 ## Low Severity
 
 ### Security Headers Missing
+
 **Add to all responses:**
+
 ```
 Content-Security-Policy: default-src 'self'
 X-Content-Type-Options: nosniff
@@ -94,6 +106,7 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains
 ```
 
 ### Information Disclosure
+
 **Fixes:**
 - Remove version numbers from headers
 - Use generic error messages

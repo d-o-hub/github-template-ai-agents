@@ -14,7 +14,7 @@
 > "Invalid input. Please check your entries and try again."
 
 **After:**
-> "Your email needs an @ sign — like name@example.com"
+> "Your email needs an @ sign — like <name@example.com>"
 
 ---
 

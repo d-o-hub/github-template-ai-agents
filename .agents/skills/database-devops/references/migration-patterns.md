@@ -9,12 +9,14 @@ This guide covers safe patterns for evolving database schemas without downtime o
 ## Migration Categories
 
 ### Schema Migrations
+
 - Adding/removing tables
 - Adding/removing columns
 - Modifying column types
 - Adding constraints/indexes
 
 ### Data Migrations
+
 - Backfilling data
 - Transforming existing data
 - Splitting/merging columns

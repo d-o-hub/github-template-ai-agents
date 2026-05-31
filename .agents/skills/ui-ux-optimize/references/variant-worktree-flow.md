@@ -6,12 +6,14 @@
 **Game:** immersive (cinematic/serif), competitive (dense HUD), minimal-hud (clean/floating)
 
 ## Rules
+
 1. All variants share: token architecture, navigation model, screen map
 2. Variants differ: token values, composition density, visual personality
 3. Each variant: token diff list, rationale, one-sentence summary
 4. Max 3 variants (avoid decision paralysis)
 
 ## Output Format
+
 ```yaml
 variant_plan:
   base_variant: editorial
@@ -23,6 +25,7 @@ variant_plan:
 ```
 
 ## Anti-Patterns
+
 - Never change navigation model between variants
 - Never add new token categories
 - Never break responsive behavior

@@ -21,12 +21,14 @@ Automated code review with intelligent analysis of changes, quality checks, and 
 ## Core Workflow
 
 ### Phase 1: Change Analysis
+
 1. **Identify modified files** - Categorize by type and risk level
 2. **Calculate metrics** - Lines changed, complexity delta, test coverage
 3. **Detect patterns** - New features, bug fixes, refactoring, dependencies
 4. **Assess risk** - Critical paths, public APIs, security-sensitive areas
 
 ### Phase 2: Quality Assessment
+
 1. **Style compliance** - Check against project style guide
 2. **Best practices** - Design patterns, code organization
 3. **Test coverage** - Verify tests accompany changes
@@ -34,6 +36,7 @@ Automated code review with intelligent analysis of changes, quality checks, and 
 5. **Security scan** - Identify potential vulnerabilities
 
 ### Phase 3: Feedback Generation
+
 1. **Summarize changes** - High-level description of what changed
 2. **Identify issues** - Bugs, anti-patterns, performance concerns
 3. **Suggest improvements** - Refactoring opportunities, optimizations
@@ -62,6 +65,7 @@ Automated code review with intelligent analysis of changes, quality checks, and 
 ## Quality Checks
 
 ### Style Violations
+
 ```python
 # Common patterns to check
 STYLE_CHECKS = {
@@ -77,6 +81,7 @@ STYLE_CHECKS = {
 ```
 
 ### Security Patterns
+
 ```python
 SECURITY_CHECKS = [
     ('hardcoded_secrets', r'(password|secret|key)\s*=\s*["\'][^"\']+'),
@@ -88,6 +93,7 @@ SECURITY_CHECKS = [
 ## Review Comment Templates
 
 ### Issue Template
+
 ```
 **Issue**: {description}
 
@@ -97,6 +103,7 @@ SECURITY_CHECKS = [
 ```
 
 ### Praise Template
+
 ```
 ✨ **Nice!** {description}
 

@@ -3,23 +3,29 @@
 ## Principles
 
 ### Determinism
+
 All test data must be deterministic. Random values break snapshot tests and make failures irreproducible.
 
 ### Isolation
+
 Each test should create its own data. Never share mutable test data between tests.
 
 ### Cleanup
+
 Clean up test data after each test run. Use transactions or teardown functions.
 
 ## Strategies
 
 ### 1. Inline Builders (Recommended)
+
 ```typescript
 const user = makeUser({ role: 'admin' });
 ```
 
 ### 2. Fixture Files
+
 For complex data that doesn't fit builder pattern:
+
 ```json
 {
   "complexEntity": {
@@ -29,7 +35,9 @@ For complex data that doesn't fit builder pattern:
 ```
 
 ### 3. Database Seeding
+
 For integration tests:
+
 ```bash
 npm run seed -- --scenario=basic-auth
 ```

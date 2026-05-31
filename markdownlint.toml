@@ -3,3 +3,5 @@
 MD041 = false # Line length
 MD032 = false # Dirst line ehading
 MD033 = false # No inline html
+MD055 = false # Table pipe style
+MD056 = false # Table column count

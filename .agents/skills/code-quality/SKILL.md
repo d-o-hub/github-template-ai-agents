@@ -29,6 +29,7 @@ Expert skill for code quality assessment and improvement.
 ## Core Principles
 
 ### DRY
+
 ```python
 # Bad: Duplicated
 def calc_tax_us(p): return p * 0.08
@@ -40,6 +41,7 @@ def calc_tax(p, region): return p * TAX_RATES[region]
 ```
 
 ### Single Responsibility
+
 ```javascript
 // Bad: One function does everything
 function process(data) { validate(data); save(data); notify(data); }
@@ -49,6 +51,7 @@ validate(data); save(data); notify(data);
 ```
 
 ### No Magic Numbers
+
 ```rust
 // Bad
 if timeout > 30000 { /* ... */ }
@@ -61,22 +64,26 @@ if timeout > TIMEOUT_MS { /* ... */ }
 ## Code Smells
 
 ### Bloaters
+
 - Long Method (>50 lines)
 - Large Class (>300 lines)
 - Long Parameter List (>4 params)
 
 ### Object-Orientation Abusers
+
 - Switch Statements (replace with polymorphism)
 - Temporary Field
 - Refused Bequest
 
 ### Dispensables
+
 - Duplicate Code
 - Lazy Class
 - Dead Code
 - Speculative Generality
 
 ### Couplers
+
 - Feature Envy
 - Inappropriate Intimacy
 - Message Chains (obj.getX().getY())
@@ -94,6 +101,7 @@ if timeout > TIMEOUT_MS { /* ... */ }
 ## Best Practices
 
 ### DO:
+
 - Use named constants
 - Write small functions
 - Handle errors explicitly
@@ -102,6 +110,7 @@ if timeout > TIMEOUT_MS { /* ... */ }
 - Refactor continuously
 
 ### DON'T:
+
 - Copy-paste code
 - Ignore compiler warnings
 - Skip error handling

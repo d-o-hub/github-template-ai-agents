@@ -153,7 +153,7 @@ This starts a local MCP server over stdio for the given database file. It does n
 
 ## Online Docs Reference
 
-Official docs: **https://docs.turso.tech** (Mintlify — append `.md` to any URL path to get raw markdown, e.g. `https://docs.turso.tech/sdk.md`).
+Official docs: **<https://docs.turso.tech>** (Mintlify — append `.md` to any URL path to get raw markdown, e.g. `https://docs.turso.tech/sdk.md`).
 
 | Topic | URL | When to use |
 |-------|-----|-------------|

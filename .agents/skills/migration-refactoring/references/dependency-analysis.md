@@ -1085,6 +1085,6 @@ jobs:
 
 ## References
 
-- NetworkX Documentation: https://networkx.org/documentation/stable/
-- Martin Fowler - Dependency Management: https://martinfowler.com/articles/isolation-versus-healthy-dependencies.html
-- Snyk - Dependency Management Best Practices: https://snyk.io/learn/dependency-management/
+- NetworkX Documentation: <https://networkx.org/documentation/stable/>
+- Martin Fowler - Dependency Management: <https://martinfowler.com/articles/isolation-versus-healthy-dependencies.html>
+- Snyk - Dependency Management Best Practices: <https://snyk.io/learn/dependency-management/>

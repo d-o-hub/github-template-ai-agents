@@ -11,6 +11,7 @@ template_version: "0.3"
 Generate and maintain DORA (DevOps Research and Assessment) metrics and agentic performance metrics to track project velocity, stability, and agent efficiency.
 
 ## When to Use
+
 Activate when:
 - Monthly reporting is required (e.g., at the end of a calendar month).
 - The user requests a performance audit or "DORA report".
@@ -39,11 +40,13 @@ Activate when:
    - Based on metrics, suggest one "Innovation Opportunity" using TRIZ principles to improve a lagging metric.
 
 ## Instructions
+
 1. Run the automation script: `python3 scripts/generate_report.py`
 2. Verify the output in `agents-docs/dora-reports/YYYY-MM.md`.
 3. Add any qualitative analysis or TRIZ-based innovation opportunities to the generated file.
 
 ## Rationalizations
+
 | Rationalization | Reality |
 |-----------------|---------|
 | "Metrics are for managers, not agents" | Metrics provide the feedback loop for agentic self-improvement and workflow optimization. |
@@ -51,10 +54,12 @@ Activate when:
 | "A monthly report is too frequent for a small repo" | Regular snapshots prevent technical debt from accumulating unnoticed. |
 
 ## Red Flags
+
 - [ ] Reporting "zero" for failures without verifying revert history or hotfix commits.
 - [ ] Ignoring "agentic overhead" (e.g., extremely high token usage for simple tasks).
 - [ ] Metrics that lack a time-bound context (e.g., "total tasks" instead of "tasks per week").
 
 ## Reference Files
+
 - `agents-docs/WORKFLOW.md` - Standard delivery process to measure against.
 - `scripts/analyze-codebase.sh` - Source for some raw performance data.

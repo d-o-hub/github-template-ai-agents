@@ -62,6 +62,7 @@ Comprehensive procedures for testing web applications with screen readers.
 ## Common Issues
 
 ### 1. Missing Alt Text
+
 ```html
 <!-- Bad -->
 <img src="chart.png">
@@ -71,6 +72,7 @@ Comprehensive procedures for testing web applications with screen readers.
 ```
 
 ### 2. Decorative Images Not Hidden
+
 ```html
 <!-- Bad -->
 <img src="divider.png" alt="divider">
@@ -80,6 +82,7 @@ Comprehensive procedures for testing web applications with screen readers.
 ```
 
 ### 3. Form Labels Missing
+
 ```html
 <!-- Bad -->
 <span>Email</span>
@@ -91,6 +94,7 @@ Comprehensive procedures for testing web applications with screen readers.
 ```
 
 ### 4. Headings Skipped
+
 ```html
 <!-- Bad -->
 <h1>Title</h1>

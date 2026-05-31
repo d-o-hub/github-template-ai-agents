@@ -9,6 +9,7 @@ Store test cases in `evals/evals.json` inside your skill directory. A test case 
 - **Assertions**: verifiable statements about what the output should achieve.
 
 ### evals/evals.json
+
 ```json
 {
   "skill_name": "csv-analyzer",
@@ -60,6 +61,7 @@ Organize eval results in a workspace directory alongside your skill directory. E
 ## Artifact Schemas
 
 ### timing.json
+
 ```json
 {
   "total_tokens": 84852,
@@ -68,6 +70,7 @@ Organize eval results in a workspace directory alongside your skill directory. E
 ```
 
 ### grading.json
+
 ```json
 {
   "assertion_results": [
@@ -87,6 +90,7 @@ Organize eval results in a workspace directory alongside your skill directory. E
 ```
 
 ### benchmark.json
+
 ```json
 {
   "run_summary": {
@@ -110,6 +114,7 @@ Organize eval results in a workspace directory alongside your skill directory. E
 ```
 
 ### feedback.json
+
 ```json
 {
   "eval-top-months-chart": "The chart is missing axis labels.",

@@ -101,6 +101,7 @@ On failure, automatically:
 ## Configuration
 
 Environment variables:
+
 ```bash
 ATOMIC_COMMIT_TIMEOUT=1800          # Check wait timeout
 ATOMIC_COMMIT_BASE_BRANCH=main      # Target branch for PR
@@ -142,4 +143,5 @@ Command succeeds only when:
 - `.opencode/commands/commit.md` - Basic commit guidelines
 - `.github/PULL_REQUEST_TEMPLATE.md` - PR template
 - `references/IMPLEMENTATION.md` - Technical details
+
 # Test change

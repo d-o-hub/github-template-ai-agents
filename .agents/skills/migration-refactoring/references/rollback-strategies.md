@@ -1138,7 +1138,7 @@ class TestRollbackProcedures:
 
 3. **Rollback Drills**: Run chaos engineering exercises that specifically test rollback procedures monthly
 
-4. **Time-to-Recovery (TTR) Goals**: 
+4. **Time-to-Recovery (TTR) Goals**:
    - Critical errors: < 2 minutes
    - Performance degradation: < 5 minutes
    - Data corruption: < 15 minutes
@@ -1155,8 +1155,8 @@ class TestRollbackProcedures:
 
 ## References
 
-- Martin Fowler - Blue-Green Deployment: https://martinfowler.com/bliki/BlueGreenDeployment.html
-- Martin Fowler - Canary Release: https://martinfowler.com/bliki/CanaryRelease.html
-- Kubernetes Deployment Rollback: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
-- AWS ECS Deployment Guide: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployments.html
-- Google Cloud Run Revisions: https://cloud.google.com/run/docs/managing/revisions
+- Martin Fowler - Blue-Green Deployment: <https://martinfowler.com/bliki/BlueGreenDeployment.html>
+- Martin Fowler - Canary Release: <https://martinfowler.com/bliki/CanaryRelease.html>
+- Kubernetes Deployment Rollback: <https://kubernetes.io/docs/concepts/workloads/controllers/deployment/>
+- AWS ECS Deployment Guide: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployments.html>
+- Google Cloud Run Revisions: <https://cloud.google.com/run/docs/managing/revisions>
