@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-05-15T10:00:00Z",
+  "task_id": "abc123def456",
+  "parent_task_id": null,
+  "task": "initial setup",
+  "agents": ["jules"],
+  "skills_used": [],
+  "status": "completed",
+  "tokens_used": 0,
+  "duration_seconds": 0,
+  "handoff_count": 0,
+  "agent_metrics": [
+    { "agent": "jules", "tokens": 0, "duration_seconds": 0 }
+  ],
+  "notes": "Seed entry for metrics tracking"
+}
