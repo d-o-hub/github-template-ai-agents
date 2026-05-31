@@ -87,15 +87,30 @@ else
         fi
     )
 
+    llms_ok=true
     if ! diff -q llms.txt "$TMP_LLMS" > /dev/null; then
-        printf "%b  ✗ llms.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
-        FAILED=1
+        if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+            printf "%b  ⚠ llms.txt is out of date (auto-fixed on main by workflow)%b\n" "${YELLOW}" "${NC}"
+        else
+            printf "%b  ✗ llms.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
+            FAILED=1
+        fi
         DRIFT_DETECTED=true
-    elif ! diff -q llms-full.txt "$TMP_LLMS_FULL" > /dev/null; then
-        printf "%b  ✗ llms-full.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
-        FAILED=1
+        llms_ok=false
+    fi
+
+    if ! diff -q llms-full.txt "$TMP_LLMS_FULL" > /dev/null; then
+        if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+            printf "%b  ⚠ llms-full.txt is out of date (auto-fixed on main by workflow)%b\n" "${YELLOW}" "${NC}"
+        else
+            printf "%b  ✗ llms-full.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
+            FAILED=1
+        fi
         DRIFT_DETECTED=true
-    else
+        llms_ok=false
+    fi
+
+    if $llms_ok; then
         printf "%b  ✓ llms.txt and llms-full.txt are up to date%b\n" "${GREEN}" "${NC}"
     fi
 fi
