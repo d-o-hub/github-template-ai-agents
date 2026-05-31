@@ -88,8 +88,8 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 
 ## Repository Structure
 
-- `agents-docs/`: Reference; `.agents/skills/`: Canonical skills; `scripts/`: Setup/validation.
 - `llms.txt` & `llms-full.txt`: Machine-readable project context for LLMs
+- `agents-docs/`: Reference; `.agents/skills/`: Canonical skills; `scripts/`: Setup/validation.
 - `plans/`: ADRs define decisions; progress updates track implementation status.
 
 ## PR & Commit Instructions
