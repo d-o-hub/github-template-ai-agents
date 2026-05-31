@@ -26,21 +26,25 @@ readonly MAX_PR_TITLE_LENGTH=150
 
 ## Development Phases
 
-We use GOAP combined with ADRs and TRIZ for structured development.
+We use a GOAP approach combined with ADRs and TRIZ for structured development.
 
 **Prerequisites**:
-- Fetch/pull latest default remote branch before beginning analysis.
+- Fetch/pull latest default remote branch before beginning.
 - **Check CI Status**: Agents MUST check `ci-status.json`. If NOT "passing", pause until fixed.
 
-1. **ANALYZE & STRATEGIZE (Phase 1)**: Use `triz-analysis` or `triz-solver`. Write an **ADR** in `plans/`.
-2. **DECOMPOSE & PLAN (Phase 2)**: Use `goap-agent` to break down into tasks in `plans/GOAP_STATE.md`.
-3. **EXECUTE & COORDINATE (Phase 3)**: Execute tasks systematically; use `self-fix-loop` for CI.
-4. **SYNTHESIZE (Phase 4)**: Run `learn` skill to update project-specific `AGENTS.md`.
+1. **ANALYZE & STRATEGIZE (Phase 1)**
+   - **Action**: Use `triz-analysis` or `triz-solver`. Write an **ADR** in `plans/`.
+   - **Human Gate**: Review and approve the ADR and analysis before proceeding. *Only human gate.*
 
-## ADR Status Convention
+2. **DECOMPOSE & PLAN (Phase 2)**
+   - **Action**: Use the `goap-agent` to break down in `plans/GOAP_STATE.md`.
 
-- **accepted**: Architectural decision defining an ongoing pattern.
-- **complete**: Feature implementation with clear completion criteria.
+3. **EXECUTE & COORDINATE (Phase 3)**
+   - **Action**: Execute tasks systematically using atomic commit workflow.
+   - **Action**: Use `self-fix-loop` or equivalent until all CI checks pass.
+
+4. **SYNTHESIZE (Phase 4)**
+   - **Action**: Run `learn` skill to extract discoveries and update `AGENTS.md`.
 
 ## Setup
 
@@ -51,85 +55,69 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 
 ## Version Management
 
-**Single source of truth**: `VERSION` file at root. See `agents-docs/VERSION.md`.
+**Single source of truth**: `VERSION` file at root. Never edit version strings elsewhere.
 
 ## Quality Gate (Required Before Commit)
 
 ```bash
-./scripts/quality_gate.sh # Fix all errors before committing
+./scripts/quality_gate.sh # Always run before committing. Fix all errors.
 ./scripts/update-all-docs.sh # Verify and update documentation
 ```
-
-## CI State Artifacts
-
-- `ci-status.json`: Machine-readable CI state file.
-- `ci-summary.md`: Human/agent readable markdown summary.
 
 ## Maintenance & Verification
 
 ```bash
 ./scripts/analyze-codebase.sh   # Autonomous analysis and self-learning
 ./scripts/check-adr-compliance.sh # Verify ADR registration and patterns
-./scripts/run-evals.py --skill dora-report # Mandatory monthly DORA + agentic report
+./scripts/run-evals.py --skill dora-report # Mandatory monthly report
 ./scripts/check-plan-numbering.sh # Ensure plan counters are consistent
 ./scripts/archive-stale-plans.sh # Archive plans older than 60 days
 ```
 
 **Guard Rails:**
-- **Temporary Files**: NEVER in root or source. Use `/tmp` or `mktemp`.
-- **Secret Scanning**: Gitleaks enforced via CI.
+- **Temporary Files**: NEVER in root or source. Use system temporary directories (e.g., `/tmp`).
+- **Secret Scanning**: Gitleaks is enforced via CI only.
 - **Git Config**: Pre-commit validates git config. Use `SKIP_GLOBAL_HOOKS_CHECK=true` if needed.
 
 ## Code Style
 
-- Max `${MAX_LINES_PER_SOURCE_FILE}`/source; `${MAX_LINES_PER_SKILL_MD}`/`SKILL.md`; `${MAX_LINES_AGENTS_MD}`/`AGENTS.md`
-- `SKILL.md` must have frontmatter, **Rationalizations**, and **Red Flags** sections.
-- **No hardcoded values**: Use relative paths, environment variables, or named constants.
-- Shell: `shellcheck` (error); Markdown: `markdownlint`; Diagrams: `mermaid`
+- Max `${MAX_LINES_PER_SOURCE_FILE}`/file; `${MAX_LINES_PER_SKILL_MD}`/`SKILL.md`; `${MAX_LINES_AGENTS_MD}`/`AGENTS.md`
+- `SKILL.md` must start with frontmatter and include **Rationalizations** and **Red Flags** sections.
+- **No hardcoded values**: Use relative paths, runtime derivation, env vars, or named constants.
+- Shell: `shellcheck` (severity=error); Markdown: `markdownlint`; Diagrams: `mermaid`
 
 ## Repository Structure
 
-- `agents-docs/`: Reference; `.agents/skills/`: Canonical skills; `scripts/`: Validation
-- `plans/`: ADRs and implementation progress; `analysis/`: Generated outputs.
+- `agents-docs/`: Reference; `.agents/skills/`: Canonical skills; `scripts/`: Setup/validation.
+- `plans/`: ADRs define decisions; progress updates track implementation status.
 
 ## PR & Commit Instructions
 
-- PR Title: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}`)
-- Commit Header: `type(scope): subject` (max `${MAX_COMMIT_SUBJECT_LENGTH}`, lowercase)
-- Commit Body/Footer: max 1000 chars; wrap body at 100 chars/line
-- Branch per feature; One concern per PR; Never commit to `main`
+- PR Title: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
+- Commit Header: `type(scope): subject` (max `${MAX_COMMIT_SUBJECT_LENGTH}` chars total, lowercase)
+- Commit Body: max 1000 chars; wrap at 100 chars per line. Footer: max 1000 chars.
+- Branch per feature; One concern per PR; Never commit to `main`.
 
-### Commit Workflow (Mandatory)
+### Commit Type Mapping
 
-1. **Helper**: `./scripts/ai-commit.sh --type <type> --subject <subject> --body <body>`
-2. **Manual**: Validated via `.githooks/commit-msg` (requires `./scripts/install-git-hooks.sh`)
-3. **If Validation Fails**: Identify violation, then `git commit --amend` to fix.
+| Intent                        | Type     | Scope suggestion |
+|-------------------------------|----------|------------------|
+| Security patch / hardening    | `fix`    | `security`       |
+| New security feature/control  | `feat`   | `security`       |
+| Security-related CI/tooling   | `ci`     | `security`       |
 
-### Commit Types
-
-Allowed: `build` `chore` `ci` `docs` `feat` `fix` `perf` `refactor` `revert` `style` `test`
-Security: `fix(security)` (patch), `feat(security)` (feature), `ci(security)` (tooling).
-
-## Skills
-
-See `agents-docs/skills-reference.md` for the full skill catalog (50+ skills).
-
-## Security
-
-- Gitleaks enforced via CI. No secrets in commits (use `.env`).
-- Pin Actions to SHA (with `# vX.Y` comment). No untrusted MCPs.
+If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject>"` or use `git rebase -i`.
 
 ## Agent Guidance
 
 - **Rules**: Review `## Rationalizations` and `## Red Flags` in skills before use.
-- **Plan**: Produce written plan; wait for confirmation for non-trivial tasks.
+- **Plan**: Produce written plan, wait for confirmation for non-trivial tasks.
 - **Policies**: See `agents-docs/WORKFLOW.md` for Atomic Commit & Issue resolution.
 - **Learning**: After work, run `learn` or append discoveries to nearest `AGENTS.md`.
-- **Context**: Delegate to sub-agents; Use `/clear`; Load skills only when needed.
 
 ## Post-Task Protocol
 
-After **every** completed task, append a JSON entry to `.agents/metrics.jsonl`:
+After **every** completed task, the agent MUST append a JSON entry to `.agents/metrics.jsonl`:
 
 ```json
 {
@@ -144,7 +132,7 @@ After **every** completed task, append a JSON entry to `.agents/metrics.jsonl`:
 }
 ```
 
-- JSONL format; Append-only; Never truncate.
+- JSONL format; Append-only; Never truncate or delete.
 - If task fails mid-way, still append with `"status": "failed"`.
 - `dora-report` skill reads this file for its monthly summary.
 
@@ -159,5 +147,5 @@ Updated by `./scripts/analyze-codebase.sh`. See `agents-docs/self-learning-rules
 
 #### Integration Learnings
 
-- **Optional Skills**: `SKILLS_OPTIONAL` in `setup-skills.sh` allows opt-in for specialized knowledge.
-- **Compliance**: Established "Compliance & Governance" as a new skill category.
+- **Optional Skills**: Implemented `SKILLS_OPTIONAL` in `setup-skills.sh` for opt-in knowledge.
+- **Compliance Category**: Established "Compliance & Governance" for regulatory patterns.

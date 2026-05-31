@@ -2,8 +2,27 @@ import os
 import datetime
 import sys
 import json
+import argparse
+
+def update_counters(entry, month_year, counters):
+    if not isinstance(entry, dict): return
+    if entry.get("timestamp", "").startswith(month_year):
+        status = entry.get("status")
+        if status in counters:
+            counters[status] += 1
+
+        if entry.get("skill_used"):
+            counters["skills"] += 1
+
+        tokens = entry.get("tokens_used")
+        if isinstance(tokens, (int, float)):
+            counters["tokens"] += int(tokens)
 
 def main():
+    parser = argparse.ArgumentParser(description="Generate DORA & Agentic Metrics Report")
+    parser.add_argument("--month", type=str, help="Target month in YYYY-MM format")
+    args = parser.parse_args()
+
     # Set the output directory
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
     reports_dir = os.path.join(repo_root, "agents-docs/dora-reports")
@@ -12,50 +31,44 @@ def main():
     if not os.path.exists(reports_dir):
         os.makedirs(reports_dir)
 
-    # Determine current month and year
-    now = datetime.datetime.now()
-    month_year = now.strftime("%Y-%m")
+    # Determine target month
+    if args.month:
+        month_year = args.month
+    else:
+        month_year = datetime.datetime.now().strftime("%Y-%m")
+
     filename = f"{month_year}.md"
     filepath = os.path.join(reports_dir, filename)
 
-    tasks_completed = 0
-    skill_invocations = 0
-    total_tokens = 0
-    failed_tasks = 0
-    partial_tasks = 0
+    counters = {
+        "completed": 0, "failed": 0, "partial": 0,
+        "skills": 0, "tokens": 0
+    }
 
+    # Aggregate from .agents/metrics.jsonl
     if os.path.exists(metrics_file):
-        with open(metrics_file, "r") as f:
-            for line in f:
-                if not line.strip():
-                    continue
-                try:
-                    entry = json.loads(line)
-                    # Simple filter for current month based on timestamp string
-                    if entry.get("timestamp", "").startswith(month_year):
-                        status = entry.get("status")
-                        if status == "completed":
-                            tasks_completed += 1
-                        elif status == "failed":
-                            failed_tasks += 1
-                        elif status == "partial":
-                            partial_tasks += 1
+        try:
+            with open(metrics_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    if line.strip():
+                        try:
+                            update_counters(json.loads(line), month_year, counters)
+                        except json.JSONDecodeError:
+                            continue
+        except OSError:
+            pass
 
-                        if entry.get("skill_used"):
-                            skill_invocations += 1
-
-                        tokens = entry.get("tokens_used")
-                        if isinstance(tokens, (int, float)):
-                            total_tokens += int(tokens)
-                except json.JSONDecodeError:
-                    continue
+    tasks_completed = counters["completed"]
+    failed_tasks = counters["failed"]
+    partial_tasks = counters["partial"]
+    skill_invocations = counters["skills"]
+    total_tokens = counters["tokens"]
 
     # Calculate success rate
-    # We include partial tasks in the denominator to be conservative
     total_tasks = tasks_completed + failed_tasks + partial_tasks
     success_rate = (tasks_completed / total_tasks * 100) if total_tasks > 0 else 0
 
-    # Mock DORA data (as per original script, would need git analysis for real values)
+    # Mock DORA data
     report_content = f"""# DORA & Agentic Metrics Report - {month_year}
 
 ## DORA Metrics
@@ -80,10 +93,10 @@ def main():
 
 ---
 
-*Report generated automatically on {now.strftime("%Y-%m-%d %H:%M:%S")}*
+*Report generated automatically on {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}*
 """
 
-    with open(filepath, "w") as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write(report_content)
 
     print(f"Report generated successfully: {filepath}")

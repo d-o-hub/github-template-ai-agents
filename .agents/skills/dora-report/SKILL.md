@@ -19,10 +19,10 @@ Activate when:
 ## Instructions
 
 1. **Calculate DORA Metrics**:
-   - **Deployment Frequency**: How often code is successfully released to production (or merged to `main` in this template context).
+   - **Deployment Frequency**: How often code is successfully released to production.
    - **Lead Time for Changes**: The amount of time it takes a commit to get into production.
-   - **Change Failure Rate**: The percentage of deployments causing a failure in production (e.g., requiring a hotfix or revert).
-   - **Time to Restore Service**: How long it takes to recover from a failure in production.
+   - **Change Failure Rate**: The percentage of deployments causing a failure.
+   - **Time to Restore Service**: How long it takes to recover from a failure.
 
 2. **Calculate Agentic Metrics**:
    - Parse `.agents/metrics.jsonl` for raw performance data.
@@ -37,7 +37,7 @@ Activate when:
    - Compare current metrics against the previous month's baseline.
 
 4. **Identify Bottlenecks**:
-   - Based on metrics, suggest one "Innovation Opportunity" using TRIZ principles to improve a lagging metric.
+   - Based on metrics, suggest one "Innovation Opportunity" using TRIZ principles.
 
 ## Instructions
 1. Run the automation script: `python3 scripts/generate_report.py`
