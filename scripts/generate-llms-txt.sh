@@ -25,8 +25,13 @@ printf "Generating %s and %s...\n" "$LLMS_TXT" "$LLMS_FULL_TXT"
 
 # Extract Project Info from README.md
 # Using sed to extract title and blockquote description
-PROJECT_NAME=$(grep -m 1 "^# " README.md 2>/dev/null | sed 's/^# //' || echo "Project")
-PROJECT_DESC=$(sed -n '/^> /,/^$/p' README.md 2>/dev/null | sed 's/^> //' | tr '\\n' ' ' | sed 's/  */ /g' | sed 's/^ *//;s/ *$//' || echo "Project Description")
+PROJECT_NAME=$(grep -m 1 "^# " README.md | sed 's/^# //' || echo "Unnamed Project")
+PROJECT_DESC=$(sed -n '/^> /,/^$/p' README.md | sed 's/^> //' | tr '\n' ' ' | sed 's/  */ /g' | sed 's/^ *//;s/ *$//' || echo "No description available.")
+
+# Fallback for empty description
+if [[ -z "${PROJECT_DESC:-}" ]]; then
+    PROJECT_DESC="No description available."
+fi
 
 # 1. Generate llms.txt (Concise)
 {

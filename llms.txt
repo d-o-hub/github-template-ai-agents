@@ -32,3 +32,4 @@ This repository provides a unified harness for AI coding agents with consistent 
 - [Full Skill Catalog](agents-docs/AVAILABLE_SKILLS.md): Reference for all available agent skills.
 - [Architecture Overview](agents-docs/HARNESS.md): Deep dive into the harness architecture.
 - [Workflow Guide](agents-docs/WORKFLOW.md): Detailed explanation of atomic commits and development phases.
+Tampered
