@@ -25,7 +25,7 @@ Activate when:
    - **Time to Restore Service**: How long it takes to recover from a failure.
 
 2. **Calculate Agentic Metrics**:
-   - Parse `.agents/metrics.jsonl` for raw performance data.
+   - Aggregate from `.agents/metrics/*.json` for raw performance data.
    - **Tasks Completed**: Total number of GOAP goals or atomic tasks finalized.
    - **Skill Invocations**: Frequency and distribution of skill usage.
    - **Token Usage Trends**: Efficiency of context usage over time.
@@ -58,5 +58,5 @@ Activate when:
 
 ## Reference Files
 - `agents-docs/WORKFLOW.md` - Standard delivery process to measure against.
-- `.agents/metrics.jsonl` - Primary source for agentic performance data.
+- `.agents/metrics/*.json` - Primary source for agentic performance data (directory of individual JSON files).
 - `scripts/analyze-codebase.sh` - Source for some raw performance data.
