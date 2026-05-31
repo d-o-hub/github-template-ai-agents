@@ -444,6 +444,54 @@ timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
 
 ---
 
+### LESSON-017: CI Workflow Symlink Dependency - validate-skills Requires setup-skills First
+
+**Date**: 2026-05-31
+**Component**: CI/CD / Skills / Quality Gate
+**Severity**: High
+
+**Issue**: Multiple CI workflows fail because `validate-skills.sh` checks for symlinks that don't exist in a fresh checkout.
+
+**Symptoms**:
+- `Quality Gate / Quality Gate (push)` fails in standalone `quality-gate.yml` workflow
+- `CI + Labels Setup / Quality Gate (push)` fails when symlinks aren't created first
+- `CI + Labels Setup / Update CI Status (push)` fails because upstream test job fails
+- `validate-skills.bats` test 2 fails: "validate-skills.sh runs without errors on valid repository"
+- `llms-full.txt` drift detected: file is out of date vs regenerated version
+
+**Root Cause**:
+1. **Missing `setup-skills.sh` step**: The standalone `quality-gate.yml` workflow and test job in `ci-and-labels.yml` didn't run `./scripts/setup-skills.sh` before `validate-skills.sh`
+2. **Missing `.qwen/skills/` symlinks**: Fresh checkout doesn't have any CLI agent symlinks (`.qwen/skills/`, `.claude/skills/`)
+3. **`validate-skills.sh` fails hard**: Returns exit code 2 when any CLI symlink directory exists but has missing symlinks
+4. **Out-of-date `llms-full.txt`**: Regenerated version differs from committed version, causing drift detection to fail
+5. **Cascading failure**: Test job depends on quality-gate job, so quality-gate failure blocks tests
+
+**Solution**:
+
+```yaml
+# In every workflow that runs validate-skills.sh, add setup step first:
+- name: Setup skills
+  run: ./scripts/setup-skills.sh
+
+# Regenerate LLM context files when they drift:
+./scripts/generate-llms-txt.sh
+```
+
+**Prevention**:
+- Any CI job that runs `validate-skills.sh` MUST run `setup-skills.sh` first
+- Run `./scripts/generate-llms-txt.sh` whenever skill docs change
+- Consider adding `.qwen/skills/` to `.gitignore` and auto-creating in CI only (like llms files)
+- Add a CI check that verifies `setup-skills.sh` was run before `validate-skills.sh`
+- Document this dependency in workflow YAML comments
+
+**Files Modified**:
+- `.github/workflows/quality-gate.yml` - Added setup-skills.sh step
+- `.github/workflows/ci-and-labels.yml` - Added setup-skills.sh step to test job
+- `llms-full.txt` - Regenerated
+- `.qwen/skills/` - Created missing symlinks
+
+---
+
 ## Resources
 
 - [BashFAQ/105 - Why set -e doesn't work](https://mywiki.wooledge.org/BashFAQ/105)

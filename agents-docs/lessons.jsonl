@@ -13,3 +13,5 @@
 {"id": "LESSON-013", "date": "2026-04-04", "component": "CI/CD", "title": "CI Hangs Indefinitely Due to BATS Recursion", "severity": "Critical", "tags": ["bats", "recursion", "ci-hang", "timeout", "testing"]}
 {"id": "LESSON-014", "date": "2026-04-04", "component": "CI/CD", "title": "Shellcheck Warnings vs Errors in CI", "severity": "Medium", "tags": ["shellcheck", "ci", "static-analysis", "warnings", "quality-gate"]}
 {"id": "LESSON-015", "date": "2026-04-04", "component": "CI/CD", "title": "GitHub API 403 Errors in Generic Templates", "severity": "High", "tags": ["github-api", "permissions", "token", "generic-template", "ci"]}
+{"id": "LESSON-016", "date": "2026-04-05", "component": "Security", "title": "GitHub Actions SHA Pinning", "severity": "High", "tags": ["security", "github-actions", "sha-pinning", "supply-chain"]}
+{"id": "LESSON-017", "date": "2026-05-31", "component": "CI/CD", "title": "CI Workflow Symlink Dependency - validate-skills Requires setup-skills First", "severity": "High", "tags": ["ci", "symlinks", "skills", "validate-skills", "setup-skills", "quality-gate"]}

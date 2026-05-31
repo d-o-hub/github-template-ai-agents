@@ -143,6 +143,7 @@ After **every** completed task, the agent MUST append a JSON entry to `.agents/m
 
 #### Recent Project-Wide Learnings
 
+- **CI Symlink Dependency**: Always run `setup-skills.sh` before `validate-skills.sh` in CI workflows (LESSON-017)
 - **Action SHA Pinning**: Pin to 40-char SHAs for security (LESSON-016)
 - **Worktree Cleanup**: Use `trap cleanup EXIT ERR` and `CREATED_WORKTREES` (LESSON-010)
 
