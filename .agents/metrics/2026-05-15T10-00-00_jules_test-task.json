@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-05-15T10:00:00Z",
+  "agent": "jules",
+  "task": "test task",
+  "skill_used": "dora-report",
+  "status": "completed",
+  "tokens_used": 100,
+  "duration_seconds": 60,
+  "notes": "Test entry"
+}
