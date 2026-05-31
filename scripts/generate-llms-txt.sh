@@ -97,7 +97,7 @@ fi
     printf "## Full Skill Index\n\n"
 
     shopt -s nullglob
-    SKILL_DIRS=$(printf "%s\n" .agents/skills/*/ | sort)
+    SKILL_DIRS=$(printf "%s\n" .agents/skills/*/ | LC_ALL=C sort)
     for skill_dir in $SKILL_DIRS; do
         skill_file="${skill_dir}SKILL.md"
         if [[ -f "$skill_file" ]]; then
