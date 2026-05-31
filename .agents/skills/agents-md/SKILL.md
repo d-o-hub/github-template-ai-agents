@@ -1,5 +1,6 @@
 ---
 name: agents-md
+version: "0.0.0"
 description: Create AGENTS.md files with production-ready best practices. Use when creating new AGENTS.md or implementing quality gates.
 license: MIT
 ---

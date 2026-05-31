@@ -1,5 +1,6 @@
 ---
 name: codeberg-api
+version: "0.0.0"
 description: >-
   Interact with Forgejo/Codeberg repositories via the REST API — read or write
   files, manage issues, create pull requests, list branches/tags, search repos,
@@ -175,6 +176,7 @@ Place workflows in `.forgejo/workflows/` directory.
 
 ```yaml
 name: Build
+version: "0.0.0"
 on: [push, pull_request]
 jobs:
   build:

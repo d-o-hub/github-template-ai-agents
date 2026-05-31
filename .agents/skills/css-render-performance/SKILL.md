@@ -1,5 +1,6 @@
 ---
 name: css-render-performance
+version: "0.0.0"
 description: Guide CSS render performance analysis and optimization. Use when reviewing or writing CSS animations, transitions, scroll-heavy UIs, or long lists. Covers compositor layer promotion, paint vs composite, and content-visibility.
 ---
 

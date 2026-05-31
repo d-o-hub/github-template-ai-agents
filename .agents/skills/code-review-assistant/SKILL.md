@@ -1,5 +1,6 @@
 ---
 name: code-review-assistant
+version: "0.0.0"
 description: Automated code review with PR analysis, change summaries, and quality checks. Use for reviewing pull requests, generating review comments, checking against best practices, and identifying potential issues. Includes style guide compliance, security issue detection, and review automation.
 license: MIT
 ---
@@ -143,6 +144,7 @@ AUTO_APPROVE_CRITERIA = {
 
 ```yaml
 name: Automated Code Review
+version: "0.0.0"
 
 on:
   pull_request:

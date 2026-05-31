@@ -1,5 +1,6 @@
 ---
 name: github-pr-sentinel
+version: "0.0.0"
 description: Monitor a GitHub pull request until it's merged, green, or blocked. Polls CI checks, review comments, and mergeability state continuously. Diagnoses failures, retries flaky checks up to 3 times, auto-fixes branch-related issues when possible, and stops only when user help is required. Use when asked to "monitor a PR", "watch CI", "handle review comments", "sentinel a PR", or keep an eye on failures and feedback.
 compatibility: Any CLI agent (OpenCode, Claude, Codex, Cursor, etc.)
 metadata:
