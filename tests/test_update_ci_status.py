@@ -12,10 +12,12 @@ class TestUpdateCIStatus(unittest.TestCase):
         self.old_cwd = os.getcwd()
         os.chdir(self.test_dir.name)
 
-        # Create dummy ci-status.json and ci-summary.md
-        with open("ci-status.json", "w") as f:
+        # Create dummy ci-status.json and ci-summary.md in subdirectory
+        ci_dir = os.path.join(self.test_dir.name, ".github", "ci-status")
+        os.makedirs(ci_dir, exist_ok=True)
+        with open(os.path.join(ci_dir, "ci-status.json"), "w") as f:
             f.write("{}")
-        with open("ci-summary.md", "w") as f:
+        with open(os.path.join(ci_dir, "ci-summary.md"), "w") as f:
             f.write("")
 
         # Path to the script
@@ -41,12 +43,13 @@ class TestUpdateCIStatus(unittest.TestCase):
         res = self.run_script(needs)
         self.assertEqual(res.returncode, 0)
 
-        with open("ci-status.json", "r") as f:
+        ci_dir = os.path.join(self.test_dir.name, ".github", "ci-status")
+        with open(os.path.join(ci_dir, "ci-status.json"), "r") as f:
             data = json.load(f)
             self.assertEqual(data["status"], "passing")
             self.assertEqual(data["failing_jobs"], [])
 
-        with open("ci-summary.md", "r") as f:
+        with open(os.path.join(ci_dir, "ci-summary.md"), "r") as f:
             content = f.read()
             self.assertIn("Latest CI status: **passing**", content)
             self.assertIn("✅ success", content)
@@ -59,12 +62,13 @@ class TestUpdateCIStatus(unittest.TestCase):
         res = self.run_script(needs)
         self.assertEqual(res.returncode, 0)
 
-        with open("ci-status.json", "r") as f:
+        ci_dir = os.path.join(self.test_dir.name, ".github", "ci-status")
+        with open(os.path.join(ci_dir, "ci-status.json"), "r") as f:
             data = json.load(f)
             self.assertEqual(data["status"], "failing")
             self.assertEqual(data["failing_jobs"], ["job2"])
 
-        with open("ci-summary.md", "r") as f:
+        with open(os.path.join(ci_dir, "ci-summary.md"), "r") as f:
             content = f.read()
             self.assertIn("Latest CI status: **failing**", content)
             self.assertIn("❌ failure", content)
@@ -76,7 +80,8 @@ class TestUpdateCIStatus(unittest.TestCase):
         res = self.run_script(needs)
         self.assertEqual(res.returncode, 0)
 
-        with open("ci-status.json", "r") as f:
+        ci_dir = os.path.join(self.test_dir.name, ".github", "ci-status")
+        with open(os.path.join(ci_dir, "ci-status.json"), "r") as f:
             data = json.load(f)
             self.assertEqual(data["status"], "failing")
 
