@@ -57,6 +57,8 @@ if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
 fi
 
 # --- LLM Context files check ---
+# On PRs: only validate the script works (drift is auto-fixed on main by update-llms-txt.yml)
+# On main: validate files are up to date
 printf "%bChecking LLM context files...%b\n" "${BLUE}" "${NC}"
 if [[ ! -f "llms.txt" ]] || [[ ! -f "llms-full.txt" ]]; then
     printf "%b  ✗ llms.txt or llms-full.txt missing%b\n" "${RED}" "${NC}"
@@ -65,10 +67,10 @@ else
     TMP_LLMS=$(mktemp)
     TMP_LLMS_FULL=$(mktemp)
 
-    cleanup() {
+    cleanup_llms() {
         rm -f "$TMP_LLMS" "$TMP_LLMS_FULL"
     }
-    trap cleanup EXIT
+    trap cleanup_llms EXIT
 
     (
         export LLMS_TXT="$TMP_LLMS"
@@ -80,11 +82,19 @@ else
     )
 
     if ! diff -q llms.txt "$TMP_LLMS" > /dev/null; then
-        printf "%b  ✗ llms.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
-        FAILED=1
+        if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+            printf "%b  ⚠ llms.txt is out of date (auto-fixed on main by workflow)%b\n" "${YELLOW}" "${NC}"
+        else
+            printf "%b  ✗ llms.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
+            FAILED=1
+        fi
     elif ! diff -q llms-full.txt "$TMP_LLMS_FULL" > /dev/null; then
-        printf "%b  ✗ llms-full.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
-        FAILED=1
+        if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+            printf "%b  ⚠ llms-full.txt is out of date (auto-fixed on main by workflow)%b\n" "${YELLOW}" "${NC}"
+        else
+            printf "%b  ✗ llms-full.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
+            FAILED=1
+        fi
     else
         printf "%b  ✓ llms.txt and llms-full.txt are up to date%b\n" "${GREEN}" "${NC}"
     fi
