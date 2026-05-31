@@ -81,7 +81,7 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 
 ## Code Style
 
-- Max `${MAX_LINES_PER_SOURCE_FILE}`/file; `${MAX_LINES_PER_SKILL_MD}`/`SKILL.md`; `${MAX_LINES_AGENTS_MD}`/`AGENTS.md`
+- Max ${MAX_LINES_PER_SOURCE_FILE}/file; ${MAX_LINES_PER_SKILL_MD}/`SKILL.md`; ${MAX_LINES_AGENTS_MD}/`AGENTS.md`
 - `SKILL.md` must start with frontmatter and include **Rationalizations** and **Red Flags** sections.
 - **No hardcoded values**: Use relative paths, runtime derivation, env vars, or named constants.
 - Shell: `shellcheck` (severity=error); Markdown: `markdownlint`; Diagrams: `mermaid`
@@ -93,18 +93,18 @@ cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-c
 
 ## PR & Commit Instructions
 
-- PR Title: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
-- Commit Header: `type(scope): subject` (max `${MAX_COMMIT_SUBJECT_LENGTH}` chars total, lowercase)
+- PR Title: `type(scope): description` (max ${MAX_PR_TITLE_LENGTH} chars)
+- Commit Header: `type(scope): subject` (max ${MAX_COMMIT_SUBJECT_LENGTH} chars total, lowercase)
 - Commit Body: max 1000 chars; wrap at 100 chars per line. Footer: max 1000 chars.
 - Branch per feature; One concern per PR; Never commit to `main`.
 
 ### Commit Type Mapping
 
-| Intent                        | Type     | Scope suggestion |
-|-------------------------------|----------|------------------|
-| Security patch / hardening    | `fix`    | `security`       |
-| New security feature/control  | `feat`   | `security`       |
-| Security-related CI/tooling   | `ci`     | `security`       |
+| Intent | Type | Scope suggestion |
+|--------|------|------------------|
+| Security patch / hardening | `fix` | `security` |
+| New security feature/control | `feat` | `security` |
+| Security-related CI/tooling | `ci` | `security` |
 
 If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject>"` or use `git rebase -i`.
 
@@ -117,24 +117,38 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 
 ## Post-Task Protocol
 
-After **every** completed task, the agent MUST append a JSON entry to `.agents/metrics.jsonl`:
+After **every** completed task, the agent MUST create a JSON file in `.agents/metrics/`:
 
 ```json
 {
   "timestamp": "<ISO-8601>",
-  "agent": "<agent-id>",
-  "task": "<description>",
-  "skill_used": "<skill or null>",
+  "task_id": "<uuid or short hash>",
+  "parent_task_id": "<task_id or null>",
+  "task": "<short task description>",
+  "agents": ["<agent-id-1>", "<agent-id-2>"],
+  "skills_used": ["<skill-name-1>", "<skill-name-2>"],
   "status": "completed" | "failed" | "partial",
-  "tokens_used": <int>,
-  "duration_seconds": <int>,
-  "notes": "<text>"
+  "tokens_used": <int or null>,
+  "duration_seconds": <int or null>,
+  "handoff_count": <int>,
+  "agent_metrics": [
+    { "agent": "<agent-id>", "tokens": <int>, "duration_seconds": <int> }
+  ],
+  "notes": "<optional free text>"
 }
 ```
 
-- JSONL format; Append-only; Never truncate or delete.
-- If task fails mid-way, still append with `"status": "failed"`.
-- `dora-report` skill reads this file for its monthly summary.
+**File Naming Convention**: Use format `{timestamp}_{task_id}.json`
+- Example: `2026-05-31T10-00-00_abc123def456.json`
+- This ensures unique filenames and **prevents Git merge conflicts**
+
+**Rules**:
+- JSON format; One file per task; Never modify existing files.
+- If task fails mid-way, still create file with `"status": "failed"`.
+- `dora-report` skill aggregates all JSON files in `.agents/metrics/` for its monthly summary.
+- `task_id` + `parent_task_id` allow linking retries, self-fix loops, and sub-task chains
+- `handoff_count` surfaces coordination cost at a glance
+- `agent_metrics` enables per-agent token and duration attribution
 
 #### Recent Project-Wide Learnings
 
