@@ -49,3 +49,7 @@ htmlcov/
 .pytest_cache/
 .gradle/
 .cache/
+
+# Generated LLM context files (produced by CI workflow on main only)
+llms.txt
+llms-full.txt

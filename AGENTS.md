@@ -30,7 +30,7 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 
 **Prerequisites**:
 - Fetch/pull latest default remote branch before beginning.
-- **Check CI Status**: Agents MUST check `ci-status.json`. If NOT "passing", pause until fixed.
+- **Check CI Status**: Agents MUST check `.github/ci-status/ci-status.json`. If NOT "passing", pause until fixed.
 
 1. **ANALYZE & STRATEGIZE (Phase 1)**
    - **Action**: Use `triz-analysis` or `triz-solver`. Write an **ADR** in `plans/`.

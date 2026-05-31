@@ -4,7 +4,7 @@ description: >
   Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination,
   confidence-scored autoresearch loops, and backpressure quality gates. Use for web apps,
   mobile apps, games, dashboards, SaaS, e-commerce, kiosks, and any screen-based product.
-version: "2.1.0"
+version: "0.2.10"
 ---
 
 # UI/UX Prompt Optimizer

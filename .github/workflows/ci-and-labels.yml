@@ -221,17 +221,29 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-          # Fetch and checkout the target branch directly to avoid rebasing the PR merge commit
-          git stash push ci-status.json ci-summary.md
+          git stash push .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
           git fetch origin "$TARGET_BRANCH"
           git checkout "origin/$TARGET_BRANCH"
           git stash pop || true
 
-          git add ci-status.json ci-summary.md
+          git add .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
           if git diff --staged --quiet; then
             echo "No changes to CI status"
-          else
-            git commit -m "ci: update ci status artifacts [skip ci]"
-            # Push to the branch that triggered the workflow
-            git push origin "HEAD:$TARGET_BRANCH"
+            exit 0
           fi
+
+          git commit -m "ci: update ci status artifacts [skip ci]"
+
+          # Retry push with rebase on conflict (max 3 attempts)
+          MAX_RETRIES=3
+          for i in $(seq 1 "$MAX_RETRIES"); do
+            if git push origin "HEAD:$TARGET_BRANCH"; then
+              echo "Push succeeded on attempt $i"
+              exit 0
+            fi
+            echo "Push failed (attempt $i/$MAX_RETRIES), rebasing..."
+            git fetch origin "$TARGET_BRANCH"
+            git rebase "origin/$TARGET_BRANCH" || true
+          done
+          echo "Push failed after $MAX_RETRIES attempts"
+          exit 1

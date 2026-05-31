@@ -1,5 +1,6 @@
 ---
 name: readme-best-practices
+version: "0.2.10"
 description: >
   Create, audit, and improve GitHub README.md files following 2026 best practices.
   Use this skill when a user asks to write, rewrite, or review a README.md for a
