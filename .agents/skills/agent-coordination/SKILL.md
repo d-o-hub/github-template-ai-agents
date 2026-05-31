@@ -1,5 +1,6 @@
 ---
 name: agent-coordination
+version: "0.2.10"
 description: Coordinate multiple agents for software development across any language. Use for parallel execution of independent tasks, sequential chains with dependencies, swarm analysis from multiple perspectives, or iterative refinement loops. Handles Python, JavaScript, Java, Go, Rust, C#, and other languages.
 ---
 

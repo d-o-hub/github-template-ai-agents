@@ -6,4 +6,4 @@ Gemini-specific notes:
 - Prefer `agents-docs/` for context before asking clarifying questions
 - Use the skills in `.agents/skills/` for structured tasks
 - Always append task results to `.agents/metrics.jsonl` after each task
-- Check `ci-status.json` before making any changes
+- Check `.github/ci-status/ci-status.json` before making any changes

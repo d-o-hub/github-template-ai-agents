@@ -25,7 +25,33 @@ printf "Generating %s and %s...\n" "$LLMS_TXT" "$LLMS_FULL_TXT"
 
 # Extract Project Info from README.md
 PROJECT_NAME=$(grep -m 1 "^# " README.md | sed 's/^# //' || echo "Unnamed Project")
-PROJECT_DESC=$(sed -n '/^> /,/^$/p' README.md | sed 's/^> //' | tr '\n' ' ' | sed 's/  */ /g' | sed 's/^ *//;s/ *$//' || echo "No description available.")
+PROJECT_DESC=$(awk '
+/^>/ {
+    gsub(/^>[-+|]*[ ]*/, "")
+    if ($0 != "") desc = (desc ? desc " " : "") $0
+    in_desc = 1
+    next
+}
+/^[|][-+]?$/ {
+    in_desc = 1
+    next
+}
+in_desc && /^[[:space:]]/ && !/^$/ {
+    sub(/^[[:space:]]*/, "")
+    if ($0 != "") desc = (desc ? desc " " : "") $0
+    next
+}
+in_desc && !/^$/ && !/^>/ && !/^[|][-+]?$/ {
+    if ($0 != "") desc = (desc ? desc " " : "") $0
+    in_desc = 0
+    next
+}
+in_desc { in_desc = 0 }
+END {
+    gsub(/^ *| *$/, "", desc)
+    if (desc) print desc
+}
+' README.md)
 
 if [[ -z "${PROJECT_DESC:-}" ]]; then
     PROJECT_DESC="No description available."
@@ -81,9 +107,18 @@ fi
             BEGIN { in_desc=0; desc="" }
             /^description: / {
                 in_desc=1
-                val = substr($0, index($0, "description: ") + 14)
+                val = substr($0, index($0, "description: ") + 13)
                 gsub(/^[\"'\'']/, "", val)
                 gsub(/[\"'\'']$/, "", val)
+                
+                # Handle block scalar modifiers (|, |-, |+, >, >-, >+)
+                # These are YAML block scalar indicators that should be stripped
+                if (substr(val, 1, 2) == "|-" || substr(val, 1, 2) == "|+" || 
+                    substr(val, 1, 2) == ">-" || substr(val, 1, 2) == ">+") {
+                    desc = substr(val, 3)
+                    gsub(/^[ \t]+/, "", desc)
+                    next
+                }
                 if (substr(val, 1, 1) == "|" || substr(val, 1, 1) == ">") {
                     desc = substr(val, 2)
                     gsub(/^[ \t]+/, "", desc)
@@ -104,7 +139,6 @@ fi
             }
             END {
                 gsub(/\n/, " ", desc)
-                gsub(/  */, " ", desc)
                 gsub(/^ *| *$/, "", desc)
                 print desc
             }

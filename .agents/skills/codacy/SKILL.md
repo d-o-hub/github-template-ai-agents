@@ -1,6 +1,6 @@
 ---
 name: codacy
-version: 1.0.0
+version: "0.2.10"
 description: Orchestrate static analysis using Codacy CLIs. Use when Codacy blocks a PR, for fixing quality gate failures, or suppressing false positives across multi-language projects (Go, Rust, C, TS, etc.).
 license: MIT
 ---

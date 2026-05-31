@@ -1,5 +1,6 @@
 ---
 name: privacy-first
+version: "0.2.10"
 description: >
   Prevent email addresses and personal data from entering the codebase.
   Use when user asks to "prevent emails", "remove personal data", "privacy check",

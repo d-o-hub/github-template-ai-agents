@@ -1,5 +1,6 @@
 ---
 name: verification-template
+version: "0.2.10"
 description: Template for creating portable domain-specific verification skills. Use this as a starting point when defining systematic verification checklists for new features, modules, or domain-specific operations.
 ---
 

@@ -1,0 +1,51 @@
+---
+name: Update LLM Context Files
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'AGENTS.md'
+      - 'README.md'
+      - '.agents/skills/*/SKILL.md'
+      - 'scripts/generate-llms-txt.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-llms:
+    name: Regenerate llms.txt and llms-full.txt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4.2.2
+
+      - name: Regenerate LLM context files
+        run: ./scripts/generate-llms-txt.sh
+
+      - name: Commit and create PR if changed
+        run: |
+          BRANCH="auto/regenerate-llms-txt"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add -f llms.txt llms-full.txt
+          if git diff --cached --quiet; then
+            echo "No changes to llms.txt or llms-full.txt"
+            exit 0
+          fi
+          git commit -m "ci: regenerate llms.txt and llms-full.txt"
+          git push -f origin "$BRANCH"
+          # Create PR only if no open PR already exists for this branch
+          if [[ -z $(gh pr list --head "$BRANCH" --state open --json number -q '.[0].number') ]]; then
+            gh pr create --base main --head "$BRANCH" \
+              --title "ci: regenerate llms.txt and llms-full.txt" \
+              --body "Automated regeneration of LLM context files triggered by source changes."
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}

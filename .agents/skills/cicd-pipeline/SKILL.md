@@ -1,5 +1,6 @@
 ---
 name: cicd-pipeline
+version: "0.2.10"
 description: Design and implement CI/CD pipelines with GitHub Actions, GitLab CI, and Forgejo Actions. Includes pipeline optimization, secrets management, and failure handling patterns.
 ---
 

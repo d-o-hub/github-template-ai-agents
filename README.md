@@ -24,7 +24,7 @@ with quality gates, skills, and sub-agent patterns.
 - ✓ **Multi-Agent Support**: Works with 6+ AI coding tools simultaneously
 - ✓ **Skills System**: Reusable knowledge modules in canonical location
 - ✓ **Quality Gates**: Automatic lint, test, format before commits
-- ✓ **CI State Artifacts**: `ci-status.json` and `ci-summary.md` track CI health for agents
+- ✓ **CI State Artifacts**: `.github/ci-status/ci-status.json` and `.github/ci-status/ci-summary.md` track CI health for agents
 - ✓ **Context Discipline**: Prevents context rot with sub-agents and hooks
 - ✓ **Dependabot Integration**: Automated security and version updates
 
@@ -188,3 +188,4 @@ for details.
 ---
 
 **Built with AI agents. Maintained by humans.**
+

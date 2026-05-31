@@ -21,6 +21,12 @@ def determine_status(results):
         return "failing"
     return "passing"
 
+def get_ci_dir():
+    """Return path to .github/ci-status/ directory, creating it if needed."""
+    ci_dir = os.path.join(os.getcwd(), ".github", "ci-status")
+    os.makedirs(ci_dir, exist_ok=True)
+    return ci_dir
+
 def update_json(status, last_run, failing_jobs, workflow_url):
     """Update ci-status.json."""
     ci_status = {
@@ -29,7 +35,8 @@ def update_json(status, last_run, failing_jobs, workflow_url):
         "failing_jobs": failing_jobs,
         "workflow_url": workflow_url
     }
-    with open("ci-status.json", "w", encoding="utf-8") as f:
+    path = os.path.join(get_ci_dir(), "ci-status.json")
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(ci_status, f, indent=2)
         f.write("\n")
 
@@ -41,7 +48,8 @@ def update_markdown(status, last_run, workflow_url, needs):
         "skipped": "⏭️"
     }
 
-    with open("ci-summary.md", "w", encoding="utf-8") as f:
+    path = os.path.join(get_ci_dir(), "ci-summary.md")
+    with open(path, "w", encoding="utf-8") as f:
         f.write("# CI Summary\n\n")
         f.write(f"Latest CI status: **{status}**\n\n")
         f.write(f"- **Last Run:** {last_run}\n")

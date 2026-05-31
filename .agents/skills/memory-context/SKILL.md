@@ -1,7 +1,7 @@
 ---
 name: memory-context
 description: Retrieve semantically relevant past learnings and analysis outputs using the csm CLI (HDC encoder with hybrid BM25 retrieval)
-version: "1.0"
+version: "0.2.10"
 ---
 
 # Memory Context

@@ -2,7 +2,7 @@
 name: dora-report
 description: "Monthly DORA + agentic metrics reporting skill. Triggers on 'generate dora report', 'monthly metrics', 'agentic performance report', 'report DORA metrics', or when a monthly audit is required."
 category: devops
-version: "1.0.0"
+version: "0.2.10"
 template_version: "0.3"
 ---
 

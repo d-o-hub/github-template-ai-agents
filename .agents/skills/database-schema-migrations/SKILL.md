@@ -1,5 +1,5 @@
 ---
-version: "1.0.0"
+version: "0.2.10"
 name: database-schema-migrations
 description: >
   Design database schema and write migrations. Activate for table design, migration scripts, or schema changes. Generic pattern adaptable to any SQL database.
