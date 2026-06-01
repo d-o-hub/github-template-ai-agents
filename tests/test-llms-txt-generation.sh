@@ -20,17 +20,22 @@ mkdir -p "$MOCK_SKILLS_DIR/skill-b"
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
+PASSED_MSG='%bPASSED%b\n'
 
 assert_contains() {
-    if ! grep -F -q -- "$1" "$2"; then
-        printf "%bFAILED: Expected '%s' in %s%b\n" "$RED" "$1" "$2" "$NC"
+    local expected="$1"
+    local file="$2"
+    if ! grep -F -q -- "$expected" "$file"; then
+        printf "%bFAILED: Expected '%s' in %s%b\n" "$RED" "$expected" "$file" "$NC" >&2
         exit 1
     fi
 }
 
 assert_not_contains() {
-    if grep -F -q -- "$1" "$2"; then
-        printf "%bFAILED: Did NOT expect '%s' in %s%b\n" "$RED" "$1" "$2" "$NC"
+    local pattern="$1"
+    local file="$2"
+    if grep -F -q -- "$pattern" "$file"; then
+        printf "%bFAILED: Did NOT expect '%s' in %s%b\n" "$RED" "$pattern" "$file" "$NC" >&2
         exit 1
     fi
 }
@@ -65,7 +70,7 @@ touch "$TEST_DIR/VERSION"
 
 assert_contains "# Mock Project Name" "$LLMS_TXT"
 assert_contains "> Mock project description that spans multiple lines." "$LLMS_TXT"
-printf "%bPASSED%b\n" "$GREEN" "$NC"
+printf "$PASSED_MSG" "$GREEN" "$NC"
 
 # Test 2: Completeness of llms-full.txt skill index
 printf "Test 2: Skill index completeness... "
@@ -92,7 +97,7 @@ EOF
 
 assert_contains "- [skill-a](.agents/skills/skill-a/SKILL.md): Description for skill A" "$LLMS_FULL_TXT"
 assert_contains "- [skill-b](.agents/skills/skill-b/SKILL.md): Description for skill B" "$LLMS_FULL_TXT"
-printf "%bPASSED%b\n" "$GREEN" "$NC"
+printf "$PASSED_MSG" "$GREEN" "$NC"
 
 # Test 3: Quality gate failure on manual modification
 printf "Test 3: Quality gate divergence check... "
@@ -116,7 +121,7 @@ fi
 rm -f "$TMP_LLMS" "$TMP_LLMS_FULL"
 
 if [[ $FAILED -eq 1 ]]; then
-    printf "%bPASSED%b\n" "$GREEN" "$NC"
+    printf "$PASSED_MSG" "$GREEN" "$NC"
 else
     printf "%bFAILED: Quality gate did not detect divergence%b\n" "$RED" "$NC"
     exit 1
@@ -138,7 +143,7 @@ EOF
 )
 # Should fallback to directory name
 assert_contains "- [skill-c](.agents/skills/skill-c/SKILL.md): No description available." "$LLMS_FULL_TXT"
-printf "%bPASSED%b\n" "$GREEN" "$NC"
+printf "$PASSED_MSG" "$GREEN" "$NC"
 
 # Test 5: Robustness against malformed README.md
 printf "Test 5: Malformed README.md (no H1)... "
@@ -154,6 +159,6 @@ EOF
 # Should have fallback title
 assert_contains "# Unnamed Project" "$LLMS_TXT"
 assert_contains "> But description exists." "$LLMS_TXT"
-printf "%bPASSED%b\n" "$GREEN" "$NC"
+printf "$PASSED_MSG" "$GREEN" "$NC"
 
-printf "All llms.txt generation tests %bPASSED%b\n" "$GREEN" "$NC"
+printf "All llms.txt generation tests $PASSED_MSG" "$GREEN" "$NC"

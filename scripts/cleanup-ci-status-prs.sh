@@ -16,7 +16,7 @@ for PR_NUM in "${STALE_PR_NUMBERS[@]}"; do
   # Get PR info
   PR_INFO=$(gh pr view "$PR_NUM" --repo "$REPO" --json state,headRefName 2>/dev/null || true)
 
-  if [ -z "$PR_INFO" ]; then
+  if [[ -z "$PR_INFO" ]]; then
     echo "  PR #$PR_NUM not found or inaccessible. Skipping."
     continue
   fi
@@ -24,14 +24,14 @@ for PR_NUM in "${STALE_PR_NUMBERS[@]}"; do
   STATE=$(echo "$PR_INFO" | jq -r '.state')
   BRANCH=$(echo "$PR_INFO" | jq -r '.headRefName')
 
-  if [ "$STATE" == "OPEN" ]; then
+  if [[ "$STATE" == "OPEN" ]]; then
     echo "  Closing PR #$PR_NUM..."
     gh pr close "$PR_NUM" --repo "$REPO"
   else
     echo "  PR #$PR_NUM is already $STATE."
   fi
 
-  if [ -n "$BRANCH" ]; then
+  if [[ -n "$BRANCH" ]]; then
     echo "  Deleting branch $BRANCH..."
     gh api -X DELETE "repos/$REPO/git/refs/heads/$BRANCH" 2>/dev/null || echo "  Branch $BRANCH already deleted or not found."
   fi
@@ -41,11 +41,11 @@ done
 echo "Searching for any other open CI status update PRs..."
 OTHER_PRS=$(gh pr list --repo "$REPO" --state open --search "ci: update ci status artifacts" --json number,headRefName --jq '.[] | "\(.number) \(.headRefName)"')
 
-if [ -z "$OTHER_PRS" ]; then
+if [[ -z "$OTHER_PRS" ]]; then
   echo "No other stale PRs found."
 else
   echo "$OTHER_PRS" | while read -r num branch; do
-    if [ -z "$num" ]; then continue; fi
+    if [[ -z "$num" ]]; then continue; fi
     echo "  Closing PR #$num..."
     gh pr close "$num" --repo "$REPO"
     echo "  Deleting branch $branch..."

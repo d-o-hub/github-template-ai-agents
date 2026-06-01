@@ -21,14 +21,14 @@ trap cleanup EXIT
 
 # Allow passing specific files or directories to check
 CHECK_PATHS=("$@")
-if [ ${#CHECK_PATHS[@]} -eq 0 ]; then
+if [[ ${#CHECK_PATHS[@]} -eq 0 ]]; then
     # Support both .yml and .yaml extensions
     shopt -s nullglob
     CHECK_PATHS=(.github/workflows/*.yml .github/workflows/*.yaml)
     shopt -u nullglob
 fi
 
-if [ ${#CHECK_PATHS[@]} -eq 0 ]; then
+if [[ ${#CHECK_PATHS[@]} -eq 0 ]]; then
     printf "No workflow files found to validate.\n"
     exit 0
 fi
