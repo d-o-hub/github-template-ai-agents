@@ -202,10 +202,11 @@ jobs:
     if: always()
     permissions:
       contents: write
-      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4.2.2
+        with:
+          ref: main
 
       - name: Setup Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v5.3.0
@@ -218,13 +219,10 @@ jobs:
           WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: python3 scripts/update-ci-status.py
 
-      - name: Commit and create PR
-        env:
-          TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit CI status directly to main
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
 
           git add .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
           if git diff --staged --quiet; then
@@ -232,20 +230,5 @@ jobs:
             exit 0
           fi
 
-          PR_BRANCH="ci-status-update-${GITHUB_RUN_ID}"
-          git checkout -b "$PR_BRANCH"
           git commit -m "ci: update ci status artifacts [skip ci]"
-          git push origin "$PR_BRANCH"
-
-          # Check if a PR already exists for this branch
-          EXISTING_PR=$(gh pr list --head "$PR_BRANCH" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
-          if [ -n "$EXISTING_PR" ]; then
-            echo "PR #$EXISTING_PR already exists for $PR_BRANCH"
-            exit 0
-          fi
-
-          gh pr create \
-            --title "ci: update ci status artifacts" \
-            --body "Automated CI status update from workflow run ${GITHUB_RUN_ID}." \
-            --base "$TARGET_BRANCH" \
-            --head "$PR_BRANCH"
+          git push origin main
