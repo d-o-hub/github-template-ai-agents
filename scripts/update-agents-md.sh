@@ -36,7 +36,8 @@ fi
 
 # Find the line number of the next section (end of skills table)
 # Supports both "### Context Discipline" and "## Security"
-NEXT_SECTION_LINE=$(grep -nE "^(### Context Discipline|## Security)" "$AGENTS_FILE" | cut -d: -f1 | awk -v start="$SKILLS_SECTION_LINE" -- '$1 > start { print $1; exit }')
+# Security: Use -- to prevent option injection from filenames starting with -
+NEXT_SECTION_LINE=$(grep -nE "^(### Context Discipline|## Security)" -- "$AGENTS_FILE" | cut -d: -f1 | awk -v start="$SKILLS_SECTION_LINE" -- '$1 > start { print $1; exit }')
 
 if [ -z "$NEXT_SECTION_LINE" ]; then
     # Fallback to end of file if no next section found
