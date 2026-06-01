@@ -7,12 +7,12 @@ on:
     branches: ['**']
     paths:
       - '**.md'
-      - '.markdownlintrc'
+      - '.markdownlint-cli2.jsonc'
   pull_request:
     branches: ['**']
     paths:
       - '**.md'
-      - '.markdownlintrc'
+      - '.markdownlint-cli2.jsonc'
 
 permissions:
   contents: read
@@ -32,14 +32,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install markdownlint-cli
-        run: npm install -g markdownlint-cli@0.48.0
+      - name: Install markdownlint-cli2
+        run: npm install -g markdownlint-cli2
 
       - name: Run markdownlint
         run: |
-          markdownlint '**/*.md' \
-            --ignore node_modules \
-            --ignore target \
-            --ignore vendor \
-            --config .markdownlintrc 2>&1 || \
-            (echo "❌ Markdown lint failed. Fix errors with: markdownlint --fix '**/*.md'" && exit 1)
+          markdownlint-cli2 '**/*.md' 2>&1 || \
+            (echo "❌ Markdown lint failed. Fix errors with: markdownlint-cli2 --fix '**/*.md'" && exit 1)
