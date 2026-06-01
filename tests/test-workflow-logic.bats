@@ -1,17 +1,17 @@
 #!/usr/bin/env bats
 
-@test "workflow uses fixed branch ci/status-update" {
-    grep -q "branch: ci/status-update" .github/workflows/ci-and-labels.yml
+@test "workflow uses ci-status-update branch pattern" {
+    grep -q 'PR_BRANCH="ci-status-update-' .github/workflows/ci-and-labels.yml
 }
 
-@test "workflow uses create-pull-request action" {
-    grep -q "uses: peter-evans/create-pull-request" .github/workflows/ci-and-labels.yml
+@test "workflow uses gh pr create command" {
+    grep -q "gh pr create" .github/workflows/ci-and-labels.yml
 }
 
 @test "workflow includes skip ci in commit message" {
-    grep -q "commit-message: \"ci: update ci status artifacts \[skip ci\]\"" .github/workflows/ci-and-labels.yml
+    grep -q "commit -m \"ci: update ci status artifacts \[skip ci\]\"" .github/workflows/ci-and-labels.yml
 }
 
-@test "workflow targets main as base branch" {
-    grep -q "base: main" .github/workflows/ci-and-labels.yml
+@test "workflow targets base via TARGET_BRANCH variable" {
+    grep -q "TARGET_BRANCH" .github/workflows/ci-and-labels.yml
 }
