@@ -76,22 +76,22 @@ extract_agent_info() {
 }
 
 # Scan .claude/agents/ directory
-if [ -d "$REPO_ROOT/.claude/agents" ]; then
+if [[ -d "$REPO_ROOT/.claude/agents" ]]; then
     echo "  Found .claude/agents/"
     
     for agent_file in "$REPO_ROOT/.claude/agents"/*.md; do
-        [ -f "$agent_file" ] || continue
+        [[ -f "$agent_file" ]] || continue
         ((++CLAUDE_COUNT))
         extract_agent_info "$agent_file" "Claude Code" >> "$TEMP_FILE"
     done
 fi
 
 # Scan .opencode/agents/ directory
-if [ -d "$REPO_ROOT/.opencode/agents" ]; then
+if [[ -d "$REPO_ROOT/.opencode/agents" ]]; then
     echo "  Found .opencode/agents/"
 
     for agent_file in "$REPO_ROOT/.opencode/agents"/*.md; do
-        [ -f "$agent_file" ] || continue
+        [[ -f "$agent_file" ]] || continue
         # Skip symlinks to .agents/skills
         [ -L "$agent_file" ] && continue
         ((++OPENCODE_COUNT))
@@ -114,18 +114,18 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 SKILLS_HEADER
 
 # Scan .agents/skills/ directory (canonical source)
-if [ -d "$REPO_ROOT/.agents/skills" ]; then
+if [[ -d "$REPO_ROOT/.agents/skills" ]]; then
     echo "  Found .agents/skills/"
     
     for skill_dir in "$REPO_ROOT/.agents/skills"/*/; do
-        [ -d "$skill_dir" ] || continue
+        [[ -d "$skill_dir" ]] || continue
         # Use Bash parameter expansion instead of basename
         skill_name="${skill_dir%/}"
         skill_name="${skill_name##*/}"
         
         # Skip if no SKILL.md exists
         skill_file="$skill_dir/SKILL.md"
-        [ -f "$skill_file" ] || continue
+        [[ -f "$skill_file" ]] || continue
         ((++SKILL_COUNT))
         
         # Optimized extraction using a single awk pass

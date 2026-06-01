@@ -9,14 +9,14 @@ cd "$REPO_ROOT"
 
 # Read version from single source of truth
 if [[ ! -f "VERSION" ]]; then
-    echo "Error: VERSION file not found"
+    echo "Error: VERSION file not found" >&2
     exit 1
 fi
 
 VERSION=$(tr -d '[:space:]' < VERSION)
 
 if [[ -z "$VERSION" ]]; then
-    echo "Error: VERSION file is empty"
+    echo "Error: VERSION file is empty" >&2
     exit 1
 fi
 
