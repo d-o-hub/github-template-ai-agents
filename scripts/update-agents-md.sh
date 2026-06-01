@@ -27,7 +27,7 @@ echo "Updating AGENTS.md skill table..."
 # Find the line number of the skills section header
 # Supports both "### Available Skills" (template) and "## Skills" (customized)
 # Security: Use -- to prevent option injection from filenames starting with -
-SKILLS_SECTION_LINE=$(grep -nE "^(### Available Skills|## Skills)" -- "$AGENTS_FILE" | head -n 1 -- | cut -d: -f1)
+SKILLS_SECTION_LINE=$(grep -nE "^(### Available Skills|## Skills)" -- "$AGENTS_FILE" | head -n 1 | cut -d: -f1)
 
 if [ -z "$SKILLS_SECTION_LINE" ]; then
     echo "Error: Could not find skills section header in AGENTS.md"
