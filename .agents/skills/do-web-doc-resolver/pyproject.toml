@@ -56,3 +56,6 @@ pythonpath = ["."]
 markers = [
     "live: tests requiring live API keys (deselect with '-m \"not live\"')",
 ]
+
+[tool.uv]
+dev-dependencies = []

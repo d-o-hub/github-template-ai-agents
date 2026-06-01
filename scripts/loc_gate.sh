@@ -10,12 +10,13 @@ MAX_SOURCE=500
 MAX_SKILL=250
 MAX_AGENTS=150
 
+readonly AGENTS_MD_FILE='AGENTS.md'
+
 # Try to extract from AGENTS.md if available
-if [[ -f "AGENTS.md" ]]; then
-    # Security: Validate numeric format to prevent injection from AGENTS.md values
-    MAX_SOURCE_RAW=$(grep -e "MAX_LINES_PER_SOURCE_FILE=" -- "AGENTS.md" | cut -d'=' -f2 || echo 500)
-    MAX_SKILL_RAW=$(grep -e "MAX_LINES_PER_SKILL_MD=" -- "AGENTS.md" | cut -d'=' -f2 || echo 250)
-    MAX_AGENTS_RAW=$(grep -e "MAX_LINES_AGENTS_MD=" -- "AGENTS.md" | cut -d'=' -f2 || echo 150)
+if [[ -f "$AGENTS_MD_FILE" ]]; then
+    MAX_SOURCE_RAW=$(grep -e "MAX_LINES_PER_SOURCE_FILE=" -- "$AGENTS_MD_FILE" | cut -d'=' -f2 || echo 500)
+    MAX_SKILL_RAW=$(grep -e "MAX_LINES_PER_SKILL_MD=" -- "$AGENTS_MD_FILE" | cut -d'=' -f2 || echo 250)
+    MAX_AGENTS_RAW=$(grep -e "MAX_LINES_AGENTS_MD=" -- "$AGENTS_MD_FILE" | cut -d'=' -f2 || echo 150)
 
     # Validate numeric format or fallback to defaults
     [[ "$MAX_SOURCE_RAW" =~ ^[0-9]+$ ]] && MAX_SOURCE="$MAX_SOURCE_RAW"
@@ -28,10 +29,10 @@ FAILED=0
 echo "Checking LOC limits..."
 
 # 1. Check AGENTS.md
-if [[ -f "AGENTS.md" ]]; then
-    LOC=$(wc -l < "AGENTS.md")
+if [[ -f "$AGENTS_MD_FILE" ]]; then
+    LOC=$(wc -l < "$AGENTS_MD_FILE")
     if [[ "$LOC" -gt "$MAX_AGENTS" ]]; then
-        echo "ERROR: AGENTS.md has $LOC lines (max $MAX_AGENTS)"
+        echo "ERROR: $AGENTS_MD_FILE has $LOC lines (max $MAX_AGENTS)"
         FAILED=1
     fi
 fi
