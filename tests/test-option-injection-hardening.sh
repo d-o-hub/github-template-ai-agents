@@ -41,7 +41,7 @@ echo "✓ readlink test passed"
 
 # Test 3: head/tail with hyphenated filename
 echo "Testing head/tail..."
-echo "test content" > -- "-v"
+printf "test content\n" > "./-v"
 if ! head -n 1 -- "-v" >/dev/null; then
     echo "FAILED: head -v failed"
     exit 1
