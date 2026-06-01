@@ -18,7 +18,8 @@ if [ ! -f "$COMMIT_MSG_FILE" ]; then
 fi
 
 # Run commitlint
-if ! npx commitlint --edit "$COMMIT_MSG_FILE"; then
+# Security: Use -- to prevent option injection from filenames starting with -
+if ! npx commitlint --edit -- "$COMMIT_MSG_FILE"; then
     exit 1
 fi
 
