@@ -1,7 +1,7 @@
 ---
 name: turso-db
-description: Use this skill for Turso (LibSQL/Limbo) database development, including scaffolding, querying, migrations, and maintenance. Supports vector search, full-text search, CDC, MVCC, encryption, and bidirectional remote sync. Use when working with Turso SDKs for JavaScript, Rust, Python, Go, and React Native. Provides current API guidance to avoid stale "libsql" legacy knowledge.
-version: "0.2.10"
+description: Use this skill for Turso (LibSQL/Limbo) database development, including scaffolding, querying, migrations, and maintenance. Supports vector search, full-text search, CDC, MVCC, encryption, and bidirectional remote sync. Use when working with Turso SDKs for JavaScript, Rust, Python, Go, Swift, and React Native. Provides current API guidance to avoid stale "libsql" legacy knowledge.
+version: 0.6.1
 license: MIT
 ---
 
@@ -18,9 +18,9 @@ For the latest details or topics not covered locally, search the official docs o
 Before writing any Turso code, you MUST know these constraints:
 
 - **BETA software** — not all SQLite features are implemented yet.
-- **No multi-process access** — only one process can open a database file at a time.
+- **Multi-process access is experimental** — enable with `--experimental-multiprocess-wal` flag. Only available on 64-bit Unix-like systems (Linux, macOS) with local filesystems. Not supported on Windows, WASM, 32-bit, or network filesystems (NFS, CIFS, etc.).
 - **No WITHOUT ROWID tables** — all tables must have a rowid.
-- **No vacuum** — VACUUM is not supported.
+- **In-place VACUUM is experimental** — requires enabling experimental features. `VACUUM INTO` (writes compacted copy to new file) is always available without a flag.
 - **UTF-8 only** — the only supported character encoding.
 - **WAL is the default journal mode** — legacy SQLite modes (delete, truncate, persist) are not supported.
 - **FTS requires compile-time `fts` feature** — not available in all builds.
@@ -71,6 +71,9 @@ Use this to decide which reference file to load:
 **React Native / Mobile?**
 → Read `sdks/react-native.md`
 
+**Swift / iOS / macOS?**
+→ Read `sdks/swift.md`
+
 **Rust?**
 → Read `sdks/rust.md`
 
@@ -90,6 +93,7 @@ Use this to decide which reference file to load:
 | WASM (Browser) | `@tursodatabase/database-wasm` | `npm i @tursodatabase/database-wasm` |
 | WASM + Sync (local-first/offline-first) | `@tursodatabase/sync-wasm` | `npm i @tursodatabase/sync-wasm` |
 | React Native | `@tursodatabase/sync-react-native` | `npm i @tursodatabase/sync-react-native` |
+| Swift | `libsql-swift` | Add via SwiftPM: `https://github.com/tursodatabase/libsql-swift` |
 | Rust | `turso` | `cargo add turso` |
 | Python | `pyturso` | `pip install pyturso` |
 | Go | `tursogo` | `go get turso.tech/database/tursogo` |
@@ -184,6 +188,7 @@ Official docs: **<https://docs.turso.tech>** (Mintlify — append `.md` to any U
 | `sdks/serverless.md` | @tursodatabase/serverless: fetch()-based driver for Turso Cloud, edge/serverless |
 | `sdks/wasm.md` | @tursodatabase/database-wasm: browser WASM, OPFS, sync-wasm |
 | `sdks/react-native.md` | @tursodatabase/sync-react-native: mobile, sync, encryption |
+| `sdks/swift.md` | libsql-swift: SwiftPM package, Database/Connection API, embedded replicas |
 | `sdks/rust.md` | turso crate: Builder, async execute/query, sync feature |
 | `sdks/python.md` | pyturso: DB-API 2.0, turso.aio async, turso.sync remote |
 | `sdks/go.md` | tursogo: database/sql driver, no CGO, sync driver |
