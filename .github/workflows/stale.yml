@@ -1,7 +1,6 @@
 ---
 name: Stale Issues and PRs
 
-# yamllint disable-line rule:truthy
 on:
   schedule:
     - cron: '0 0 * * *'  # Run daily at midnight UTC

@@ -1,7 +1,6 @@
 ---
 name: Version Propagation
 
-# yamllint disable-line rule:truthy
 on:
   push:
     paths:

@@ -1,7 +1,6 @@
 ---
 name: Security Scan
 
-# yamllint disable-line rule:truthy
 on:
   push:
     branches:
@@ -52,7 +51,6 @@ jobs:
         run: |
           # Generate SARIF for GitHub Security tab
           # Find all shell scripts
-          # yamllint disable-line rule:line-length
           mapfile -t script_files < <(find scripts .agents/skills \
             -name "*.sh" -type f 2>/dev/null || true)
 
@@ -135,14 +133,12 @@ jobs:
 
       - name: Check for JavaScript/Python files
         id: check_files
-        # yamllint disable-line rule:line-length
         run: |
           # Check if there are any JS/TS or Python files to analyze
           if find . -name "*.js" -o -name "*.ts" -o -name "*.py" | grep -q .; then
             echo "has_codeql_files=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_codeql_files=false" >> "$GITHUB_OUTPUT"
-            # yamllint disable-line rule:line-length
             echo "ℹ️ No JavaScript/TypeScript/Python files found. Skipping CodeQL analysis."
           fi
 
@@ -175,7 +171,6 @@ jobs:
           # no upload).
           cat > codeql-empty-results.sarif << 'EOF'
           {
-            # yamllint disable-line rule:line-length
             "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
             "version": "2.1.0",
             "runs": [
@@ -256,7 +251,7 @@ jobs:
           echo "=========================================="
           echo ""
           echo "Job Results:"
-          # yamllint disable-line rule:line-length
+          # yamllint disable-next-line rule:line-length
           echo "  • ShellCheck Security: ${{ needs.shellcheck-security.result }}"
           echo "  • Trivy Filesystem: ${{ needs.trivy-fs.result }}"
           echo "  • CodeQL Analysis: ${{ needs.codeql.result }}"
@@ -278,11 +273,10 @@ jobs:
           else
             echo "✅ All critical security checks passed."
             if [[ "$codeql_result" == "failure" ]]; then
-              # yamllint disable-line rule:line-length
               echo "   ℹ️ CodeQL skipped (no supported languages in shell script repo)"
             fi
           fi
           echo ""
           echo "All scan results available in the Security tab:"
-          # yamllint disable-line rule:line-length
+          # yamllint disable-next-line rule:line-length
           echo "  https://github.com/${{ github.repository }}/security/code-scanning"
