@@ -2,33 +2,39 @@
 
 ## Current State
 
-- PR #414: WASM size gate performance improvement
-- Branch: `jules-perf-wasm-size-gate-17911831025962272705`
-- Base: `main` (rebased)
-- Commit: `620720e` - perf(wasm): batch stat calls to eliminate loop subshells in wasm_size_gate.sh
-- Changes: 2 files (scripts/wasm_size_gate.sh, .jules/bolt.md) — 38 additions, 16 deletions
-- **Status: MONITORING CI**
-
-## Target State
-
-- All GitHub Actions CI checks passing
-- All review conversations resolved
-- PR mergeable with no conflicts
+- PR #419: turso-db sync + SonarCloud fixes — **READY TO MERGE**
+- Branch: `sync-turso-skill`
+- Base: `main`
+- Commits:
+  - `9e41ac2` — fix: address SonarCloud code smells, vulnerabilities, and hotspots
+  - `8e77cbb` — fix(turso-db): restore quoted version format
+  - `4ad6245` — test(turso-db): update version check to match v0.6.1
+  - `e9d1424` — feat(turso-db): sync with latest Turso docs (v0.6.1)
+- All 25/25 CI checks passing (commitlint, Quality Gates, CodeQL, shellcheck, SonarCloud, Run Tests)
+- SonarCloud: 48 code smells + 1 vulnerability fixed across 14 files
+- Review addressed: codacy contradiction resolved, Swift SDK added
+- **Status: GREEN + REVIEW-CLEAN + MERGEABLE**
 
 ## Actions Queue
 
-1. [x] Rebase onto main to resolve merge conflicts
-2. [x] Revert quality_gate.sh regression (restored from main)
-3. [x] Revert ci-and-labels.yml cosmetic change (restored from main)
-4. [x] Fix .jules/bolt.md markdownlint MD022 (blank line around headings)
-5. [x] Restore deleted files (cleanup-ci-status-prs.sh, test files)
-6. [x] Squash 4 duplicate commits into one properly formatted conventional commit
-7. [x] Fix commit scope (wasi → wasm) and add STAT_CMD safety comment
-8. [ ] Verify all CI checks passing after latest push
+1. [x] Fetch PR #419 and analyze codacy review + CI failures
+2. [x] Update Critical Rules: VACUUM (experimental in-place, always INTO), Multi-Process (experimental)
+3. [x] Add Swift SDK to decision trees + create sdks/swift.md
+4. [x] Fix commitlint: squash 3 non-conventional commits into 1
+5. [x] Fix turso-db.bats version check + quote format
+6. [x] Fix SonarCloud: 48 code smells (S7688, S7677, S7679, S1192, S7682, S131, S1066, python:S1192/S1066/S3776)
+7. [x] Fix SonarCloud: text:S8565 vulnerability (missing lock file)
+8. [x] Regenerate llms-full.txt
+9. [x] All CI green (25/25 passing)
+
+## Previous (PR #414)
+
+- PR #414: WASM size gate performance improvement — **MERGED**
+- All 24 CI checks passed, squashed into main
 
 ## Blockers
 
-- None
+- auto-merge skipped (requires human approval — by design)
 
 ## Deferred
 

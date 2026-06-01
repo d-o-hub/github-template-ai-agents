@@ -141,22 +141,27 @@ fi
 
 log_info() {
     echo -e "${COLOR_BLUE}[INFO]${COLOR_RESET} $*"
+    return 0
 }
 
 log_success() {
     echo -e "${COLOR_GREEN}[PASS]${COLOR_RESET} $*"
+    return 0
 }
 
 log_warning() {
     echo -e "${COLOR_YELLOW}[WARN]${COLOR_RESET} $*" >&2
+    return 0
 }
 
 log_error() {
     echo -e "${COLOR_RED}[ERROR]${COLOR_RESET} $*" >&2
+    return 0
 }
 
 log_section() {
     echo -e "\n${COLOR_BOLD}${COLOR_CYAN}$*${COLOR_RESET}"
+    return 0
 }
 
 # ============================================================================
@@ -166,25 +171,30 @@ log_section() {
 # Check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
+    return 0
 }
 
 # Count non-empty lines in a file (excluding comments)
 count_content_lines() {
     local file="$1"
     grep -v '^\s*$' "$file" | grep -cv '^\s*#'
+    return 0
 }
 
 # Validate semantic version format (x.y.z)
 is_valid_version() {
     [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+    return 0
 }
 
 # Check if running in CI environment
 is_ci() {
     [[ "${CI:-}" == "true" ]] || [[ -n "${GITHUB_ACTIONS:-}" ]]
+    return 0
 }
 
 # Get relative path from git root
 get_git_relative_path() {
     git rev-parse --show-prefix 2>/dev/null || echo "."
+    return 0
 }
