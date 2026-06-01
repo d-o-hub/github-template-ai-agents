@@ -84,7 +84,8 @@ CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
 
 # Update skill table if skills changed
 # The pattern matches any file under .agents/skills/ directory
-echo "$CHANGED_FILES" | grep -q ".agents/skills/" && {
+# Security: Use printf to prevent option injection and structural manipulation
+printf "%s\n" "$CHANGED_FILES" | grep -q -- ".agents/skills/" && {
     echo "Skills changed - updating AGENTS.md..."
     "$REPO_ROOT/scripts/update-agents-md.sh"
     git add AGENTS.md
@@ -96,7 +97,7 @@ echo "$CHANGED_FILES" | grep -q ".agents/skills/" && {
 
 # Update registry if agents changed  
 # The pattern matches files in .claude/, .opencode/, etc. agent directories
-echo "$CHANGED_FILES" | grep -qE "\.(claude|opencode)/agents/" && {
+printf "%s\n" "$CHANGED_FILES" | grep -qE -- "\.(claude|opencode)/agents/" && {
     echo "Agents changed - updating AGENTS_REGISTRY.md..."
     "$REPO_ROOT/scripts/update-agents-registry.sh"
     git add agents-docs/AGENTS_REGISTRY.md
@@ -108,7 +109,7 @@ echo "$CHANGED_FILES" | grep -qE "\.(claude|opencode)/agents/" && {
 exit 0
 HOOK
 
-chmod +x "$HOOKS_DIR/post-commit"
+chmod +x -- "$HOOKS_DIR/post-commit"
 echo "✓ Installed post-commit hook (auto-updates docs)"
 
 # Install pre-commit hook (for quality gate)
@@ -170,7 +171,7 @@ echo "✓ Pre-commit checks passed."
 exit 0
 HOOK
 
-chmod +x "$HOOKS_DIR/pre-commit"
+chmod +x -- "$HOOKS_DIR/pre-commit"
 echo "✓ Installed pre-commit hook (runs quality gate)"
 
 echo ""
