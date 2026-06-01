@@ -331,22 +331,22 @@ fi
 # Markdown checks
 if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
     printf "%bRunning Markdown checks...%b\n" "${BLUE}" "${NC}"
-    if command -v markdownlint &> /dev/null; then
+    if command -v markdownlint-cli2 &> /dev/null; then
         MD_FILES=$(find . -name "*.md" -not -path "*/node_modules/*" -not -path "./target/*" -not -path "./.git/*" -not -path "./vendor/*" 2>/dev/null || true)
         if [[ -n "$MD_FILES" ]]; then
             md_failed=0
             TMP_MD_OUT=$(mktemp)
             while IFS= read -r md_file; do
                 [[ -n "$md_file" ]] || continue
-                if ! lint_if_changed "$md_file" "markdownlint" ".markdownlintrc" markdownlint -- "$md_file" >"$TMP_MD_OUT" 2>&1; then
-                    printf "%b  ✗ markdownlint failed: %s%b\n" "${RED}" "$md_file" "${NC}"
+                if ! lint_if_changed "$md_file" "markdownlint" ".markdownlint-cli2.jsonc" markdownlint-cli2 -- "$md_file" >"$TMP_MD_OUT" 2>&1; then
+                    printf "%b  ✗ markdownlint-cli2 failed: %s%b\n" "${RED}" "$md_file" "${NC}"
                     cat "$TMP_MD_OUT" >&2
                     md_failed=1
                 fi
             done <<< "$MD_FILES"
             rm -f "$TMP_MD_OUT"
             if [[ $md_failed -eq 0 ]]; then
-                printf "%b  ✓ markdownlint passed%b\n" "${GREEN}" "${NC}"
+                printf "%b  ✓ markdownlint-cli2 passed%b\n" "${GREEN}" "${NC}"
             else
                 FAILED=1
             fi

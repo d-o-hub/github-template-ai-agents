@@ -1,0 +1,48 @@
+{
+  // markdownlint-cli2 configuration
+  // See: https://github.com/DavidAnson/markdownlint-cli2
+  "config": {
+    "default": true,
+    // MD013: Line length - disabled (lines can exceed 80 chars)
+    "MD013": false,
+    // MD032: Lists should be surrounded by blank lines
+    "MD032": false,
+    // MD033: No inline HTML - disabled (some docs need inline HTML)
+    "MD033": false,
+    // MD041: First line in a file should be a top-level heading
+    "MD041": false,
+    // MD060: Table pipe style
+    "MD060": false,
+    // MD024: Multiple headings with the same content
+    "MD024": false,
+    // MD026: Trailing punctuation in heading
+    "MD026": false,
+    // MD040: Fenced code blocks should have a language specified
+    "MD040": false,
+    // MD036: Emphasis used instead of a heading
+    "MD036": false,
+    // MD025: Multiple top-level headings in the same document
+    "MD025": false,
+    // MD001: Heading levels should only increment by one level at a time
+    "MD001": false,
+    // MD029: Ordered list item prefix
+    "MD029": false,
+    // MD046: Code block style
+    "MD046": false,
+    // MD055: Table pipe style
+    "MD055": false,
+    // MD056: Table column count
+    "MD056": false
+  },
+  // Glob patterns for files to lint
+  "globs": [
+    "**/*.md"
+  ],
+  // Patterns to ignore
+  "ignores": [
+    "**/node_modules/**",
+    "**/target/**",
+    "**/vendor/**",
+    ".git/**"
+  ]
+}
