@@ -39,7 +39,7 @@ if command -v shellcheck &> /dev/null; then
     # Only check .sh files directly in scripts/ for minimal gate
     for script in "$REPO_ROOT"/scripts/*.sh; do
         [ -f "$script" ] || continue
-        if ! lint_if_changed "$script" "shellcheck" ".shellcheckrc" shellcheck --severity=error -f quiet "$script" 2>/dev/null; then
+        if ! lint_if_changed "$script" "shellcheck" ".shellcheckrc" shellcheck --severity=error -f quiet -- "$script" 2>/dev/null; then
             echo "  ✗ shellcheck failed: $script"
             sc_failed=1
         fi
