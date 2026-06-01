@@ -26,7 +26,8 @@ echo "Updating AGENTS.md skill table..."
 
 # Find the line number of the skills section header
 # Supports both "### Available Skills" (template) and "## Skills" (customized)
-SKILLS_SECTION_LINE=$(grep -nE "^(### Available Skills|## Skills)" "$AGENTS_FILE" | head -1 | cut -d: -f1)
+# Security: Use -- to prevent option injection from filenames starting with -
+SKILLS_SECTION_LINE=$(grep -nE "^(### Available Skills|## Skills)" -- "$AGENTS_FILE" | head -n 1 -- | cut -d: -f1)
 
 if [ -z "$SKILLS_SECTION_LINE" ]; then
     echo "Error: Could not find skills section header in AGENTS.md"
@@ -44,7 +45,8 @@ if [ -z "$NEXT_SECTION_LINE" ]; then
 fi
 
 # Extract everything before the table (including the header)
-head -n "$SKILLS_SECTION_LINE" "$AGENTS_FILE" > "$TEMP_FILE"
+# Security: Use -- to prevent option injection from filenames starting with -
+head -n "$SKILLS_SECTION_LINE" -- "$AGENTS_FILE" > "$TEMP_FILE"
 
 # Add table header
 cat >> "$TEMP_FILE" << 'TABLE_HEADER'
@@ -145,18 +147,19 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
 fi
 
 # Sort the table rows (excluding header) alphabetically by skill name
-head -n $((SKILLS_SECTION_LINE + 3)) "$TEMP_FILE" > "$UPDATE_AGENTS_TEMP_TABLE"
-tail -n +$((SKILLS_SECTION_LINE + 4)) "$TEMP_FILE" | sort >> "$UPDATE_AGENTS_TEMP_TABLE"
-mv "$UPDATE_AGENTS_TEMP_TABLE" "$TEMP_FILE"
+# Security: Use -- to prevent option injection from filenames starting with -
+head -n $((SKILLS_SECTION_LINE + 3)) -- "$TEMP_FILE" > "$UPDATE_AGENTS_TEMP_TABLE"
+tail -n +$((SKILLS_SECTION_LINE + 4)) -- "$TEMP_FILE" | sort >> "$UPDATE_AGENTS_TEMP_TABLE"
+mv -- "$UPDATE_AGENTS_TEMP_TABLE" "$TEMP_FILE"
 
 # Add empty line before next section
 echo "" >> "$TEMP_FILE"
 
 # Append everything after the table (from "### Context Discipline" onwards)
-tail -n +"$NEXT_SECTION_LINE" "$AGENTS_FILE" >> "$TEMP_FILE"
+tail -n +"$NEXT_SECTION_LINE" -- "$AGENTS_FILE" >> "$TEMP_FILE"
 
 # Replace original file
-mv "$TEMP_FILE" "$AGENTS_FILE"
+mv -- "$TEMP_FILE" "$AGENTS_FILE"
 
 # Count skills
 SKILL_COUNT=$(find "$REPO_ROOT/.agents/skills" -mindepth 1 -maxdepth 1 -type d | wc -l)
