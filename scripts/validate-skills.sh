@@ -40,7 +40,7 @@ echo "Checking canonical skills and CLI symlinks..."
 
 # Cache for readlink -f existence
 HAS_READLINK_F=""
-if readlink -f -- . &>/dev/null; then HAS_READLINK_F=1; else HAS_READLINK_F=0; fi
+if [ ! -d "$SKILLS_SRC" ] || [ -z "$(ls -A -- "$SKILLS_SRC" 2>/dev/null)" ]; then
 
 for skill_path in "$SKILLS_SRC"/*/; do
     [ -d "$skill_path" ] || continue
