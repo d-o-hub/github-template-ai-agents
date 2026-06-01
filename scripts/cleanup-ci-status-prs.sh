@@ -9,7 +9,7 @@ REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null || pr
 
 printf "%s\n" "Searching for open CI status update PRs authored by app/github-actions..."
 # We target PRs with the specific title and authored by the bot
-PRS_TO_CLEAN=$(gh pr list --repo "$REPO" --author "app/github-actions" --state open --search "ci: update ci status artifacts" --json number,headRefName --jq '.[] | "\(.number) \(.headRefName)"' 2>/dev/null || printf "%s\n" "")
+gh pr list --author "@me" --limit 1000 --json number,title,headRefName
 
 if [[ -z "$PRS_TO_CLEAN" ]]; then
   printf "%s\n" "No stale PRs found."
