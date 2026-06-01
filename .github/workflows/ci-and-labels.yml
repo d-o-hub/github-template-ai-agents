@@ -218,34 +218,13 @@ jobs:
           WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: python3 scripts/update-ci-status.py
 
-      - name: Commit and create PR
-        env:
-          TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
-          git add .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
-          if git diff --staged --quiet; then
-            echo "No changes to CI status"
-            exit 0
-          fi
-
-          PR_BRANCH="ci-status-update-${GITHUB_RUN_ID}"
-          git checkout -b "$PR_BRANCH"
-          git commit -m "ci: update ci status artifacts [skip ci]"
-          git push origin "$PR_BRANCH"
-
-          # Check if a PR already exists for this branch
-          EXISTING_PR=$(gh pr list --head "$PR_BRANCH" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
-          if [ -n "$EXISTING_PR" ]; then
-            echo "PR #$EXISTING_PR already exists for $PR_BRANCH"
-            exit 0
-          fi
-
-          gh pr create \
-            --title "ci: update ci status artifacts" \
-            --body "Automated CI status update from workflow run ${GITHUB_RUN_ID}." \
-            --base "$TARGET_BRANCH" \
-            --head "$PR_BRANCH"
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1  # v7.0.5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "ci: update ci status artifacts [skip ci]"
+          title: "ci: update ci status artifacts"
+          body: "Automated CI status update."
+          branch: ci/status-update
+          base: main
+          delete-branch: true
