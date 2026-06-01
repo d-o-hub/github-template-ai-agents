@@ -42,7 +42,7 @@ get_changed_files() {
     local last_commit
     last_commit=$(get_last_commit)
 
-    if [ -z "$last_commit" ] || [ "$last_commit" = "no-git-repo" ]; then
+    if [[ -z "$last_commit" ]] || [[ "$last_commit" == "no-git-repo" ]]; then
         if command -v git &> /dev/null && git rev-parse --git-dir &> /dev/null; then
             git ls-files "*.md" 2>/dev/null || true
         else
@@ -76,6 +76,7 @@ should_invalidate_command() {
             requirements*.txt|pyproject.toml|setup.py) [[ "$cmd" =~ ^(pip|python) ]] && return 0 ;;
             go.mod|go.sum) [[ "$cmd" =~ ^go ]] && return 0 ;;
             Gemfile*) [[ "$cmd" =~ ^(bundle|gem) ]] && return 0 ;;
+            *) ;;
         esac
     done <<< "$changed_files"
     return 1
@@ -106,7 +107,7 @@ get_cached_result() {
     local cache_file
     cache_file=$(get_cache_path "$1" "$2")
 
-    if [ -f "$cache_file" ]; then
+    if [[ -f "$cache_file" ]]; then
         cat -- "$cache_file"
     else
         printf ""
@@ -128,7 +129,7 @@ save_cached_result() {
     # Log to audit trail and rotate
     printf "%s CACHED: %s\n" "$(date -Iseconds)" "$cmd" >> "$AUDIT_LOG"
 
-    if [ "$(grep -c . "$AUDIT_LOG" || true)" -gt "$MAX_AUDIT_LOG_LINES" ]; then
+    if [[ "$(grep -c . "$AUDIT_LOG" || true)" -gt "$MAX_AUDIT_LOG_LINES" ]]; then
         tail -n "$MAX_AUDIT_LOG_LINES" "$AUDIT_LOG" > "${AUDIT_LOG}.tmp" && mv "${AUDIT_LOG}.tmp" "$AUDIT_LOG"
     fi
 }

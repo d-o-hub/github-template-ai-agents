@@ -39,6 +39,8 @@ FAILED=0
 # DETECTED_LANGUAGES stores which language ecosystems are present in the repo
 DETECTED_LANGUAGES=()
 
+readonly GITHUB_EVENT_PR='pull_request'
+
 # Determine the current context
 GITHUB_EVENT="${GITHUB_EVENT:-${GITHUB_EVENT_NAME:-}}"
 GITHUB_REF="${GITHUB_REF:-}"
@@ -67,7 +69,7 @@ fi
 # --- LLM Context files check ---
 printf "%bChecking LLM context files...%b\n" "${BLUE}" "${NC}"
 if [[ ! -f "llms.txt" ]] || [[ ! -f "llms-full.txt" ]]; then
-    if [[ "$GITHUB_EVENT" == "pull_request" ]]; then
+    if [[ "$GITHUB_EVENT" == "$GITHUB_EVENT_PR" ]]; then
         printf "%b  ⚠ llms.txt or llms-full.txt missing (auto-generated on main by workflow)%b\n" "${YELLOW}" "${NC}"
         DRIFT_DETECTED=true
     elif [[ "$ON_MAIN_BRANCH" == "true" ]]; then
@@ -81,6 +83,7 @@ else
 
     cleanup() {
         rm -f "$TMP_LLMS" "$TMP_LLMS_FULL"
+        return 0
     }
     trap cleanup EXIT
 
@@ -95,7 +98,7 @@ else
 
     llms_ok=true
     if ! diff -q llms.txt "$TMP_LLMS" > /dev/null; then
-        if [[ "$GITHUB_EVENT" == "pull_request" ]]; then
+        if [[ "$GITHUB_EVENT" == "$GITHUB_EVENT_PR" ]]; then
             printf "%b  ⚠ llms.txt is out of date (auto-fixed on main by workflow)%b\n" "${YELLOW}" "${NC}"
         else
             printf "%b  ✗ llms.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
@@ -106,7 +109,7 @@ else
     fi
 
     if ! diff -q llms-full.txt "$TMP_LLMS_FULL" > /dev/null; then
-        if [[ "$GITHUB_EVENT" == "pull_request" ]]; then
+        if [[ "$GITHUB_EVENT" == "$GITHUB_EVENT_PR" ]]; then
             printf "%b  ⚠ llms-full.txt is out of date (auto-fixed on main by workflow)%b\n" "${YELLOW}" "${NC}"
         else
             printf "%b  ✗ llms-full.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
@@ -354,7 +357,7 @@ fi
 
 # Special handling for drift detection based on context
 if [[ "$DRIFT_DETECTED" == "true" ]]; then
-    if [[ "$GITHUB_EVENT" == "pull_request" ]]; then
+    if [[ "$GITHUB_EVENT" == "$GITHUB_EVENT_PR" ]]; then
         # During pull_request, print warning but exit 0
         printf "%b─────────────────────────────────────────────────────────────────%b\n" "${YELLOW}" "${NC}"
         printf "%b│ ⚠ Quality Gate: Drift detected (warning only during PR)     │%b\n" "${YELLOW}" "${NC}"
