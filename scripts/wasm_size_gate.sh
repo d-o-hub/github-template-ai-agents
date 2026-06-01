@@ -19,8 +19,9 @@ printf "Checking WASM size limits (Max: %s bytes)...\n" "$MAX_SIZE_BYTES"
 WASM_FOUND=0
 
 TMP_OUT=$(mktemp)
+TMP_FIND=$(mktemp)
 cleanup_wasm_gate() {
-    rm -f -- "$TMP_OUT"
+    rm -f -- "$TMP_OUT" "$TMP_FIND"
 }
 trap cleanup_wasm_gate EXIT
 
@@ -34,15 +35,16 @@ fi
 # Security: Use -- separator with stat to prevent option injection from malicious filenames
 # Add -type f to ensure we only check files, not directories.
 # Avoid using xargs -r (GNU extension) to maintain macOS compatibility.
-WASM_FILES=$(find . -type f -name "*.wasm" -not -path "./.git/*" -not -path "*/node_modules/*" -print0 2>/dev/null || true)
-if [ -n "$WASM_FILES" ]; then
-    printf "%s" "$WASM_FILES" | xargs -0 sh -c "$STAT_CMD" _ > "$TMP_OUT" || true
+# Avoid command substitution $() which strips null bytes.
+find . -type f -name "*.wasm" -not -path "./.git/*" -not -path "*/node_modules/*" -print0 2>/dev/null > "$TMP_FIND" || true
+if [[ -s "$TMP_FIND" ]]; then
+    xargs -0 sh -c "$STAT_CMD" _ < "$TMP_FIND" > "$TMP_OUT" || true
 fi
 
-if [ -s "$TMP_OUT" ]; then
+if [[ -s "$TMP_OUT" ]]; then
     WASM_FOUND=1
     while IFS="|" read -r size file; do
-        if [ "$size" -gt "$MAX_SIZE_BYTES" ]; then
+        if [[ "$size" -gt "$MAX_SIZE_BYTES" ]]; then
             printf "ERROR: %s size %s exceeds limit %s\n" "$file" "$size" "$MAX_SIZE_BYTES"
             FAILED=1
         else
@@ -51,12 +53,12 @@ if [ -s "$TMP_OUT" ]; then
     done < "$TMP_OUT"
 fi
 
-if [ "$WASM_FOUND" -eq 0 ]; then
+if [[ "$WASM_FOUND" -eq 0 ]]; then
     printf "No WASM files found to check.\n"
     exit 0
 fi
 
-if [ $FAILED -ne 0 ]; then
+if [[ $FAILED -ne 0 ]]; then
     printf "WASM size check failed.\n"
     exit 1
 fi
