@@ -1,7 +1,6 @@
 ---
 name: Knowledge Cleanup
 
-# yamllint disable-line rule:truthy
 on:
   schedule:
     - cron: '0 2 1 * *'

@@ -43,7 +43,7 @@ setup() {
     cd "$TEMP_DIR" || exit 1
     
     # Run quality gate with pull_request event
-    run env GITHUB_EVENT=pull_request ./scripts/quality_gate.sh
+    run env GITHUB_EVENT_NAME=pull_request GITHUB_EVENT=pull_request ./scripts/quality_gate.sh
     
     # Should exit with 0 (not 2) during pull_request
     [ "$status" -eq 0 ]
@@ -85,7 +85,7 @@ setup() {
     cd "$TEMP_DIR" || exit 1
     
     # Run quality gate on main branch (GITHUB_REF=refs/heads/main)
-    run env GITHUB_REF=refs/heads/main GITHUB_EVENT=push ./scripts/quality_gate.sh
+    run env GITHUB_REF=refs/heads/main GITHUB_EVENT_NAME=push GITHUB_EVENT=push ./scripts/quality_gate.sh
     
     # Should exit with 1 when drift detected on main
     [ "$status" -eq 1 ]

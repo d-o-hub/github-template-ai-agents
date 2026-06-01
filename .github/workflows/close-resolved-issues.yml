@@ -1,7 +1,6 @@
 ---
 name: Close Resolved Issues
 
-# yamllint disable-line rule:truthy
 on:
   pull_request_target:
     types: [closed]

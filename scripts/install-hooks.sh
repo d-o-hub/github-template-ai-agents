@@ -14,7 +14,7 @@ echo ""
 # Pre-installation safety check: validate git hooks configuration
 # Global hooks can override local hooks, which would silently break our automation
 # We validate first so users aren't confused when hooks don't run
-if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
+if [[ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]]; then
     echo "Checking git hooks configuration..."
     if ! "$REPO_ROOT/scripts/validate-git-hooks.sh" 2>/dev/null; then
         echo ""
@@ -31,7 +31,7 @@ fi
 
 # Ensure .git/hooks directory exists
 # This shouldn't happen in a valid git repo, but we handle it gracefully
-if [ ! -d "$HOOKS_DIR" ]; then
+if [[ ! -d "$HOOKS_DIR" ]]; then
     echo "Error: .git/hooks directory not found. Are you in a git repository?"
     exit 1
 fi
@@ -73,7 +73,7 @@ cd "$REPO_ROOT" || exit 1
 # HEAD~1 = parent of current commit (what changed since last commit)
 PREV_COMMIT=$(git rev-parse HEAD~1 2>/dev/null || echo "")
 
-if [ -z "$PREV_COMMIT" ]; then
+if [[ -z "$PREV_COMMIT" ]]; then
     # First commit - skip (nothing to diff against)
     exit 0
 fi
@@ -84,7 +84,7 @@ CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
 
 # Update skill table if skills changed
 # The pattern matches any file under .agents/skills/ directory
-echo "$CHANGED_FILES" | grep -q ".agents/skills/" && {
+printf "%s\n" "$CHANGED_FILES" | grep -q -- ".agents/skills/" && {
     echo "Skills changed - updating AGENTS.md..."
     "$REPO_ROOT/scripts/update-agents-md.sh"
     git add AGENTS.md
@@ -96,7 +96,7 @@ echo "$CHANGED_FILES" | grep -q ".agents/skills/" && {
 
 # Update registry if agents changed  
 # The pattern matches files in .claude/, .opencode/, etc. agent directories
-echo "$CHANGED_FILES" | grep -qE "\.(claude|opencode)/agents/" && {
+printf "%s\n" "$CHANGED_FILES" | grep -qE -- "\.(claude|opencode)/agents/" && {
     echo "Agents changed - updating AGENTS_REGISTRY.md..."
     "$REPO_ROOT/scripts/update-agents-registry.sh"
     git add agents-docs/AGENTS_REGISTRY.md
@@ -108,7 +108,7 @@ echo "$CHANGED_FILES" | grep -qE "\.(claude|opencode)/agents/" && {
 exit 0
 HOOK
 
-chmod +x "$HOOKS_DIR/post-commit"
+chmod +x -- "$HOOKS_DIR/post-commit"
 echo "✓ Installed post-commit hook (auto-updates docs)"
 
 # Install pre-commit hook (for quality gate)
@@ -139,14 +139,14 @@ cd "$REPO_ROOT" || exit 1
 
 # Source lint-cache library
 # shellcheck source=scripts/lib/lint_cache.sh
-if [ -f "$REPO_ROOT/scripts/lib/lint_cache.sh" ]; then
+if [[ -f "$REPO_ROOT/scripts/lib/lint_cache.sh" ]]; then
     # shellcheck source=scripts/lib/lint_cache.sh
     source "$REPO_ROOT/scripts/lib/lint_cache.sh"
 fi
 
 # Validate git hooks configuration (prevent global hooks from overriding local)
 # This catches cases where user's global git config would prevent hooks from running
-if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
+if [[ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]]; then
     if ! "$REPO_ROOT/scripts/validate-git-hooks.sh"; then
         echo ""
         echo "Commit aborted. Fix the hooks configuration or use SKIP_GLOBAL_HOOKS_CHECK=true to skip."
@@ -170,7 +170,7 @@ echo "✓ Pre-commit checks passed."
 exit 0
 HOOK
 
-chmod +x "$HOOKS_DIR/pre-commit"
+chmod +x -- "$HOOKS_DIR/pre-commit"
 echo "✓ Installed pre-commit hook (runs quality gate)"
 
 echo ""
