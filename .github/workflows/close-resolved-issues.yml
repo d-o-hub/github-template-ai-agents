@@ -1,7 +1,6 @@
 ---
 name: Close Resolved Issues
 
-# yamllint disable-line rule:truthy
 on:
   pull_request_target:
     types: [closed]
@@ -47,7 +46,7 @@ jobs:
             }
 
             // Conservative matching: only explicit closing keywords.
-            // Examples: "closes #12", "fixed #34", "resolve #56"
+            // Examples: "closes  #12", "fixed  #34", "resolve  #56"
             const closingPattern = /\b(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+#(\d+)\b/gi;
 
             const found = new Set();
@@ -101,15 +100,15 @@ jobs:
                   owner,
                   repo,
                   issue_number,
-                  body: `✅ Closed automatically via PR #${prNumber}${prUrl ? ` (${prUrl})` : ''}.`
+                  body: `✅ Closed automatically via PR  #${prNumber}${prUrl ? ` (${prUrl})` : ''}.`
                 });
 
                 closed.push(issue_number);
-                core.info(`Closed issue #${issue_number}`);
+                core.info(`Closed issue  #${issue_number}`);
               } catch (error) {
                 const message = error instanceof Error ? error.message : String(error);
                 failed.push(`#${issue_number}: ${message}`);
-                core.warning(`Could not process issue #${issue_number}: ${message}`);
+                core.warning(`Could not process issue  #${issue_number}: ${message}`);
               }
             }
 

@@ -93,3 +93,9 @@
 **Vulnerability:** Utility scripts using `awk` or `wc` were vulnerable to option injection when processing filenames starting with a hyphen (e.g., `-v`, `-f`, `-l`).
 **Learning:** For `awk`, the correct robust pattern to terminate option processing before the program string and filenames is `awk [options] -- 'program' [files]`. For `wc`, it is `wc [options] -- [files]`. Adding `--` *after* the program string in a piped or xargs context (e.g., `... | awk 'program' --`) can cause `awk` to treat `--` as a literal filename, leading to "file not found" errors and script failure.
 **Prevention:** Always use the `--` separator before the first positional argument (the program string for `awk`, or the first filename for `wc`) in utility scripts to ensure subsequent arguments are treated as data, not options.
+
+## 2026-06-01 - Widespread Option Injection in Utility Scripts
+
+**Vulnerability:** Core utility scripts (chmod, readlink, head, tail, mv, grep) were vulnerable to option injection when handling hyphenated filenames.
+**Learning:** Standard POSIX utilities interpret arguments starting with hyphens as options unless the -- delimiter is used. This can be exploited to crash scripts or change command behavior.
+**Prevention:** Always use the -- separator before positional arguments in shell commands and prefer printf over echo for variable output.
