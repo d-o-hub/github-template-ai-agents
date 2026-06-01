@@ -200,6 +200,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [labels, quality-gate, test]
     if: always()
+    concurrency:
+      group: ci-status-${{ github.ref }}
+      cancel-in-progress: true
     permissions:
       contents: write
       pull-requests: write
@@ -226,22 +229,22 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-          git add .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
+          git add -- .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
           if git diff --staged --quiet; then
-            echo "No changes to CI status"
+            printf "No changes to CI status\n"
             exit 0
           fi
 
-          PR_BRANCH="ci-status-update-${GITHUB_RUN_ID}"
-          git checkout -b "$PR_BRANCH"
+          PR_BRANCH="ci/status-update"
+          git checkout -b "$PR_BRANCH" -- 2>/dev/null || git checkout "$PR_BRANCH" --
           git commit -m "ci: update ci status artifacts [skip ci]"
-          git push origin "$PR_BRANCH"
+          git push origin -- "$PR_BRANCH" --force
 
           # Check if a PR already exists for this branch
           EXISTING_PR=$(gh pr list --head "$PR_BRANCH" --state open \
-            --json number --jq '.[0].number' 2>/dev/null || echo "")
+            --json number --jq ".[0].number" 2>/dev/null || echo "")
           if [ -n "$EXISTING_PR" ]; then
-            echo "PR #$EXISTING_PR already exists for $PR_BRANCH"
+            printf "PR #%s already exists for %s\n" "$EXISTING_PR" "$PR_BRANCH"
             exit 0
           fi
 
