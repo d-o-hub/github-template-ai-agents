@@ -231,4 +231,4 @@ jobs:
           fi
 
           git commit -m "ci: update ci status artifacts [skip ci]"
-          git push origin main
+          git pull --rebase origin main && git push origin main
