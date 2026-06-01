@@ -31,7 +31,7 @@ declare -A _CONFIG_HASH_CACHE
 # Helper for portable sha256
 _get_hash_internal() {
     local file="$1"
-    if [ ! -f "$file" ]; then
+    if [[ ! -f "$file" ]]; then
         printf "none\n"
         return
     fi
@@ -101,13 +101,13 @@ lint_if_changed() {
         else
             # Check if config_file is absolute or relative to REPO_ROOT
             local real_config=""
-            if [ -f "$config_file" ]; then
+            if [[ -f "$config_file" ]]; then
                 real_config="$config_file"
-            elif [ -f "$REPO_ROOT/$config_file" ]; then
+            elif [[ -f "$REPO_ROOT/$config_file" ]]; then
                 real_config="$REPO_ROOT/$config_file"
             fi
 
-            if [ -n "$real_config" ]; then
+            if [[ -n "$real_config" ]]; then
                 config_hash=$(_get_hash_internal "$real_config")
                 _CONFIG_HASH_CACHE["$config_file"]="$config_hash"
             fi

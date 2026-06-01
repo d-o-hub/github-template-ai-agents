@@ -3,16 +3,16 @@ set -euo pipefail
 
 # Check if GitHub CLI and jq are installed
 if ! command -v gh &> /dev/null || ! command -v jq &> /dev/null; then
-    echo "Error: GitHub CLI (gh) and jq are required."
-    echo "Install gh: https://cli.github.com/"
-    echo "Install jq: https://stedolan.github.io/jq/"
+    echo "Error: GitHub CLI (gh) and jq are required." >&2
+    echo "Install gh: https://cli.github.com/" >&2
+    echo "Install jq: https://stedolan.github.io/jq/" >&2
     exit 1
 fi
 
 # Check if running in CI mode
 CI_MODE="${1:-}"
 
-if [ "$CI_MODE" == "--ci" ]; then
+if [[ "$CI_MODE" == "--ci" ]]; then
     echo "Running in CI mode - skipping interactive prompts"
     # In CI, we don't delete existing labels to avoid race conditions
     # Labels should be managed separately or initialized once

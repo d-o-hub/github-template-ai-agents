@@ -9,15 +9,15 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 # Source libraries
-if [ -f "$REPO_ROOT/scripts/lib/command-categories.sh" ]; then
+if [[ -f "$REPO_ROOT/scripts/lib/command-categories.sh" ]]; then
     source "$REPO_ROOT/scripts/lib/command-categories.sh"
 fi
 
-if [ -f "$REPO_ROOT/scripts/lib/command-cache.sh" ]; then
+if [[ -f "$REPO_ROOT/scripts/lib/command-cache.sh" ]]; then
     source "$REPO_ROOT/scripts/lib/command-cache.sh"
 fi
 
-if [ -f "$REPO_ROOT/scripts/lib/command-invalidation.sh" ]; then
+if [[ -f "$REPO_ROOT/scripts/lib/command-invalidation.sh" ]]; then
     source "$REPO_ROOT/scripts/lib/command-invalidation.sh"
 fi
 
@@ -27,7 +27,7 @@ CONFIG_FILE=".command-verify.conf"
 readonly UNKNOWN_CATEGORY="unknown"
 
 # Load config if exists
-[ -f "$CONFIG_FILE" ] && source "$CONFIG_FILE"
+[[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
 
 # Parse arguments
 FORCE=false
@@ -85,12 +85,12 @@ if ! $SILENT; then
 fi
 
 DISCOVERED_COMMANDS=""
-if [ -x "./scripts/discover-commands.sh" ]; then
+if [[ -x "./scripts/discover-commands.sh" ]]; then
     DISCOVERED_COMMANDS=$(./scripts/discover-commands.sh 2>/dev/null | grep -v "^Discovering\|^Command\|^─\|^\$" || printf "")
 fi
 
 COMMAND_COUNT=0
-if [ -n "$DISCOVERED_COMMANDS" ]; then
+if [[ -n "$DISCOVERED_COMMANDS" ]]; then
     COMMAND_COUNT=$(printf "%s\n" "$DISCOVERED_COMMANDS" | grep -c . || printf "0")
 fi
 
@@ -117,7 +117,7 @@ if type get_changed_files &> /dev/null; then
     CHANGED_FILES=$(get_changed_files 2>/dev/null || printf "")
 fi
 CHANGED_COUNT=0
-if [ -n "$CHANGED_FILES" ]; then
+if [[ -n "$CHANGED_FILES" ]]; then
     CHANGED_COUNT=$(printf "%s\n" "$CHANGED_FILES" | grep -c . || printf "0")
 fi
 
@@ -131,7 +131,7 @@ CACHE_HITS=0
 declare -a FAILED_COMMANDS=()
 declare -A CATEGORY_COUNT=(["safe"]=0 ["conditional"]=0 ["dangerous"]=0 ["$UNKNOWN_CATEGORY"]=0)
 
-if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
+if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
     # Pre-parse JSON to avoid O(N) jq subshells inside the loop
     # Use NUL delimiter to safely handle multiline commands
     # Format: file\0line\0command\0
@@ -142,13 +142,13 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
     while IFS= read -r -d '' file && \
           IFS= read -r -d '' line && \
           IFS= read -r -d '' cmd; do
-        [ -z "$cmd" ] && continue
+        [[ -z "$cmd" ]] && continue
 
         # Check cache first
         CACHED=false
         if ! $FORCE && type get_cached_result &> /dev/null; then
             cached_result=$(get_cached_result "$file" "$line" 2>/dev/null || printf "")
-            if [ -n "$cached_result" ]; then
+            if [[ -n "$cached_result" ]]; then
                 # Check if this command needs invalidation
                 if type should_invalidate_command &> /dev/null; then
                     if ! should_invalidate_command "$cmd" "$file" "$CHANGED_FILES" 2>/dev/null; then
@@ -163,7 +163,7 @@ if [ -n "$DISCOVERED_COMMANDS" ] && ! $QUICK; then
                             cached_cat="$UNKNOWN_CATEGORY"
                         fi
 
-                        if [ -n "$cached_cat" ]; then
+                        if [[ -n "$cached_cat" ]]; then
                             CATEGORY_COUNT[$cached_cat]=$((CATEGORY_COUNT[$cached_cat]+1))
                         fi
                         continue

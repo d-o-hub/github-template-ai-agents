@@ -85,4 +85,5 @@ See: web_research/_summary.json
 EOF
 
     echo "$synthesis_file"
+    return 0
 }

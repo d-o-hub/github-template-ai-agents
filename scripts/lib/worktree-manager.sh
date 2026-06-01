@@ -15,6 +15,7 @@ cleanup_worktrees() {
             git worktree remove --force -- "$wt" 2>/dev/null || true
         fi
     done
+    return 0
 }
 
 setup_worktree() {

@@ -97,6 +97,7 @@ get_category_description() {
         unknown) printf "Category not determined - manual review recommended\n" ;;
         *) printf "Unknown category: %s\n" "$1" ;;
     esac
+    return 0
 }
 
 is_safe_to_run() {
@@ -121,6 +122,7 @@ print_category_badge() {
         unknown) color='\033[0;36m' ;;
         *) color='\033[0m' ;;
     esac
+    return 0
     # Security: Use printf for safe variable output
     printf "${color}[%s]${NC}\n" "$category"
 }

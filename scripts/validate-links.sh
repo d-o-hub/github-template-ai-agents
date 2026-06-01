@@ -119,7 +119,7 @@ check_link() {
     local full_path="$skill_dir/$clean_path"
 
     # Security check: Ensure the path is within REPO_ROOT (Path Traversal prevention)
-    if [ -z "$HAS_REALPATH" ]; then
+    if [[ -z "$HAS_REALPATH" ]]; then
         if command -v realpath &> /dev/null; then HAS_REALPATH=1; else HAS_REALPATH=0; fi
     fi
 
@@ -131,7 +131,7 @@ check_link() {
         fi
     fi
 
-    if [ "$HAS_REALPATH" -eq 1 ] && [ -n "$RESOLVED_ROOT" ]; then
+    if [[ "$HAS_REALPATH" -eq 1 ]] && [[ -n "$RESOLVED_ROOT" ]]; then
         # Performance optimization: Use pre-resolved root to avoid subshell
         local resolved_path
         resolved_path=$(realpath -m "$full_path" 2>/dev/null)

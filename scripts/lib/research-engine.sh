@@ -26,6 +26,8 @@ resolve_with_optimization() {
         "reference")
             resolve_args+=("--profile" "quality" "--validate-all")
             ;;
+        *)
+            ;;
     esac
 
     local result

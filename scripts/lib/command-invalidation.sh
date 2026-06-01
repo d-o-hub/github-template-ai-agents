@@ -71,7 +71,7 @@ get_affected_commands() {
     local extracted
     extracted=$(printf "%s\n" "$commands_json" | jq -r 'select(.command != null and .command != "null") | "\(.file)\t\(.command)"' 2>/dev/null || printf "")
 
-    if [ -z "$extracted" ]; then
+    if [[ -z "$extracted" ]]; then
         return 0
     fi
 
@@ -114,7 +114,7 @@ get_affected_commands() {
     done <<< "$extracted"
 
     # Output unique affected commands
-    if [ ${#affected[@]} -gt 0 ]; then
+    if [[ ${#affected[@]} -gt 0 ]]; then
         printf '%s\n' "${affected[@]}" | sort -u
     fi
 }
@@ -141,7 +141,7 @@ build_invalidation_report() {
         count=$(printf "%s\n" "$affected" | grep -c . || true)
         count=${count:-0}
 
-        if [ "$count" -gt 0 ]; then
+        if [[ "$count" -gt 0 ]]; then
             printf "File: %s → %s commands to revalidate\n" "$file" "$count"
             total_affected=$((total_affected + count))
         fi

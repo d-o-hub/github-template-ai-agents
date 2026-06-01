@@ -32,7 +32,7 @@ fi
 # Ensure .git/hooks directory exists
 # This shouldn't happen in a valid git repo, but we handle it gracefully
 if [[ ! -d "$HOOKS_DIR" ]]; then
-    echo "Error: .git/hooks directory not found. Are you in a git repository?"
+    echo "Error: .git/hooks directory not found. Are you in a git repository?" >&2
     exit 1
 fi
 

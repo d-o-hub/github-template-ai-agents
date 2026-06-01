@@ -18,7 +18,7 @@ trap 'rm -f "$TEMP_FILE" "$UPDATE_AGENTS_TEMP_TABLE"' EXIT ERR
 
 # Check if AGENTS.md exists
 if [[ ! -f "$AGENTS_FILE" ]]; then
-    echo "Error: AGENTS.md not found at $AGENTS_FILE"
+    echo "Error: AGENTS.md not found at $AGENTS_FILE" >&2
     exit 1
 fi
 
