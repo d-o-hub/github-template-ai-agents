@@ -13,7 +13,7 @@ cd "$REPO_ROOT" || exit 1
 
 # Source lint-cache library
 # shellcheck source=scripts/lib/lint_cache.sh
-if [ -f "$REPO_ROOT/scripts/lib/lint_cache.sh" ]; then
+if [[ -f "$REPO_ROOT/scripts/lib/lint_cache.sh" ]]; then
     # shellcheck source=scripts/lib/lint_cache.sh
     source "$REPO_ROOT/scripts/lib/lint_cache.sh"
 fi
@@ -40,7 +40,7 @@ FAILED=0
 DETECTED_LANGUAGES=()
 
 # Determine the current context
-GITHUB_EVENT="${GITHUB_EVENT:-${GITHUB_EVENT_NAME:-}}"
+GITHUB_EVENT="${GITHUB_EVENT:-}"
 GITHUB_REF="${GITHUB_REF:-}"
 
 # Check if we're on main branch
@@ -56,7 +56,7 @@ printf "Running quality gate...\n"
 printf "\n"
 
 # --- Validate git hooks configuration (prevent global hooks from overriding local) ---
-if [ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]; then
+if [[ "${SKIP_GLOBAL_HOOKS_CHECK:-false}" != "true" ]]; then
     printf "%bValidating git hooks configuration...%b\n" "${BLUE}" "${NC}"
     if ! ./scripts/validate-git-hooks.sh; then
         FAILED=1
@@ -67,7 +67,7 @@ fi
 # --- LLM Context files check ---
 printf "%bChecking LLM context files...%b\n" "${BLUE}" "${NC}"
 if [[ ! -f "llms.txt" ]] || [[ ! -f "llms-full.txt" ]]; then
-    if [[ "$GITHUB_EVENT" == "pull_request" ]]; then
+    if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
         printf "%b  ⚠ llms.txt or llms-full.txt missing (auto-generated on main by workflow)%b\n" "${YELLOW}" "${NC}"
         DRIFT_DETECTED=true
     elif [[ "$ON_MAIN_BRANCH" == "true" ]]; then
@@ -95,7 +95,7 @@ else
 
     llms_ok=true
     if ! diff -q llms.txt "$TMP_LLMS" > /dev/null; then
-        if [[ "$GITHUB_EVENT" == "pull_request" ]]; then
+        if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
             printf "%b  ⚠ llms.txt is out of date (auto-fixed on main by workflow)%b\n" "${YELLOW}" "${NC}"
         else
             printf "%b  ✗ llms.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
@@ -106,7 +106,7 @@ else
     fi
 
     if ! diff -q llms-full.txt "$TMP_LLMS_FULL" > /dev/null; then
-        if [[ "$GITHUB_EVENT" == "pull_request" ]]; then
+        if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
             printf "%b  ⚠ llms-full.txt is out of date (auto-fixed on main by workflow)%b\n" "${YELLOW}" "${NC}"
         else
             printf "%b  ✗ llms-full.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
@@ -130,7 +130,7 @@ fi
 printf "\n"
 
 # --- Validate Gemini TOML commands ---
-if [ -d ".gemini/commands" ]; then
+if [[ -d ".gemini/commands" ]]; then
     printf "%bValidating Gemini TOML commands...%b\n" "${BLUE}" "${NC}"
     if ! python3 ./scripts/validate_gemini_toml.py; then
         FAILED=1
@@ -195,25 +195,25 @@ printf "\n"
 printf "%bDetecting project languages...%b\n" "${BLUE}" "${NC}"
 
 # Rust detection
-if [ -f "Cargo.toml" ]; then
+if [[ -f "Cargo.toml" ]]; then
     printf "  %b✓%b Rust (Cargo.toml)\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("rust")
 fi
 
 # TypeScript/JavaScript detection
-if [ -f "package.json" ]; then
+if [[ -f "package.json" ]]; then
     printf "  %b✓%b TypeScript/JavaScript (package.json)\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("typescript")
 fi
 
 # Python detection
-if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ] || [ -f "setup.py" ]; then
+if [[ -f "requirements.txt" ]] || [[ -f "pyproject.toml" ]] || [[ -f "setup.py" ]]; then
     printf "  %b✓%b Python (requirements.txt/pyproject.toml)\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("python")
 fi
 
 # Go detection
-if [ -f "go.mod" ]; then
+if [[ -f "go.mod" ]]; then
     printf "  %b✓%b Go (go.mod)\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("go")
 fi
@@ -230,7 +230,7 @@ if find . -name "*.md" -not -path "./.git/*" -print -quit | grep -q .; then
     DETECTED_LANGUAGES+=("markdown")
 fi
 
-if [ ${#DETECTED_LANGUAGES[@]} -eq 0 ]; then
+if [[ ${#DETECTED_LANGUAGES[@]} -eq 0 ]]; then
     printf "%b  No recognized project files found.%b\n" "${YELLOW}" "${NC}"
 fi
 printf "\n"
@@ -248,7 +248,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " rust " ]]; then
         else
             printf "%b  ✓ cargo fmt passed%b\n" "${GREEN}" "${NC}"
         fi
-        if [ "${SKIP_CLIPPY:-false}" != "true" ]; then
+        if [[ "${SKIP_CLIPPY:-false}" != "true" ]]; then
             if ! OUTPUT=$(cargo clippy --all-targets -- -D warnings 2>&1); then
                 printf "%b  ✗ cargo clippy failed%b\n" "${RED}" "${NC}"
                 printf "%s\n" "$OUTPUT" >&2
@@ -257,7 +257,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " rust " ]]; then
                 printf "%b  ✓ cargo clippy passed%b\n" "${GREEN}" "${NC}"
             fi
         fi
-        if [ "${SKIP_TESTS:-false}" != "true" ]; then
+        if [[ "${SKIP_TESTS:-false}" != "true" ]]; then
             if ! OUTPUT=$(cargo test --lib 2>&1); then
                 printf "%b  ✗ cargo test failed%b\n" "${RED}" "${NC}"
                 printf "%s\n" "$OUTPUT" >&2
@@ -288,7 +288,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " typescript " ]]; then
         else
             printf "%b  ✓ pnpm typecheck passed%b\n" "${GREEN}" "${NC}"
         fi
-        if [ "${SKIP_TESTS:-false}" != "true" ]; then
+        if [[ "${SKIP_TESTS:-false}" != "true" ]]; then
             if ! OUTPUT=$(pnpm test 2>&1); then
                 printf "%b  ✗ pnpm test failed%b\n" "${RED}" "${NC}"
                 printf "%s\n" "$OUTPUT" >&2
@@ -306,16 +306,16 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
     printf "%bRunning Shell script checks...%b\n" "${BLUE}" "${NC}"
     if command -v shellcheck &> /dev/null; then
         SHELL_SCRIPTS=$(find . -name "*.sh" -not -path "./.git/*" -not -path "./target/*" 2>/dev/null || true)
-        if [ -n "$SHELL_SCRIPTS" ]; then
+        if [[ -n "$SHELL_SCRIPTS" ]]; then
             sc_failed=0
             while IFS= read -r script; do
-                [ -n "$script" ] || continue
+                [[ -n "$script" ]] || continue
                 if ! lint_if_changed "$script" "shellcheck" ".shellcheckrc" shellcheck --severity=error -f quiet -- "$script" >/dev/null 2>&1; then
                     printf "%b  ✗ shellcheck failed: %s%b\n" "${RED}" "$script" "${NC}"
                     sc_failed=1
                 fi
             done <<< "$SHELL_SCRIPTS"
-            if [ $sc_failed -eq 0 ]; then
+            if [[ $sc_failed -eq 0 ]]; then
                 printf "%b  ✓ shellcheck passed%b\n" "${GREEN}" "${NC}"
             else
                 FAILED=1
@@ -330,11 +330,11 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
     printf "%bRunning Markdown checks...%b\n" "${BLUE}" "${NC}"
     if command -v markdownlint &> /dev/null; then
         MD_FILES=$(find . -name "*.md" -not -path "*/node_modules/*" -not -path "./target/*" -not -path "./.git/*" -not -path "./vendor/*" 2>/dev/null || true)
-        if [ -n "$MD_FILES" ]; then
+        if [[ -n "$MD_FILES" ]]; then
             md_failed=0
             TMP_MD_OUT=$(mktemp)
             while IFS= read -r md_file; do
-                [ -n "$md_file" ] || continue
+                [[ -n "$md_file" ]] || continue
                 if ! lint_if_changed "$md_file" "markdownlint" ".markdownlintrc" markdownlint -- "$md_file" >"$TMP_MD_OUT" 2>&1; then
                     printf "%b  ✗ markdownlint failed: %s%b\n" "${RED}" "$md_file" "${NC}"
                     cat "$TMP_MD_OUT" >&2
@@ -342,7 +342,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
                 fi
             done <<< "$MD_FILES"
             rm -f "$TMP_MD_OUT"
-            if [ $md_failed -eq 0 ]; then
+            if [[ $md_failed -eq 0 ]]; then
                 printf "%b  ✓ markdownlint passed%b\n" "${GREEN}" "${NC}"
             else
                 FAILED=1
@@ -353,8 +353,8 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
 fi
 
 # Special handling for drift detection based on context
-if [ "$DRIFT_DETECTED" = true ]; then
-    if [ "$GITHUB_EVENT" = "pull_request" ]; then
+if [[ "$DRIFT_DETECTED" == "true" ]]; then
+    if [[ "$GITHUB_EVENT" == "pull_request" ]]; then
         # During pull_request, print warning but exit 0
         printf "%b─────────────────────────────────────────────────────────────────%b\n" "${YELLOW}" "${NC}"
         printf "%b│ ⚠ Quality Gate: Drift detected (warning only during PR)     │%b\n" "${YELLOW}" "${NC}"
@@ -362,7 +362,7 @@ if [ "$DRIFT_DETECTED" = true ]; then
         printf "\n"
         printf "Languages checked: %s\n" "${DETECTED_LANGUAGES[*]}"
         exit 0
-    elif [ "$ON_MAIN_BRANCH" = true ]; then
+    elif [[ "$ON_MAIN_BRANCH" == "true" ]]; then
         # On main branch, exit with 1
         printf "%b─────────────────────────────────────────────────────────────────%b\n" "${RED}" "${NC}"
         printf "%b│ ✗ Quality Gate FAILED (drift on main branch)                │%b\n" "${RED}" "${NC}"
@@ -374,7 +374,7 @@ if [ "$DRIFT_DETECTED" = true ]; then
 fi
 
 # Final status
-if [ $FAILED -ne 0 ]; then
+if [[ $FAILED -ne 0 ]]; then
     printf "%b─────────────────────────────────────────────────────────────────%b\n" "${RED}" "${NC}"
     printf "%b│ ✗ Quality Gate FAILED                                         │%b\n" "${RED}" "${NC}"
     printf "%b─────────────────────────────────────────────────────────────────%b\n" "${RED}" "${NC}"

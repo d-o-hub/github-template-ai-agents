@@ -17,7 +17,7 @@ UPDATE_AGENTS_TEMP_TABLE=$(mktemp /tmp/temp-table-XXXXXX)  # Define before trap
 trap 'rm -f "$TEMP_FILE" "$UPDATE_AGENTS_TEMP_TABLE"' EXIT ERR
 
 # Check if AGENTS.md exists
-if [ ! -f "$AGENTS_FILE" ]; then
+if [[ ! -f "$AGENTS_FILE" ]]; then
     echo "Error: AGENTS.md not found at $AGENTS_FILE"
     exit 1
 fi
@@ -26,9 +26,9 @@ echo "Updating AGENTS.md skill table..."
 
 # Find the line number of the skills section header
 # Supports both "### Available Skills" (template) and "## Skills" (customized)
-SKILLS_SECTION_LINE=$(grep -nE -e "^(### Available Skills|## Skills)" -- "$AGENTS_FILE" | head -n 1 -- | cut -d: -f1)
+SKILLS_SECTION_LINE=$(grep -nE -e "^(### Available Skills|## Skills)" -- "$AGENTS_FILE" | head -n 1 | cut -d: -f1)
 
-if [ -z "$SKILLS_SECTION_LINE" ]; then
+if [[ -z "$SKILLS_SECTION_LINE" ]]; then
     echo "Error: Could not find skills section header in AGENTS.md"
     exit 1
 fi
@@ -54,7 +54,7 @@ cat >> "$TEMP_FILE" << 'TABLE_HEADER'
 TABLE_HEADER
 
 # Generate skill rows by scanning .agents/skills/
-if [ -d "$REPO_ROOT/.agents/skills" ]; then
+if [[ -d "$REPO_ROOT/.agents/skills" ]]; then
     # Use array to hold valid SKILL.md paths
     shopt -s nullglob
     SKILL_MD_FILES=("$REPO_ROOT/.agents/skills"/*/"SKILL.md")
@@ -145,8 +145,8 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
 fi
 
 # Sort the table rows (excluding header) alphabetically by skill name
-head -n $((SKILLS_SECTION_LINE + 3)) "$TEMP_FILE" > "$UPDATE_AGENTS_TEMP_TABLE"
-tail -n +$((SKILLS_SECTION_LINE + 4)) "$TEMP_FILE" | sort >> "$UPDATE_AGENTS_TEMP_TABLE"
+head -n $((SKILLS_SECTION_LINE + 3)) -- "$TEMP_FILE" > "$UPDATE_AGENTS_TEMP_TABLE"
+tail -n +$((SKILLS_SECTION_LINE + 4)) -- "$TEMP_FILE" | sort >> "$UPDATE_AGENTS_TEMP_TABLE"
 mv -- "$UPDATE_AGENTS_TEMP_TABLE" "$TEMP_FILE"
 
 # Add empty line before next section

@@ -6,19 +6,19 @@ set -euo pipefail
 
 COMMIT_MSG_FILE="${1:-}"
 
-if [ -z "$COMMIT_MSG_FILE" ]; then
+if [[ -z "$COMMIT_MSG_FILE" ]]; then
     echo "Error: No commit message file specified."
     echo "Usage: $0 <commit-msg-file>"
     exit 1
 fi
 
-if [ ! -f "$COMMIT_MSG_FILE" ]; then
+if [[ ! -f "$COMMIT_MSG_FILE" ]]; then
     echo "Error: Commit message file not found: $COMMIT_MSG_FILE"
     exit 1
 fi
 
 # Run commitlint
-if ! npx commitlint --edit -- "$COMMIT_MSG_FILE"; then
+if ! npx commitlint --edit "$COMMIT_MSG_FILE"; then
     exit 1
 fi
 
