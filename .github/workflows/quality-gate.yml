@@ -1,7 +1,8 @@
 ---
 name: Quality Gate
 
-'on':
+# yamllint disable-line rule:truthy
+on:
   push:
   pull_request:
 
@@ -46,7 +47,7 @@ jobs:
           set -euo pipefail
 
           if [ -x ./scripts/quality_gate.sh ]; then
-            SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/quality_gate.sh
+            ./scripts/quality_gate.sh
           else
             echo "scripts/quality_gate.sh not found or not executable" >&2
             exit 1
