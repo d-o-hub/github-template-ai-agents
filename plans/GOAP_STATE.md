@@ -2,10 +2,12 @@
 
 ## Current State
 
-- PR #401: Sentinel hardening of utility scripts against option injection
-- Branch: `sentinel/harden-utility-scripts-12598819953247361667`
-- Base: `main`
-- All local quality gates passing
+- PR #414: WASM size gate performance improvement
+- Branch: `jules-perf-wasm-size-gate-17911831025962272705`
+- Base: `main` (rebased)
+- Commit: `620720e` - perf(wasm): batch stat calls to eliminate loop subshells in wasm_size_gate.sh
+- Changes: 2 files (scripts/wasm_size_gate.sh, .jules/bolt.md) — 38 additions, 16 deletions
+- **Status: MONITORING CI**
 
 ## Target State
 
@@ -15,14 +17,14 @@
 
 ## Actions Queue
 
-1. [x] Fix YAML block scalar indentation in 5 workflow files (ci-and-labels.yml, cleanup.yml, knowledge-cleanup.yml, security-scan.yml, update-llms-txt.yml)
-2. [x] Harden `ls -A` with `--` delimiter in validate-skills.sh
-3. [x] Fix markdownlint MD022 blank line in .jules/sentinel.md
-4. [x] Squash all non-compliant commits into single conventional commit
-5. [x] Fix yamllint disable-line comments moved inside block scalars
-6. [ ] Verify all GitHub Actions pass after force push
-7. [ ] Resolve all review conversations
-8. [ ] Merge PR
+1. [x] Rebase onto main to resolve merge conflicts
+2. [x] Revert quality_gate.sh regression (restored from main)
+3. [x] Revert ci-and-labels.yml cosmetic change (restored from main)
+4. [x] Fix .jules/bolt.md markdownlint MD022 (blank line around headings)
+5. [x] Restore deleted files (cleanup-ci-status-prs.sh, test files)
+6. [x] Squash 4 duplicate commits into one properly formatted conventional commit
+7. [x] Fix commit scope (wasi → wasm) and add STAT_CMD safety comment
+8. [ ] Verify all CI checks passing after latest push
 
 ## Blockers
 
