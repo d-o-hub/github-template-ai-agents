@@ -143,6 +143,8 @@ After **every** completed task, the agent MUST append a JSON entry to `.agents/m
 
 #### Recent Project-Wide Learnings
 
+- **Locale-Independent Sort**: Use `LC_ALL=C sort` for committed generator output to prevent CI drift (LESSON-018)
+- **Nested node_modules**: Use `*/node_modules/*` in `find` to exclude at any depth, not just root (LESSON-019)
 - **CI Symlink Dependency**: Always run `setup-skills.sh` before `validate-skills.sh` in CI workflows (LESSON-017)
 - **Action SHA Pinning**: Pin to 40-char SHAs for security (LESSON-016)
 - **Worktree Cleanup**: Use `trap cleanup EXIT ERR` and `CREATED_WORKTREES` (LESSON-010)

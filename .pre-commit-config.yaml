@@ -37,7 +37,7 @@ repos:
     rev: v0.39.0
     hooks:
       - id: markdownlint
-        args: ['--config', 'markdownlint.toml']
+        args: ['--config', '.markdownlintrc']
 
   # Local hooks (custom quality gate)
   - repo: local
