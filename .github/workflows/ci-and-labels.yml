@@ -202,11 +202,10 @@ jobs:
     if: always()
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4.2.2
-        with:
-          ref: main
 
       - name: Setup Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v5.3.0
@@ -219,16 +218,13 @@ jobs:
           WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: python3 scripts/update-ci-status.py
 
-      - name: Commit CI status directly to main
-        run: |
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
-          if git diff --staged --quiet; then
-            echo "No changes to CI status"
-            exit 0
-          fi
-
-          git commit -m "ci: update ci status artifacts [skip ci]"
-          git pull --rebase origin main && git push origin main
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1  # v7.0.5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "ci: update ci status artifacts [skip ci]"
+          title: "ci: update ci status artifacts"
+          body: "Automated CI status update."
+          branch: ci/status-update
+          base: main
+          delete-branch: true

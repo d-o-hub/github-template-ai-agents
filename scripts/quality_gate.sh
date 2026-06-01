@@ -40,7 +40,7 @@ FAILED=0
 DETECTED_LANGUAGES=()
 
 # Determine the current context
-GITHUB_EVENT="${GITHUB_EVENT:-}"
+GITHUB_EVENT="${GITHUB_EVENT:-${GITHUB_EVENT_NAME:-}}"
 GITHUB_REF="${GITHUB_REF:-}"
 
 # Check if we're on main branch
@@ -67,7 +67,7 @@ fi
 # --- LLM Context files check ---
 printf "%bChecking LLM context files...%b\n" "${BLUE}" "${NC}"
 if [[ ! -f "llms.txt" ]] || [[ ! -f "llms-full.txt" ]]; then
-    if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+    if [[ "$GITHUB_EVENT" == "pull_request" ]]; then
         printf "%b  ⚠ llms.txt or llms-full.txt missing (auto-generated on main by workflow)%b\n" "${YELLOW}" "${NC}"
         DRIFT_DETECTED=true
     elif [[ "$ON_MAIN_BRANCH" == "true" ]]; then
@@ -95,7 +95,7 @@ else
 
     llms_ok=true
     if ! diff -q llms.txt "$TMP_LLMS" > /dev/null; then
-        if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+        if [[ "$GITHUB_EVENT" == "pull_request" ]]; then
             printf "%b  ⚠ llms.txt is out of date (auto-fixed on main by workflow)%b\n" "${YELLOW}" "${NC}"
         else
             printf "%b  ✗ llms.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
@@ -106,7 +106,7 @@ else
     fi
 
     if ! diff -q llms-full.txt "$TMP_LLMS_FULL" > /dev/null; then
-        if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+        if [[ "$GITHUB_EVENT" == "pull_request" ]]; then
             printf "%b  ⚠ llms-full.txt is out of date (auto-fixed on main by workflow)%b\n" "${YELLOW}" "${NC}"
         else
             printf "%b  ✗ llms-full.txt is out of date. Run ./scripts/generate-llms-txt.sh%b\n" "${RED}" "${NC}"
