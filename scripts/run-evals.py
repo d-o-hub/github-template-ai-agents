@@ -21,6 +21,11 @@ from lib.eval_executors import run_command_check, run_file_validation
 from lib.eval_types import EvalReport, EvalResult, EvalStatus, EvalType, SkillEvalResult
 from lib.eval_validators import load_evals_file, run_structure_check, validate_evals_format
 
+EVALS_FILENAME = "evals.json"
+EVALS_SUBDIR = "evals"
+SEPARATOR_DOUBLE = "=" * 70
+SEPARATOR_SINGLE = "-" * 40
+
 
 def run_eval_case(
     eval_case: dict,
@@ -58,7 +63,7 @@ def evaluate_skill(
     result = SkillEvalResult(
         skill_name=skill_name, skill_path=skill_path, status=EvalStatus.PASS
     )
-    evals_path = skill_path / "evals" / "evals.json"
+    evals_path = skill_path / EVALS_SUBDIR / EVALS_FILENAME
     data, error = load_evals_file(evals_path)
     if error:
         result.errors.append(error)
@@ -105,7 +110,7 @@ def discover_skills(skills_dir: Path, specific_skill: str | None = None) -> list
         if ".." in specific_skill or skill_path.is_absolute():
             return []
         skill_path = skills_dir / specific_skill
-        evals_path = skill_path / "evals" / "evals.json"
+        evals_path = skill_path / EVALS_SUBDIR / EVALS_FILENAME
         if skill_path.is_dir() and evals_path.exists():
             return [skill_path]
         return []
@@ -114,7 +119,7 @@ def discover_skills(skills_dir: Path, specific_skill: str | None = None) -> list
         return skills
     for path in sorted(skills_dir.iterdir()):
         if path.is_dir():
-            evals_path = path / "evals" / "evals.json"
+            evals_path = path / EVALS_SUBDIR / EVALS_FILENAME
             if evals_path.exists():
                 skills.append(path)
     return skills
@@ -123,12 +128,12 @@ def discover_skills(skills_dir: Path, specific_skill: str | None = None) -> list
 def generate_text_report(report: EvalReport) -> str:
     """Generate a human-readable text report."""
     lines: list[str] = []
-    lines.append("=" * 70)
+    lines.append(SEPARATOR_DOUBLE)
     lines.append("SKILL EVALUATION REPORT")
-    lines.append("=" * 70)
+    lines.append(SEPARATOR_DOUBLE)
     lines.append("")
     lines.append("SUMMARY")
-    lines.append("-" * 40)
+    lines.append(SEPARATOR_SINGLE)
     lines.append(f"Total skills evaluated: {report.total_skills}")
     lines.append(f"  - Passed: {report.skills_passed}")
     lines.append(f"  - Failed: {report.skills_failed}")
@@ -144,7 +149,7 @@ def generate_text_report(report: EvalReport) -> str:
         lines.append("OVERALL STATUS: FAIL")
     lines.append("")
     lines.append("DETAILED RESULTS")
-    lines.append("-" * 40)
+    lines.append(SEPARATOR_SINGLE)
     for skill_result in report.skill_results:
         status_icon = "PASS" if skill_result.status == EvalStatus.PASS else "FAIL"
         lines.append(f"\n[{status_icon}] {skill_result.skill_name}")
@@ -169,7 +174,7 @@ def generate_text_report(report: EvalReport) -> str:
                 for detail in eval_result.details:
                     lines.append(f"            - {detail}")
     lines.append("")
-    lines.append("=" * 70)
+    lines.append(SEPARATOR_DOUBLE)
     return "\n".join(lines)
 
 

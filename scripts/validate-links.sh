@@ -66,17 +66,23 @@ PROPER_REF_REGEX='^\-[[:space:]]+\`(references?/[a-zA-Z0-9_-]+\.md)\`[[:space:]]
 
 # Function to check if a line starts the References section
 is_references_header() {
-    [[ "$1" =~ ^##[[:space:]]+[Rr]eferences ]]
+    local line="$1"
+    [[ "$line" =~ ^##[[:space:]]+[Rr]eferences ]]
+    return $?
 }
 
 # Function to check if a line starts a new section (## header)
 is_section_header() {
-    [[ "$1" =~ ^##[[:space:]]+ ]] && ! [[ "$1" =~ ^##[[:space:]]+[Rr]eferences ]]
+    local line="$1"
+    [[ "$line" =~ ^##[[:space:]]+ ]] && ! [[ "$line" =~ ^##[[:space:]]+[Rr]eferences ]]
+    return $?
 }
 
 # Function to check if a path is a URL (http/https)
 is_url() {
-    [[ "$1" =~ ^https?:// ]] || [[ "$1" =~ ^ftp:// ]] || [[ "$1" =~ ^mailto: ]]
+    local url="$1"
+    [[ "$url" =~ ^https?:// ]] || [[ "$url" =~ ^ftp:// ]] || [[ "$url" =~ ^mailto: ]]
+    return $?
 }
 
 # Cache for realpath existence check
@@ -148,11 +154,8 @@ check_link() {
         if [[ -e "$resolved_path" || -L "$resolved_path" ]]; then
             return 0
         fi
-    else
-        # Fallback if realpath not available: basic existence check
-        if [[ -e "$full_path" || -L "$full_path" ]]; then
-            return 0
-        fi
+    elif [[ -e "$full_path" || -L "$full_path" ]]; then
+        return 0
     fi
 
     printf "  ${RED}✗${NC} Broken link at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
@@ -183,11 +186,9 @@ check_reference_format() {
     fi
 
     # Check for proper format: - `references?/filename.md` - description
-    if [[ "$line" =~ ^-[[:space:]] ]]; then
-        # This looks like a reference entry
-            if ! [[ "$line" =~ $PROPER_REF_REGEX ]]; then
-            # Check if it has markdown link format [text](path)
-            if [[ "$line" =~ \[.+\]\((references?/.+)\) ]]; then
+    if [[ "$line" =~ ^-[[:space:]] ]] && ! [[ "$line" =~ $PROPER_REF_REGEX ]]; then
+        # Check if it has markdown link format [text](path)
+        if [[ "$line" =~ \[.+\]\((references?/.+)\) ]]; then
                 local link_path="${BASH_REMATCH[1]}"
                 printf "  ${RED}✗${NC} Invalid reference format at line %s\n" "$line_num" >&2
                 printf "     Found: Markdown link [text](%s)\n" "$link_path" >&2
@@ -195,7 +196,6 @@ check_reference_format() {
                 printf "     in: %s\n" "$skill_file" >&2
                 return 1
             fi
-        fi
     fi
 
     return 0
