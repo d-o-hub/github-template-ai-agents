@@ -14,10 +14,13 @@ trap 'rm -rf "$TEST_DIR"' EXIT
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
+PASSED_MSG='%bPASSED%b\n'
 
 assert_contains() {
-    if ! grep -F -q -- "$1" "$2"; then
-        printf "%bFAILED: Expected '%s' in %s%b\n" "$RED" "$1" "$2" "$NC"
+    local expected="$1"
+    local file="$2"
+    if ! grep -F -q -- "$expected" "$file"; then
+        printf "%bFAILED: Expected '%s' in %s%b\n" "$RED" "$expected" "$file" "$NC" >&2
         exit 1
     fi
 }
@@ -54,7 +57,7 @@ export LLMS_FULL_TXT="$TEST_DIR/llms-full-1.txt"
 
 # The description should be parsed and included in the output
 assert_contains "This is a folded description that spans multiple lines and should be parsed correctly." "$LLMS_TXT"
-printf "%bPASSED%b\n" "$GREEN" "$NC"
+printf "$PASSED_MSG" "$GREEN" "$NC"
 
 # Test 2: Block scalar modifier '|+' (literal style)
 printf "Test 2: Parsing '|+' block scalar modifier... "
@@ -81,7 +84,7 @@ export LLMS_FULL_TXT="$TEST_DIR/llms-full-2.txt"
 # The description should be parsed with preserved spacing
 assert_contains "This is a literal description" "$LLMS_TXT"
 assert_contains "with   multiple   spaces" "$LLMS_TXT"
-printf "%bPASSED%b\n" "$GREEN" "$NC"
+printf "$PASSED_MSG" "$GREEN" "$NC"
 
 # Test 3: Block scalar modifier with inline content
 printf "Test 3: Parsing '>-' with inline content... "
@@ -104,7 +107,7 @@ export LLMS_FULL_TXT="$TEST_DIR/llms-full-3.txt"
 )
 
 assert_contains "This is a single-line folded description." "$LLMS_TXT"
-printf "%bPASSED%b\n" "$GREEN" "$NC"
+printf "$PASSED_MSG" "$GREEN" "$NC"
 
 # Test 4: Block scalar modifier with inline content
 printf "Test 4: Parsing '|+' with inline content... "
@@ -127,6 +130,6 @@ export LLMS_FULL_TXT="$TEST_DIR/llms-full-4.txt"
 )
 
 assert_contains "This is a literal single-line description." "$LLMS_TXT"
-printf "%bPASSED%b\n" "$GREEN" "$NC"
+printf "$PASSED_MSG" "$GREEN" "$NC"
 
-printf "\nAll block scalar modifier tests %bPASSED%b\n" "$GREEN" "$NC"
+printf "\nAll block scalar modifier tests $PASSED_MSG" "$GREEN" "$NC"

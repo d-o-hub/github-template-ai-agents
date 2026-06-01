@@ -21,7 +21,7 @@ echo "Running option injection tests..."
 echo "Testing chmod..."
 touch -- "-v"
 chmod +x -- "-v"
-if [ ! -x "-v" ]; then
+if [[ ! -x "-v" ]]; then
     echo "FAILED: chmod -v failed"
     (exit 1)
 fi
@@ -52,7 +52,7 @@ echo "✓ head/tail test passed"
 # Test 4: mv with hyphenated filename
 echo "Testing mv..."
 mv -- "-v" "new-v"
-if [ ! -f "new-v" ]; then
+if [[ ! -f "new-v" ]]; then
     echo "FAILED: mv -v failed"
     (exit 1)
 fi

@@ -31,7 +31,7 @@ if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
 fi
 
 # If no skills exist, nothing to validate
-if [ ! -d "$SKILLS_SRC" ] || [ -z "$(ls -A -- "$SKILLS_SRC" 2>/dev/null)" ]; then
+if [[ ! -d "$SKILLS_SRC" ]] || [[ -z "$(ls -A -- "$SKILLS_SRC" 2>/dev/null)" ]]; then
     echo "No skills in .agents/skills/ - nothing to validate."
     exit 0
 fi
@@ -74,7 +74,7 @@ for skill_path in "$SKILLS_SRC"/*/; do
     # Check 3: Validate CLI symlinks
     # Performance optimization: Pre-calculate expected target once per skill
     expected_target=""
-    if { [ "${CHECK_SYMLINK_TARGETS:-false}" = "true" ] || [ -n "${CI:-}" ]; } && [ "$HAS_READLINK_F" -eq 1 ]; then
+    if { [[ "${CHECK_SYMLINK_TARGETS:-false}" == "true" ]] || [[ -n "${CI:-}" ]]; } && [[ "$HAS_READLINK_F" -eq 1 ]]; then
         expected_target=$(readlink -f -- "$skill_path" 2>/dev/null || printf "")
     fi
 

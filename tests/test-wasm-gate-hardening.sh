@@ -26,13 +26,13 @@ printf "dummy wasm content" > "$MALICIOUS_FILE"
         if grep -q "OK: ./-e.wasm" output.log; then
              echo "  ✓ Test 1 detail: Filename correctly reported in output"
         else
-             echo "  ✗ Test 1 detail: Filename NOT correctly reported in output"
-             cat output.log
+             echo "  ✗ Test 1 detail: Filename NOT correctly reported in output" >&2
+             cat output.log >&2
              exit 1
         fi
     else
-        echo "  ✗ Test 1 failed: Script crashed or failed on -e.wasm"
-        cat output.log
+        echo "  ✗ Test 1 failed: Script crashed or failed on -e.wasm" >&2
+        cat output.log >&2
         exit 1
     fi
 )
@@ -46,16 +46,16 @@ dd if=/dev/zero of="$LARGE_FILE" bs=1024 count=2048 2>/dev/null
 (
     cd "$TEST_TEMP_DIR"
     if "$WASM_GATE" > output.log 2>&1; then
-        echo "  ✗ Test 2 failed: Script should have failed on oversized file"
-        cat output.log
+        echo "  ✗ Test 2 failed: Script should have failed on oversized file" >&2
+        cat output.log >&2
         exit 1
     else
         echo "  ✓ Test 2 passed: Script correctly identified oversized file"
         if grep -q "ERROR: ./large.wasm size 2097152 exceeds limit" output.log; then
              echo "  ✓ Test 2 detail: Correct error message shown"
         else
-             echo "  ✗ Test 2 detail: Incorrect or missing error message"
-             cat output.log
+             echo "  ✗ Test 2 detail: Incorrect or missing error message" >&2
+             cat output.log >&2
              exit 1
         fi
     fi

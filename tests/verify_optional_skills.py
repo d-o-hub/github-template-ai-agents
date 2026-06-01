@@ -3,13 +3,18 @@ import subprocess
 import shutil
 import sys
 
+QWEN_SKILLS_DIR = ".qwen/skills"
+QWEN_DIR = ".qwen"
+VALIDATE_SKILLS_SCRIPT = "./scripts/validate-skills.sh"
+CLAUDE_SKILLS_DIR = ".claude/skills"
+
 def run(cmd, env=None):
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env={**os.environ, **(env or {})})
     stdout, stderr = process.communicate()
     return process.returncode, stdout.decode(), stderr.decode()
 
 def cleanup():
-    for d in [".claude/skills", ".qwen/skills"]:
+    for d in [CLAUDE_SKILLS_DIR, QWEN_SKILLS_DIR]:
         if os.path.exists(d):
             # We only want to remove the specific optional skills we added
             # to avoid breaking other tests if they run in parallel (unlikely here but good practice)
@@ -27,7 +32,7 @@ def test():
     cleanup()
     code, out, err = run("./scripts/setup-skills.sh")
     # It should skip for both .claude and .qwen
-    if "skip (optional): .claude/skills/eu-ai-act-compliance" in out and "skip (optional): .qwen/skills/eu-ai-act-compliance" in out:
+    if "skip (optional): .claude/skills/eu-ai-act-compliance" in out and f"skip (optional): {QWEN_SKILLS_DIR}/eu-ai-act-compliance" in out:
         print("✓ Test 1 Passed: skipped optional skill by default for all CLIs")
     else:
         print("✗ Test 1 Failed: optional skill not skipped correctly")
@@ -37,7 +42,7 @@ def test():
     # Test 2: LINK_OPTIONAL=true
     cleanup()
     code, out, err = run("./scripts/setup-skills.sh", env={"LINK_OPTIONAL": "true"})
-    if "linked: .claude/skills/eu-ai-act-compliance" in out and "linked: .qwen/skills/eu-ai-act-compliance" in out:
+    if "linked: .claude/skills/eu-ai-act-compliance" in out and f"linked: {QWEN_SKILLS_DIR}/eu-ai-act-compliance" in out:
         print("✓ Test 2 Passed: linked optional skill when requested for all CLIs")
     else:
         print("✗ Test 2 Failed: optional skill not linked correctly")
@@ -46,7 +51,7 @@ def test():
 
     # Test 3: validate-skills.sh passes when missing from CLI dirs
     cleanup()
-    code, out, err = run("./scripts/validate-skills.sh")
+    code, out, err = run(VALIDATE_SKILLS_SCRIPT)
     if code == 0:
         print("✓ Test 3 Passed: validate-skills.sh handles missing optional skills in CLI dirs")
     else:
@@ -63,7 +68,7 @@ def test():
         with open(skill_md, "w") as f:
             f.write("Invalid content\n")
 
-        code, out, err = run("./scripts/validate-skills.sh")
+        code, out, err = run(VALIDATE_SKILLS_SCRIPT)
         os.remove(skill_md)
         os.rename(bak_md, skill_md)
 
@@ -84,13 +89,13 @@ def test():
         return False
 
     # Test 6: validate-skills.sh handles missing CLI directory entirely
-    if os.path.exists(".qwen/skills"):
-        shutil.rmtree(".qwen/skills")
+    if os.path.exists(QWEN_SKILLS_DIR):
+        shutil.rmtree(QWEN_SKILLS_DIR)
     # Also remove the parent if it's empty to be thorough
-    if os.path.exists(".qwen") and not os.listdir(".qwen"):
-        os.rmdir(".qwen")
+    if os.path.exists(QWEN_DIR) and not os.listdir(QWEN_DIR):
+        os.rmdir(QWEN_DIR)
 
-    code, out, err = run("./scripts/validate-skills.sh")
+    code, out, err = run(VALIDATE_SKILLS_SCRIPT)
     if code == 0:
         print("✓ Test 6 Passed: validate-skills.sh passes when a CLI directory is entirely missing")
     else:
