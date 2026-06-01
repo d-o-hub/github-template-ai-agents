@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 @test "workflow uses fixed ci/status-update branch" {
-    grep -q 'PR_BRANCH="ci/status-update"' .github/workflows/ci-and-labels.yml
+    grep -q "PR_BRANCH=\"ci/status-update\"" .github/workflows/ci-and-labels.yml
 }
 
 @test "workflow uses gh pr create command" {
@@ -9,9 +9,15 @@
 }
 
 @test "workflow includes skip ci in commit message" {
-    grep -q "commit -m \"ci: update ci status artifacts \[skip ci\]\"" .github/workflows/ci-and-labels.yml
+    grep -q "commit -m \"ci: update ci status artifacts \\[skip ci\\]\"" .github/workflows/ci-and-labels.yml
 }
 
 @test "workflow targets base via TARGET_BRANCH variable" {
     grep -q "TARGET_BRANCH" .github/workflows/ci-and-labels.yml
+}
+
+@test "workflow has concurrency configuration" {
+    grep -q "concurrency:" .github/workflows/ci-and-labels.yml
+    grep -q "group: ci-status-\\\${{ github.ref }}" .github/workflows/ci-and-labels.yml
+    grep -q "cancel-in-progress: true" .github/workflows/ci-and-labels.yml
 }
