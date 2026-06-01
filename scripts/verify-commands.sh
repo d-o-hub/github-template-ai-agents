@@ -202,7 +202,7 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
         ((VALIDATED++))
 
         # Track dangerous commands
-        if [ "$category" = "dangerous" ]; then
+        if [[ "$category" == "dangerous" ]]; then
             FAILED_COMMANDS+=("$cmd")
         fi
     done < "$TMP_PARSED_COMMANDS"
@@ -246,7 +246,7 @@ else
         printf "    Dangerous:     ${RED}%s${NC}\n" "$TOTAL_DANGEROUS"
         printf "    Unknown:       %s\n" "$TOTAL_UNKNOWN"
 
-        if [ ${#FAILED_COMMANDS[@]} -gt 0 ]; then
+        if [[ ${#FAILED_COMMANDS[@]} -gt 0 ]]; then
             printf "\n"
             printf "${RED}⚠️  Dangerous commands found:${NC}\n"
             for cmd in "${FAILED_COMMANDS[@]}"; do
@@ -255,7 +255,7 @@ else
         fi
 
         printf "\n"
-        if [ ${#FAILED_COMMANDS[@]} -eq 0 ]; then
+        if [[ ${#FAILED_COMMANDS[@]} -eq 0 ]]; then
             printf "${GREEN}✅ All commands validated successfully${NC}\n"
         else
             printf "${YELLOW}❌ Review required for %s dangerous commands${NC}\n" "${#FAILED_COMMANDS[@]}"

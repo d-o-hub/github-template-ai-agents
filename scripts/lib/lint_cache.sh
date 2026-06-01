@@ -4,7 +4,7 @@
 # Stored in .git/lint-cache/
 
 # Ensure REPO_ROOT is set
-if [ -z "${REPO_ROOT:-}" ]; then
+if [[ -z "${REPO_ROOT:-}" ]]; then
     REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 fi
 

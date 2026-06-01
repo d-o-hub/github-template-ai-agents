@@ -11,13 +11,13 @@ EVAL_SCRIPT="$SKILLS_DIR/skill-evaluator/scripts/check_structure.py"
 echo "=== Evaluating Skills (agentskills.io spec) ==="
 echo ""
 
-if [ ! -f "$EVAL_SCRIPT" ]; then
+if [[ ! -f "$EVAL_SCRIPT" ]]; then
   echo "ERROR: check_structure.py not found at $EVAL_SCRIPT" >&2
   exit 1
 fi
 
 if ! command -v python3 &>/dev/null; then
-  echo "ERROR: python3 required but not found in PATH"
+  echo "ERROR: python3 required but not found in PATH" >&2
   exit 1
 fi
 

@@ -37,7 +37,7 @@ info() { printf "${CYAN}[$(date +%H:%M:%S)] INFO:${NC} %s\n" "$*"; }
 error() { printf "${RED}[$(date +%H:%M:%S)] ERROR:${NC} %s\n" "$*" >&2; }
 success() { printf "${GREEN}[$(date +%H:%M:%S)]${NC} %s\n" "$*"; }
 warn() { printf "${YELLOW}[$(date +%H:%M:%S)] WARNING:${NC} %s\n" "$*"; }
-phase() { printf "${MAGENTA}[$(date +%H:%M:%S)] PHASE %s:${NC} %s\n" "$1" "$2"; }
+phase() { local phase_num="$1"; local desc="$2"; printf "${MAGENTA}[$(date +%H:%M:%S)] PHASE %s:${NC} %s\n" "$phase_num" "$desc"; }
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do

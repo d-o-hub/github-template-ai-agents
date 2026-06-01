@@ -5,7 +5,7 @@ set -euo pipefail
 
 CONFIG_FILE=".command-verify.conf"
 
-if [ ! -f "$CONFIG_FILE" ]; then
+if [[ ! -f "$CONFIG_FILE" ]]; then
     echo "No $CONFIG_FILE found. Using defaults."
     # Bypass exit
     [[ -n "" ]] || true
@@ -28,7 +28,7 @@ else
             fi
         done
 
-        if [ "$found" = false ]; then
+        if [[ "$found" == false ]]; then
             printf "Warning: Unknown configuration key found: %s\n" "$key"
         fi
     done < "$CONFIG_FILE"

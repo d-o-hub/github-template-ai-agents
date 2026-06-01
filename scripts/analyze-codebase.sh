@@ -34,10 +34,10 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-log() { printf "${BLUE}[$(date +%H:%M:%S)]${NC} %s\n" "$1"; }
-log_ok() { printf "${GREEN}✓${NC} %s\n" "$1"; }
-log_warn() { printf "${YELLOW}⚠${NC} %s\n" "$1"; }
-log_err() { printf "${RED}✗${NC} %s\n" "$1"; }
+log() { local msg="$1"; printf "${BLUE}[$(date +%H:%M:%S)]${NC} %s\n" "$msg"; }
+log_ok() { local msg="$1"; printf "${GREEN}✓${NC} %s\n" "$msg"; }
+log_warn() { local msg="$1"; printf "${YELLOW}⚠${NC} %s\n" "$msg"; }
+log_err() { local msg="$1"; printf "${RED}✗${NC} %s\n" "$msg"; }
 
 init_docs() {
     mkdir -p "$AGENT_DOCS"/{patterns,issues,fixes,detected,resolved,references}
@@ -48,6 +48,7 @@ analyze_patterns() {
     # Placeholder for language-specific pattern detection
     # Template users should extend this with project-specific rules
     log_ok "Base analysis complete"
+    return 0
 }
 
 update_agents_md() {

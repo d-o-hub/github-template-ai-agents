@@ -93,7 +93,7 @@ if [[ -d "$REPO_ROOT/.opencode/agents" ]]; then
     for agent_file in "$REPO_ROOT/.opencode/agents"/*.md; do
         [[ -f "$agent_file" ]] || continue
         # Skip symlinks to .agents/skills
-        [ -L "$agent_file" ] && continue
+        [[ -L "$agent_file" ]] && continue
         ((++OPENCODE_COUNT))
         extract_agent_info "$agent_file" "OpenCode" >> "$TEMP_FILE"
     done

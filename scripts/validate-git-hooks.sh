@@ -21,7 +21,7 @@ fi
 GLOBAL_HOOKS_PATH=$(git config --global core.hooksPath 2>/dev/null || true)
 LOCAL_HOOKS_PATH=$(git config --local core.hooksPath 2>/dev/null || true)
 
-if [ -n "$GLOBAL_HOOKS_PATH" ]; then
+if [[ -n "$GLOBAL_HOOKS_PATH" ]]; then
     printf "%b\n" "${RED}✗ ERROR: Global git hooks path is set!${NC}"
     printf "   Global hooks path: ${YELLOW}%s${NC}\n" "$GLOBAL_HOOKS_PATH"
     echo ""
@@ -42,7 +42,7 @@ if [ -n "$GLOBAL_HOOKS_PATH" ]; then
 fi
 
 # Check if local hooks path is correctly set
-if [ -n "$LOCAL_HOOKS_PATH" ] && [ "$LOCAL_HOOKS_PATH" != ".git/hooks" ] && [ "$LOCAL_HOOKS_PATH" != ".githooks" ]; then
+if [[ -n "$LOCAL_HOOKS_PATH" ]] && [[ "$LOCAL_HOOKS_PATH" != ".git/hooks" ]] && [[ "$LOCAL_HOOKS_PATH" != ".githooks" ]]; then
     printf "%b\n" "${RED}✗ ERROR: Local hooks path is non-standard!${NC}"
     printf "   Local hooks path: ${YELLOW}%s${NC}\n" "$LOCAL_HOOKS_PATH"
     echo ""
