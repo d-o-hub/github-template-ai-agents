@@ -815,4 +815,80 @@ jobs:
 
 **References**:
 - GitHub Security Best Practices: <https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions>
+
+---
+
+### LESSON-018: Locale-Dependent Sort Causes CI Drift Detection
+
+**Date**: 2026-05-31
+**Component**: Scripts / CI/CD / Quality Gate
+**Severity**: High
+
+**Issue**: Quality Gate detects "drift on main branch" because `llms-full.txt` regenerated in CI differs from the committed version, even though no content changed.
+
+**Symptoms**:
+- `llms-full.txt` drift detected only in CI, not locally
+- File content appears identical but `diff` shows differences
+- macOS passes quality gate, Linux CI fails
+- Skill ordering differs between regeneration runs
+
+**Root Cause**:
+1. **Locale-dependent `sort`**: The `generate-llms-txt.sh` script uses `sort` without `LC_ALL=C`, causing different byte ordering on macOS (BSD sort) vs Linux (GNU sort)
+2. **`LC_COLLATE` differences**: macOS and Linux have different default collation rules
+3. **Skill directory ordering**: `SKILL_DIRS=$(printf "%s\n" .agents/skills/*/ | sort)` orders skills differently across platforms
+
+**Solution**:
+
+```bash
+# Pin sort to C locale for bytewise, platform-independent ordering
+SKILL_DIRS=$(printf "%s\n" .agents/skills/*/ | LC_ALL=C sort)
+```
+
+**Prevention**:
+- Always use `LC_ALL=C` with `sort` in scripts that produce committed output
+- Run `generate-llms-txt.sh` and check for drift before committing skill changes
+- Consider adding a CI step that regenerates and warns on drift (already implemented)
+- Document locale sensitivity in script comments
+
+**Files Modified**:
+- `scripts/generate-llms-txt.sh` - Added `LC_ALL=C` before `sort`
+- `llms-full.txt` - Regenerated with stable ordering
+
+---
+
+### LESSON-019: Nested node_modules Not Excluded from Quality Gate Find
+
+**Date**: 2026-05-31
+**Component**: Scripts / Quality Gate / Markdown Lint
+**Severity**: Medium
+
+**Issue**: Quality gate markdown lint fails on files inside `.opencode/node_modules/` because the `find` exclusion pattern only matches `./node_modules/*`, not nested paths.
+
+**Symptoms**:
+- `markdownlint` reports violations in `.opencode/node_modules/toml/README.md`
+- Quality gate fails on third-party vendored markdown files
+- `git check-ignore` confirms the files are gitignored but quality gate still scans them
+
+**Root Cause**:
+1. **`find` pattern too narrow**: `-not -path "./node_modules/*"` only matches `node_modules` at the root
+2. **Nested modules**: `.opencode/node_modules/` is a valid path not matched by `./node_modules/*`
+3. **No vendor exclusion**: `./vendor/*` was also not excluded
+
+**Solution**:
+
+```bash
+# Use */node_modules/* to match node_modules at any level
+find . -name '*.md' \
+  -not -path "*/node_modules/*" \
+  -not -path "./vendor/*"
+```
+
+**Prevention**:
+- Always use `*/prefix/*` patterns in `find` to match at any depth
+- Regularly audit quality gate for false positives from vendored files
+- Prefer `git ls-files` for listing tracked files instead of `find` when possible
+
+**Files Modified**:
+- `scripts/quality_gate.sh` - Changed `./node_modules/*` to `*/node_modules/*` and added `-not -path "./vendor/*"`
+
 ---
