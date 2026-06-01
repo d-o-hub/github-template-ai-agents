@@ -238,7 +238,7 @@ jobs:
           PR_BRANCH="ci/status-update"
           git checkout -b "$PR_BRANCH" -- 2>/dev/null || git checkout "$PR_BRANCH" --
           git commit -m "ci: update ci status artifacts [skip ci]"
-          git push origin -- "$PR_BRANCH" --force
+          git push origin --force -- "$PR_BRANCH"
 
           # Check if a PR already exists for this branch
           EXISTING_PR=$(gh pr list --head "$PR_BRANCH" --state open \

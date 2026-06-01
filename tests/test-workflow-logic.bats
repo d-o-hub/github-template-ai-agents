@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
-@test "workflow uses ci-status-update branch pattern" {
-    grep -q 'PR_BRANCH="ci-status-update-' .github/workflows/ci-and-labels.yml
+@test "workflow uses fixed ci/status-update branch" {
+    grep -q 'PR_BRANCH="ci/status-update"' .github/workflows/ci-and-labels.yml
 }
 
 @test "workflow uses gh pr create command" {
