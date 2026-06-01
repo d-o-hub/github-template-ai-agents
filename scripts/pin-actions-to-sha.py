@@ -62,7 +62,7 @@ def pin_actions(content: str) -> tuple[str, int]:
 
 def main() -> int:
     repo_root = Path(__file__).resolve().parent.parent
-    workflows_dir = repo_root / WORKFLOWS_DIR_NAME.replace("/", "/").split("/")[0] / WORKFLOWS_DIR_NAME.split("/")[1]
+    workflows_dir = repo_root / WORKFLOWS_DIR_NAME
 
     if not workflows_dir.is_dir():
         print("Error: .github/workflows directory not found", file=sys.stderr)

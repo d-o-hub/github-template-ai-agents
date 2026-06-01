@@ -34,7 +34,7 @@ if [[ ${#CHECK_PATHS[@]} -eq 0 ]]; then
 fi
 
 for wf in "${CHECK_PATHS[@]}"; do
-    [ -e "$wf" ] || continue
+    [[ -e "$wf" ]] || continue
     printf "Checking %s...\n" "$wf"
 
     current_block=""
@@ -122,7 +122,7 @@ for wf in "${CHECK_PATHS[@]}"; do
     ' "$wf")
 done
 
-if [ $FAILED -ne 0 ]; then
+if [[ $FAILED -ne 0 ]]; then
     printf "\n${RED}Validation FAILED${NC}\n"
     exit 1
 else

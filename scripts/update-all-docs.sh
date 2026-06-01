@@ -35,7 +35,7 @@ else
     ./scripts/verify-commands.sh --quick --silent || verify_status=$?
 fi
 
-if [ "$verify_status" -ne 0 ]; then
+if [[ "$verify_status" -ne 0 ]]; then
     echo "Error: Command verification failed with status $verify_status"
     exit "$verify_status"
 fi

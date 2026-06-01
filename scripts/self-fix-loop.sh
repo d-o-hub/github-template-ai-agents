@@ -32,11 +32,11 @@ else
     RED=''; GREEN=''; YELLOW=''; BLUE=''; CYAN=''; MAGENTA=''; NC=''
 fi
 
-log() { printf "${BLUE}[$(date +%H:%M:%S)]${NC} %s\n" "$*"; }
-info() { printf "${CYAN}[$(date +%H:%M:%S)] INFO:${NC} %s\n" "$*"; }
-error() { printf "${RED}[$(date +%H:%M:%S)] ERROR:${NC} %s\n" "$*" >&2; }
-success() { printf "${GREEN}[$(date +%H:%M:%S)]${NC} %s\n" "$*"; }
-warn() { printf "${YELLOW}[$(date +%H:%M:%S)] WARNING:${NC} %s\n" "$*"; }
+log() { local msg="$*"; printf "${BLUE}[$(date +%H:%M:%S)]${NC} %s\n" "$msg"; }
+info() { local msg="$*"; printf "${CYAN}[$(date +%H:%M:%S)] INFO:${NC} %s\n" "$msg"; }
+error() { local msg="$*"; printf "${RED}[$(date +%H:%M:%S)] ERROR:${NC} %s\n" "$msg" >&2; }
+success() { local msg="$*"; printf "${GREEN}[$(date +%H:%M:%S)]${NC} %s\n" "$msg"; }
+warn() { local msg="$*"; printf "${YELLOW}[$(date +%H:%M:%S)] WARNING:${NC} %s\n" "$msg"; }
 phase() { local phase_num="$1"; local desc="$2"; printf "${MAGENTA}[$(date +%H:%M:%S)] PHASE %s:${NC} %s\n" "$phase_num" "$desc"; }
 
 # Parse arguments

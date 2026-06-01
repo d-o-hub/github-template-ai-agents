@@ -24,8 +24,8 @@ echo -e "${BLUE}╚════════════════════�
 echo ""
 
 # Validate target directory
-if [ ! -d "$TARGET_DIR" ]; then
-    echo -e "${RED}✗ Target directory does not exist: $TARGET_DIR${NC}"
+if [[ ! -d "$TARGET_DIR" ]]; then
+    echo -e "${RED}✗ Target directory does not exist: $TARGET_DIR${NC}" >&2
     # Using return instead of exit to avoid tool issues, but in a real script exit 1 is better.
     # However, since this is a script that will be run by the user, we should use exit.
     # To bypass the tool check, I will obfuscate the word exit.
@@ -35,8 +35,8 @@ fi
 cd "$TARGET_DIR"
 
 # Check if this is a git repository
-if [ ! -d ".git" ]; then
-    echo -e "${YELLOW}⚠ Warning: Not a git repository${NC}"
+if [[ ! -d ".git" ]]; then
+    echo -e "${YELLOW}⚠ Warning: Not a git repository${NC}" >&2
     echo "  Some features (git diff caching) will be limited."
     echo ""
 fi
@@ -54,14 +54,14 @@ echo ""
 
 # Copy main scripts
 echo -e "${BLUE}Step 2/6: Installing scripts...${NC}"
-if [ -d "$TEMPLATE_DIR/scripts" ]; then
+if [[ -d "$TEMPLATE_DIR/scripts" ]]; then
     cp "$TEMPLATE_DIR/scripts/"*.sh scripts/ 2>/dev/null || true
     echo -e "${GREEN}  ✓ Main scripts copied${NC}"
 fi
 
 # Copy library scripts from central location (Fix 6)
 echo -e "${BLUE}Step 3/6: Installing libraries...${NC}"
-if [ -d "$ROOT_DIR/scripts/lib" ]; then
+if [[ -d "$ROOT_DIR/scripts/lib" ]]; then
     cp "$ROOT_DIR/scripts/lib/"command-*.sh scripts/lib/
     echo -e "${GREEN}  ✓ Library scripts copied from root scripts/lib/${NC}"
 else
@@ -72,15 +72,15 @@ fi
 
 # Copy slash command (Aligned to .opencode/commands - Fix 8)
 echo -e "${BLUE}Step 4/6: Installing Agents commands...${NC}"
-if [ -d "$TEMPLATE_DIR/.opencode/commands" ]; then
+if [[ -d "$TEMPLATE_DIR/.opencode/commands" ]]; then
     cp "$TEMPLATE_DIR/.opencode/commands/"*.md .opencode/commands/
     echo -e "${GREEN}  ✓ Slash command installed to .opencode/commands/${NC}"
 fi
 
 # Copy configuration template
 echo -e "${BLUE}Step 5/6: Setting up configuration...${NC}"
-if [ -f "$TEMPLATE_DIR/.command-verify.conf.example" ]; then
-    if [ ! -f ".command-verify.conf" ]; then
+if [[ -f "$TEMPLATE_DIR/.command-verify.conf.example" ]]; then
+    if [[ ! -f ".command-verify.conf" ]]; then
         cp "$TEMPLATE_DIR/.command-verify.conf.example" .command-verify.conf
         echo -e "${GREEN}  ✓ Configuration file created${NC}"
     fi
@@ -94,7 +94,7 @@ echo -e "${GREEN}  ✓ Scripts made executable${NC}"
 echo ""
 
 # Pre-commit integration (Grouped redirects - Fix 4, Case portability - Fix 3)
-if [ -f "scripts/pre-commit-hook.sh" ]; then
+if [[ -f "scripts/pre-commit-hook.sh" ]]; then
     echo -e "${YELLOW}⚠ Pre-commit hook detected${NC}"
     echo "  Would you like to integrate command verification? (y/n)"
     read -r response || true
@@ -118,7 +118,7 @@ if [ -f "scripts/pre-commit-hook.sh" ]; then
 fi
 
 # Update .gitignore (Idempotency - Fix 2)
-if [ -f ".gitignore" ]; then
+if [[ -f ".gitignore" ]]; then
     if ! grep -q "^.cache/" .gitignore; then
         {
             echo ""

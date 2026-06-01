@@ -43,7 +43,7 @@ HAS_READLINK_F=""
 if readlink -f -- . &>/dev/null; then HAS_READLINK_F=1; else HAS_READLINK_F=0; fi
 
 for skill_path in "$SKILLS_SRC"/*/; do
-    [ -d "$skill_path" ] || continue
+    [[ -d "$skill_path" ]] || continue
     # Performance optimization: Use Bash parameter expansion instead of basename
     skill_name="${skill_path%/}"
     skill_name="${skill_name##*/}"
@@ -66,7 +66,7 @@ for skill_path in "$SKILLS_SRC"/*/; do
 
     # Check 2: Circular symlink detection for the skill directory
     # On Windows, we skip this check as MSYS/Cygwin symlinks appear as files
-    if [ "$IS_WINDOWS" = "false" ] && [ -L "$skill_path" ]; then
+    if [[ "$IS_WINDOWS" == "false" ]] && [[ -L "$skill_path" ]]; then
         printf "  ${RED}✗${NC} %s: Circular symlink detected\n" "$skill_name" >&2
         FAILED=1
     fi
@@ -80,7 +80,7 @@ for skill_path in "$SKILLS_SRC"/*/; do
 
     for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
         # Skip validation if the CLI skill directory doesn't exist
-        if [ ! -d "$REPO_ROOT/$cli_dir" ]; then
+        if [[ ! -d "$REPO_ROOT/$cli_dir" ]]; then
             continue
         fi
 
@@ -94,14 +94,14 @@ for skill_path in "$SKILLS_SRC"/*/; do
                 break
             fi
         done
-        if [[ "$is_optional" == true ]] && [ ! -L "$link" ] && [ ! -f "$link" ]; then
+        if [[ "$is_optional" == true ]] && [[ ! -L "$link" ]] && [[ ! -f "$link" ]]; then
             continue
         fi
 
-        if [ ! -L "$link" ] && { [ "$IS_WINDOWS" = "false" ] || [ ! -f "$link" ]; }; then
+        if [[ ! -L "$link" ]] && { [[ "$IS_WINDOWS" == "false" ]] || [[ ! -f "$link" ]]; }; then
             printf "  ${RED}✗${NC} MISSING symlink: %s/%s\n" "$cli_dir" "$skill_name" >&2
             FAILED=1
-        elif [ ! -d "$link" ] && { [ "$IS_WINDOWS" = "false" ] || [ ! -f "$link" ]; }; then
+        elif [[ ! -d "$link" ]] && { [[ "$IS_WINDOWS" == "false" ]] || [[ ! -f "$link" ]]; }; then
             # Optimized: check if target exists without subshell if possible
             # -d on a symlink already checks target existence
             printf "  ${RED}✗${NC} BROKEN symlink: %s/%s\n" "$cli_dir" "$skill_name" >&2
@@ -109,10 +109,10 @@ for skill_path in "$SKILLS_SRC"/*/; do
         else
             # Verify symlink points to correct location
             # Only do this expensive check if explicitly requested or in CI
-            if [ -n "$expected_target" ]; then
+            if [[ -n "$expected_target" ]]; then
                 target=$(readlink -f -- "$link" 2>/dev/null || printf "")
 
-                if [ -n "$target" ] && [ "$target" != "$expected_target" ]; then
+                if [[ -n "$target" ]] && [[ "$target" != "$expected_target" ]]; then
                     printf "  ${YELLOW}⚠${NC} WRONG target: %s/%s\n" "$cli_dir" "$skill_name" >&2
                     printf "     expected: %s\n" "$expected_target"
                     printf "     actual:   %s\n" "$target"
@@ -127,7 +127,7 @@ done
 echo ""
 echo "Checking skill-rules.json..."
 RULES_FILE="$REPO_ROOT/.agents/skill-rules.json"
-if [ -f "$RULES_FILE" ]; then
+if [[ -f "$RULES_FILE" ]]; then
     if ! python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$RULES_FILE" 2>/dev/null; then
         printf "  ${RED}✗${NC} skill-rules.json: Invalid JSON\n" >&2
         FAILED=1
@@ -140,7 +140,7 @@ else
     echo "  (No skill-rules.json found)"
 fi
 
-if [ $FAILED -ne 0 ]; then
+if [[ $FAILED -ne 0 ]]; then
     echo ""
     echo -e "${RED}─────────────────────────────────────────────────────────────────${NC}"
     echo -e "${RED}│ ✗ Skill Validation FAILED                                     │${NC}"

@@ -37,7 +37,7 @@ fi
 # Supports both "### Context Discipline" and "## Security"
 NEXT_SECTION_LINE=$(grep -nE -e "^(### Context Discipline|## Security)" -- "$AGENTS_FILE" | cut -d: -f1 | awk -v start="$SKILLS_SECTION_LINE" -- '$1 > start { print $1; exit }')
 
-if [ -z "$NEXT_SECTION_LINE" ]; then
+if [[ -z "$NEXT_SECTION_LINE" ]]; then
     # Fallback to end of file if no next section found
     NEXT_SECTION_LINE=$(wc -l < "$AGENTS_FILE")
     NEXT_SECTION_LINE=$((NEXT_SECTION_LINE + 1))

@@ -14,7 +14,7 @@ CONDITIONAL_PATTERNS=()
 DANGEROUS_PATTERNS=()
 
 # Load project-specific configuration if available
-if [ -f ".command-verify.conf" ]; then
+    if [[ -f ".command-verify.conf" ]]; then
     # shellcheck source=/dev/null
     source ".command-verify.conf"
 fi
@@ -28,7 +28,7 @@ categorize_command() {
 
     # Check custom dangerous patterns first (E3)
     for pattern in "${DANGEROUS_PATTERNS[@]:-}"; do
-        [ -z "$pattern" ] && continue
+        [[ -z "$pattern" ]] && continue
         if [[ "$cmd_lower" == *"$pattern"* ]]; then
             printf "dangerous\n"
             return 0
@@ -38,7 +38,7 @@ categorize_command() {
     # Check dangerous keywords
     IFS=':' read -ra keywords <<< "$DANGEROUS_KEYWORDS"
     for keyword in "${keywords[@]}"; do
-        [ -z "$keyword" ] && continue
+        [[ -z "$keyword" ]] && continue
         if [[ "$cmd_lower" == *"$keyword"* ]]; then
             printf "dangerous\n"
             return 0
@@ -47,7 +47,7 @@ categorize_command() {
 
     # Check custom conditional patterns (E3)
     for pattern in "${CONDITIONAL_PATTERNS[@]:-}"; do
-        [ -z "$pattern" ] && continue
+        [[ -z "$pattern" ]] && continue
         if [[ "$cmd_lower" == *"$pattern"* ]]; then
             printf "conditional\n"
             return 0
@@ -57,7 +57,7 @@ categorize_command() {
     # Check conditional keywords
     IFS=':' read -ra keywords <<< "$CONDITIONAL_KEYWORDS"
     for keyword in "${keywords[@]}"; do
-        [ -z "$keyword" ] && continue
+        [[ -z "$keyword" ]] && continue
         if [[ "$cmd_lower" == *"$keyword"* ]]; then
             printf "conditional\n"
             return 0
@@ -66,7 +66,7 @@ categorize_command() {
 
     # Check custom safe patterns (E3)
     for pattern in "${SAFE_PATTERNS[@]:-}"; do
-        [ -z "$pattern" ] && continue
+        [[ -z "$pattern" ]] && continue
         if [[ "$cmd_lower" == *"$pattern"* ]]; then
             printf "safe\n"
             return 0
@@ -76,7 +76,7 @@ categorize_command() {
     # Check safe keywords
     IFS=':' read -ra keywords <<< "$SAFE_KEYWORDS"
     for keyword in "${keywords[@]}"; do
-        [ -z "$keyword" ] && continue
+        [[ -z "$keyword" ]] && continue
         if [[ "$cmd_lower" == *"$keyword"* ]]; then
             printf "safe\n"
             return 0
@@ -103,13 +103,13 @@ get_category_description() {
 is_safe_to_run() {
     local category
     category=$(categorize_command "$1")
-    [ "$category" = "safe" ]
+    [[ "$category" == "safe" ]]
 }
 
 requires_warning() {
     local category
     category=$(categorize_command "$1")
-    [ "$category" = "dangerous" ] || [ "$category" = "conditional" ]
+    [[ "$category" == "dangerous" ]] || [[ "$category" == "conditional" ]]
 }
 
 print_category_badge() {

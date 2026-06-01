@@ -25,7 +25,7 @@ DEFAULT_INVALIDATION_RULES=(
 )
 
 # Load configuration if available
-if [ -f ".command-verify.conf" ]; then
+if [[ -f ".command-verify.conf" ]]; then
     # shellcheck source=/dev/null
     source ".command-verify.conf"
 fi
@@ -91,7 +91,7 @@ get_affected_commands() {
 
     # Read extracted commands once and check against matched rules
     while IFS=$'\t' read -r cmd_file cmd; do
-        [ -z "$cmd" ] && continue
+        [[ -z "$cmd" ]] && continue
 
         for rule in "${matched_rules[@]}"; do
             local file_pattern="${rule%%:*}"
