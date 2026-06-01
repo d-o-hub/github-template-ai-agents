@@ -8,7 +8,7 @@ if [ "$1" = "repo" ]; then
     echo "owner/repo"
 elif [ "$1" = "pr" ]; then
     if [ "$2" = "list" ]; then
-        if [[ "$*" == *"--author app/github-actions"* ]] && [[ "$*" == *"--search ci: update ci status artifacts"* ]]; then
+        if [[ "$*" == *"--author"* ]] && [[ "$*" == *"app/github-actions"* ]] && [[ "$*" == *"--search"* ]] && [[ "$*" == *"ci: update ci status artifacts"* ]]; then
             echo "123 branch-123"
         else
             echo ""
