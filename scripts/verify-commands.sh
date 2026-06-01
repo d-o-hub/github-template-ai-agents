@@ -279,7 +279,7 @@ fi
 save_current_commit 2>/dev/null || true
 
 # Exit code
-if [ ${#FAILED_COMMANDS[@]} -gt 0 ] && [ "${FAIL_ON_DANGEROUS:-false}" = "true" ]; then
+if [[ ${#FAILED_COMMANDS[@]} -gt 0 ]] && [[ "${FAIL_ON_DANGEROUS:-false}" == "true" ]]; then
     exit 1
 fi
 

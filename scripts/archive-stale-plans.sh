@@ -43,14 +43,10 @@ for file in "$PLANS_DIR"/*-progress-update-*.md; do
   fi
 
   # Lexicographical comparison of ISO 8601 dates works perfectly
-  if [[ "$file_date" < "$CUTOFF_DATE" ]]; then
-    # We will do a batched move, but we should also handle the "already exists" case
-    # to maintain exactly the same behavior as before
-    if [[ -f "$ARCHIVE_DIR/$filename" ]]; then
-      printf "  ~ %s already exists in archive, skipped\n" "$filename"
-    else
-      files_to_move+=("$file")
-    fi
+  if [[ "$file_date" < "$CUTOFF_DATE" ]] && [[ -f "$ARCHIVE_DIR/$filename" ]]; then
+    printf "  ~ %s already exists in archive, skipped\n" "$filename"
+  elif [[ "$file_date" < "$CUTOFF_DATE" ]]; then
+    files_to_move+=("$file")
   fi
 done
 shopt -u nullglob
