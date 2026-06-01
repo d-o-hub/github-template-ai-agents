@@ -22,13 +22,13 @@ result=$?
 echo "validate-skills.sh exit code: $result"
 
 if [[ $result -ne 0 ]]; then
-    echo "ERROR: validate-skills.sh failed"
+    echo "ERROR: validate-skills.sh failed" >&2
     exit 2
 fi
 
 # Test 2: Check some files exist
 if [[ ! -d "$REPO_ROOT/.agents/skills" ]]; then
-    echo "ERROR: .agents/skills not found"
+    echo "ERROR: .agents/skills not found" >&2
     exit 2
 fi
 
@@ -45,7 +45,7 @@ if command -v shellcheck &> /dev/null; then
         fi
     done
     if [[ $sc_failed -ne 0 ]]; then
-        echo "ERROR: shellcheck failed on some scripts"
+        echo "ERROR: shellcheck failed on some scripts" >&2
         exit 2
     fi
 fi

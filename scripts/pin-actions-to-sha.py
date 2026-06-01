@@ -11,6 +11,8 @@ from pathlib import Path
 import re
 import sys
 
+WORKFLOWS_DIR_NAME = ".github/workflows"
+
 # Mapping of action@version to action@SHA # version
 # These are the latest stable versions as of 2026-04
 ACTION_SHAS = {
@@ -60,7 +62,7 @@ def pin_actions(content: str) -> tuple[str, int]:
 
 def main() -> int:
     repo_root = Path(__file__).resolve().parent.parent
-    workflows_dir = repo_root / ".github" / "workflows"
+    workflows_dir = repo_root / WORKFLOWS_DIR_NAME.replace("/", "/").split("/")[0] / WORKFLOWS_DIR_NAME.split("/")[1]
 
     if not workflows_dir.is_dir():
         print("Error: .github/workflows directory not found", file=sys.stderr)

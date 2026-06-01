@@ -13,7 +13,7 @@ from lib.eval_types import EvalResult, EvalStatus
 def run_command_check(
     eval_case: dict,
     skill_path: Path,
-    verbose: bool
+    verbose: bool  # noqa: ARG001
 ) -> EvalResult:
     """Run a command-based evaluation."""
     scripts_dir = skill_path / "scripts"
@@ -76,7 +76,7 @@ def run_command_check(
 def run_file_validation(
     eval_case: dict,
     skill_path: Path,
-    verbose: bool
+    verbose: bool  # noqa: ARG001
 ) -> EvalResult:
     """Run file validation for referenced files."""
     files = eval_case.get("files", [])

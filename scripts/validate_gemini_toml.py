@@ -25,7 +25,7 @@ def validate_gemini_toml(filepath, required_fields):
         print(f"Error reading {filepath}: {e}")
         return False
 
-def main():
+def main() -> int:
     success = True
     total_validated = 0
 
