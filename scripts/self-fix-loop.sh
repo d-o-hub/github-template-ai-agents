@@ -124,7 +124,8 @@ phase_commit_push() {
     fi
 
     # Stage and commit
-    local commit_msg="fix: self-fix-loop iteration $((RETRY_COUNT + 1)) of $MAX_RETRIES"
+    local commit_msg
+    commit_msg="fix: self-fix-loop iteration $((RETRY_COUNT + 1)) of $MAX_RETRIES"
     log "Staging all changes..."
     if [[ "$DRY_RUN" != true ]]; then
         git add -A

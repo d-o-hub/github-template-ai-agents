@@ -37,25 +37,25 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [ -z "$TYPE" ] || [ -z "$SUBJECT" ]; then
+if [[ -z "$TYPE" ]] || [[ -z "$SUBJECT" ]]; then
     echo "Usage: $0 --type <type> [--scope <scope>] --subject <subject> [--body <body> ...]"
     exit 1
 fi
 
-if [ ${#SUBJECT} -gt 72 ]; then
-    echo "Error: Subject is too long (${#SUBJECT} > 72 chars)."
+if [[ ${#SUBJECT} -gt 72 ]]; then
+    echo "Error: Subject is too long (${#SUBJECT} > 72 chars)." >&2
     exit 1
 fi
 
 # Build message
 MSG="${TYPE}"
-if [ -n "$SCOPE" ]; then
+if [[ -n "$SCOPE" ]]; then
     MSG="${MSG}(${SCOPE})"
 fi
 MSG="${MSG}: ${SUBJECT}"
 
 # Add blank line and bodies
-if [ ${#BODIES[@]} -gt 0 ]; then
+if [[ ${#BODIES[@]} -gt 0 ]]; then
     MSG="${MSG}"$'\n'
     for BODY in "${BODIES[@]}"; do
         # Wrap body to $BODY_WRAP_WIDTH chars

@@ -20,7 +20,7 @@ CLI_SKILL_DIRS=(
   ".qwen/skills"
 )
 
-if [ ! -d "$SKILLS_SRC" ]; then
+if [[ ! -d "$SKILLS_SRC" ]]; then
   printf "No skills found at .agents/skills/ - nothing to symlink.\n"
   exit 0
 fi
@@ -60,9 +60,9 @@ for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
     # Performance optimization: Use pre-calculated base
     rel="$rel_base/$skill_name"
 
-    if [ -L "$link" ]; then
+    if [[ -L "$link" ]]; then
       printf "  skip (exists): %s/%s\n" "$cli_dir" "$skill_name"
-    elif [ -d "$link" ]; then
+    elif [[ -d "$link" ]]; then
       printf "  WARN: real dir exists at %s/%s - skipping\n" "$cli_dir" "$skill_name"
     else
       ln -s -- "$rel" "$link"

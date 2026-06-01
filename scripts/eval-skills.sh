@@ -12,7 +12,7 @@ echo "=== Evaluating Skills (agentskills.io spec) ==="
 echo ""
 
 if [ ! -f "$EVAL_SCRIPT" ]; then
-  echo "ERROR: check_structure.py not found at $EVAL_SCRIPT"
+  echo "ERROR: check_structure.py not found at $EVAL_SCRIPT" >&2
   exit 1
 fi
 
@@ -120,7 +120,7 @@ if ! find "$SKILLS_DIR" -maxdepth 2 -type f -name "SKILL.md" -print0 2>/dev/null
 fi
 
 echo ""
-if [ $FAILED -eq 0 ]; then
+if [[ $FAILED -eq 0 ]]; then
   echo "All eval checks passed"
   exit 0
 else

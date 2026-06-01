@@ -8,14 +8,14 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 # Read version from single source of truth
-if [ ! -f "VERSION" ]; then
+if [[ ! -f "VERSION" ]]; then
     echo "Error: VERSION file not found"
     exit 1
 fi
 
 VERSION=$(tr -d '[:space:]' < VERSION)
 
-if [ -z "$VERSION" ]; then
+if [[ -z "$VERSION" ]]; then
     echo "Error: VERSION file is empty"
     exit 1
 fi
