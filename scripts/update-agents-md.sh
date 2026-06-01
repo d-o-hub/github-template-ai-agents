@@ -26,8 +26,7 @@ echo "Updating AGENTS.md skill table..."
 
 # Find the line number of the skills section header
 # Supports both "### Available Skills" (template) and "## Skills" (customized)
-# Security: Use -- to prevent option injection from filenames starting with -
-SKILLS_SECTION_LINE=$(grep -nE "^(### Available Skills|## Skills)" -- "$AGENTS_FILE" | head -n 1 | cut -d: -f1)
+SKILLS_SECTION_LINE=$(grep -nE -e "^(### Available Skills|## Skills)" -- "$AGENTS_FILE" | head -n 1 -- | cut -d: -f1)
 
 if [ -z "$SKILLS_SECTION_LINE" ]; then
     echo "Error: Could not find skills section header in AGENTS.md"
@@ -36,8 +35,7 @@ fi
 
 # Find the line number of the next section (end of skills table)
 # Supports both "### Context Discipline" and "## Security"
-# Security: Use -- to prevent option injection from filenames starting with -
-NEXT_SECTION_LINE=$(grep -nE "^(### Context Discipline|## Security)" -- "$AGENTS_FILE" | cut -d: -f1 | awk -v start="$SKILLS_SECTION_LINE" -- '$1 > start { print $1; exit }')
+NEXT_SECTION_LINE=$(grep -nE -e "^(### Context Discipline|## Security)" -- "$AGENTS_FILE" | cut -d: -f1 | awk -v start="$SKILLS_SECTION_LINE" -- '$1 > start { print $1; exit }')
 
 if [ -z "$NEXT_SECTION_LINE" ]; then
     # Fallback to end of file if no next section found
@@ -46,7 +44,6 @@ if [ -z "$NEXT_SECTION_LINE" ]; then
 fi
 
 # Extract everything before the table (including the header)
-# Security: Use -- to prevent option injection from filenames starting with -
 head -n "$SKILLS_SECTION_LINE" -- "$AGENTS_FILE" > "$TEMP_FILE"
 
 # Add table header
@@ -148,9 +145,8 @@ if [ -d "$REPO_ROOT/.agents/skills" ]; then
 fi
 
 # Sort the table rows (excluding header) alphabetically by skill name
-# Security: Use -- to prevent option injection from filenames starting with -
-head -n $((SKILLS_SECTION_LINE + 3)) -- "$TEMP_FILE" > "$UPDATE_AGENTS_TEMP_TABLE"
-tail -n +$((SKILLS_SECTION_LINE + 4)) -- "$TEMP_FILE" | sort >> "$UPDATE_AGENTS_TEMP_TABLE"
+head -n $((SKILLS_SECTION_LINE + 3)) "$TEMP_FILE" > "$UPDATE_AGENTS_TEMP_TABLE"
+tail -n +$((SKILLS_SECTION_LINE + 4)) "$TEMP_FILE" | sort >> "$UPDATE_AGENTS_TEMP_TABLE"
 mv -- "$UPDATE_AGENTS_TEMP_TABLE" "$TEMP_FILE"
 
 # Add empty line before next section

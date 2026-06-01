@@ -40,7 +40,7 @@ echo "Checking canonical skills and CLI symlinks..."
 
 # Cache for readlink -f existence
 HAS_READLINK_F=""
-if [ ! -d "$SKILLS_SRC" ] || [ -z "$(ls -A -- "$SKILLS_SRC" 2>/dev/null)" ]; then
+if readlink -f -- . &>/dev/null; then HAS_READLINK_F=1; else HAS_READLINK_F=0; fi
 
 for skill_path in "$SKILLS_SRC"/*/; do
     [ -d "$skill_path" ] || continue
@@ -75,7 +75,6 @@ for skill_path in "$SKILLS_SRC"/*/; do
     # Performance optimization: Pre-calculate expected target once per skill
     expected_target=""
     if { [ "${CHECK_SYMLINK_TARGETS:-false}" = "true" ] || [ -n "${CI:-}" ]; } && [ "$HAS_READLINK_F" -eq 1 ]; then
-        # Security: Use -- to prevent option injection from filenames starting with -
         expected_target=$(readlink -f -- "$skill_path" 2>/dev/null || printf "")
     fi
 
@@ -111,7 +110,6 @@ for skill_path in "$SKILLS_SRC"/*/; do
             # Verify symlink points to correct location
             # Only do this expensive check if explicitly requested or in CI
             if [ -n "$expected_target" ]; then
-                # Security: Use -- to prevent option injection from filenames starting with -
                 target=$(readlink -f -- "$link" 2>/dev/null || printf "")
 
                 if [ -n "$target" ] && [ "$target" != "$expected_target" ]; then

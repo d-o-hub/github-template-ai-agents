@@ -95,6 +95,6 @@
 **Prevention:** Always use the `--` separator before the first positional argument (the program string for `awk`, or the first filename for `wc`) in utility scripts to ensure subsequent arguments are treated as data, not options.
 
 ## 2026-06-01 - Widespread Option Injection in Utility Scripts
-**Vulnerability:** Core utility scripts (chmod, readlink, head, tail, mv) were vulnerable to option injection when handling hyphenated filenames.
+**Vulnerability:** Core utility scripts (chmod, readlink, head, tail, mv, grep) were vulnerable to option injection when handling hyphenated filenames.
 **Learning:** Standard POSIX utilities interpret arguments starting with hyphens as options unless the -- delimiter is used. This can be exploited to crash scripts or change command behavior.
 **Prevention:** Always use the -- separator before positional arguments in shell commands and prefer printf over echo for variable output.

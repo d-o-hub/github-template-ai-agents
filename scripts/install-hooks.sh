@@ -84,7 +84,6 @@ CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
 
 # Update skill table if skills changed
 # The pattern matches any file under .agents/skills/ directory
-# Security: Use printf to prevent option injection and structural manipulation
 printf "%s\n" "$CHANGED_FILES" | grep -q -- ".agents/skills/" && {
     echo "Skills changed - updating AGENTS.md..."
     "$REPO_ROOT/scripts/update-agents-md.sh"
