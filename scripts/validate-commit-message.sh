@@ -18,7 +18,7 @@ if [ ! -f "$COMMIT_MSG_FILE" ]; then
 fi
 
 # Run commitlint
-if ! npx commitlint --edit "$COMMIT_MSG_FILE"; then
+if ! npx commitlint --edit -- "$COMMIT_MSG_FILE"; then
     exit 1
 fi
 
