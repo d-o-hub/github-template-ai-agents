@@ -1,7 +1,6 @@
 ---
 name: Security Scan
 
-# yamllint disable-line rule:truthy
 on:
   push:
     branches:

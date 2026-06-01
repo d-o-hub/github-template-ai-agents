@@ -1,7 +1,6 @@
 ---
 name: Detect & Auto-Close Duplicate Issues
 
-# yamllint disable-line rule:truthy
 on:
   issues:
     types: [opened, reopened]

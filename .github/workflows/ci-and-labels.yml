@@ -1,8 +1,7 @@
 ---
 name: CI + Labels Setup
 
-# yamllint disable-line rule:truthy
-on:
+'on':
   push:
     branches:
       - main
@@ -238,7 +237,8 @@ jobs:
           git push origin "$PR_BRANCH"
 
           # Check if a PR already exists for this branch
-          EXISTING_PR=$(gh pr list --head "$PR_BRANCH" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+          EXISTING_PR=$(gh pr list --head "$PR_BRANCH" --state open --json number \
+            --jq '.[0].number' 2>/dev/null || echo "")
           if [ -n "$EXISTING_PR" ]; then
             echo "PR #$EXISTING_PR already exists for $PR_BRANCH"
             exit 0
