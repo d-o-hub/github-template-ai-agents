@@ -17,8 +17,8 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
 EXIT_CODE=0
 
-log_ok() { echo "  ✓ $1"; }
-log_fail() { echo "  ✗ $1"; EXIT_CODE=1; }
+log_ok() { local msg="$1"; echo "  ✓ $msg"; }
+log_fail() { local msg="$1"; echo "  ✗ $msg"; EXIT_CODE=1; }
 
 # --- Phase 1: ADR File Inventory ---
 echo "=== Phase 1: ADR File Inventory ==="

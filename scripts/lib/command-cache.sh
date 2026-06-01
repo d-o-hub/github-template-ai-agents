@@ -21,7 +21,7 @@ init_cache() {
 
 # Get the last validated commit hash
 get_last_commit() {
-    if [ -f "$LAST_COMMIT_FILE" ]; then
+    if [[ -f "$LAST_COMMIT_FILE" ]]; then
         cat -- "$LAST_COMMIT_FILE"
     else
         printf ""
@@ -61,7 +61,7 @@ should_invalidate_command() {
 
     # Use a loop that handles spaces in filenames if needed, though here changed_files is space-separated
     while IFS= read -r changed; do
-        [ -z "$changed" ] && continue
+        [[ -z "$changed" ]] && continue
         if [[ "$changed" == "$file" ]]; then
             return 0
         fi

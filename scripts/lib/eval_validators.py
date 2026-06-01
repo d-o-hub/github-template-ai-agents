@@ -21,6 +21,42 @@ def load_evals_file(evals_path: Path) -> tuple[dict | None, str | None]:
     return data, None
 
 
+def _validate_eval_case(eval_case: dict, idx: int, required_fields: set[str]) -> list[str]:
+    """Validate a single eval case entry."""
+    issues: list[str] = []
+    if not isinstance(eval_case, dict):
+        issues.append(f"Eval #{idx} is not an object")
+        return issues
+    missing = required_fields - set(eval_case.keys())
+    if missing:
+        issues.append(f"Eval #{idx} missing fields: {', '.join(sorted(missing))}")
+    _validate_assertions(eval_case, idx, issues)
+    _validate_files(eval_case, idx, issues)
+    return issues
+
+
+def _validate_assertions(eval_case: dict, idx: int, issues: list[str]) -> None:
+    """Validate assertions field in an eval case."""
+    if "assertions" not in eval_case:
+        return
+    assertions = eval_case["assertions"]
+    if not isinstance(assertions, list):
+        issues.append(f"Eval #{idx}: 'assertions' must be an array")
+    elif len(assertions) == 0:
+        issues.append(f"Eval #{idx}: 'assertions' array is empty")
+
+
+def _validate_files(eval_case: dict, idx: int, issues: list[str]) -> None:
+    """Validate files field in an eval case."""
+    if "files" not in eval_case:
+        return
+    files = eval_case["files"]
+    if not isinstance(files, list):
+        issues.append(f"Eval #{idx}: 'files' must be an array")
+    elif not all(isinstance(f, str) for f in files):
+        issues.append(f"Eval #{idx}: all 'files' must be strings")
+
+
 def validate_evals_format(data: dict, skill_name: str) -> list[str]:
     """Validate the evals.json format."""
     issues: list[str] = []
@@ -42,24 +78,7 @@ def validate_evals_format(data: dict, skill_name: str) -> list[str]:
         issues.append("'evals' array is empty")
     required_fields = {"id", "prompt", "expected_output"}
     for idx, eval_case in enumerate(evals, start=1):
-        if not isinstance(eval_case, dict):
-            issues.append(f"Eval #{idx} is not an object")
-            continue
-        missing = required_fields - set(eval_case.keys())
-        if missing:
-            issues.append(f"Eval #{idx} missing fields: {', '.join(sorted(missing))}")
-        if "assertions" in eval_case:
-            assertions = eval_case["assertions"]
-            if not isinstance(assertions, list):
-                issues.append(f"Eval #{idx}: 'assertions' must be an array")
-            elif len(assertions) == 0:
-                issues.append(f"Eval #{idx}: 'assertions' array is empty")
-        if "files" in eval_case:
-            files = eval_case["files"]
-            if not isinstance(files, list):
-                issues.append(f"Eval #{idx}: 'files' must be an array")
-            elif not all(isinstance(f, str) for f in files):
-                issues.append(f"Eval #{idx}: all 'files' must be strings")
+        issues.extend(_validate_eval_case(eval_case, idx, required_fields))
     return issues
 
 

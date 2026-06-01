@@ -42,7 +42,7 @@ FILES_TO_UPDATE=(
 UPDATED=0
 
 for file in "${FILES_TO_UPDATE[@]}"; do
-    if [ ! -f "$file" ]; then
+    if [[ ! -f "$file" ]]; then
         echo "Warning: $file not found, skipping"
         continue
     fi
@@ -77,7 +77,7 @@ for file in "${FILES_TO_UPDATE[@]}"; do
 done
 
 # Update CHANGELOG.md - add unreleased section if missing
-if [ -f "CHANGELOG.md" ]; then
+if [[ -f "CHANGELOG.md" ]]; then
     if ! grep -q "^## \[Unreleased\]" CHANGELOG.md 2>/dev/null; then
         sed -i "1a\\\\n## [Unreleased]\n" CHANGELOG.md
         echo "  Added [Unreleased] section to CHANGELOG.md"
@@ -85,7 +85,7 @@ if [ -f "CHANGELOG.md" ]; then
     fi
 fi
 
-if [ $UPDATED -eq 0 ]; then
+if [[ $UPDATED -eq 0 ]]; then
     echo "  No updates needed"
 else
     echo "Version $VERSION propagated successfully"
