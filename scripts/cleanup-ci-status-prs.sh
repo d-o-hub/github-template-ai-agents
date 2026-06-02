@@ -5,52 +5,27 @@
 
 set -e
 
-REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null || echo "d-o-hub/github-template-ai-agents")
-STALE_PR_NUMBERS=("398" "399" "400" "402" "403")
+REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null || printf "%s\n" "d-o-hub/github-template-ai-agents")
 
-echo "Cleaning up stale CI status PRs for $REPO..."
+printf "%s\n" "Searching for open CI status update PRs authored by app/github-actions..."
+# We target PRs with the specific title and authored by the bot
+PRS_TO_CLEAN=$(gh pr list --repo "$REPO" --author "app/github-actions" --state open --search "ci: update ci status artifacts" --json number,headRefName --jq '.[] | "\(.number) \(.headRefName)"' 2>/dev/null || printf "%s\n" "")
 
-for PR_NUM in "${STALE_PR_NUMBERS[@]}"; do
-  echo "Checking PR #$PR_NUM..."
-
-  # Get PR info
-  PR_INFO=$(gh pr view "$PR_NUM" --repo "$REPO" --json state,headRefName 2>/dev/null || true)
-
-  if [[ -z "$PR_INFO" ]]; then
-    echo "  PR #$PR_NUM not found or inaccessible. Skipping."
-    continue
-  fi
-
-  STATE=$(echo "$PR_INFO" | jq -r '.state')
-  BRANCH=$(echo "$PR_INFO" | jq -r '.headRefName')
-
-  if [[ "$STATE" == "OPEN" ]]; then
-    echo "  Closing PR #$PR_NUM..."
-    gh pr close "$PR_NUM" --repo "$REPO"
-  else
-    echo "  PR #$PR_NUM is already $STATE."
-  fi
-
-  if [[ -n "$BRANCH" ]]; then
-    echo "  Deleting branch $BRANCH..."
-    gh api -X DELETE "repos/$REPO/git/refs/heads/$BRANCH" 2>/dev/null || echo "  Branch $BRANCH already deleted or not found."
-  fi
-done
-
-# Also search for any other open PRs with the same title pattern
-echo "Searching for any other open CI status update PRs..."
-OTHER_PRS=$(gh pr list --repo "$REPO" --state open --search "ci: update ci status artifacts" --json number,headRefName --jq '.[] | "\(.number) \(.headRefName)"')
-
-if [[ -z "$OTHER_PRS" ]]; then
-  echo "No other stale PRs found."
+if [[ -z "$PRS_TO_CLEAN" ]]; then
+  printf "%s\n" "No stale PRs found."
 else
-  echo "$OTHER_PRS" | while read -r num branch; do
+  printf "Found PRs to clean up:\n"
+  printf "%s\n" "$PRS_TO_CLEAN"
+
+  printf "%s\n" "$PRS_TO_CLEAN" | while read -r num branch; do
     if [[ -z "$num" ]]; then continue; fi
-    echo "  Closing PR #$num..."
-    gh pr close "$num" --repo "$REPO"
-    echo "  Deleting branch $branch..."
-    gh api -X DELETE "repos/$REPO/git/refs/heads/$branch" 2>/dev/null || echo "  Branch $branch already deleted or not found."
+    printf "%s\n" "  Closing PR #$num and deleting branch $branch..."
+    gh pr close "$num" --repo "$REPO" --delete-branch 2>/dev/null || {
+      printf "%s\n" "    Manual cleanup for PR #$num..."
+      gh pr close "$num" --repo "$REPO" || true
+      gh api -X DELETE "repos/$REPO/git/refs/heads/$branch" 2>/dev/null || true
+    }
   done
 fi
 
-echo "Cleanup complete."
+printf "%s\n" "Cleanup complete."
