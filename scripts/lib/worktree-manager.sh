@@ -12,7 +12,7 @@ CREATED_WORKTREES=()
 cleanup_worktrees() {
     for wt in "${CREATED_WORKTREES[@]}"; do
         # Security: Use grep -F for literal string matching of worktree paths
-        if git worktree list --porcelain 2>/dev/null | grep -F -q -- "worktree ${wt}"; then
+        if git worktree list --porcelain 2>/dev/null | grep -x -F -q -- "worktree ${wt}"; then
             git worktree remove --force -- "$wt" 2>/dev/null || true
         fi
     done
