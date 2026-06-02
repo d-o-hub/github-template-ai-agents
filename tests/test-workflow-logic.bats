@@ -30,3 +30,15 @@
 @test "workflow uses force push to fixed branch" {
     grep -q "git push origin --force -- \"\$PR_BRANCH\"" .github/workflows/ci-and-labels.yml
 }
+
+@test "workflow has post-creation duplicate cleanup" {
+    grep -q "Post-creation concurrency validation" .github/workflows/ci-and-labels.yml
+    grep -q "ALL_PR_NUMBERS" .github/workflows/ci-and-labels.yml
+    grep -q "Closing duplicate PR" .github/workflows/ci-and-labels.yml
+    # Should NOT use --delete-branch for duplicates (shared branch)
+    grep -q "Do NOT use --delete-branch" .github/workflows/ci-and-labels.yml
+}
+
+@test "workflow has ci-status label step" {
+    grep -q "gh label create ci-status" .github/workflows/ci-and-labels.yml
+}

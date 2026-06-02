@@ -1,0 +1,28 @@
+---
+name: Weekly CI Status PR Cleanup
+
+on:
+  schedule:
+    - cron: '30 3 * * 1'  # Weekly on Monday at 3:30 AM UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  cleanup:
+    name: Clean Up Stale CI Status PRs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4.2.2
+
+      - name: Run CI status PR cleanup
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          chmod +x scripts/cleanup-ci-status-prs.sh
+          ./scripts/cleanup-ci-status-prs.sh

@@ -71,5 +71,6 @@ gh label create --color 5319e7 --description "Performance-related improvement" -
 gh label create --color f4c542 --description "Related to automated/manual tests" --force -- "tests"
 gh label create --color fef2c0 --description "Maintenance task, tooling update, cleanup" --force -- "chore"
 gh label create --color cfd3d7 --description "Dependency updates or changes" --force -- "deps"
+gh label create --color d4c5f9 --description "CI status tracking PR - exempt from stale automation" --force -- "ci-status"
 
 echo "Label creation completed!"
