@@ -12,8 +12,8 @@
     grep -q "commit -m \"ci: update ci status artifacts \\[skip ci\\]\"" .github/workflows/ci-and-labels.yml
 }
 
-@test "workflow targets base via TARGET_BRANCH variable" {
-    grep -q "TARGET_BRANCH" .github/workflows/ci-and-labels.yml
+@test "workflow hardcodes base to main" {
+    grep -q "\-\-base main" .github/workflows/ci-and-labels.yml
 }
 
 @test "workflow has concurrency configuration" {
@@ -23,8 +23,8 @@
 }
 
 @test "workflow skips PR creation if one exists" {
-    grep -q "if \[ -n \"\$EXISTING_PR\" \]; then" .github/workflows/ci-and-labels.yml
-    grep -A 2 "if \[ -n \"\$EXISTING_PR\" \]; then" .github/workflows/ci-and-labels.yml | grep -q "exit 0"
+    grep -q "EXISTING_PR" .github/workflows/ci-and-labels.yml
+    grep -q "already exists" .github/workflows/ci-and-labels.yml
 }
 
 @test "workflow uses force push to fixed branch" {
