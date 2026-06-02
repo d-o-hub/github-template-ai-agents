@@ -1,7 +1,7 @@
 ---
 name: Weekly CI Status PR Cleanup
 
-on:
+on:  # yamllint disable-line rule:truthy
   schedule:
     - cron: '30 3 * * 1'  # Weekly on Monday at 3:30 AM UTC
   workflow_dispatch:

@@ -1,7 +1,7 @@
 ---
 name: Automated Cleanup
 
-on:
+on:  # yamllint disable-line rule:truthy
   # Run weekly on Sundays at 2 AM UTC (low traffic time)
   schedule:
     - cron: '0 2 * * 0'

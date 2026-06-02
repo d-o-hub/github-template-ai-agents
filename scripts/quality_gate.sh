@@ -180,6 +180,13 @@ if [[ -f "./scripts/check-plan-numbering.sh" ]]; then
     printf "\n"
 fi
 
+# --- Validate commitlint configuration consistency ---
+printf "%bValidating commitlint configuration...%b\n" "${BLUE}" "${NC}"
+if ! bash ./tests/test-commitlint-rules.sh; then
+    FAILED=1
+fi
+printf "\n"
+
 # --- Enforce LOC limits ---
 printf "%bEnforcing LOC limits...%b\n" "${BLUE}" "${NC}"
 if ! ./scripts/loc_gate.sh; then

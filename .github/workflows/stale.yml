@@ -1,7 +1,7 @@
 ---
 name: Stale Issues and PRs
 
-on:
+on:  # yamllint disable-line rule:truthy
   schedule:
     - cron: '0 0 * * *'  # Run daily at midnight UTC
   workflow_dispatch:
