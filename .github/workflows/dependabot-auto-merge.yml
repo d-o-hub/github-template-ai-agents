@@ -19,6 +19,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const THIS_JOB_NAME = 'auto-merge';
             const MAX_RETRIES = 90; // ~45 minutes total (handles check queue buildup from concurrent CI triggers)
             const POLL_INTERVAL_MS = 30000;
             const ref = context.payload.pull_request.head.sha;
@@ -39,14 +40,10 @@ jobs:
                   ref
                 });
 
-                // Filter out the current workflow's check runs to avoid self-waiting
-                // Note: The Check Run object doesn't have run_id directly. We use html_url as a fallback
-                // and check if external_id matches our runId.
-                const otherChecks = checks.check_runs.filter(run => {
-                  const isCurrentRun = run.external_id === String(context.runId) ||
-                                      (run.html_url && run.html_url.includes(`/actions/runs/${context.runId}`));
-                  return !isCurrentRun;
-                });
+                // Exclude this workflow's own check runs. Previous auto-merge
+                // failures don't indicate code issues — they mean other checks
+                // weren't ready. The current run verifies other checks independently.
+                const otherChecks = checks.check_runs.filter(run => run.name !== THIS_JOB_NAME);
 
                 const pendingChecks = otherChecks.filter(run => run.status !== 'completed');
                 const failedChecks = otherChecks.filter(run =>
