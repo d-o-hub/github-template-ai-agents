@@ -306,7 +306,7 @@ class TestSecurityScanWorkflow:
             raw,
         )
         for comment in version_comments:
-            assert comment == "v4.35", (
+            assert comment == "v4.36", (
                 f"Expected version comment 'v4.35', got '{comment}'"
             )
 
