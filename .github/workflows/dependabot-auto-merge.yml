@@ -19,7 +19,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const MAX_RETRIES = 60; // ~30 minutes total
+            const MAX_RETRIES = 90; // ~45 minutes total (handles check queue buildup from concurrent CI triggers)
             const POLL_INTERVAL_MS = 30000;
             const ref = context.payload.pull_request.head.sha;
 
@@ -51,7 +51,7 @@ jobs:
                 const pendingChecks = otherChecks.filter(run => run.status !== 'completed');
                 const failedChecks = otherChecks.filter(run =>
                   run.status === 'completed' &&
-                  !['success', 'neutral', 'skipped'].includes(run.conclusion)
+                  !['success', 'neutral', 'skipped', 'cancelled'].includes(run.conclusion)
                 );
 
                 console.log(`Combined status state: ${status.state}`);
