@@ -236,7 +236,7 @@ jobs:
           fi
 
           PR_BRANCH="ci/status-update"
-          git checkout -B "$PR_BRANCH"
+          git checkout -b "$PR_BRANCH" -- 2>/dev/null || git checkout "$PR_BRANCH" --
           git commit -m "ci: update ci status artifacts [skip ci]"
           git push origin --force -- "$PR_BRANCH"
 
