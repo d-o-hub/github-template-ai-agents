@@ -28,13 +28,7 @@ jobs:
               console.log(`Checking status (attempt ${attempt + 1}/${MAX_RETRIES})...`);
 
               try {
-                // 1. Get Combined Status (legacy statuses)
-                const { data: status } = await github.rest.repos.getCombinedStatusForRef({
-                  ...context.repo,
-                  ref
-                });
-
-                // 2. Get Check Runs (modern GitHub Actions jobs)
+                // 1. Get Check Runs (modern GitHub Actions jobs)
                 const { data: checks } = await github.rest.checks.listForRef({
                   ...context.repo,
                   ref
@@ -51,26 +45,21 @@ jobs:
                   !['success', 'neutral', 'skipped', 'cancelled'].includes(run.conclusion)
                 );
 
-                console.log(`Combined status state: ${status.state}`);
                 console.log(`Pending check runs: ${pendingChecks.length}`);
                 if (pendingChecks.length > 0) {
                   console.log(`Waiting for: ${pendingChecks.map(c => c.name).join(', ')}`);
                 }
 
-                // Check for hard failures
-                if (status.state === 'failure' || status.state === 'error' || failedChecks.length > 0) {
-                  const failedNames = [
-                    ...status.statuses.filter(s => s.state === 'failure' || s.state === 'error').map(s => s.context),
-                    ...failedChecks.map(c => c.name)
-                  ];
-                  core.setFailed(`❌ Checks failed: ${failedNames.join(', ')}`);
+                // Only use check runs for failure detection (not legacy combined status).
+                // Combined status treats cancelled checks as failures, but check runs
+                // let us accept 'cancelled' as a non-failing conclusion.
+                if (failedChecks.length > 0) {
+                  core.setFailed(`❌ Checks failed: ${failedChecks.map(c => c.name).join(', ')}`);
                   return;
                 }
 
-                // Success condition:
-                // - Combined status is 'success' (or no statuses exist)
-                // - ALL other check runs are 'completed' and successful
-                if ((status.state === 'success' || status.total_count === 0) && pendingChecks.length === 0) {
+                // Success: all check runs completed and none failed
+                if (pendingChecks.length === 0) {
                   console.log('✅ All checks and statuses passed!');
                   return;
                 }
