@@ -21,20 +21,20 @@ AGENTS_MD="AGENTS.md"
 CONFIG_FILE="commitlint.config.cjs"
 
 check_consistency() {
-    local pattern="$1"
+    local key="$1"
     local value="$2"
     local name="$3"
 
-    if grep -q "$pattern" "$CONFIG_FILE"; then
-        if grep -q "$value" "$CONFIG_FILE"; then
-            printf "✓ %s matches: %s\n" "$name" "$value"
-        else
-            printf "✗ Error: %s does not match expected value: %s\n" "$name" "$value" >&2
-            grep "$pattern" "$CONFIG_FILE"
-            exit 1
-        fi
+    # Strict: require key and value on the same line (not just anywhere in file)
+    if grep -q "${key}.*${value}" "$CONFIG_FILE"; then
+        printf "✓ %s matches: %s\n" "$name" "$value"
     else
-        printf "✗ Error: %s pattern not found in %s\n" "$name" "$CONFIG_FILE" >&2
+        if grep -q "$key" "$CONFIG_FILE"; then
+            printf "✗ Error: %s key found but value '%s' not on same line\n" "$name" "$value" >&2
+            grep "$key" "$CONFIG_FILE"
+        else
+            printf "✗ Error: %s key not found in %s\n" "$name" "$CONFIG_FILE" >&2
+        fi
         exit 1
     fi
 }
@@ -45,6 +45,21 @@ check_consistency "'body-max-length'" "1000" "Body max length"
 check_consistency "'body-max-line-length'" "100" "Body max line length"
 check_consistency "'footer-max-length'" "1000" "Footer max length"
 check_consistency "'footer-max-line-length'" "100" "Footer max line length"
-check_consistency "'subject-case'" "'lower-case'" "Subject case"
+# subject-case is intentionally disabled ([0]) because identifiers like
+# LESSON-017, SKILL.md, and technical references are valid commit subjects
+check_consistency "'subject-case'" "[0]" "Subject case (disabled)"
+
+printf "Checking dependabot commitlint exemption...\n"
+if grep -q "ignores" "$CONFIG_FILE"; then
+    if grep -q "Signed-off-by: dependabot\[bot\]" "$CONFIG_FILE"; then
+        printf "✓ commitlint ignores rule exists for dependabot commits\n"
+    else
+        printf "✗ Error: ignores array exists but doesn't target dependabot commits\n" >&2
+        exit 1
+    fi
+else
+    printf "✗ Error: commitlint ignores rule missing for dependabot commits\n" >&2
+    exit 1
+fi
 
 exit 0
