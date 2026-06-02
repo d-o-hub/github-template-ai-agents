@@ -199,7 +199,9 @@ jobs:
     name: Update CI Status
     runs-on: ubuntu-latest
     needs: [labels, quality-gate, test]
-    if: always()
+    if: |
+      always() &&
+      github.actor != 'dependabot[bot]'
     concurrency:
       group: ci-status-update
       cancel-in-progress: true
