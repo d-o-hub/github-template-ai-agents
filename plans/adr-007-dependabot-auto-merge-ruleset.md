@@ -69,4 +69,4 @@ Edge cases handled:
 - `.github/workflows/dependabot-auto-merge.yml` — Implementation
 - `.github/workflows/ci-and-labels.yml` — Update CI Status Dependabot guard
 - `tests/test-automerge-workflow.bats` — 17 validation tests (11 positive + 6 negative)
-- `agents-docs/LESSONS.md#LESSON-023` — Detailed root cause analysis
+- `agents-docs/LESSONS.md#lesson-023` — Detailed root cause analysis
