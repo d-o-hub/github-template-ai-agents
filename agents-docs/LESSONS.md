@@ -492,6 +492,91 @@ timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
 
 ---
 
+### LESSON-020: Dependabot Auto-Merge Skipped - github.actor vs PR Author on Synchronize
+
+**Date**: 2026-06-02
+**Component**: CI/CD / GitHub Actions / Dependabot
+**Severity**: High
+
+**Issue**: Dependabot auto-merge workflow skipped on all synchronize events because `github.actor` reflects the human who triggered the sync, not the PR author.
+
+**Symptoms**:
+- Auto-merge job skipped with duration 1s (instant skip, no steps ran)
+- Condition `github.actor == 'dependabot[bot]'` evaluates to false
+- Triggered via pull_request synchronize by human account (d-o-hub)
+- Affected all open Dependabot PRs (#456-#460)
+
+**Root Cause**:
+1. **`github.actor` semantics**: On `pull_request` `synchronize` sub-events, `github.actor` reflects who caused the sync (e.g., a human force-pushing or triggering a rebase), not the original PR author
+2. **`github.event.pull_request.user.login`**: Always reflects the PR creator regardless of which actor triggered the workflow
+3. **Dependabot PRs only show `dependabot[bot]` as `github.actor` on initial `opened` event**
+
+**Solution**:
+
+```yaml
+# Before (broken on synchronize)
+if: github.actor == 'dependabot[bot]'
+
+# After (correct - check PR author, not event actor)
+if: |
+  github.event.pull_request.user.login == 'dependabot[bot]' ||
+  github.actor == 'dependabot[bot]'
+```
+
+**Prevention**:
+- Always use `github.event.pull_request.user.login` when checking PR authorship in workflows
+- Use `github.actor` only as an OR fallback for extra robustness
+- Test Dependabot workflows on synchronize events, not just initial open events
+
+**Files Modified**:
+- `.github/workflows/dependabot-auto-merge.yml` - Fixed guard condition and removed redundant permissions
+
+**References**:
+- GitHub Docs: `github.actor` vs `github.event.pull_request.user.login`
+- Issue #475: fix(ci): Dependabot Auto-Merge job skipped due to wrong github.actor on synchronize events
+
+---
+
+### LESSON-021: CI Status File Staleness After Direct Pushes
+
+**Date**: 2026-06-02
+**Component**: CI/CD / Artifacts / Agent Guardrails
+**Severity**: Medium
+
+**Issue**: The `.github/ci-status/ci-status.json` file can become stale when commits are pushed directly to main bypassing CI, misleading agents that rely on it as a prerequisite gate.
+
+**Symptoms**:
+- `ci-status.json` shows `status: "failing"` with a stale timestamp (May 31)
+- All recent GitHub Actions runs on main are actually passing
+- The "Update CI Status" job never ran on the latest commits (direct push bypasses CI workflow)
+- Agents following AGENTS.md prerequisite incorrectly pause work
+
+**Root Cause**:
+1. **Direct pushes bypass CI**: The CI status update job runs in `ci-and-labels.yml` on `pull_request`, not on `push` to main
+2. **No fallback validation**: Agents check only the file, not actual CI run status
+3. **Artifact drift**: File is updated by CI jobs, not as a git hook or pre-push check
+
+**Solution**:
+
+```bash
+# Before trusting ci-status.json, verify against actual CI runs:
+gh run list -b main -w 'CI + Labels Setup' --limit 1 --json conclusion
+
+# Update manually if stale:
+# Edit .github/ci-status/ci-status.json to reflect reality
+```
+
+**Prevention**:
+- Add a CI job that runs on `push` to main to update the status file (not just on `pull_request`)
+- Agents should cross-reference ci-status.json with `gh run list` before pausing
+- Consider triggering the CI workflow on push to main as well
+- Document the staleness risk in AGENTS.md prerequisite section
+
+**Files Modified**:
+- `.github/ci-status/ci-status.json` - Updated from stale May 31 status to current passing status
+
+---
+
 ## Resources
 
 - [BashFAQ/105 - Why set -e doesn't work](https://mywiki.wooledge.org/BashFAQ/105)

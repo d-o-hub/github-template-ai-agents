@@ -143,6 +143,8 @@ After **every** completed task, the agent MUST append a JSON entry to `.agents/m
 
 #### Recent Project-Wide Learnings
 
+- **Dependabot Actor on Synchronize**: Use `github.event.pull_request.user.login` not `github.actor` for Dependabot auto-merge guards; on synchronize events, `github.actor` is the human who triggered the sync (LESSON-020)
+- **CI Status File Staleness**: Verify CI via `gh run list` before trusting `.github/ci-status/ci-status.json`, which can be stale after direct pushes (LESSON-021)
 - **Locale-Independent Sort**: Use `LC_ALL=C sort` for committed generator output to prevent CI drift (LESSON-018)
 - **Nested node_modules**: Use `*/node_modules/*` in `find` to exclude at any depth, not just root (LESSON-019)
 - **CI Symlink Dependency**: Always run `setup-skills.sh` before `validate-skills.sh` in CI workflows (LESSON-017)
