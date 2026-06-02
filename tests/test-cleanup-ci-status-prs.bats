@@ -2,41 +2,49 @@
 
 setup() {
     # Create mock gh
-    cat << 'MOCK' > "$BATS_TMPDIR/gh"
+    cat << "MOCK" > "$BATS_TMPDIR/gh"
 #!/bin/bash
-case "$1" in
-  repo) echo "owner/repo" ;;
-  pr)
-    case "$2" in
-      view) echo '{"state":"OPEN","headRefName":"branch-1"}' ;;
-      list) echo -e "123 branch-123\n456 branch-456" ;;
-      close) echo "Closing PR $3" ;;
-    esac
-    ;;
-  api) echo "API call: $*" ;;
-esac
+if [ "$1" = "repo" ]; then
+    echo "owner/repo"
+elif [ "$1" = "pr" ]; then
+    if [ "$2" = "list" ]; then
+        if [[ "$*" == *"--author"* ]] && [[ "$*" == *"app/github-actions"* ]] && [[ "$*" == *"--search"* ]] && [[ "$*" == *"ci: update ci status artifacts"* ]]; then
+            echo "123 branch-123"
+        else
+            echo ""
+        fi
+    elif [ "$2" = "close" ]; then
+        if [[ "$*" == *"--delete-branch"* ]]; then
+            if [ -f "$BATS_TMPDIR/fail_delete_branch" ]; then
+                echo "Simulated failure" >&2
+                false
+            else
+                echo "Closing PR $3 and deleting branch"
+            fi
+        else
+            echo "Closing PR $3"
+        fi
+    fi
+elif [ "$1" = "api" ]; then
+    echo "API call: $*"
+fi
 MOCK
     chmod +x "$BATS_TMPDIR/gh"
     export PATH="$BATS_TMPDIR:$PATH"
+    rm -f "$BATS_TMPDIR/fail_delete_branch"
 }
 
-@test "cleanup script identifies and closes PRs" {
-    # We need to set a fake GITHUB_TOKEN to avoid the check in the script if any
-    # The script currently doesn't check for token explicitly at the top but gh command might.
-
-    # Run script and capture output
+@test "cleanup script identifies PRs filtered by author and title" {
     run ./scripts/cleanup-ci-status-prs.sh
-
     [ "$status" -eq 0 ]
-    [[ "$output" == *"Closing PR #398"* ]]
-    [[ "$output" == *"Closing PR #399"* ]]
+    [[ "$output" == *"Found PRs to clean up:"* ]]
     [[ "$output" == *"Closing PR #123"* ]]
 }
 
-@test "cleanup script deletes branches" {
+@test "cleanup script handles branch deletion fallback" {
+    touch "$BATS_TMPDIR/fail_delete_branch"
     run ./scripts/cleanup-ci-status-prs.sh
-
     [ "$status" -eq 0 ]
-    [[ "$output" == *"Deleting branch branch-1"* ]]
-    [[ "$output" == *"Deleting branch branch-123"* ]]
+    [[ "$output" == *"Manual cleanup for PR #123"* ]]
+    [[ "$output" == *"API call: api -X DELETE repos/owner/repo/git/refs/heads/branch-123"* ]]
 }
