@@ -57,3 +57,43 @@ setup() {
 @test "auto-merge workflow has contents write permission" {
     grep -q "contents: write" "$WORKFLOW_FILE"
 }
+
+# ──────────────────────────────────────────────────────────────
+# Negative tests: verify OLD patterns are NOT present (regression guards)
+# These prevent accidental reintroduction of the manual polling +
+# direct REST merge approach that couldn't handle linear history.
+# ──────────────────────────────────────────────────────────────
+
+@test "auto-merge workflow does NOT contain THIS_JOB_NAME (no manual self-exclusion)" {
+    # Manual check-run filtering by job name is obsolete;
+    # GitHub native auto-merge handles this natively
+    ! grep -q "THIS_JOB_NAME" "$WORKFLOW_FILE"
+}
+
+@test "auto-merge workflow does NOT contain MAX_RETRIES (no manual polling timeout)" {
+    # Manual polling loop with timeout is obsolete;
+    # GitHub native auto-merge handles check waiting natively
+    ! grep -q "MAX_RETRIES" "$WORKFLOW_FILE"
+}
+
+@test "auto-merge workflow does NOT contain external_id (broken self-exclusion removed)" {
+    ! grep -q "external_id" "$WORKFLOW_FILE"
+}
+
+@test "auto-merge workflow does NOT contain getCombinedStatusForRef (dead legacy API removed)" {
+    # Combined status API treats cancelled as failure and is no longer used
+    ! grep -q "getCombinedStatusForRef" "$WORKFLOW_FILE"
+}
+
+@test "auto-merge workflow does NOT contain listForRef (no manual check polling)" {
+    # Direct check-run polling via REST API is obsolete;
+    # GitHub native auto-merge handles required checks natively
+    ! grep -q "listForRef" "$WORKFLOW_FILE"
+}
+
+@test "auto-merge workflow does NOT contain pulls.merge (no direct REST merge)" {
+    # Direct REST pulls.merge can't satisfy required_linear_history
+    # when Dependabot token is read-only; GraphQL enablePullRequestAutoMerge
+    # uses system privileges instead
+    ! grep -q "pulls.merge" "$WORKFLOW_FILE"
+}
