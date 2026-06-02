@@ -19,11 +19,11 @@ CLEANUP_CI_STATUS_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "cleanup-ci-s
 
 # SHA hashes that should be present after the PR update
 LABELER_NEW_SHA = "f27b608878404679385c85cfa523b85ccb86e213"
-CODEQL_NEW_SHA = "9e0d7b8d25671d64c341c19c0152d693099fb5ba"
+CODEQL_NEW_SHA = "7211b7c8077ea37d8641b6271f6a365a22a5fbfa"
 
 # Old SHA hashes that must NOT appear after the update
 LABELER_OLD_SHA = "634933edcd8ababfe52f92936142cc22ac488b1b"
-CODEQL_OLD_SHA = "e46ed2cbd01164d986452f91f178727624ae40d7"
+CODEQL_OLD_SHA = "9e0d7b8d25671d64c341c19c0152d693099fb5ba"
 
 # Full 40-hex-char SHA pattern
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
