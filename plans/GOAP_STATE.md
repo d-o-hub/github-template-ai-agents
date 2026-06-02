@@ -25,7 +25,7 @@
 2. [x] Fix MD022 markdownlint error in GOAP_STATE.md (`### PR #419`/`### PR #414`)
 3. [x] Register ADR-007 in `plans/_status.json` (checked by `check-adr-compliance.sh`)
 4. [ ] Verify CI returns to passing after `e3e72d5`, PR #477 auto-resolves
-5. [ ] Monitor next Dependabot run: **Monday June 8, 2026 09:00 UTC** — verify GraphQL auto-merge works end-to-end
+5. [ ] Monitor next Dependabot run: **Monday June 8, 2026 09:00 UTC** — verify GraphQL auto-merge works end-to-end. Check with `gh pr list --author dependabot --state open` on/after June 8.
 
 ## Blockers
 
@@ -33,7 +33,7 @@
 
 ## Deferred
 
-- None
+- **act CI simulation**: Docker and act binary not installed — local CI simulation unavailable. When Docker becomes available, use `scripts/run_act_local.sh` to test workflows locally before pushing.
 
 ## Previous Sessions
 
