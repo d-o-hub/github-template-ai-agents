@@ -2,40 +2,45 @@
 
 ## Current State
 
-- PR #419: turso-db sync + SonarCloud fixes — **READY TO MERGE**
-- Branch: `sync-turso-skill`
-- Base: `main`
-- Commits:
-  - `9e41ac2` — fix: address SonarCloud code smells, vulnerabilities, and hotspots
-  - `8e77cbb` — fix(turso-db): restore quoted version format
-  - `4ad6245` — test(turso-db): update version check to match v0.6.1
-  - `e9d1424` — feat(turso-db): sync with latest Turso docs (v0.6.1)
-- All 25/25 CI checks passing (commitlint, Quality Gates, CodeQL, shellcheck, SonarCloud, Run Tests)
-- SonarCloud: 48 code smells + 1 vulnerability fixed across 14 files
-- Review addressed: codacy contradiction resolved, Swift SDK added
-- **Status: GREEN + REVIEW-CLEAN + MERGEABLE**
+- **Branch**: `main`
+- **CI Status**: Failing — quality-gate MD022 error in `plans/adr-007-dependabot-auto-merge-ruleset.md` (being fixed)
+- **Open PRs**:
+  - PR #477: `ci: update ci status artifacts` — automated CI status update detecting the quality-gate failure
+
+### Dependabot Auto-Merge Rewrite (Completed)
+
+- **Commits**: `5f73014`, `e2a650f`, `e92791b`, `b4086de`
+- **What changed**: Replaced manual check polling + direct REST `pulls.merge()` with GraphQL-based `enablePullRequestAutoMerge` (SQUASH) + `resolveReviewThread`
+- **ADR**: [ADR-007](adr-007-dependabot-auto-merge-ruleset.md) — documents ruleset requirements and how GraphQL satisfies them
+- **Learnings**: [LESSON-023](../agents-docs/LESSONS.md) — 5 root causes + 5 fixes for Dependabot auto-merge failure chain
+- **Tests**: 17 auto-merge BATS tests (11 positive + 6 negative regression) — all passing
+- **Additional fixes**:
+  - `ci-and-labels.yml`: Skip `update-ci-status` on Dependabot PRs (`github.actor` guard)
+  - Removed dead `getCombinedStatusForRef` from auto-merge workflow
+  - Created `pre-commit` label for Dependabot pre-commit ecosystem
 
 ## Actions Queue
 
-1. [x] Fetch PR #419 and analyze codacy review + CI failures
-2. [x] Update Critical Rules: VACUUM (experimental in-place, always INTO), Multi-Process (experimental)
-3. [x] Add Swift SDK to decision trees + create sdks/swift.md
-4. [x] Fix commitlint: squash 3 non-conventional commits into 1
-5. [x] Fix turso-db.bats version check + quote format
-6. [x] Fix SonarCloud: 48 code smells (S7688, S7677, S7679, S1192, S7682, S131, S1066, python:S1192/S1066/S3776)
-7. [x] Fix SonarCloud: text:S8565 vulnerability (missing lock file)
-8. [x] Regenerate llms-full.txt
-9. [x] All CI green (25/25 passing)
-
-## Previous (PR #414)
-
-- PR #414: WASM size gate performance improvement — **MERGED**
-- All 24 CI checks passed, squashed into main
+1. [x] Fix MD022 markdownlint error in ADR-007 (blank lines around `### Positive`/`### Negative` headings)
+2. [x] Fix MD022 markdownlint error in GOAP_STATE.md (`### PR #419`/`### PR #414`)
+3. [ ] Handle PR #477 — merge after fix propagates or close if superseded
+4. [ ] Monitor next Dependabot run: **Monday June 8, 2026 09:00 UTC** — verify GraphQL auto-merge works end-to-end
 
 ## Blockers
 
-- auto-merge skipped (requires human approval — by design)
+- None
 
 ## Deferred
 
 - None
+
+## Previous Sessions
+
+### PR #419 (turso-db sync) — MERGED
+
+- All 25/25 CI checks passed, squashed into main
+- See commit `e9d1424` through `9e41ac2`
+
+### PR #414 (WASM size gate) — MERGED
+
+- All 24 CI checks passed, squashed into main

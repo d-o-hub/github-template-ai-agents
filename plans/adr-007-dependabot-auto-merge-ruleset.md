@@ -46,6 +46,7 @@ Edge cases handled:
 ## Consequences
 
 ### Positive
+
 - Auto-merge works regardless of branch staleness (GitHub handles updates)
 - No 45-minute polling timeout (native auto-merge handles timing)
 - Resilient to bot review comments (automatic thread resolution)
@@ -53,6 +54,7 @@ Edge cases handled:
 - Simpler code (~45 lines vs ~90 lines)
 
 ### Negative
+
 - Requires `allow_auto_merge` to be enabled in repository settings (confirmed: `true`)
 - Requires `actions/github-script@v9` with GraphQL support (already in use)
 - `reviewThreads(first: 100)` pagination — if a PR accumulates 100+ threads, some may be missed (extremely unlikely)
