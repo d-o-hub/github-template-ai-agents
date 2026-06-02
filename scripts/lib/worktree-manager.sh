@@ -11,8 +11,9 @@ CREATED_WORKTREES=()
 # Cleanup trap function - call from trap in main script
 cleanup_worktrees() {
     for wt in "${CREATED_WORKTREES[@]}"; do
-        # Security: Use grep -F for literal string matching of worktree paths
-        if git worktree list --porcelain 2>/dev/null | grep -F -q -- "worktree ${wt}"; then
+        # Security: Use --porcelain and grep -x -F for exact literal matching of worktree paths.
+        # This prevents false positives from overlapping paths (e.g., /app matching /app-2).
+        if git worktree list --porcelain 2>/dev/null | grep -x -F -q -- "worktree ${wt}"; then
             git worktree remove --force -- "$wt" 2>/dev/null || true
         fi
     done
@@ -25,8 +26,8 @@ setup_worktree() {
 
     mkdir -p -- "$WORKTREE_BASE"
 
-    # Security: Use grep -F for literal string matching of worktree paths
-    if git worktree list | grep -F -q -- "${worktree_path}"; then
+    # Security: Use --porcelain and grep -x -F for exact literal matching of worktree paths.
+    if git worktree list --porcelain 2>/dev/null | grep -x -F -q -- "worktree ${worktree_path}"; then
         git worktree remove --force -- "$worktree_path" 2>/dev/null || true
     fi
 
@@ -42,8 +43,8 @@ setup_worktree() {
 
 cleanup_worktree() {
     local worktree_path="$1"
-    # Security: Use grep -F for literal string matching of worktree paths
-    if git worktree list | grep -F -q -- "${worktree_path}"; then
+    # Security: Use --porcelain and grep -x -F for exact literal matching of worktree paths.
+    if git worktree list --porcelain 2>/dev/null | grep -x -F -q -- "worktree ${worktree_path}"; then
         git worktree remove --force -- "${worktree_path}" 2>/dev/null || {
             local resolved
             resolved=$(realpath -m -- "$worktree_path" 2>/dev/null || echo "$worktree_path")
