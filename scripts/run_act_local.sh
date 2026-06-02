@@ -26,7 +26,7 @@ ACT_EVENT="${ACT_EVENT:-$DEFAULT_EVENT}"
 ACT_JOB="${ACT_JOB:-}"
 ACT_PLATFORM="${ACT_PLATFORM:-ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest}"
 
-if [ ! -f "$ACT_WORKFLOW_FILE" ]; then
+if [[ ! -f "$ACT_WORKFLOW_FILE" ]]; then
     echo "Workflow file not found: $ACT_WORKFLOW_FILE"
     exit 1
 fi
@@ -36,7 +36,7 @@ echo "  workflow: $ACT_WORKFLOW_FILE"
 echo "  event:    $ACT_EVENT"
 echo "  platform: $ACT_PLATFORM"
 
-if [ -n "$ACT_JOB" ]; then
+if [[ -n "$ACT_JOB" ]]; then
     echo "  job:      $ACT_JOB"
     act "$ACT_EVENT" -W "$ACT_WORKFLOW_FILE" -j "$ACT_JOB" -P "$ACT_PLATFORM" "$@"
 else

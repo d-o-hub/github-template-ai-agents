@@ -65,14 +65,14 @@ dd if=/dev/zero of="$LARGE_FILE" bs=1024 count=2048 2>/dev/null
 echo "Test 3: MAX_WASM_SIZE_BYTES validation..."
 # Attempting to inject commands or escapes via the environment variable
 if MAX_WASM_SIZE_BYTES="1024\nGOTCHA" "$WASM_GATE" > output.log 2>&1; then
-    echo "  ✗ Test 3 failed: Script should have rejected invalid MAX_WASM_SIZE_BYTES"
+    echo "  ✗ Test 3 failed: Script should have rejected invalid MAX_WASM_SIZE_BYTES" >&2
     exit 1
 else
     echo "  ✓ Test 3 passed: Script rejected malicious MAX_WASM_SIZE_BYTES"
     if grep -q "Error: MAX_WASM_SIZE_BYTES must be numeric" output.log; then
          echo "  ✓ Test 3 detail: Correct validation error shown"
     else
-         echo "  ✗ Test 3 detail: Incorrect validation error"
+         echo "  ✗ Test 3 detail: Incorrect validation error" >&2
          cat output.log
          exit 1
     fi

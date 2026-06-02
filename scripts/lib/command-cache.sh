@@ -86,7 +86,7 @@ should_invalidate_command() {
 get_cache_path() {
     local file="$1"
     local line="${2:-0}"
-    [ -z "$file" ] && file="unknown"
+    [[ -z "$file" ]] && file="unknown"
 
     # Sanitize file path for use in directory structure using sha256 to avoid collisions
     local safe_file
@@ -104,8 +104,10 @@ get_cache_path() {
 
 # Get cached validation result
 get_cached_result() {
+    local file="$1"
+    local line="$2"
     local cache_file
-    cache_file=$(get_cache_path "$1" "$2")
+    cache_file=$(get_cache_path "$file" "$line")
 
     if [[ -f "$cache_file" ]]; then
         cat -- "$cache_file"

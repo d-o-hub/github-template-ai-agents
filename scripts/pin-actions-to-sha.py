@@ -13,15 +13,19 @@ import sys
 
 WORKFLOWS_DIR_NAME = ".github/workflows"
 
+# SHA constants for commonly used actions
+CHECKOUT_SHA = "11bd71901bbe5b1630ceea73d27597364c9af683"
+SETUP_NODE_SHA = "1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a"
+
 # Mapping of action@version to action@SHA # version
 # These are the latest stable versions as of 2026-04
 ACTION_SHAS = {
-    "actions/checkout@v4": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2",
-    "actions/checkout@v5": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2",
-    "actions/checkout@v6": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2",
-    "actions/setup-node@v4": "actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a  # v4.2.0",
-    "actions/setup-node@v5": "actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a  # v4.2.0",
-    "actions/setup-node@v6": "actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a  # v4.2.0",
+    "actions/checkout@v4": f"actions/checkout@{CHECKOUT_SHA}  # v4.2.2",
+    "actions/checkout@v5": f"actions/checkout@{CHECKOUT_SHA}  # v4.2.2",
+    "actions/checkout@v6": f"actions/checkout@{CHECKOUT_SHA}  # v4.2.2",
+    "actions/setup-node@v4": f"actions/setup-node@{SETUP_NODE_SHA}  # v4.2.0",
+    "actions/setup-node@v5": f"actions/setup-node@{SETUP_NODE_SHA}  # v4.2.0",
+    "actions/setup-node@v6": f"actions/setup-node@{SETUP_NODE_SHA}  # v4.2.0",
     "actions/setup-python@v5": "actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55  # v5.5.0",
     "actions/setup-python@v6": "actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55  # v5.5.0",
     "actions/setup-go@v5": "actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34  # v5.3.0",

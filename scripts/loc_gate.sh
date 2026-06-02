@@ -32,7 +32,7 @@ echo "Checking LOC limits..."
 if [[ -f "$AGENTS_MD_FILE" ]]; then
     LOC=$(wc -l < "$AGENTS_MD_FILE")
     if [[ "$LOC" -gt "$MAX_AGENTS" ]]; then
-        echo "ERROR: $AGENTS_MD_FILE has $LOC lines (max $MAX_AGENTS)"
+        echo "ERROR: $AGENTS_MD_FILE has $LOC lines (max $MAX_AGENTS)" >&2
         FAILED=1
     fi
 fi

@@ -32,11 +32,11 @@ else
     RED=''; GREEN=''; YELLOW=''; BLUE=''; CYAN=''; MAGENTA=''; NC=''
 fi
 
-log() { local msg="$*"; printf "${BLUE}[$(date +%H:%M:%S)]${NC} %s\n" "$msg"; }
-info() { local msg="$*"; printf "${CYAN}[$(date +%H:%M:%S)] INFO:${NC} %s\n" "$msg"; }
-error() { local msg="$*"; printf "${RED}[$(date +%H:%M:%S)] ERROR:${NC} %s\n" "$msg" >&2; }
-success() { local msg="$*"; printf "${GREEN}[$(date +%H:%M:%S)]${NC} %s\n" "$msg"; }
-warn() { local msg="$*"; printf "${YELLOW}[$(date +%H:%M:%S)] WARNING:${NC} %s\n" "$msg"; }
+log() { local msg="$*"; printf "${BLUE}[$(date +%H:%M:%S)]${NC} %s\n" "$msg"; return $?; }
+info() { local msg="$*"; printf "${CYAN}[$(date +%H:%M:%S)] INFO:${NC} %s\n" "$msg"; return $?; }
+error() { local msg="$*"; printf "${RED}[$(date +%H:%M:%S)] ERROR:${NC} %s\n" "$msg" >&2; return $?; }
+success() { local msg="$*"; printf "${GREEN}[$(date +%H:%M:%S)]${NC} %s\n" "$msg"; return $?; }
+warn() { local msg="$*"; printf "${YELLOW}[$(date +%H:%M:%S)] WARNING:${NC} %s\n" "$msg"; return $?; }
 phase() { local phase_num="$1"; local desc="$2"; printf "${MAGENTA}[$(date +%H:%M:%S)] PHASE %s:${NC} %s\n" "$phase_num" "$desc"; }
 
 # Parse arguments
@@ -418,10 +418,12 @@ phase_analyze_fix() {
 
 # Main loop
 main() {
+    readonly SEP="═══════════════════════════════════════════════════════════════════"
+
     log ""
-    log "╔═══════════════════════════════════════════════════════════════════╗"
+    log "$SEP"
     log "║     SELF-FIX LOOP - Automated Commit, Push, Monitor, Fix         ║"
-    log "╚═══════════════════════════════════════════════════════════════════╝"
+    log "$SEP"
     log ""
     log "Configuration:"
     log "  Max retries: $MAX_RETRIES"
@@ -435,9 +437,9 @@ main() {
 
     while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
         RETRY_COUNT=$((RETRY_COUNT + 1))
-        log "═══════════════════════════════════════════════════════════════════"
+        log "$SEP"
         log "  ITERATION $RETRY_COUNT of $MAX_RETRIES"
-        log "═══════════════════════════════════════════════════════════════════"
+        log "$SEP"
         log ""
 
         # Phase 1: Commit & Push
@@ -455,9 +457,9 @@ main() {
         # Phase 3: Monitor CI
         if phase_monitor_ci; then
             success ""
-            log "╔═══════════════════════════════════════════════════════════════════╗"
+            log "$SEP"
             success "║     ALL CHECKS PASSED - Loop completed successfully!             ║"
-            log "╚═══════════════════════════════════════════════════════════════════╝"
+            log "$SEP"
             log ""
             log "Summary:"
             log "  Iterations: $RETRY_COUNT"
@@ -474,9 +476,9 @@ main() {
             log "Retrying..."
         else
             error ""
-            log "╔═══════════════════════════════════════════════════════════════════╗"
+            log "$SEP"
             error "║     MAX RETRIES EXCEEDED - Could not pass all checks               ║"
-            log "╚═══════════════════════════════════════════════════════════════════╝"
+            log "$SEP"
             log ""
             log "Summary:"
             log "  Iterations: $RETRY_COUNT"
@@ -486,6 +488,7 @@ main() {
             exit 3
         fi
     done
+    return 0
 }
 
-main
+main "$@"

@@ -93,7 +93,8 @@ NC='\033[0m'
 
 # Get description for a category
 get_category_description() {
-    case "$1" in
+    local category="$1"
+    case "$category" in
         safe) printf "No side effects - can run without modifications\n" ;;
         conditional) printf "May modify files - review before running\n" ;;
         dangerous) printf "Potentially destructive - requires careful review\n" ;;
@@ -104,19 +105,22 @@ get_category_description() {
 }
 
 is_safe_to_run() {
+    local cmd="$1"
     local category
-    category=$(categorize_command "$1")
+    category=$(categorize_command "$cmd")
     [[ "$category" == "safe" ]]
 }
 
 requires_warning() {
+    local cmd="$1"
     local category
-    category=$(categorize_command "$1")
+    category=$(categorize_command "$cmd")
     [[ "$category" == "dangerous" ]] || [[ "$category" == "conditional" ]]
 }
 
 print_category_badge() {
-    local category="$1"
+    local badge_category="$1"
+    local category="$badge_category"
     local color
     case "$category" in
         safe) color='\033[0;32m' ;;

@@ -29,7 +29,7 @@ echo "Updating AGENTS.md skill table..."
 SKILLS_SECTION_LINE=$(grep -nE -e "^(### Available Skills|## Skills)" -- "$AGENTS_FILE" | head -n 1 | cut -d: -f1)
 
 if [[ -z "$SKILLS_SECTION_LINE" ]]; then
-    echo "Error: Could not find skills section header in AGENTS.md"
+    echo "Error: Could not find skills section header in AGENTS.md" >&2
     exit 1
 fi
 
