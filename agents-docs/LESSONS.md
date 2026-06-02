@@ -737,10 +737,124 @@ Five coordinated fixes:
 - `plans/_status.json` — Registered ADR-007, bumped next ADR to adr-008
 - `tests/test-quality-gate-drift.bats` — Added 2 regression tests for ADR compliance gating
 
-**Related Discoveries (same session)**:
-- **Quality gate markdown fixtures**: BATS test fixtures creating `.md` files via `printf` must end with `\n` to satisfy markdownlint MD047 (single trailing newline). Missing newlines cause quality gate failures during test execution.
-- **act CI simulation unavailable**: `act` (local GitHub Actions runner) requires Docker and the act binary. Neither is available in this environment, so local CI simulation is not possible. Document in `.actrc` for when Docker becomes available.
-- **PR #477 auto-detection**: The automated `ci-status-update` PR correctly detected the transient quality-gate failure and would have auto-resolved when CI returned to passing. This is the system working as designed.
+**Related**: See LESSON-025 (MD047 fixture newlines), LESSON-026 (act unavailability), LESSON-027 (PR #477 auto-detection) — discovered in same session.
+
+---
+
+### LESSON-025: BATS Markdown Fixtures — Trailing Newline for MD047
+
+**Date**: 2026-06-02
+**Component**: Testing / Quality Gate / Markdown Lint
+**Severity**: Low
+
+**Issue**: BATS tests creating `.md` fixture files via `printf` fail markdownlint MD047 (single trailing newline) when the fixture lacks a trailing `\n`.
+
+**Symptoms**:
+- `quality_gate.sh` exits with status 1 during BATS test execution
+- Markdownlint reports: `MD047/single-trailing-newline Files should end with a single newline character`
+- Test expects exit 0 but gets exit 1 due to MD047 violation
+- Fixture files are valid markdown but don't satisfy the linter
+
+**Root Cause**:
+1. **`printf` doesn't add trailing newline**: `printf '# Title\n\nBody' > file.md` produces a file without a final newline character
+2. **MD047 enforcement**: The quality gate runs markdownlint-cli2 on all `.md` files, including test fixtures in temp directories
+3. **BATS runs in temp dirs**: Test-created fixtures in `$TEMP_DIR` are scanned by the quality gate's markdown linting step
+
+**Solution**:
+
+```bash
+# Always end printf with \n when creating .md fixtures
+printf '# ADR: Test Decision\n\n**Status**: Draft\n' > "$TEMP_DIR/plans/adr-001-test.md"
+```
+
+**Prevention**:
+- Always include trailing `\n` in `printf` statements that create `.md` fixture files
+- Run `echo` with `-e` as an alternative: `echo -e '# Title\n\nBody' > file.md` (echo auto-adds trailing newline)
+- Consider using `cat << 'EOF'` heredocs for multi-line markdown fixtures (auto-handles newlines)
+
+**Files Modified**:
+- `tests/test-quality-gate-drift.bats` — Fixed ADR fixture files to end with `\n`
+
+---
+
+### LESSON-026: act CI Simulation — Requires Docker + act Binary
+
+**Date**: 2026-06-02
+**Component**: CI/CD / Dev Tools
+**Severity**: Low
+
+**Issue**: Local CI simulation with `act` is not possible because Docker and the act binary are not installed.
+
+**Symptoms**:
+- `act --version` returns "command not found"
+- `docker --version` returns "command not found"
+- `scripts/run_act_local.sh` cannot execute
+- `.actrc` configuration exists but is unused
+
+**Root Cause**:
+1. **Docker not installed**: `act` runs GitHub Actions in Docker containers — requires Docker Engine
+2. **act binary not installed**: The act CLI tool is not in PATH
+3. **Minimal environment**: The development environment doesn't include containerization tools
+
+**Solution**:
+
+```bash
+# To enable local CI simulation:
+# 1. Install Docker: https://docs.docker.com/engine/install/
+# 2. Install act: https://github.com/nektos/act#installation
+#    brew install act  # macOS
+#    curl -sL https://raw.githubusercontent.com/nektos/act/master/install.sh | bash  # Linux
+# 3. Run: ./scripts/run_act_local.sh
+```
+
+**Prevention**:
+- Do not rely on act for CI validation until Docker + act are installed
+- Use `gh run list` to check CI status remotely as an alternative
+- `.actrc` configuration is ready for when Docker becomes available
+- Document in GOAP_STATE.md Deferred section
+
+**Files Modified**:
+- `plans/GOAP_STATE.md` — Added Deferred section documenting act unavailability
+
+---
+
+### LESSON-027: CI Status PR Auto-Detection — System Working as Designed
+
+**Date**: 2026-06-02
+**Component**: CI/CD / Monitoring
+**Severity**: Low
+
+**Issue**: An automated `ci-status-update` PR (#477) was created to report a quality-gate failure, which initially appeared to be a new bug but was the monitoring system working correctly.
+
+**Symptoms**:
+- PR #477 created by `app/github-actions` with title "ci: update ci status artifacts"
+- PR updated `ci-status.json` status from `passing` to `failing`
+- PR diffs correctly identified `quality-gate` as the failing job
+- After the underlying issue was fixed (unregistered ADR-007), CI returned to passing
+
+**Root Cause**:
+1. **System working as designed**: The `update-ci-status` job in `ci-and-labels.yml` detects CI failures and creates a PR to report them
+2. **Transient failure correctly captured**: The unregistered ADR-007 caused a quality-gate failure, which was accurately detected and reported
+3. **PR auto-resolves**: When CI returns to passing, the next `update-ci-status` run would update the PR to reflect passing status
+
+**Solution**:
+
+```bash
+# When a ci-status-update PR appears, check if CI is actually failing:
+gh run list --branch main --limit 5 --json conclusion,displayTitle
+
+# If CI is passing but the PR says failing, the fix may have already landed:
+# Close the PR manually if CI is green: gh pr close <NUMBER>
+```
+
+**Prevention**:
+- Do not assume ci-status-update PRs are bugs — check actual CI status first
+- The system auto-detects and reports failures; fix the root cause, not the PR
+- If the fix has been pushed and CI is green, close the PR manually
+- LESSON-021 (CI Status File Staleness) also applies — cross-reference `ci-status.json` with `gh run list`
+
+**Files Modified**:
+- PR #477 — Closed after root cause (unregistered ADR-007) was fixed
 
 ---
 
