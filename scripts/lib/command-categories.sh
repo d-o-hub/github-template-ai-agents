@@ -127,7 +127,7 @@ print_category_badge() {
     esac
     # Security: Use printf for safe variable output.
     # Note: %b is used for color codes to ensure they are interpreted correctly.
-    printf "%b[%s]%b\n" "$color" "$category" "$NC"
+    printf -- "%b[%s]%b\n" "$color" "$category" '\033[0m'
     return 0
 }
 
