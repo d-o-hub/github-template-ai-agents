@@ -88,10 +88,12 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 - **No hardcoded values**: Use relative paths, runtime derivation, env vars, or named constants.
 - Shell: `shellcheck` (severity=error); Markdown: `markdownlint`; Diagrams: `mermaid`
 - **YAML Workflow Files**: All new `.github/workflows/*.yml` files must include `# yamllint disable-line rule:truthy` on the `on:` line (line 4) to suppress the PyYAML boolean interpretation warning. Example:
+
   ```yaml
   on:  # yamllint disable-line rule:truthy
     pull_request:
   ```
+
   CI yamllint uses strict rules (line-length: 120, indentation: 2 spaces). Use `# yamllint disable-line rule:truthy` on the `on:` line, and `# yamllint disable-next-line rule:line-length` for long lines that cannot be split.
 
 ## Repository Structure
