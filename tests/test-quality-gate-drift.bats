@@ -119,11 +119,8 @@ setup() {
         chmod +x "$TEMP_DIR/scripts/$s"
     done
     
-    # Create minimal required files
-    cat > "$TEMP_DIR/README.md" <<'EOF'
-# Test Project
-> Test description
-EOF
+    # Create minimal required files (README.md passes markdownlint MD022)
+    printf '# Test Project\n\n> Test description\n' > "$TEMP_DIR/README.md"
     touch "$TEMP_DIR/VERSION"
     touch "$TEMP_DIR/AGENTS.md"
     
@@ -166,11 +163,8 @@ EOF
         chmod +x "$TEMP_DIR/scripts/$s"
     done
 
-    # Create minimal required files
-    cat > "$TEMP_DIR/README.md" <<'EOF'
-# Test Project
-> Test description
-EOF
+    # Create minimal required files (README.md passes markdownlint MD022)
+    printf '# Test Project\n\n> Test description\n' > "$TEMP_DIR/README.md"
     touch "$TEMP_DIR/VERSION"
     touch "$TEMP_DIR/AGENTS.md"
 
