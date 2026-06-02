@@ -88,6 +88,9 @@ categorize_command() {
     return 0
 }
 
+# Color reset code
+NC='\033[0m'
+
 # Get description for a category
 get_category_description() {
     case "$1" in
@@ -122,9 +125,10 @@ print_category_badge() {
         unknown) color='\033[0;36m' ;;
         *) color='\033[0m' ;;
     esac
+    # Security: Use printf for safe variable output.
+    # Note: %b is used for color codes to ensure they are interpreted correctly.
+    printf -- "%b[%s]%b\n" "$color" "$category" '\033[0m'
     return 0
-    # Security: Use printf for safe variable output
-    printf "${color}[%s]${NC}\n" "$category"
 }
 
 export -f categorize_command get_category_description is_safe_to_run requires_warning print_category_badge
