@@ -693,6 +693,57 @@ Five coordinated fixes:
 
 ---
 
+### LESSON-024: ADR Compliance Gate Already Exists — Registration Required, Not Gate Creation
+
+**Date**: 2026-06-02
+**Component**: Quality Gate / ADR Compliance / CI/CD
+**Severity**: Low
+
+**Issue**: The quality gate failed with "ADR NOT registered in _status.json" after creating ADR-007, requiring investigation into whether a compliance gate needed to be added.
+
+**Symptoms**:
+- `quality_gate.sh` reports: `✗ adr-007-dependabot-auto-merge-ruleset.md NOT registered in _status.json`
+- CI status flips to `failing` with `quality-gate` as the failing job
+- Automated `ci-status-update` PR created (#477) to report the failure
+- Quality gate worked correctly — no new gate implementation needed
+
+**Root Cause**:
+1. **Gate already exists**: `quality_gate.sh` lines 166-169 already call `check-adr-compliance.sh`, which scans `plans/adr-*.md` and verifies each ADR filename appears in `plans/_status.json`
+2. **Missing registration**: ADR-007 was created on disk but never registered in `_status.json` entries
+3. **No gate gap**: The system was working as designed — creating an ADR without registering it in `_status.json` correctly triggers a quality gate failure
+
+**Solution**:
+
+```json
+// Register the ADR in plans/_status.json entries:
+{
+  "entries": {
+    "adr-007-dependabot-auto-merge-ruleset.md": {
+      "status": "accepted",
+      "date": "2026-06-02"
+    }
+  },
+  "nextAvailable": { "adr": "adr-008" }
+}
+```
+
+**Prevention**:
+- After creating an ADR file in `plans/adr-*.md`, ALWAYS register it in `plans/_status.json` entries
+- Run `./scripts/check-adr-compliance.sh` after creating any ADR to verify registration
+- The quality gate already runs this check in pre-commit and CI — no additional gate needed
+- Add BATS regression tests (`test-quality-gate-drift.bats`) verifying the gate catches unregistered ADRs (exit 2) and passes on registered ADRs (exit 0)
+
+**Files Modified**:
+- `plans/_status.json` — Registered ADR-007, bumped next ADR to adr-008
+- `tests/test-quality-gate-drift.bats` — Added 2 regression tests for ADR compliance gating
+
+**Related Discoveries (same session)**:
+- **Quality gate markdown fixtures**: BATS test fixtures creating `.md` files via `printf` must end with `\n` to satisfy markdownlint MD047 (single trailing newline). Missing newlines cause quality gate failures during test execution.
+- **act CI simulation unavailable**: `act` (local GitHub Actions runner) requires Docker and the act binary. Neither is available in this environment, so local CI simulation is not possible. Document in `.actrc` for when Docker becomes available.
+- **PR #477 auto-detection**: The automated `ci-status-update` PR correctly detected the transient quality-gate failure and would have auto-resolved when CI returned to passing. This is the system working as designed.
+
+---
+
 ## Resources
 
 - [BashFAQ/105 - Why set -e doesn't work](https://mywiki.wooledge.org/BashFAQ/105)
