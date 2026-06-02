@@ -577,6 +577,68 @@ gh run list -b main -w 'CI + Labels Setup' --limit 1 --json conclusion
 
 ---
 
+### LESSON-022: CI Status PR Recreation - Duplicate Auto-Generated PRs
+
+**Date**: 2026-06-02
+**Component**: CI/CD / Pull Requests / GitHub Actions / Stale Bot
+**Severity**: High
+
+**Issue**: The automated CI status update workflow creates duplicate PRs instead of reusing the single `ci/status-update` PR, causing PR clutter (28 duplicate PRs observed).
+
+**Symptoms**:
+- Multiple open PRs with title "ci: update ci status artifacts"
+- PR #474 was closed (part of manual cleanup), then recreated as a new PR
+- CI status PR gets auto-closed by stale bot after 60+7 days of inactivity
+- Cleanup script (`cleanup-ci-status-prs.sh`) finds no PRs despite duplicates existing
+- `gh pr list --head ci/status-update --state open` returns empty when it should find an existing PR
+
+**Root Cause**:
+
+1. **Stale workflow closes the CI status PR**: The `stale.yml` workflow (`days-before-stale: 60`, `days-before-close: 7`) auto-closes the CI status PR after 67 days. There was no `ci-status` label exemption.
+
+2. **Cleanup script author mismatch**: `cleanup-ci-status-prs.sh` searched for `--author "app/github-actions"` but the actual PR author when using `GITHUB_TOKEN` is `github-actions[bot]`. The cleanup script was completely non-functional.
+
+3. **Race condition from per-ref concurrency**: The `update-ci-status` job had `concurrency: group: ci-status-${{ github.ref }}`. A push to `main` (`refs/heads/main`) and a pull_request (`refs/pull/N/merge`) could run simultaneously, both check for an existing PR, both find none, and both create one.
+
+4. **No error handling for `gh pr list` failures**: `EXISTING_PR=$(gh pr list ... 2>/dev/null || echo "")` silently swallowed errors. If `gh` was rate-limited or unauthenticated, the check returned empty and a duplicate PR was created.
+
+5. **Variable base branch**: `TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}` could produce nonsensical bases like `feature/xyz` for CI status PRs.
+
+**Solution**:
+
+Seven fixes applied across four files:
+
+1. **Concurrency group**: Changed from `ci-status-${{ github.ref }}` to fixed `ci-status-update` to serialize all update jobs globally.
+
+2. **Hardcoded base branch**: Changed `--base $TARGET_BRANCH` to `--base main` — CI status always targets main.
+
+3. **Stale exemption**: Added `ci-status` label to PR creation and to `stale.yml` `exempt-pr-labels` so the CI status PR is never auto-closed.
+
+4. **Error handling**: `gh pr list` failures now log a warning and skip PR creation instead of silently creating duplicates. Uses separate stderr file (`/tmp/gh-pr-list-err.log`) to avoid mixing stdout/stderr.
+
+5. **Cleanup author fix**: Changed `--author "app/github-actions"` → `--author "github-actions[bot]"` in `cleanup-ci-status-prs.sh`.
+
+6. **Post-creation concurrency validation**: After creating a PR, verifies only one open PR exists for `ci/status-update`. If duplicates are found (racing beat the concurrency group), auto-closes all but the newest one. Does NOT use `--delete-branch` since all duplicates share the same branch.
+
+7. **Label existence guarantee**: Added `issues:write` permission and a pre-creation step (`gh label create ci-status --force`) to guarantee the label exists before the PR is created.
+
+**Prevention**:
+- Weekly scheduled cleanup workflow (`cleanup-ci-status-prs.yml`) runs `cleanup-ci-status-prs.sh` every Monday at 3:30 AM
+- `ci-status` label added to `gh-labels-creator.sh` for new repo clones
+- BATS tests validate post-creation duplicate cleanup logic and label step existence
+- All PR creation steps use defensive error handling with explicit failure messages
+
+**Files Modified**:
+- `.github/workflows/ci-and-labels.yml` - Concurrency group, base branch, label, error handling, post-creation validation, label-ensure step
+- `.github/workflows/stale.yml` - Added `ci-status` to `exempt-pr-labels`
+- `scripts/cleanup-ci-status-prs.sh` - Fixed author filter
+- `scripts/gh-labels-creator.sh` - Added `ci-status` label creation
+- `.github/workflows/cleanup-ci-status-prs.yml` - New weekly scheduled cleanup workflow
+- `tests/test-workflow-logic.bats` - Added 4 tests for new workflow behavior
+- `tests/test-cleanup-ci-status-prs.bats` - Updated mock author filter
+
+---
+
 ## Resources
 
 - [BashFAQ/105 - Why set -e doesn't work](https://mywiki.wooledge.org/BashFAQ/105)

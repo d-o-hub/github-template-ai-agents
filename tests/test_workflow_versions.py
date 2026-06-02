@@ -3,6 +3,7 @@
 Covers changes introduced in:
 - .github/workflows/labeler.yml  (actions/labeler updated to v6.1.0)
 - .github/workflows/security-scan.yml  (github/codeql-action/* updated to v4.35 new SHA)
+- .github/workflows/cleanup-ci-status-prs.yml  (weekly scheduled CI status PR cleanup)
 """
 
 import re
@@ -14,6 +15,7 @@ import yaml
 REPO_ROOT = Path(__file__).parent.parent
 LABELER_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "labeler.yml"
 SECURITY_SCAN_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "security-scan.yml"
+CLEANUP_CI_STATUS_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "cleanup-ci-status-prs.yml"
 
 # SHA hashes that should be present after the PR update
 LABELER_NEW_SHA = "f27b608878404679385c85cfa523b85ccb86e213"
@@ -334,4 +336,79 @@ class TestSecurityScanWorkflow:
         )
         assert not non_codeql_with_new_sha, (
             f"New codeql SHA found in non-codeql actions: {non_codeql_with_new_sha}"
+        )
+
+
+# ===========================================================================
+# cleanup-ci-status-prs.yml tests
+# ===========================================================================
+
+
+class TestCleanupCIStatusWorkflow:
+    """Tests for .github/workflows/cleanup-ci-status-prs.yml"""
+
+    def test_workflow_exists(self):
+        assert CLEANUP_CI_STATUS_WORKFLOW.exists(), (
+            "cleanup-ci-status-prs.yml must exist"
+        )
+
+    def test_workflow_is_valid_yaml(self):
+        """Workflow file must parse as valid YAML without errors."""
+        doc = _load_yaml(CLEANUP_CI_STATUS_WORKFLOW)
+        assert doc is not None
+
+    def test_workflow_has_descriptive_name(self):
+        """Workflow name should describe its purpose."""
+        doc = _load_yaml(CLEANUP_CI_STATUS_WORKFLOW)
+        name = doc.get("name", "")
+        assert "CI" in name.upper() and (
+            "cleanup" in name.lower() or "clean" in name.lower()
+        ), f"Workflow name should mention CI cleanup: got '{name}'"
+
+    def test_workflow_has_schedule_trigger(self):
+        """Must have a schedule trigger for weekly automated runs."""
+        raw = _raw_text(CLEANUP_CI_STATUS_WORKFLOW)
+        assert "schedule:" in raw, "Workflow must have a schedule trigger"
+        assert "cron:" in raw, "Workflow must define a cron schedule"
+
+    def test_workflow_has_workflow_dispatch(self):
+        """Must allow manual triggering via workflow_dispatch."""
+        raw = _raw_text(CLEANUP_CI_STATUS_WORKFLOW)
+        assert "workflow_dispatch" in raw, (
+            "Workflow must have workflow_dispatch trigger"
+        )
+
+    def test_workflow_has_cleanup_job(self):
+        """Must define a cleanup job that runs the cleanup script."""
+        doc = _load_yaml(CLEANUP_CI_STATUS_WORKFLOW)
+        jobs = doc.get("jobs", {})
+        assert len(jobs) >= 1, "Workflow must define at least one job"
+        raw = _raw_text(CLEANUP_CI_STATUS_WORKFLOW)
+        assert "cleanup-ci-status-prs.sh" in raw, (
+            "Workflow must run cleanup-ci-status-prs.sh"
+        )
+
+    def test_workflow_permissions_allow_branch_deletion(self):
+        """Must have contents:write for branch deletion in cleanup."""
+        doc = _load_yaml(CLEANUP_CI_STATUS_WORKFLOW)
+        perms = doc.get("permissions", {})
+        assert perms.get("contents") == "write", (
+            "contents permission must be 'write' for branch deletion"
+        )
+        assert perms.get("pull-requests") == "write", (
+            "pull-requests permission must be 'write' for PR closing"
+        )
+
+    def test_workflow_has_timeout(self):
+        """Must have a timeout to prevent hung runs."""
+        raw = _raw_text(CLEANUP_CI_STATUS_WORKFLOW)
+        assert "timeout-minutes" in raw, (
+            "Workflow must have timeout-minutes set"
+        )
+
+    def test_workflow_uses_checkout_action(self):
+        """Must checkout the repository before running cleanup script."""
+        raw = _raw_text(CLEANUP_CI_STATUS_WORKFLOW)
+        assert "actions/checkout" in raw, (
+            "Workflow must use actions/checkout"
         )
