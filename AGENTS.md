@@ -158,6 +158,8 @@ After **every** completed task, the agent MUST append a JSON entry to `.agents/m
 - **CI Symlink Dependency**: Always run `setup-skills.sh` before `validate-skills.sh` in CI workflows (LESSON-017)
 - **Action SHA Pinning**: Pin to 40-char SHAs for security (LESSON-016)
 - **Worktree Cleanup**: Use `trap cleanup EXIT ERR` and `CREATED_WORKTREES` (LESSON-010)
+- **Dependabot Auto-Merge**: Use `enablePullRequestAutoMerge` (GraphQL) not `pulls.merge()` (REST); Dependabot's restricted token can't push branches, but GitHub native auto-merge uses system privileges for linear history + branch updates (LESSON-023)
+- **Update CI Status on Dependabot**: Skip `update-ci-status` job with `github.actor != 'dependabot[bot]'` guard; Dependabot's read-only token causes git push failures that block auto-merge (LESSON-023)
 
 ## Self-Learning Rules (Auto-Generated)
 

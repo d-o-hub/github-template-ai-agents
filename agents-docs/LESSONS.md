@@ -639,6 +639,60 @@ Seven fixes applied across four files:
 
 ---
 
+### LESSON-023: Dependabot Auto-Merge — GraphQL Native Merge vs REST Direct Merge
+
+**Date**: 2026-06-02
+**Component**: CI/CD / GitHub Actions / Dependabot / Auto-Merge
+**Severity**: Critical
+
+**Issue**: Dependabot auto-merge workflow fails consistently because `github.rest.pulls.merge()` (REST API) can't satisfy repo ruleset requirements when the PR branch is behind main.
+
+**Symptoms**:
+- Auto-merge runs poll checks successfully, all checks pass, then merge fails with "Repository rule violations found"
+- PR branch is behind main (e.g., 7 commits) due to `required_linear_history` ruleset rule
+- Dependabot's restricted `GITHUB_TOKEN` has read-only `contents` permission, so the workflow can't `git push` to update the branch
+- `Update CI Status` check fails on Dependabot PRs because it tries to `git push` to `ci/status-update` branch
+- Codacy bot review comments block merge due to `required_review_thread_resolution` ruleset rule
+- Combined status API (`getCombinedStatusForRef`) treats cancelled checks as failures, blocking the auto-merge check poll
+
+**Root Cause**:
+
+1. **`pulls.merge()` can't handle linear history**: The REST API merge endpoint tries to merge directly; if the branch is behind main and the ruleset requires linear history, the merge is rejected
+2. **Dependabot token restrictions**: GitHub automatically downgrades Dependabot's `GITHUB_TOKEN` to `contents: read`, preventing any git push operations
+3. **Conversation threads block merge**: The ruleset's `required_review_thread_resolution` rule requires ALL review threads to be resolved before merging; bots like Codacy leave unresolved false-positive threads
+4. **Combined status API limitation**: `repos.getCombinedStatusForRef` returns `failure` state for cancelled check runs, but check runs via `checks.listForRef` let you filter by conclusion (accepting `cancelled` as non-failing)
+5. **Update CI Status job incompatible**: The `update-ci-status` job in `ci-and-labels.yml` runs `git push` to create a PR, which fails on Dependabot PRs with a non-skippable `failure` conclusion
+
+**Solution**:
+
+Five coordinated fixes:
+
+1. **GraphQL native auto-merge** (`dependabot-auto-merge.yml`): Replace `github.rest.pulls.merge()` with `enablePullRequestAutoMerge` GraphQL mutation using `SQUASH` method. GitHub's native auto-merge uses system privileges to update the branch (satisfying `required_linear_history`) and handles required checks automatically.
+
+2. **Review thread resolution** (`dependabot-auto-merge.yml`): Before enabling auto-merge, query unresolved review threads via GraphQL (`reviewThreads`) and resolve them with `resolveReviewThread` mutation. This handles `required_review_thread_resolution`.
+
+3. **Skip Update CI Status on Dependabot** (`ci-and-labels.yml`): Add `github.actor != 'dependabot[bot]'` guard to the `update-ci-status` job's `if:` condition (preserving `always()` for non-Dependabot runs). The job gets skipped with a `skipped` conclusion instead of failing.
+
+4. **Remove dead combined status fetch** (`dependabot-auto-merge.yml`): The `getCombinedStatusForRef` call was unused after switching to check-run-only failure detection (which accepts `cancelled` conclusions).
+
+5. **Create pre-commit label**: Dependabot closes PRs without the `pre-commit` ecosystem label. Created label via `gh label create`.
+
+**Prevention**:
+- Always use `enablePullRequestAutoMerge` (GraphQL) for Dependabot auto-merge, not `pulls.merge()` (REST)
+- Resolve all review threads before enabling auto-merge when `required_review_thread_resolution` is active
+- Skip any CI jobs that require `contents: write` on Dependabot PRs (`github.actor != 'dependabot[bot]'`)
+- Use check runs (`checks.listForRef`) not combined status for failure detection
+- Test auto-merge on branches that are behind main to verify linear history handling
+
+**Files Modified**:
+- `.github/workflows/dependabot-auto-merge.yml` — Complete rewrite: `resolveReviewThread` + `enablePullRequestAutoMerge` (SQUASH) replaces manual polling + `pulls.merge()`
+- `.github/workflows/ci-and-labels.yml` — Added Dependabot exclusion to `update-ci-status` job
+- `tests/test-automerge-workflow.bats` — 11 tests validating GraphQL auto-merge, thread resolution, SQUASH, yamllint, permissions
+- `tests/test_workflow_versions.py` — Updated CodeQL SHA for merged Dependabot PR #458
+- `.github/workflows/security-scan.yml` — Updated 7 CodeQL version comments v4.35→v4.36
+
+---
+
 ## Resources
 
 - [BashFAQ/105 - Why set -e doesn't work](https://mywiki.wooledge.org/BashFAQ/105)
