@@ -17,7 +17,7 @@ while IFS= read -r file; do
   [[ -n "$file" && -f "$REPO_ROOT/$file" ]] && printf "Updated: %s\n" "$file"
 done <<< "$diff_output"
 
-if [ -z "$diff_output" ]; then
+if [[ -z "$diff_output" ]]; then
     count=0
 else
     # Security: Use printf to pipe variable content safely

@@ -33,7 +33,7 @@ def cleanup():
 def _test_default_skip() -> bool:
     """Test 1: Optional skills skipped by default."""
     cleanup()
-    code, out, err = run("./scripts/setup-skills.sh")
+    _, out, _ = run("./scripts/setup-skills.sh")
     expected_claude = "skip (optional): .claude/skills/eu-ai-act-compliance"
     expected_qwen = f"skip (optional): {QWEN_SKILLS_DIR}/eu-ai-act-compliance"
     if expected_claude in out and expected_qwen in out:
@@ -47,7 +47,7 @@ def _test_default_skip() -> bool:
 def _test_link_optional() -> bool:
     """Test 2: LINK_OPTIONAL=true links optional skills."""
     cleanup()
-    code, out, err = run("./scripts/setup-skills.sh", env={"LINK_OPTIONAL": "true"})
+    _, out, _ = run("./scripts/setup-skills.sh", env={"LINK_OPTIONAL": "true"})
     expected_claude = "linked: .claude/skills/eu-ai-act-compliance"
     expected_qwen = f"linked: {QWEN_SKILLS_DIR}/eu-ai-act-compliance"
     if expected_claude in out and expected_qwen in out:
@@ -61,7 +61,7 @@ def _test_link_optional() -> bool:
 def _test_validate_missing_optional() -> bool:
     """Test 3: validate-skills.sh handles missing optional skills."""
     cleanup()
-    code, out, err = run(VALIDATE_SKILLS_SCRIPT)
+    code, _, err = run(VALIDATE_SKILLS_SCRIPT)
     if code == 0:
         print("✓ Test 3 Passed: validate-skills.sh handles missing optional skills in CLI dirs")
         return True
@@ -80,7 +80,7 @@ def _test_validate_skill_format() -> bool:
     os.rename(SKILL_MD, bak_md)
     with open(SKILL_MD, "w") as f:
         f.write("Invalid content\n")
-    code, out, err = run(VALIDATE_SKILLS_SCRIPT)
+    _, _, err = run(VALIDATE_SKILLS_SCRIPT)
     os.remove(SKILL_MD)
     os.rename(bak_md, SKILL_MD)
     if code == 2 and "Must start with '---'" in err:
@@ -106,7 +106,7 @@ def _test_missing_cli_dir() -> bool:
         shutil.rmtree(QWEN_SKILLS_DIR)
     if os.path.exists(QWEN_DIR) and not os.listdir(QWEN_DIR):
         os.rmdir(QWEN_DIR)
-    code, out, err = run(VALIDATE_SKILLS_SCRIPT)
+    code, _, err = run(VALIDATE_SKILLS_SCRIPT)
     if code == 0:
         print("✓ Test 6 Passed: validate-skills.sh passes when a CLI directory is entirely missing")
         return True

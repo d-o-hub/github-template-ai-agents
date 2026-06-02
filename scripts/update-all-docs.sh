@@ -36,7 +36,7 @@ else
 fi
 
 if [[ "$verify_status" -ne 0 ]]; then
-    echo "Error: Command verification failed with status $verify_status"
+    echo "Error: Command verification failed with status $verify_status" >&2
     exit "$verify_status"
 fi
 
