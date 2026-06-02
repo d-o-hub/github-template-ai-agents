@@ -225,7 +225,10 @@ jobs:
       - name: Ensure ci-status label exists
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh label create ci-status --color d4c5f9 --description "CI status tracking PR - exempt from stale automation" --force 2>/dev/null || true
+        run: >
+          gh label create ci-status --color d4c5f9
+          --description "CI status tracking PR - exempt from stale automation"
+          --force 2>/dev/null || true
 
       - name: Commit and create PR
         env:

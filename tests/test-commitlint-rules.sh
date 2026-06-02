@@ -47,7 +47,7 @@ check_consistency "'footer-max-length'" "1000" "Footer max length"
 check_consistency "'footer-max-line-length'" "100" "Footer max line length"
 # subject-case is intentionally disabled ([0]) because identifiers like
 # LESSON-017, SKILL.md, and technical references are valid commit subjects
-check_consistency "'subject-case'" "[0]" "Subject case (disabled)"
+check_consistency "'subject-case'" "\\[0\\]" "Subject case (disabled)"
 
 printf "Checking dependabot commitlint exemption...\n"
 if grep -q "ignores" "$CONFIG_FILE"; then
