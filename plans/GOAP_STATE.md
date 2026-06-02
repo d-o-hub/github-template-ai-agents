@@ -3,9 +3,9 @@
 ## Current State
 
 - **Branch**: `main`
-- **CI Status**: Failing — quality-gate MD022 error in `plans/adr-007-dependabot-auto-merge-ruleset.md` (being fixed)
+- **CI Status**: Fix pushed (`e3e72d5`), CI running — quality-gate should return to passing
 - **Open PRs**:
-  - PR #477: `ci: update ci status artifacts` — automated CI status update detecting the quality-gate failure
+  - PR #477: `ci: update ci status artifacts` — will auto-resolve when CI passes
 
 ### Dependabot Auto-Merge Rewrite (Completed)
 
@@ -23,8 +23,9 @@
 
 1. [x] Fix MD022 markdownlint error in ADR-007 (blank lines around `### Positive`/`### Negative` headings)
 2. [x] Fix MD022 markdownlint error in GOAP_STATE.md (`### PR #419`/`### PR #414`)
-3. [ ] Handle PR #477 — merge after fix propagates or close if superseded
-4. [ ] Monitor next Dependabot run: **Monday June 8, 2026 09:00 UTC** — verify GraphQL auto-merge works end-to-end
+3. [x] Register ADR-007 in `plans/_status.json` (checked by `check-adr-compliance.sh`)
+4. [ ] Verify CI returns to passing after `e3e72d5`, PR #477 auto-resolves
+5. [ ] Monitor next Dependabot run: **Monday June 8, 2026 09:00 UTC** — verify GraphQL auto-merge works end-to-end
 
 ## Blockers
 
