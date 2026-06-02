@@ -140,6 +140,111 @@ setup() {
     rm -rf "$TEMP_DIR"
 }
 
+@test "quality_gate.sh fails when ADR file is unregistered in _status.json" {
+    # Create a temporary directory
+    TEMP_DIR=$(mktemp -d)
+    mkdir -p "$TEMP_DIR/.git"
+    mkdir -p "$TEMP_DIR/scripts"
+    mkdir -p "$TEMP_DIR/plans"
+    mkdir -p "$TEMP_DIR/.agents/skills"
+
+    # Copy necessary scripts
+    cp scripts/quality_gate.sh "$TEMP_DIR/scripts/"
+    cp scripts/generate-llms-txt.sh "$TEMP_DIR/scripts/"
+    mkdir -p "$TEMP_DIR/scripts/lib"
+    if [ -f scripts/lib/lint_cache.sh ]; then
+        cp scripts/lib/lint_cache.sh "$TEMP_DIR/scripts/lib/"
+    fi
+    chmod +x "$TEMP_DIR/scripts/"*.sh
+
+    # Copy real check-adr-compliance.sh (not stubbed) to catch unregistered ADRs
+    cp scripts/check-adr-compliance.sh "$TEMP_DIR/scripts/"
+    chmod +x "$TEMP_DIR/scripts/check-adr-compliance.sh"
+
+    # Stub all other validation scripts
+    for s in validate-git-hooks.sh validate-github-actions-shas.sh validate-workflows.sh validate-skills.sh validate-links.sh loc_gate.sh wasm_size_gate.sh check-plan-numbering.sh; do
+        printf '#!/usr/bin/env bash\n# stub script\ntrue\n' > "$TEMP_DIR/scripts/$s"
+        chmod +x "$TEMP_DIR/scripts/$s"
+    done
+
+    # Create minimal required files
+    printf '# Test Project\n\n> Test description\n' > "$TEMP_DIR/README.md"
+    touch "$TEMP_DIR/VERSION"
+    touch "$TEMP_DIR/AGENTS.md"
+
+    # Create an unregistered ADR file (should trigger check-adr-compliance.sh failure)
+    printf '# ADR: Test Decision\n\n**Status**: Draft\n' > "$TEMP_DIR/plans/adr-001-test.md"
+
+    # Create _status.json with NO entries for adr-001-test.md
+    printf '{"nextAvailable":{"plan":"001","adr":"adr-001"},"entries":{}}' > "$TEMP_DIR/plans/_status.json"
+
+    cd "$TEMP_DIR" || exit 1
+
+    # Run quality gate (should fail due to unregistered ADR)
+    run env SKIP_GLOBAL_HOOKS_CHECK=true GITHUB_REF=refs/heads/main GITHUB_EVENT_NAME=push GITHUB_EVENT=push ./scripts/quality_gate.sh
+
+    # Should exit with 2 (quality gate FAILED)
+    [ "$status" -eq 2 ]
+
+    # Should mention the unregistered ADR
+    [[ "$output" == *"NOT registered"* ]]
+
+    # Cleanup
+    cd "$REPO_ROOT" || exit 1
+    rm -rf "$TEMP_DIR"
+}
+
+@test "quality_gate.sh passes when all ADRs are registered in _status.json" {
+    # Create a temporary directory
+    TEMP_DIR=$(mktemp -d)
+    mkdir -p "$TEMP_DIR/.git"
+    mkdir -p "$TEMP_DIR/scripts"
+    mkdir -p "$TEMP_DIR/plans"
+    mkdir -p "$TEMP_DIR/.agents/skills"
+
+    # Copy necessary scripts
+    cp scripts/quality_gate.sh "$TEMP_DIR/scripts/"
+    cp scripts/generate-llms-txt.sh "$TEMP_DIR/scripts/"
+    mkdir -p "$TEMP_DIR/scripts/lib"
+    if [ -f scripts/lib/lint_cache.sh ]; then
+        cp scripts/lib/lint_cache.sh "$TEMP_DIR/scripts/lib/"
+    fi
+    chmod +x "$TEMP_DIR/scripts/"*.sh
+
+    # Copy real check-adr-compliance.sh
+    cp scripts/check-adr-compliance.sh "$TEMP_DIR/scripts/"
+    chmod +x "$TEMP_DIR/scripts/check-adr-compliance.sh"
+
+    # Stub all other validation scripts
+    for s in validate-git-hooks.sh validate-github-actions-shas.sh validate-workflows.sh validate-skills.sh validate-links.sh loc_gate.sh wasm_size_gate.sh check-plan-numbering.sh; do
+        printf '#!/usr/bin/env bash\n# stub script\ntrue\n' > "$TEMP_DIR/scripts/$s"
+        chmod +x "$TEMP_DIR/scripts/$s"
+    done
+
+    # Create minimal required files
+    printf '# Test Project\n\n> Test description\n' > "$TEMP_DIR/README.md"
+    touch "$TEMP_DIR/VERSION"
+    touch "$TEMP_DIR/AGENTS.md"
+
+    # Create a registered ADR file (must end with newline to pass MD047)
+    printf '# ADR: Test Decision\n\n**Status**: Accepted\n' > "$TEMP_DIR/plans/adr-001-test.md"
+
+    # Create _status.json WITH the ADR registered
+    printf '{"nextAvailable":{"plan":"001","adr":"adr-002"},"entries":{"adr-001-test.md":{"status":"accepted","date":"2026-06-02"}}}' > "$TEMP_DIR/plans/_status.json"
+
+    cd "$TEMP_DIR" || exit 1
+
+    # Run quality gate (should pass - ADR is registered)
+    run env SKIP_GLOBAL_HOOKS_CHECK=true GITHUB_REF=refs/heads/main GITHUB_EVENT_NAME=push GITHUB_EVENT=push ./scripts/quality_gate.sh
+
+    # Should exit with 0 (all checks pass)
+    [ "$status" -eq 0 ]
+
+    # Cleanup
+    cd "$REPO_ROOT" || exit 1
+    rm -rf "$TEMP_DIR"
+}
+
 @test "quality_gate.sh exits with 0 on main branch when llms files are missing (gitignored)" {
     # Create a temporary directory
     TEMP_DIR=$(mktemp -d)
