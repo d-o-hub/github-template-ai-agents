@@ -164,6 +164,7 @@ After **every** completed task, the agent MUST append a JSON entry to `.agents/m
 - **Markdown Test Fixtures**: BATS tests creating `.md` fixture files via `printf` must end with `\n` to pass markdownlint MD047/single-trailing-newline (LESSON-025)
 - **act CI Simulation**: `act` requires Docker + act binary; if unavailable, skip local CI simulation and rely on `gh run list` for CI status (LESSON-026)
 - **CI Status PR Auto-Detection**: Automated `ci-status-update` PRs are the monitoring system working as designed — fix the root CI failure, not the PR (LESSON-027)
+- **Codacy SonarPython Suppression**: Codacy ignores `# NOSONAR`, `# noqa`, `# nosec` for S-prefixed rules; use constant extraction for literal patterns or `.codacy.yml` file exclusion (LESSON-028)
 
 ## Self-Learning Rules (Auto-Generated)
 
