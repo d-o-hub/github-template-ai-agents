@@ -146,8 +146,8 @@ fi
 
 # Sort the table rows (excluding header) alphabetically by skill name
 # Security: Use 10# to force decimal interpretation (handles leading zeros like 08)
-head -n $((10#$SKILLS_SECTION_LINE + 3)) -- "$TEMP_FILE" > "$UPDATE_AGENTS_TEMP_TABLE"
-tail -n +$((10#$SKILLS_SECTION_LINE + 4)) -- "$TEMP_FILE" | sort >> "$UPDATE_AGENTS_TEMP_TABLE"
+head -n $((10#0$SKILLS_SECTION_LINE + 3)) -- "$TEMP_FILE" > "$UPDATE_AGENTS_TEMP_TABLE"
+tail -n +$((10#0$SKILLS_SECTION_LINE + 4)) -- "$TEMP_FILE" | sort >> "$UPDATE_AGENTS_TEMP_TABLE"
 mv -- "$UPDATE_AGENTS_TEMP_TABLE" "$TEMP_FILE"
 
 # Add empty line before next section
