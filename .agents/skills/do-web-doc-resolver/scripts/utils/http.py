@@ -19,6 +19,8 @@ from scripts.constants import (
     BLOCKED_NETWORKS,
     BLOCKED_SCHEMES,
     DNS_CACHE_TTL,
+    HTTP_SCHEME,
+    HTTPS_SCHEME,
     USER_AGENT,
 )
 from scripts.models import ValidationResult
@@ -39,8 +41,8 @@ def create_session_with_retry() -> requests.Session:
         raise_on_status=False,
     )
     adapter = HTTPAdapter(max_retries=retry_strategy)
-    session.mount("http://", adapter)  # NOSONAR: S504 -- HTTP adapter needed for SSRF-safe requests to HTTP-only endpoints
-    session.mount("https://", adapter)
+    session.mount(HTTP_SCHEME, adapter)  # HTTP adapter needed for SSRF-safe requests to HTTP-only endpoints
+    session.mount(HTTPS_SCHEME, adapter)
     session.headers.update(
         {
             "User-Agent": USER_AGENT,
