@@ -48,9 +48,9 @@
 
 ---
 
-## High (118) — Mostly False Positives
+## High (117) — Mostly False Positives
 
-### Assert Usage — 118 findings
+### Assert Usage — 117 findings
 
 | Issue | Context | Action |
 |-------|---------|--------|
