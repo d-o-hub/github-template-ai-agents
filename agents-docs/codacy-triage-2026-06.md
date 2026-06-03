@@ -7,10 +7,10 @@
 | Severity | Count | Status |
 |----------|-------|--------|
 | **Critical** | 13 | Action required |
-| **High** | 118 | Mostly false positives (test assertions) |
+| **High** | 117 | Mostly false positives (test assertions) |
 | **Medium** | 16 | Mixed — CVEs + code quality |
 | **Low** | 5 | Known false positives (subprocess SSRF) |
-| **Total** | **152** | Grade: **A** |
+| **Total** | **151** | Grade: **A** |
 
 ---
 
@@ -130,6 +130,6 @@ pip install pytest>=9.0.3
 
 ### Phase 3 — Suppression (Manual)
 
-1. **Test assertions (117 High)**: Codacy's SonarPython S101 is a built-in engine — NOT exposed as a configurable tool. `.codacy.yml` `sonarpython` key, `codacy pattern --disable`, and API endpoints all fail silently or return errors. **Only fix**: manually mark as "False Positive" via Codacy dashboard (https://app.codacy.com).
+1. **Test assertions (117 High)**: Codacy's SonarPython S101 is a built-in engine — NOT exposed as a configurable tool. `.codacy.yml` `sonarpython` key, `codacy pattern --disable`, and API endpoints all fail silently or return errors. **Only fix**: manually mark as "False Positive" via [Codacy dashboard](https://app.codacy.com).
 2. Suppress remaining subprocess false positives (5 Low) — already excluded via `.codacy.yml`
 3. Document all suppressions with rationale
