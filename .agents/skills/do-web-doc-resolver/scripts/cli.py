@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 CLI entrypoint for Web Doc Resolver.
+(Ported to support modular architecture)
 """
 
 import argparse

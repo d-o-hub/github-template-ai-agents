@@ -2,18 +2,10 @@
 Negative caching logic for the Web Doc Resolver.
 """
 
-from dataclasses import dataclass
+import logging
 from datetime import datetime, timedelta, timezone
-from typing import Any
 
-
-@dataclass
-class NegativeCacheEntry:
-    key: str
-    provider: str
-    reason: str
-    expires_at: datetime
-    metadata: dict[str, Any]
+logger = logging.getLogger(__name__)
 
 
 def should_skip_from_negative_cache(cache, key: str, provider: str) -> bool:
@@ -35,16 +27,23 @@ def should_skip_from_negative_cache(cache, key: str, provider: str) -> bool:
             dt = dt.replace(tzinfo=timezone.utc)
         return dt > datetime.now(timezone.utc)
     except Exception:
+        logger.debug("Failed to parse negative cache expiry: %s", expires_at, exc_info=True)
         return False
 
 
 def write_negative_cache(
-    cache, key: str, provider: str, reason: str, ttl_seconds: int, **metadata
+    cache, key: str, provider: str, reason: str, ttl_seconds: int | None = None, **metadata
 ) -> None:
     if cache is None:
         return
     if not hasattr(cache, "set"):
         return
+
+    if ttl_seconds is None:
+        from scripts.utils import get_ttl
+
+        ttl_seconds = get_ttl(provider)
+
     now = datetime.now(timezone.utc)
     entry = {
         "key": key,

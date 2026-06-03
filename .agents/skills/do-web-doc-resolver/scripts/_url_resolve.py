@@ -1,26 +1,13 @@
 """URL resolution - resolve_url and resolve_url_stream."""
 
-import concurrent.futures
 import logging
-import time
 from collections.abc import Generator
+from dataclasses import asdict
 from typing import Any
 
-import scripts.cache_negative
-import scripts.circuit_breaker
-import scripts.providers_impl
-import scripts.quality
 import scripts.routing
-import scripts.routing_memory
-import scripts.semantic_cache
-import scripts.utils
-from scripts.models import (
-    ErrorType,
-    Profile,
-    ProviderType,
-    ResolvedResult,
-    ResolveMetrics,
-)
+from scripts._cascade import cascade_stream
+from scripts.models import Profile, ProviderType, ResolvedResult, ResolveMetrics
 from scripts.providers_impl import (
     resolve_with_docling,
     resolve_with_duckduckgo,
@@ -30,18 +17,15 @@ from scripts.providers_impl import (
     resolve_with_ocr,
 )
 from scripts.semantic_cache import get_semantic_cache
+from scripts.state import circuit_breakers as _circuit_breakers
+from scripts.state import routing_memory as _routing_memory
 from scripts.utils import (
-    _detect_error_type,
-    _get_cache,
     compact_content,
     fetch_llms_txt,
     fetch_url_content,
 )
 
 logger = logging.getLogger(__name__)
-
-_circuit_breakers = scripts.circuit_breaker.CircuitBreakerRegistry()
-_routing_memory = scripts.routing_memory.RoutingMemory()
 
 
 def _check_semantic_cache(query_or_url: str) -> dict[str, Any] | None:
@@ -100,7 +84,7 @@ def resolve_url(
 
 def resolve_url_stream(
     url: str, max_chars: int = 8000, profile: Profile = Profile.BALANCED
-) -> Generator[dict[str, Any], None, None]:
+) -> Generator[dict[str, Any]]:
     logger.info(f"Resolving URL: {url}")
 
     cached_result = _check_semantic_cache(url)
@@ -114,9 +98,10 @@ def resolve_url_stream(
         profile.value, scripts.routing.PROFILE_BUDGETS["balanced"]
     )
     budget = scripts.routing.ResolutionBudget(
-        max_provider_attempts=budget_data["max_provider_attempts"],
-        max_paid_attempts=budget_data["max_paid_attempts"],
-        max_total_latency_ms=budget_data["max_total_latency_ms"],
+        max_provider_attempts=int(budget_data["max_provider_attempts"]),
+        max_paid_attempts=int(budget_data["max_paid_attempts"]),
+        max_total_latency_ms=int(budget_data["max_total_latency_ms"]),
+        min_free_quality_to_skip_paid=float(budget_data.get("min_free_quality_to_skip_paid", 0.70)),
         allow_paid=bool(budget_data["allow_paid"]),
     )
 
@@ -151,120 +136,41 @@ def resolve_url_stream(
         "duckduckgo": (ProviderType.DUCKDUCKGO, lambda: resolve_with_duckduckgo(url, max_chars)),
     }
 
-    cache = _get_cache()
     domain = scripts.routing.extract_domain(url)
     eligible = [p for p in provider_names if p in cascade_map]
-    active_futures = {}
 
-    from scripts import resolve as resolve_module
+    def _url_result_builder(res, target_url, p_name, met, score):
+        if isinstance(res, ResolvedResult):
+            res.metrics, res.score = met, score
+            return res.to_dict()
+        elif p_name == "llms_txt":
+            return {
+                "source": "llms.txt",
+                "url": target_url,
+                "content": compact_content(str(res), max_chars),
+                "metrics": asdict(met),
+                "score": score,
+            }
+        else:
+            return {
+                "source": p_name,
+                "url": target_url,
+                "content": str(res),
+                "metrics": asdict(met),
+                "score": score,
+            }
 
-    executor = resolve_module._get_executor(max_workers=max(10, len(eligible)))
-    try:
-        for i, p_name in enumerate(eligible):
-            pt, func = cascade_map[p_name]
-            if not budget.can_try(is_paid=pt.is_paid()):
-                if budget.stop_reason in ("paid_disabled", "max_paid_attempts"):
-                    continue
-                break
-            if scripts.cache_negative.should_skip_from_negative_cache(cache, url, p_name):
-                continue
-            if _circuit_breakers.is_open(p_name):
-                continue
-
-            logger.info(f"Starting probe: {p_name}")
-            start_time_probe = time.time()
-            future = executor.submit(func)
-            active_futures[future] = (p_name, pt, start_time_probe)
-            threshold = _routing_memory.get_p75_latency(domain or "any", p_name) / 1000.0
-
-            while active_futures:
-                elapsed = time.time() - start_time_probe
-
-                if i < len(eligible) - 1 and elapsed >= threshold:
-                    logger.info(f"Hedging threshold reached for {p_name} ({threshold}s)")
-                    break
-
-                done, _ = concurrent.futures.wait(
-                    active_futures.keys(),
-                    timeout=0.01,
-                    return_when=concurrent.futures.FIRST_COMPLETED,
-                )
-
-                found_acceptable = False
-                for f in list(done):
-                    if f not in active_futures:
-                        continue
-                    p_name_done, pt_done, s_time = active_futures.pop(f)
-                    latency = int((time.time() - s_time) * 1000)
-                    budget.record_attempt(is_paid=pt_done.is_paid(), latency_ms=latency)
-                    try:
-                        res_or_content = f.result()
-                    except Exception as e:
-                        err_type = _detect_error_type(e)
-                        if err_type not in (ErrorType.AUTH_ERROR, ErrorType.SSRF_BLOCKED):
-                            _circuit_breakers.record_failure(p_name_done)
-                        metrics.record_provider(pt_done, latency, False)
-                        continue
-                    if res_or_content:
-                        if isinstance(res_or_content, ResolvedResult):
-                            content = res_or_content.content
-                        else:
-                            content = str(res_or_content)
-
-                        q_score = scripts.quality.score_content(content)
-                        if q_score.acceptable or pt_done == ProviderType.LLMS_TXT:
-                            _circuit_breakers.record_success(p_name_done)
-                            metrics.record_provider(pt_done, latency, True)
-                            if domain:
-                                _routing_memory.record(
-                                    domain, p_name_done, True, latency, q_score.score
-                                )
-
-                            found_acceptable = True
-                            if pt_done == ProviderType.LLMS_TXT:
-                                result_dict = {
-                                    "source": "llms.txt",
-                                    "url": url,
-                                    "content": compact_content(content, max_chars),
-                                    "metrics": metrics,
-                                }
-                                _store_in_semantic_cache(url, result_dict)
-                                yield result_dict
-                            elif isinstance(res_or_content, ResolvedResult):
-                                res_or_content.metrics, res_or_content.score = (
-                                    metrics,
-                                    q_score.score,
-                                )
-                                result_dict = res_or_content.to_dict()
-                                _store_in_semantic_cache(url, result_dict)
-                                yield result_dict
-                            break
-                        else:
-                            scripts.cache_negative.write_negative_cache(
-                                cache, url, p_name_done, "thin_content", 1800
-                            )
-                            if domain:
-                                _routing_memory.record(
-                                    domain, p_name_done, False, latency, q_score.score
-                                )
-                    else:
-                        _circuit_breakers.record_failure(p_name_done)
-                        metrics.record_provider(pt_done, latency, False)
-
-                if found_acceptable:
-                    return
-                if done:
-                    break
-                if not active_futures:
-                    break
-    finally:
-        # We don't shut down the shared executor, but we should cancel our own futures
-        for f in active_futures:
-            f.cancel()
-
-    yield {
-        "source": "none",
-        "url": url,
-        "content": "Failed",
-        "error": f"No resolution method available. Stop reason: {budget.stop_reason}",
-    }
+    yield from cascade_stream(
+        target=url,
+        cascade_map=cascade_map,
+        eligible=eligible,
+        budget=budget,
+        metrics=metrics,
+        routing_memory=_routing_memory,
+        circuit_breakers=_circuit_breakers,
+        semantic_cache_store=_store_in_semantic_cache,
+        routing_key=domain or "any",
+        result_builder=_url_result_builder,
+        content_acceptable=lambda q, pt: q.acceptable or pt == ProviderType.LLMS_TXT,
+        target_key="url",
+    )
