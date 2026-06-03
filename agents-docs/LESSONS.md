@@ -891,21 +891,26 @@ Three-tier approach:
    # After: Codacy doesn't trace constant values
    HTTP_SCHEME = "http://"
    session.mount(HTTP_SCHEME, adapter)
+
    ```
 
 2. **File-level exclusion** (fallback for unfixable patterns): Add specific files to `.codacy.yml` `exclude_paths`:
+
    ```yaml
    exclude_paths:
      - ".agents/skills/do-web-doc-resolver/scripts/providers/docling.py"
+
    ```
 
 3. **Bandit B101 for tests**: Use engine-level exclusion for assert-in-tests false positives:
+
    ```yaml
    engines:
      bandit:
        enabled: true
        exclude_paths:
          - "**/tests/**"
+
    ```
 
 **Prevention**:
