@@ -49,7 +49,7 @@ def _clear_cached_result(input_value: str, source: str, rate_limit_key: str | No
     if cache is not None:
         try:
             cache.delete(_cache_key(input_value, source))
-        except Exception:
+        except Exception:  # nosec B110 -- best-effort cache cleanup, failure is non-critical
             pass
     _rate_limits.pop(rate_limit_key or source, None)
 

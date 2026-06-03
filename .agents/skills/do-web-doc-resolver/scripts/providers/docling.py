@@ -16,7 +16,7 @@ def resolve_with_docling(url: str, max_chars: int) -> ResolvedResult | None:
         logger.warning("SSRF blocked: %s", url)
         return None
     try:
-        res = subprocess.run(
+        res = subprocess.run(  # nosec B603 -- list form, URL validated by is_safe_url
             ["docling", "--format", "markdown", url],
             capture_output=True,
             text=True,
@@ -35,7 +35,7 @@ def resolve_with_ocr(url: str, max_chars: int) -> ResolvedResult | None:
         logger.warning("SSRF blocked: %s", url)
         return None
     try:
-        res = subprocess.run(
+        res = subprocess.run(  # nosec B603 -- list form, URL validated by is_safe_url
             ["tesseract", url, "stdout"], capture_output=True, text=True, timeout=30, check=False
         )
         if res.returncode == 0:

@@ -1,0 +1,33 @@
+---
+# Codacy configuration for github-template-ai-agents
+# See: templates/codacy/.codacy.yml for reference template
+# See: .agents/skills/codacy/references/config-format.md for format docs
+
+exclude_paths:
+  - "target/**"
+  - "node_modules/**"
+  - "vendor/**"
+  - "**/dist/**"
+  - "**/build/**"
+
+engines:
+  duplication:
+    enabled: true
+    exclude_paths:
+      - "**/tests/**"
+      - "**/*.test.ts"
+      - "**/*_test.go"
+  metric:
+    enabled: true
+    config:
+      languages:
+        - "python"
+        - "typescript"
+        - "shell"
+  bandit:
+    enabled: true
+    # B101 (assert) is a false positive in pytest test files where assert is
+    # the canonical assertion mechanism.  B110 (try-except-pass) is intentional
+    # for best-effort cache cleanup.  Exclude test trees from these patterns.
+    exclude_paths:
+      - "**/tests/**"

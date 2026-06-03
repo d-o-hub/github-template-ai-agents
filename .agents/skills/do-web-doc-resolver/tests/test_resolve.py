@@ -3,7 +3,6 @@
 import logging
 import os
 import sys
-from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
@@ -16,7 +15,6 @@ from scripts.resolve import (
     _detect_error_type,
     _is_rate_limited,
     _set_rate_limit,
-    fetch_llms_txt,
     is_url,
     resolve,
     resolve_with_duckduckgo,

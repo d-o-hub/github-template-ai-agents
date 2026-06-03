@@ -2,7 +2,6 @@
 Two-stage synthesis gating logic for the Web Doc Resolver.
 """
 
-import datetime
 import logging
 from difflib import SequenceMatcher
 
@@ -130,8 +129,6 @@ def synthesize_results(query: str, results: list[ResolvedResult], api_key: str, 
             for i, res in enumerate(results)
         ]
     )
-
-    current_date = datetime.date.today().isoformat()
 
     system_prompt = (
         "You are an expert research assistant. Synthesize the provided context into a high-quality, "

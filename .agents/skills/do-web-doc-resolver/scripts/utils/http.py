@@ -95,7 +95,7 @@ def is_safe_url(url: str) -> bool:
             "localhost.localdomain",
             "127.0.0.1",
             "::1",
-            "0.0.0.0",
+            "0.0.0.0",  # nosec B104 -- SSRF blocklist, not a bind address
         ):
             return False
         try:
