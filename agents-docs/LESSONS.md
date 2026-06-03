@@ -884,6 +884,7 @@ gh run list --branch main --limit 5 --json conclusion,displayTitle
 Three-tier approach:
 
 1. **Constant extraction** (best for literal string patterns): Extract flagged literals to constants to avoid pattern detection:
+
    ```python
    # Before: Codacy flags literal "http://" as S504
    session.mount("http://", adapter)
