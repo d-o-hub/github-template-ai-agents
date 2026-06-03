@@ -66,7 +66,7 @@ def put_file(owner: str, repo: str, path: str, content: str, message: str, branc
         url = f"{BASE}/repos/{owner}/{repo}/contents/{path}?ref={branch}"
         existing = _get(url, TOKEN)
         sha = existing.get("sha")
-    except Exception:
+    except Exception:  # nosec B110 -- best-effort SHA lookup for new file creation
         pass
 
     encoded = base64.b64encode(content.encode("utf-8")).decode("ascii")

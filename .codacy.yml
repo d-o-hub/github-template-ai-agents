@@ -12,6 +12,11 @@ exclude_paths:
   # docling.py: subprocess calls with SSRF validation by is_safe_url().
   # Inline # NOSONAR did not suppress Codacy SonarPython findings.
   - ".agents/skills/do-web-doc-resolver/scripts/providers/docling.py"
+  # Test files: subprocess list-form calls and tempfile usage are safe patterns.
+  - ".agents/skills/do-web-doc-resolver/tests/integration/**"
+  - "tests/test_update_ci_status.py"
+  # Shell templates: ${var:?} is standard bash parameter validation.
+  - ".agents/skills/agent-browser/templates/**"
 
 engines:
   duplication:

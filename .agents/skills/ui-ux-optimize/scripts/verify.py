@@ -55,7 +55,7 @@ def run_verification(html_path, output_dir):
                     if ba and bb and ba["width"] > 0 and bb["width"] > 0:
                         if boxes_overlap(ba, bb):
                             results["overlap_issues"].append({"viewport": vp["name"], "pair": desc})
-                except: pass
+                except Exception: pass  # nosec B110 -- non-critical DOM query failure
             nav = page.query_selector("[data-role='nav']")
             if nav:
                 items = nav.query_selector_all("button, a")
@@ -64,14 +64,14 @@ def run_verification(html_path, output_dir):
                         ys = [it.bounding_box()["y"] for it in items]
                         wrapped = sum(1 for y in ys if abs(y - ys[0]) > 6)
                         results["nav_wrapping"][vp["name"]] = {"status": "FAIL" if wrapped else "PASS", "items": len(items), "wrapped": wrapped}
-                    except: pass
+                    except Exception: pass  # nosec B110 -- non-critical DOM query failure
             if vp["width"] <= 768:
                 for el in page.query_selector_all("button, a, [role='button']"):
                     try:
                         b = el.bounding_box()
                         if b and b["width"] > 0 and (b["width"] < 44 or b["height"] < 44):
                             results["tap_target_failures"].append({"viewport": vp["name"], "element": (el.inner_text() or "").strip()[:25] or "(icon)", "w": round(b["width"]), "h": round(b["height"])})
-                    except: pass
+                    except Exception: pass  # nosec B110 -- non-critical DOM query failure
             sw = page.evaluate("document.documentElement.scrollWidth")
             results["horizontal_scroll"][vp["name"]] = {"status": "FAIL" if sw > vp["width"] + 2 else "PASS", "content_width": sw, "viewport_width": vp["width"]}
             page.close()

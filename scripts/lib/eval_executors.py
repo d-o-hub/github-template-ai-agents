@@ -34,7 +34,7 @@ def run_command_check(
     check_structure = scripts_dir / "check_structure.py"
     if check_structure.exists():
         try:
-            result = subprocess.run(
+            result = subprocess.run(  # NOSONAR: S603,S607 -- list form, all args derived from validated Path objects
                 [sys.executable, str(check_structure), "--path", str(skill_path.parent)],
                 capture_output=True, text=True, timeout=30,
                 cwd=str(skill_path.parent.parent.parent)
@@ -54,7 +54,7 @@ def run_command_check(
                 details=[result.stdout, result.stderr] if result.stderr else [result.stdout],
                 duration_ms=duration
             )
-        except subprocess.TimeoutExpired:
+        except subprocess.TimeoutExpired:  # NOSONAR -- standard timeout handling
             return EvalResult(
                 eval_id=eval_case.get("id", 0),
                 status=EvalStatus.ERROR,

@@ -115,7 +115,7 @@ def gh_text(args, repo=None):
         cmd.extend(["-R", repo])
     cmd.extend(args)
     try:
-        proc = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        proc = subprocess.run(cmd, check=True, capture_output=True, text=True)  # NOSONAR: S603 -- list form, cmd built from CLI args + gh API
     except FileNotFoundError as err:
         raise GhCommandError("`gh` command not found") from err
     except subprocess.CalledProcessError as err:

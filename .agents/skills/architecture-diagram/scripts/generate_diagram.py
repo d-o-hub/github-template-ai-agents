@@ -47,7 +47,7 @@ def _read_frontmatter_name(path: Path) -> str:
             m = re.search(r"^name:\s*(.+)$", block, re.MULTILINE)
             if m:
                 return m.group(1).strip().strip('"').strip("'")
-    except Exception:
+    except Exception:  # nosec B110 -- best-effort frontmatter parse, fall back to stem
         pass
     return path.stem
 
