@@ -128,8 +128,8 @@ pip install pytest>=9.0.3
 3. Fix try/except/pass (add logging)
 4. Review insecure temp file usage
 
-### Phase 3 — Suppression (Ongoing)
+### Phase 3 — Suppression (Manual)
 
-1. Suppress test assertion findings (118 High) via `.codacy.yml`
-2. Suppress remaining subprocess false positives (5 Low)
+1. **Test assertions (117 High)**: Codacy's SonarPython S101 is a built-in engine — NOT exposed as a configurable tool. `.codacy.yml` `sonarpython` key, `codacy pattern --disable`, and API endpoints all fail silently or return errors. **Only fix**: manually mark as "False Positive" via Codacy dashboard (https://app.codacy.com).
+2. Suppress remaining subprocess false positives (5 Low) — already excluded via `.codacy.yml`
 3. Document all suppressions with rationale
