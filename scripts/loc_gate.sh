@@ -32,7 +32,7 @@ echo "Checking LOC limits..."
 if [[ -f "$AGENTS_MD_FILE" ]]; then
     LOC=$(wc -l < "$AGENTS_MD_FILE")
     # Security: Use 10# to force decimal interpretation (handles leading zeros like 08)
-    if (( 10#$LOC > 10#$MAX_AGENTS )); then
+    if (( 10#${LOC// /} > 10#$MAX_AGENTS )); then
         echo "ERROR: $AGENTS_MD_FILE has $LOC lines (max $MAX_AGENTS)" >&2
         FAILED=1
     fi
