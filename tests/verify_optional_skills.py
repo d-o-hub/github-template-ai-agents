@@ -1,6 +1,7 @@
 import os
-import subprocess
+import shlex
 import shutil
+import subprocess
 import sys
 
 QWEN_SKILLS_DIR = ".qwen/skills"
@@ -14,7 +15,11 @@ SKILL_IMPL = ".agents/skills/eu-ai-act-compliance/eu-ai-act-compliance.ts"
 
 
 def run(cmd, env=None):
-    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env={**os.environ, **(env or {})})
+    """Run a shell command safely without shell=True."""
+    if isinstance(cmd, str):
+        cmd = shlex.split(cmd)
+    merged_env = {**os.environ, **(env or {})}
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=merged_env)
     stdout, stderr = process.communicate()
     return process.returncode, stdout.decode(), stderr.decode()
 

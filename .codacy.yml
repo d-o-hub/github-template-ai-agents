@@ -34,3 +34,12 @@ engines:
     # for best-effort cache cleanup.  Exclude test trees from these patterns.
     exclude_paths:
       - "**/tests/**"
+  # SonarPython: suppress 118 test-assertion false positives ("Use of assert
+  # detected") that Codacy flags as High severity in every test file.
+  sonarpython:
+    enabled: true
+    exclude_paths:
+      - "**/tests/**"
+      - "**/test_*.py"
+      - "**/*_test.py"
+      - "**/verify_optional_skills.py"
