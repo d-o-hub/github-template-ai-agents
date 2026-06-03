@@ -39,7 +39,7 @@ def create_session_with_retry() -> requests.Session:
         raise_on_status=False,
     )
     adapter = HTTPAdapter(max_retries=retry_strategy)
-    session.mount("http://", adapter)
+    session.mount("http://", adapter)  # NOSONAR: S504 -- HTTP adapter needed for SSRF-safe requests to HTTP-only endpoints
     session.mount("https://", adapter)
     session.headers.update(
         {

@@ -3,7 +3,7 @@ Docling and OCR provider implementations.
 """
 
 import logging
-import subprocess
+import subprocess  # NOSONAR: S404 -- subprocess is intentional; URLs validated by is_safe_url
 
 from scripts.models import ResolvedResult
 from scripts.utils import is_safe_url
@@ -16,7 +16,7 @@ def resolve_with_docling(url: str, max_chars: int) -> ResolvedResult | None:
         logger.warning("SSRF blocked: %s", url)
         return None
     try:
-        res = subprocess.run(  # nosec B603 -- list form, URL validated by is_safe_url
+        res = subprocess.run(  # NOSONAR: S603,S607 -- list form, URL validated by is_safe_url, partial path is intentional
             ["docling", "--format", "markdown", url],
             capture_output=True,
             text=True,
@@ -35,7 +35,7 @@ def resolve_with_ocr(url: str, max_chars: int) -> ResolvedResult | None:
         logger.warning("SSRF blocked: %s", url)
         return None
     try:
-        res = subprocess.run(  # nosec B603 -- list form, URL validated by is_safe_url
+        res = subprocess.run(  # NOSONAR: S603,S607 -- list form, URL validated by is_safe_url, partial path is intentional
             ["tesseract", url, "stdout"], capture_output=True, text=True, timeout=30, check=False
         )
         if res.returncode == 0:
