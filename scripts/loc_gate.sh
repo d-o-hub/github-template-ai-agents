@@ -43,7 +43,7 @@ fi
 if ! find .agents/skills -name "SKILL.md" -not -path "*/node_modules/*" -print0 | \
     xargs -0 -r wc -l -- | \
     awk -v max="${MAX_SKILL_OVERRIDE:-$MAX_SKILL}" -- '
-    BEGIN { err = 0; if (max ~ /^0[0-9]+/) max = substr(max, 2) }
+    BEGIN { err = 0 }
     $NF == "total" { next }
     $1 + 0 > max + 0 {
         count = $1
