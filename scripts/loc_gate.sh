@@ -31,7 +31,8 @@ echo "Checking LOC limits..."
 # 1. Check AGENTS.md
 if [[ -f "$AGENTS_MD_FILE" ]]; then
     LOC=$(wc -l < "$AGENTS_MD_FILE")
-    if [[ "$LOC" -gt "$MAX_AGENTS" ]]; then
+    # Security: Use 10# to force decimal interpretation (handles leading zeros like 08)
+    if (( 10#$LOC > 10#$MAX_AGENTS )); then
         echo "ERROR: $AGENTS_MD_FILE has $LOC lines (max $MAX_AGENTS)" >&2
         FAILED=1
     fi
@@ -42,9 +43,9 @@ fi
 if ! find .agents/skills -name "SKILL.md" -not -path "*/node_modules/*" -print0 | \
     xargs -0 -r wc -l -- | \
     awk -v max="${MAX_SKILL_OVERRIDE:-$MAX_SKILL}" -- '
-    BEGIN { err = 0 }
+    BEGIN { err = 0; if (max ~ /^0[0-9]+/) max = substr(max, 2) }
     $NF == "total" { next }
-    $1 > max {
+    $1 + 0 > max + 0 {
         count = $1
         $1 = ""
         sub(/^[[:space:]]+/, "")
@@ -68,9 +69,9 @@ if ! find . -type f \( -name "*.py" -o -name "*.rs" -o -name "*.ts" -o -name "*.
     -not -path "./.agents/skills/*" -print0 | \
     xargs -0 -r wc -l -- | \
     awk -v max="${MAX_SOURCE_OVERRIDE:-$MAX_SOURCE}" -- '
-    BEGIN { err = 0 }
+    BEGIN { err = 0; if (max ~ /^0[0-9]+/) max = substr(max, 2) }
     $NF == "total" { next }
-    $1 > max {
+    $1 + 0 > max + 0 {
         count = $1
         $1 = ""
         sub(/^[[:space:]]+/, "")
