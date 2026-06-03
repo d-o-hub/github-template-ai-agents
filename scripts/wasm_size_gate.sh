@@ -46,7 +46,8 @@ fi
 if [[ -s "$TMP_OUT" ]]; then
     WASM_FOUND=1
     while IFS="|" read -r size file; do
-        if [[ "$size" -gt "$MAX_SIZE_BYTES" ]]; then
+        # Security: Use 10# to force decimal interpretation (handles leading zeros like 08)
+        if (( 10#$size > 10#$MAX_SIZE_BYTES )); then
             printf "ERROR: %s size %s exceeds limit %s\n" "$file" "$size" "$MAX_SIZE_BYTES"
             FAILED=1
         else

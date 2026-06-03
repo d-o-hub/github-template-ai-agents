@@ -24,7 +24,8 @@ MAJOR="${BASH_REMATCH[1]}"
 MINOR="${BASH_REMATCH[2]}"
 PATCH="${BASH_REMATCH[3]}"
 
-NEW_PATCH=$((PATCH + 1))
+# Security: Use 10# to force decimal interpretation (handles leading zeros like 08)
+NEW_PATCH=$((10#$PATCH + 1))
 NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
 CURRENT_DATE=$(date +"%Y-%m-%d")
 RECENT_COMMIT_COUNT=15
