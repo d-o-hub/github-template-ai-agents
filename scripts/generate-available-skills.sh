@@ -8,18 +8,39 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SKILLS_DIR="$REPO_ROOT/.agents/skills"
-OUTPUT_FILE="$REPO_ROOT/agents-docs/AVAILABLE_SKILLS.md"
+REPO_ROOT="${REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+SKILLS_DIR="${SKILLS_DIR:-$REPO_ROOT/.agents/skills}"
+OUTPUT_FILE="${OUTPUT_FILE:-$REPO_ROOT/agents-docs/AVAILABLE_SKILLS.md}"
 
-# Optimization: Use a single awk process to extract data from all SKILL.md files.
-# This eliminates the O(N) process forks where N is the number of skills.
-SKILL_DATA=$(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" | xargs awk -- '
-    BEGINFILE {
+# Optimization: Use native bash globbing to avoid `find` process fork overhead.
+# Use nullglob+extglob to match SKILL.md files while excluding _prefixed dirs.
+shopt -s nullglob extglob
+skill_files=("$SKILLS_DIR"/!(_*)/SKILL.md)
+shopt -u nullglob extglob
+
+if [[ ${#skill_files[@]} -gt 0 ]]; then
+    # Use mawk-compatible awk (no BEGINFILE/ENDFILE) with FILENAME tracking.
+    SKILL_DATA=$(printf '%s\0' "${skill_files[@]}" | xargs -0 awk -- '
+    function clean(s) {
+        sub(/^[^:]*: */, "", s)
+        if (s ~ /^".*"$/ || s ~ /^\x27.*\x27$/) {
+            s = substr(s, 2, length(s) - 2)
+        }
+        return s
+    }
+    function flush_entry() {
+        if (prev_file != "") {
+            if (name == "") name = skill_dir_name
+            if (description == "") description = "No description available"
+            print category "|" name "|" description
+        }
+    }
+    FILENAME != prev_file {
+        flush_entry()
+        prev_file = FILENAME
         category = "general"
         description = ""
         name = ""
-        # Get skill name from directory name
         split(FILENAME, parts, "/")
         skill_dir_name = parts[length(parts)-1]
         in_fm = 0
@@ -32,23 +53,11 @@ SKILL_DATA=$(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" |
         next
     }
     !in_fm { next }
-
-    function clean(s) {
-        sub(/^[^:]*: */, "", s)
-        # Handle cases like description: "value" or description: '\''value'\''
-        if (s ~ /^".*"$/ || s ~ /^\x27.*\x27$/) {
-            s = substr(s, 2, length(s) - 2)
-        }
-        return s
-    }
-
     /^name:/ { name = clean($0) }
     /^category:/ { category = clean($0) }
     /^description:/ {
-        # Check if description uses multiline or is single line
         orig_val = $0
         sub(/^description: */, "", orig_val)
-
         if (orig_val ~ /^>[-|]?$/) {
             desc = ""
             while (getline > 0) {
@@ -57,7 +66,6 @@ SKILL_DATA=$(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" |
                     sub(/^  /, "", line)
                     desc = (desc == "" ? line : desc " " line)
                 } else {
-                    # Handle the line that broke the multiline loop
                     if ($0 ~ /^name:/) name = clean($0)
                     if ($0 ~ /^category:/) category = clean($0)
                     if ($0 ~ /^---$/) { fm_count++; in_fm = 0 }
@@ -69,12 +77,11 @@ SKILL_DATA=$(find "$SKILLS_DIR" -maxdepth 2 -name "SKILL.md" -not -path "*/_*" |
             description = clean($0)
         }
     }
-    ENDFILE {
-        if (name == "") name = skill_dir_name
-        if (description == "") description = "No description available"
-        print category "|" name "|" description
-    }
+    END { flush_entry() }
 ')
+else
+    SKILL_DATA=""
+fi
 
 # Generate output
 {
