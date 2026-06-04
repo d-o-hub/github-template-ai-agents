@@ -4,9 +4,9 @@
 set -euo pipefail
 
 # Default categories (can be overridden in .command-verify.conf)
-SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get}"
+SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get:mkdir:confirm:inform}"
 CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace}"
-DANGEROUS_KEYWORDS="${DANGEROUS_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate}"
+DANGEROUS_KEYWORDS="${DANGEROUS_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:shred}"
 
 # Custom patterns for categories (E3)
 SAFE_PATTERNS=()
@@ -22,24 +22,26 @@ fi
 # Categorize a command as safe, conditional, dangerous, or unknown
 categorize_command() {
     local cmd="$1"
-    local cmd_lower
-    # Security: Use printf for safe variable expansion and to prevent option injection
-    cmd_lower=$(printf "%s\n" "$cmd" | tr '[:upper:]' '[:lower:]')
+    local cmd_normalized
+    # Security: Use printf for safe variable expansion and to prevent option injection.
+    # Normalize command by converting to lowercase and stripping quotes to prevent bypasses like r""m.
+    cmd_normalized=$(printf "%s\n" "$cmd" | tr '[:upper:]' '[:lower:]' | tr -d "'\"")
 
-    # Check custom dangerous patterns first (E3)
+    # Check custom dangerous patterns first (E3) - patterns allow substring matching
     for pattern in "${DANGEROUS_PATTERNS[@]:-}"; do
         [[ -z "$pattern" ]] && continue
-        if [[ "$cmd_lower" == *"$pattern"* ]]; then
+        if [[ "$cmd_normalized" == *"$pattern"* ]]; then
             printf "dangerous\n"
             return 0
         fi
     done
 
-    # Check dangerous keywords
+    # Check dangerous keywords with word boundary awareness to prevent false positives (e.g., "farm")
     IFS=':' read -ra keywords <<< "$DANGEROUS_KEYWORDS"
     for keyword in "${keywords[@]}"; do
         [[ -z "$keyword" ]] && continue
-        if [[ "$cmd_lower" == *"$keyword"* ]]; then
+        # Use a regex match for word boundaries
+        if [[ "$cmd_normalized" =~ (^|[[:space:]]|[^a-zA-Z0-9])${keyword}($|[[:space:]]|[^a-zA-Z0-9]) ]]; then
             printf "dangerous\n"
             return 0
         fi
@@ -48,7 +50,7 @@ categorize_command() {
     # Check custom conditional patterns (E3)
     for pattern in "${CONDITIONAL_PATTERNS[@]:-}"; do
         [[ -z "$pattern" ]] && continue
-        if [[ "$cmd_lower" == *"$pattern"* ]]; then
+        if [[ "$cmd_normalized" == *"$pattern"* ]]; then
             printf "conditional\n"
             return 0
         fi
@@ -58,7 +60,7 @@ categorize_command() {
     IFS=':' read -ra keywords <<< "$CONDITIONAL_KEYWORDS"
     for keyword in "${keywords[@]}"; do
         [[ -z "$keyword" ]] && continue
-        if [[ "$cmd_lower" == *"$keyword"* ]]; then
+        if [[ "$cmd_normalized" =~ (^|[[:space:]]|[^a-zA-Z0-9])${keyword}($|[[:space:]]|[^a-zA-Z0-9]) ]]; then
             printf "conditional\n"
             return 0
         fi
@@ -67,7 +69,7 @@ categorize_command() {
     # Check custom safe patterns (E3)
     for pattern in "${SAFE_PATTERNS[@]:-}"; do
         [[ -z "$pattern" ]] && continue
-        if [[ "$cmd_lower" == *"$pattern"* ]]; then
+        if [[ "$cmd_normalized" == *"$pattern"* ]]; then
             printf "safe\n"
             return 0
         fi
@@ -77,7 +79,7 @@ categorize_command() {
     IFS=':' read -ra keywords <<< "$SAFE_KEYWORDS"
     for keyword in "${keywords[@]}"; do
         [[ -z "$keyword" ]] && continue
-        if [[ "$cmd_lower" == *"$keyword"* ]]; then
+        if [[ "$cmd_normalized" =~ (^|[[:space:]]|[^a-zA-Z0-9])${keyword}($|[[:space:]]|[^a-zA-Z0-9]) ]]; then
             printf "safe\n"
             return 0
         fi

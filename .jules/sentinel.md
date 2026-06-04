@@ -99,3 +99,9 @@
 **Vulnerability:** Core utility scripts (chmod, readlink, head, tail, mv, grep) were vulnerable to option injection when handling hyphenated filenames.
 **Learning:** Standard POSIX utilities interpret arguments starting with hyphens as options unless the -- delimiter is used. This can be exploited to crash scripts or change command behavior.
 **Prevention:** Always use the -- separator before positional arguments in shell commands and prefer printf over echo for variable output.
+
+## 2026-06-03 - Command Categorization Bypass and False Positives
+
+**Vulnerability:** The `categorize_command` function used naive substring matching for dangerous keywords (e.g., `rm`) and did not normalize command strings, allowing bypasses via quotes (e.g., `r""m`) and causing false positives (e.g., `mkdir farm` flagged as dangerous).
+**Learning:** Security auditing tools that perform string analysis on commands must normalize input (strip quotes, lowercase) and use word boundaries for matching to prevent evasion and reduce noise.
+**Prevention:** Always normalize untrusted command strings before analysis and use regex word boundaries `(^|[[:space:]]|[^a-zA-Z0-9])` for keyword matching instead of simple substring checks.
