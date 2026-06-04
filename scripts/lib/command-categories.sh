@@ -25,7 +25,7 @@ categorize_command() {
     local cmd_normalized
     # Security: Use printf for safe variable expansion and to prevent option injection.
     # Normalize command by converting to lowercase and stripping quotes to prevent bypasses like r""m.
-    cmd_normalized=$(printf "%s\n" "$cmd" | tr '[:upper:]' '[:lower:]' | tr -d "'\"")
+    cmd_normalized=$(printf "%s\n" "$cmd" | tr '[:upper:]' '[:lower:]' | tr -d "'\"\\\\")
 
     # Check custom dangerous patterns first (E3) - patterns allow substring matching
     for pattern in "${DANGEROUS_PATTERNS[@]:-}"; do
