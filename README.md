@@ -5,7 +5,6 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Template Version](https://img.shields.io/badge/version-0.2.10-blue)](CHANGELOG-TEMPLATE.md)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/d-o-hub/github-template-ai-agents)](https://app.codacy.com/gh/d-o-hub/github-template-ai-agents/dashboard)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Quick Links**: [Quick Start](#quick-start-2-minutes)
