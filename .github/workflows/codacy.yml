@@ -28,12 +28,13 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4.2.2
 
       - name: Run Codacy Analysis CLI
-        uses: codacy/codacy-analysis-cli-action@89a4b409540657685808099220844c85422702dd  # v2.1.0
+        uses: codacy/codacy-analysis-cli-action@562ee3e92b8e92df8b67e0a5ff8aa8e261919c08  # v4.4.7
         continue-on-error: true
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           upload: true
           max-allowed-issues: 2147483647
+          run-staticcheck: false
         env:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 

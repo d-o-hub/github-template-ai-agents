@@ -19,6 +19,7 @@ skill_files=("$SKILLS_DIR"/!(_*)/SKILL.md)
 shopt -u nullglob extglob
 
 if [[ ${#skill_files[@]} -gt 0 ]]; then
+    # shellcheck disable=SC2016
     # Use mawk-compatible awk (no BEGINFILE/ENDFILE) with FILENAME tracking.
     SKILL_DATA=$(printf '%s\0' "${skill_files[@]}" | xargs -0 awk -- '
     function clean(s) {
