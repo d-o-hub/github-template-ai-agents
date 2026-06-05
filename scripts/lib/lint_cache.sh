@@ -137,3 +137,102 @@ lint_if_changed() {
         return 1
     fi
 }
+
+lint_batch_if_changed() {
+    local tmp_file_list="$1"
+    local tool_id="$2"
+    local config_file="$3"
+    shift 3
+    # The remaining arguments are the command to run via xargs
+
+    if [[ ! -s "$tmp_file_list" ]]; then
+        return 0
+    fi
+
+    # Try resolving config file hash early
+    local config_hash="none"
+    local real_config=""
+    if [[ -n "$config_file" ]]; then
+        if [[ -f "$config_file" ]]; then
+            real_config="$config_file"
+        elif [[ -f "$REPO_ROOT/$config_file" ]]; then
+            real_config="$REPO_ROOT/$config_file"
+        fi
+
+        if [[ -n "$real_config" ]]; then
+            local cached_val="${_CONFIG_HASH_CACHE["$config_file"]-}"
+            if [[ -n "$cached_val" ]]; then
+                config_hash="$cached_val"
+            else
+                config_hash=$(_get_hash_internal "$real_config")
+                _CONFIG_HASH_CACHE["$config_file"]="$config_hash"
+            fi
+        fi
+    fi
+
+    local tmp_misses
+    tmp_misses=$(mktemp)
+
+    local -a keys_to_cache=()
+    local -a vals_to_cache=()
+
+    while IFS= read -r -d '' file; do
+        [[ -n "$file" ]] || continue
+
+        local safe_file="${file//[\/\. ]/_}"
+        local cache_key="$CACHE_DIR/${tool_id}_${safe_file}"
+
+        # Fast-path cache hit check
+        local skip=0
+        if [[ -f "$cache_key" ]] && [[ "$cache_key" -nt "$file" ]]; then
+            skip=1
+            if [[ -n "$real_config" ]] && [[ ! "$cache_key" -nt "$real_config" ]]; then
+                skip=0
+            fi
+        fi
+
+        if [[ $skip -eq 1 ]]; then
+            continue
+        fi
+
+        # Compute hash for robust check
+        local file_hash
+        file_hash=$(_get_hash_internal "$file")
+        local cache_value="${file_hash}:${config_hash}"
+
+        if [[ -f "$cache_key" ]]; then
+            local cached_content
+            read -r cached_content < "$cache_key" || true
+            if [[ "$cached_content" == "$cache_value" ]]; then
+                continue # Unchanged, skip
+            fi
+        fi
+
+        # We have a miss
+        printf "%s\0" "$file" >> "$tmp_misses"
+        # We need to save the cache_value mapped to the file securely
+        keys_to_cache+=("$cache_key")
+        vals_to_cache+=("$cache_value")
+    done < "$tmp_file_list"
+
+    if [[ ! -s "$tmp_misses" ]]; then
+        rm -f -- "$tmp_misses"
+        return 0
+    fi
+
+    if xargs -0 -r "$@" < "$tmp_misses"; then
+        # Success, update cache for all processed files
+        local i
+        for ((i=0; i<${#keys_to_cache[@]}; i++)); do
+            local c_key="${keys_to_cache[i]}"
+            local c_val="${vals_to_cache[i]}"
+            printf "%s\n" "$c_val" > "$c_key"
+        done
+        rm -f -- "$tmp_misses"
+        return 0
+    else
+        # Failed, do not update cache
+        rm -f -- "$tmp_misses"
+        return 1
+    fi
+}

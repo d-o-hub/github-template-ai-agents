@@ -8,6 +8,14 @@
 set +e
 set -uo pipefail
 
+# --- Configuration ---
+# Use named constants for common exclusions
+readonly GIT_EXCLUDE="./.git/*"
+
+# --- Configuration ---
+# Use named constants for common exclusions
+
+
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT" || exit 1
 
@@ -231,13 +239,13 @@ if [[ -f "go.mod" ]]; then
 fi
 
 # Shell script detection
-if find . -name "*.sh" -not -path "./.git/*" -print -quit | grep -q .; then
+if find . -name "*.sh" -not -path "$GIT_EXCLUDE" -print -quit | grep -q .; then
     printf "  %b✓%b Shell scripts detected\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("shell")
 fi
 
 # Markdown detection
-if find . -name "*.md" -not -path "./.git/*" -print -quit | grep -q .; then
+if find . -name "*.md" -not -path "$GIT_EXCLUDE" -print -quit | grep -q .; then
     printf "  %b✓%b Markdown files detected\n" "${GREEN}" "${NC}"
     DETECTED_LANGUAGES+=("markdown")
 fi
@@ -317,22 +325,18 @@ fi
 if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
     printf "%bRunning Shell script checks...%b\n" "${BLUE}" "${NC}"
     if command -v shellcheck &> /dev/null; then
-        SHELL_SCRIPTS=$(find . -name "*.sh" -not -path "./.git/*" -not -path "./target/*" 2>/dev/null || true)
-        if [[ -n "$SHELL_SCRIPTS" ]]; then
-            sc_failed=0
-            while IFS= read -r script; do
-                [[ -n "$script" ]] || continue
-                if ! lint_if_changed "$script" "shellcheck" ".shellcheckrc" shellcheck --severity=error -f quiet -- "$script" >/dev/null 2>&1; then
-                    printf "%b  ✗ shellcheck failed: %s%b\n" "${RED}" "$script" "${NC}"
-                    sc_failed=1
-                fi
-            done <<< "$SHELL_SCRIPTS"
-            if [[ $sc_failed -eq 0 ]]; then
-                printf "%b  ✓ shellcheck passed%b\n" "${GREEN}" "${NC}"
-            else
+        TMP_SH_LIST=$(mktemp)
+        find . -name "*.sh" -not -path "$GIT_EXCLUDE" -not -path "./target/*" -print0 2>/dev/null > "$TMP_SH_LIST" || true
+        if [[ -s "$TMP_SH_LIST" ]]; then
+            # Do not pass -f quiet so errors are visible in CI
+            if ! lint_batch_if_changed "$TMP_SH_LIST" "shellcheck" ".shellcheckrc" shellcheck --severity=error; then
+                printf "%b  ✗ shellcheck failed%b\n" "${RED}" "${NC}"
                 FAILED=1
+            else
+                printf "%b  ✓ shellcheck passed%b\n" "${GREEN}" "${NC}"
             fi
         fi
+        rm -f "$TMP_SH_LIST"
     fi
     printf "\n"
 fi
@@ -341,25 +345,17 @@ fi
 if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
     printf "%bRunning Markdown checks...%b\n" "${BLUE}" "${NC}"
     if command -v markdownlint-cli2 &> /dev/null; then
-        MD_FILES=$(find . -name "*.md" -not -path "*/node_modules/*" -not -path "./target/*" -not -path "./.git/*" -not -path "./vendor/*" 2>/dev/null || true)
-        if [[ -n "$MD_FILES" ]]; then
-            md_failed=0
-            TMP_MD_OUT=$(mktemp)
-            while IFS= read -r md_file; do
-                [[ -n "$md_file" ]] || continue
-                if ! lint_if_changed "$md_file" "markdownlint" ".markdownlint-cli2.jsonc" markdownlint-cli2 -- "$md_file" >"$TMP_MD_OUT" 2>&1; then
-                    printf "%b  ✗ markdownlint-cli2 failed: %s%b\n" "${RED}" "$md_file" "${NC}"
-                    cat "$TMP_MD_OUT" >&2
-                    md_failed=1
-                fi
-            done <<< "$MD_FILES"
-            rm -f "$TMP_MD_OUT"
-            if [[ $md_failed -eq 0 ]]; then
-                printf "%b  ✓ markdownlint-cli2 passed%b\n" "${GREEN}" "${NC}"
-            else
+        TMP_MD_LIST=$(mktemp)
+        find . -name "*.md" -not -path "*/node_modules/*" -not -path "./target/*" -not -path "$GIT_EXCLUDE" -not -path "./vendor/*" -print0 2>/dev/null > "$TMP_MD_LIST" || true
+        if [[ -s "$TMP_MD_LIST" ]]; then
+            if ! lint_batch_if_changed "$TMP_MD_LIST" "markdownlint" ".markdownlint-cli2.jsonc" markdownlint-cli2 >/dev/null 2>&1; then
+                printf "%b  ✗ markdownlint-cli2 failed (run 'markdownlint-cli2 "**/*.md"' locally to see details)%b\n" "${RED}" "${NC}"
                 FAILED=1
+            else
+                printf "%b  ✓ markdownlint-cli2 passed%b\n" "${GREEN}" "${NC}"
             fi
         fi
+        rm -f "$TMP_MD_LIST"
     fi
     printf "\n"
 fi
