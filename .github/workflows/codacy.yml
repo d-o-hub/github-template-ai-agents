@@ -34,6 +34,7 @@ jobs:
         run: |
           # Use docker directly to avoid unpinned setup-go@v3 in the composite action
           # Pinning to a specific SHA of the codacy/codacy-analysis-cli image
+          # Using --skip-uncommitted-files-check to avoid failure if the runner has modified files
           docker run \
             --rm \
             --env CODACY_PROJECT_TOKEN="${{ secrets.CODACY_PROJECT_TOKEN }}" \
@@ -44,6 +45,7 @@ jobs:
             --upload \
             --max-allowed-issues 2147483647 \
             --gh-code-scanning-compat \
+            --skip-uncommitted-files-check \
             --output results.sarif
         env:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
