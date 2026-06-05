@@ -14,7 +14,7 @@ CONDITIONAL_PATTERNS=()
 DANGEROUS_PATTERNS=()
 
 # Load project-specific configuration if available
-    if [[ -f ".command-verify.conf" ]]; then
+if [[ -f ".command-verify.conf" ]]; then
     # shellcheck source=/dev/null
     source ".command-verify.conf"
 fi
@@ -23,8 +23,13 @@ fi
 categorize_command() {
     local cmd="$1"
     local cmd_lower
-    # Security: Use printf for safe variable expansion and to prevent option injection
-    cmd_lower=$(printf "%s\n" "$cmd" | tr '[:upper:]' '[:lower:]')
+    # Security: Use printf for safe variable expansion and to prevent option injection.
+    # Normalize input by removing common shell escapes/quotes and converting to lowercase.
+    cmd_lower=$(printf "%s\n" "$cmd" | tr -d "'\"\\\\" | tr '[:upper:]' '[:lower:]')
+
+    # Regex for word boundaries including common shell metacharacters
+    local boundary="(^|[[:space:]]|[\|&;()<>])"
+    local end_boundary="($|[[:space:]]|[\|&;()<>])"
 
     # Check custom dangerous patterns first (E3)
     for pattern in "${DANGEROUS_PATTERNS[@]:-}"; do
@@ -35,11 +40,12 @@ categorize_command() {
         fi
     done
 
-    # Check dangerous keywords
+    # Check dangerous keywords with boundaries to avoid false positives (e.g., mkdir farm)
+    # while still catching commands near shell metacharacters (e.g., (rm) or rm;ls)
     IFS=':' read -ra keywords <<< "$DANGEROUS_KEYWORDS"
     for keyword in "${keywords[@]}"; do
         [[ -z "$keyword" ]] && continue
-        if [[ "$cmd_lower" == *"$keyword"* ]]; then
+        if [[ "$cmd_lower" =~ ${boundary}${keyword}${end_boundary} ]]; then
             printf "dangerous\n"
             return 0
         fi
@@ -54,11 +60,11 @@ categorize_command() {
         fi
     done
 
-    # Check conditional keywords
+    # Check conditional keywords with boundaries
     IFS=':' read -ra keywords <<< "$CONDITIONAL_KEYWORDS"
     for keyword in "${keywords[@]}"; do
         [[ -z "$keyword" ]] && continue
-        if [[ "$cmd_lower" == *"$keyword"* ]]; then
+        if [[ "$cmd_lower" =~ ${boundary}${keyword}${end_boundary} ]]; then
             printf "conditional\n"
             return 0
         fi
@@ -73,11 +79,11 @@ categorize_command() {
         fi
     done
 
-    # Check safe keywords
+    # Check safe keywords with boundaries
     IFS=':' read -ra keywords <<< "$SAFE_KEYWORDS"
     for keyword in "${keywords[@]}"; do
         [[ -z "$keyword" ]] && continue
-        if [[ "$cmd_lower" == *"$keyword"* ]]; then
+        if [[ "$cmd_lower" =~ ${boundary}${keyword}${end_boundary} ]]; then
             printf "safe\n"
             return 0
         fi

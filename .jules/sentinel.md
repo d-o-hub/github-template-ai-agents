@@ -43,7 +43,7 @@
 ## 2026-05-10 - Structural and Option Injection in Commit Tooling
 
 **Vulnerability:** `scripts/ai-commit.sh` used `echo -e` to write commit messages to temporary files, allowing backslash escape sequences in agent-generated input to manipulate message structure. It also used `echo` for variable wrapping, susceptible to option injection.
-**Learning:** `echo -e` interprets escapes like `\n` in the variable content itself, not just the format string. This can lead to structural injection when the output is written to a file or piped.
+**Learning:** `echo -e` interprets escapes like \n in the variable content itself, not just the format string. This can lead to structural injection when the output is written to a file or piped.
 **Prevention:** Use `printf "%s\n"` for all variable output. Use literal newlines (`$'\n'`) for intentional line breaks in variables. Always implement `trap` cleanup for temporary files.
 
 ## 2026-05-11 - Command Substitution via Unquoted Heredocs and Option Injection in Utility Scripts
@@ -91,11 +91,17 @@
 ## 2026-05-26 - Standardized AWK and Utility Hardening against Option Injection
 
 **Vulnerability:** Utility scripts using `awk` or `wc` were vulnerable to option injection when processing filenames starting with a hyphen (e.g., `-v`, `-f`, `-l`).
-**Learning:** For `awk`, the correct robust pattern to terminate option processing before the program string and filenames is `awk [options] -- 'program' [files]`. For `wc`, it is `wc [options] -- [files]`. Adding `--` *after* the program string in a piped or xargs context (e.g., `... | awk 'program' --`) can cause `awk` to treat `--` as a literal filename, leading to "file not found" errors and script failure.
-**Prevention:** Always use the `--` separator before the first positional argument (the program string for `awk`, or the first filename for `wc`) in utility scripts to ensure subsequent arguments are treated as data, not options.
+**Learning:** For `awk`, the correct robust pattern to terminate option processing before the program string and filenames is \`awk [options] -- 'program' [files]\`. For \`wc\`, it is \`wc [options] -- [files]\`. Adding \`--\` *after* the program string in a piped or xargs context (e.g., \`... | awk 'program' --\`) can cause \`awk\` to treat \`--\` as a literal filename, leading to \"file not found\" errors and script failure.
+**Prevention:** Always use the \`--\` separator before the first positional argument (the program string for \`awk\`, or the first filename for \`wc\`) in utility scripts to ensure subsequent arguments are treated as data, not options.
 
 ## 2026-06-01 - Widespread Option Injection in Utility Scripts
 
 **Vulnerability:** Core utility scripts (chmod, readlink, head, tail, mv, grep) were vulnerable to option injection when handling hyphenated filenames.
 **Learning:** Standard POSIX utilities interpret arguments starting with hyphens as options unless the -- delimiter is used. This can be exploited to crash scripts or change command behavior.
 **Prevention:** Always use the -- separator before positional arguments in shell commands and prefer printf over echo for variable output.
+
+## 2026-06-05 - Command Obfuscation and Metacharacter Boundary Bypasses
+
+**Vulnerability:** Command categorization logic used simple substring matching, which led to false positives (e.g., \"mkdir farm\" flagged for \"rm\") and was vulnerable to obfuscation (e.g., \"r\"\"m\"). An initial fix using strict whitespace-only word boundaries introduced detection bypasses for commands adjacent to shell metacharacters (e.g., \"(rm)\" or \"rm;ls\").
+**Learning:** Obfuscation via quotes and backslashes is a common bypass for keyword-based filters. Word-boundary detection must account for the full set of shell metacharacters that can delimit commands, not just whitespace.
+**Prevention:** Normalize command strings by stripping quotes and backslashes before categorization. Use a robust regex boundary \`(^|[[:space:]]|[\\|&;()<>])\` to ensure keywords are detected even when embedded in complex shell expressions while avoiding partial-word matches.
