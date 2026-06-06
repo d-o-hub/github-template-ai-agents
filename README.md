@@ -206,21 +206,7 @@ graph LR
 - [Hooks](agents-docs/HOOKS.md) — pre/post tool hooks
 - [Context](agents-docs/CONTEXT.md) — back-pressure mechanisms
 - [Migration](agents-docs/MIGRATION.md) — adopting in existing projects
-
-## Available Skills
-
-| Skill | Description |
-| --- | --- |
-| [`task-decomposition`](.agents/skills/task-decomposition/) | Break complex tasks into atomic goals |
-| [`shell-script-quality`](.agents/skills/shell-script-quality/) | Lint/test shell scripts (ShellCheck + BATS) |
-| [`github-readme`](.agents/skills/github-readme/) | Create human-focused README.md files |
-| [`parallel-execution`](.agents/skills/parallel-execution/) | Coordinate parallel agent execution |
-| [`iterative-refinement`](.agents/skills/iterative-refinement/) | Progressive improvement loops |
-| [`agent-coordination`](.agents/skills/agent-coordination/) | Multi-agent orchestration patterns |
-| [`goap-agent`](.agents/skills/goap-agent/) | Goal-oriented action planning |
-| [`web-search-researcher`](.agents/skills/web-search-researcher/) | Web research and synthesis |
-| [`eu-ai-act-compliance`](.agents/skills/eu-ai-act-compliance/) | EU AI Act regulatory adherence |
-| [`durable-objects`](.agents/skills/durable-objects/) | Cloudflare Durable Objects coordination |
+- [Available Skills](.agents/skills/README.md) - agents skills overview 
 
 ## Contributing
 
