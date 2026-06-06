@@ -12,12 +12,12 @@ echo "=== Evaluating Skills (agentskills.io spec) ==="
 echo ""
 
 if [[ ! -f "$EVAL_SCRIPT" ]]; then
-  echo "ERROR: check_structure.py not found at $EVAL_SCRIPT" >&2
+  printf "ERROR: check_structure.py not found at %s\n" "$EVAL_SCRIPT" >&2
   exit 1
 fi
 
 if ! command -v python3 &>/dev/null; then
-  echo "ERROR: python3 required but not found in PATH" >&2
+  printf "ERROR: python3 required but not found in PATH\n" >&2
   exit 1
 fi
 
@@ -89,10 +89,10 @@ for eval_file in "$SKILLS_DIR"/*/evals.json "$SKILLS_DIR"/*/evals/evals.json; do
       dir_path="${eval_file%/*}"
     fi
     skill_name="${dir_path##*/}"
-    echo " [FAIL] $skill_name: evals missing 'expected_output' field"
-    echo " [FAIL] $skill_name: evals missing 'id' field"
-    echo " [FAIL] $skill_name: evals missing 'prompt' field"
-    echo " [FAIL] $skill_name: evals missing 'assertions' field"
+    printf " [FAIL] %s: evals missing 'expected_output' field\n" "$skill_name"
+    printf " [FAIL] %s: evals missing 'id' field\n" "$skill_name"
+    printf " [FAIL] %s: evals missing 'prompt' field\n" "$skill_name"
+    printf " [FAIL] %s: evals missing 'assertions' field\n" "$skill_name"
     FAILED=1
   fi
 done

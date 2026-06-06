@@ -47,7 +47,7 @@ cleanup_worktree() {
     if git worktree list --porcelain 2>/dev/null | grep -x -F -q -- "worktree ${worktree_path}"; then
         git worktree remove --force -- "${worktree_path}" 2>/dev/null || {
             local resolved
-            resolved=$(realpath -m -- "$worktree_path" 2>/dev/null || echo "$worktree_path")
+            resolved=$(realpath -m -- "$worktree_path" 2>/dev/null || printf "%s\n" "$worktree_path")
 
             if [[ -z "$resolved" ]] || [[ "$resolved" == "/" ]] || [[ "$resolved" == "." ]] || [[ "$resolved" == "~" ]]; then
                 printf "Error: Dangerous or invalid worktree_path: %s\n" "$worktree_path" >&2
@@ -56,7 +56,7 @@ cleanup_worktree() {
 
             # Resides under WORKTREE_BASE
             local base_resolved
-            base_resolved=$(realpath -m -- "$WORKTREE_BASE" 2>/dev/null || echo "$WORKTREE_BASE")
+            base_resolved=$(realpath -m -- "$WORKTREE_BASE" 2>/dev/null || printf "%s\n" "$WORKTREE_BASE")
             if [[ "$resolved/" != "$base_resolved/"* ]]; then
                 printf "Error: worktree_path %s is not under %s\n" "$resolved" "$base_resolved" >&2
                 exit 1
