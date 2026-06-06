@@ -20,9 +20,17 @@ from unittest.mock import patch, MagicMock
 # Import types for testing
 from lib.eval_types import EvalReport, SkillEvalResult, EvalResult, EvalStatus, EvalType
 
+# Test skill paths are relative identifiers, not real filesystem locations:
+# every callsite passes them to a mocked function, so the contents of the
+# Path object are never dereferenced.  Using relative paths avoids the
+# SonarCloud S5443 hotspot (publicly writable directory usage).
+TEST_SKILL_PATH = Path("test-skill")
+TEST_FAIL_SKILL_PATH = Path("fail-skill")
+TEST_SKIP_SKILL_PATH = Path("skip-skill")
+
 def test_evaluate_skill_success():
     """Test evaluate_skill when all eval cases pass or are skipped."""
-    skill_path = Path("/tmp/test-skill")
+    skill_path = TEST_SKILL_PATH
     eval_types = [EvalType.COMMAND]
     verbose = False
 
@@ -58,7 +66,7 @@ def test_evaluate_skill_success():
 
 def test_evaluate_skill_failure_in_case():
     """Test evaluate_skill when an eval case fails."""
-    skill_path = Path("/tmp/test-skill")
+    skill_path = TEST_SKILL_PATH
     eval_types = [EvalType.COMMAND]
     verbose = False
 
@@ -85,7 +93,7 @@ def test_evaluate_skill_failure_in_case():
 
 def test_evaluate_skill_load_error():
     """Test evaluate_skill when evals.json fails to load."""
-    skill_path = Path("/tmp/test-skill")
+    skill_path = TEST_SKILL_PATH
 
     with patch.object(run_evals, "load_evals_file") as mock_load:
         mock_load.return_value = (None, "File not found")
@@ -97,7 +105,7 @@ def test_evaluate_skill_load_error():
 
 def test_evaluate_skill_validation_error():
     """Test evaluate_skill when evals.json has format issues."""
-    skill_path = Path("/tmp/test-skill")
+    skill_path = TEST_SKILL_PATH
 
     with patch.object(run_evals, "load_evals_file") as mock_load, \
          patch.object(run_evals, "validate_evals_format") as mock_validate:
@@ -111,7 +119,7 @@ def test_evaluate_skill_validation_error():
 
 def test_evaluate_skill_with_structure_check():
     """Test evaluate_skill when structure check is included."""
-    skill_path = Path("/tmp/test-skill")
+    skill_path = TEST_SKILL_PATH
     eval_types = [EvalType.STRUCTURE, EvalType.COMMAND]
 
     mock_data = {"evals": [{"id": 1}]}
@@ -141,7 +149,7 @@ def test_generate_text_report_basic():
         skill_results=[
             SkillEvalResult(
                 skill_name="test-skill",
-                skill_path=Path("/tmp/test-skill"),
+                skill_path=TEST_SKILL_PATH,
                 status=EvalStatus.PASS,
                 evals_run=1,
                 evals_passed=1,
@@ -170,7 +178,7 @@ def test_generate_text_report_failure():
         skill_results=[
             SkillEvalResult(
                 skill_name="fail-skill",
-                skill_path=Path("/tmp/fail-skill"),
+                skill_path=TEST_FAIL_SKILL_PATH,
                 status=EvalStatus.FAIL,
                 evals_run=1,
                 evals_passed=0,
@@ -198,7 +206,7 @@ def test_generate_text_report_with_skips():
         skill_results=[
             SkillEvalResult(
                 skill_name="skip-skill",
-                skill_path=Path("/tmp/skip-skill"),
+                skill_path=TEST_SKIP_SKILL_PATH,
                 status=EvalStatus.PASS,
                 evals_run=2,
                 evals_passed=1,
