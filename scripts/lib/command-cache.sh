@@ -139,7 +139,7 @@ save_cached_result() {
 # Clear entire cache
 clear_cache() {
     local resolved
-    resolved=$(realpath -m -- "$COMMANDS_CACHE_DIR" 2>/dev/null || echo "$COMMANDS_CACHE_DIR")
+    resolved=$(realpath -m -- "$COMMANDS_CACHE_DIR" 2>/dev/null || printf "%s\n" "$COMMANDS_CACHE_DIR")
 
     if [[ -z "$resolved" ]] || [[ "$resolved" == "/" ]] || [[ "$resolved" == "." ]] || [[ "$resolved" == "~" ]]; then
         printf "Error: Dangerous or invalid COMMANDS_CACHE_DIR: %s (resolved: %s)\n" "$COMMANDS_CACHE_DIR" "$resolved" >&2
