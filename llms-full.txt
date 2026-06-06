@@ -1,6 +1,6 @@
 # GitHub Template AI Agents
 
-> Production-ready template for AI agent-powered development with Claude Code, Gemini CLI, OpenCode, Qwen Code, and more.
+> Opinionated GitHub template for teams who want reproducible, multi-agent software delivery with shared instructions, quality gates, and low-context-rot workflows. **Rule:** `AGENTS.md` is the only place shared instructions live. Tool files extend or override; they never duplicate.
 
 This repository provides a unified harness for AI coding agents with consistent workflows across multiple tools. It emphasizes quality gates, skill systems, and context discipline.
 
