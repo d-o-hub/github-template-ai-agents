@@ -33,7 +33,7 @@ resolve_with_optimization() {
     local result
     result=$(cd "$resolver_dir" && \
         python3 -m scripts.resolve "${resolve_args[@]}" -- "$query_or_url" 2>/dev/null || \
-        echo '{"source": "error", "content": "Resolution failed", "score": 0}')
+        printf "%s\n" '{"source": "error", "content": "Resolution failed", "score": 0}')
 
     # Safe JSON generation using Python to avoid shell injection and malformed output
     python3 -c '
@@ -55,7 +55,7 @@ print(json.dumps(output, indent=2))
 ' "$query_or_url" "$context" "$profile" "$result" > "$output_file"
 
     local score
-    score=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.stdin).get('score', 0))" 2>/dev/null || echo "0")
+    score=$(printf "%s\n" "$result" | python3 -c "import sys,json; print(json.load(sys.stdin).get('score', 0))" 2>/dev/null || printf "%s\n" "0")
 
     # Security: Use python3 for floating-point comparison to improve portability and safety (replaces bc)
     if python3 -c "import sys; sys.exit(0 if float(sys.argv[1]) > 0.7 else 1)" "$score" 2>/dev/null; then

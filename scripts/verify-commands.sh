@@ -44,20 +44,20 @@ while [[ $# -gt 0 ]]; do
         --quick|-q) QUICK=true; shift ;;
         --silent) SILENT=true; shift ;;
         --help|-h)
-            echo "Usage: $0 [--force|--stats|--json|--quick|--silent]"
-            echo ""
-            echo "Verify all commands in markdown documentation with intelligent caching."
-            echo ""
-            echo "Options:"
-            echo "  --force, -f    Force full validation, bypass cache"
-            echo "  --stats, -s    Show detailed statistics"
-            echo "  --json, -j     Output results as JSON"
-            echo "  --quick, -q    Quick check (cache only)"
-            echo "  --silent       Suppress output except errors"
-            echo "  --help, -h     Show this help message"
+            printf "Usage: %s [--force|--stats|--json|--quick|--silent]\n" "$0"
+            printf "\n"
+            printf "Verify all commands in markdown documentation with intelligent caching.\n"
+            printf "\n"
+            printf "Options:\n"
+            printf "  --force, -f    Force full validation, bypass cache\n"
+            printf "  --stats, -s    Show detailed statistics\n"
+            printf "  --json, -j     Output results as JSON\n"
+            printf "  --quick, -q    Quick check (cache only)\n"
+            printf "  --silent       Suppress output except errors\n"
+            printf "  --help, -h     Show this help message\n"
             exit 0
             ;;
-        *) echo "Unknown option: $1" >&2; exit 1 ;;
+        *) printf "Unknown option: %s\n" "$1" >&2; exit 1 ;;
     esac
 done
 
