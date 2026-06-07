@@ -235,11 +235,18 @@ jobs:
       - name: Commit and create PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_BRANCH: ${{ github.event.pull_request.base.ref || github.ref_name }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-          git add -- .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
+          # Fetch and checkout the target branch directly to avoid rebasing the PR merge commit
+          git stash push .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
+          git fetch origin "$TARGET_BRANCH"
+          git checkout "origin/$TARGET_BRANCH"
+          git stash pop || true
+
+          git add .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
           if git diff --staged --quiet; then
             printf "No changes to CI status\n"
             exit 0

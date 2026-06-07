@@ -1,7 +1,7 @@
 {
   "general": {
     "vimMode": true,
-    "preferredEditor": "code",
+    "preferredEditor": "vscode",
     "approvalMode": "auto_edit",
     "checkpointing": {
       "enabled": true
