@@ -31,19 +31,19 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     *)
-      echo "Unknown option: $1"
+      printf "Unknown option: %s\n" "$1" >&2
       exit 1
       ;;
   esac
 done
 
 if [[ -z "$TYPE" ]] || [[ -z "$SUBJECT" ]]; then
-    echo "Usage: $0 --type <type> [--scope <scope>] --subject <subject> [--body <body> ...]"
+    printf "Usage: %s --type <type> [--scope <scope>] --subject <subject> [--body <body> ...]\n" "$0"
     exit 1
 fi
 
 if [[ ${#SUBJECT} -gt 72 ]]; then
-    echo "Error: Subject is too long (${#SUBJECT} > 72 chars)." >&2
+    printf "Error: Subject is too long (%d > 72 chars).\n" "${#SUBJECT}" >&2
     exit 1
 fi
 
@@ -76,7 +76,7 @@ printf "%s\n" "$MSG" > "$TMP_MSG"
 # Validate
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 if ! "$REPO_ROOT/scripts/validate-commit-message.sh" "$TMP_MSG"; then
-    echo "Commit message validation failed."
+    printf "Commit message validation failed.\n" >&2
     exit 1
 fi
 
