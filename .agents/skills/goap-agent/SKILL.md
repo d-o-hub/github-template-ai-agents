@@ -81,6 +81,8 @@ See **[execution-strategies.md](execution-strategies.md)** for details.
 | test-runner | Test validation |
 | refactorer | Code improvements |
 | code-reviewer | Quality assurance |
+| delegate | Context retrieval, pattern search, state assessment (before planning) |
+| implementer | Atomic code changes post-Blueprint approval |
 
 ## Phase 5: Execution Planning
 
