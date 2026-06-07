@@ -28,13 +28,45 @@ jobs:
         uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed  # v6.2.1
         with:
           configFile: commitlint.config.cjs
-          from: ${{ github.event.before }}
-          to: ${{ github.event.after }}
+          # v6 lints the push range (before..after) automatically. Do NOT pass
+          # legacy v5 `from`/`to` inputs - they were removed in v6 and now
+          # produce an "Unexpected input(s)" warning. See ADR-008.
 
       - name: Lint commit messages (PR)
         if: github.event_name == 'pull_request'
         uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed  # v6.2.1
         with:
           configFile: commitlint.config.cjs
-          from: ${{ github.event.pull_request.base.sha }}
-          to: ${{ github.event.pull_request.head.sha }}
+          # v6 lints the PR range (base..head) automatically.
+
+  lint-pr-title:
+    name: Lint PR title (squash-merge subject)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a  # v6.4.0
+        with:
+          node-version: '20'
+
+      - name: Lint PR title against commitlint
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          # Defends against bots (Jules, Dependabot, Copilot) that bypass
+          # local commit-msg hooks. The PR title is the squash-merge subject
+          # for the merged commit; it MUST be a valid conventional commit.
+          # See ADR-008 (PR #505 run 27086771117).
+          printf '%s\n' "$PR_TITLE" > pr-title.txt
+          if ! npx --yes @commitlint/cli@19 \
+                --config commitlint.config.cjs \
+                --edit pr-title.txt; then
+            echo "::error::PR title is not a valid conventional commit."
+            echo "::error::Required format: type(scope): subject (max 150 chars)"
+            echo "::error::Got: $PR_TITLE"
+            exit 1
+          fi
+          echo "PR title is a valid conventional commit."
