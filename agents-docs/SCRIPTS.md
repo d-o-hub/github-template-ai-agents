@@ -7,6 +7,8 @@
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
+| `bootstrap.sh` | Single-command first-time setup (skills + hook + validate + gate) | `./scripts/bootstrap.sh` |
+| `doctor.sh` | Environment diagnostics for self-service troubleshooting | `./scripts/doctor.sh` |
 | `quality_gate.sh` | Multi-language quality gate (lint, test, format) | `./scripts/quality_gate.sh` |
 | `setup-skills.sh` | Create symlinks from `.agents/skills/` to CLI dirs | `./scripts/setup-skills.sh` |
 | `pre-commit-hook.sh` | Pre-commit hook template (copied by install-hooks.sh) | Installed via `install-hooks.sh` |

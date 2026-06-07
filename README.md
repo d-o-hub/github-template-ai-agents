@@ -206,7 +206,7 @@ graph LR
 - [Hooks](agents-docs/HOOKS.md) — pre/post tool hooks
 - [Context](agents-docs/CONTEXT.md) — back-pressure mechanisms
 - [Migration](agents-docs/MIGRATION.md) — adopting in existing projects
-- [Available Skills](.agents/skills/README.md) - agents skills overview 
+- [Available Skills](.agents/skills/README.md) — agents skills overview
 
 ## Contributing
 
