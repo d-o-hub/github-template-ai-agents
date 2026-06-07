@@ -15,47 +15,39 @@
   - [Qwen Code](https://github.com/QwenLM/Qwen-Coder)
   - Or any agent that supports the AGENTS.md format
 
-## Step 1: Use This Template
-
-### Option A: GitHub UI
-
-1. Click **"Use this template"** on GitHub
-2. Enter your repository name
-3. Click **"Create repository"**
-4. Clone your new repository:
+## Setup
 
 ```bash
 git clone https://github.com/your-org/your-project.git
 cd your-project
+./scripts/bootstrap.sh
 ```
 
-### Option B: CLI
-
-```bash
-git clone https://github.com/your-org/your-project.git
-cd your-project
-```
-
-## Step 2: Setup (2 minutes)
-
-```bash
-# Create skill symlinks for all CLI tools
-./scripts/setup-skills.sh
-
-# Install git pre-commit hook
-cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
-
-# Validate setup
-./scripts/validate-skills.sh
-```
-
-Expected output:
+**Expected output:**
 
 ```text
-✓ All skill validations passed
+==> Checking environment
+  ✓ git present and inside a repository
+==> Setting up skills
+  ✓ Skills ready
+==> Installing pre-commit hook
+  ✓ pre-commit hook installed
+==> Validating skills
+  ✓ Skills valid
+==> Running quality gate
+  ✓ Quality gate passed
+
+Bootstrap complete. Repository is ready for AI agent workflows.
 ```
 
-## Step 3: Configure for Your Project
+`bootstrap.sh` is idempotent — re-run it any time to repair the environment.
+
+### Use this template on GitHub
+
+If you are starting from scratch, click **"Use this template"** on GitHub before
+cloning. The bootstrap step is the same.
+
+## Configure for Your Project
 
 Edit `AGENTS.md` to add your project details:
 
@@ -84,7 +76,7 @@ pnpm install | cargo build | pip install -r requirements.txt
 pnpm dev | cargo run | python main.py
 ```
 
-```text
+```
 
 ### 3. Add Language-Specific Style
 
@@ -109,7 +101,7 @@ Uncomment and customize the relevant section:
 -->
 ```
 
-## Step 4: Test Your Setup
+## Test Your Setup
 
 ### With Claude Code
 
@@ -129,7 +121,7 @@ gemini "What are the main components of this project?"
 opencode "Review the project structure"
 ```
 
-## Step 5: Start Coding
+## Start Coding
 
 ### Example: Implement a Feature
 
@@ -138,6 +130,7 @@ claude "Implement a function that validates user input"
 ```
 
 The agent will:
+
 1. Read relevant files
 2. Implement the feature
 3. Run quality gates automatically
@@ -158,11 +151,58 @@ claude "Refactor the authentication module to improve readability"
 ## Verify Everything Works
 
 ```bash
-# Run quality gate manually
 ./scripts/quality_gate.sh
-
-# Expected: All checks pass
 ```
+
+Expected: all checks pass.
+
+## Troubleshooting
+
+If bootstrap fails or the quality gate reports unexpected errors, run the doctor:
+
+```bash
+./scripts/doctor.sh
+```
+
+The doctor checks:
+
+- Required tools (`git`, `bash`)
+- Optional quality tools (`markdownlint-cli2`, `shellcheck`, `yamllint`)
+- Git repository state
+- Symlink support (critical on Windows)
+- `.agents/skills` directory and expected symlinks
+- Pre-commit hook installation
+- Core file presence (`AGENTS.md`, `QUICKSTART.md`)
+
+Share its output when filing a bug report.
+
+### Common issues
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Symlink errors during bootstrap | Windows without Developer Mode | Run inside WSL2 or enable Developer Mode |
+| `pre-commit: command not found` after commit | Hook installed, tool missing | `pip install pre-commit` or `brew install pre-commit` |
+| Skills validation fails | Symlinks not created | Re-run `./scripts/bootstrap.sh` |
+| Quality gate fails on fresh clone | Missing optional tools | Run `./scripts/doctor.sh` to identify gaps |
+
+### Per-agent verification
+
+If the agent does not respond, check installation:
+
+- Claude Code: `claude --version`
+- Gemini CLI: `gemini --version`
+- OpenCode: `opencode --version`
+- Qwen Code: `qwen --version`
+
+## Convention
+
+| Command | Purpose |
+|---|---|
+| `./scripts/bootstrap.sh` | First-time setup (idempotent) |
+| `./scripts/doctor.sh` | Environment diagnostics |
+| `./scripts/quality_gate.sh` | Local quality enforcement |
+| `./scripts/validate-skills.sh` | Low-level skill check (called by bootstrap) |
+| `./scripts/setup-skills.sh` | Low-level symlink setup (called by bootstrap) |
 
 ## Next Steps
 
@@ -173,31 +213,7 @@ claude "Refactor the authentication module to improve readability"
 | Configuring hooks | [`agents-docs/HOOKS.md`](agents-docs/HOOKS.md) |
 | Context management | [`agents-docs/CONTEXT.md`](agents-docs/CONTEXT.md) |
 | Available agents | [`agents-docs/AGENTS_REGISTRY.md`](agents-docs/AGENTS_REGISTRY.md) |
-
-## Troubleshooting
-
-### Skills Not Found
-
-```text
-Error: MISSING symlink: .claude/skills/task-decomposition
-```
-
-**Fix:** Run `./scripts/setup-skills.sh`
-
-### Quality Gate Fails
-
-```text
-Error: cargo fmt failed
-```
-
-**Fix:** Run `cargo fmt` to format code, then retry
-
-### Agent Not Responding
-
-**Fix:** Check agent installation:
-- Claude Code: `claude --version`
-- Gemini CLI: `gemini --version`
-- OpenCode: `opencode --version`
+| Adopting in existing repo | [`agents-docs/MIGRATION.md`](agents-docs/MIGRATION.md) |
 
 ## Common First Tasks
 

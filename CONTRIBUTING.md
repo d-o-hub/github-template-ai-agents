@@ -14,12 +14,12 @@ Thank you for your interest in contributing! This guide helps you contribute eff
 git clone https://github.com/your-org/your-project.git
 cd your-project
 
-# Setup skills symlinks
-./scripts/setup-skills.sh
-
-# Install pre-commit hook
-cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# One-command setup (skills, hook, validation, quality gate)
+./scripts/bootstrap.sh
 ```
+
+For troubleshooting, run `./scripts/doctor.sh`. See
+[QUICKSTART.md](QUICKSTART.md) for full setup detail and per-agent verification.
 
 ## How to Contribute
 
