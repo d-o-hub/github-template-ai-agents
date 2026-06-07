@@ -9,10 +9,10 @@ cd "$REPO_ROOT" || { printf 'doctor: cannot cd to repo root: %s\n' "$REPO_ROOT" 
 
 fail=0
 
-pass() { printf '  \u2713 %s\n' "$*"; }
-warn() { printf '  ! %s\n' "$*"; }
-bad()  { printf '  \u2717 %s\n' "$*" >&2; fail=1; }
-sect() { printf '\n==> %s\n' "$*"; }
+pass() { printf '  \u2713 %s\n' "$*"; return 0; }
+warn() { printf '  ! %s\n' "$*"; return 0; }
+bad()  { printf '  \u2717 %s\n' "$*" >&2; fail=1; return 1; }
+sect() { printf '\n==> %s\n' "$*"; return 0; }
 
 # ---- Required commands ----
 sect "Required tools"

@@ -7,9 +7,9 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-log()  { printf '==> %s\n' "$*"; }
-ok()   { printf '  \u2713 %s\n' "$*"; }
-warn() { printf '  ! %s\n' "$*"; }
+log()  { printf '==> %s\n' "$*"; return 0; }
+ok()   { printf '  \u2713 %s\n' "$*"; return 0; }
+warn() { printf '  ! %s\n' "$*"; return 0; }
 fail() { printf '\n\u2717 %s\n' "$*" >&2; exit 1; }
 
 # --- pre-flight ---
