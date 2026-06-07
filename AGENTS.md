@@ -51,6 +51,15 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 ./scripts/doctor.sh    # Run anytime to diagnose environment issues
 ```
 
+## Session Bootstrap
+
+Agents use a `SessionStart` hook to auto-inject project context (docs map + latest changelog) at startup.
+This is configured via `docflow.json` and agent-specific settings (e.g., `.claude/settings.json`).
+
+```bash
+./hooks/session-start.sh # Manual execution to verify context injection
+```
+
 ## Version Management
 
 **Single source of truth**: `VERSION` file at root. Never edit version strings elsewhere.

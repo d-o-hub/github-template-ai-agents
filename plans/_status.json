@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-009"
+    "adr": "adr-010"
   },
   "active_plan": "plans/GOAP_STATE.md",
   "phases": [],
@@ -12,6 +12,10 @@
       "date": "2026-06-02"
     },
     "adr-008-enforce-conventional-commits.md": {
+      "status": "accepted",
+      "date": "2026-06-07"
+    },
+    "adr-009-session-start-hook.md": {
       "status": "accepted",
       "date": "2026-06-07"
     }
