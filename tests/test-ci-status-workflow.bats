@@ -41,6 +41,7 @@ teardown() {
 @test "commit logic stages and commits changes when artifacts are modified" {
     echo "modified" > .github/ci-status/ci-status.json
 
+    # Logic from workflow
     git add .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
     if git diff --staged --quiet; then
         echo "No changes"
@@ -53,6 +54,7 @@ teardown() {
 }
 
 @test "commit logic does nothing when artifacts are unchanged" {
+    # Logic from workflow
     git add .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
     if git diff --staged --quiet; then
         echo "No changes"
@@ -68,9 +70,15 @@ teardown() {
     export TARGET_BRANCH="feature-branch"
     echo "modified" > .github/ci-status/ci-status.json
 
+    # Logic from workflow
     git add .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
-    git commit -m "ci: update ci status artifacts [skip ci]"
-    git push origin "HEAD:$TARGET_BRANCH"
+    if git diff --staged --quiet; then
+        echo "No changes"
+        false
+    else
+        git commit -m "ci: update ci status artifacts [skip ci]"
+        git push origin "HEAD:$TARGET_BRANCH"
+    fi
 
     grep -q "push origin HEAD:feature-branch" "$GIT_LOG"
 }
@@ -147,4 +155,21 @@ MOCK
 
     [ "$PUSHED" = false ]
     [ "$(grep -c "push origin HEAD:main" "$GIT_LOG")" -eq "$MAX_RETRIES" ]
+}
+
+@test "git push handles main branch correctly" {
+    export TARGET_BRANCH="main"
+    echo "modified" > .github/ci-status/ci-status.json
+
+    # Logic from workflow
+    git add .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
+    if git diff --staged --quiet; then
+        echo "No changes"
+        false
+    else
+        git commit -m "ci: update ci status artifacts [skip ci]"
+        git push origin "HEAD:$TARGET_BRANCH"
+    fi
+
+    grep -q "push origin HEAD:main" "$GIT_LOG"
 }
