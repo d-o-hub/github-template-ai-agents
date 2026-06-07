@@ -81,15 +81,16 @@ done
 
 # ---- Git hooks ----
 sect "Git hooks"
-HOOK=".git/hooks/pre-commit"
+HOOKS_DIR=$(git config core.hooksPath || echo ".git/hooks")
+HOOK="$HOOKS_DIR/pre-commit"
 if [[ -f "$HOOK" ]]; then
   if [[ -x "$HOOK" ]]; then
-    pass "pre-commit hook installed and executable"
+    pass "pre-commit hook installed and executable ($HOOK)"
   else
     bad "pre-commit hook exists but is NOT executable (run: chmod +x $HOOK)"
   fi
 else
-  bad "pre-commit hook missing (run: bootstrap.sh)"
+  bad "pre-commit hook missing in $HOOKS_DIR (run: bootstrap.sh)"
 fi
 
 # ---- Core files ----
