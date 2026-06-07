@@ -17,9 +17,9 @@ The Implementer skill is an execution-focused tier responsible for making atomic
 
 ## Workflow
 
-1.  **Blueprint Check**: Verify that a clear implementation strategy (ADR) exists.
-2.  **Atomic Edits**: Apply changes one concern at a time.
-3.  **Verification**: Run tests and the quality gate.
+1. **Blueprint Check**: Verify that a clear implementation strategy (ADR) exists.
+2. **Atomic Edits**: Apply changes one concern at a time.
+3. **Verification**: Run tests and the quality gate.
 
 ## Rationalizations
 

@@ -17,9 +17,9 @@ The Delegate skill provides a lightweight tier for rapid retrieval and context g
 
 ## Workflow
 
-1.  **Context Retrieval**: Use `grep` and `glob` to locate files.
-2.  **Summarization**: Read relevant files and synthesize findings.
-3.  **Handoff**: Pass gathered context to the primary agent or an Implementer.
+1. **Context Retrieval**: Use `grep` and `glob` to locate files.
+2. **Summarization**: Read relevant files and synthesize findings.
+3. **Handoff**: Pass gathered context to the primary agent or an Implementer.
 
 ## Rationalizations
 
