@@ -1,6 +1,8 @@
 # AGENTS.md
 
-<!-- AGENT-specific guidance: CLAUDE.md, GEMINI.md, QWEN.md, JULES.md -->
+> Single source of truth for all AI coding skills in this repository.
+
+<!-- Skill-specific guidance: CLAUDE.md, GEMINI.md, QWEN.md, JULES.md -->
 
 ## Named Constants
 
