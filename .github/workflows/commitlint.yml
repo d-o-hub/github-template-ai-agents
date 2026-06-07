@@ -52,6 +52,15 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install commitlint
+        run: |
+          # The wagoid action's Docker image bundles commitlint + the
+          # config-conventional preset; here we install them via npm so
+          # the same config (commitlint.config.cjs) is available.
+          npm install --no-save --no-audit --no-fund \
+              @commitlint/cli@19 \
+              @commitlint/config-conventional@19
+
       - name: Lint PR title against commitlint
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
@@ -61,7 +70,7 @@ jobs:
           # for the merged commit; it MUST be a valid conventional commit.
           # See ADR-008 (PR #505 run 27086771117).
           printf '%s\n' "$PR_TITLE" > pr-title.txt
-          if ! npx --yes @commitlint/cli@19 \
+          if ! npx commitlint \
                 --config commitlint.config.cjs \
                 --edit pr-title.txt; then
             echo "::error::PR title is not a valid conventional commit."
