@@ -84,17 +84,6 @@ gh run view <run-id> --log-failed
 
 - Patch code locally, commit with conventional format, push.
 
-**Non-conventional commit subjects** — the failed job is `commitlint` and the
-log shows `header-max-length`, `type-empty`, `subject-empty`, or
-`subject-full-stop`. Common with bot-authored PRs (`google-labs-jules[bot]`,
-`dependabot[bot]`, `github-copilot[bot]`). See ADR-008 and PR #505 run
-27086771117.
-
-- Run `.agents/skills/jules-delegator/scripts/normalize-commits.sh --from <base> --to HEAD --type <type> --scope <scope>` to rewrite the subjects in place.
-- For bots other than Jules, derive a generic prefix: `--type chore --scope <area>`.
-- `git push --force-with-lease` to the PR head branch.
-- Resume `--watch` on the new head SHA — the commitlint job will re-run.
-
 **Flaky/unrelated** — transient infra issues (timeouts, runner failures, registry outages, rate limits):
 
 - Rerun failed jobs.
@@ -144,7 +133,6 @@ On a fresh state file, existing pending review feedback is surfaced immediately 
 
 - `fix: fix CI failure on PR #<n>`
 - `fix: address PR review feedback (#<n>)`
-- `chore(commit): normalize bot commits to conventional format`
 
 ## Monitoring Loop Pattern
 

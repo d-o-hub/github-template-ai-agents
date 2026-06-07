@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-009"
+    "adr": "adr-008"
   },
   "active_plan": "plans/GOAP_STATE.md",
   "phases": [],
@@ -10,10 +10,6 @@
     "adr-007-dependabot-auto-merge-ruleset.md": {
       "status": "accepted",
       "date": "2026-06-02"
-    },
-    "adr-008-enforce-conventional-commits.md": {
-      "status": "accepted",
-      "date": "2026-06-07"
     }
   }
 }
