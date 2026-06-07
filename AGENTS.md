@@ -128,6 +128,12 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 - **Policies**: See `agents-docs/WORKFLOW.md` for Atomic Commit & Issue resolution.
 - **Learning**: After work, run `learn` or append discoveries to nearest `AGENTS.md`.
 
+## Delegation Routing
+
+- **Self-Execute**: 1 trivial isolated edit (e.g., typos, single-line constants).
+- **Delegate**: 2+ files, architectural changes, or tasks requiring judgment.
+- **Route to**: `delegate.md` (retrieval/context) or `implementer.md` (execution).
+
 ## Post-Task Protocol
 
 After **every** completed task, the agent MUST append a JSON entry to `.agents/metrics.jsonl`:
