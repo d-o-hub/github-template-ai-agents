@@ -14,18 +14,18 @@ This command allows an agent to quickly re-orient itself by reading the current 
 
 ## Logic
 
-1.  **Read `plans/_status.json`**:
-    - Identify the `active_plan` (if any).
-    - Read the `phases` array to determine completed vs. in-progress steps.
-    - Extract the `handover_ref` path.
+1. **Read `plans/_status.json`**:
+   - Identify the `active_plan` (if any).
+   - Read the `phases` array to determine completed vs. in-progress steps.
+   - Extract the `handover_ref` path.
 
-2.  **Load Handover**:
-    - If `handover_ref` exists and points to a valid file (e.g., `plans/handovers/session-XYZ.md`), read its content.
-    - Handover files should contain critical context, pending blockers, and immediate next steps not captured in the GOAP plan.
+2. **Load Handover**:
+   - If `handover_ref` exists and points to a valid file (e.g., `plans/handovers/session-XYZ.md`), read its content.
+   - Handover files should contain critical context, pending blockers, and immediate next steps not captured in the GOAP plan.
 
-3.  **Synchronize State**:
-    - Load the active plan's file (e.g., `plans/GOAP_STATE.md` or a specific ADR-based plan).
-    - Extract the "todo" state and currently active phase.
+3. **Synchronize State**:
+   - Load the active plan's file (e.g., `plans/GOAP_STATE.md` or a specific ADR-based plan).
+   - Extract the "todo" state and currently active phase.
 
 ## Example Output
 

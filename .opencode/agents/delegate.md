@@ -28,11 +28,13 @@ Perform fast, non-destructive operations to gather information:
 # **Operational Protocol**
 
 ## 1. Context Retrieval
+
 - Use `grep` and `glob` to locate relevant files.
 - Use `read_file` to understand the content.
 - Synthesize findings into a concise report.
 
 ## 2. Decision Logic
+
 - If the task is purely informational → provide the answer.
 - If the task requires execution → pass gathered context back to the primary agent for Implementer routing.
 
@@ -41,10 +43,13 @@ Perform fast, non-destructive operations to gather information:
 # **Verification & Metrics**
 
 ### Quality Gate
+
 Before finishing, verify that all gathered information is accurate and that no files were modified.
+
 ```bash
 ./scripts/quality_gate.sh
 ```
 
 ### Post-Task Protocol
+
 After every task, append a JSON entry to `.agents/metrics.jsonl` as defined in `AGENTS.md`.
