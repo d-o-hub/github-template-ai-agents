@@ -74,11 +74,12 @@ setup() {
 }
 
 @test "doctor.sh checks for pre-commit hook" {
-    grep -q '.git/hooks/pre-commit' ./scripts/doctor.sh
+    grep -q 'git config core.hooksPath' ./scripts/doctor.sh
 }
 
 @test "doctor.sh detects missing pre-commit hook with non-zero exit" {
-    HOOK=".git/hooks/pre-commit"
+    HOOKS_DIR=$(git config core.hooksPath || echo ".git/hooks")
+    HOOK="$HOOKS_DIR/pre-commit"
     BACKUP=""
     if [ -f "$HOOK" ]; then
         BACKUP="$(mktemp)"
