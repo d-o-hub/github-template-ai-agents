@@ -3,6 +3,9 @@
     "plan": "001",
     "adr": "adr-009"
   },
+  "active_plan": "plans/GOAP_STATE.md",
+  "phases": [],
+  "handover_ref": null,
   "entries": {
     "adr-007-dependabot-auto-merge-ruleset.md": {
       "status": "accepted",

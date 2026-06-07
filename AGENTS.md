@@ -1,7 +1,5 @@
 # AGENTS.md
 
-> Single source of truth for all AI coding agents in this repository.
-
 <!-- Agent-specific guidance: CLAUDE.md, GEMINI.md, QWEN.md, JULES.md -->
 
 ## Named Constants
@@ -121,12 +119,19 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 
 If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject>"` or use `git rebase -i`.
 
-## Agent Guidance
+## Skill Guidance
 
 - **Rules**: Review `## Rationalizations` and `## Red Flags` in skills before use.
 - **Plan**: Produce written plan, wait for confirmation for non-trivial tasks.
 - **Policies**: See `agents-docs/WORKFLOW.md` for Atomic Commit & Issue resolution.
 - **Learning**: After work, run `learn` or append discoveries to nearest `AGENTS.md`.
+
+## Delegation Routing
+
+- **Self-Execute**: 1 trivial isolated edit (e.g., typos, single-line constants).
+- **Delegate**: 2+ files, architectural changes, or tasks requiring judgment.
+- **Swarm**: 5+ similar independent tasks (e.g., batch doc normalization, multi-file refactors).
+- **Route to**: `delegate` (retrieval/context) → `implementer` (execution) → `parallel-execution` (parallel batch).
 
 ## Post-Task Protocol
 
