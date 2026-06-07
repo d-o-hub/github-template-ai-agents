@@ -36,12 +36,14 @@ chmod +x scripts/atomic-commit/*.sh
    ls -la .git/hooks/pre-commit
    ```
 
-2. If not present, install it:
+2. If not present, run the bootstrap script (preferred) or install manually:
 
    ```bash
-   cp scripts/pre-commit-hook.sh .git/hooks/pre-commit
-   chmod +x .git/hooks/pre-commit
+   ./scripts/bootstrap.sh
    ```
+
+   The manual approach is not recommended for first-time setup; use `bootstrap.sh` instead.
+   It is documented here only for environments where `bootstrap.sh` cannot run.
 
 3. Check for conflicting global hooks:
 

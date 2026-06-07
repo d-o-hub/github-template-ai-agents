@@ -49,8 +49,8 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 ## Setup
 
 ```bash
-./scripts/setup-skills.sh # Create skill symlinks
-cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+./scripts/bootstrap.sh # One-command setup: skills + hook + validate + quality gate
+./scripts/doctor.sh    # Run anytime to diagnose environment issues
 ```
 
 ## Version Management
