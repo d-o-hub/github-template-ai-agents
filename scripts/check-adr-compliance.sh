@@ -17,45 +17,45 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
 EXIT_CODE=0
 
-log_ok() { local msg="$1"; echo "  ✓ $msg"; }
-log_fail() { local msg="$1"; echo "  ✗ $msg"; EXIT_CODE=1; }
+log_ok() { local msg="$1"; printf "  ✓ %s\n" "$msg"; }
+log_fail() { local msg="$1"; printf "  ✗ %s\n" "$msg"; EXIT_CODE=1; }
 
 # --- Phase 1: ADR File Inventory ---
-echo "=== Phase 1: ADR File Inventory ==="
+printf "=== Phase 1: ADR File Inventory ===\n"
 declare -a ADR_FILES=()
 for file in "$REPO_ROOT/plans"/adr-*.md; do
   [[ -f "$file" ]] && ADR_FILES+=("${file##*/}")
 done
 
-for f in "${ADR_FILES[@]}"; do echo "  - $f"; done
+for f in "${ADR_FILES[@]}"; do printf "  - %s\n" "$f"; done
 
 # --- Phase 2: Status Registration ---
-echo -e "\n=== Phase 2: _status.json Registration ==="
+printf "\n=== Phase 2: _status.json Registration ===\n"
 STATUS_FILE="$REPO_ROOT/plans/_status.json"
 if [[ ! -f "$STATUS_FILE" ]]; then
   if [[ ${#ADR_FILES[@]} -eq 0 ]]; then
-    echo "  (Skipping check: plans/_status.json not found and no ADR files exist)"
+    printf "  (Skipping check: plans/_status.json not found and no ADR files exist)\n"
   else
     log_fail "plans/_status.json not found but ADR files exist!"
   fi
 else
   for f in "${ADR_FILES[@]}"; do
-    if grep -q "\"$f\"" "$STATUS_FILE"; then :
+    if grep -q -- "\"$f\"" "$STATUS_FILE"; then :
     else log_fail "$f NOT registered in _status.json"; fi
   done
 fi
 
 # --- Phase 3: Pattern Compliance (Skeleton) ---
-echo -e "\n=== Phase 3: Basic Pattern Compliance ==="
+printf "\n=== Phase 3: Basic Pattern Compliance ===\n"
 # Users should add project-specific checks here.
 # Example:
-# if grep -rq "pattern" "$REPO_ROOT/src/"; then log_ok "Pattern found"; else log_fail "Pattern missing"; fi
-echo "  (No project-specific patterns defined in template)"
+# if grep -rq -- "pattern" "$REPO_ROOT/src/"; then log_ok "Pattern found"; else log_fail "Pattern missing"; fi
+printf "  (No project-specific patterns defined in template)\n"
 
 if [[ $EXIT_CODE -eq 0 ]]; then
-  echo -e "\n✓ All ADR compliance checks passed."
+  printf "\n✓ All ADR compliance checks passed.\n"
 else
-  echo -e "\n✗ ADR compliance issues found."
+  printf "\n✗ ADR compliance issues found.\n"
 fi
 
 exit $EXIT_CODE
