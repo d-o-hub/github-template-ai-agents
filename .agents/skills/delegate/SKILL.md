@@ -1,7 +1,10 @@
 ---
 name: delegate
-version: "0.1.0"
+version: "0.1.1"
 description: Lightweight retrieval and context agent skill for rapid information gathering and environment assessment. Use for quick context lookups, finding code patterns, or assessing current state without full implementation overhead.
+changelog:
+  - 0.1.1: Initial stable version for opencode-processing-skills adaptation.
+  - 0.1.0: Draft version.
 ---
 
 # Delegate Skill

@@ -31,7 +31,7 @@ You have access to:
 
 ## 1. Blueprint Approval
 
-**GATED STEP**: You must have a clear implementation strategy or ADR before making changes. If a Blueprint is missing, stop and request one.
+**GATED STEP**: A clear ADR with TRIZ contradiction analysis must exist. If no TRIZ analysis was performed upstream, invoke `triz-analysis` skill before proceeding.
 
 ## 2. Implementation
 

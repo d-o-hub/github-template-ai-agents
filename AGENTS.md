@@ -132,7 +132,8 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 
 - **Self-Execute**: 1 trivial isolated edit (e.g., typos, single-line constants).
 - **Delegate**: 2+ files, architectural changes, or tasks requiring judgment.
-- **Route to**: `delegate` (retrieval/context) or `implementer` (execution).
+- **Swarm**: 5+ similar independent tasks (e.g., batch doc normalization, multi-file refactors).
+- **Route to**: `delegate` (retrieval/context) → `implementer` (execution) → `swarm` (parallel batch).
 
 ## Post-Task Protocol
 

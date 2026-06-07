@@ -24,8 +24,10 @@ This command allows an agent to quickly re-orient itself by reading the current 
    - Handover files should contain critical context, pending blockers, and immediate next steps not captured in the GOAP plan.
 
 3. **Synchronize State**:
-   - Load the active plan's file (e.g., `plans/GOAP_STATE.md` or a specific ADR-based plan).
-   - Extract the "todo" state and currently active phase.
+   - Load `plans/GOAP_STATE.md` (or the `active_plan` file) and determine the last `✅ Complete` phase.
+   - Cross-check against the `_status.json.phases` array.
+   - If they diverge, prefer `GOAP_STATE.md` as source of truth and flag the discrepancy.
+   - Extract the current "todo" state and the next pending phase.
 
 ## Example Output
 
