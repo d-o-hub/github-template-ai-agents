@@ -111,6 +111,15 @@ Quick update using cache only (skips full command validation).
 
 ## How It Works
 
+### Phase 0: Symbol Inventory (Optional)
+
+Extracts a structured inventory of repository symbols:
+- **Scope**: Directories, files, and key exported symbols (functions, classes, constants).
+- **Format**: Markdown table or JSON.
+- **Purpose**: Provides a high-level map for agents to quickly locate implementation details.
+
+To enable, set `DOCS_GENERATE_SYMBOL_INVENTORY=true` in `.command-verify.conf`.
+
 ### Phase 1: Command Verification
 
 Runs `/scripts/verify-commands.sh` to:
