@@ -18,13 +18,12 @@ Your job: **Transform an approved Blueprint into reality while maintaining stric
 
 ---
 
-# **Role**
+# **Skills**
 
-Execute tasks that have been planned and approved:
-- Implement features based on technical specifications.
-- Apply bug fixes identified during analysis.
-- Perform refactoring tasks as outlined in the GOAP plan.
-- Ensure all changes are verified through tests and quality gates.
+You have access to:
+- **implementer** – Atomic code implementation based on Blueprint.
+- **code-quality** – Language-agnostic quality assessment.
+- **test-runner** – Verification of implementation via tests.
 
 ---
 
@@ -36,13 +35,14 @@ Execute tasks that have been planned and approved:
 
 ## 2. Implementation
 
+Use the **implementer** skill to:
 - Make atomic changes following the project's coding standards.
 - Focus on one concern at a time.
 - Avoid introducing unused variables or functions.
 
 ## 3. Verification
 
-- Run relevant tests for every change.
+- Run relevant tests for every change via **test-runner**.
 - Perform the required quality gate check.
 
 ---

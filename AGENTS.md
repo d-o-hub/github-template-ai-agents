@@ -132,7 +132,7 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 
 - **Self-Execute**: 1 trivial isolated edit (e.g., typos, single-line constants).
 - **Delegate**: 2+ files, architectural changes, or tasks requiring judgment.
-- **Route to**: `delegate.md` (retrieval/context) or `implementer.md` (execution).
+- **Route to**: `delegate` (retrieval/context) or `implementer` (execution).
 
 ## Post-Task Protocol
 
