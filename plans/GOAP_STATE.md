@@ -80,4 +80,3 @@
 ### Dependabot Auto-Merge Rewrite
 
 - See `adr-007-dependabot-auto-merge-ruleset.md` and `agents-docs/LESSONS.md` LESSON-023.
-

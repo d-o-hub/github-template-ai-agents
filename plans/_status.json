@@ -1,12 +1,16 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-008"
+    "adr": "adr-009"
   },
   "entries": {
     "adr-007-dependabot-auto-merge-ruleset.md": {
       "status": "accepted",
       "date": "2026-06-02"
+    },
+    "adr-008-enforce-conventional-commits.md": {
+      "status": "accepted",
+      "date": "2026-06-07"
     }
   }
 }
