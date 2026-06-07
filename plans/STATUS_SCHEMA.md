@@ -34,9 +34,11 @@ Documentation for the `plans/_status.json` file schema used for session tracking
 ## Field Definitions
 
 ### `active_plan`
+
 The path to the currently active GOAP plan or ADR-based plan. Used by `/resume` to identify the starting point.
 
 ### `phases`
+
 An array of objects representing the status of individual plan phases.
 - **`id`**: Unique identifier for the phase.
 - **`name`**: Descriptive name of the phase.
@@ -46,4 +48,5 @@ An array of objects representing the status of individual plan phases.
 - **`timestamp`**: Last update time in ISO-8601 format.
 
 ### `handover_ref`
+
 Path to a markdown file in `plans/handovers/` containing cross-session context and next steps.
