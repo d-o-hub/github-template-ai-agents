@@ -2,59 +2,30 @@
 
 ## Current Mission
 
-**Goal**: Implement all 7 open GitHub issues (#491-#497) using a multi-agent swarm, address all PR comments, ensure all GitHub Actions pass with zero warnings.
+**Goal**: Implement SessionStart hook for agent context injection at session start.
 
-**Status**: Complete — all 7 issues implemented across 3 PRs, 1 PR already merged, 2 PRs green and ready to merge.
+**Status**: In Progress
 
-## PR Status (final)
+## Phase 1: Implementation (Active)
 
-| PR | Wave | Issues | Status | CI checks |
-|---|---|---|---|---|
-| [#500](https://github.com/d-o-hub/github-template-ai-agents/pull/500) | README overhaul | #491, #492, #495, #496 | MERGED | all green |
-| [#498](https://github.com/d-o-hub/github-template-ai-agents/pull/498) | Setup scripts | #493, #494 | OPEN, MERGEABLE | 21/25 success (4 skipped/neutral) |
-| [#504](https://github.com/d-o-hub/github-template-ai-agents/pull/504) | Docs normalization | #497 | OPEN, MERGEABLE | 26/28 success (2 skipped/neutral) |
+1. [x] ADR-009: SessionStart Hook for Agent Context Injection created.
+2. [ ] Create `hooks/` directory.
+3. [ ] Implement `hooks/session-start.sh`.
+4. [ ] Create `docflow.json`.
+5. [ ] Register hook in `.claude/settings.json`.
+6. [ ] Document in `AGENTS.md`.
 
-## Wave 1: Setup Scripts (Completed)
+## Phase 2: Verification
 
-- **Branch**: `feat/bootstrap-doctor-scripts`
-- **PR**: #498
-- **Commits**:
-  - `f9758a0` — feat(scripts): add bootstrap.sh and doctor.sh entry points
-  - `8b3269c` — fix(readme): remove trailing space in Available Skills link (rebase fix)
-  - `3805313` — fix(scripts): add explicit return statements to helper functions (review fix)
-- **Review comment addressed**: "Add an explicit return statement at the end of the function" — applied to all helper functions in both scripts.
-- **BATS tests**: 16/16 passing in `tests/bootstrap-doctor.bats`
-- **shellcheck**: clean
-- **agents-docs/SCRIPTS.md**: both scripts registered in core table
+1. [ ] Verify file creation and contents.
+2. [ ] Run `bash hooks/session-start.sh` and verify output.
+3. [ ] Run `./scripts/quality_gate.sh`.
 
-## Wave 2: README Overhaul (Completed — Merged)
+## Phase 3: Submission
 
-- **Branch**: `docs/readme-overhaul` (already merged to main via PR #500)
-- **Files**: `README.md` (+146 -90), `llms.txt`, `llms-full.txt`
-- **Key corrections vs. issue spec**:
-  - Windsurf uses **directory symlink** to `.agents/skills`, not best-effort rules
-  - `ci-status.json` shape matches actual artifact (`status`, `last_run`, `failing_jobs`, `workflow_url` — no `checks` field)
-  - MIGRATION.md is at `agents-docs/MIGRATION.md`, not root
-
-## Wave 3: Docs Normalization (Completed)
-
-- **Branch**: `chore/normalize-setup-docs`
-- **PR**: #504
-- **Files**: `QUICKSTART.md` (full rewrite), `CONTRIBUTING.md`, `AGENTS.md`, `agents-docs/TROUBLESHOOTING.md`, `README.md` (trailing-space drive-by fix)
-- **All 4 user-facing setup references** now route through `bootstrap.sh` / `doctor.sh`
-- **No `cp scripts/pre-commit-hook.sh`** remains in any .md file (verified via grep)
-
-## Issue closure mapping
-
-| Issue | Title | Closed by |
-|---|---|---|
-| #491 | docs: Rewrite README hero | PR #500 |
-| #492 | docs: Add 'Why this template' section | PR #500 |
-| #493 | feat: Add scripts/bootstrap.sh | PR #498 |
-| #494 | feat: Add scripts/doctor.sh | PR #498 |
-| #495 | docs: Add agent compatibility matrix + Mermaid | PR #500 |
-| #496 | docs: Add adoption paths + practical examples | PR #500 |
-| #497 | chore: Normalize all setup documentation | PR #504 |
+1. [ ] Complete pre-commit steps.
+2. [ ] Commit and create PR.
+3. [ ] Post-task protocol.
 
 ## Lessons learned (this session)
 
