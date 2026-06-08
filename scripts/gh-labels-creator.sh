@@ -40,7 +40,7 @@ create_label() {
 }
 
 printf "Creating labels...\n"
-create_label "d73a4a" "Something isn"t working" "bug"
+create_label "d73a4a" "Something isn't working" "bug"
 create_label "a2eeef" "New feature request" "feature"
 create_label "0075ca" "Improvements or additions to documentation" "documentation"
 create_label "d876e3" "Further information is requested" "question"
