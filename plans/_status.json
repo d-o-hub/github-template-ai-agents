@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-010"
+    "adr": "adr-011"
   },
   "active_plan": "plans/GOAP_STATE.md",
   "phases": [],
@@ -18,6 +18,10 @@
     "adr-009-session-start-hook.md": {
       "status": "accepted",
       "date": "2026-06-07"
+    },
+    "adr-010-automated-pr-auto-merge.md": {
+      "status": "accepted",
+      "date": "2026-06-08"
     }
   }
 }
