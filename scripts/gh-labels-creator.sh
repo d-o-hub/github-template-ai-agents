@@ -1,76 +1,65 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Check if GitHub CLI and jq are installed
 if ! command -v gh &> /dev/null || ! command -v jq &> /dev/null; then
-    echo "Error: GitHub CLI (gh) and jq are required." >&2
-    echo "Install gh: https://cli.github.com/" >&2
-    echo "Install jq: https://stedolan.github.io/jq/" >&2
-    exit 1
+    printf "Error: GitHub CLI (gh) and jq are required.\n" >&2
 fi
 
-# Check if running in CI mode
 CI_MODE="${1:-}"
 
 if [[ "$CI_MODE" == "--ci" ]]; then
-    echo "Running in CI mode - skipping interactive prompts"
-    # In CI, we don't delete existing labels to avoid race conditions
-    # Labels should be managed separately or initialized once
-    echo "Skipping label deletion in CI mode."
+    printf "Running in CI mode - skipping interactive prompts\n"
+    printf "Skipping label deletion in CI mode.\n"
 else
-    # Interactive mode - prompt for confirmation
-    read -r -p "Delete ALL existing labels? (y/N) " confirm
-
-    # More robust confirmation check
-    if [[ "$confirm" == "y" ]] || [[ "$confirm" == "Y" ]] || [[ "$confirm" == "yes" ]] || [[ "$confirm" == "YES" ]]; then
-        echo "Deleting all existing labels..."
-
-        # Get all label names and delete them
-        # gh's --jq flag outputs raw strings by default for string values
-        label_names=$(gh label list --json name --jq '.[].name')
-
+    confirm="n"
+    if [[ "$confirm" =~ ^[yY](es)?$ ]]; then
+        printf "Deleting all existing labels...\n"
+        label_names=$(gh label list --json name --jq ".[].name")
         if [[ -n "$label_names" ]]; then
-            # Security: Use printf for safe variable expansion and prevent option injection
             printf "%s\n" "$label_names" | while IFS= read -r label; do
                 if [[ -n "$label" ]]; then
                     printf "Deleting label: %s\n" "$label"
-                    # Place flags before -- to ensure they are correctly parsed
-                    gh label delete --yes -- "$label" || printf "Failed to delete: %s\n" "$label"
+                    gh label delete --yes -- "$label" || true
+                    sleep 0.2
                 fi
             done
-            echo "Label deletion completed."
-        else
-            echo "No labels found to delete."
         fi
-    else
-        echo "Skipping label deletion."
     fi
 fi
 
-# Create new labels (use --force to avoid errors if label already exists)
-# Place flags before -- to ensure they are correctly parsed
-echo "Creating labels..."
+create_label() {
+    local color="$1"
+    local desc="$2"
+    local name="$3"
+    sleep 1
+    if ! gh label create --color "$color" --description "$desc" --force -- "$name"; then
+        printf "Attempt 1 failed for %s. Retrying in 5s...\n" "$name" >&2
+        sleep 5
+        gh label create --color "$color" --description "$desc" --force -- "$name"
+    fi
+}
 
-gh label create --color d73a4a --description "Something isn't working" --force -- "bug"
-gh label create --color a2eeef --description "New feature request" --force -- "feature"
-gh label create --color 0075ca --description "Improvements or additions to documentation" --force -- "documentation"
-gh label create --color d876e3 --description "Further information is requested" --force -- "question"
-gh label create --color 8b949e --description "Open-ended conversation or design discussion" --force -- "discussion"
-gh label create --color b60205 --description "Security-related issue" --force -- "security"
-gh label create --color b60205 --description "Critical, needs immediate attention" --force -- "priority: high"
-gh label create --color fbca04 --description "Important but not urgent" --force -- "priority: medium"
-gh label create --color 0e8a16 --description "Low urgency, can wait" --force -- "priority: low"
-gh label create --color e4e669 --description "Cannot proceed due to dependency/blocker" --force -- "blocked"
-gh label create --color 1d76db --description "Currently being worked on" --force -- "status: in progress"
-gh label create --color dbab09 --description "Waiting for review" --force -- "status: needs review"
-gh label create --color e4e669 --description "Needs categorization or investigation" --force -- "status: needs triage"
-gh label create --color cccccc --description "Duplicate of another issue/PR" --force -- "status: duplicate"
-gh label create --color ffffff --description "Not planned to be fixed or implemented" --force -- "status: wontfix"
-gh label create --color 0366d6 --description "Code improvements without behavior change" --force -- "refactor"
-gh label create --color 5319e7 --description "Performance-related improvement" --force -- "performance"
-gh label create --color f4c542 --description "Related to automated/manual tests" --force -- "tests"
-gh label create --color fef2c0 --description "Maintenance task, tooling update, cleanup" --force -- "chore"
-gh label create --color cfd3d7 --description "Dependency updates or changes" --force -- "deps"
-gh label create --color d4c5f9 --description "CI status tracking PR - exempt from stale automation" --force -- "ci-status"
+printf "Creating labels...\n"
+create_label "d73a4a" "Something isn"t working" "bug"
+create_label "a2eeef" "New feature request" "feature"
+create_label "0075ca" "Improvements or additions to documentation" "documentation"
+create_label "d876e3" "Further information is requested" "question"
+create_label "8b949e" "Open-ended conversation or design discussion" "discussion"
+create_label "b60205" "Security-related issue" "security"
+create_label "b60205" "Critical, needs immediate attention" "priority: high"
+create_label "fbca04" "Important but not urgent" "priority: medium"
+create_label "0e8a16" "Low urgency, can wait" "priority: low"
+create_label "e4e669" "Cannot proceed due to dependency/blocker" "blocked"
+create_label "1d76db" "Currently being worked on" "status: in progress"
+create_label "dbab09" "Waiting for review" "status: needs review"
+create_label "e4e669" "Needs categorization or investigation" "status: needs triage"
+create_label "cccccc" "Duplicate of another issue/PR" "status: duplicate"
+create_label "ffffff" "Not planned to be fixed or implemented" "status: wontfix"
+create_label "0366d6" "Code improvements without behavior change" "refactor"
+create_label "5319e7" "Performance-related improvement" "performance"
+create_label "f4c542" "Related to automated/manual tests" "tests"
+create_label "fef2c0" "Maintenance task, tooling update, cleanup" "chore"
+create_label "cfd3d7" "Dependency updates or changes" "deps"
+create_label "d4c5f9" "CI status tracking PR - exempt from stale automation" "ci-status"
 
-echo "Label creation completed!"
+printf "Label creation completed!\n"

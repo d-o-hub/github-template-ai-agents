@@ -3,6 +3,12 @@
   All items must be checked ✓ before merge. No exceptions.
 -->
 
+<!--
+  MANDATORY (ADR-008): PR Title MUST follow type(scope): subject
+  Validate: echo "title" | npx commitlint --config commitlint.config.cjs
+  Example: feat(hooks): add session-start context injection
+-->
+
 ## 📋 Summary
 
 <!-- Provide a clear, concise summary of changes (2-3 sentences max) -->
