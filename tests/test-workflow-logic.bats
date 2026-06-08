@@ -12,8 +12,8 @@
     grep -q "commit -m \"ci: update ci status artifacts \\[skip ci\\]\"" .github/workflows/ci-and-labels.yml
 }
 
-@test "workflow hardcodes base to main" {
-    grep -q "\-\-base main" .github/workflows/ci-and-labels.yml
+@test "workflow uses dynamic base for PR creation" {
+    grep -q "\-\-base \"\$TARGET_BRANCH\"" .github/workflows/ci-and-labels.yml
 }
 
 @test "workflow has concurrency configuration" {
@@ -22,21 +22,21 @@
     grep -q "cancel-in-progress: true" .github/workflows/ci-and-labels.yml
 }
 
-@test "workflow skips PR creation if one exists" {
+@test "workflow reuses existing PR for merging" {
     grep -q "EXISTING_PR" .github/workflows/ci-and-labels.yml
-    grep -q "already exists" .github/workflows/ci-and-labels.yml
+    grep -q "Reusing existing PR" .github/workflows/ci-and-labels.yml
 }
 
 @test "workflow uses force push to fixed branch" {
     grep -q "git push origin --force -- \"\$PR_BRANCH\"" .github/workflows/ci-and-labels.yml
 }
 
-@test "workflow has post-creation duplicate cleanup" {
-    grep -q "Post-creation concurrency validation" .github/workflows/ci-and-labels.yml
-    grep -q "ALL_PR_NUMBERS" .github/workflows/ci-and-labels.yml
-    grep -q "Closing duplicate PR" .github/workflows/ci-and-labels.yml
-    # Should NOT use --delete-branch for duplicates (shared branch)
-    grep -q "Do NOT use --delete-branch" .github/workflows/ci-and-labels.yml
+@test "workflow performs auto-merge with admin bypass" {
+    grep -q "gh pr merge \"\$NEW_PR\"" .github/workflows/ci-and-labels.yml
+    grep -q "\-\-admin" .github/workflows/ci-and-labels.yml
+    grep -q "\-\-squash" .github/workflows/ci-and-labels.yml
+    # Should NOT use --delete-branch for this specific workflow
+    grep -q "\-\-delete-branch=false" .github/workflows/ci-and-labels.yml
 }
 
 @test "workflow has ci-status label step" {
