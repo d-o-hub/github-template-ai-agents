@@ -135,12 +135,18 @@ check_link() {
         if [[ -e "$full_path" || -L "$full_path" ]]; then
             return 0
         fi
+    elif [[ "$HAS_REALPATH" -eq 0 ]]; then
+        # Security: Fail-closed if realpath is missing and path contains '..'
+        printf "  ${RED}✗${NC} Security Error: Cannot validate path with '..' (realpath missing) at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
+        printf "     in: %s\n" "$skill_file" >&2
+        return 1
     fi
 
     if [[ "$HAS_REALPATH" -eq 1 ]] && [[ -n "$RESOLVED_ROOT" ]]; then
         # Performance optimization: Use pre-resolved root to avoid subshell
         local resolved_path
-        resolved_path=$(realpath -m "$full_path" 2>/dev/null)
+        # Security: Use -- to prevent option injection
+        resolved_path=$(realpath -m -- "$full_path" 2>/dev/null)
 
         # Ensure trailing slash for robust prefix matching
         if [[ "$resolved_path/" != "$RESOLVED_ROOT/"* ]]; then
