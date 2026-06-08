@@ -135,11 +135,16 @@ check_link() {
         if [[ -e "$full_path" || -L "$full_path" ]]; then
             return 0
         fi
-    elif [[ "$HAS_REALPATH" -eq 0 ]]; then
-        # Security: Fail-closed if realpath is missing and path contains '..'
-        printf "  ${RED}✗${NC} Security Error: Cannot validate path with '..' (realpath missing) at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
-        printf "     in: %s\n" "$skill_file" >&2
-        return 1
+    fi
+
+    # Security: If path contains '..', we MUST use realpath to verify it stays within REPO_ROOT.
+    # If realpath is unavailable or REPO_ROOT cannot be resolved, we must fail-closed.
+    if [[ "$clean_path" == *".."* ]]; then
+        if [[ "$HAS_REALPATH" -eq 0 ]] || [[ -z "$RESOLVED_ROOT" ]]; then
+            printf "  ${RED}✗${NC} Security Error: Cannot safely validate path with '..' (realpath or root resolution unavailable) at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
+            printf "     in: %s\n" "$skill_file" >&2
+            return 1
+        fi
     fi
 
     if [[ "$HAS_REALPATH" -eq 1 ]] && [[ -n "$RESOLVED_ROOT" ]]; then
