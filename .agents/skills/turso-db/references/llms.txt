@@ -62,7 +62,7 @@
 - [Errors](https://docs.turso.tech/api-reference/response-codes.md)
 - [Create API Token](https://docs.turso.tech/api-reference/tokens/create.md): Returns a new API token belonging to a user.
 - [List API Tokens](https://docs.turso.tech/api-reference/tokens/list.md): Returns a list of API tokens belonging to a user.
-- [List Organization API Tokens](https://docs.turso.tech/api-reference/tokens/list-organization.md): Returns the API tokens scoped to this organization (both organization-scoped and group-scoped). Unrestricted tokens are not returned here — manage those via [`GET /v1/auth/api-tokens`](https://docs.turso.tech/api-reference/tokens/list.md).
+- [List Organization API Tokens](https://docs.turso.tech/api-reference/tokens/list-organization.md): Returns the API tokens scoped to this organization (both organization-scoped and group-scoped). Unrestricted tokens are not returned here — manage those via [`GET /v1/auth/api-tokens`](/api-reference/tokens/list).
 - [Revoke API Token](https://docs.turso.tech/api-reference/tokens/revoke.md): Revokes the provided API token belonging to a user.
 - [Revoke Organization API Token](https://docs.turso.tech/api-reference/tokens/revoke-organization.md): Revokes a token scoped to this organization.
 - [Validate API Token](https://docs.turso.tech/api-reference/tokens/validate.md): Validates an API token belonging to a user.
