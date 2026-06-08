@@ -24,8 +24,9 @@ fi
 printf "Generating %s and %s...\n" "$LLMS_TXT" "$LLMS_FULL_TXT"
 
 # Extract Project Info from README.md
-PROJECT_NAME=$(grep -m 1 "^# " README.md | sed 's/^# //' || echo "Unnamed Project")
-PROJECT_DESC=$(awk '
+# Security: Use -- to prevent option injection
+PROJECT_NAME=$(grep -m 1 -- "^# " README.md | sed 's/^# //' || echo "Unnamed Project")
+PROJECT_DESC=$(awk -- '
 /^>/ {
     gsub(/^>[-+|]*[ ]*/, "")
     if ($0 != "") desc = (desc ? desc " " : "") $0
@@ -101,9 +102,10 @@ fi
     for skill_dir in $SKILL_DIRS; do
         skill_file="${skill_dir}SKILL.md"
         if [[ -f "$skill_file" ]]; then
-            s_name=$(sed -n 's/^name: *//p' "$skill_file" | head -n 1 | sed 's/^["'\'']//;s/["'\'']$//')
+            # Security: Use -- to prevent option injection
+            s_name=$(sed -n -- 's/^name: *//p' "$skill_file" | head -n 1 | sed 's/^["'\'']//;s/["'\'']$//')
 
-            s_desc=$(awk '
+            s_desc=$(awk -- '
             BEGIN { in_desc=0; desc="" }
             /^description: / {
                 in_desc=1
