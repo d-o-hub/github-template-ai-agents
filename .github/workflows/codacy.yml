@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4.2.2
 
       - name: Set up Go
-        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491  # v4.1.0
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c  # v4.1.0
 
       - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@5cc54a75f9ad88159bb54046196d920e40e367a5  # v4.3.0
