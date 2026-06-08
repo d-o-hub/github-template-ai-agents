@@ -118,7 +118,7 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 
 - PR Title: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
 - Commit Header: `type(scope): subject` (max `${MAX_COMMIT_SUBJECT_LENGTH}` chars total, lowercase)
-- Commit Body: max 1000 chars; wrap at 100 chars per line. Footer: max 1000 chars.
+- Commit Body: no hard limit (body-max-length disabled in commitlint; enforced at PR level as 1000 chars). Wrap at 100 chars per line. Footer: max 1000 chars.
 - Branch per feature; One concern per PR; Never commit to `main`.
 
 ### Commit Type Mapping
