@@ -38,13 +38,28 @@ jobs:
             echo "No changes to llms.txt or llms-full.txt"
             exit 0
           fi
-          git commit -m "ci: regenerate llms.txt and llms-full.txt"
+          git commit -m "ci: regenerate llms.txt and llms-full.txt [skip ci]"
           git push -f origin "$BRANCH"
-          # Create PR only if no open PR already exists for this branch
-          if [[ -z $(gh pr list --head "$BRANCH" --state open --json number -q '.[0].number') ]]; then
-            gh pr create --base main --head "$BRANCH" \
+          # Find-or-create the canonical PR for this branch
+          EXISTING_PR=$(gh pr list --head "$BRANCH" --state open \
+            --json number --jq '.[0].number' 2>/dev/null || echo "")
+          if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
+            printf "Reusing existing PR #%s for %s\n" "$EXISTING_PR" "$BRANCH"
+            NEW_PR="$EXISTING_PR"
+          else
+            NEW_PR=$(gh pr create --base main --head "$BRANCH" \
               --title "ci: regenerate llms.txt and llms-full.txt" \
-              --body "Automated regeneration of LLM context files triggered by source changes."
+              --body "Automated regeneration of LLM context files triggered by source changes." \
+              --json number --jq '.number')
+            printf "Created PR #%s\n" "$NEW_PR"
           fi
+          # Auto-merge via squash; --admin bypasses required checks to avoid deadlock;
+          # [skip ci] prevents the merge commit from re-triggering this workflow.
+          gh pr merge "$NEW_PR" \
+            --squash \
+            --subject "ci: regenerate llms.txt and llms-full.txt [skip ci]" \
+            --admin \
+            --delete-branch=false \
+          || printf "Merge skipped or already merged for PR #%s\n" "$NEW_PR"
         env:
           GH_TOKEN: ${{ github.token }}

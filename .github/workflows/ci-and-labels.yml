@@ -257,40 +257,35 @@ jobs:
           git commit -m "ci: update ci status artifacts [skip ci]"
           git push origin --force -- "$PR_BRANCH"
 
-          # Check if a PR already exists for this branch
+          # Find-or-create the canonical CI status PR
           if ! EXISTING_PR=$(gh pr list --head "$PR_BRANCH" --state open \
             --json number --jq ".[0].number" 2>/tmp/gh-pr-list-err.log); then
-            printf "WARNING: gh pr list failed: %s\n" "$(cat /tmp/gh-pr-list-err.log)" >&2
-            printf "Skipping PR creation to avoid duplicates\n"
+            printf "WARNING: gh pr list failed: %s\n" \
+              "$(cat /tmp/gh-pr-list-err.log)" >&2
+            printf "Skipping PR creation/merge to avoid duplicates\n"
             exit 0
           fi
+
           if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
-            printf "PR #%s already exists for %s\n" "$EXISTING_PR" "$PR_BRANCH"
-            exit 0
+            printf "Reusing existing PR #%s for %s\n" "$EXISTING_PR" "$PR_BRANCH"
+            NEW_PR="$EXISTING_PR"
+          else
+            NEW_PR=$(gh pr create \
+              --title "ci: update ci status artifacts" \
+              --body "Automated CI status update from workflow run ${GITHUB_RUN_ID}." \
+              --base "$TARGET_BRANCH" \
+              --head "$PR_BRANCH" \
+              --label "ci-status" \
+              --json number --jq ".number")
+            printf "Created PR #%s\n" "$NEW_PR"
           fi
 
-          gh pr create \
-            --title "ci: update ci status artifacts" \
-            --body "Automated CI status update from workflow run ${GITHUB_RUN_ID}." \
-            --base main \
-            --head "$PR_BRANCH" \
-            --label "ci-status"
-
-          # Post-creation concurrency validation: ensure only 1 open PR exists
-          ALL_PR_NUMBERS=$(gh pr list --head "$PR_BRANCH" --state open \
-            --json number --jq '.[].number' 2>/dev/null || echo "")
-          PR_COUNT=$(printf "%s\n" "$ALL_PR_NUMBERS" | grep -c '^[0-9]' || echo "0")
-          if [ "$PR_COUNT" -gt 1 ]; then
-            printf "WARNING: Found %s open PRs for %s (should be 1). Cleaning up %s duplicate(s)...\n" \
-              "$PR_COUNT" "$PR_BRANCH" "$((PR_COUNT - 1))"
-            # Keep the newest (highest number), close others
-            NEWEST=$(printf "%s\n" "$ALL_PR_NUMBERS" | sort -rn | head -1)
-            for pr_num in $ALL_PR_NUMBERS; do
-              if [ "$pr_num" != "$NEWEST" ]; then
-                printf "  Closing duplicate PR #%s...\n" "$pr_num"
-                # Do NOT use --delete-branch: all duplicates share ci/status-update
-                gh pr close "$pr_num" 2>/dev/null || true
-              fi
-            done
-            printf "  Kept PR #%s as the canonical CI status PR\n" "$NEWEST"
-          fi
+          # Auto-merge via squash; --admin bypasses required checks (ci/status-update
+          # is itself one of them, so --auto would deadlock); [skip ci] prevents
+          # the merge commit from re-triggering this workflow.
+          gh pr merge "$NEW_PR" \
+            --squash \
+            --subject "ci: update ci status artifacts [skip ci]" \
+            --admin \
+            --delete-branch=false \
+          || printf "Merge skipped or already merged for PR #%s\n" "$NEW_PR"

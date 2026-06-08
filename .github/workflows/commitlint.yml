@@ -79,3 +79,24 @@ jobs:
             exit 1
           fi
           echo "PR title is a valid conventional commit."
+
+      - name: Enforce PR body length for squash merge compatibility
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # On squash merge, GitHub concatenates PR title + body as the
+          # commit message. Enforce body limits here since commitlint
+          # body-max-length is disabled (squash merges produce long bodies
+          # from PR descriptions by design).
+          BODY_LEN=${#PR_BODY}
+          if [ "$BODY_LEN" -gt 1000 ]; then
+            echo "::error::PR body is ${BODY_LEN} chars (max 1000)."
+            echo "::error::On squash merge, long bodies become commit messages."
+            echo "::error::Please shorten the PR description."
+            exit 1
+          fi
+          if printf '%s' "$PR_BODY" | grep -qE '.{101}'; then
+            echo "::warning::PR body has lines exceeding 100 characters."
+            echo "::warning::This may trigger commitlint body-max-line-length on squash merge."
+          fi
+          echo "PR body length check passed (${BODY_LEN} chars)."

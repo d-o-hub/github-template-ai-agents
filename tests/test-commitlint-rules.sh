@@ -41,7 +41,10 @@ check_consistency() {
 
 printf "Checking consistency with AGENTS.md...\n"
 check_consistency "'header-max-length'" "150" "Header max length"
-check_consistency "'body-max-length'" "1000" "Body max length"
+# body-max-length is intentionally disabled ([0]) because squash merges
+# produce long commit bodies from PR descriptions. Enforced at PR level
+# via lint-pr-title workflow body-length warning step.
+check_consistency "'body-max-length'" "\\[0\\]" "Body max length (disabled)"
 check_consistency "'body-max-line-length'" "100" "Body max line length"
 check_consistency "'footer-max-length'" "1000" "Footer max length"
 check_consistency "'footer-max-line-length'" "100" "Footer max line length"

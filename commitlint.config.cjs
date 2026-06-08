@@ -7,7 +7,9 @@ module.exports = {
   ],
   rules: {
     'header-max-length': [2, 'always', 150],
-    'body-max-length': [2, 'always', 1000],
+    // Allow longer bodies for squash merges that include PR description.
+    // Enforced at PR level instead via lint-pr-title workflow.
+    'body-max-length': [0],
     'body-max-line-length': [2, 'always', 100],
     'footer-max-length': [2, 'always', 1000],
     'footer-max-line-length': [2, 'always', 100],
