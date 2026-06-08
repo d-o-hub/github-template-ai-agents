@@ -11,6 +11,7 @@ if [[ "$CI_MODE" == "--ci" ]]; then
     printf "Running in CI mode - skipping interactive prompts\n"
     printf "Skipping label deletion in CI mode.\n"
 else
+    # Interactive mode check disabled for MCP
     confirm="n"
     if [[ "$confirm" =~ ^[yY](es)?$ ]]; then
         printf "Deleting all existing labels...\n"

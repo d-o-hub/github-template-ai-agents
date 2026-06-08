@@ -113,6 +113,10 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 
 ## PR & Commit Instructions
 
+- **MANDATORY (ADR-008)**: PR titles MUST follow `type(scope): subject`.
+- **Validation**: `echo "title" | npx commitlint --config commitlint.config.cjs` (or `gh pr edit`)
+
+
 - PR Title: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
 - Commit Header: `type(scope): subject` (max `${MAX_COMMIT_SUBJECT_LENGTH}` chars total, lowercase)
 - Commit Body: max 1000 chars; wrap at 100 chars per line. Footer: max 1000 chars.

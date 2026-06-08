@@ -52,7 +52,7 @@ jobs:
         run: |
           set -euo pipefail
           grep -q '^version:' .agents/skills/turso-db/SKILL.md
-          sed -i "s/^version: .*/version: "\"${LATEST_RELEASE#v}\""/" .agents/skills/turso-db/SKILL.md
+          sed -i "s/^version: .*/version: \"${LATEST_RELEASE#v}\"/" .agents/skills/turso-db/SKILL.md
 
       - name: Ensure labels exist
         if: steps.check_changes.outputs.changed == 'true'
