@@ -105,3 +105,11 @@
 **Vulnerability:** Command categorization logic used simple substring matching, which led to false positives (e.g., \"mkdir farm\" flagged for \"rm\") and was vulnerable to obfuscation (e.g., \"r\"\"m\"). An initial fix using strict whitespace-only word boundaries introduced detection bypasses for commands adjacent to shell metacharacters (e.g., \"(rm)\" or \"rm;ls\").
 **Learning:** Obfuscation via quotes and backslashes is a common bypass for keyword-based filters. Word-boundary detection must account for the full set of shell metacharacters that can delimit commands, not just whitespace.
 **Prevention:** Normalize command strings by stripping quotes and backslashes before categorization. Use a robust regex boundary \`(^|[[:space:]]|[\\|&;()<>])\` to ensure keywords are detected even when embedded in complex shell expressions while avoiding partial-word matches.
+
+## 2026-06-10 - Fail-Closed Path Traversal and Widespread Option Injection Hardening
+
+**Vulnerability:** `scripts/validate-links.sh` lacked a fail-closed mechanism for paths containing `..` when `realpath` was unavailable, potentially allowing path traversal to go undetected. Multiple utility scripts (`generate-llms-txt.sh`, `propagate-version.sh`, `validate-links.sh`) were also susceptible to option injection by passing variables to `grep`, `sed`, `awk`, and `realpath` without the `--` separator.
+
+**Learning:** Security validation logic must explicitly fail-closed when its primary validation tool (e.g., `realpath`) is missing or fails. Subshells and variable interpolation in shell commands are primary vectors for option injection if delimiters are omitted.
+
+**Prevention:** Always implement explicit checks for shell metacharacters like `..` and ensure validation fails if safe resolution cannot be guaranteed. Use the `--` separator religiously before all positional arguments in shell utilities. Replace `echo -e` with `printf` for safe, portable terminal output.
