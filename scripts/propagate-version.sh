@@ -48,30 +48,29 @@ for file in "${FILES_TO_UPDATE[@]}"; do
     fi
 
     # Update version badges: version-0.X.Y -> version-NEW_VERSION
-    # Security: Use -- to prevent option injection
-    if grep -q -- "version-[0-9]" "$file" 2>/dev/null; then
-        sed -i -- "s/version-[0-9]\+\.[0-9]\+\.[0-9]\+/version-${VERSION}/g" "$file"
+    if grep -q "version-[0-9]" "$file" 2>/dev/null; then
+        sed -i "s/version-[0-9]\+\.[0-9]\+\.[0-9]\+/version-${VERSION}/g" "$file"
         UPDATED=1
         echo "  Updated version badge in $file"
     fi
 
     # Update "Template version: X.Y.Z" text
-    if grep -q -- "Template version:" "$file" 2>/dev/null; then
-        sed -i -- "s/Template version: [0-9]\+\.[0-9]\+\.[0-9]\+/Template version: ${VERSION}/g" "$file"
+    if grep -q "Template version:" "$file" 2>/dev/null; then
+        sed -i "s/Template version: [0-9]\+\.[0-9]\+\.[0-9]\+/Template version: ${VERSION}/g" "$file"
         UPDATED=1
         echo "  Updated template version in $file"
     fi
 
     # Update "**Version:** X.Y.Z" text
-    if grep -q -- "\*\*Version:\*\* [0-9]\+\.[0-9]\+\.[0-9]\+" "$file" 2>/dev/null; then
-        sed -i -- "s/\*\*Version:\*\* [0-9]\+\.[0-9]\+\.[0-9]\+/\*\*Version:\*\* ${VERSION}/g" "$file"
+    if grep -q "\*\*Version:\*\* [0-9]\+\.[0-9]\+\.[0-9]\+" "$file" 2>/dev/null; then
+        sed -i "s/\*\*Version:\*\* [0-9]\+\.[0-9]\+\.[0-9]\+/\*\*Version:\*\* ${VERSION}/g" "$file"
         UPDATED=1
         echo "  Updated **Version:** text in $file"
     fi
 
     # Update "| \`VERSION\` | \`X.Y.Z\` |" text in tables
-    if grep -q -- "| \`VERSION\` | \`[0-9]\+\.[0-9]\+\.[0-9]\+\` |" "$file" 2>/dev/null; then
-        sed -i -- "s/| \`VERSION\` | \`[0-9]\+\.[0-9]\+\.[0-9]\+\` |/| \`VERSION\` | \`${VERSION}\` |/g" "$file"
+    if grep -q "| \`VERSION\` | \`[0-9]\+\.[0-9]\+\.[0-9]\+\` |" "$file" 2>/dev/null; then
+        sed -i "s/| \`VERSION\` | \`[0-9]\+\.[0-9]\+\.[0-9]\+\` |/| \`VERSION\` | \`${VERSION}\` |/g" "$file"
         UPDATED=1
         echo "  Updated table VERSION text in $file"
     fi
@@ -79,8 +78,8 @@ done
 
 # Update CHANGELOG.md - add unreleased section if missing
 if [[ -f "CHANGELOG.md" ]]; then
-    if ! grep -q -- "^## \[Unreleased\]" CHANGELOG.md 2>/dev/null; then
-        sed -i -- "1a\\\\n## [Unreleased]\n" CHANGELOG.md
+    if ! grep -q "^## \[Unreleased\]" CHANGELOG.md 2>/dev/null; then
+        sed -i "1a\\\\n## [Unreleased]\n" CHANGELOG.md
         echo "  Added [Unreleased] section to CHANGELOG.md"
         UPDATED=1
     fi

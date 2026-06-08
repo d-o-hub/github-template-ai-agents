@@ -54,7 +54,7 @@ main() {
             # Remove trailing comments
             sub(/[[:space:]]*#.*/, "", line)
             # Remove quotes (using \x27 for single quote to avoid shell escaping issues)
-            gsub(/[\x27"]/, "", line)
+            gsub(/[\x27\x22]/, "", line)
             # Trim trailing whitespace
             sub(/[[:space:]]*$/, "", line)
 

@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v6.0.2
 
       - name: Fetch latest Turso release and llms.txt
         run: |
@@ -52,7 +52,7 @@ jobs:
         run: |
           set -euo pipefail
           grep -q '^version:' .agents/skills/turso-db/SKILL.md
-          sed -i "s/^version: .*/version: ${LATEST_RELEASE#v}/" .agents/skills/turso-db/SKILL.md
+          sed -i "s/^version: .*/version: \"${LATEST_RELEASE#v}\"/" .agents/skills/turso-db/SKILL.md
 
       - name: Ensure labels exist
         if: steps.check_changes.outputs.changed == 'true'

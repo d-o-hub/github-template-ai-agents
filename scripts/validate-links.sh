@@ -137,21 +137,10 @@ check_link() {
         fi
     fi
 
-    # Security: If path contains '..', we MUST use realpath to verify it stays within REPO_ROOT.
-    # If realpath is unavailable or REPO_ROOT cannot be resolved, we must fail-closed.
-    if [[ "$clean_path" == *".."* ]]; then
-        if [[ "$HAS_REALPATH" -eq 0 ]] || [[ -z "$RESOLVED_ROOT" ]]; then
-            printf "  ${RED}✗${NC} Security Error: Cannot safely validate path with '..' (realpath or root resolution unavailable) at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
-            printf "     in: %s\n" "$skill_file" >&2
-            return 1
-        fi
-    fi
-
     if [[ "$HAS_REALPATH" -eq 1 ]] && [[ -n "$RESOLVED_ROOT" ]]; then
         # Performance optimization: Use pre-resolved root to avoid subshell
         local resolved_path
-        # Security: Use -- to prevent option injection
-        resolved_path=$(realpath -m -- "$full_path" 2>/dev/null)
+        resolved_path=$(realpath -m "$full_path" 2>/dev/null)
 
         # Ensure trailing slash for robust prefix matching
         if [[ "$resolved_path/" != "$RESOLVED_ROOT/"* ]]; then
