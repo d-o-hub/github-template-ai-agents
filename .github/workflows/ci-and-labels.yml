@@ -270,13 +270,13 @@ jobs:
             printf "Reusing existing PR #%s for %s\n" "$EXISTING_PR" "$PR_BRANCH"
             NEW_PR="$EXISTING_PR"
           else
-            NEW_PR=$(gh pr create \
+            PR_URL=$(gh pr create \
               --title "ci: update ci status artifacts" \
               --body "Automated CI status update from workflow run ${GITHUB_RUN_ID}." \
               --base "$TARGET_BRANCH" \
               --head "$PR_BRANCH" \
-              --label "ci-status" \
-              --json number --jq ".number")
+              --label "ci-status")
+            NEW_PR=$(gh pr view "$PR_URL" --json number --jq '.number')
             printf "Created PR #%s\n" "$NEW_PR"
           fi
 
