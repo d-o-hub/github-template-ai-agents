@@ -142,9 +142,10 @@ fi
 
 if [[ $FAILED -ne 0 ]]; then
     echo ""
-    echo -e "${RED}─────────────────────────────────────────────────────────────────${NC}"
-    echo -e "${RED}│ ✗ Skill Validation FAILED                                     │${NC}"
-    echo -e "${RED}─────────────────────────────────────────────────────────────────${NC}"
+    # Security: Use printf for safe variable output
+    printf "%b\n" "${RED}─────────────────────────────────────────────────────────────────${NC}"
+    printf "%b\n" "${RED}│ ✗ Skill Validation FAILED                                     │${NC}"
+    printf "%b\n" "${RED}─────────────────────────────────────────────────────────────────${NC}"
     echo ""
     echo "Run: ./scripts/setup-skills.sh to fix missing symlinks."
     echo "See: agents-docs/SKILLS.md for skill authoring guide."
@@ -152,7 +153,8 @@ if [[ $FAILED -ne 0 ]]; then
 fi
 
 echo ""
-echo -e "${GREEN}─────────────────────────────────────────────────────────────────${NC}"
-echo -e "${GREEN}│ ✓ All skills valid                                            │${NC}"
-echo -e "${GREEN}─────────────────────────────────────────────────────────────────${NC}"
+# Security: Use printf for safe variable output
+printf "%b\n" "${GREEN}─────────────────────────────────────────────────────────────────${NC}"
+printf "%b\n" "${GREEN}│ ✓ All skills valid                                            │${NC}"
+printf "%b\n" "${GREEN}─────────────────────────────────────────────────────────────────${NC}"
 exit 0
