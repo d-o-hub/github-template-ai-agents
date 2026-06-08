@@ -187,6 +187,7 @@ After **every** completed task, the agent MUST append a JSON entry to `.agents/m
 - **Squash Merge Body-Length Failures**: Disable `body-max-length` in commitlint config (`[0]`) for repos using squash merges; GitHub concatenates PR title+body as the commit message, causing recurring failures on main. Enforce body length at PR level instead via a step in the commitlint workflow that fails if body >1000 chars (LESSON-031)
 - **Automated PR Auto-Merge**: All workflows that create PRs (ci-and-labels.yml, update-llms-txt.yml) MUST auto-merge with `gh pr merge --squash --admin --delete-branch=false` immediately after creation/reuse. Without auto-merge, automated PRs linger as open and require manual cleanup. Use `--admin` to bypass required status checks that would deadlock (LESSON-032)
 - **BATS Subshell Variable Loss**: Piped `while read` loops run in subshells; variables modified inside are lost. Use heredoc `<<< "$var"` instead of `printf ... | while read` to keep the loop in the current shell (LESSON-033)
+- **gh pr create Does Not Support --json**: `gh pr create` does not accept `--json`/`--jq` flags. To get the PR number after creation, capture the URL from stdout: `PR_URL=$(gh pr create ...) && PR_NUM=$(gh pr view "$PR_URL" --json number --jq '.number')`. This caused the CI + Labels Setup job to fail silently on main (LESSON-034)
 
 ## Self-Learning Rules (Auto-Generated)
 
