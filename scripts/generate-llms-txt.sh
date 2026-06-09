@@ -9,6 +9,70 @@ cd "$REPO_ROOT"
 
 LLMS_TXT="${LLMS_TXT:-llms.txt}"
 LLMS_FULL_TXT="${LLMS_FULL_TXT:-llms-full.txt}"
+CHECK_MODE=false
+
+usage() {
+    cat <<'EOF'
+Usage: ./scripts/generate-llms-txt.sh [--check|--dry-run]
+
+Generates llms.txt and llms-full.txt for LLM context.
+
+Options:
+  --check, --dry-run  Generate into a temporary directory and compare with committed outputs.
+  -h, --help          Show this help message.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --check|--dry-run)
+            CHECK_MODE=true
+            shift
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'Unknown argument: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if "$CHECK_MODE"; then
+    llms_check_tmpdir=$(mktemp -d)
+    cleanup_llms_check_tmpdir() {
+        rm -rf "$llms_check_tmpdir"
+    }
+    trap cleanup_llms_check_tmpdir EXIT
+
+    if [[ ! -f llms.txt || ! -f llms-full.txt ]]; then
+        printf 'Error: llms.txt and llms-full.txt must exist before running --check.\n' >&2
+        exit 1
+    fi
+
+    LLMS_TXT="$llms_check_tmpdir/llms.txt" \
+        LLMS_FULL_TXT="$llms_check_tmpdir/llms-full.txt" \
+        "$0" > /dev/null
+
+    llms_check_status=0
+    if ! diff -q llms.txt "$llms_check_tmpdir/llms.txt" > /dev/null; then
+        printf 'Error: llms.txt is out of date. Run ./scripts/generate-llms-txt.sh\n' >&2
+        llms_check_status=1
+    fi
+
+    if ! diff -q llms-full.txt "$llms_check_tmpdir/llms-full.txt" > /dev/null; then
+        printf 'Error: llms-full.txt is out of date. Run ./scripts/generate-llms-txt.sh\n' >&2
+        llms_check_status=1
+    fi
+
+    if [[ "$llms_check_status" -eq 0 ]]; then
+        printf 'llms.txt and llms-full.txt are up to date.\n'
+    fi
+    exit "$llms_check_status"
+fi
 
 # Colors for output
 if [[ -t 1 ]] && [[ "${FORCE_COLOR:-}" != "0" ]]; then
@@ -108,8 +172,8 @@ fi
             /^description: / {
                 in_desc=1
                 val = substr($0, index($0, "description: ") + 13)
-                gsub(/^[\"'\'']/, "", val)
-                gsub(/[\"'\'']$/, "", val)
+                gsub(/^["'\'']/, "", val)
+                gsub(/["'\'']$/, "", val)
                 
                 # Handle block scalar modifiers (|, |-, |+, >, >-, >+)
                 # These are YAML block scalar indicators that should be stripped
