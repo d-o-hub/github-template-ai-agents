@@ -25,11 +25,13 @@ categorize_command() {
     local cmd_lower
     # Security: Use printf for safe variable expansion and to prevent option injection.
     # Normalize input by removing common shell escapes/quotes and converting to lowercase.
-    cmd_lower=$(printf "%s\n" "$cmd" | tr -d "'\"\\\\" | tr '[:upper:]' '[:lower:]')
+    # Strips metacharacters used for obfuscation: quotes, backslashes, backticks,
+    # dollar signs, braces, parentheses, and brackets.
+    cmd_lower=$(printf "%s\n" "$cmd" | tr -d "'\"\\\\\`\$(){}[]" | tr '[:upper:]' '[:lower:]')
 
-    # Regex for word boundaries including common shell metacharacters
-    local boundary="(^|[[:space:]]|[\|&;()<>])"
-    local end_boundary="($|[[:space:]]|[\|&;()<>])"
+    # Regex for word boundaries including common shell metacharacters and commas
+    local boundary="(^|[[:space:]]|[\|&;()<>|,])"
+    local end_boundary="($|[[:space:]]|[\|&;()<>|,])"
 
     # Check custom dangerous patterns first (E3)
     for pattern in "${DANGEROUS_PATTERNS[@]:-}"; do
