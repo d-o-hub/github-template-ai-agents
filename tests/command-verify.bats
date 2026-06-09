@@ -47,3 +47,43 @@ setup() {
     run "$REPO_ROOT/scripts/verify-commands.sh" --quick --silent
     [ "$status" -eq 0 ]
 }
+
+@test "update-all-docs dry-run does not rewrite generated documentation" {
+    local backup_dir="$BATS_TEST_TMPDIR/generated-doc-backups"
+    mkdir -p "$backup_dir/agents-docs"
+
+    cp "$REPO_ROOT/llms.txt" "$backup_dir/llms.txt"
+    cp "$REPO_ROOT/llms-full.txt" "$backup_dir/llms-full.txt"
+    cp "$REPO_ROOT/agents-docs/AVAILABLE_SKILLS.md" "$backup_dir/agents-docs/AVAILABLE_SKILLS.md"
+    cp "$REPO_ROOT/agents-docs/AGENTS_REGISTRY.md" "$backup_dir/agents-docs/AGENTS_REGISTRY.md"
+
+    printf '\nDRY-RUN CANARY llms.txt\n' >> "$REPO_ROOT/llms.txt"
+    printf '\nDRY-RUN CANARY llms-full.txt\n' >> "$REPO_ROOT/llms-full.txt"
+    printf '\nDRY-RUN CANARY available skills\n' >> "$REPO_ROOT/agents-docs/AVAILABLE_SKILLS.md"
+    printf '\nDRY-RUN CANARY agents registry\n' >> "$REPO_ROOT/agents-docs/AGENTS_REGISTRY.md"
+
+    cp "$REPO_ROOT/llms.txt" "$backup_dir/llms.txt.dirty"
+    cp "$REPO_ROOT/llms-full.txt" "$backup_dir/llms-full.txt.dirty"
+    cp "$REPO_ROOT/agents-docs/AVAILABLE_SKILLS.md" "$backup_dir/agents-docs/AVAILABLE_SKILLS.md.dirty"
+    cp "$REPO_ROOT/agents-docs/AGENTS_REGISTRY.md" "$backup_dir/agents-docs/AGENTS_REGISTRY.md.dirty"
+
+    run "$REPO_ROOT/scripts/update-all-docs.sh" --dry-run
+
+    local docs_unchanged=0
+    cmp "$backup_dir/llms.txt.dirty" "$REPO_ROOT/llms.txt" >/dev/null || docs_unchanged=1
+    cmp "$backup_dir/llms-full.txt.dirty" "$REPO_ROOT/llms-full.txt" >/dev/null || docs_unchanged=1
+    cmp "$backup_dir/agents-docs/AVAILABLE_SKILLS.md.dirty" \
+        "$REPO_ROOT/agents-docs/AVAILABLE_SKILLS.md" >/dev/null || docs_unchanged=1
+    cmp "$backup_dir/agents-docs/AGENTS_REGISTRY.md.dirty" \
+        "$REPO_ROOT/agents-docs/AGENTS_REGISTRY.md" >/dev/null || docs_unchanged=1
+
+    cp "$backup_dir/llms.txt" "$REPO_ROOT/llms.txt"
+    cp "$backup_dir/llms-full.txt" "$REPO_ROOT/llms-full.txt"
+    cp "$backup_dir/agents-docs/AVAILABLE_SKILLS.md" "$REPO_ROOT/agents-docs/AVAILABLE_SKILLS.md"
+    cp "$backup_dir/agents-docs/AGENTS_REGISTRY.md" "$REPO_ROOT/agents-docs/AGENTS_REGISTRY.md"
+
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"[DRY-RUN] Checking generated LLM context files without writing committed outputs"* ]]
+    [[ "$output" == *"llms.txt is out of date"* ]]
+    [ "$docs_unchanged" -eq 0 ]
+}
