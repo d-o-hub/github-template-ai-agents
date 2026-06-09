@@ -3,7 +3,7 @@
 setup() {
     # Create mock gh that handles auth status, repo view, and PR operations
     cat << "MOCK" > "$BATS_TMPDIR/gh"
-#!/bin/bash
+#!/usr/bin/env bash
 if [ "$1" = "auth" ] && [ "$2" = "status" ]; then
     exit 0
 elif [ "$1" = "repo" ]; then
@@ -74,7 +74,7 @@ MOCK
 @test "cleanup script fails fast when gh is not authenticated" {
     # Override the mock to make gh auth status fail
     cat << "MOCK" > "$BATS_TMPDIR/gh"
-#!/bin/bash
+#!/usr/bin/env bash
 if [ "$1" = "auth" ] && [ "$2" = "status" ]; then
     echo "You are not logged into any GitHub hosts." >&2
     exit 1

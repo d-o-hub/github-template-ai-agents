@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # scripts/cleanup-ci-status-prs.sh
 # This script closes stale CI status update PRs and deletes their associated branches.
 # It requires the GitHub CLI (gh) to be installed and authenticated.
