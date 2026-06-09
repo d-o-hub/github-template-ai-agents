@@ -105,3 +105,8 @@
 **Vulnerability:** Command categorization logic used simple substring matching, which led to false positives (e.g., \"mkdir farm\" flagged for \"rm\") and was vulnerable to obfuscation (e.g., \"r\"\"m\"). An initial fix using strict whitespace-only word boundaries introduced detection bypasses for commands adjacent to shell metacharacters (e.g., \"(rm)\" or \"rm;ls\").
 **Learning:** Obfuscation via quotes and backslashes is a common bypass for keyword-based filters. Word-boundary detection must account for the full set of shell metacharacters that can delimit commands, not just whitespace.
 **Prevention:** Normalize command strings by stripping quotes and backslashes before categorization. Use a robust regex boundary \`(^|[[:space:]]|[\\|&;()<>])\` to ensure keywords are detected even when embedded in complex shell expressions while avoiding partial-word matches.
+
+## 2026-06-10 - Command Categorization Bypass via Shell Metacharacters
+**Vulnerability:** Command categorization logic could be bypassed by using shell metacharacters like backticks (`` ` ``) or dollar signs (`$`) for command substitution (e.g., `` `rm` ``), as normalization only stripped quotes and backslashes.
+**Learning:** Obfuscation and substitution are common bypasses for keyword-based security filters. Normalization must account for all shell metacharacters that can wrap or precede commands.
+**Prevention:** Normalize all command input by stripping a comprehensive set of shell metacharacters (quotes, backslashes, backticks, dollar signs, braces, parentheses, brackets) before keyword matching. Standardize word-boundary regexes to include separators like commas for bracket expansion.
