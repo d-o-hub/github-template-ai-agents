@@ -103,6 +103,9 @@ for wf in "${CHECK_PATHS[@]}"; do
         }
     }
     BEGIN { in_block = 0; indent = 0; is_script = 0 }
+    END {
+        if (in_block && is_script) print "---END_SCRIPT---"
+    }
     in_block {
         match($0, /^[ ]*/)
         if (RLENGTH > indent || length($0) == 0) {

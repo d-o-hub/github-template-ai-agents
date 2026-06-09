@@ -21,6 +21,7 @@ run_test() {
     local name="$1"
     local content="$2"
     local expected_fail="$3"
+    local expected_message="${4:-Potential script injection risk detected}"
 
     printf "Test: %s... " "$name"
     echo "$content" > "$TEST_WF"
@@ -30,10 +31,10 @@ run_test() {
     local status=$?
 
     if [[ "$expected_fail" == "true" ]]; then
-        if [[ $status -ne 0 ]] && echo "$output" | grep -q "Potential script injection risk detected"; then
+        if [[ $status -ne 0 ]] && grep -q "$expected_message" <<< "$output"; then
             printf "${GREEN}PASSED${NC}\n"
         else
-            printf "${RED}FAILED${NC} (expected detection)\n"
+            printf "${RED}FAILED${NC} (expected failure matching %s)${NC}\n" "$expected_message"
             echo "$output"
             return 1
         fi
@@ -41,7 +42,7 @@ run_test() {
         if [[ $status -eq 0 ]]; then
             printf "${GREEN}PASSED${NC}\n"
         else
-            printf "${RED}FAILED${NC} (unexpected detection)\n"
+            printf "${RED}FAILED${NC} (unexpected detection)${NC}\n"
             echo "$output"
             return 1
         fi
@@ -115,4 +116,34 @@ jobs:
         run: echo \"\${{ github.event.issue.title }}\"
 " "true"
 
-echo -e \"\n\${GREEN}All workflow validation tests passed!\${NC}\"
+# Test 6: Validate final EOF script block with no following workflow key
+run_test "Allowed final EOF multiline script block" "
+name: EOF Script
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: EOF Script
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log('ok')
+" "false"
+
+# Test 7: Reject invalid final EOF script block with no following workflow key
+run_test "Detected invalid final EOF multiline script block" "
+name: Invalid EOF Script
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invalid EOF Script
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log(
+" "true" "Syntax error in script block"
+
+echo -e "\n${GREEN}All workflow validation tests passed!${NC}"
