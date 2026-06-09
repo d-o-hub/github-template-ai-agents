@@ -131,6 +131,19 @@ for f in AGENTS.md QUICKSTART.md; do
   fi
 done
 
+# ---- CI status freshness ----
+sect "CI status freshness"
+if [[ -x scripts/check_ci_status_freshness.sh ]]; then
+  if ci_status_output="$(scripts/check_ci_status_freshness.sh 2>&1)"; then
+    pass "$ci_status_output"
+  else
+    warn "CI status freshness check reported an issue:"
+    printf '%s\n' "$ci_status_output" | sed 's/^/    /'
+  fi
+else
+  warn "scripts/check_ci_status_freshness.sh missing or not executable"
+fi
+
 # ---- Final result ----
 printf '\n'
 if [[ $fail -eq 0 ]]; then
