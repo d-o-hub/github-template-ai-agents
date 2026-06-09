@@ -22,6 +22,7 @@
 | `validate-skill-format.sh` | Validate SKILL.md frontmatter format | `./scripts/validate-skill-format.sh` |
 | `validate-git-hooks.sh` | Check git hooks configuration | `./scripts/validate-git-hooks.sh` |
 | `validate-links.sh` | Validate markdown links are not broken | `./scripts/validate-links.sh` |
+| `check_ci_status_freshness.sh` | Validate `.github/ci-status/ci-status.json` required fields, freshness, and optional `gh run list` parity | `./scripts/check_ci_status_freshness.sh` |
 
 ## Update Scripts
 
@@ -64,6 +65,9 @@
 | `SKIP_LINKS` | `false` | Skip link validation |
 | `SKIP_GLOBAL_HOOKS_CHECK` | `false` | Skip git hooks validation |
 | `MAX_SKILL_LINES` | `250` | Max lines per SKILL.md |
+| `CI_STATUS_MAX_AGE_SECONDS` | `86400` | Max accepted age for `.github/ci-status/ci-status.json` `last_run` before freshness check fails |
+| `CI_STATUS_BRANCH` | `main` | Branch used by `check_ci_status_freshness.sh` for optional `gh run list` comparison |
+| `CI_STATUS_RUN_LIMIT` | `5` | Number of recent workflow runs fetched by `check_ci_status_freshness.sh` when `gh` is authenticated |
 
 ## Exit Codes
 
