@@ -19,6 +19,7 @@ Git flags adjacent-line additions in append-only files. The conflict markers wil
 To resolve the conflict while keeping all entries and maintaining chronological order:
 
 1. **Rebase or Merge Main**:
+
    ```bash
    git fetch origin main
    git rebase origin/main
@@ -27,7 +28,9 @@ To resolve the conflict while keeping all entries and maintaining chronological 
    ```
 
 2. **Extract all entries**:
+
    If conflict markers appear, run this command to keep all unique lines and remove markers:
+
    ```bash
    grep -v -E '^(<<<<<<<|=======|>>>>>>>|)' .agents/metrics.jsonl \
      | sort -u -t'"' -k4 \
@@ -36,6 +39,7 @@ To resolve the conflict while keeping all entries and maintaining chronological 
    ```
 
 3. **Verify and Commit**:
+
    ```bash
    # Validate JSON and timestamp format
    ./scripts/quality_gate.sh
