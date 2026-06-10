@@ -67,14 +67,7 @@ validate_skill_file() {
     fi
 
     local line_count err_no_dash has_name has_description has_version template_version
-
-    local temp="$awk_result"
-    line_count="${temp%%:*}"; temp="${temp#*:}"
-    err_no_dash="${temp%%:*}"; temp="${temp#*:}"
-    has_name="${temp%%:*}"; temp="${temp#*:}"
-    has_description="${temp%%:*}"; temp="${temp#*:}"
-    has_version="${temp%%:*}"; temp="${temp#*:}"
-    template_version="${temp}"
+    IFS=':' read -r line_count err_no_dash has_name has_description has_version template_version <<< "$awk_result"
 
     if [[ "$err_no_dash" -eq $TRUE ]]; then
         printf "  %b✗%b %s: Must start with '---'\n" "${RED}" "${NC}" "$skill_name" >&2
