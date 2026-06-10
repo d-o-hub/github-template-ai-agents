@@ -14,19 +14,6 @@ warn() { printf '  ! %s\n' "$*"; return 0; }
 bad()  { printf '  \u2717 %s\n' "$*" >&2; fail=1; return 1; }
 sect() { printf '\n==> %s\n' "$*"; return 0; }
 
-relative_path_strategy() {
-  local from_dir=$1
-  local to_path=$2
-
-  if realpath --relative-to="$from_dir" "$to_path" >/dev/null 2>&1; then
-    printf 'gnu-realpath'
-  elif command -v python3 >/dev/null 2>&1; then
-    printf 'python3-relpath'
-  else
-    printf 'absolute-targets'
-  fi
-}
-
 # ---- Required commands ----
 sect "Required tools"
 for cmd in git bash; do
@@ -64,21 +51,6 @@ if ln -sf /dev/null "$SYMLINK_TEST" 2>/dev/null; then
 else
   bad "Symlinks not supported - Windows without Developer Mode or WSL2"
 fi
-
-# ---- Skill symlink path calculation ----
-sect "Skill symlink path calculation"
-RELATIVE_PATH_STRATEGY=$(relative_path_strategy "$REPO_ROOT/.claude/skills" "$REPO_ROOT/.agents/skills")
-case "$RELATIVE_PATH_STRATEGY" in
-  gnu-realpath)
-    pass "GNU realpath --relative-to supported"
-    ;;
-  python3-relpath)
-    pass "GNU realpath --relative-to unavailable; python3 fallback available"
-    ;;
-  absolute-targets)
-    pass "Relative path helpers unavailable; setup-skills.sh can use absolute symlink targets"
-    ;;
-esac
 
 # ---- Canonical skills directory ----
 sect "Skills"
