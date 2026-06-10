@@ -22,7 +22,8 @@ fi
 # Categorize a command as safe, conditional, dangerous, or unknown
 categorize_command() {
     local cmd="$1"
-    local cmd_lower
+    local cmd_lower pattern keyword IFS
+    local -a keywords
     # Security: Use printf for safe variable expansion and to prevent option injection.
     # Normalize input by removing common shell escapes/quotes and converting to lowercase.
     # Strips metacharacters used for obfuscation: quotes, backslashes, backticks,

@@ -52,7 +52,9 @@ matches_pattern() {
 
     # Handle simple * patterns
     if [[ "$pattern" == *"*"* ]]; then
-        local regex="^${pattern//\*/.*}$"
+        # Escape dots and convert * to .* for a basic glob-to-regex conversion
+        local escaped_pattern="${pattern//./\\.}"
+        local regex="^${escaped_pattern//\*/.*}$"
         [[ "$file" =~ $regex ]] && return 0
     fi
 
@@ -66,6 +68,7 @@ get_affected_commands() {
     local changed_file="$1"
     local commands_json="$2"
     local affected=()
+    local rule file_pattern cmd_prefix cmd_file cmd IFS
 
     # Pre-parse JSON once
     local extracted
@@ -124,6 +127,7 @@ get_affected_commands() {
 build_invalidation_report() {
     local changed_files="$1"
     local commands_json="$2"
+    local file affected count
 
     printf "=== Invalidation Report ===\n\n"
     printf "Changed files:\n"
@@ -138,7 +142,7 @@ build_invalidation_report() {
         affected=$(get_affected_commands "$file" "$commands_json")
         local count
         # Security: Ignore grep's nonzero exit and ensure count has a default value to prevent duplicate zeros or empty values.
-        count=$(printf "%s\n" "$affected" | grep -c . || true)
+        count=$(printf "%s\n" "$affected" | grep -c -- . || true)
         count=${count:-0}
 
         if [[ "$count" -gt 0 ]]; then

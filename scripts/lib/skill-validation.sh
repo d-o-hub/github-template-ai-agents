@@ -32,7 +32,7 @@ SKILL_LINE_COUNT=0
 # Returns 0 if valid, 1 if invalid (prints errors to stderr)
 validate_skill_file() {
     local skill_file="$1"
-    local skill_name
+    local skill_name IFS
     # Performance optimization: Use Bash parameter expansion instead of basename/dirname
     local skill_dir="${skill_file%/*}"
     skill_name="${skill_dir##*/}"
