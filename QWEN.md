@@ -5,5 +5,3 @@ This project uses a unified agent framework. **All rules, skills, and workflows 
 Qwen-specific notes:
 - Prefer `agents-docs/` for context before asking clarifying questions
 - Use the skills in `.agents/skills/` for structured tasks
-- Always append task results to `.agents/metrics.jsonl` after each task in `YYYY-MM-DDTHH:MM:SSZ` format
-- Check `.github/ci-status/ci-status.json` before making any changes
