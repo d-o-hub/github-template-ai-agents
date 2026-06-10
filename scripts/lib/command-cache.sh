@@ -59,10 +59,16 @@ should_invalidate_command() {
     local file="$2"
     local changed_files="$3"
 
-    # Use a loop that handles spaces in filenames if needed, though here changed_files is space-separated
-    while IFS= read -r changed; do
+    local old_ifs="${IFS:-}"
+    IFS=$'\n'
+    local old_opts=$-
+    set -f
+
+    for changed in $changed_files; do
         [[ -z "$changed" ]] && continue
         if [[ "$changed" == "$file" ]]; then
+            IFS="$old_ifs"
+            [[ $old_opts != *f* ]] && set +f
             return 0
         fi
 
@@ -71,14 +77,17 @@ should_invalidate_command() {
         # to avoid O(N) subshell overhead when processing many changed files.
         # This reduces execution time from ~4s to ~0.04s for 1000 items.
         case "${changed##*/}" in
-            package.json) [[ "$cmd" =~ ^(npm|yarn|pnpm|npx|node) ]] && return 0 ;;
-            Cargo.toml|Cargo.lock) [[ "$cmd" =~ ^(cargo|rustc) ]] && return 0 ;;
-            requirements*.txt|pyproject.toml|setup.py) [[ "$cmd" =~ ^(pip|python) ]] && return 0 ;;
-            go.mod|go.sum) [[ "$cmd" =~ ^go ]] && return 0 ;;
-            Gemfile*) [[ "$cmd" =~ ^(bundle|gem) ]] && return 0 ;;
+            package.json) [[ "$cmd" =~ ^(npm|yarn|pnpm|npx|node) ]] && { IFS="$old_ifs"; [[ $old_opts != *f* ]] && set +f; return 0; } ;;
+            Cargo.toml|Cargo.lock) [[ "$cmd" =~ ^(cargo|rustc) ]] && { IFS="$old_ifs"; [[ $old_opts != *f* ]] && set +f; return 0; } ;;
+            requirements*.txt|pyproject.toml|setup.py) [[ "$cmd" =~ ^(pip|python) ]] && { IFS="$old_ifs"; [[ $old_opts != *f* ]] && set +f; return 0; } ;;
+            go.mod|go.sum) [[ "$cmd" =~ ^go ]] && { IFS="$old_ifs"; [[ $old_opts != *f* ]] && set +f; return 0; } ;;
+            Gemfile*) [[ "$cmd" =~ ^(bundle|gem) ]] && { IFS="$old_ifs"; [[ $old_opts != *f* ]] && set +f; return 0; } ;;
             *) ;;
         esac
-    done <<< "$changed_files"
+    done
+
+    IFS="$old_ifs"
+    [[ $old_opts != *f* ]] && set +f
     return 1
 }
 
@@ -91,9 +100,11 @@ get_cache_path() {
     # Sanitize file path for use in directory structure using sha256 to avoid collisions
     local safe_file
     if command -v sha256sum >/dev/null 2>&1; then
-        safe_file=$(printf "%s" "$file" | sha256sum | cut -d' ' -f1)
+        safe_file=$(printf "%s" "$file" | sha256sum)
+        safe_file="${safe_file%% *}"
     elif command -v shasum >/dev/null 2>&1; then
-        safe_file=$(printf "%s" "$file" | shasum -a 256 | cut -d' ' -f1)
+        safe_file=$(printf "%s" "$file" | shasum -a 256)
+        safe_file="${safe_file%% *}"
     else
         printf "Error: Neither sha256sum nor shasum is available. Cannot generate secure cache keys.\n" >&2
         exit 1
@@ -131,7 +142,16 @@ save_cached_result() {
     # Log to audit trail and rotate
     printf "%s CACHED: %s\n" "$(date -Iseconds)" "$cmd" >> "$AUDIT_LOG"
 
-    if [[ "$(grep -c . "$AUDIT_LOG" || true)" -gt "$MAX_AUDIT_LOG_LINES" ]]; then
+    # Only check size periodically or if we cross a generous threshold to avoid frequent tail/mv
+    local current_lines=0
+    # WC -l is much faster than grep -c
+    if [[ -f "$AUDIT_LOG" ]]; then
+        current_lines=$(wc -l < "$AUDIT_LOG" || echo 0)
+    fi
+
+    # Allow 10% overflow before rotating to batch rotations
+    local threshold=$((MAX_AUDIT_LOG_LINES + MAX_AUDIT_LOG_LINES / 10))
+    if [[ "$current_lines" -gt "$threshold" ]]; then
         tail -n "$MAX_AUDIT_LOG_LINES" "$AUDIT_LOG" > "${AUDIT_LOG}.tmp" && mv "${AUDIT_LOG}.tmp" "$AUDIT_LOG"
     fi
 }
