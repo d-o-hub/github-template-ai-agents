@@ -108,7 +108,6 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 - `agents-docs/`: Detailed reference; `.agents/skills/`: Canonical skills
 - `llms.txt` & `llms-full.txt`: Machine-readable project context for LLMs
 - `scripts/`: Setup/validation; `analysis/` & `reports/`: Generated outputs
-- `.claude/`: Agent-specific symlinks (see `scripts/setup-skills.sh`)
 - `plans/`: ADRs define decisions; progress updates track implementation status.
 
 ## PR & Commit Instructions
@@ -145,13 +144,23 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 - **Swarm**: 5+ similar independent tasks (e.g., batch doc normalization, multi-file refactors).
 - **Route to**: `delegate` (retrieval/context) → `implementer` (execution) → `parallel-execution` (parallel batch).
 
+## Metrics File
+
+Append to `.agents/metrics.jsonl` after every task (see Post-Task Protocol).
+
+- **Timestamp format**: `YYYY-MM-DDTHH:MM:SSZ` (UTC, no microseconds, no offset)
+- **Merge conflicts**: `.gitattributes` sets `merge=union` — the CI bot auto-resolves
+  positional conflicts. If you see conflict markers locally, run:
+  `git fetch origin main && git merge origin/main`
+- **Never sort or rewrite** the file; append-only, insertion order preserved.
+
 ## Post-Task Protocol
 
 After **every** completed task, the agent MUST append a JSON entry to `.agents/metrics.jsonl`:
 
 ```json
 {
-  "timestamp": "<ISO-8601>",
+  "timestamp": "YYYY-MM-DDTHH:MM:SSZ",
   "agent": "<agent-id>",
   "task": "<description>",
   "skill_used": "<skill or null>",
@@ -168,17 +177,6 @@ After **every** completed task, the agent MUST append a JSON entry to `.agents/m
 
 #### Recent Project-Wide Learnings
 
-- **Dependabot Actor on Synchronize**: Use `github.event.pull_request.user.login` not `github.actor` for Dependabot auto-merge guards; on synchronize events, `github.actor` is the human who triggered the sync (LESSON-020)
-- **CI Status File Staleness**: Verify CI via `gh run list` before trusting `.github/ci-status/ci-status.json`, which can be stale after direct pushes (LESSON-021)
-- **Locale-Independent Sort**: Use `LC_ALL=C sort` for committed generator output to prevent CI drift (LESSON-018)
-- **Nested node_modules**: Use `*/node_modules/*` in `find` to exclude at any depth, not just root (LESSON-019)
-- **CI Symlink Dependency**: Always run `setup-skills.sh` before `validate-skills.sh` in CI workflows (LESSON-017)
-- **Action SHA Pinning**: Pin to 40-char SHAs for security (LESSON-016)
-- **Worktree Cleanup**: Use `trap cleanup EXIT ERR` and `CREATED_WORKTREES` (LESSON-010)
-- **Dependabot Auto-Merge**: Use `enablePullRequestAutoMerge` (GraphQL) not `pulls.merge()` (REST); Dependabot's restricted token can't push branches, but GitHub native auto-merge uses system privileges for linear history + branch updates (LESSON-023)
-- **Update CI Status on Dependabot**: Skip `update-ci-status` job with `github.actor != 'dependabot[bot]'` guard; Dependabot's read-only token causes git push failures that block auto-merge (LESSON-023)
-- **ADR Compliance Gate**: The quality gate already runs `check-adr-compliance.sh` — no new gate needed. After creating an ADR in `plans/adr-*.md`, always register it in `plans/_status.json` entries and bump `nextAvailable.adr` (LESSON-024)
-- **Markdown Test Fixtures**: BATS tests creating `.md` fixture files via `printf` must end with `\n` to pass markdownlint MD047/single-trailing-newline (LESSON-025)
 - **act CI Simulation**: `act` requires Docker + act binary; if unavailable, skip local CI simulation and rely on `gh run list` for CI status (LESSON-026)
 - **CI Status PR Auto-Detection**: Automated `ci-status-update` PRs are the monitoring system working as designed — fix the root CI failure, not the PR (LESSON-027)
 - **Codacy SonarPython Suppression**: Codacy ignores `# NOSONAR`, `# noqa`, `# nosec` for S-prefixed rules; use constant extraction for literal patterns or `.codacy.yml` file exclusion (LESSON-028)
@@ -188,6 +186,7 @@ After **every** completed task, the agent MUST append a JSON entry to `.agents/m
 - **Automated PR Auto-Merge**: All workflows that create PRs (ci-and-labels.yml, update-llms-txt.yml) MUST auto-merge with `gh pr merge --squash --admin --delete-branch=false` immediately after creation/reuse. Without auto-merge, automated PRs linger as open and require manual cleanup. Use `--admin` to bypass required status checks that would deadlock (LESSON-032)
 - **BATS Subshell Variable Loss**: Piped `while read` loops run in subshells; variables modified inside are lost. Use heredoc `<<< "$var"` instead of `printf ... | while read` to keep the loop in the current shell (LESSON-033)
 - **gh pr create Does Not Support --json**: `gh pr create` does not accept `--json`/`--jq` flags. To get the PR number after creation, capture the URL from stdout: `PR_URL=$(gh pr create ...) && PR_NUM=$(gh pr view "$PR_URL" --json number --jq '.number')`. This caused the CI + Labels Setup job to fail silently on main (LESSON-034)
+- **Metrics JSONL Merge Conflicts**: Concurrent PRs often conflict on the tail of `.agents/metrics.jsonl`. Resolved via `merge=union` in `.gitattributes` and an automated CI rebase bot. See `agents-docs/runbooks/resolve-metrics-conflict.md` (LESSON-035)
 
 ## Self-Learning Rules (Auto-Generated)
 
