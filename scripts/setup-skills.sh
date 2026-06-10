@@ -7,34 +7,6 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
 SKILLS_SRC="$REPO_ROOT/.agents/skills"
 
-relative_path_from_to() {
-  local from_dir=$1
-  local to_path=$2
-  local rel_path
-
-  if rel_path=$(realpath --relative-to="$from_dir" "$to_path" 2>/dev/null); then
-    printf '%s\n' "$rel_path"
-    return 0
-  fi
-
-  if command -v python3 >/dev/null 2>&1; then
-    if rel_path=$(python3 - "$from_dir" "$to_path" <<'PY_REL_PATH'
-import os
-import sys
-
-from_dir = os.path.abspath(sys.argv[1])
-to_path = os.path.abspath(sys.argv[2])
-print(os.path.relpath(to_path, from_dir))
-PY_REL_PATH
-); then
-      printf '%s\n' "$rel_path"
-      return 0
-    fi
-  fi
-
-  printf '%s\n' "$to_path"
-}
-
 # CLI folders that should contain symlinks to canonical skills
 # (OpenCode reads directly from .agents/skills/ - not included here)
 # (Qwen CLI also reads directly from .agents/skills/ - directory created for consistency)
@@ -61,7 +33,7 @@ for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
 
   # Performance optimization: Pre-calculate relative path base once per target dir
   # to avoid O(N) subshell calls in the inner loop.
-  rel_base=$(relative_path_from_to "$target_dir" "$SKILLS_SRC")
+  rel_base=$(realpath --relative-to="$target_dir" "$SKILLS_SRC")
 
   for skill_path in "$SKILLS_SRC"/*/; do
     [ -d "$skill_path" ] || continue
