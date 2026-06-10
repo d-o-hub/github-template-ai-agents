@@ -103,3 +103,85 @@ setup() {
     # Either pass or fail, output should include section headers
     echo "$output" | grep -q '==>'
 }
+
+@test "setup-skills.sh falls back when realpath lacks --relative-to" {
+    fake_bin="$(mktemp -d)"
+    cat >"$fake_bin/realpath" <<'EOF_REALPATH'
+#!/usr/bin/env bash
+for arg in "$@"; do
+    case "$arg" in
+        --relative-to|--relative-to=*)
+            printf 'realpath: unsupported option: %s\n' "$arg" >&2
+            exit 1
+            ;;
+    esac
+done
+if [ -x /usr/bin/realpath ]; then
+    exec /usr/bin/realpath "$@"
+fi
+printf '%s\n' "${@: -1}"
+EOF_REALPATH
+    chmod +x "$fake_bin/realpath"
+
+    backup_root="$(mktemp -d)"
+    claude_backup=""
+    qwen_backup=""
+    if [ -e .claude/skills ] || [ -L .claude/skills ]; then
+        claude_backup="$backup_root/claude-skills"
+        mv .claude/skills "$claude_backup"
+    fi
+    if [ -e .qwen/skills ] || [ -L .qwen/skills ]; then
+        qwen_backup="$backup_root/qwen-skills"
+        mv .qwen/skills "$qwen_backup"
+    fi
+
+    run env PATH="$fake_bin:$PATH" ./scripts/setup-skills.sh
+
+    sample_skill="$(find .agents/skills -mindepth 1 -maxdepth 1 -type d ! -name durable-objects ! -name eu-ai-act-compliance | head -n 1)"
+    sample_name="${sample_skill##*/}"
+    claude_link=".claude/skills/$sample_name"
+    qwen_link=".qwen/skills/$sample_name"
+    claude_usable=false
+    qwen_usable=false
+    [ -L "$claude_link" ] && [ -d "$claude_link" ] && claude_usable=true
+    [ -L "$qwen_link" ] && [ -d "$qwen_link" ] && qwen_usable=true
+
+    rm -rf .claude/skills .qwen/skills "$fake_bin"
+    if [ -n "$claude_backup" ]; then
+        mv "$claude_backup" .claude/skills
+    fi
+    if [ -n "$qwen_backup" ]; then
+        mv "$qwen_backup" .qwen/skills
+    fi
+    rm -rf "$backup_root"
+
+    [ "$status" -eq 0 ]
+    [ "$claude_usable" = true ]
+    [ "$qwen_usable" = true ]
+}
+
+@test "doctor.sh reports setup-skills fallback when realpath lacks --relative-to" {
+    fake_bin="$(mktemp -d)"
+    cat >"$fake_bin/realpath" <<'EOF_REALPATH'
+#!/usr/bin/env bash
+for arg in "$@"; do
+    case "$arg" in
+        --relative-to|--relative-to=*)
+            printf 'realpath: unsupported option: %s\n' "$arg" >&2
+            exit 1
+            ;;
+    esac
+done
+if [ -x /usr/bin/realpath ]; then
+    exec /usr/bin/realpath "$@"
+fi
+printf '%s\n' "${@: -1}"
+EOF_REALPATH
+    chmod +x "$fake_bin/realpath"
+
+    run env PATH="$fake_bin:$PATH" ./scripts/doctor.sh
+    rm -rf "$fake_bin"
+
+    echo "$output" | grep -q 'Skill symlink path calculation'
+    echo "$output" | grep -Eq 'python3 fallback available|absolute symlink targets'
+}
