@@ -188,6 +188,34 @@ if [[ -f "./scripts/check-plan-numbering.sh" ]]; then
     printf "\n"
 fi
 
+# --- Validate .agents/metrics.jsonl ---
+if [[ -f ".agents/metrics.jsonl" ]]; then
+    printf "%bValidating .agents/metrics.jsonl...%b\n" "${BLUE}" "${NC}"
+    METRICS_VALID=0
+    while IFS= read -r line; do
+        if [[ -z "${line// }" ]]; then continue; fi
+        # Validate valid JSON per line
+        if ! echo "$line" | python3 -m json.tool > /dev/null 2>&1; then
+            printf "%b  ✗ Invalid JSON in metrics.jsonl: %s%b\n" "${RED}" "$line" "${NC}"
+            METRICS_VALID=1
+            break
+        fi
+        # Validate timestamp format YYYY-MM-DDTHH:MM:SSZ
+        ts=$(echo "$line" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("timestamp",""))')
+        if ! echo "$ts" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$' ; then
+            printf "%b  ✗ Bad timestamp format \"%s\" in metrics.jsonl — must be YYYY-MM-DDTHH:MM:SSZ%b\n" "${RED}" "$ts" "${NC}"
+            METRICS_VALID=1
+            break
+        fi
+    done < .agents/metrics.jsonl
+    if [[ $METRICS_VALID -eq 0 ]]; then
+        printf "%b  ✓ .agents/metrics.jsonl is valid%b\n" "${GREEN}" "${NC}"
+    else
+        FAILED=1
+    fi
+    printf "\n"
+fi
+
 # --- Validate commitlint configuration consistency ---
 if [[ -f "./tests/test-commitlint-rules.sh" ]]; then
     printf "%bValidating commitlint configuration...%b\n" "${BLUE}" "${NC}"

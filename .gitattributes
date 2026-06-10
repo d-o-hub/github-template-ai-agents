@@ -203,3 +203,5 @@ markdownlint.toml   export-ignore
 opencode.json       export-ignore
 scripts             export-ignore
 agents-docs         export-ignore
+# Metrics JSONL — union merge to reduce conflicts on concurrent contributions
+.agents/metrics.jsonl   text eol=lf merge=union
