@@ -14,9 +14,9 @@ MAX_AUDIT_LOG_LINES=1000
 
 # Initialize cache directories
 init_cache() {
-    mkdir -p "$CACHE_DIR"
-    mkdir -p "$COMMANDS_CACHE_DIR"
-    touch "$AUDIT_LOG"
+    mkdir -p -- "$CACHE_DIR"
+    mkdir -p -- "$COMMANDS_CACHE_DIR"
+    touch -- "$AUDIT_LOG"
 }
 
 # Get the last validated commit hash
@@ -125,14 +125,16 @@ save_cached_result() {
 
     local cache_file
     cache_file=$(get_cache_path "$file" "$line")
-    mkdir -p "$(dirname "$cache_file")"
+    mkdir -p -- "$(dirname "$cache_file")"
     printf "%s\n" "$result" > "$cache_file"
 
     # Log to audit trail and rotate
     printf "%s CACHED: %s\n" "$(date -Iseconds)" "$cmd" >> "$AUDIT_LOG"
 
-    if [[ "$(grep -c . "$AUDIT_LOG" || true)" -gt "$MAX_AUDIT_LOG_LINES" ]]; then
-        tail -n "$MAX_AUDIT_LOG_LINES" "$AUDIT_LOG" > "${AUDIT_LOG}.tmp" && mv "${AUDIT_LOG}.tmp" "$AUDIT_LOG"
+    # Optimization: Use wc -l for faster line counting and add a 10% overflow threshold to batch log rotations
+    local threshold=$((MAX_AUDIT_LOG_LINES + MAX_AUDIT_LOG_LINES / 10))
+    if [[ "$(wc -l < "$AUDIT_LOG" || echo 0)" -gt "$threshold" ]]; then
+        tail -n "$MAX_AUDIT_LOG_LINES" -- "$AUDIT_LOG" > "${AUDIT_LOG}.tmp" && mv -- "${AUDIT_LOG}.tmp" "$AUDIT_LOG"
     fi
 }
 
