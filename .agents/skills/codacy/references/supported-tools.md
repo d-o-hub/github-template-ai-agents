@@ -1,4 +1,8 @@
-# Supported Codacy Tools
+> **Skills:** This reference is used by
+> [codacy-analysis-cli](../SKILL.md) and
+> [codacy-cloud-cli](../SKILL-cloud.md).
+
+# Supported Codacy Tools (v1.4.0/v1.5.0)
 
 This repository template supports a wide range of languages. Codacy integrates multiple industry-standard tools for analysis.
 

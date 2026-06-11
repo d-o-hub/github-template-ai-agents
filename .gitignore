@@ -53,3 +53,5 @@ htmlcov/
 # Generated LLM context files (produced by CI workflow on main only)
 llms.txt
 llms-full.txt
+
+commit*.txt
