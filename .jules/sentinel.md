@@ -110,3 +110,8 @@
 **Vulnerability:** Command categorization logic could be bypassed by using shell metacharacters like backticks (`` ` ``) or dollar signs (`$`) for command substitution (e.g., `` `rm` ``), as normalization only stripped quotes and backslashes.
 **Learning:** Obfuscation and substitution are common bypasses for keyword-based security filters. Normalization must account for all shell metacharacters that can wrap or precede commands.
 **Prevention:** Normalize all command input by stripping a comprehensive set of shell metacharacters (quotes, backslashes, backticks, dollar signs, braces, parentheses, brackets) before keyword matching. Standardize word-boundary regexes to include separators like commas for bracket expansion.
+
+## 2026-06-15 - Command Categorization Bypass via eval and exec
+**Vulnerability:** The command categorization logic did not explicitly flag `eval` and `exec` as dangerous keywords, allowing them to be used to execute arbitrary strings or replace the current shell process, potentially bypassing security filters that only look for direct command names like `rm`.
+**Learning:** Administrative and meta-execution commands like `eval` and `exec` are common primitives for bypassing security controls or escalating privileges in restricted shell environments.
+**Prevention:** Explicitly include `eval` and `exec` in the `DANGEROUS_KEYWORDS` list to ensure they are flagged for manual review alongside destructive commands like `rm`.
