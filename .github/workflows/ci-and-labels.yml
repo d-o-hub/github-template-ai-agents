@@ -201,7 +201,8 @@ jobs:
     needs: [labels, quality-gate, test]
     if: |
       always() &&
-      github.actor != 'dependabot[bot]'
+      github.actor != 'dependabot[bot]' &&
+      github.event_name != 'pull_request'
     concurrency:
       group: ci-status-update
       cancel-in-progress: true
@@ -254,7 +255,7 @@ jobs:
 
           PR_BRANCH="ci/status-update"
           git checkout -b "$PR_BRANCH" 2>/dev/null || git checkout "$PR_BRANCH"
-          git commit -m "ci: update ci status artifacts [skip ci]"
+          git commit -m "ci: update ci status artifacts"
           git push origin --force -- "$PR_BRANCH"
 
           # Find-or-create the canonical CI status PR
@@ -283,9 +284,18 @@ jobs:
           # Auto-merge via squash; --admin bypasses required checks (ci/status-update
           # is itself one of them, so --auto would deadlock); [skip ci] prevents
           # the merge commit from re-triggering this workflow.
-          gh pr merge "$NEW_PR" \
+          # NOTE: If --admin fails (e.g. GITHUB_TOKEN lacks repo admin), the PR
+          # stays open and required checks will run on subsequent pushes, allowing
+          # normal merge once checks pass.
+          if gh pr merge "$NEW_PR" \
             --squash \
             --subject "ci: update ci status artifacts [skip ci]" \
             --admin \
-            --delete-branch=false \
-          || printf "Merge skipped or already merged for PR #%s\n" "$NEW_PR"
+            --delete-branch=false; then
+            printf "Auto-merged PR #%s\n" "$NEW_PR"
+          else
+            EXIT_CODE=$?
+            printf "WARNING: Auto-merge failed for PR #%s (exit %d)\n" \
+              "$NEW_PR" "$EXIT_CODE" >&2
+            printf "PR will be merged once required checks pass\n"
+          fi
