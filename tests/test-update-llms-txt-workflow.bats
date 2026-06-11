@@ -4,8 +4,9 @@
     grep -q "BRANCH=\"auto/regenerate-llms-txt\"" .github/workflows/update-llms-txt.yml
 }
 
-@test "llms-txt workflow uses skip ci in commit message" {
-    grep -q 'commit -m "ci: regenerate llms.txt and llms-full.txt \[skip ci\]"' .github/workflows/update-llms-txt.yml
+@test "llms-txt workflow omits skip ci from branch commit (allows checks to run)" {
+    grep -q 'commit -m "ci: regenerate llms.txt and llms-full.txt"' .github/workflows/update-llms-txt.yml
+    ! grep -q 'commit -m "ci: regenerate llms.txt and llms-full.txt \[skip ci\]"' .github/workflows/update-llms-txt.yml
 }
 
 @test "llms-txt workflow uses skip ci in merge subject" {

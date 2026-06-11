@@ -8,8 +8,13 @@
     grep -q "gh pr create" .github/workflows/ci-and-labels.yml
 }
 
-@test "workflow includes skip ci in commit message" {
-    grep -q "commit -m \"ci: update ci status artifacts \\[skip ci\\]\"" .github/workflows/ci-and-labels.yml
+@test "workflow omits skip ci from branch commit (allows checks to run)" {
+    grep -q "commit -m \"ci: update ci status artifacts\"" .github/workflows/ci-and-labels.yml
+    ! grep -q "commit -m \"ci: update ci status artifacts \\[skip ci\\]\"" .github/workflows/ci-and-labels.yml
+}
+
+@test "workflow includes skip ci only in squash merge subject" {
+    grep -q '\-\-subject "ci: update ci status artifacts \[skip ci\]"' .github/workflows/ci-and-labels.yml
 }
 
 @test "workflow uses dynamic base for PR creation" {
@@ -41,4 +46,8 @@
 
 @test "workflow has ci-status label step" {
     grep -q "gh label create ci-status" .github/workflows/ci-and-labels.yml
+}
+
+@test "update-ci-status job skips on pull_request events" {
+    grep -q "github.event_name != 'pull_request'" .github/workflows/ci-and-labels.yml
 }
