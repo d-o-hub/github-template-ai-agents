@@ -1,0 +1,91 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+categories:
+  - title: 'Breaking Changes'
+    labels:
+      - 'breaking'
+      - 'breaking-change'
+  - title: 'Features'
+    labels:
+      - 'feat'
+      - 'feature'
+      - 'enhancement'
+  - title: 'Bug Fixes'
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+  - title: 'Security'
+    labels:
+      - 'security'
+  - title: 'Documentation'
+    labels:
+      - 'docs'
+      - 'documentation'
+  - title: 'Dependencies'
+    labels:
+      - 'dependencies'
+      - 'deps'
+  - title: 'Maintenance'
+    labels:
+      - 'chore'
+      - 'ci'
+      - 'refactor'
+      - 'tests'
+
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&'
+no-changes-template: 'No changes since last release.'
+
+version-resolver:
+  major:
+    labels:
+      - 'breaking'
+      - 'breaking-change'
+  minor:
+    labels:
+      - 'feat'
+      - 'feature'
+      - 'enhancement'
+  patch:
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+      - 'security'
+      - 'docs'
+      - 'documentation'
+      - 'dependencies'
+      - 'deps'
+      - 'chore'
+      - 'ci'
+      - 'refactor'
+      - 'tests'
+  default: patch
+
+autolabeler:
+  - label: 'security'
+    title: '/sec/i'
+  - label: 'feat'
+    title: '/feat/i'
+  - label: 'fix'
+    title: '/fix/i'
+  - label: 'docs'
+    title: '/docs/i'
+  - label: 'chore'
+    title: '/chore/i'
+  - label: 'ci'
+    title: '/ci/i'
+  - label: 'dependencies'
+    title: '/dependabot/i'
+
+exclude-labels:
+  - 'skip-changelog'
+
+template: |
+  ## Changes
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION

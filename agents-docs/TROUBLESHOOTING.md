@@ -87,7 +87,7 @@ chmod +x scripts/atomic-commit/*.sh
 
 **Solution**:
 - This should not happen anymore (was fixed in quick wins)
-- If still occurring, check `.github/workflows/ci-and-labels.yml`
+- If still occurring, check `.github/workflows/ci.yml`
 
 ### Workflow Permissions Error
 
