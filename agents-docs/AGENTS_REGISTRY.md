@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-05-30 18:59 UTC
+> Last updated: 2026-06-11 09:55 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -38,13 +38,14 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `atomic-commit` | `.agents/skills/atomic-commit` | Atomic git workflow - validates, commits, pushes, creates PR |
 | `cicd-pipeline` | `.agents/skills/cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, Gi |
 | `cloudflare-worker-api` | `.agents/skills/cloudflare-worker-api` | Structure Worker API routes and handlers. Activate for route |
-| `codacy` | `.agents/skills/codacy` | Orchestrate static analysis using Codacy CLIs. Use when Coda |
+| `codacy-analysis-cli` | `.agents/skills/codacy` | Uses the Codacy Analysis CLI to run local static analysis on |
 | `code-quality` | `.agents/skills/code-quality` | Review and improve code quality across any programming langu |
 | `code-review-assistant` | `.agents/skills/code-review-assistant` | Automated code review with PR analysis, change summaries, an |
 | `codeberg-api` | `.agents/skills/codeberg-api` | Interact with Forgejo/Codeberg repositories via the REST API |
 | `css-render-performance` | `.agents/skills/css-render-performance` | Guide CSS render performance analysis and optimization. Use  |
 | `database-devops` | `.agents/skills/database-devops` | Database design, migration, and DevOps automation with safet |
 | `database-schema-migrations` | `.agents/skills/database-schema-migrations` | Design database schema and write migrations. Activate for ta |
+| `delegate` | `.agents/skills/delegate` | Lightweight retrieval and context agent skill for rapid info |
 | `dist-channel-selection` | `.agents/skills/dist-channel-selection` | Guide for selecting the correct distribution channel (npm, C |
 | `do-web-doc-resolver` | `.agents/skills/do-web-doc-resolver` | Python resolver for URLs and queries into compact, LLM-ready |
 | `docs-hook` | `.agents/skills/docs-hook` | Lightweight git hook integration for updating agents-docs wi |
@@ -57,6 +58,7 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `github-pr-sentinel` | `.agents/skills/github-pr-sentinel` | Monitor a GitHub pull request until it's merged, green, or b |
 | `github-workflow` | `.agents/skills/github-workflow` | Complete GitHub workflow automation - push, create branch/PR |
 | `goap-agent` | `.agents/skills/goap-agent` | Invoke for complex multi-step tasks requiring intelligent pl |
+| `implementer` | `.agents/skills/implementer` | Execution agent skill focused on implementing changes based  |
 | `intent-classifier` | `.agents/skills/intent-classifier` | Classify user intents and route to appropriate skills, comma |
 | `iterative-refinement` | `.agents/skills/iterative-refinement` | Execute iterative refinement workflows with validation loops |
 | `jules-delegator` | `.agents/skills/jules-delegator` | Use this skill to delegate complex coding tasks by creating  |
@@ -75,6 +77,7 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `shell-script-quality` | `.agents/skills/shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use w |
 | `skill-creator` | `.agents/skills/skill-creator` | Create new skills, modify and improve existing skills, and m |
 | `skill-evaluator` | `.agents/skills/skill-evaluator` | Reusable skill for evaluating other skills with structure ch |
+| `static-analysis` | `.agents/skills/static-analysis` | Language-agnostic static analysis and linter triage skill fo |
 | `task-decomposition` | `.agents/skills/task-decomposition` | Break down complex tasks into atomic, actionable goals with  |
 | `test-runner` | `.agents/skills/test-runner` | Execute tests, analyze results, and diagnose failures across |
 | `testdata-builders` | `.agents/skills/testdata-builders` | Maintain deterministic builders/factories for test entities. |
@@ -106,6 +109,7 @@ tools: Read, Grep, Glob, Bash
 # Agent Name
 
 System prompt for the agent...
+
 ```
 
 ## Adding New Skills
@@ -126,6 +130,7 @@ description: What this skill does. Use when [specific scenarios].
 # Skill Name
 
 Skill instructions...
+
 ```
 
 ---
@@ -147,6 +152,7 @@ Add to `.vscode/settings.json`:
     ".agents/skills/**/SKILL.md"
   ]
 }
+
 ```
 
 Then use a task to run the update script on file changes.
@@ -157,8 +163,10 @@ Then use a task to run the update script on file changes.
 npm install -g chokidar-cli
 
 # Watch for changes and update registry
+
 chokidar ".claude/agents/*.md" ".opencode/agents/*.md" ".agents/skills/*/SKILL.md" \
   -c "./scripts/update-agents-registry.sh && git add AGENTS_REGISTRY.md"
+
 ```
 
 ### Git Hook (Post-Merge)
@@ -169,6 +177,7 @@ Add to `.git/hooks/post-merge`:
 #!/bin/bash
 ./scripts/update-agents-registry.sh
 git add AGENTS_REGISTRY.md
+
 ```
 
 ---

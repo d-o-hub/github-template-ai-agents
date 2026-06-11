@@ -1,4 +1,6 @@
-# Codacy PR Analysis Output Format
+> **Skill:** This reference is used by [codacy-analysis-cli](../SKILL.md).
+
+# Codacy PR Analysis Output Format (v1.4.0)
 
 When running `codacy pull-request ... --output json`, the response contains structured quality data.
 
@@ -20,6 +22,7 @@ When running `codacy pull-request ... --output json`, the response contains stru
   "tool": "ShellCheck",
   "severity": "Info"
 }
+
 ```
 
 ## Identification: Hash vs. ID

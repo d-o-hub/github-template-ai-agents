@@ -1,31 +1,11 @@
 {
   "skill_name": "codacy",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "evals": [
     {
       "id": 1,
-      "prompt": "How do I check why Codacy is failing on PR #150?",
-      "expected_output": "The agent should suggest using `codacy pull-request gh <org> <repo> 150 --output json` and parsing the `newIssues` and `qualityGateStatus` fields.",
-      "assertions": [
-        "Uses `codacy pull-request`",
-        "Includes `--output json`",
-        "Mentions checking qualityGateStatus"
-      ]
-    },
-    {
-      "id": 2,
-      "prompt": "I have a false positive in a Go file. How do I suppress it using the CLI?",
-      "expected_output": "The agent should identify that the numeric `resultDataId` is required and suggest `codacy pull-request ... --ignore-issue <id> --ignore-reason FalsePositive`.",
-      "assertions": [
-        "Mentions numeric resultDataId",
-        "Uses --ignore-issue",
-        "Uses --ignore-reason"
-      ]
-    },
-    {
-      "id": 3,
       "prompt": "Can I run Codacy analysis locally for my TypeScript changes?",
-      "expected_output": "The agent should explain that `codacy-analysis analyze` supports some tools locally (like ESLint or Trivy) but note that it's a subset and recommends checking the Cloud dashboard for full integration.",
+      "expected_output": "The agent should explain that `codacy-analysis analyze` supports some tools locally (like ESLint or Trivy) but note that it is a subset and recommends checking the Cloud dashboard for full integration.",
       "assertions": [
         "Mentions `codacy-analysis analyze`",
         "Notes local analysis is a subset",
@@ -33,13 +13,43 @@
       ]
     },
     {
-      "id": 4,
-      "prompt": "I've updated the .codacy.yml file. How can I verify that the syntax is correct before committing?",
-      "expected_output": "The agent should suggest using the `codacy-analysis-cli validate-configuration` command to check the configuration file locally.",
+      "id": 2,
+      "prompt": "I have updated the .codacy.yml file. How can I verify that the syntax is correct before committing?",
+      "expected_output": "The agent should suggest using the `codacy-analysis validate-configuration` command to check the configuration file locally.",
       "assertions": [
-        "Mentions `codacy-analysis-cli validate-configuration`",
+        "Mentions `codacy-analysis validate-configuration`",
         "Specifies the `--directory` flag or implies running from root",
         "Correctly identifies the tool for configuration validation"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I want to see which tools are ready for analysis before I run it. How do I perform a dry-run with the Analysis CLI?",
+      "expected_output": "The agent should suggest `codacy-analysis analyze --inspect --output-format json` to check tool readiness.",
+      "assertions": [
+        "Uses `codacy-analysis analyze`",
+        "Includes `--inspect`",
+        "Mentions `--output-format json`"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "How can I install missing static analysis tools and run the analysis in one go?",
+      "expected_output": "The agent should suggest `codacy-analysis analyze --install-dependencies --output-format json` for one-shot installation and analysis.",
+      "assertions": [
+        "Uses `codacy-analysis analyze`",
+        "Includes `--install-dependencies`",
+        "Mentions `--output-format json`"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "I want to scan only my staged changes before I commit them. What is the command for that?",
+      "expected_output": "The agent should suggest using `codacy-analysis analyze --staged --output-format json`.",
+      "assertions": [
+        "Uses `codacy-analysis analyze`",
+        "Includes `--staged`",
+        "Mentions `--output-format json`"
       ]
     }
   ]

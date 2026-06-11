@@ -1,3 +1,5 @@
+> **Skill:** This reference is used by [codacy-analysis-cli](../SKILL.md).
+
 # Codacy Configuration Format
 
 The repository uses `.codacy.yml` or `.codacy.yaml` for advanced configuration.
@@ -29,6 +31,7 @@ engines:
     enabled: true
     exclude_paths:
       - "tests/**"
+
 ```
 
 ## Tool-Specific Configuration
@@ -46,11 +49,13 @@ engines:
     php_version: 8.1
   metric:
     # Cyclomatic complexity thresholds
+
     config:
       languages:
         - "rust"
         - "go"
         - "typescript"
+
 ```
 
 ## Validation
@@ -58,5 +63,6 @@ engines:
 Validate your configuration locally using the Codacy Analysis CLI:
 
 ```bash
-codacy-analysis-cli validate-configuration --directory .
+codacy-analysis-cli validate-configuration (v1.4.0) --directory .
+
 ```
