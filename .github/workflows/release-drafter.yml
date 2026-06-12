@@ -50,7 +50,8 @@ jobs:
           git checkout -b "$PR_BRANCH" 2>/dev/null || git checkout "$PR_BRANCH"
           git commit -m "docs: update CHANGELOG.md [skip ci]"
           git push origin --force -- "$PR_BRANCH"
-          if EXISTING_PR=$(gh pr list --head "$PR_BRANCH" --state open --json number --jq '.[0].number' 2>/dev/null); then
+          if EXISTING_PR=$(gh pr list --head "$PR_BRANCH" \
+            --state open --json number --jq '.[0].number' 2>/dev/null); then
             echo "PR #$EXISTING_PR already exists"
           else
             gh pr create \
