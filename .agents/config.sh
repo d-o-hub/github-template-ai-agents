@@ -110,6 +110,9 @@ readonly GEMINI_DIR=".gemini"
 # Qwen Code specific directory
 readonly QWEN_DIR=".qwen"
 
+# CommandCode specific directory
+readonly COMMANDCODE_DIR=".commandcode"
+
 # ============================================================================
 # COLOR CODES (for terminal output)
 # ============================================================================
