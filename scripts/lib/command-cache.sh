@@ -60,7 +60,14 @@ should_invalidate_command() {
     local changed_files="$3"
 
     # Use a loop that handles spaces in filenames if needed, though here changed_files is space-separated
-    while IFS= read -r changed; do
+    # Optimization: Use localized IFS and arrays instead of while read <<< to eliminate subshells
+    local old_opts="$-"
+    set -f # Prevent globbing when splitting into arrays
+    local IFS=$'\n'
+    local changed_array=($changed_files)
+    [[ "$old_opts" != *f* ]] && set +f
+
+    for changed in "${changed_array[@]}"; do
         [[ -z "$changed" ]] && continue
         if [[ "$changed" == "$file" ]]; then
             return 0
@@ -78,7 +85,7 @@ should_invalidate_command() {
             Gemfile*) [[ "$cmd" =~ ^(bundle|gem) ]] && return 0 ;;
             *) ;;
         esac
-    done <<< "$changed_files"
+    done
     return 1
 }
 

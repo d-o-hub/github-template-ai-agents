@@ -42,12 +42,19 @@ categorize_command() {
         fi
     done
 
+    # Optimization: Use localized IFS and arrays instead of here-strings (<<<) to eliminate
+    # subshell overhead and temporary file creation during high-frequency looping.
+    local old_opts="$-"
+    set -f # Prevent globbing when splitting into arrays
+    local IFS=':'
+    local keywords=($DANGEROUS_KEYWORDS)
+
     # Check dangerous keywords with boundaries to avoid false positives (e.g., mkdir farm)
     # while still catching commands near shell metacharacters (e.g., (rm) or rm;ls)
-    IFS=':' read -ra keywords <<< "$DANGEROUS_KEYWORDS"
     for keyword in "${keywords[@]}"; do
         [[ -z "$keyword" ]] && continue
         if [[ "$cmd_lower" =~ ${boundary}${keyword}${end_boundary} ]]; then
+            [[ "$old_opts" != *f* ]] && set +f
             printf "dangerous\n"
             return 0
         fi
@@ -57,16 +64,18 @@ categorize_command() {
     for pattern in "${CONDITIONAL_PATTERNS[@]:-}"; do
         [[ -z "$pattern" ]] && continue
         if [[ "$cmd_lower" == *"$pattern"* ]]; then
+            [[ "$old_opts" != *f* ]] && set +f
             printf "conditional\n"
             return 0
         fi
     done
 
     # Check conditional keywords with boundaries
-    IFS=':' read -ra keywords <<< "$CONDITIONAL_KEYWORDS"
-    for keyword in "${keywords[@]}"; do
+    local c_keywords=($CONDITIONAL_KEYWORDS)
+    for keyword in "${c_keywords[@]}"; do
         [[ -z "$keyword" ]] && continue
         if [[ "$cmd_lower" =~ ${boundary}${keyword}${end_boundary} ]]; then
+            [[ "$old_opts" != *f* ]] && set +f
             printf "conditional\n"
             return 0
         fi
@@ -76,20 +85,23 @@ categorize_command() {
     for pattern in "${SAFE_PATTERNS[@]:-}"; do
         [[ -z "$pattern" ]] && continue
         if [[ "$cmd_lower" == *"$pattern"* ]]; then
+            [[ "$old_opts" != *f* ]] && set +f
             printf "safe\n"
             return 0
         fi
     done
 
     # Check safe keywords with boundaries
-    IFS=':' read -ra keywords <<< "$SAFE_KEYWORDS"
-    for keyword in "${keywords[@]}"; do
+    local s_keywords=($SAFE_KEYWORDS)
+    for keyword in "${s_keywords[@]}"; do
         [[ -z "$keyword" ]] && continue
         if [[ "$cmd_lower" =~ ${boundary}${keyword}${end_boundary} ]]; then
+            [[ "$old_opts" != *f* ]] && set +f
             printf "safe\n"
             return 0
         fi
     done
+    [[ "$old_opts" != *f* ]] && set +f
 
     # Unknown category
     printf "unknown\n"
