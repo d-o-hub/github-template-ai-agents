@@ -78,7 +78,6 @@ get_affected_commands() {
     # Optimization: Pre-filter matched rules for the changed file to avoid redundant loops
     local matched_rules=()
     for rule in "${INVALIDATION_RULES[@]}"; do
-        IFS=':' read -r file_pattern cmd_prefix <<< "$rule"
         local file_pattern="${rule%%:*}"
         if matches_pattern "$changed_file" "$file_pattern"; then
             matched_rules+=("$rule")
@@ -90,7 +89,25 @@ get_affected_commands() {
     fi
 
     # Read extracted commands once and check against matched rules
-    while IFS=$'\t' read -r cmd_file cmd; do
+    # Optimization: Split into array directly without subshell here-strings
+    local old_opts="$-"
+    set -f # Prevent globbing when splitting into arrays
+    local IFS=$'\n'
+    local extracted_array=($extracted)
+    [[ "$old_opts" != *f* ]] && set +f
+
+    for line in "${extracted_array[@]}"; do
+        [[ -z "$line" ]] && continue
+
+        # Check if line actually has a tab (from jq output format "\(.file)\t\(.command)")
+        if [[ "$line" != *$'\t'* ]]; then
+            local cmd_file="$line"
+            local cmd=""
+        else
+            local cmd_file="${line%%$'\t'*}"
+            local cmd="${line#*$'\t'}"
+        fi
+
         [[ -z "$cmd" ]] && continue
 
         for rule in "${matched_rules[@]}"; do
@@ -111,7 +128,7 @@ get_affected_commands() {
                 break
             fi
         done
-    done <<< "$extracted"
+    done
 
     # Output unique affected commands
     if [[ ${#affected[@]} -gt 0 ]]; then
