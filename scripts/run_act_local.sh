@@ -6,7 +6,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-readonly DEFAULT_WORKFLOW_FILE=".github/workflows/ci-and-labels.yml"
+readonly DEFAULT_WORKFLOW_FILE=".github/workflows/ci.yml"
 readonly DEFAULT_EVENT="pull_request"
 
 if ! command -v act >/dev/null 2>&1; then

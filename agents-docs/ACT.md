@@ -29,7 +29,7 @@ You can control the script's behavior using environment variables:
 
 - `ACT_JOB`: The ID of a specific job to run (e.g., `quality-gate`).
 - `ACT_EVENT`: The GitHub event to simulate (default: `pull_request`).
-- `ACT_WORKFLOW_FILE`: Path to the workflow file (default: `.github/workflows/ci-and-labels.yml`).
+- `ACT_WORKFLOW_FILE`: Path to the workflow file (default: `.github/workflows/ci.yml`).
 
 ## Common Usage Examples
 
