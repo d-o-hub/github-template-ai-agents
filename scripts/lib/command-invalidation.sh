@@ -52,7 +52,10 @@ matches_pattern() {
 
     # Handle simple * patterns
     if [[ "$pattern" == *"*"* ]]; then
-        local regex="^${pattern//\*/.*}$"
+        # Security: Escape literal dots before converting * to .* to prevent
+        # overly broad pattern matching.
+        local escaped_pattern="${pattern//./\\.}"
+        local regex="^${escaped_pattern//\*/.*}$"
         [[ "$file" =~ $regex ]] && return 0
     fi
 
