@@ -102,6 +102,9 @@ readonly CLAUDE_DIR=".claude"
 readonly OPCODE_DIR=".opencode"
 readonly GEMINI_DIR=".gemini"
 readonly QWEN_DIR=".qwen"
+
+# CommandCode specific directory
+readonly COMMANDCODE_DIR=".commandcode"
 ```
 
 ### Color Codes

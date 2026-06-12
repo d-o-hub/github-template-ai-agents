@@ -1,6 +1,7 @@
 ---
 name: agents-md
 version: "0.2.10"
+category: documentation
 description: Create AGENTS.md files with production-ready best practices. Use when creating new AGENTS.md or implementing quality gates.
 license: MIT
 ---
@@ -104,6 +105,20 @@ See `agents-docs/SKILLS.md` for tier details.
 - [ ] Pre-existing issue policy included
 - [ ] Quality gate specified
 - [ ] < 160 lines (progressive disclosure)
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "A README is enough, AGENTS.md is overkill" | AGENTS.md encodes agent-specific constraints and workflows that README cannot cover without clutter. |
+| "I'll write it after the project stabilizes" | Without AGENTS.md from the start, agents accumulate inconsistent conventions that are costly to fix later. |
+| "Just put everything in one big AGENTS.md" | Single monolithic files become unmaintainable; tier structure enables progressive disclosure. |
+
+## Red Flags
+
+- [ ] AGENTS.md contains vague commands like "run tests" without specific invocations
+- [ ] Named constants missing or using magic numbers
+- [ ] Quality gate section absent or incomplete
 
 ## References
 

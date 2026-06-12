@@ -1,0 +1,38 @@
+{
+  "skill_name": "delegate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Where is the validation script that checks for shell script errors located?",
+      "expected_output": "The agent uses grep/glob to locate the validation script and returns the file path with a brief description of its purpose.",
+      "files": [],
+      "assertions": [
+        "The agent uses grep or glob to search for the script",
+        "The agent returns a concrete file path",
+        "The agent does not modify any files during retrieval"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "What does the quality_gate.sh script do and what tools does it invoke?",
+      "expected_output": "The agent reads quality_gate.sh, summarizes its purpose, and lists the tools/commands it invokes.",
+      "files": [],
+      "assertions": [
+        "The agent reads the script content",
+        "The agent summarizes the script's purpose",
+        "The agent lists specific tools or commands called by the script"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Assess the current state of the .agents/skills/ directory — how many skills exist and which ones have evals?",
+      "expected_output": "The agent counts skills, checks for evals/evals.json in each, and returns a structured summary.",
+      "files": [],
+      "assertions": [
+        "The agent provides a count of skills",
+        "The agent identifies which skills have evals",
+        "The output is structured and scannable"
+      ]
+    }
+  ]
+}

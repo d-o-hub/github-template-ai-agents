@@ -65,6 +65,7 @@ Use this template when you want a repository structure that survives:
 | **OpenCode** | `opencode.json` | `.agents/skills/` (direct read) | JSON config + direct canonical path |
 | **Jules** | `JULES.md` + `.jules/*.md` | `.agents/skills/` (direct read) | Override file + direct canonical path |
 | **Windsurf** | `.windsurf/` | `.windsurf/skills` → directory symlink to `.agents/skills/` | Directory config + directory symlink |
+| **CommandCode** | `.commandcode/` | `.agents/skills/` (direct read) | Directory config + taste learning |
 | **Copilot Chat** | `AGENTS.md` | Via repo docs | Best-effort structured compatibility |
 
 All tools share the same canonical instruction source (`AGENTS.md`) and canonical skills
@@ -80,7 +81,7 @@ flowchart TD
     C --> D[".claude/skills<br/>per-skill symlinks"]
     C --> E[".qwen/skills<br/>per-skill symlinks"]
     C --> F[".windsurf/skills<br/>directory symlink"]
-    C --> G["Gemini / OpenCode / Jules<br/>direct reads"]
+    C --> G["Gemini / OpenCode / Jules / CommandCode<br/>direct reads"]
     A --> H["Scripts & hooks"]
     H --> I["pre-commit quality gate<br/>scripts/quality_gate.sh"]
     H --> J["CI workflows<br/>.github/workflows/"]

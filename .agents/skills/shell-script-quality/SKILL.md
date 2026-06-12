@@ -1,6 +1,7 @@
 ---
 name: shell-script-quality
 version: "0.2.10"
+category: code-quality
 description: Lint and test shell scripts using ShellCheck and BATS. Use when checking bash/sh scripts for errors, writing shell script tests, fixing ShellCheck warnings, setting up CI/CD for shell scripts, or improving bash code quality.
 ---
 
@@ -237,3 +238,17 @@ find scripts -name "*.sh" -exec shellcheck {} + && bats tests/
 # Or use quality check script
 bash scripts/check-quality.sh
 ```
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "ShellCheck warnings are false positives" | Most SC warnings catch real bugs; suppress with documented reason, not dismissal. |
+| "BATS tests take too long to write" | Untested scripts break silently in production; test time is investment, not waste. |
+| "set -e is too strict for my script" | Scripts without -e silently swallow errors and leave systems in inconsistent states. |
+
+## Red Flags
+
+- [ ] Running shell scripts without set -euo pipefail
+- [ ] Skipping ShellCheck linting before committing shell scripts
+- [ ] Suppressing SC warnings without documenting the reason and date

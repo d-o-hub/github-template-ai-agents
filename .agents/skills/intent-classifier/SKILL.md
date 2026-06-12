@@ -1,6 +1,7 @@
 ---
 name: intent-classifier
 version: "0.2.10"
+category: agent
 description: Classify user intents and route to appropriate skills, commands, or workflows. Use when determining which skill to invoke, routing requests to specialized agents, or building skill selection logic. Trigger on 'which skill should I use', 'route this to', 'classify this request', 'skill selection', or when multiple skills could handle a task.
 license: MIT
 ---
@@ -84,6 +85,19 @@ This scans `.agents/skills/` and regenerates the skill registry with:
 | "Audit my code for security issues" | Security audit | security-code-auditor |
 | "Design a REST API for users" | API design | api-design-first |
 | "Fix this bug in my Python script" | Code debugging | (general) |
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I can just pick a skill manually" | Systematic classification ensures the best-matched skill is used and prevents overlooking specialized alternatives. |
+| "Close enough is fine, I'll just pick the first match" | Low-confidence matches lead to wrong workflows and wasted tokens; present options when uncertain. |
+
+## Red Flags
+
+- [ ] Routing to a skill without checking confidence score
+- [ ] Ignoring multi-intent requests that require chaining skills
+- [ ] Failing to update the dynamic catalog after adding new skills
 
 ## References
 

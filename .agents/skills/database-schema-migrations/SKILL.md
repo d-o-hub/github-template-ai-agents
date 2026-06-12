@@ -57,3 +57,17 @@ CREATE INDEX IF NOT EXISTS idx_resources_owner ON resources(owner_id);
 
 - `references/migration-patterns.md` - Common migration patterns by database type
 - `references/rollback-strategies.md` - Safe rollback strategies
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "We'll test the migration on prod first" | A destructive migration without a rollback plan can cause irreversible data loss. |
+| "This index can wait until next release" | Missing indexes on hot tables cause cascading slowdowns that compound under load. |
+| "Schema changes don't need code review" | Migrations are code; unreviewed DDL can drop columns, leak data, or break transactions. |
+
+## Red Flags
+
+- [ ] Dropping columns or tables without a backup verification step
+- [ ] Running migrations without idempotent guards against partial failures
+- [ ] Skipping foreign key constraints for "performance reasons"

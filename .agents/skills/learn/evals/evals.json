@@ -22,6 +22,17 @@
         "The agent describes the auto-indexing into lessons.jsonl",
         "The agent warns against manual edits to lessons.jsonl if applicable"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "I discovered that `scripts/validate-skills.sh` silently passes when no skills exist. Should I record this?",
+      "expected_output": "The agent identifies this as a non-obvious runtime discovery worth capturing, explains the scoping rule (script-specific goes in scripts/AGENTS.md), and notes the dual-write requirement to LESSONS.md.",
+      "files": [],
+      "assertions": [
+        "The agent identifies this as a non-obvious runtime discovery",
+        "The agent recommends the correct scope (scripts/AGENTS.md)",
+        "The agent mentions the dual-write to LESSONS.md"
+      ]
     }
   ]
 }

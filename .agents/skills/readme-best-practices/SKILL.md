@@ -1,6 +1,7 @@
 ---
 name: readme-best-practices
 version: "0.2.10"
+category: documentation
 description: >
   Create, audit, and improve GitHub README.md files following 2026 best practices.
   Use this skill when a user asks to write, rewrite, or review a README.md for a
@@ -158,3 +159,17 @@ Before finalising, verify:
 - Image paths that work locally but break on GitHub (always use paths from repo root)
 - More than 8 badges (becomes noise)
 - Forgetting `<div align="center">` closing tag
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "Any README is better than no README" | A bad README actively damages trust; incomplete or broken docs are worse than none. |
+| "Badges are just decoration" | Badges convey CI status, version, and license at a glance — they are functional signals. |
+| "I'll update the README when I have time" | Stale READMEs mislead contributors and users; update docs alongside code changes. |
+
+## Red Flags
+
+- [ ] README contains placeholder text or lorem ipsum
+- [ ] Badge URLs point to non-existent workflow files
+- [ ] Quick Start requires API keys or credentials without mention

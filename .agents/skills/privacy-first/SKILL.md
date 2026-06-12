@@ -1,6 +1,7 @@
 ---
 name: privacy-first
 version: "0.2.10"
+category: security
 description: >
   Prevent email addresses and personal data from entering the codebase.
   Use when user asks to "prevent emails", "remove personal data", "privacy check",
@@ -115,3 +116,17 @@ fi
 - Remove email fields from package metadata
 - Use test domains (`example.com`) only in test files
 - Link to SECURITY.md for vulnerability reporting
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "It's just a README, no one cares about emails in docs" | Scrapers harvest emails from public repos; any address becomes a phishing target. |
+| "We need a real contact email for support" | Use GitHub Issues or a web form; email addresses in repos are permanent even after deletion. |
+| "This is an internal tool, privacy doesn't apply" | Internal repos get leaked; personal data in source code violates privacy-by-design principles. |
+
+## Red Flags
+
+- [ ] Adding email fields to package metadata or config files
+- [ ] Using real email addresses in documentation examples
+- [ ] Skipping email scans in CI because "it's just a test file"

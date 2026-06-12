@@ -22,6 +22,17 @@
         "The agent mentions both AGENTS.md and SECURITY.md as sources",
         "The output includes an example of a pinned action"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "Use code-aware retrieval to find how MAX_CONTEXT_TOKENS is defined and used across the project.",
+      "expected_output": "The agent runs a code-aware csm query for MAX_CONTEXT_TOKENS, finds its definition in .agents/config.sh, and identifies where it's referenced in scripts.",
+      "files": [],
+      "assertions": [
+        "The agent uses the --code-aware flag or equivalent",
+        "The agent finds the definition location of MAX_CONTEXT_TOKENS",
+        "The agent identifies at least one usage site"
+      ]
     }
   ]
 }
