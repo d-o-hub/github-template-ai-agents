@@ -115,3 +115,8 @@
 **Vulnerability:** The command categorization logic did not explicitly flag `eval` and `exec` as dangerous keywords, allowing them to be used to execute arbitrary strings or replace the current shell process, potentially bypassing security filters that only look for direct command names like `rm`.
 **Learning:** Administrative and meta-execution commands like `eval` and `exec` are common primitives for bypassing security controls or escalating privileges in restricted shell environments.
 **Prevention:** Explicitly include `eval` and `exec` in the `DANGEROUS_KEYWORDS` list to ensure they are flagged for manual review alongside destructive commands like `rm`.
+
+## 2026-06-18 - Overly Broad Glob Matching in Command Invalidation
+**Vulnerability:** The `matches_pattern` function converted globs to regexes without escaping literal dots (e.g., `package*.json` -> `package.*\.json`). This allowed `packageAjson` to match a pattern intended only for `package.json`.
+**Learning:** Simple string replacement for glob-to-regex conversion (`*` -> `.*`) is unsafe if it ignores other regex metacharacters like `.` that appear in common filenames.
+**Prevention:** Always escape literal dots (e.g., `${pattern//./\\.}`) before converting asterisks to `.*` in security-critical pattern matching logic.
