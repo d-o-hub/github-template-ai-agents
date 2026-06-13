@@ -1,0 +1,39 @@
+{
+  "skill_name": "lifecycle-management",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "How do I implement global error handling in a web application?",
+      "expected_output": "The agent provides the initGlobalErrorHandling() function that adds event listeners for 'error' and 'unhandledrejection' events, with console.error and optional telemetry.",
+      "files": [],
+      "assertions": [
+        "The agent provides a function named initGlobalErrorHandling",
+        "The function adds listener for 'error' event",
+        "The function adds listener for 'unhandledrejection' event",
+        "The function includes error logging"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to cancel in-flight requests when navigating between routes. How do I do this?",
+      "expected_output": "The agent suggests using an AbortController: call controller.abort() before navigation, then create a new AbortController for the new route.",
+      "files": [],
+      "assertions": [
+        "The agent mentions AbortController",
+        "The agent suggests aborting before navigation",
+        "The agent suggests creating new controller after abort"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "What's the best way to clean up event listeners in a JavaScript application?",
+      "expected_output": "The agent recommends using AbortController signal with addEventListener: pass { signal } option, then call controller.abort() to remove all listeners associated with that controller.",
+      "files": [],
+      "assertions": [
+        "The agent mentions AbortController signal option",
+        "The agent shows addEventListener with signal",
+        "The agent explains abort() removes listeners"
+      ]
+    }
+  ]
+}

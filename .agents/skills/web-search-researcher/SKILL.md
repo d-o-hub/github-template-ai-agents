@@ -1,6 +1,7 @@
 ---
 name: web-search-researcher
 version: "0.2.10"
+category: tool
 description: Research topics using web search to find accurate, current information. Use when you need modern information, official documentation, best practices, or technical solutions beyond training data.
 ---
 
@@ -213,6 +214,19 @@ site:github.com tokio spawn_blocking
 ## Summary
 
 Analyze, Search strategically, Fetch authoritative, Synthesize with attribution.
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "The first search result is probably correct." | Top results are often SEO-optimized content farms, not authoritative sources — always cross-reference. |
+| "I don't need to check the date — the info is probably still valid." | Technical information becomes outdated quickly; stale API docs or deprecated patterns cause real bugs. |
+
+## Red Flags
+
+- [ ] Stopping at the first search result without cross-referencing
+- [ ] Omitting date checks — using outdated information as current fact
+- [ ] Relying on AI-generated aggregator content instead of official documentation
 
 ## Reference Files
 

@@ -46,3 +46,17 @@ src/routes/
 
 - `references/routing-patterns.md` - Common routing patterns for Workers
 - `references/response-helpers.md` - Consistent response formatting
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I'll add auth later, it's just an MVP" | Unauthenticated endpoints are immediately exploitable; even internal routes need auth. |
+| "Hardcoded secrets are fine for dev" | Dev credentials leak into version control; use environment bindings from day one. |
+| "Rate limiting isn't needed for internal APIs" | Compromised internal tokens turn rate-limited services into attack amplifiers. |
+
+## Red Flags
+
+- [ ] Returning raw error stack traces in API responses
+- [ ] Skipping input validation because "the client should handle it"
+- [ ] Deploying without CORS configuration on public endpoints

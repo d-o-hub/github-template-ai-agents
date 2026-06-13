@@ -33,6 +33,20 @@ Purpose: deliver intentional, localized, accessible reader/admin UX.
 - [ ] Async effects cancel via AbortController; cleanup functions implemented.
 - [ ] UI interactions include aria-labels + focus traps where applicable.
 
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "Accessibility is a nice-to-have, not a requirement" | Legal compliance (WCAG, ADA, Section 508) and user inclusion make it mandatory. |
+| "I'll add localization later after the UI is done" | Retroactive localization is costly; string extraction and fallback logic should be designed upfront. |
+| "Prop drilling is simpler than state management" | Prop drilling breaks at scale; memoized selectors prevent unnecessary re-renders and deep coupling. |
+
+## Red Flags
+
+- [ ] Reader UI built without keyboard navigation support
+- [ ] Locale strings hardcoded in components instead of catalog
+- [ ] Missing ErrorBoundary or AbortController cleanup on async effects
+
 ## References
 
 - `references/responsive-patterns.md` - Responsive layout patterns

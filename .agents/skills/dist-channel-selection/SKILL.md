@@ -1,6 +1,7 @@
 ---
 name: dist-channel-selection
 version: "0.2.10"
+category: tool
 description: Guide for selecting the correct distribution channel (npm, Cargo, etc.) based on artifact type and target audience. Use when preparing to publish or release a new version of a package.
 ---
 
@@ -43,6 +44,19 @@ Use the official toolchain for the selected channel.
 - Publishing WASM binaries without size verification.
 - Forgetting to sync the `VERSION` file across sub-packages.
 - Incomplete CHANGELOG leading to consumer confusion.
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I'll skip the dry run — the publish always works." | Dry runs catch packaging errors, missing files, and metadata issues that silently corrupt published artifacts. |
+| "The VERSION file doesn't need to match package.json." | Version mismatches confuse consumers, break CI/CD pipelines, and invalidate changelog entries. |
+
+## Red Flags
+
+- [ ] Publishing without running the dry-run command first
+- [ ] Forgetting to update CHANGELOG.md before publishing
+- [ ] Skipping quality gate checks prior to release
 
 ## References
 

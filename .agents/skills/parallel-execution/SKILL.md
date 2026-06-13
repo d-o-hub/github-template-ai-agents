@@ -1,6 +1,7 @@
 ---
 name: parallel-execution
 version: "0.2.10"
+category: agent
 description: Execute multiple independent tasks simultaneously using parallel agent coordination to maximize throughput and minimize execution time. Use when tasks have no dependencies, results can be aggregated, and agents are available for concurrent work.
 ---
 
@@ -214,6 +215,19 @@ Used by **agent-coordination** for independent task strategy.
 ## Summary
 
 Parallel execution maximizes efficiency through concurrent execution, independent validation, and synchronized aggregation.
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "It's faster to do tasks one at a time" | Parallel execution reduces total time to the slowest task, not the sum of all tasks. |
+| "These tasks share a file, but I'll parallelize anyway" | Shared writes cause race conditions; verify true independence before parallelizing. |
+
+## Red Flags
+
+- [ ] Sending separate messages for each agent instead of a single parallel launch
+- [ ] Parallelizing tasks that share mutable state or write to the same files
+- [ ] Ignoring partial failures and not collecting available results
 
 ## Reference Files
 

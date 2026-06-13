@@ -2,6 +2,7 @@
 name: lifecycle-management
 description: Manage application lifecycle, error handling, and resource cleanup to prevent memory leaks and ensure stability.
 version: "0.2.10"
+category: quality
 ---
 
 # Lifecycle Management

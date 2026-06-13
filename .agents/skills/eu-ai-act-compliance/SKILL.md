@@ -2,6 +2,7 @@
 name: eu-ai-act-compliance
 description: EU AI Act compliance logging and requirements. Use for ensuring transparency, human oversight, and record-keeping per Regulation (EU) 2024/1689.
 version: "0.2.10"
+category: compliance
 metadata:
   author: <ORG_NAME>
   spec: agentskills.io

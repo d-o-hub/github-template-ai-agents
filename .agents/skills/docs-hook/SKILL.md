@@ -2,6 +2,7 @@
 name: docs-hook
 version: "0.2.10"
 description: Lightweight git hook integration for updating agents-docs with minimal tokens. Triggered on commit/merge events to sync documentation.
+category: workflow
 ---
 
 # Docs Hook
@@ -37,3 +38,17 @@ Or add to `.git/hooks/post-commit`:
 ## Working Script
 
 See `scripts/docs-sync.sh` - the actual executable.
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "Docs can sync manually, no need for automation" | Manual sync is forgotten within days. Automation ensures consistency. |
+| "The hook is slow, I'll skip it" | A few seconds of sync time prevents hours of out-of-date documentation debt. |
+| "Only production docs need syncing" | Stale developer docs cause onboarding confusion and incorrect assumptions. |
+
+## Red Flags
+
+- [ ] Disabling the docs hook to speed up commits
+- [ ] Manually copying docs instead of using the sync script
+- [ ] Ignoring sync failures after documentation changes

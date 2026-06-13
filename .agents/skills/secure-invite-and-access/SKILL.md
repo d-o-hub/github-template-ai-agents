@@ -34,6 +34,21 @@ Implement access-control rules (authentication, authorization, sessions, audit l
 - [ ] Rate limiting or abuse guard documented (even if stubbed).
 - [ ] Never expose whether an email/username exists in error messages.
 
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "Auth is straightforward, I don't need a dedicated skill" | Authentication bugs are among the most critical security vulnerabilities; systematic patterns prevent common mistakes. |
+| "I'll add rate limiting later" | Rate limiting is a core auth control, not an afterthought; abuse vectors are most effective before protections exist. |
+| "Generic error messages are用户体验bad" | leaking account existence is a security vulnerability; generic errors are an industry-standard requirement. |
+
+## Red Flags
+
+- [ ] Hardcoding secrets or tokens in source code instead of using environment variables.
+- [ ] Skipping session revocation on logout or password change.
+- [ ] Returning specific error messages like "account not found" instead of generic access-denied responses.
+- [ ] Implementing custom cryptography instead of using established libraries like Argon2id or bcrypt.
+
 ## References
 
 - `references/auth-patterns.md` - Common authentication patterns

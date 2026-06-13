@@ -1,0 +1,38 @@
+{
+  "skill_name": "implementer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Fix the typo in scripts/quality_gate.sh where 'chekc' should be 'check'.",
+      "expected_output": "The agent identifies the typo, applies the atomic edit to correct it, and runs the quality gate to verify no regressions.",
+      "files": [],
+      "assertions": [
+        "The agent makes exactly one targeted edit",
+        "The agent does not change unrelated code",
+        "The agent runs a verification step"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "The SKILL.md for delegate is missing a changelog entry. Add version 0.1.2 noting the evals addition.",
+      "expected_output": "The agent adds a changelog entry to the delegate SKILL.md frontmatter with the correct version and note.",
+      "files": [],
+      "assertions": [
+        "The agent edits only the changelog section",
+        "The version number follows the existing pattern",
+        "The entry describes the change accurately"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "The evals.json for memory-context only has 2 cases. Add a third eval case for querying with code-aware mode.",
+      "expected_output": "The agent adds a new eval case with id 3, a realistic prompt about code-aware querying, and concrete assertions.",
+      "files": [],
+      "assertions": [
+        "The new eval case has id 3",
+        "The prompt is specific to code-aware querying",
+        "The assertions are concrete and checkable"
+      ]
+    }
+  ]
+}
