@@ -98,9 +98,15 @@ get_cache_path() {
     # Sanitize file path for use in directory structure using sha256 to avoid collisions
     local safe_file
     if command -v sha256sum >/dev/null 2>&1; then
-        safe_file=$(printf "%s" "$file" | sha256sum | cut -d' ' -f1)
+        # Optimization: Use native Bash parameter expansion instead of `cut -d' ' -f1`
+        # subshell to eliminate fork overhead when processing high-volume caches
+        safe_file=$(printf "%s" "$file" | sha256sum)
+        safe_file="${safe_file%% *}"
     elif command -v shasum >/dev/null 2>&1; then
-        safe_file=$(printf "%s" "$file" | shasum -a 256 | cut -d' ' -f1)
+        # Optimization: Use native Bash parameter expansion instead of `cut -d' ' -f1`
+        # subshell to eliminate fork overhead when processing high-volume caches
+        safe_file=$(printf "%s" "$file" | shasum -a 256)
+        safe_file="${safe_file%% *}"
     else
         printf "Error: Neither sha256sum nor shasum is available. Cannot generate secure cache keys.\n" >&2
         exit 1
