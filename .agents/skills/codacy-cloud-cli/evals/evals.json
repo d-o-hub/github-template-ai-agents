@@ -1,56 +1,26 @@
 {
   "skill_name": "codacy-cloud-cli",
-  "version": "1.5.0",
   "evals": [
     {
       "id": 1,
-      "prompt": "How do I check why Codacy is failing on PR #150?",
-      "expected_output": "The agent should suggest using `codacy pull-request gh <org> <repo> 150 --output json` and parsing the `newIssues` and `qualityGateStatus` fields.",
-      "assertions": [
-        "Uses `codacy pull-request`",
-        "Includes `--output json`",
-        "Mentions checking qualityGateStatus"
-      ]
+      "prompt": "Show me the current code quality issues for the main branch of this repository on Codacy.",
+      "expected_output": "Auto-detect repository parameters from git remote and fetch issues with structured output.",
+      "files": [],
+      "assertions": ["Auto-detects provider, org, and repo", "Uses --output json for structured data", "Displays issues by severity"]
     },
     {
       "id": 2,
-      "prompt": "I have a false positive in a Go file. How do I suppress it using the CLI?",
-      "expected_output": "The agent should identify that the numeric `issueId` is required and suggest `codacy pull-request ... --ignore-issue <id> --ignore-reason FalsePositive`.",
-      "assertions": [
-        "Mentions issueId (not resultDataId)",
-        "Uses --ignore-issue",
-        "Uses --ignore-reason"
-      ]
+      "prompt": "Trigger a reanalysis of the latest PR and wait for the results to see if our changes improved the issue count.",
+      "expected_output": "Use --reanalyze-and-wait to trigger reanalysis, poll for completion, and report issue deltas.",
+      "files": [],
+      "assertions": ["Uses --reanalyze-and-wait flag", "Reports delta by pattern and severity", "Includes timing information"]
     },
     {
       "id": 3,
-      "prompt": "How do I trigger a reanalysis on Codacy Cloud and wait for the results from the terminal?",
-      "expected_output": "The agent should suggest `codacy repository gh <org> <repo> --reanalyze-and-wait`.",
-      "assertions": [
-        "Uses `codacy repository`",
-        "Includes `--reanalyze-and-wait` or `-w`",
-        "Correctly identifies Cloud CLI for this task"
-      ]
-    },
-    {
-      "id": 4,
-      "prompt": "My Codacy results are too noisy. How can I see an overview of false positives and get suggestions to reduce the noise?",
-      "expected_output": "The agent should suggest `codacy issues gh <org> <repo> --overview`.",
-      "assertions": [
-        "Uses `codacy issues`",
-        "Includes `--overview` or `-O`",
-        "Mentions noise-reduction suggestions"
-      ]
-    },
-    {
-      "id": 5,
-      "prompt": "List all open security findings for my repository sorted by severity.",
-      "expected_output": "The agent should suggest `codacy findings gh <org> <repo> --severities Critical,High`.",
-      "assertions": [
-        "Uses `codacy findings`",
-        "Includes `--severities`",
-        "Uses correct provider/org/repo format"
-      ]
+      "prompt": "I need to check which analysis tools are enabled for this repository and disable the Semgrep tool.",
+      "expected_output": "List current tools, verify Semgrep is enabled, then disable it and trigger reanalysis for changes to take effect.",
+      "files": [],
+      "assertions": ["Lists tools with current state", "Disables Semgrep correctly", "Mentions reanalysis is required for config changes"]
     }
   ]
 }

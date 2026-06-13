@@ -1,6 +1,7 @@
 ---
 name: static-analysis
 version: 1.0.0
+category: code-quality
 description: Language-agnostic static analysis and linter triage skill for cross-language projects.
 license: MIT
 ---

@@ -3,53 +3,24 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Add contact information to the README for support questions",
-      "expected_output": "The agent uses GitHub Issues URL instead of email, e.g., 'Report issues: https://github.com/owner/repo/issues'",
-      "assertions": [
-        "The agent does not add email addresses",
-        "The agent uses GitHub Issues URL for support"
-      ],
-      "files": []
+      "prompt": "Scan this README.md for any email addresses that should be removed",
+      "expected_output": "Identifies email addresses and replaces them with GitHub Issues links or generic placeholders",
+      "files": ["README.md"],
+      "assertions": ["Detects email addresses", "Replaces with GitHub Issues URL", "Does not flag example.com addresses"]
     },
     {
       "id": 2,
-      "prompt": "Update the pyproject.toml with author information",
-      "expected_output": "The agent adds author without email field, e.g., 'authors = [{name = \"Author\"}]'",
-      "assertions": [
-        "The agent does not add email field to authors",
-        "The agent uses correct pyproject.toml format without email"
-      ],
-      "files": []
+      "prompt": "Check pyproject.toml for personal data leaks before we publish",
+      "expected_output": "Removes email fields from package metadata and authors list",
+      "files": ["pyproject.toml"],
+      "assertions": ["Removes email from authors", "Preserves non-personal metadata", "Does not break package structure"]
     },
     {
       "id": 3,
-      "prompt": "Add a contact email to the CONTRIBUTING.md for questions",
-      "expected_output": "The agent redirects to GitHub Issues instead of adding email",
-      "assertions": [
-        "The agent does not add email addresses",
-        "The agent suggests GitHub Issues URL"
-      ],
-      "files": []
-    },
-    {
-      "id": 4,
-      "prompt": "Check this code for any email addresses that might have leaked: example@example.com",
-      "expected_output": "The agent identifies this is a test domain (example.com) which is allowed in test files, or flags it if in non-test code",
-      "assertions": [
-        "The agent correctly identifies test domain exception",
-        "The agent applies correct rules based on file location"
-      ],
-      "files": []
-    },
-    {
-      "id": 5,
-      "prompt": "Write a SECURITY.md with vulnerability reporting instructions",
-      "expected_output": "The agent uses GitHub Security Advisories or Issues URL, no personal emails",
-      "assertions": [
-        "The agent does not add personal email addresses",
-        "The agent uses appropriate security reporting URL"
-      ],
-      "files": []
+      "prompt": "Add a contact section to our CONTRIBUTING.md but make sure no personal emails end up in it",
+      "expected_output": "Adds a contact section that references GitHub Issues instead of an email address",
+      "files": ["CONTRIBUTING.md"],
+      "assertions": ["Uses GitHub Issues link", "Contains no email addresses", "Section is present and functional"]
     }
   ]
 }

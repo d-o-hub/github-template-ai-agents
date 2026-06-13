@@ -1,6 +1,7 @@
 ---
 name: implementer
 version: "0.1.1"
+category: agent
 description: Execution agent skill focused on implementing changes based on an approved Blueprint. Gated by human or primary agent approval of the implementation strategy. Use for targeted, atomic code changes once the plan is solid.
 changelog:
   - 0.1.1: Initial stable version with mandatory TRIZ gate.

@@ -6,6 +6,7 @@ compatibility: Any CLI agent (OpenCode, Claude, Codex, Cursor, etc.)
 metadata:
   source: https://github.com/openai/codex/tree/main/.codex/skills/babysit-pr
   version: "1.0.0"
+category: workflow
 ---
 
 # PR Sentinel

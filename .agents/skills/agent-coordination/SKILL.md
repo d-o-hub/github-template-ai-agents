@@ -1,6 +1,7 @@
 ---
 name: agent-coordination
 version: "0.2.10"
+category: agent
 description: Coordinate multiple agents for software development across any language. Use for parallel execution of independent tasks, sequential chains with dependencies, swarm analysis from multiple perspectives, or iterative refinement loops. Handles Python, JavaScript, Java, Go, Rust, C#, and other languages.
 ---
 
@@ -85,6 +86,19 @@ Between each phase, verify:
 - Security scans clean
 - Performance acceptable
 - No regressions introduced
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I'll just handle everything sequentially myself" | Parallel coordination reduces wall-clock time and leverages specialized agent strengths. |
+| "Coordination overhead isn't worth it for small tasks" | Even small tasks benefit from quality gates and specialized validation that coordination provides. |
+
+## Red Flags
+
+- [ ] Running agents without defining quality gates between phases
+- [ ] Choosing a coordination strategy without analyzing task dependencies first
+- [ ] Skipping result validation after parallel execution completes
 
 ## Next Steps
 

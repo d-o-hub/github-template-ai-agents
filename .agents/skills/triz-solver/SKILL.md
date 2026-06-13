@@ -152,6 +152,19 @@ Result: Reliability maintained, context efficiency improved
 ✓ No new contradictions introduced
 ✓ Approaches ideal state (minimal added complexity)
 
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I already know the solution, no need for TRIZ analysis" | Skipping contradiction analysis often means solving the wrong problem correctly, wasting implementation effort. |
+| "This is just a minor tweak, not a real problem" | Minor tweaks can introduce new contradictions; validate that no new trade-offs are created. |
+
+## Red Flags
+
+- [ ] Proposing a solution without explicitly stating the contradiction first
+- [ ] Skipping IFR definition and jumping to implementation details
+- [ ] Introducing new contradictions without validating the solution
+
 ## Reference Files
 
 - **[references/principles.md](references/principles.md)** - All 40 TRIZ principles with software examples

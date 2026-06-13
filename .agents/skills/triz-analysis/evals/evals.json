@@ -22,6 +22,17 @@
         "The agent mentions specific principles like 'Segmentation' or 'Local Quality'",
         "The output follows the required reporting structure"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run a TRIZ audit on the CI pipeline — it's fast but fails intermittently due to flaky tests.",
+      "expected_output": "The agent identifies the contradiction as 'Speed (improve) vs Reliability (worsen)', maps to principles like Separation in Time or Dynamics, and saves findings to analysis/triz-ci-pipeline-YYYY-MM-DD.md.",
+      "files": [],
+      "assertions": [
+        "The agent identifies Speed vs Reliability as the contradiction",
+        "The agent maps to at least one TRIZ principle",
+        "The findings are saved to the analysis/ directory"
+      ]
     }
   ]
 }

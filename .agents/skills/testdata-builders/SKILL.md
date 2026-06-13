@@ -50,6 +50,20 @@ function makeUser(overrides: Partial<User> = {}): User {
 // Usage: const admin = makeUser({ role: 'admin', email: 'admin@test.com' });
 ```
 
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "Inline test data is fine for now" | Inline objects proliferate silently; builders enforce consistency and catch schema drift. |
+| "Builders are overkill for simple entities" | Simple today becomes complex tomorrow; early investment prevents ad-hoc sprawl. |
+| "I'll reuse fixtures from other tests" | Shared mutable fixtures cause order-dependent failures and hidden coupling. |
+
+## Red Flags
+
+- [ ] Inline test objects repeated across multiple test files
+- [ ] Builders not updated when schema changes
+- [ ] Random test data without seeding that breaks snapshot stability
+
 ## References
 
 - `references/builder-patterns.md` - Common factory/builder patterns

@@ -1,6 +1,7 @@
 ---
 name: task-decomposition
 version: "0.2.10"
+category: agent
 description: Break down complex tasks into atomic, actionable goals with clear dependencies and success criteria. Use when planning multi-step projects, coordinating agents, or decomposing complex requests.
 ---
 
@@ -155,6 +156,19 @@ GOAP Phase 1: Decomposition → Execution Plan → Monitor → Report
 ## Summary
 
 Good decomposition enables optimal execution, clear validation, and higher quality.
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I already know what needs to be done, no need to decompose" | Skipping decomposition leads to scope creep, missed dependencies, and rework. |
+| "The task is too simple to break down" | Even simple tasks benefit from explicit success criteria and dependency mapping. |
+
+## Red Flags
+
+- [ ] Defining tasks that are too vague to test or verify
+- [ ] Skipping dependency mapping between decomposed tasks
+- [ ] Creating tasks larger than 4 hours without further breakdown
 
 ## Reference Files
 
