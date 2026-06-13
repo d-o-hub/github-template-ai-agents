@@ -35,16 +35,19 @@ Activate after completing a non-trivial task to capture insights that would othe
 
 ### Scoping Rules
 
-Place learnings in the most specific `AGENTS.md` file:
-- **Project-wide**: Root `AGENTS.md`.
+Place learnings in the most specific file:
+- **Project-wide**: `agents-docs/self-learning-rules.md` (under `## Recent Project-Wide Learnings`).
 - **Script-specific**: `scripts/AGENTS.md`.
 - **Skill-specific**: `.agents/skills/<name>/AGENTS.md`.
 
-### Dual-Write Requirement
+Also write a fuller `LESSON-NNN` entry to `agents-docs/LESSONS.md` for archival.
 
-Every new non-obvious insight must be recorded in two places:
+### Triple-Write Requirement
+
+Every new non-obvious insight must be recorded in three places:
 1. **Verbose Log**: Add a full `LESSON-NNN` entry to `agents-docs/LESSONS.md` with Issue/Root Cause/Solution.
-2. **Distilled Note**: Add a 1–3 line note to the nearest `AGENTS.md` (this is what `learn` automates).
+2. **Distilled Note (scoped)**: Add a 1–3 line note to the nearest `AGENTS.md` (this is what `learn` automates).
+3. **Distilled Note (project-wide)**: Add a 1–3 line note to `agents-docs/self-learning-rules.md` under `## Recent Project-Wide Learnings`.
 
 ### Format
 
