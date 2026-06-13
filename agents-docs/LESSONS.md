@@ -14,7 +14,7 @@ Each lesson follows a dual-write pattern for both human readability and agent di
    - Placed in the `AGENTS.md` file closest to the affected code (e.g., `scripts/AGENTS.md`).
    - Focuses on the non-obvious core finding.
 
-For machine-readable index, see `lessons.jsonl`.
+For machine-readable index, see `agents-docs/lessons.jsonl`.
 
 ---
 
@@ -202,11 +202,6 @@ exit $EXIT_CODE
 - Property-based testing for validation logic
 - Test coverage reporting with kcov/bashcov
 
-**Files to Test**:
-- `scripts/atomic-commit/run.sh` (285 lines)
-- `scripts/atomic-commit/atomic-commit.sh` (569 lines)
-- `scripts/atomic-commit/pre-commit-check.sh` (439 lines)
-- `scripts/atomic-commit/create-pr.sh` (556 lines)
 - `scripts/atomic-commit/sync-and-push.sh` (523 lines)
 - `scripts/atomic-commit/verify-checks.sh` (463 lines)
 
@@ -954,7 +949,7 @@ Three-tier approach:
 **Next User Should**:
 - Reference specific lesson: `@agents-docs/LESSONS.md#LESSON-001`
 - Add new lessons using the template format above
-- Update `lessons.jsonl` when adding lessons
+- Update `agents-docs/lessons.jsonl` when adding lessons
 - Include Date, Component, Issue, Symptoms, Root Cause, Solution, Prevention
 
 ---

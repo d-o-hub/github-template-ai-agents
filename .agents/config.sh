@@ -15,6 +15,9 @@ readonly MAX_LINES_PER_SOURCE_FILE=500
 # Maximum lines per SKILL.md file (to keep skills concise)
 readonly MAX_LINES_PER_SKILL_MD=250
 
+# Maximum lines for AGENTS.md
+readonly MAX_LINES_AGENTS_MD=200
+
 # Maximum lines per configuration file
 readonly MAX_LINES_PER_CONFIG_FILE=250
 
@@ -45,10 +48,10 @@ readonly DEFAULT_TIMEOUT_SECONDS=1800
 # ============================================================================
 
 # Maximum length for commit subject line (characters)
-readonly MAX_COMMIT_SUBJECT_LENGTH=72
+readonly MAX_COMMIT_SUBJECT_LENGTH=150
 
 # Maximum length for PR title (characters)
-readonly MAX_PR_TITLE_LENGTH=72
+readonly MAX_PR_TITLE_LENGTH=150
 
 # Maximum length for PR description body lines
 readonly MAX_PR_BODY_LINE_LENGTH=80

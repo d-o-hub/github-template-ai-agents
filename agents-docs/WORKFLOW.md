@@ -30,8 +30,8 @@ git checkout -b feat/your-feature-name
 
 # Make changes
 
-# Run atomic commit (validates, commits, pushes, creates PR, verifies)
-./scripts/atomic-commit/run.sh
+# Run quality gate (validates changes before commit)
+./scripts/quality_gate.sh
 
 # If checks fail, fix and retry
 ```

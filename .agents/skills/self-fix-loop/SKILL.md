@@ -4,6 +4,7 @@ description: Self-learning fix loop - commit, push, monitor CI, auto-fix failure
 version: "0.2.10"
 template_version: "0.2"
 category: workflow
+license: MIT
 ---
 
 # Self-Fix Loop Skill

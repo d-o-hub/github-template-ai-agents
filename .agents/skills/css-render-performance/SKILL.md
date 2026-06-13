@@ -3,6 +3,7 @@ name: css-render-performance
 version: "0.2.10"
 category: code-quality
 description: Guide CSS render performance analysis and optimization. Use when reviewing or writing CSS animations, transitions, scroll-heavy UIs, or long lists. Covers compositor layer promotion, paint vs composite, and content-visibility.
+license: MIT
 ---
 
 # CSS Render Performance

@@ -4,6 +4,7 @@ name: reader-ui-ux
 description: >
   Build localized, accessible reader/admin UI with responsive layouts, telemetry, and state management. Activate for React screens or UX polish. Generic pattern for any document reader application.
 category: workflow
+license: MIT
 ---
 
 # Reader UI/UX

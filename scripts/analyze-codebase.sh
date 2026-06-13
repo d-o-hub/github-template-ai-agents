@@ -51,35 +51,19 @@ analyze_patterns() {
     return 0
 }
 
-update_agents_md() {
-    local agents_file="$REPO_ROOT/AGENTS.md"
-    if [[ ! -f "$agents_file" ]]; then return; fi
-
-    local max_lines=200
-    local current_lines
-    current_lines=$(wc -l < "$agents_file")
-    if (( current_lines >= max_lines )); then
-        log_warn "Skipping AGENTS.md update: line limit reached ($current_lines/$max_lines)"
-        return
+update_self_learning_rules() {
+    local rules_file="$AGENT_DOCS/self-learning-rules.md"
+    if [[ ! -f "$rules_file" ]]; then
+        log "Creating agents-docs/self-learning-rules.md"
+        touch "$rules_file"
     fi
-
-    if ! grep -q "Self-Learning Rules" "$agents_file"; then
-        log "Adding Self-Learning Rules section to AGENTS.md"
-        cat >> "$agents_file" << 'EOM'
-
----
-
-## Self-Learning Rules (Auto-Generated)
-
-This section is automatically updated by `./scripts/analyze-codebase.sh`.
-EOM
-    fi
+    log_ok "Self-learning rules file ready at $rules_file"
 }
 
 main() {
     init_docs
     analyze_patterns
-    update_agents_md
+    update_self_learning_rules
     log_ok "Analysis complete"
 }
 

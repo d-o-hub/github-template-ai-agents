@@ -245,8 +245,5 @@ See `references/language-migrations.md` for framework-specific guides.
 ## References
 
 - `references/migration-patterns.md` - Detailed pattern implementations
-- `references/breaking-change-catalog.md` - Common breaking changes by library
 - `references/dependency-analysis.md` - Cross-file dependency tracking
-- `references/rollback-strategies.md` - Platform-specific rollback guides
 - `references/language-migrations.md` - Framework migration guides
-- `references/safety-patterns.md` - Testing and safety patterns

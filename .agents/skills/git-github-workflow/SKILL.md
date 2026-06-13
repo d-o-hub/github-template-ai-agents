@@ -3,6 +3,7 @@ name: git-github-workflow
 version: "0.2.10"
 description: Unified atomic git workflow with GitHub integration - commits all changes, checks GitHub issues, creates PR, validates all Actions pass including pre-existing, uses swarm coordination with web research on failures. Post-merge validation of all files and docs.
 category: workflow
+license: MIT
 ---
 
 # Git-GitHub Workflow Skill
