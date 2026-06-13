@@ -1,6 +1,7 @@
 ---
 name: codeberg-api
 version: "0.2.10"
+category: platform
 description: >-
   Interact with Forgejo/Codeberg repositories via the REST API — read or write
   files, manage issues, create pull requests, list branches/tags, search repos,
@@ -201,6 +202,19 @@ jobs:
 ## Bundled Scripts
 
 - `scripts/forgejo_api.py` — Main CLI tool for Forgejo API operations
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I'll hardcode the token in the script for convenience." | Hardcoded tokens leak into version control and logs; always use environment variables or `.env` files. |
+| "The API is the same as GitHub — I'll just use GitHub patterns." | Forgejo/Codeberg API has different endpoints, auth scopes, and error codes; copying GitHub patterns silently fails. |
+
+## Red Flags
+
+- [ ] Committing FORGEJO_TOKEN or any secrets to the repository
+- [ ] Skipping SHA fetch before file updates — causes 409 Conflict errors
+- [ ] Not checking token scopes when receiving 403 Forbidden responses
 
 ## References
 

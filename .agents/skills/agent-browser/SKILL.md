@@ -1,6 +1,7 @@
 ---
 name: agent-browser
 version: "0.2.10"
+category: tool
 description: Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. Triggers include requests to "open a website", "fill out a form", "click a button", "take a screenshot", "scrape data from a page", "test this web app", "login to a site", "automate browser actions", or any task requiring programmatic web interaction.
 allowed-tools: Bash(npx agent-browser:*), Bash(agent-browser:*)
 ---
@@ -199,6 +200,20 @@ agent-browser batch --bail < commands.json
 ```
 
 Use `batch` when you have a known sequence of commands that don't depend on intermediate output. Use separate commands or `&&` chaining when you need to parse output between steps (e.g., snapshot to discover refs, then interact).
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "Hardcoding credentials in scripts is faster" | Plaintext secrets in scripts are exposed in shell history, CI logs, and version control. |
+| "I don't need to snapshot after every action" | DOM state changes after interactions; stale refs cause silent failures or wrong-element clicks. |
+| "Batch mode works for everything" | Batch can't parse intermediate output; use separate commands when ref discovery depends on prior results. |
+
+## Red Flags
+
+- [ ] Auth state files committed to version control
+- [ ] No re-snapshot after navigation or DOM mutation
+- [ ] Using `npx agent-browser` instead of direct binary (slower Node.js path)
 
 ## Reference Files
 

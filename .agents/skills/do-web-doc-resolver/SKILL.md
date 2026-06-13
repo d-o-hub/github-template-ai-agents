@@ -1,6 +1,7 @@
 ---
 name: do-web-doc-resolver
 version: "0.2.10"
+category: tool
 description: Python resolver for URLs and queries into compact, LLM-ready markdown. Uses progressive free-first cascade with quality scoring, circuit breakers, layered routing memory, trace-based evaluation, and agent-friendly docs validation. Use when fetching documentation, resolving web URLs, or building context from web sources.
 license: MIT
 compatibility: Python 3.10+, async/await
@@ -103,6 +104,19 @@ scripts/
 ├── synthesis.py         # LLM synthesis gate
 └── utils.py             # Utilities
 ```
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I'll just use the cheapest provider for everything." | Free providers often have lower quality, latency, or reliability; cascading with quality scoring ensures acceptable results. |
+| "Circuit breakers are overkill — errors are rare." | Without circuit breakers, a failing provider consumes budget and time on every request, degrading the entire cascade. |
+
+## Red Flags
+
+- [ ] Ignoring quality scores and accepting low-quality content without validation
+- [ ] Disabling circuit breakers or skipping cooldown periods during provider failures
+- [ ] Not setting max character limits — fetching unbounded content wastes tokens
 
 ## References
 

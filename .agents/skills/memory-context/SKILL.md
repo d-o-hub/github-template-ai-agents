@@ -2,6 +2,7 @@
 name: memory-context
 description: Retrieve semantically relevant past learnings and analysis outputs using the csm CLI (HDC encoder with hybrid BM25 retrieval)
 version: "0.2.10"
+category: knowledge
 ---
 
 # Memory Context
@@ -73,3 +74,16 @@ awk -v max_tokens="$MAX_CONTEXT_TOKENS" '
 ```
 
 This enforces an approximate token ceiling even if retrieval output is verbose.
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I'll just search with grep instead" | grep finds literal text; semantic retrieval surfaces related concepts and non-obvious connections. |
+| "The index is probably out of date" | A stale index is better than no index; re-index periodically rather than skipping retrieval entirely. |
+
+## Red Flags
+
+- [ ] Skipping index creation and assuming retrieval will work without it
+- [ ] Ignoring token budget limits and flooding context with unfiltered results
+- [ ] Using only keyword search when semantic relationships are needed

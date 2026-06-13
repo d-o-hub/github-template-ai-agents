@@ -1,6 +1,7 @@
 ---
 name: goap-agent
 version: "0.2.10"
+category: workflow
 description: Invoke for complex multi-step tasks requiring intelligent planning and multi-agent coordination. Use when tasks need decomposition, dependency mapping, parallel/sequential/swarm/iterative execution strategies, or coordination of multiple specialized agents with quality gates.
 ---
 
@@ -148,6 +149,19 @@ See **[execution-strategies.md](execution-strategies.md)** for details.
 ## Summary
 
 GOAP enables systematic planning through: Analysis, Decomposition, Strategy, Quality Assurance, and Coordinated Agents.
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I can just execute all tasks in parallel — it's faster." | Parallel execution without dependency analysis causes race conditions, wasted tokens, and corrupted intermediate state. |
+| "Quality gates slow things down — skip them for speed." | Skipping quality gates compounds errors across agents, requiring far more rework than the time saved. |
+
+## Red Flags
+
+- [ ] Executing tasks without mapping dependencies first
+- [ ] Skipping ADR approval gate before decomposition
+- [ ] Assigning agents without matching skills to task requirements
 
 ## Reference Files
 

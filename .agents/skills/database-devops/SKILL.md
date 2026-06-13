@@ -1,6 +1,7 @@
 ---
 name: database-devops
 version: "0.2.10"
+category: database
 description: Database design, migration, and DevOps automation with safety patterns. Use for schema design, migration planning, query optimization, multi-database orchestration, and Infrastructure-as-Code. Includes rollback strategies, performance analysis, and cross-database synchronization.
 license: MIT
 ---
@@ -182,6 +183,19 @@ See `references/backup-strategies.md` for point-in-time recovery, automated back
 - [ ] Connection pooling configured
 - [ ] Monitoring/alerting for slow queries
 - [ ] Secrets managed externally
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "We'll just run the migration in production — it's a small change." | Even small schema changes can lock tables, corrupt data, or cause cascading failures without staging validation and rollback plans. |
+| "We don't need indexes — the database is small enough." | Query performance degrades non-linearly with data growth; missing indexes compound into full table scans under load. |
+
+## Red Flags
+
+- [ ] Running migrations directly in production without staging validation
+- [ ] Skipping backup before destructive schema changes
+- [ ] Using SELECT * in production queries instead of explicit column lists
 
 ## References
 

@@ -83,10 +83,7 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 ./scripts/archive-stale-plans.sh # Archive plans older than 60 days
 ```
 
-**Guard Rails:**
-- **Temporary Files**: NEVER in root or source. Use system temporary directories (e.g., `/tmp`).
-- **Secret Scanning**: Gitleaks is enforced via CI only.
-- **Git Config**: Pre-commit validates git config. Use `SKIP_GLOBAL_HOOKS_CHECK=true` if needed.
+**Guard Rails:** Temporary files in `/tmp` only. Gitleaks enforced via CI. Pre-commit validates git config (`SKIP_GLOBAL_HOOKS_CHECK=true` to bypass).
 
 ## Code Style
 
@@ -101,7 +98,7 @@ Use the `static-analysis` skill to triage and fix any findings before committing
     pull_request:
   ```
 
-  CI yamllint uses strict rules (line-length: 120, indentation: 2 spaces). Use `# yamllint disable-line rule:truthy` on the `on:` line, and `# yamllint disable-next-line rule:line-length` for long lines that cannot be split.
+  CI yamllint uses strict rules (line-length: 120, indentation: 2 spaces).
 
 ## Repository Structure
 
@@ -115,7 +112,6 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 
 - **MANDATORY (ADR-008)**: PR titles MUST follow `type(scope): subject`.
 - **Validation**: `echo "title" | npx commitlint --config commitlint.config.cjs` (or `gh pr edit`)
-
 - PR Title: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
 - Commit Header: `type(scope): subject` (max `${MAX_COMMIT_SUBJECT_LENGTH}` chars total, lowercase)
 - Commit Body: no hard limit (body-max-length disabled in commitlint; enforced at PR level as 1000 chars). Wrap at 100 chars per line. Footer: max 1000 chars.
@@ -132,6 +128,10 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject>"` or use `git rebase -i`.
 
 ## Skill Guidance
+
+> **Authoring or updating a skill?** Load `skill-creator` for authoring and
+> `skill-evaluator` for validation. Verdict must be `PASS` before merging.
+> See `CONTRIBUTING.md → Creating or Updating Skills`. Use `.agents/skills/SKILL_TEMPLATE.md`.
 
 - **Rules**: Review `## Rationalizations` and `## Red Flags` in skills before use.
 - **Plan**: Produce written plan, wait for confirmation for non-trivial tasks.

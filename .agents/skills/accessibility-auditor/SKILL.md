@@ -1,6 +1,7 @@
 ---
 name: accessibility-auditor
 version: "0.2.10"
+category: ui-ux
 description: Audit web applications for WCAG 2.2 compliance, screen reader compatibility, keyboard navigation, and color contrast. Triggers on "accessibility audit", "a11y check", "WCAG compliance", "screen reader test", "keyboard navigation", "color contrast check", "ARIA validation", "wcag", " Section 508", "ADA compliance".
 license: MIT
 ---
@@ -33,6 +34,20 @@ Check these automatically using axe-core, Lighthouse, or WAVE:
 | **High** | Significant barrier | Fix before release |
 | **Medium** | Minor friction | Next sprint |
 | **Low** | Enhancement | Backlog |
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "Automated scans catch everything" | Automated tools miss keyboard traps, focus order, screen reader semantics, and cognitive load issues. |
+| "Accessibility only matters for blind users" | Motor, cognitive, and situational impairments affect far more users than visual alone. |
+| "We'll fix accessibility in the next release" | Each release without a11y compounds legal risk and excludes users; fix forward. |
+
+## Red Flags
+
+- [ ] Only automated scans run without manual keyboard/screen reader testing
+- [ ] Color contrast issues deferred as cosmetic
+- [ ] ARIA labels applied without role verification
 
 ## References
 

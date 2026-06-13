@@ -2,6 +2,7 @@
 name: architecture-diagram
 version: "0.2.10"
 description: Generate or update a project architecture SVG diagram by scanning the live project structure. Use this skill whenever the user asks to regenerate, refresh, or update the architecture diagram, or when skills, agents, or commands have been added/removed and the diagram is stale. Triggers on phrases like "update the diagram", "regenerate the architecture SVG", "sync the diagram", or "diagram is out of date".
+category: documentation
 license: MIT
 metadata:
   author: d.o.
@@ -91,3 +92,17 @@ absent.
 ## Bundled Scripts
 
 - `scripts/generate_diagram.py` — Main generator script
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "The diagram is close enough, no need to regenerate" | Stale diagrams mislead new contributors and mask architectural drift. |
+| "I'll update the diagram manually in an editor" | Manual SVG edits break on next regeneration and introduce inconsistencies. |
+| "Architecture diagrams are just decoration" | Diagrams are the primary onboarding tool for understanding system structure. |
+
+## Red Flags
+
+- [ ] Committing architecture changes without regenerating the diagram
+- [ ] Manually editing the SVG instead of using the generator script
+- [ ] Ignoring diagram regeneration when adding/removing skills or agents
