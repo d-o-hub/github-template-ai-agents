@@ -51,6 +51,19 @@ Every new non-obvious insight must be recorded in two places:
 - Fits within `MAX_LINES_AGENTS_MD=150` constraint.
 - Bulleted list under a "Learnings" or "Context" section.
 
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "This is obvious, no need to record it" | What seems obvious today becomes non-obvious in a new session; document runtime discoveries. |
+| "I'll remember this later" | Session context is lost on termination; if it's not written down, it's gone. |
+
+## Red Flags
+
+- [ ] Capturing obvious or already-documented behavior as a new learning
+- [ ] Placing learnings in the wrong scope (project-wide for script-specific insights)
+- [ ] Skipping the dual-write to LESSONS.md for non-obvious findings
+
 ## Reference Files
 
 - `agents-docs/LESSONS.md` - Legacy project-wide lessons.

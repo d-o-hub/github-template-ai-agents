@@ -3,6 +3,7 @@ name: self-fix-loop
 description: Self-learning fix loop - commit, push, monitor CI, auto-fix failures using swarm agents with skills on demand, loop until all checks pass.
 version: "0.2.10"
 template_version: "0.2"
+category: workflow
 ---
 
 # Self-Fix Loop Skill
@@ -132,6 +133,20 @@ Loop succeeds when:
 | 3 | Max retries exceeded |
 | 4 | Timeout |
 | 5 | PR operations failed |
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "The loop is stuck, I'll just force merge" | Force merging defeats the purpose of CI and introduces regressions silently. |
+| "One more retry should fix it" | Repeated identical failures indicate a root cause, not a flaky test. Diagnose first. |
+| "I'll disable strict validation to pass faster" | Strict validation exists to catch issues early; disabling it pushes bugs to production. |
+
+## Red Flags
+
+- [ ] Exceeding max retries without diagnosing root cause
+- [ ] Disabling strict validation to bypass failing checks
+- [ ] Force merging when the self-fix loop reports failure
 
 ## See Also
 

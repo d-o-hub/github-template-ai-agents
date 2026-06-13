@@ -1,6 +1,7 @@
 ---
 name: delegate
 version: "0.1.1"
+category: agent
 description: Lightweight retrieval and context agent skill for rapid information gathering and environment assessment. Use for quick context lookups, finding code patterns, or assessing current state without full implementation overhead.
 changelog:
   - 0.1.1: Initial stable version for opencode-processing-skills adaptation.

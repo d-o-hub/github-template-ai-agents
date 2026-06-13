@@ -5,6 +5,7 @@ description: >
   confidence-scored autoresearch loops, and backpressure quality gates. Use for web apps,
   mobile apps, games, dashboards, SaaS, e-commerce, kiosks, and any screen-based product.
 version: "0.2.10"
+category: ui-ux
 ---
 
 # UI/UX Prompt Optimizer
@@ -242,3 +243,17 @@ Run every step. Swarm coordinates handoffs.
 | `scripts/validate-tokens.cjs` | Fast-fail: checks design docs + TOKENS export exist |
 | `scripts/check-output.cjs` | Eval assertion: contains/not_contains for code output |
 | `scripts/verify.py` | Browser verification: overlap, tap targets, scroll audit |
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I can skip the token freeze and just eyeball it" | Without frozen tokens, visual drift accumulates silently across components and sessions. |
+| "Research Scout is optional for a simple UI" | Even simple UIs benefit from domain context; skipping research leads to generic slop. |
+| "The autoresearch loop takes too long, ship the first draft" | First drafts rarely converge on quality; the loop exists to catch regressions before users do. |
+
+## Red Flags
+
+- [ ] Token scaffold modified after Phase 2 freeze
+- [ ] Anti-slop audit skipped to save time
+- [ ] Variants generated without shared token foundation

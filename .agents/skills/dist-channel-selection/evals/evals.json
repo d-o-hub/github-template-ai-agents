@@ -1,0 +1,41 @@
+{
+  "skill_name": "dist-channel-selection",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to publish a Rust library to crates.io. What's the correct process?",
+      "expected_output": "The agent guides through: 1) Verify version in VERSION file, 2) Update CHANGELOG.md, 3) Run quality_gate.sh, 4) Perform cargo publish --dry-run, 5) Final cargo publish. Mentions preconditions.",
+      "files": [],
+      "assertions": [
+        "The agent mentions checking VERSION file",
+        "The agent suggests updating CHANGELOG.md",
+        "The agent recommends running quality gate",
+        "The agent includes dry-run step",
+        "The agent mentions final publish command"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "What preconditions must be met before publishing any package?",
+      "expected_output": "The agent lists preconditions: version bumped in VERSION file, CHANGELOG.md updated, quality_gate.sh passes locally, all CI checks are green.",
+      "files": [],
+      "assertions": [
+        "The agent mentions VERSION file version bump",
+        "The agent mentions CHANGELOG.md update",
+        "The agent mentions local quality gate pass",
+        "The agent mentions CI checks green"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm about to publish a WASM library to npm but forgot to run the size verification. What should I do?",
+      "expected_output": "The agent advises: stop, run wasm_size_gate.sh to verify size, then proceed with npm pack --dry-run, then npm publish. Warns about risks of skipping verification.",
+      "files": [],
+      "assertions": [
+        "The agent recommends running size verification",
+        "The agent mentions dry-run before publish",
+        "The agent warns about risks of skipping verification"
+      ]
+    }
+  ]
+}

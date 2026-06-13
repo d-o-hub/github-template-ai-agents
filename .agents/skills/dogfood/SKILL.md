@@ -131,6 +131,20 @@ Aim to find **5-10 well-documented issues**, then wrap up. Depth of evidence mat
 - **Never read the target app's source code.** All findings must come from browser observation.
 - **Check the console.** Many issues are invisible in the UI but show as JS errors.
 
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "Manual testing is too slow compared to automated tests" | Automated tests verify logic; dogfooding catches usability and UX issues that scripts miss. |
+| "I already know the app works, I built it" | Builders have the curse of knowledge; systematic exploration reveals what users actually encounter. |
+| "A few screenshots are enough for a report" | Reproduction evidence must be complete and reproducible to be actionable. |
+
+## Red Flags
+
+- [ ] Dogfood session skipped due to time pressure
+- [ ] Issues reported without reproduction steps or evidence
+- [ ] Only testing happy paths without edge cases or error states
+
 ## References
 
 - `references/issue-taxonomy.md` - What to look for, severity levels, exploration checklist

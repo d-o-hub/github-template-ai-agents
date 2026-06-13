@@ -2,6 +2,7 @@
 name: api-design-first
 description: Design and document RESTful APIs using design-first principles with OpenAPI specifications. Use when users ask to 'design an API', 'create API spec', 'REST API', 'OpenAPI', 'Swagger', or 'API documentation'. Trigger on API design tasks, endpoint planning, request/response modeling, or API versioning discussions.
 version: "0.2.10"
+category: platform
 template_version: "0.2"
 license: MIT
 ---
@@ -120,6 +121,19 @@ paths:
 1. **URL Path**: `/v1/users`, `/v2/users`
 2. **Header**: `Accept: application/vnd.api+json;version=2`
 3. **Query Param**: `/users?api-version=2`
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "We'll design the API after implementing the feature." | Post-hoc API design leads to inconsistent contracts, breaking changes, and poor developer experience. |
+| "Verbs in URLs are fine — `/getUser` is clear." | REST uses HTTP methods for actions; verb-based URLs break caching, proxying, and violate RESTful conventions. |
+
+## Red Flags
+
+- [ ] Designing endpoints without an OpenAPI specification first
+- [ ] Using verbs in resource URLs instead of nouns with HTTP methods
+- [ ] Ignoring versioning strategy until breaking changes force a rewrite
 
 ## References
 

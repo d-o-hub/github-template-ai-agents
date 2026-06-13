@@ -2,6 +2,7 @@
 name: turso-db
 description: Use this skill for Turso (LibSQL/Limbo) database development, including scaffolding, querying, migrations, and maintenance. Supports vector search, full-text search, CDC, MVCC, encryption, and bidirectional remote sync. Use when working with Turso SDKs for JavaScript, Rust, Python, Go, Swift, and React Native. Provides current API guidance to avoid stale "libsql" legacy knowledge.
 version: "0.6.1"
+category: database
 license: MIT
 ---
 
@@ -168,6 +169,19 @@ Official docs: **<https://docs.turso.tech>** (Mintlify — append `.md` to any U
 | Embedded replicas | `docs.turso.tech/features/embedded-replicas/introduction` | Local replicas, offline-first, `syncUrl` setup |
 | Sync usage | `docs.turso.tech/sync/usage` | Push/pull/checkpoint operations, bootstrap, stats |
 | AgentFS | `docs.turso.tech/agentfs/introduction` | Filesystem for AI agents, Built on Turso |
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "LibSQL and Turso are the same — I'll use the old docs." | Legacy `libsql` package names and APIs are deprecated; using them leads to broken code and missed features. |
+| "MVCC is experimental but fine for production." | MVCC is explicitly not production-ready; using it risks data corruption and undefined behavior. |
+
+## Red Flags
+
+- [ ] Using deprecated `@libsql/client` or `libsql` package names
+- [ ] Enabling MVCC or encryption flags in production without understanding experimental limitations
+- [ ] Assuming all SQLite features are available — Turso is BETA and not all features are implemented
 
 ## Integration with other skills
 

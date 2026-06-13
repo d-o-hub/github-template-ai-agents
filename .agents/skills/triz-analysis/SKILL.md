@@ -79,6 +79,19 @@ Example: `analysis/triz-scripts-2025-05-20.md`
 ✓ Recommendations mapped to TRIZ inventive principles
 ✓ Findings saved to `analysis/triz-<scope>-YYYY-MM-DD.md`
 
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "This code works fine, no contradictions exist" | Every system has trade-offs; the audit's purpose is to surface hidden ones, not confirm existing state. |
+| "TRIZ is too theoretical for my codebase" | TRIZ principles map directly to software patterns like IoC, segmentation, and polymorphism. |
+
+## Red Flags
+
+- [ ] Skipping the contradiction statement and jumping straight to solutions
+- [ ] Defining contradictions too vaguely to map to specific TRIZ principles
+- [ ] Not saving findings to the analysis/ directory as specified
+
 ## Reference Files
 
 - `references/principles.md` - All 40 TRIZ principles with software examples

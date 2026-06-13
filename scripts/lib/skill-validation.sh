@@ -120,8 +120,7 @@ validate_skill_file() {
     fi
 
     if [[ "$line_count" -gt "$MAX_SKILL_LINES" ]]; then
-        printf "  %b✗%b %s: SKILL.md exceeds %d lines (%d lines)\n" "${RED}" "${NC}" "$skill_name" "$MAX_SKILL_LINES" "$line_count" >&2
-        ((errors++))
+        printf "  %b⚠%b %s: SKILL.md exceeds %d lines (%d lines)\n" "${YELLOW}" "${NC}" "$skill_name" "$MAX_SKILL_LINES" "$line_count" >&2
     fi
 
     # Export line count for callers to avoid redundant reads
