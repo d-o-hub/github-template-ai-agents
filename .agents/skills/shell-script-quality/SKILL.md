@@ -3,6 +3,7 @@ name: shell-script-quality
 version: "0.2.10"
 category: code-quality
 description: Lint and test shell scripts using ShellCheck and BATS. Use when checking bash/sh scripts for errors, writing shell script tests, fixing ShellCheck warnings, setting up CI/CD for shell scripts, or improving bash code quality.
+license: MIT
 ---
 
 # Shell Script Quality
@@ -226,18 +227,6 @@ For quality-critical operations:
 - **[PATTERNS.md](PATTERNS.md)** - Common patterns and examples
 - **[CONFIG.md](CONFIG.md)** - Configuration and setup details
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
-
-## Quick Quality Check
-
-Run this command for complete validation:
-
-```bash
-# Check everything
-find scripts -name "*.sh" -exec shellcheck {} + && bats tests/
-
-# Or use quality check script
-bash scripts/check-quality.sh
-```
 
 ## Rationalizations
 

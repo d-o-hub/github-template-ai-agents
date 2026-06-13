@@ -4,6 +4,7 @@ name: pwa-offline-sync
 description: >
   Design Cache Storage + IndexedDB strategy and sync queue. Activate for service worker, cache, or offline bug investigation. Generic pattern for any offline-first application.
 category: workflow
+license: MIT
 ---
 
 # PWA Offline Sync

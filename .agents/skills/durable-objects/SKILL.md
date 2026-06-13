@@ -6,6 +6,7 @@ category: platform
 metadata:
   author: <ORG_NAME>
   spec: agentskills.io
+license: MIT
 ---
 
 # Durable Objects

@@ -3,6 +3,7 @@ name: goap-agent
 version: "0.2.10"
 category: workflow
 description: Invoke for complex multi-step tasks requiring intelligent planning and multi-agent coordination. Use when tasks need decomposition, dependency mapping, parallel/sequential/swarm/iterative execution strategies, or coordination of multiple specialized agents with quality gates.
+license: MIT
 ---
 
 # GOAP Agent Skill: Goal-Oriented Action Planning

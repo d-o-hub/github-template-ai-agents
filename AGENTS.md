@@ -189,9 +189,7 @@ After **every** completed task, the agent MUST append a JSON entry to `.agents/m
 - **gh pr create Does Not Support --json**: `gh pr create` does not accept `--json`/`--jq` flags. To get the PR number after creation, capture the URL from stdout: `PR_URL=$(gh pr create ...) && PR_NUM=$(gh pr view "$PR_URL" --json number --jq '.number')`. This caused the CI + Labels Setup job to fail silently on main (LESSON-034)
 - **Metrics JSONL Merge Conflicts**: Concurrent PRs often conflict on the tail of `.agents/metrics.jsonl`. Resolved via `merge=union` in `.gitattributes` and an automated CI rebase bot. See `agents-docs/runbooks/resolve-metrics-conflict.md` (LESSON-035)
 
-## Self-Learning Rules (Auto-Generated)
-
-Updated by `./scripts/analyze-codebase.sh`. See `agents-docs/self-learning-rules.md`.
+## Self-Learning Rules
 
 #### Integration Learnings
 

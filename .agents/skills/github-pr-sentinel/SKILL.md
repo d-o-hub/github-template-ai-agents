@@ -7,6 +7,7 @@ metadata:
   source: https://github.com/openai/codex/tree/main/.codex/skills/babysit-pr
   version: "1.0.0"
 category: workflow
+license: MIT
 ---
 
 # PR Sentinel

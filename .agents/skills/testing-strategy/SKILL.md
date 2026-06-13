@@ -3,6 +3,7 @@ name: testing-strategy
 version: "0.2.10"
 description: Design and implement comprehensive testing strategies for software projects. Use for test planning, property-based testing, visual regression, load testing, mutation testing, and E2E test generation. Handles Python, JavaScript, and other languages.
 category: testing
+license: MIT
 ---
 
 # Testing Strategy

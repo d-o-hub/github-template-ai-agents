@@ -3,6 +3,7 @@ name: iterative-refinement
 version: "0.2.10"
 category: code-quality
 description: Execute iterative refinement workflows with validation loops until quality criteria are met. Use for test-fix cycles, code quality improvement, performance optimization, or any task requiring repeated action-validate-improve cycles.
+license: MIT
 ---
 
 # Iterative Refinement
@@ -201,16 +202,6 @@ I2: 72% → Write tests → 81%
 I3: 81% → Write tests → 88%
 I4: 88% → Write tests → 91% ✓
 ```
-
-## Language-Specific Tools
-
-For validation tools and commands for your language, see:
-`tools/python.md` · `tools/javascript.md` · `tools/rust.md` · `tools/java.md` · `tools/go.md` · `tools/cpp.md` · `tools/ruby.md` · `tools/php.md` · `tools/dotnet.md`
-
-## Advanced Usage
-
-For complex workflows, convergence detection, and advanced patterns:
-See patterns.md
 
 ## Best Practices
 

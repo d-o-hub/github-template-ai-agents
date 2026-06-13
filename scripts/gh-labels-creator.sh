@@ -3,6 +3,7 @@ set -euo pipefail
 
 if ! command -v gh &> /dev/null || ! command -v jq &> /dev/null; then
     printf "Error: GitHub CLI (gh) and jq are required.\n" >&2
+    exit 1
 fi
 
 CI_MODE="${1:-}"

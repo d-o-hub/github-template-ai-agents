@@ -4,6 +4,7 @@ name: database-schema-migrations
 description: >
   Design database schema and write migrations. Activate for table design, migration scripts, or schema changes. Generic pattern adaptable to any SQL database.
 category: workflow
+license: MIT
 ---
 
 # Database Schema Migrations

@@ -22,7 +22,7 @@ Common issues and solutions for the AI agent template.
 
 ```bash
 chmod +x scripts/*.sh
-chmod +x scripts/atomic-commit/*.sh
+chmod +x scripts/quality_gate.sh
 ```
 
 ### Git Hooks Not Executing
@@ -161,7 +161,7 @@ cat .agents/skills/<skill>/evals/evals.json | jq empty
 
 ### Atomic Commit Fails
 
-**Symptom**: `./scripts/atomic-commit/run.sh` fails mid-way
+**Symptom**: `./scripts/quality_gate.sh` fails mid-way
 
 **Common Causes**:
 1. **No changes to commit**: Stage some changes first
@@ -180,7 +180,7 @@ cat .agents/skills/<skill>/evals/evals.json | jq empty
   ```bash
   git fetch origin
   git rebase origin/main
-  ./scripts/atomic-commit/run.sh
+  ./scripts/quality_gate.sh
   ```
 
 ### Pre-commit Hook Blocks Commit

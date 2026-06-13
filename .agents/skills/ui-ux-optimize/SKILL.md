@@ -6,6 +6,7 @@ description: >
   mobile apps, games, dashboards, SaaS, e-commerce, kiosks, and any screen-based product.
 version: "0.2.10"
 category: ui-ux
+license: MIT
 ---
 
 # UI/UX Prompt Optimizer
@@ -171,26 +172,6 @@ Run every step. Swarm coordinates handoffs.
 **Step 8 — Quality Auditor: Score & Gate.** Score against checklist (0–66). See → `references/review-checklist.md`
 
 **Step 9 — Quality Auditor: Record Lessons.** Append to session files. See → `references/self-learning-loop.md`
-
-## Required Outputs
-
-| Field | Content |
-|---|---|
-| `research_context` | Domain trends, platform guidelines, competitor patterns |
-| `optimized_prompt` | Full implementation-ready prompt |
-| `design_tokens_summary` | Token architecture with semantic roles |
-| `product_ui_mode` | Classified interface model |
-| `navigation_model` | Navigation type and screen hierarchy |
-| `screen_or_state_map` | All key screens or states |
-| `responsive_behavior_summary` | Per-breakpoint layout behavior |
-| `anti_slop_warnings` | What was removed or translated |
-| `layout_risk_flags` | Overlap, wrapping, or truncation risks |
-| `variant_plan` | Variant names, rationale, diff summaries |
-| `implementation_notes` | Agent-ready constraints |
-| `lessons_learned` | What improved, confused, or harmed this run |
-| `improvement_rules` | Reusable rules derived from lessons |
-| `browser_verification` | Screenshots + overlap/nav-wrap/tap-target results |
-| `quality_score` | Score out of 66, confidence multiplier |
 
 ## Quality Bar
 

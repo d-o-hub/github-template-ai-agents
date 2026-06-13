@@ -3,6 +3,7 @@ name: atomic-commit
 version: "0.2.10"
 description: Atomic git workflow - validates, commits, pushes, creates PR, and verifies CI with zero-warnings policy. Orchestrates complete code submission as state machine with rollback on failure.
 category: code-quality
+license: MIT
 ---
 
 # Atomic Commit Skill

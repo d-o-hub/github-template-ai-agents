@@ -85,7 +85,7 @@ SKIP_GLOBAL_HOOKS_CHECK=true git commit -m "feat: add feature"
 **Example Usage**:
 
 ```bash
-ATOMIC_COMMIT_TIMEOUT=3600 ./scripts/atomic-commit/run.sh
+ATOMIC_COMMIT_TIMEOUT=3600 ./scripts/quality_gate.sh
 ```
 
 **When to Use**:
@@ -104,7 +104,7 @@ ATOMIC_COMMIT_TIMEOUT=3600 ./scripts/atomic-commit/run.sh
 **Example Usage**:
 
 ```bash
-ATOMIC_COMMIT_NO_ROLLBACK=1 ./scripts/atomic-commit/run.sh
+ATOMIC_COMMIT_NO_ROLLBACK=1 ./scripts/quality_gate.sh
 ```
 
 **When to Use**:
@@ -123,7 +123,7 @@ ATOMIC_COMMIT_NO_ROLLBACK=1 ./scripts/atomic-commit/run.sh
 **Example Usage**:
 
 ```bash
-ATOMIC_COMMIT_CI_MODE=true ./scripts/atomic-commit/run.sh
+ATOMIC_COMMIT_CI_MODE=true ./scripts/quality_gate.sh
 ```
 
 **When to Use**:
@@ -261,19 +261,19 @@ Multiple variables can be combined:
 
 ```bash
 # CI mode with no rollback for debugging
-ATOMIC_COMMIT_CI_MODE=true ATOMIC_COMMIT_NO_ROLLBACK=1 ./scripts/atomic-commit/run.sh
+ATOMIC_COMMIT_CI_MODE=true ATOMIC_COMMIT_NO_ROLLBACK=1 ./scripts/quality_gate.sh
 
 # Quick quality check (no tests, no clippy)
 SKIP_TESTS=true SKIP_CLIPPY=true ./scripts/quality_gate.sh
 
 # Full CI run with extended timeout
-CI=true ATOMIC_COMMIT_TIMEOUT=3600 ./scripts/atomic-commit/run.sh
+CI=true ATOMIC_COMMIT_TIMEOUT=3600 ./scripts/quality_gate.sh
 ```
 
 ---
 
 ## See Also
 
-- `references/quality-gate.md` - Quality gate documentation
-- `references/atomic-commit.md` - Atomic commit workflow
+- `./scripts/quality_gate.sh` - Quality gate documentation
+- `.agents/skills/atomic-commit/SKILL.md` - Atomic commit workflow
 - `TROUBLESHOOTING.md` - Common issues and solutions

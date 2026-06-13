@@ -3,6 +3,7 @@ name: github-workflow
 version: "0.2.10"
 description: Complete GitHub workflow automation - push, create branch/PR, monitor Actions with pre-existing issue detection, auto-merge/rebase when checks pass. Handles the full git→GitHub→merge lifecycle.
 category: workflow
+license: MIT
 ---
 
 # GitHub Workflow Skill
