@@ -4,6 +4,7 @@ name: secure-invite-and-access
 description: >
   Implement access control, authentication, and authorization patterns. Activate for auth endpoints, permission management, session/token logic, or signed URL generation. Generic template adaptable to any project's auth needs.
 category: workflow
+license: MIT
 ---
 
 # Secure Invite and Access

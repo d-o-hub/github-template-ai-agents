@@ -4,6 +4,7 @@ name: document-rendering-and-locators
 description: >
   Implement resilient document rendering and annotation anchoring. Activate for reader-core, TOC, locator, or highlight anchoring changes. Generic pattern applicable to EPUB, PDF, or any document format.
 category: workflow
+license: MIT
 ---
 
 # Document Rendering and Locators

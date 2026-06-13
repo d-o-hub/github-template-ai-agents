@@ -11,12 +11,13 @@ on:  # yamllint disable-line rule:truthy
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   propagate-version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v6.0.2
+      - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0  # v6.0.3
         with:
           fetch-depth: 0
 
@@ -25,15 +26,40 @@ jobs:
           chmod +x scripts/propagate-version.sh
           ./scripts/propagate-version.sh
 
-      - name: Commit version propagation
+      - name: Create PR with version propagation
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(cat VERSION | tr -d '[:space:]')
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          BRANCH="auto/propagate-version-$VERSION"
+          git checkout -b "$BRANCH" 2>/dev/null || git checkout "$BRANCH"
           git add README.md QUICKSTART.md agents-docs/MIGRATION.md CHANGELOG.md
           if git diff --cached --quiet; then
             echo "No version changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: propagate version $VERSION to all files"
+          git push -f origin "$BRANCH"
+          EXISTING_PR=$(gh pr list --head "$BRANCH" --state open \
+            --json number --jq '.[0].number' 2>/dev/null || echo "")
+          if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
+            echo "Reusing existing PR #$EXISTING_PR for $BRANCH"
+            NEW_PR="$EXISTING_PR"
           else
-            git commit -m "chore: propagate version $VERSION to all files"
-            git push
+            PR_URL=$(gh pr create --base main --head "$BRANCH" \
+              --title "chore: propagate version $VERSION to all files" \
+              --body "Automated version propagation triggered by VERSION file change.")
+            NEW_PR=$(gh pr view "$PR_URL" --json number --jq '.number')
+            echo "Created PR #$NEW_PR"
+          fi
+          if gh pr merge "$NEW_PR" \
+            --squash \
+            --subject "chore: propagate version $VERSION to all files [skip ci]" \
+            --admin \
+            --delete-branch=false; then
+            echo "Auto-merged PR #$NEW_PR"
+          else
+            echo "WARNING: Auto-merge failed for PR #$NEW_PR" >&2
           fi

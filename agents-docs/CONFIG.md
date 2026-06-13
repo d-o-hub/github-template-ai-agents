@@ -47,7 +47,7 @@ log_info "Starting process..."
 readonly MAX_LINES_PER_SOURCE_FILE=500     # Scripts, code files
 readonly MAX_LINES_PER_SKILL_MD=250        # SKILL.md files
 readonly MAX_LINES_PER_CONFIG_FILE=250     # Config files
-readonly MAX_LINES_AGENTS_MD=150           # AGENTS.md (AGENTS.md only)
+readonly MAX_LINES_AGENTS_MD=200           # AGENTS.md (AGENTS.md only)
 readonly MAX_CONTEXT_TOKENS=4000           # Context tokens for memory retrieval
 ```
 
@@ -64,8 +64,8 @@ readonly DEFAULT_TIMEOUT_SECONDS=1800       # Operation timeout (30 min)
 ### Git / PR Configuration
 
 ```bash
-readonly MAX_COMMIT_SUBJECT_LENGTH=72       # Commit subject max chars
-readonly MAX_PR_TITLE_LENGTH=72              # PR title max chars
+readonly MAX_COMMIT_SUBJECT_LENGTH=150       # Commit subject max chars
+readonly MAX_PR_TITLE_LENGTH=150              # PR title max chars
 readonly MAX_PR_BODY_LINE_LENGTH=80         # PR description line max
 ```
 

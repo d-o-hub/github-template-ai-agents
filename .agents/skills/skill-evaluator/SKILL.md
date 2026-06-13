@@ -117,58 +117,6 @@ Organize eval results in a dedicated workspace directory (e.g., `<skill-name>-wo
 
 Plus `benchmark.json` and `feedback.json` at the iteration level.
 
-## Artifact Schemas
-
-### timing.json
-
-```json
-{
-  "total_tokens": 84852,
-  "duration_ms": 23332
-}
-```
-
-### grading.json
-
-```json
-{
-  "assertion_results": [
-    {
-      "text": "The output includes a bar chart image file",
-      "passed": true,
-      "evidence": "Found chart.png (45KB) in outputs directory"
-    }
-  ],
-  "summary": {
-    "passed": 3,
-    "failed": 1,
-    "total": 4,
-    "pass_rate": 0.75
-  }
-}
-```
-
-### benchmark.json
-
-```json
-{
-  "run_summary": {
-    "with_skill": { "pass_rate": { "mean": 0.83 }, "tokens": { "mean": 3800 } },
-    "without_skill": { "pass_rate": { "mean": 0.33 }, "tokens": { "mean": 2100 } },
-    "delta": { "pass_rate": 0.50, "tokens": 1700 }
-  }
-}
-```
-
-### feedback.json
-
-```json
-{
-  "eval-case-id": "Actionable feedback message from human review",
-  "another-eval-id": ""
-}
-```
-
 ## Scoring Rubric
 
 Evaluate skills across these four dimensions (Score 1-5):

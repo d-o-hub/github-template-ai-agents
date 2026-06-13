@@ -4,6 +4,7 @@ description: "Monthly DORA + agentic metrics reporting skill. Triggers on 'gener
 category: devops
 version: "0.2.10"
 template_version: "0.3"
+license: MIT
 ---
 
 # DORA Report

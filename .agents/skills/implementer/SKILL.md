@@ -6,6 +6,7 @@ description: Execution agent skill focused on implementing changes based on an a
 changelog:
   - 0.1.1: Initial stable version with mandatory TRIZ gate.
   - 0.1.0: Draft version.
+license: MIT
 ---
 
 # Implementer Skill

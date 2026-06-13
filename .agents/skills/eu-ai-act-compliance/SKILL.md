@@ -8,6 +8,7 @@ metadata:
   spec: agentskills.io
   regulation: Regulation (EU) 2024/1689
   effective_date: 2026-08-02
+license: MIT
 ---
 
 # EU AI Act Compliance

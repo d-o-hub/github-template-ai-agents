@@ -4,13 +4,12 @@ description: >
   Apply this skill to avoid generic "AI slop" in UI, UX, and copy. Triggers: "make this feel less AI", "audit my copy", "humanize this", "fix the UX writing", "anti-design".
 version: "0.2.10"
 category: ui-ux
+license: MIT
 ---
 
 # Anti-AI-Slop Skill — 2026 Edition
 
 AI tools flooded the design and copy space. The result: a recognizable monoculture. This skill is a systematic antidote. Use it to audit existing work OR to guide new creation from scratch.
-
----
 
 ## How to Use This Skill
 

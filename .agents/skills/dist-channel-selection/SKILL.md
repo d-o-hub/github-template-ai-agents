@@ -3,6 +3,7 @@ name: dist-channel-selection
 version: "0.2.10"
 category: tool
 description: Guide for selecting the correct distribution channel (npm, Cargo, etc.) based on artifact type and target audience. Use when preparing to publish or release a new version of a package.
+license: MIT
 ---
 
 # Distribution Channel Selection

@@ -3,6 +3,7 @@ name: docs-hook
 version: "0.2.10"
 description: Lightweight git hook integration for updating agents-docs with minimal tokens. Triggered on commit/merge events to sync documentation.
 category: workflow
+license: MIT
 ---
 
 # Docs Hook

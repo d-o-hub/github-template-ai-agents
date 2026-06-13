@@ -3,6 +3,7 @@ name: web-search-researcher
 version: "0.2.10"
 category: tool
 description: Research topics using web search to find accurate, current information. Use when you need modern information, official documentation, best practices, or technical solutions beyond training data.
+license: MIT
 ---
 
 # Web Search Research

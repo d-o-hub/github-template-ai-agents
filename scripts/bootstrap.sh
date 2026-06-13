@@ -34,16 +34,13 @@ else
 fi
 
 # --- git hook ---
-log "Installing pre-commit hook"
-HOOK_SRC="scripts/pre-commit-hook.sh"
-HOOK_DST=".git/hooks/pre-commit"
-
-if [[ -f "$HOOK_SRC" ]]; then
-  cp "$HOOK_SRC" "$HOOK_DST"
-  chmod +x "$HOOK_DST"
-  ok "pre-commit hook installed"
+log "Configuring git hooks via .githooks"
+if git config core.hooksPath | grep -q '.githooks' >/dev/null 2>&1 && [[ -d ".githooks" ]]; then
+  ok "hooks already configured (core.hooksPath = .githooks)"
 else
-  warn "$HOOK_SRC not found, skipping hook install"
+  git config core.hooksPath .githooks
+  chmod +x .githooks/* 2>/dev/null || true
+  ok "git hooks configured (core.hooksPath = .githooks)"
 fi
 
 # --- validate ---

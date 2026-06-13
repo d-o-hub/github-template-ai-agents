@@ -6,6 +6,7 @@ description: Lightweight retrieval and context agent skill for rapid information
 changelog:
   - 0.1.1: Initial stable version for opencode-processing-skills adaptation.
   - 0.1.0: Draft version.
+license: MIT
 ---
 
 # Delegate Skill

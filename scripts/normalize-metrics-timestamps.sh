@@ -3,7 +3,8 @@
 
 set -euo pipefail
 
-METRICS_FILE=".agents/metrics.jsonl"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+METRICS_FILE="${REPO_ROOT}/.agents/metrics.jsonl"
 TEMP_FILE="${METRICS_FILE}.tmp"
 
 if [[ ! -f "$METRICS_FILE" ]]; then
