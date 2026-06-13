@@ -33,6 +33,20 @@ Purpose: design, implement, and validate offline/PWA behavior (service worker, c
 - [ ] Service worker cleans up old caches.
 - [ ] Memory-safe listeners (remove event handlers when replaced).
 
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "Cache-first is always the best strategy" | Different data requires different strategies; stale-while-revalidate or network-first may be more appropriate. |
+| "Sync queue is overkill for our simple app" | Even simple apps need conflict resolution when offline writes collide with server state. |
+| "Zombie detection is too complex to implement" | Without it, revoked users can continue reading cached data indefinitely. |
+
+## Red Flags
+
+- [ ] Using a single cache strategy for all data types
+- [ ] Not implementing zombie detection for revoked access
+- [ ] Forgetting to bump cache/DB version numbers on schema changes
+
 ## References
 
 - `references/offline-strategies.md` - Offline-first architecture patterns

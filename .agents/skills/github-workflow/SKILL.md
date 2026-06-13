@@ -2,6 +2,7 @@
 name: github-workflow
 version: "0.2.10"
 description: Complete GitHub workflow automation - push, create branch/PR, monitor Actions with pre-existing issue detection, auto-merge/rebase when checks pass. Handles the full git→GitHub→merge lifecycle.
+category: workflow
 ---
 
 # GitHub Workflow Skill
@@ -207,6 +208,20 @@ Workflow succeeds when:
 3. ✓ All NEW issues resolved (pre-existing ok)
 4. ✓ GitHub Actions pass (or only pre-existing failures)
 5. ✓ Auto-merge completes successfully
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I'll merge now and fix CI later" | Merging with broken CI contaminates the main branch and blocks all contributors. |
+| "The pre-existing failure isn't my problem" | Pre-existing failures still block your PR's merge status and erode trust in CI. |
+| "Auto-merge is risky, I'll merge manually" | Manual merges are error-prone and slow. Auto-merge with proper checks is safer. |
+
+## Red Flags
+
+- [ ] Merging a PR while GitHub Actions are still failing
+- [ ] Disabling auto-merge to bypass required checks
+- [ ] Ignoring pre-existing CI failures as "not my problem"
 
 ## See Also
 

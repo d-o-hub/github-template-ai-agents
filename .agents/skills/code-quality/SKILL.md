@@ -1,6 +1,7 @@
 ---
 name: code-quality
 version: "0.2.10"
+category: code-quality
 description: Review and improve code quality across any programming language. Use when conducting code reviews, refactoring for best practices, identifying code smells, or improving maintainability.
 license: MIT
 ---
@@ -126,6 +127,20 @@ if timeout > TIMEOUT_MS { /* ... */ }
 | TypeScript | eslint | prettier | jest |
 | Rust | clippy | rustfmt | cargo test |
 | Go | golangci-lint | gofmt | go test |
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "This code works fine, no need to refactor" | Working code with smells will cost 10x more to maintain as complexity grows. |
+| "I'll add tests later" | "Later" rarely comes; untested code ships bugs and blocks safe refactoring. |
+| "Naming doesn't matter as long as it works" | Poor names obscure intent, causing every future reader to reverse-engineer meaning. |
+
+## Red Flags
+
+- [ ] Shipping code with magic numbers or hardcoded values
+- [ ] Skipping error handling in production code paths
+- [ ] Merging PRs without reviewing for code smells or duplication
 
 ## References
 

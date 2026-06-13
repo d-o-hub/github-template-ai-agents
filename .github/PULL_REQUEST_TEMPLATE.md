@@ -117,6 +117,25 @@
 - [ ] **Branch Protection**: All branch protection rules satisfied
 - [ ] **No Conflicts**: Branch is rebased on latest `main`/`develop`
 
+### Skill changes (if this PR adds or modifies a skill)
+
+- [ ] Loaded `skill-creator` and followed the Core Loop
+- [ ] `SKILL.md` is under 250 lines
+- [ ] Frontmatter contains `name`, `description`, `category`, `version`
+- [ ] `## Rationalizations` and `## Red Flags` sections are present
+- [ ] `evals/evals.json` contains ≥ 3 realistic eval cases
+- [ ] Loaded `skill-evaluator` — verdict is `PASS` (paste Eval Report below)
+- [ ] Skill registered in `AGENTS.md` and `agents-docs/skills-reference.md`
+- [ ] Registry scripts executed (`update-agents-registry.sh`,
+      `generate-skills-readme.py`)
+
+<details>
+<summary>Eval Report</summary>
+
+<!-- Paste skill-evaluator output here -->
+
+</details>
+
 ---
 
 ## 🚫 Blocking Conditions

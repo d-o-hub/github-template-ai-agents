@@ -23,6 +23,7 @@ CLI_SKILL_DIRS=(
 
 FAILED=0
 WARNINGS=0
+AUTHORING_FAILED=0
 
 # Detect Windows (MSYS/Cygwin) to handle symlink differences
 IS_WINDOWS=false
@@ -123,7 +124,95 @@ for skill_path in "$SKILLS_SRC"/*/; do
     done
 done
 
-# Check 4: skill-rules.json if it exists
+# Check 4: Authoring compliance checks (per-skill SKILL.md requirements)
+echo ""
+echo "Checking skill authoring compliance..."
+
+for skill_path in "$SKILLS_SRC"/*/; do
+    [[ -d "$skill_path" ]] || continue
+    skill_name="${skill_path%/}"
+    skill_name="${skill_name##*/}"
+
+    # Skip consolidated/backup folders
+    if [[ "$skill_name" == _* ]]; then
+        continue
+    fi
+
+    skill_file="${skill_path}SKILL.md"
+    [[ -f "$skill_file" ]] || continue
+
+    skill_failed=0
+
+    # Extract name field from frontmatter
+    skill_front_name=$(awk '/^---$/{n++} n==1 && /^name:/{sub(/^name:[ \t]*/, ""); print; exit}' "$skill_file")
+
+    # Check: name field must not contain uppercase, spaces, or non-hyphen special chars
+    if [[ -n "$skill_front_name" ]]; then
+        if [[ "$skill_front_name" =~ [A-Z] ]] || [[ "$skill_front_name" =~ [[:space:]] ]] || [[ "$skill_front_name" =~ [^a-z0-9-] ]]; then
+            printf "  ${RED}✗${NC} %s: name field contains invalid characters: '%s'\n" "$skill_name" "$skill_front_name"
+            skill_failed=1
+        fi
+    fi
+
+    # Check: frontmatter must contain category field
+    has_category=$(awk '/^---$/{n++} n==1 && /^category:/{print "yes"; exit}' "$skill_file")
+    if [[ -z "$has_category" ]]; then
+        printf "  ${RED}✗${NC} %s: Missing 'category' field in frontmatter\n" "$skill_name"
+        skill_failed=1
+    fi
+
+    # Check: body must contain ## Rationalizations heading
+    has_rationalizations=$(grep -c "^## Rationalizations" "$skill_file" || true)
+    if [[ "$has_rationalizations" -eq 0 ]]; then
+        printf "  ${RED}✗${NC} %s: Missing '## Rationalizations' section\n" "$skill_name"
+        skill_failed=1
+    fi
+
+    # Check: body must contain ## Red Flags heading
+    has_red_flags=$(grep -c "^## Red Flags" "$skill_file" || true)
+    if [[ "$has_red_flags" -eq 0 ]]; then
+        printf "  ${RED}✗${NC} %s: Missing '## Red Flags' section\n" "$skill_name"
+        skill_failed=1
+    fi
+
+    # Check: evals/evals.json must exist and contain >= 3 eval cases
+    evals_file="${skill_path}evals/evals.json"
+    if [[ ! -f "$evals_file" ]]; then
+        printf "  ${RED}✗${NC} %s: Missing evals/evals.json\n" "$skill_name"
+        skill_failed=1
+    else
+        eval_count=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(len(d.get('evals', [])))" "$evals_file" 2>/dev/null || echo 0)
+        if [[ "$eval_count" -lt 3 ]]; then
+            printf "  ${RED}✗${NC} %s: evals/evals.json has %d eval cases (need >= 3)\n" "$skill_name" "$eval_count"
+            skill_failed=1
+        fi
+    fi
+
+    # Check: SKILL.md line count (WARN, not FAIL)
+    skill_lines=$(wc -l < "$skill_file")
+    if [[ "$skill_lines" -gt "$MAX_SKILL_LINES" ]]; then
+        printf "  ${YELLOW}⚠${NC} %s: SKILL.md exceeds %d lines (%d lines)\n" "$skill_name" "$MAX_SKILL_LINES" "$skill_lines"
+    fi
+
+    if [[ $skill_failed -ne 0 ]]; then
+        AUTHORING_FAILED=1
+    fi
+done
+
+if [[ $AUTHORING_FAILED -ne 0 ]]; then
+    echo ""
+    echo -e "${YELLOW}─────────────────────────────────────────────────────────────────${NC}"
+    echo -e "${YELLOW}│ ⚠ Skill authoring compliance issues found                   │${NC}"
+    echo -e "${YELLOW}─────────────────────────────────────────────────────────────────${NC}"
+    echo ""
+    echo "New skills must have: category, ## Rationalizations, ## Red Flags,"
+    echo "valid name field, and evals/evals.json with >= 3 eval cases."
+    echo "See: .agents/skills/SKILL_TEMPLATE.md for the canonical structure."
+    echo "See: CONTRIBUTING.md → Creating or Updating Skills for the workflow."
+    WARNINGS=1
+fi
+
+# Check 5: skill-rules.json if it exists
 echo ""
 echo "Checking skill-rules.json..."
 RULES_FILE="$REPO_ROOT/.agents/skill-rules.json"

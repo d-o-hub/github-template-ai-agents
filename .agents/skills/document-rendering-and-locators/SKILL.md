@@ -33,6 +33,20 @@ Purpose: implement resilient document rendering, locator extraction, and annotat
 - [ ] Event handlers removed on unmount.
 - [ ] Telemetry events logged for load failures with trace IDs.
 
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "Exact match anchoring is always sufficient" | Documents change formatting across versions; multi-signal fallback prevents total anchor loss. |
+| "Lazy loading complicates the code" | Eager loading wastes memory and blocks rendering; lazy loading is essential for large documents. |
+| "Telemetry for load failures is overkill" | Without telemetry, silent anchor failures are invisible until users report them. |
+
+## Red Flags
+
+- [ ] Relying on a single anchoring signal without fallback strategy
+- [ ] Not cleaning up event handlers on unmount
+- [ ] Skipping locator serialization tests
+
 ## References
 
 - `references/locator-patterns.md` - Document locator strategies

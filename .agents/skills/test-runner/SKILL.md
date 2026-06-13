@@ -2,6 +2,7 @@
 name: test-runner
 description: Execute tests, analyze results, and diagnose failures across any testing framework. Use when running test suites, debugging failing tests, or configuring CI/CD testing pipelines.
 version: "0.2.10"
+category: testing
 template_version: "0.2"
 license: MIT
 ---
@@ -165,6 +166,20 @@ for i in {1..10}; do pytest || echo "Failed run $i"; done
 - [ ] Test environment documented
 - [ ] CI/CD configured
 - [ ] Clear error messages
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "Tests pass on my machine, CI must be flaky" | Environment differences are real; CI is the source of truth for reproducibility. |
+| "I'll fix the failing test later" | Deferred test failures accumulate and mask real regressions. |
+| "Coverage doesn't matter, I write good tests" | Coverage metrics catch blind spots that human judgment misses. |
+
+## Red Flags
+
+- [ ] Tests skipped without a tracked follow-up
+- [ ] Coverage drops below minimum thresholds on new code
+- [ ] Flaky tests re-run instead of root-caused
 
 ## References
 

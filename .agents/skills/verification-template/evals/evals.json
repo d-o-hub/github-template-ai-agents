@@ -1,0 +1,38 @@
+{
+  "skill_name": "verification-template",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a verification checklist for a new database migration skill that covers schema validation, data integrity, and rollback testing.",
+      "expected_output": "The agent uses the verification template to produce a structured checklist with categories for Operation, Data Integrity, and Security/Safety, each with specific check items.",
+      "files": [],
+      "assertions": [
+        "The checklist includes schema validation checks",
+        "The checklist includes data integrity checks",
+        "The checklist includes rollback testing checks"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I have a verification checklist for API endpoints but it's missing edge case coverage. What should I add?",
+      "expected_output": "The agent suggests edge case categories such as rate limiting, malformed input, authentication failures, and timeout handling.",
+      "files": [],
+      "assertions": [
+        "The agent identifies at least 3 edge case categories",
+        "The suggestions are specific to API endpoint verification",
+        "Each suggestion includes a concrete check item"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Review this verification step: 'Verify the output is correct'. Is this a good verification checklist item?",
+      "expected_output": "The agent identifies this as a weak verification item — too vague to be actionable. Recommends replacing it with specific, measurable criteria.",
+      "files": [],
+      "assertions": [
+        "The agent flags the item as too vague",
+        "The agent explains why vague checks are problematic",
+        "The agent provides a concrete replacement example"
+      ]
+    }
+  ]
+}

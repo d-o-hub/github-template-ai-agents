@@ -2,6 +2,7 @@
 name: atomic-commit
 version: "0.2.10"
 description: Atomic git workflow - validates, commits, pushes, creates PR, and verifies CI with zero-warnings policy. Orchestrates complete code submission as state machine with rollback on failure.
+category: code-quality
 ---
 
 # Atomic Commit Skill
@@ -137,6 +138,20 @@ Command succeeds only when:
 4. ✓ PR created with valid URL
 5. ✓ All GitHub Actions pass
 6. ✓ Zero warnings in all checks
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I'll skip the quality gate, it's just a small change" | Small changes cause the majority of production incidents. The gate exists for a reason. |
+| "Rollback is too complicated, I'll just fix forward" | Fix-forward creates tangled history and makes it harder to isolate what broke. |
+| "I don't need to verify CI, the changes are cosmetic" | Cosmetic changes can still break builds, linters, or type checks. |
+
+## Red Flags
+
+- [ ] Bypassing the quality gate for "trivial" changes
+- [ ] Committing without running validation checks
+- [ ] Disabling rollback on failure
 
 ## See Also
 

@@ -21,6 +21,39 @@ cd your-project
 For troubleshooting, run `./scripts/doctor.sh`. See
 [QUICKSTART.md](QUICKSTART.md) for full setup detail and per-agent verification.
 
+## Creating or Updating Skills
+
+All skill work MUST follow the `skill-creator` + `skill-evaluator` pipeline.
+Do not open a skill PR without completing both steps.
+
+### New skill
+
+1. Load `.agents/skills/skill-creator` and follow its Core Loop
+2. Copy `.agents/skills/SKILL_TEMPLATE.md` as your starting structure
+3. Load `.agents/skills/skill-evaluator` — verdict must be `PASS` before PR
+4. Register the skill:
+   - Add entry to `AGENTS.md` Skills section (alphabetical within category)
+   - Add entry to `agents-docs/skills-reference.md`
+   - Run `./scripts/update-agents-registry.sh`
+   - Run `./scripts/generate-skills-readme.py`
+5. Paste the full Eval Report into the PR description
+
+### Updating an existing skill
+
+1. Load `skill-creator` — follow its Core Loop for the modification
+2. Load `skill-evaluator` in baseline-comparison mode (`old_skill` vs `with_skill`)
+3. Verdict must be `PASS` or `NEEDS_WORK` with documented next fixes
+4. Bump `version` in frontmatter (SemVer: patch/minor/major)
+
+### Deprecating a skill
+
+1. Add `[DEPRECATED]` to the `description` field in the skill's frontmatter;
+   link to the replacement skill
+2. File a GitHub Issue: title `skill-improvement: <skill-name>`,
+   labels `quality` + `skill`
+3. After notice period: delete skill directory, update `AGENTS.md`,
+   `agents-docs/skills-reference.md`, and all registries
+
 ## How to Contribute
 
 ### 1. Find or Create an Issue

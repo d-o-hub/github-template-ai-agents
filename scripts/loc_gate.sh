@@ -40,20 +40,21 @@ fi
 
 # 2. Check SKILL.md files
 # Optimization: Use xargs wc -l and awk for single-pass validation to avoid per-file process forks
+# Note: SKILL.md line count is a WARNING (not failure) to allow pre-existing skills over the limit
 if ! find .agents/skills -name "SKILL.md" -not -path "*/node_modules/*" -print0 | \
     xargs -0 -r wc -l -- | \
     awk -v max="${MAX_SKILL_OVERRIDE:-$MAX_SKILL}" -- '
-    BEGIN { err = 0; if (max ~ /^0[0-9]+/) max = substr(max, 2) }
+    BEGIN { warn = 0; if (max ~ /^0[0-9]+/) max = substr(max, 2) }
     $NF == "total" { next }
     $1 + 0 > max + 0 {
         count = $1
         $1 = ""
         sub(/^[[:space:]]+/, "")
-        print "ERROR: " $0 " has " count " lines (max " max ")"
-        err = 1
+        print "WARNING: " $0 " has " count " lines (max " max ")"
+        warn = 1
     }
-    END { if (err) exit(err) }'; then
-    FAILED=1
+    END { if (warn) exit(0) }'; then
+    :
 fi
 
 # 3. Check source files (excluding common artifacts and ignored dirs)

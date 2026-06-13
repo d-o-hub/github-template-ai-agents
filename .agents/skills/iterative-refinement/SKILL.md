@@ -1,6 +1,7 @@
 ---
 name: iterative-refinement
 version: "0.2.10"
+category: code-quality
 description: Execute iterative refinement workflows with validation loops until quality criteria are met. Use for test-fix cycles, code quality improvement, performance optimization, or any task requiring repeated action-validate-improve cycles.
 ---
 
@@ -234,3 +235,17 @@ See patterns.md
 ✗ Ignore stuck signals
 ✗ Use vague criteria
 ✗ Miss early termination
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I'll just keep iterating until it works" | Unbounded loops waste compute; define clear stop criteria before starting. |
+| "The metrics are close enough" | Close enough is not passing; vague criteria hide incomplete work. |
+| "Manual validation is faster than writing a test" | Manual checks don't repeat; automated validators catch regressions in future iterations. |
+
+## Red Flags
+
+- [ ] Running more than 15 iterations without convergence or re-evaluation
+- [ ] Skipping validator execution between iterations
+- [ ] Losing context from previous iterations leading to repeated failed approaches

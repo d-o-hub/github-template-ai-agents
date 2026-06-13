@@ -3,6 +3,7 @@ name: skill-creator
 description: Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.
 license: MIT
 version: "0.2.10"
+category: quality
 ---
 
 # Skill Creator
@@ -121,6 +122,21 @@ Use `.agents/skills/verification-template/SKILL.md` as a starting point.
 - Deep domain knowledge encoded in skills.
 - Reduces onboarding time.
 - Ensures consistent debugging and verification approach.
+
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "I don't need evals, the skill works fine" | Without evals there is no evidence the skill triggers correctly or produces quality output. |
+| "The description is good enough, no need to optimize" | A poorly tuned description causes false triggers or missed invocations, wasting tokens and degrading user experience. |
+| "I'll add Rationalizations and Red Flags later" | These sections are mandatory; they prevent common failure modes and make the skill self-defending. |
+
+## Red Flags
+
+- [ ] Creating a skill without running the eval loop at least once.
+- [ ] Skipping the description optimization step and shipping a vague or overly broad trigger.
+- [ ] Hardcoding project-specific paths or values instead of using relative references.
+- [ ] Omitting the `## Rationalizations` or `## Red Flags` sections from SKILL.md.
 
 ## Reference Files
 
