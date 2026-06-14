@@ -32,8 +32,10 @@ categorize_command() {
     # Regex for word boundaries including common shell metacharacters, commas, slashes, and colons.
     # Slashes are included to detect path-prefixed commands (e.g., /bin/rm).
     # Colons are included to handle colon-prefixed commands or multi-command strings.
-    local boundary="(^|[[:space:]]|[\|&;()<>|,\/:])"
-    local end_boundary="($|[[:space:]]|[\|&;()<>|,\/:])"
+    # Optimization: Keywords are joined into a single regex alternation to eliminate loop
+    # overhead in high-frequency validation runs.
+    local boundary="(^|[[:space:]]|[|&;()<>,\/:])"
+    local end_boundary="($|[[:space:]]|[|&;()<>,\/:])"
 
     # Check custom dangerous patterns first (E3)
     for pattern in "${DANGEROUS_PATTERNS[@]:-}"; do
@@ -44,66 +46,45 @@ categorize_command() {
         fi
     done
 
-    # Optimization: Use localized IFS and arrays instead of here-strings (<<<) to eliminate
-    # subshell overhead and temporary file creation during high-frequency looping.
-    local old_opts="$-"
-    set -f # Prevent globbing when splitting into arrays
-    local IFS=':'
-    local keywords=($DANGEROUS_KEYWORDS)
-
     # Check dangerous keywords with boundaries to avoid false positives (e.g., mkdir farm)
     # while still catching commands near shell metacharacters (e.g., (rm) or rm;ls)
-    for keyword in "${keywords[@]}"; do
-        [[ -z "$keyword" ]] && continue
-        if [[ "$cmd_lower" =~ ${boundary}${keyword}${end_boundary} ]]; then
-            [[ "$old_opts" != *f* ]] && set +f
-            printf "dangerous\n"
-            return 0
-        fi
-    done
+    local dangerous_regex="${boundary}(${DANGEROUS_KEYWORDS//:/|})${end_boundary}"
+    if [[ "$cmd_lower" =~ $dangerous_regex ]]; then
+        printf "dangerous\n"
+        return 0
+    fi
 
     # Check custom conditional patterns (E3)
     for pattern in "${CONDITIONAL_PATTERNS[@]:-}"; do
         [[ -z "$pattern" ]] && continue
         if [[ "$cmd_lower" == *"$pattern"* ]]; then
-            [[ "$old_opts" != *f* ]] && set +f
             printf "conditional\n"
             return 0
         fi
     done
 
     # Check conditional keywords with boundaries
-    local c_keywords=($CONDITIONAL_KEYWORDS)
-    for keyword in "${c_keywords[@]}"; do
-        [[ -z "$keyword" ]] && continue
-        if [[ "$cmd_lower" =~ ${boundary}${keyword}${end_boundary} ]]; then
-            [[ "$old_opts" != *f* ]] && set +f
-            printf "conditional\n"
-            return 0
-        fi
-    done
+    local conditional_regex="${boundary}(${CONDITIONAL_KEYWORDS//:/|})${end_boundary}"
+    if [[ "$cmd_lower" =~ $conditional_regex ]]; then
+        printf "conditional\n"
+        return 0
+    fi
 
     # Check custom safe patterns (E3)
     for pattern in "${SAFE_PATTERNS[@]:-}"; do
         [[ -z "$pattern" ]] && continue
         if [[ "$cmd_lower" == *"$pattern"* ]]; then
-            [[ "$old_opts" != *f* ]] && set +f
             printf "safe\n"
             return 0
         fi
     done
 
     # Check safe keywords with boundaries
-    local s_keywords=($SAFE_KEYWORDS)
-    for keyword in "${s_keywords[@]}"; do
-        [[ -z "$keyword" ]] && continue
-        if [[ "$cmd_lower" =~ ${boundary}${keyword}${end_boundary} ]]; then
-            [[ "$old_opts" != *f* ]] && set +f
-            printf "safe\n"
-            return 0
-        fi
-    done
-    [[ "$old_opts" != *f* ]] && set +f
+    local safe_regex="${boundary}(${SAFE_KEYWORDS//:/|})${end_boundary}"
+    if [[ "$cmd_lower" =~ $safe_regex ]]; then
+        printf "safe\n"
+        return 0
+    fi
 
     # Unknown category
     printf "unknown\n"
