@@ -6,7 +6,7 @@ set -euo pipefail
 # Default categories (can be overridden in .command-verify.conf)
 SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get}"
 CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace}"
-DANGEROUS_KEYWORDS="${DANGEROUS_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec}"
+DANGEROUS_KEYWORDS="${DANGEROUS_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:sh:bash:zsh:python:python3:node:perl:ruby}"
 
 # Custom patterns for categories (E3)
 SAFE_PATTERNS=()
@@ -29,9 +29,11 @@ categorize_command() {
     # dollar signs, braces, parentheses, and brackets.
     cmd_lower=$(printf "%s\n" "$cmd" | tr -d "'\"\\\\\`\$(){}[]" | tr '[:upper:]' '[:lower:]')
 
-    # Regex for word boundaries including common shell metacharacters and commas
-    local boundary="(^|[[:space:]]|[\|&;()<>|,])"
-    local end_boundary="($|[[:space:]]|[\|&;()<>|,])"
+    # Regex for word boundaries including common shell metacharacters, commas, slashes, and colons.
+    # Slashes are included to detect path-prefixed commands (e.g., /bin/rm).
+    # Colons are included to handle colon-prefixed commands or multi-command strings.
+    local boundary="(^|[[:space:]]|[\|&;()<>|,\/:])"
+    local end_boundary="($|[[:space:]]|[\|&;()<>|,\/:])"
 
     # Check custom dangerous patterns first (E3)
     for pattern in "${DANGEROUS_PATTERNS[@]:-}"; do
