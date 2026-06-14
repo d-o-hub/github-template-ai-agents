@@ -120,3 +120,8 @@
 **Vulnerability:** The `matches_pattern` function converted globs to regexes without escaping literal dots (e.g., `package*.json` -> `package.*\.json`). This allowed `packageAjson` to match a pattern intended only for `package.json`.
 **Learning:** Simple string replacement for glob-to-regex conversion (`*` -> `.*`) is unsafe if it ignores other regex metacharacters like `.` that appear in common filenames.
 **Prevention:** Always escape literal dots (e.g., `${pattern//./\\.}`) before converting asterisks to `.*` in security-critical pattern matching logic.
+
+## 2026-06-14 - Command Categorization Bypass via Path Prefixes and Incomplete Keywords
+**Vulnerability:** Command categorization logic used word-boundary regexes that excluded slashes, allowing path-prefixed dangerous commands (e.g., `/bin/rm`) to bypass detection. Additionally, `sudo` and several language interpreters (`python`, `node`, `sh`, etc.) were missing from the `DANGEROUS_KEYWORDS` list.
+**Learning:** Security filters based on command names must account for absolute and relative paths. Administrative and meta-execution wrappers like `sudo` or language interpreters are high-risk primitives that should be flagged.
+**Prevention:** Include slashes and colons in word-boundary regexes for command name matching. Maintain a comprehensive list of high-risk execution primitives, including `sudo` and common language interpreters, in the `DANGEROUS_KEYWORDS` category.
