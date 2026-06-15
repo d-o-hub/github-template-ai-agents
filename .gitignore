@@ -1,3 +1,6 @@
+# Agent tooling
+.mimocode/
+
 # Dependencies
 node_modules/
 __pycache__/

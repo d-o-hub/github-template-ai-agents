@@ -21,7 +21,7 @@ ok "git present and inside a repository"
 # --- symlink support check ---
 SYMLINK_TEST="$(mktemp -u)"
 if ln -sf /dev/null "$SYMLINK_TEST" 2>/dev/null; then
-  rm -f "$SYMLINK_TEST"
+  rm -f -- "$SYMLINK_TEST"
   log "Setting up skills"
   if ./scripts/setup-skills.sh; then
     ok "Skills ready"

@@ -27,7 +27,24 @@ categorize_command() {
     # Normalize input by removing common shell escapes/quotes and converting to lowercase.
     # Strips metacharacters used for obfuscation: quotes, backslashes, backticks,
     # dollar signs, braces, parentheses, and brackets.
-    cmd_lower=$(printf "%s\n" "$cmd" | tr -d "'\"\\\\\`\$(){}[]" | tr '[:upper:]' '[:lower:]')
+    # Optimization: Use native Bash parameter expansion instead of tr pipeline to eliminate subshells.
+    # We strip characters sequentially to avoid complex escaping issues inside bracket expressions
+    # which vary between Bash versions, specifically for backslashes.
+    cmd_lower="$cmd"
+    cmd_lower="${cmd_lower//\'/}"
+    cmd_lower="${cmd_lower//\"/}"
+    cmd_lower="${cmd_lower//\\/}"
+    cmd_lower="${cmd_lower//\`/}"
+    cmd_lower="${cmd_lower//\$/}"
+    cmd_lower="${cmd_lower//\(/}"
+    cmd_lower="${cmd_lower//\)/}"
+    cmd_lower="${cmd_lower//\{/}"
+    cmd_lower="${cmd_lower//\}/}"
+    cmd_lower="${cmd_lower//\[/}"
+    cmd_lower="${cmd_lower//\]/}"
+
+    # Note: Using `cmd_lower="${cmd_lower,,}"` is supported as per repository memory for bash 4.0+.
+    cmd_lower="${cmd_lower,,}"
 
     # Regex for word boundaries including common shell metacharacters, commas, slashes, and colons.
     # Slashes are included to detect path-prefixed commands (e.g., /bin/rm).

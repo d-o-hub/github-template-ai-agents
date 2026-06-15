@@ -44,7 +44,7 @@ done
 if "$CHECK_MODE"; then
     llms_check_tmpdir=$(mktemp -d)
     cleanup_llms_check_tmpdir() {
-        rm -rf "$llms_check_tmpdir"
+        rm -rf -- "$llms_check_tmpdir"
     }
     trap cleanup_llms_check_tmpdir EXIT
 
