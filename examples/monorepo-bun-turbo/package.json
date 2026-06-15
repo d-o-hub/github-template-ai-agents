@@ -1,5 +1,6 @@
 {
   "name": "agent-monorepo-example",
+  "version": "0.1.0",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -11,6 +12,6 @@
     "dev": "turbo run dev"
   },
   "devDependencies": {
-    "turbo": "latest"
+    "turbo": "2.4.4"
   }
 }
