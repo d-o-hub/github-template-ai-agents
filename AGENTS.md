@@ -34,6 +34,13 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
    - **Action**: Use `triz-analysis` or `triz-solver`. Write an **ADR** in `plans/`.
    - **Human Gate**: Review and approve the ADR and analysis before proceeding. *Only human gate.*
 
+## Behavioral Defaults
+
+- **Automation-First**: Execute tasks autonomously within approved plans; minimize confirmation loops.
+- **Parallelism**: Use parallel tool calls for independent operations when supported by the runtime.
+- **Direct Action**: Proceed with actions immediately when intent and context are clear.
+- **Diff-Oriented**: Report changes using concise, diff-focused summaries instead of long prose.
+
 2. **DECOMPOSE & PLAN (Phase 2)**
    - **Action**: Use the `goap-agent` to break down in `plans/GOAP_STATE.md`.
 
