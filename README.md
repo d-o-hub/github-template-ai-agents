@@ -207,6 +207,8 @@ graph LR
 ## Documentation
 
 - [AGENTS.md](AGENTS.md) — main agent instructions (single source of truth)
+- [EVALS.md](templates/EVALS.md) — (Template) Agent quality and performance tracking
+- [USE_RESTRICTIONS.md](templates/USE_RESTRICTIONS.md) — (Template) Agent usage policies
 - [Quick Start](QUICKSTART.md) — setup, troubleshooting, per-tool verification
 - [Harness Overview](agents-docs/HARNESS.md) — architecture and patterns
 - [Skills Guide](agents-docs/SKILLS.md) — creating reusable skills
@@ -215,6 +217,7 @@ graph LR
 - [Context](agents-docs/CONTEXT.md) — back-pressure mechanisms
 - [Migration](agents-docs/MIGRATION.md) — adopting in existing projects
 - [Available Skills](.agents/skills/README.md) — agents skills overview
+- [Monorepo Example](examples/monorepo-bun-turbo/README.md) — Bun + Turbo project structure
 
 ## Contributing
 

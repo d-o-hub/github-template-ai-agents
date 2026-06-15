@@ -1,0 +1,6 @@
+# Bun configuration for agent monorepo
+[install]
+exact = true
+
+[test]
+coverage = true
