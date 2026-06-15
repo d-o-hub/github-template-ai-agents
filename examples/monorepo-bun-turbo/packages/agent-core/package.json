@@ -1,0 +1,10 @@
+{
+  "name": "@example/agent-core",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist",
+    "test": "bun test",
+    "lint": "bunx biome check ."
+  }
+}

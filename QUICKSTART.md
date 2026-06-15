@@ -156,6 +156,18 @@ claude "Refactor the authentication module to improve readability"
 
 Expected: all checks pass.
 
+### 4. Set Usage Policies & Eval Tracking
+
+For production-grade repositories, copy and customize the policy templates:
+
+```bash
+cp templates/USE_RESTRICTIONS.md ./USE_RESTRICTIONS.md
+cp templates/EVALS.md ./EVALS.md
+```
+
+- Edit `USE_RESTRICTIONS.md` to define what agents are allowed to do.
+- Use `EVALS.md` to track performance and quality improvements over time.
+
 ## Troubleshooting
 
 If bootstrap fails or the quality gate reports unexpected errors, run the doctor:
@@ -213,6 +225,8 @@ If the agent does not respond, check installation:
 | Configuring hooks | [`agents-docs/HOOKS.md`](agents-docs/HOOKS.md) |
 | Context management | [`agents-docs/CONTEXT.md`](agents-docs/CONTEXT.md) |
 | Available agents | [`agents-docs/AGENTS_REGISTRY.md`](agents-docs/AGENTS_REGISTRY.md) |
+| Evaluation Tracking | [`templates/EVALS.md`](templates/EVALS.md) |
+| Usage Restrictions | [`templates/USE_RESTRICTIONS.md`](templates/USE_RESTRICTIONS.md) |
 | Adopting in existing repo | [`agents-docs/MIGRATION.md`](agents-docs/MIGRATION.md) |
 
 ## Common First Tasks

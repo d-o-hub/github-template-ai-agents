@@ -44,6 +44,13 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 4. **SYNTHESIZE (Phase 4)**
    - **Action**: Run `learn` skill to extract discoveries and update `AGENTS.md`.
 
+## Behavioral Defaults
+
+- **Automation-First**: Execute tasks autonomously within approved plans; minimize confirmation loops.
+- **Parallelism**: Use parallel tool calls for independent operations when supported by the runtime.
+- **Direct Action**: Proceed with actions immediately when intent and context are clear.
+- **Diff-Oriented**: Report changes using concise, diff-focused summaries instead of long prose.
+
 ## Setup
 
 ```bash
