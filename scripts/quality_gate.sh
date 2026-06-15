@@ -90,7 +90,7 @@ else
     TMP_LLMS_FULL=$(mktemp)
 
     cleanup() {
-        rm -f "$TMP_LLMS" "$TMP_LLMS_FULL"
+        rm -f -- "$TMP_LLMS" "$TMP_LLMS_FULL"
         return 0
     }
     trap cleanup EXIT
@@ -195,14 +195,14 @@ if [[ -f ".agents/metrics.jsonl" ]]; then
     while IFS= read -r line; do
         if [[ -z "${line// }" ]]; then continue; fi
         # Validate valid JSON per line
-        if ! echo "$line" | python3 -m json.tool > /dev/null 2>&1; then
+        if ! printf "%s\n" "$line" | python3 -m json.tool > /dev/null 2>&1; then
             printf "%b  ✗ Invalid JSON in metrics.jsonl: %s%b\n" "${RED}" "$line" "${NC}"
             METRICS_VALID=1
             break
         fi
         # Validate timestamp format YYYY-MM-DDTHH:MM:SSZ
-        ts=$(echo "$line" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("timestamp",""))')
-        if ! echo "$ts" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$' ; then
+        ts=$(printf "%s\n" "$line" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("timestamp",""))')
+        if ! printf "%s\n" "$ts" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$' ; then
             printf "%b  ✗ Bad timestamp format \"%s\" in metrics.jsonl — must be YYYY-MM-DDTHH:MM:SSZ%b\n" "${RED}" "$ts" "${NC}"
             METRICS_VALID=1
             break
@@ -364,7 +364,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
                 printf "%b  ✓ shellcheck passed%b\n" "${GREEN}" "${NC}"
             fi
         fi
-        rm -f "$TMP_SH_LIST"
+        rm -f -- "$TMP_SH_LIST"
     fi
     printf "\n"
 fi
@@ -383,7 +383,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
                 printf "%b  ✓ markdownlint-cli2 passed%b\n" "${GREEN}" "${NC}"
             fi
         fi
-        rm -f "$TMP_MD_LIST"
+        rm -f -- "$TMP_MD_LIST"
     fi
     printf "\n"
 fi

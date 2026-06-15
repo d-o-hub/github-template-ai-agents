@@ -46,7 +46,7 @@ fi
 sect "Symlink support"
 SYMLINK_TEST="$(mktemp -u)"
 if ln -sf /dev/null "$SYMLINK_TEST" 2>/dev/null; then
-  rm -f "$SYMLINK_TEST"
+  rm -f -- "$SYMLINK_TEST"
   pass "Symlinks supported"
 else
   bad "Symlinks not supported - Windows without Developer Mode or WSL2"
