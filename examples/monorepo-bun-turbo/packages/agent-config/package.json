@@ -1,0 +1,8 @@
+{
+  "name": "@example/agent-config",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "lint": "bunx biome check ."
+  }
+}
