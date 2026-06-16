@@ -28,7 +28,16 @@ close_prs() {
   printf "Found %s:\n" "$description"
   printf "%s\n" "$prs_input"
 
-  while IFS=' ' read -r num branch; do
+  local old_ifs="$IFS"
+  IFS=$'\n'
+  set -f
+  local prs_array=($prs_input)
+  set +f
+  IFS="$old_ifs"
+
+  for line in "${prs_array[@]}"; do
+    local num="${line%% *}"
+    local branch="${line#* }"
     if [[ -z "$num" ]]; then continue; fi
     printf "%s\n" "  Closing PR #$num (branch: $branch)..."
     gh pr close "$num" --repo "$REPO" --delete-branch 2>/dev/null || {
@@ -36,7 +45,7 @@ close_prs() {
       gh pr close "$num" --repo "$REPO" || true
       gh api -X DELETE "repos/$REPO/git/refs/heads/$branch" 2>/dev/null || true
     }
-  done <<< "$prs_input"
+  done
 }
 
 printf "%s\n" "Searching for stale automated PRs..."
