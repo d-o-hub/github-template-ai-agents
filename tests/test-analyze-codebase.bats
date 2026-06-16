@@ -73,7 +73,8 @@ run_analyze() {
     git -C "$REPO_ROOT" commit -q -m "ds"
     touch "$REPO_ROOT/.gitignore"
 
-    run_analyze --fix > /dev/null
+    run run_analyze --fix
+    [ "$status" -eq 1 ]
     run grep -F ".DS_Store" "$REPO_ROOT/.gitignore"
     [ "$status" -eq 0 ]
 }
