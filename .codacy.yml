@@ -9,6 +9,12 @@ exclude_paths:
   - "vendor/**"
   - "**/dist/**"
   - "**/build/**"
+  # .claude/skills/ and .qwen/skills/ are symlinks to .agents/skills/.
+  # Exclude them to avoid double-analysis; .agents/skills/ is the
+  # canonical source. (Codacy cannot read the symlink targets when
+  # they live on a different filesystem context inside its Docker.)
+  - ".claude/skills/**"
+  - ".qwen/skills/**"
   # docling.py: subprocess calls with SSRF validation by is_safe_url().
   # Inline # NOSONAR did not suppress Codacy SonarPython findings.
   - ".agents/skills/do-web-doc-resolver/scripts/providers/docling.py"

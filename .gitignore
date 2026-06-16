@@ -1,3 +1,5 @@
+# Agent tooling
+
 # Dependencies
 node_modules/
 __pycache__/
@@ -28,6 +30,7 @@ target/
 *.tmp
 *.swp
 *.swo
+# Test coverage + SARIF (build artifacts, not source)
 .coverage
 *.sarif
 

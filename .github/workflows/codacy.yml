@@ -32,6 +32,10 @@ jobs:
       # `codacy/codacy-analysis-cli-action`, which is rejected by this
       # repo's `sha_pinning_required` branch protection policy.
       # CLI version pinned to the same release the composite action used.
+      # Upload is conditional on the CODACY_PROJECT_TOKEN secret being
+      # configured; without it, the CLI fails the run with
+      # "Missing upload requisites: No credentials found." The SARIF
+      # file is still produced and uploaded to GitHub Security.
       - name: Run Codacy Analysis CLI
         uses: docker://codacy/codacy-analysis-cli:7.10.0
         with:
@@ -39,9 +43,10 @@ jobs:
             analyze
             --skip-commit-uuid-validation
             --skip-uncommitted-files-check
+            --force-file-permissions
             --commit-uuid ${{ github.event.pull_request.head.sha || github.sha }}
             --max-allowed-issues 2147483647
-            --upload
+            ${{ secrets.CODACY_PROJECT_TOKEN && '--upload' || '' }}
             --format sarif
             --output results.sarif
         env:
