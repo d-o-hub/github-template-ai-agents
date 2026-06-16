@@ -1,4 +1,6 @@
 # Agent tooling
+.mimocode/
+.commandcode/
 
 # Dependencies
 node_modules/
@@ -30,7 +32,6 @@ target/
 *.tmp
 *.swp
 *.swo
-# Test coverage + SARIF (build artifacts, not source)
 .coverage
 *.sarif
 

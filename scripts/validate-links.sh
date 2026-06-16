@@ -236,7 +236,31 @@ file_format_errors=0
 
 # Process all files with a single awk call.
 # Format: FILENAME:LINE_NUM:IN_REF:CONTENT
-while IFS=: read -r skill_file line_num in_references line; do
+
+old_opts="$-"
+old_ifs="$IFS"
+set -f
+IFS=$'\n'
+lines_array=($(awk -- '
+    BEGIN { in_ref = 0 }
+    FNR == 1 { in_ref = 0; print FILENAME ":0:0:__START__" }
+    /^##[[:space:]]+[Rr]eferences/ { in_ref = 1; print FILENAME ":" FNR ":" in_ref ":" $0; next }
+    /^##[[:space:]]+/ { in_ref = 0; print FILENAME ":" FNR ":" in_ref ":" $0; next }
+    /\[[^]]+\]\([^)]+\)/ || /`(references?\/|docs\/)[^`]+`/ || /@references?/ || (in_ref && /^- /) {
+        print FILENAME ":" FNR ":" in_ref ":" $0
+    }
+' "${SKILL_FILES[@]}"))
+[[ "$old_opts" != *f* ]] && set +f
+IFS="$old_ifs"
+
+for array_line in "${lines_array[@]}"; do
+    skill_file="${array_line%%:*}"
+    rest="${array_line#*:}"
+    line_num="${rest%%:*}"
+    rest="${rest#*:}"
+    in_references="${rest%%:*}"
+    line="${rest#*:}"
+
     # Handle file transition and reporting
     if [[ "$skill_file" != "$current_file" ]]; then
         if [[ -n "$current_file" ]]; then
@@ -316,15 +340,7 @@ while IFS=: read -r skill_file line_num in_references line; do
         BROKEN_COUNT=$((BROKEN_COUNT + 1))
         file_broken=1
     fi
-done < <(awk -- '
-    BEGIN { in_ref = 0 }
-    FNR == 1 { in_ref = 0; print FILENAME ":0:0:__START__" }
-    /^##[[:space:]]+[Rr]eferences/ { in_ref = 1; print FILENAME ":" FNR ":" in_ref ":" $0; next }
-    /^##[[:space:]]+/ { in_ref = 0; print FILENAME ":" FNR ":" in_ref ":" $0; next }
-    /\[[^]]+\]\([^)]+\)/ || /`(references?\/|docs\/)[^`]+`/ || /@references?/ || (in_ref && /^- /) {
-        print FILENAME ":" FNR ":" in_ref ":" $0
-    }
-' "${SKILL_FILES[@]}")
+done
 
 # Final report for the last file
 if [[ -n "$current_file" ]]; then
