@@ -10,7 +10,9 @@ module.exports = {
     // Allow longer bodies for squash merges that include PR description.
     // Enforced at PR level instead via lint-pr-title workflow.
     'body-max-length': [0],
-    'body-max-line-length': [2, 'always', 100],
+    // body-max-line-length disabled — squash merge bodies from gh pr merge
+    // naturally exceed 100 chars. Enforced at PR level (1000 chars) instead.
+    'body-max-line-length': [0],
     'footer-max-length': [2, 'always', 1000],
     'footer-max-line-length': [2, 'always', 100],
     // subject-case disabled: identifiers like LESSON-017, SKILL.md are valid
