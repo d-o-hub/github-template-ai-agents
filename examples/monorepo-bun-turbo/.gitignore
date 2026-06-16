@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+dist/
+build/
+*.log
+
+# Bun
+.bun/
+
+# Environment
+.env
+.env.local
