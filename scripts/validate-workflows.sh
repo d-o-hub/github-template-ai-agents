@@ -39,37 +39,12 @@ for wf in "${CHECK_PATHS[@]}"; do
 
     current_block=""
 
+    old_opts="$-"
+    old_ifs="$IFS"
+    set -f
+    IFS=$'\n'
     # Extract script blocks and detect script injection risks
-    while IFS= read -r line; do
-        if [[ "$line" == "---INJECTION_RISK---"* ]]; then
-            printf "  %b⚠ Potential script injection risk detected:%b\n" "${RED}" "${NC}"
-            printf "    %s\n" "${line#---INJECTION_RISK---}"
-            printf "    Use environment variables instead of direct \${{ }} interpolation.\n"
-            FAILED=1
-            continue
-        fi
-
-        if [[ "$line" == "---END_SCRIPT---" ]]; then
-            if [[ -n "$current_block" ]]; then
-                printf "(async () => {\n%s\n})()" "$current_block" > "$TMP_JS_FILE"
-
-                if ! node -c "$TMP_JS_FILE" 2>/dev/null; then
-                    printf "  %b✗ Syntax error in script block%b\n" "${RED}" "${NC}"
-                    node -c "$TMP_JS_FILE" 2>&1 | sed 's/^/    /'
-                    FAILED=1
-                else
-                    printf "  %b✓ Script block syntax OK%b\n" "${GREEN}" "${NC}"
-                fi
-                current_block=""
-            fi
-        else
-            if [[ -z "$current_block" ]]; then
-                current_block="$line"
-            else
-                current_block="$current_block"$'\n'"$line"
-            fi
-        fi
-    done < <(awk -- '
+    lines_array=($(awk -- '
     function is_injection_risk(line) {
         if (line !~ /\$\{\{/) return 0
         # Whitelist safe contexts and safe github properties
@@ -122,7 +97,40 @@ for wf in "${CHECK_PATHS[@]}"; do
         next
     }
     { process_line($0) }
-    ' "$wf")
+    ' "$wf"))
+    [[ "$old_opts" != *f* ]] && set +f
+    IFS="$old_ifs"
+
+    for line in "${lines_array[@]}"; do
+        if [[ "$line" == "---INJECTION_RISK---"* ]]; then
+            printf "  %b⚠ Potential script injection risk detected:%b\n" "${RED}" "${NC}"
+            printf "    %s\n" "${line#---INJECTION_RISK---}"
+            printf "    Use environment variables instead of direct \${{ }} interpolation.\n"
+            FAILED=1
+            continue
+        fi
+
+        if [[ "$line" == "---END_SCRIPT---" ]]; then
+            if [[ -n "$current_block" ]]; then
+                printf "(async () => {\n%s\n})()" "$current_block" > "$TMP_JS_FILE"
+
+                if ! node -c "$TMP_JS_FILE" 2>/dev/null; then
+                    printf "  %b✗ Syntax error in script block%b\n" "${RED}" "${NC}"
+                    node -c "$TMP_JS_FILE" 2>&1 | sed 's/^/    /'
+                    FAILED=1
+                else
+                    printf "  %b✓ Script block syntax OK%b\n" "${GREEN}" "${NC}"
+                fi
+                current_block=""
+            fi
+        else
+            if [[ -z "$current_block" ]]; then
+                current_block="$line"
+            else
+                current_block="$current_block"$'\n'"$line"
+            fi
+        fi
+    done
 done
 
 if [[ $FAILED -ne 0 ]]; then
