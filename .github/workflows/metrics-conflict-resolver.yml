@@ -10,9 +10,15 @@ on:
       - main
 
 # Default permissions
+# `workflows: write` is required so the auto-merge can push to PR branches
+# that include workflow-file changes (e.g. updates to .github/workflows/*).
+# Without it, the GitHub Actions App token is rejected with:
+#   "refusing to allow a GitHub App to create or update workflow
+#    `.github/workflows/X.yml` without `workflows` permission"
 permissions:
   contents: write
   pull-requests: read
+  workflows: write
 
 jobs:
   resolve:
