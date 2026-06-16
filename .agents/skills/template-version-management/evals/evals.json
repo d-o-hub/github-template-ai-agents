@@ -1,0 +1,77 @@
+{
+  "skill_name": "template-version-management",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just merged a release PR and now QUICKSTART.md shows 'version-0.2.0' but our template is at 0.2.10. How do I fix this?",
+      "expected_output": "The agent explains that QUICKSTART.md should not have a template version badge at all — README.md is the only file that should display one. The fix is to remove the stale '![Template Version](...)' line entirely from QUICKSTART.md, not to update the version number. The agent should also check agents-docs/MIGRATION.md for the same issue and any 'Template version: X.Y.Z' text inside code block snippets (which should be updated to the current version).",
+      "files": [],
+      "assertions": [
+        "The agent identifies QUICKSTART.md badge as one to remove, not update",
+        "The agent identifies README.md as the only place a template version badge should appear",
+        "The agent mentions checking agents-docs/MIGRATION.md for the same stale badge",
+        "The agent distinguishes between removing a badge and updating a 'Template version: X.Y.Z' snippet"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Why is VERSION pinned to 0.0.0 in this template repo? Should I set it to 0.2.10 to match the current template release?",
+      "expected_output": "The agent explains that VERSION=0.0.0 is intentional for template repos — it's the consumer-side default that downstream consumers reset on first use. The template's own release version lives in CHANGELOG-TEMPLATE.md (currently 0.2.10). Setting VERSION to 0.2.10 would break downstream consumers who expect a clean starting point. The agent should NOT recommend changing VERSION.",
+      "files": [],
+      "assertions": [
+        "The agent identifies VERSION=0.0.0 as intentional, not a bug",
+        "The agent identifies CHANGELOG-TEMPLATE.md as the canonical template version source",
+        "The agent does NOT recommend changing VERSION to 0.2.10",
+        "The agent explains the consumer-repo flow (downstream clones, edits VERSION to their own version)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I want to make propagate-version.sh read from CHANGELOG-TEMPLATE.md instead of VERSION so the README badge always shows the current template release. This way the badge will never go stale.",
+      "expected_output": "The agent pushes back. The scripts/propagate-version.sh is a general-purpose utility designed for downstream consumer codebases, not just the template repo. Changing it to read from CHANGELOG-TEMPLATE.md would break every consumer repo using this template. The right approach is to NOT modify the script; instead, remove the template version badge from QUICKSTART.md and agents-docs/MIGRATION.md so the README badge is the only one (and the script's normal output is correct for the template).",
+      "files": [],
+      "assertions": [
+        "The agent pushes back on modifying propagate-version.sh",
+        "The agent identifies the script as a general-purpose utility for downstream consumers",
+        "The agent proposes an alternative that doesn't modify the script (e.g., removing redundant badges)",
+        "The agent explains the downstream-consumer impact of changing the script"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I added a new doc file examples/ai-agents.md and want to add a template version badge to it, mirroring what QUICKSTART.md has. Walk me through it.",
+      "expected_output": "The agent pushes back. The template should have only ONE template version badge, in README.md. New docs should not duplicate the badge. Instead, the new doc should either link to README.md/CHANGELOG-TEMPLATE.md or have no version reference at all. The agent should also flag that QUICKSTART.md's badge is itself redundant and should be removed (not mirrored).",
+      "files": [],
+      "assertions": [
+        "The agent pushes back on adding a new template version badge",
+        "The agent identifies README.md as the only place a template version badge should appear",
+        "The agent flags that QUICKSTART.md's existing badge is also redundant and should be removed",
+        "The agent suggests alternative approaches (link to README/CHANGELOG, or no version ref at all)"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Run the template release process: bump the template from 0.2.10 to 0.2.11 and propagate the changes. Show me the commands.",
+      "expected_output": "The agent provides the correct command sequence: 1) run ./scripts/bump_patch_version.sh (which reads VERSION=0.0.0, computes 0.0.1, appends to CHANGELOG-TEMPLATE.md, writes 0.0.1 to VERSION). The agent should also note that this script is consumer-oriented and may not be the right tool for a template release. For a template release, the canonical flow is: edit CHANGELOG-TEMPLATE.md directly to add '## [0.2.11] - YYYY-MM-DD' (the maintainer manually writes the changelog), then manually update README.md badge to 0.2.11 (or accept that it shows 0.0.0 because VERSION=0.0.0). The agent should not blindly recommend bump_patch_version.sh for a template release.",
+      "files": [],
+      "assertions": [
+        "The agent identifies that bump_patch_version.sh is consumer-oriented",
+        "The agent suggests editing CHANGELOG-TEMPLATE.md directly for a template release",
+        "The agent addresses the README badge question (0.0.0 vs 0.2.11)",
+        "The agent does not blindly run bump_patch_version.sh without flagging the template/consumer distinction"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "A new contributor asks: where is the template's version defined? They see VERSION=0.0.0 and CHANGELOG-TEMPLATE.md has 0.2.10 as the latest. Confused.",
+      "expected_output": "The agent explains clearly: CHANGELOG-TEMPLATE.md is the canonical source for the template's release version. VERSION is a separate, consumer-side artifact pinned to 0.0.0 so downstream consumers start fresh. The README badge shows 0.0.0 (from VERSION), not 0.2.10 — this is intentional for a template repo. The template's release history is the 0.2.0/0.2.1/.../0.2.10 sequence in CHANGELOG-TEMPLATE.md.",
+      "files": [],
+      "assertions": [
+        "The agent identifies CHANGELOG-TEMPLATE.md as the canonical source",
+        "The agent identifies VERSION as a separate consumer-side artifact",
+        "The agent explains why README shows 0.0.0 (not 0.2.10)",
+        "The agent references the release history pattern in CHANGELOG-TEMPLATE.md"
+      ]
+    }
+  ]
+}
