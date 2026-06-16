@@ -10,6 +10,14 @@ on:
       - main
 
 # Default permissions
+# This workflow auto-merges main into PRs that have a metrics.jsonl
+# conflict. The merge is restricted to a SAFE set of files: if main
+# contains any change to .github/workflows/*, .agents/, scripts/, or
+# agents-docs/ that is NOT purely the metrics.jsonl union resolution,
+# the auto-merge is skipped to avoid silently pushing untrusted
+# workflow/script changes to PR branches (the GITHUB_TOKEN lacks
+# `workflows` permission and is rightly rejected when trying to push
+# workflow-file changes).
 permissions:
   contents: write
   pull-requests: read
@@ -70,8 +78,20 @@ jobs:
               if git diff --quiet 'HEAD@{1}' HEAD; then
                 printf -- "No changes to push for PR #%s\n" "$PR_NUMBER"
               else
+                # Only auto-push if the merge introduced changes OUTSIDE
+                # of metrics.jsonl + auto-generated taste files. If main
+                # changed workflows, scripts, or other sensitive paths,
+                # the push would be rejected by the App token (it lacks
+                # the workflows permission required to push workflow-file
+                # changes). Skip and let a human resolve.
+                if git diff --name-only 'HEAD@{1}' HEAD | \
+                    grep -vE '^\.agents/metrics\.jsonl$|^\.commandcode/taste/.*\.md$'; then
+                  printf -- "PR #%s has non-taste changes from main; skipping for human review.\n" "$PR_NUMBER"
+                  git merge --abort || true
+                  continue
+                fi
                 git push origin "$PR_BRANCH"
-                printf -- "Successfully merged main into PR #%s\n" "$PR_NUMBER"
+                printf -- "Successfully merged metrics/taste into PR #%s\n" "$PR_NUMBER"
               fi
             else
               printf -- "Automatic merge failed for PR #%s. Skipping.\n" "$PR_NUMBER"
