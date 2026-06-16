@@ -189,3 +189,7 @@ After **every** completed task, the agent MUST append a JSON entry to `.agents/m
 #### Recent Project-Wide Learnings
 
 See `agents-docs/self-learning-rules.md` for all learnings (LESSON-026 through LESSON-035 and Integration Learnings).
+
+## Recovery & Advanced Topics
+
+- **Local CI rehearsal with `act`**: `agents-docs/ACT.md` plus `./scripts/run_act_local.sh` (never blocks the quality gate; opt-in).

@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "$comment": "SCAFFOLD: tasks below are placeholders matching the example packages' scripts. Add real tasks as you grow the workspace.",
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
