@@ -108,7 +108,7 @@ fi
 
         # Filter skills for this category and sort by name
         # Use -- separator with grep to prevent option injection if category starts with -
-        printf "%s\n" "$SKILL_DATA" | grep -- "^$category|" | sort -t'|' -k2,2 | while IFS="|" read -r _ name description; do
+        printf "%s\n" "$SKILL_DATA" | grep -- "^$category|" | LC_ALL=C sort -t'|' -k2,2 | while IFS="|" read -r _ name description; do
             printf "| \`%s\` | %s |\n" "$name" "$description"
         done
         printf "\n"

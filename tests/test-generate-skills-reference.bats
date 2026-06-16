@@ -74,6 +74,18 @@ EOF
     [ "$status" -eq 1 ]
 }
 
+@test "generate-skills-reference.sh output is locale-independent" {
+    local c_output utf_output
+    bash "$BATS_TEST_DIRNAME/../scripts/generate-skills-reference.sh"
+    cp "$OUTPUT_FILE" "$OUTPUT_FILE.c"
+    rm -f "$OUTPUT_FILE"
+
+    LC_ALL=en_US.UTF-8 bash "$BATS_TEST_DIRNAME/../scripts/generate-skills-reference.sh"
+
+    diff -q "$OUTPUT_FILE.c" "$OUTPUT_FILE"
+    rm -f "$OUTPUT_FILE.c"
+}
+
 @test "generate-skills-reference.sh rejects paths starting with a dash" {
     SKILLS_DIR="-evil" run bash "$BATS_TEST_DIRNAME/../scripts/generate-skills-reference.sh"
     [ "$status" -eq 2 ]
