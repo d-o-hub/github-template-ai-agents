@@ -12,12 +12,20 @@ printf "Syncing docs %s → %s\n" "$LAST_COMMIT" "$CURRENT"
 # Security: Use -- separator BEFORE revisions to prevent option injection from malicious revision names
 diff_output=$(git diff --name-only -- "$LAST_COMMIT" "$CURRENT" -- '*.md' 2>/dev/null || true)
 
-while IFS= read -r file; do
+old_opts="$-"
+set -f
+old_ifs="$IFS"
+IFS=$'\n'
+diff_array=($diff_output)
+IFS="$old_ifs"
+[[ "$old_opts" != *f* ]] && set +f
+
+for file in "${diff_array[@]}"; do
   # Security: Use printf for safe variable output
   [[ -n "$file" && -f "$REPO_ROOT/$file" ]] && printf "Updated: %s\n" "$file"
-done <<< "$diff_output"
+done
 
-if [[ -z "$diff_output" ]]; then
+if [[ ${#diff_array[@]} -eq 0 && -z "${diff_array[0]:-}" ]]; then
     count=0
 else
     # Security: Use printf to pipe variable content safely
