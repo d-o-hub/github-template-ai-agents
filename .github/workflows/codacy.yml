@@ -38,6 +38,7 @@ jobs:
           args: >-
             analyze
             --skip-commit-uuid-validation
+            --skip-uncommitted-files-check
             --commit-uuid ${{ github.event.pull_request.head.sha || github.sha }}
             --max-allowed-issues 2147483647
             --upload

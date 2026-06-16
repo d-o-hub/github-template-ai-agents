@@ -1,5 +1,6 @@
 # Agent tooling
 .mimocode/
+.commandcode/
 
 # Dependencies
 node_modules/
@@ -31,6 +32,8 @@ target/
 *.tmp
 *.swp
 *.swo
+.coverage
+*.sarif
 
 # Editors and IDEs
 .vscode/
