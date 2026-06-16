@@ -44,7 +44,6 @@
     "**/target/**",
     "**/vendor/**",
     ".git/**",
-    ".jules/**",
-    ".commandcode/**"
+    ".jules/**"
   ]
 }
