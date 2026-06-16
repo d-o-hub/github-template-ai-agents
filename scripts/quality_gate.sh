@@ -156,10 +156,29 @@ if ! ./scripts/validate-workflows.sh; then
 fi
 printf "\n"
 
-# --- Always: validate skills (symlinks and format) ---
+# --- Validate skills (symlinks and format) ---
 printf "%bValidating skills...%b\n" "${BLUE}" "${NC}"
 if ! ./scripts/validate-skills.sh; then
     FAILED=1
+fi
+printf "\n"
+
+# --- Validate skills-reference.md drift ---
+printf "%bChecking skills-reference.md is up to date...%b\n" "${BLUE}" "${NC}"
+if [[ -f "agents-docs/skills-reference.md" ]]; then
+    if ! ./scripts/generate-skills-reference.sh --check > /dev/null 2>&1; then
+        if [[ "$GITHUB_EVENT" == "$GITHUB_EVENT_PR" ]]; then
+            printf "%b  ⚠ skills-reference.md is out of date (auto-fix on main by workflow)%b\n" "${YELLOW}" "${NC}"
+            DRIFT_DETECTED=true
+        else
+            printf "%b  ✗ skills-reference.md is out of date. Run ./scripts/generate-skills-reference.sh%b\n" "${RED}" "${NC}"
+            FAILED=1
+        fi
+    else
+        printf "%b  ✓ skills-reference.md is up to date%b\n" "${GREEN}" "${NC}"
+    fi
+else
+    printf "%b  ⚠ agents-docs/skills-reference.md not present (regenerate with ./scripts/generate-skills-reference.sh)%b\n" "${YELLOW}" "${NC}"
 fi
 printf "\n"
 
