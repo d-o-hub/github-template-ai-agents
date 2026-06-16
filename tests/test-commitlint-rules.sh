@@ -45,7 +45,10 @@ check_consistency "'header-max-length'" "150" "Header max length"
 # produce long commit bodies from PR descriptions. Enforced at PR level
 # via lint-pr-title workflow body-length warning step.
 check_consistency "'body-max-length'" "\\[0\\]" "Body max length (disabled)"
-check_consistency "'body-max-line-length'" "100" "Body max line length"
+# body-max-line-length is intentionally disabled ([0]) because squash merge
+# bodies from gh pr merge --squash naturally exceed 100 characters per line.
+# The AGENTS.md "Wrap at 100 chars per line" is a recommendation, not enforced.
+check_consistency "'body-max-line-length'" "\\[0\\]" "Body max line length (disabled)"
 check_consistency "'footer-max-length'" "1000" "Footer max length"
 check_consistency "'footer-max-line-length'" "100" "Footer max line length"
 # subject-case is intentionally disabled ([0]) because identifiers like
