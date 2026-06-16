@@ -22,6 +22,14 @@
     "adr-010-automated-pr-auto-merge.md": {
       "status": "accepted",
       "date": "2026-06-08"
+    },
+    "adr-011-adopt-p0-primitives-from-do-gist-hub.md": {
+      "status": "accepted",
+      "date": "2026-06-16"
+    },
+    "adr-027-ci-node24-migration.md": {
+      "status": "accepted",
+      "date": "2026-06-16"
     }
   }
 }
