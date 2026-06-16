@@ -7,3 +7,4 @@
 - Skill `SKILL.md` must stay under 250 lines, include `## Rationalizations` table and `## Red Flags` checklist. Confidence: 0.80
 - After adding a new skill, run `./scripts/generate-llms-txt.sh` to keep `llms-full.txt` in sync. Confidence: 0.75
 - Never add `.commandcode/` or `.mimocode/` to `.gitignore` — both directories are required at runtime and must be committed (agent tooling state and taste/learnings). Confidence: 0.95
+- Always fix all pre-existing CI issues and warnings — never discuss/leave them be; use the `goap` skill as orchestrator with a swarm of agents, and encode this workflow in `agents.md`. Confidence: 0.85

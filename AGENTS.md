@@ -50,6 +50,9 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 - **Parallelism**: Use parallel tool calls for independent operations when supported by the runtime.
 - **Direct Action**: Proceed with actions immediately when intent and context are clear.
 - **Diff-Oriented**: Report changes using concise, diff-focused summaries instead of long prose.
+- **Always-Fix Pre-Existing Issues**: No discussion. No deferral. If a CI check, lint warning, or quality-gate finding is failing on `main` (regardless of who introduced it), agents MUST fix it as part of the current task. The only acceptable exit is a green CI for the current commit's run, with no new regressions and no inherited failures.
+
+**Workflow for pre-existing issues**: load `.agents/skills/goap-agent/SKILL.md` (orchestrator) and `.agents/skills/agent-coordination/SKILL.md` (swarm dispatch). Retriever / Implementer / Verifier in parallel, atomic commits per issue, verify green before moving on. Full playbook: `agents-docs/AGENTS_GUIDANCE.md`.
 
 ## Setup
 
