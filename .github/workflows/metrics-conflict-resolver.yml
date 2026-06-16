@@ -10,15 +10,17 @@ on:
       - main
 
 # Default permissions
-# `workflows: write` is required so the auto-merge can push to PR branches
-# that include workflow-file changes (e.g. updates to .github/workflows/*).
-# Without it, the GitHub Actions App token is rejected with:
-#   "refusing to allow a GitHub App to create or update workflow
-#    `.github/workflows/X.yml` without `workflows` permission"
+# This workflow auto-merges main into PRs that have a metrics.jsonl
+# conflict. The merge is restricted to a SAFE set of files: if main
+# contains any change to .github/workflows/*, .agents/, scripts/, or
+# agents-docs/ that is NOT purely the metrics.jsonl union resolution,
+# the auto-merge is skipped to avoid silently pushing untrusted
+# workflow/script changes to PR branches (the GITHUB_TOKEN lacks
+# `workflows` permission and is rightly rejected when trying to push
+# workflow-file changes).
 permissions:
   contents: write
   pull-requests: read
-  workflows: write
 
 jobs:
   resolve:
