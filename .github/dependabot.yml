@@ -1,5 +1,13 @@
 ---
 version: 2
+# Dependabot is configured only for ecosystems that exist in this repo:
+#   - github-actions: SHA-pinned actions in .github/workflows/
+#   - pre-commit:     hooks in .pre-commit-config.yaml
+# Ecosystems previously configured (docker, docker-compose, terraform)
+# were removed because the repo has no Dockerfiles, no docker-compose files,
+# and no Terraform manifests — Dependabot was failing weekly with
+# "No Dockerfiles nor Kubernetes YAML found in /" before the removal.
+# See commit history for the removal.
 updates:
   # GitHub Actions
   - package-ecosystem: "github-actions"
@@ -23,60 +31,7 @@ updates:
           - "minor"
           - "patch"
 
-  # Docker
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "09:00"
-      timezone: "UTC"
-    open-pull-requests-limit: 3
-    labels:
-      - "deps"
-      - "docker"
-    commit-message:
-      prefix: "chore"
-    ignore:
-      - dependency-name: "*"
-
-  # Terraform (if used)
-  - package-ecosystem: "terraform"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-      day: "monday"
-      time: "09:00"
-      timezone: "UTC"
-    open-pull-requests-limit: 3
-    labels:
-      - "deps"
-      - "terraform"
-    commit-message:
-      prefix: "chore"
-    groups:
-      terraform-providers:
-        patterns:
-          - "hashicorp/*"
-        update-types:
-          - "minor"
-          - "patch"
-
-  # Docker Compose
-  - package-ecosystem: "docker-compose"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-      time: "09:00"
-      timezone: "UTC"
-    open-pull-requests-limit: 2
-    labels:
-      - "deps"
-      - "docker-compose"
-    commit-message:
-      prefix: "chore"
-
-  # Pre-commit hooks (if used)
+  # Pre-commit hooks
   - package-ecosystem: "pre-commit"
     directory: "/"
     schedule:
