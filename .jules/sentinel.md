@@ -125,3 +125,8 @@
 **Vulnerability:** Command categorization logic used word-boundary regexes that excluded slashes, allowing path-prefixed dangerous commands (e.g., `/bin/rm`) to bypass detection. Additionally, `sudo` and several language interpreters (`python`, `node`, `sh`, etc.) were missing from the `DANGEROUS_KEYWORDS` list.
 **Learning:** Security filters based on command names must account for absolute and relative paths. Administrative and meta-execution wrappers like `sudo` or language interpreters are high-risk primitives that should be flagged.
 **Prevention:** Include slashes and colons in word-boundary regexes for command name matching. Maintain a comprehensive list of high-risk execution primitives, including `sudo` and common language interpreters, in the `DANGEROUS_KEYWORDS` category.
+
+## 2026-06-19 - Command Categorization Bypass via Truncation and Chained Commands
+**Vulnerability:** Attempting to optimize command categorization by stripping arguments (truncating to the first word) allowed dangerous commands to bypass detection when chained (e.g., `echo hi; rm -rf /`).
+**Learning:** Command security filters must analyze the entire input string. Truncating to the first word only secures the primary command and ignores subsequent commands separated by shell metacharacters (`;`, `&&`, `||`, `|`).
+**Prevention:** Always perform security categorization on the full normalized command string using robust word boundaries (`boundary` regex) that account for all shell delimiters.
