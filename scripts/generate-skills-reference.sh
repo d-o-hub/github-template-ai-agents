@@ -156,7 +156,7 @@ mkdir -p "$(dirname -- "$OUTPUT_FILE")"
     printf '| Skill | Description | Category |\n'
     printf '|-------|-------------|----------|\n'
 
-    printf '%s\n' "$SKILL_DATA" | sort -t'|' -k1,1 | while IFS='|' read -r name description category; do
+    printf '%s\n' "$SKILL_DATA" | LC_ALL=C sort -t'|' -k1,1 | while IFS='|' read -r name description category; do
         category_display=$(printf '%s' "$category" | sed 's/-/ /g')
         printf '| `%s` | %s | %s |\n' "$name" "$description" "$category_display"
     done
