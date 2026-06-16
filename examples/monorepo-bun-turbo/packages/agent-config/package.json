@@ -1,4 +1,5 @@
 {
+  "_comment": "SCAFFOLD: add src/index.ts and replace placeholder scripts with real ones for this package's responsibility",
   "name": "@example/agent-config",
   "version": "0.1.0",
   "private": true,

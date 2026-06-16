@@ -35,3 +35,22 @@ In a monorepo, you have two primary options for `AGENTS.md`:
 2. **Per-Package**: package-specific `AGENTS.md` files that extend the root guidance.
 
 We recommend keeping the canonical `AGENTS.md` at the root and using tool-specific overrides (`CLAUDE.md`, etc.) within individual packages if they require specialized context.
+
+## Scaffold Packages — Empty by Design
+
+`packages/agent-core/` and `packages/agent-config/` are intentionally shipped
+as near-empty scaffolds (each with just a `package.json` and a placeholder
+`scripts` block). The example is meant to show **monorepo wiring** — workspace
+globs, Turbo pipeline, Bun config — not a finished application.
+
+To turn the example into something runnable:
+
+1. Add a `src/index.ts` to each package (the `bun build` and `bun test`
+   scripts already expect one).
+2. Replace placeholder `scripts` entries with the real commands for that
+   package's responsibility.
+3. Add a `tsconfig.json` at the workspace root and at each package if you
+   need strict type-checking across the workspace.
+
+The `// SCAFFOLD` marker at the top of each `package.json` is a signal for
+reviewers that the package is a starting point, not finished code.
