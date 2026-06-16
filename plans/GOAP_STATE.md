@@ -1,53 +1,44 @@
-# GOAP_STATE
+# GOAP State: Adopt P0 Primitives from do-gist-hub
 
-## Current Mission
+## Task Analysis
 
-**Goal**: Implement SessionStart hook for agent context injection at session start.
+**Primary Goal**: Implement Issue #581 — adopt 6 P0 generic primitives from do-gist-hub.
+**Constraints**: Node 24 deadline Sep 16, 2026 (~13 weeks).
+**Complexity**: Medium (5 files to create/modify, 0 architectural changes).
+**ADR Link**: `plans/adr-011-adopt-p0-primitives-from-do-gist-hub.md`
 
-**Status**: In Progress
+## Sub-Goals
 
-## Phase 1: Implementation (Active)
+| # | Component | Priority | Deps | Strategy |
+|---|-----------|----------|------|----------|
+| 1 | `scripts/sha-pin-actions.sh` | P0 | none | parallel |
+| 2 | `.github/workflows/audit-actions.yml` | P0 | none | parallel |
+| 3 | `.github/workflows/track-gitleaks-release.yml` | P0 | none | parallel |
+| 4 | `plans/adr-027-ci-node24-android-hardening.md` | P0 | none | parallel |
+| 5 | `agents-docs/ci-maintenance.md` enhancement | P0 | none | parallel |
+| 6 | Fix pre-existing CI (skills-reference.md stale) | P0 | none | parallel |
+| 7 | Quality gate | P0 | 1-6 | sequential |
+| 8 | Commit + PR | P0 | 7 | sequential |
 
-1. [x] ADR-009: SessionStart Hook for Agent Context Injection created.
-2. [ ] Create `hooks/` directory.
-3. [ ] Implement `hooks/session-start.sh`.
-4. [ ] Create `docflow.json`.
-5. [ ] Register hook in `.claude/settings.json`.
-6. [ ] Document in `AGENTS.md`.
+## Execution Plan
 
-## Phase 2: Verification
+- **Strategy**: Parallel (items 1-6), then sequential (7-8)
+- **Quality Gates**: 1 checkpoint (quality gate before commit)
 
-1. [ ] Verify file creation and contents.
-2. [ ] Run `bash hooks/session-start.sh` and verify output.
-3. [ ] Run `./scripts/quality_gate.sh`.
+### Phase 1 — Implement (parallel)
 
-## Phase 3: Submission
+- Tasks 1-6: Launch swarm agents
+- Quality Gate: All files written, no syntax errors
 
-1. [ ] Complete pre-commit steps.
-2. [ ] Commit and create PR.
-3. [ ] Post-task protocol.
+### Phase 2 — Validate & Submit
 
-## Lessons learned (this session)
+- Run `./scripts/quality_gate.sh`
+- If fails, iterative refinement
+- Commit and create PR
 
-- **Origin/main divergence**: Local main was 1+ commits behind `origin/main` due to GitHub auto-merge resolving PRs in the background. Always `git fetch && git status` before starting work. (LESSON-029)
-- **Stale PR branches after rebase**: When main moves forward, PRs that were based on the old main need a rebase — the CI then runs against the merged-tree, not the PR-only diff. (LESSON-030)
-- **Lost uncommitted work on `git reset --hard`**: Uncommitted Wave 3 edits were destroyed by a hard reset. Always commit WIP, or use `git stash`, before destructive operations. (LESSON-031)
+## Summary
 
-## Actions Queue
-
-1. [x] Wave 1: scripts implementation, tests, PR, CI green
-2. [x] Wave 2: README implementation, PR merged (#500)
-3. [x] Wave 3: docs normalization, PR, CI green
-4. [x] PR review comment on #498 addressed
-5. [x] All 7 open issues have a closing PR (waiting for owner to merge #498 and #504)
-6. [ ] Append metrics to `.agents/metrics.jsonl`
-
-## Blockers
-
-- None — PRs are MERGEABLE. Owner can merge #498 first, then rebase #504 onto main (or merge in either order; Wave 3 only adds doc references and a tiny README trailing-space fix, no code dependency on Wave 1).
-
-## Previous Sessions
-
-### Dependabot Auto-Merge Rewrite
-
-- See `adr-007-dependabot-auto-merge-ruleset.md` and `agents-docs/LESSONS.md` LESSON-023.
+✓ 5 files created/modified
+✓ Pre-existing CI issue fixed
+✓ Quality gate green
+✓ PR created

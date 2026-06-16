@@ -1,0 +1,122 @@
+name: Audit GitHub Actions
+
+on:  # yamllint disable-line rule:truthy
+  schedule:
+    - cron: '0 9 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    name: Audit Action Node Runtimes
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # pinned from v4
+
+      - name: Audit actions for deprecated Node runtimes
+        id: audit
+        run: |
+          set -euo pipefail
+
+          DEPRECATED=""
+          EXCEPTIONS="gitleaks/gitleaks-action ludeeus/action-shellcheck wagoid/commitlint-github-action"
+
+          ACTIONS=$(grep -rhoP 'uses:\s+\K[^/\s]+/[^@\s]+@[^\s]+' .github/workflows/ || true)
+
+          for ref in $ACTIONS; do
+            ACTION=$(echo "$ref" | cut -d'@' -f1)
+            VERSION=$(echo "$ref" | cut -d'@' -f2)
+
+            if [[ "$ACTION" == .* ]] || [[ "$ACTION" == /* ]]; then
+              continue
+            fi
+
+            if echo "$EXCEPTIONS" | grep -qw "$ACTION"; then
+              echo "SKIPPED (exception): $ref"
+              continue
+            fi
+
+            RUNTIME=$(curl -sL --fail \
+              "https://raw.githubusercontent.com/${ACTION}/${VERSION}/action.yml" \
+              2>/dev/null | grep -oP 'using:\s*\K\S+' || echo "unknown")
+
+            if [[ "$RUNTIME" == "node16" ]] || [[ "$RUNTIME" == "node20" ]]; then
+              echo "DEPRECATED ($RUNTIME): $ref"
+              DEPRECATED="${DEPRECATED}- $ref ($RUNTIME)\n"
+            elif [[ "$RUNTIME" == "node24" ]] || [[ "$RUNTIME" == "composite" ]] || [[ "$RUNTIME" == "docker" ]]; then
+              echo "OK ($RUNTIME): $ref"
+            else
+              echo "UNKNOWN ($RUNTIME): $ref"
+            fi
+
+            sleep 0.5
+          done
+
+          if [[ -n "$DEPRECATED" ]]; then
+            echo "::error::Deprecated Node runtimes detected:"
+            echo -e "$DEPRECATED"
+            {
+              echo "deprecated_actions<<EOF"
+              echo -e "$DEPRECATED"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            exit 1
+          else
+            echo "No deprecated Node runtimes found."
+          fi
+
+      - name: Open issue on failure
+        if: failure()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # pinned from v7
+        env:
+          DEPRECATED_ACTIONS: ${{ steps.audit.outputs.deprecated_actions }}
+        with:
+          script: |
+            const deprecated = process.env.DEPRECATED_ACTIONS;
+            const title = 'ci: deprecated Node.js runtimes detected in GitHub Actions';
+            const body = [
+              '## Deprecated Actions Audit Result',
+              '',
+              'The monthly audit found GitHub Actions using deprecated Node.js runtimes.',
+              '',
+              '### Affected Actions',
+              deprecated || '_(unknown)_',
+              '',
+              '### Next Steps',
+              '1. Identify the latest major version for each action that uses node24.',
+              '2. Bump the version in the relevant workflow file(s).',
+              '3. Verify via curl against raw action.yml.',
+              '4. Push and monitor CI.',
+              '',
+              'See agents-docs/ci-maintenance.md for the remediation playbook.',
+            ].join('\n');
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+            });
+
+            const existing = issues.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body,
+              });
+              console.log(`Updated existing issue #${existing.number}`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['ci'],
+              });
+              console.log(`Created issue #${created.number}`);
+            }

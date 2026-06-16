@@ -1,0 +1,90 @@
+name: Track Gitleaks Node 24 Upgrade
+
+on:  # yamllint disable-line rule:truthy
+  schedule:
+    - cron: '0 10 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    name: Check Gitleaks Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # pinned from v4
+
+      - name: Check for gitleaks v3+ release with node24
+        id: check
+        run: |
+          set -euo pipefail
+          LATEST=$(curl -sL --fail --max-time 10 --retry 3 \
+            "https://api.github.com/repos/gitleaks/gitleaks-action/releases/latest" \
+            | jq -r '.tag_name')
+          if [[ -z "$LATEST" ]] || ! echo "$LATEST" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Failed to fetch valid gitleaks-action release tag (got: '$LATEST')"
+            exit 1
+          fi
+          echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
+          echo "Latest gitleaks-action: $LATEST"
+
+          MAJOR=$(echo "$LATEST" | sed -E 's/^v?([0-9]+).*/\1/')
+          if [[ "$MAJOR" -ge 3 ]]; then
+            RUNTIME=$(curl -sL --fail --max-time 10 --retry 3 \
+              "https://raw.githubusercontent.com/gitleaks/gitleaks-action/$LATEST/action.yml" \
+              2>/dev/null | grep -oP 'using:\s*\K\S+' || echo "unknown")
+            echo "Runtime for $LATEST: $RUNTIME"
+            if [[ "$RUNTIME" == "node24" ]]; then
+              echo "node24_available=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "node24_available=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "node24_available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open issue when node24 version available
+        if: steps.check.outputs.node24_available == 'true'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # pinned from v7
+        with:
+          script: |
+            const latest = '${{ steps.check.outputs.latest }}';
+            const title = `ci: gitleaks-action ${latest} is node24-native`;
+            const body = [
+              '## Gitleaks Node 24 Upgrade Available',
+              '',
+              `A new major version of \`gitleaks/gitleaks-action\` has been released that uses \`node24\`.`,
+              '',
+              `**Latest version:** ${latest}`,
+              '',
+              '### Action Required',
+              `1. Update \`.github/workflows/gitleaks.yml\` to use \`gitleaks/gitleaks-action@${latest}\``,
+              '2. Remove `gitleaks/gitleaks-action` from exceptions in `audit-actions.yml`',
+              '3. Run quality gate',
+              '4. Push and monitor CI',
+              '',
+              'See agents-docs/ci-maintenance.md for the remediation playbook.',
+            ].join('\n');
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+            });
+
+            const existing = issues.find(i => i.title === title);
+            if (!existing) {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['ci'],
+              });
+              console.log(`Created issue #${created.number}`);
+            } else {
+              console.log(`Issue already exists: #${existing.number}`);
+            }
