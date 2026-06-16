@@ -6,7 +6,12 @@ set -euo pipefail
 # Default categories (can be overridden in .command-verify.conf)
 SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get}"
 CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace}"
-DANGEROUS_KEYWORDS="${DANGEROUS_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:sh:bash:zsh:python:python3:node:perl:ruby}"
+# Destructive and administrative commands (strict boundaries)
+DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo}"
+# Language interpreters (broad boundaries to catch versioned ones like python3.11)
+INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php}"
+# Networking tools (strict boundaries to avoid false positives like curl.sh)
+NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap}"
 
 # Custom patterns for categories (E3)
 SAFE_PATTERNS=()
@@ -49,10 +54,10 @@ categorize_command() {
     # Regex for word boundaries including common shell metacharacters, commas, slashes, and colons.
     # Slashes are included to detect path-prefixed commands (e.g., /bin/rm).
     # Colons are included to handle colon-prefixed commands or multi-command strings.
-    # Optimization: Keywords are joined into a single regex alternation to eliminate loop
-    # overhead in high-frequency validation runs.
     local boundary="(^|[[:space:]]|[|&;()<>,\/:])"
     local end_boundary="($|[[:space:]]|[|&;()<>,\/:])"
+    # Broad boundary to catch versioned interpreters (e.g., python3.11)
+    local broad_end_boundary="($|[[:space:]]|[|&;()<>,\/:\.])"
 
     # Check custom dangerous patterns first (E3)
     for pattern in "${DANGEROUS_PATTERNS[@]:-}"; do
@@ -63,12 +68,35 @@ categorize_command() {
         fi
     done
 
-    # Check dangerous keywords with boundaries to avoid false positives (e.g., mkdir farm)
-    # while still catching commands near shell metacharacters (e.g., (rm) or rm;ls)
-    local dangerous_regex="${boundary}(${DANGEROUS_KEYWORDS//:/|})${end_boundary}"
-    if [[ "$cmd_lower" =~ $dangerous_regex ]]; then
+    # Check destructive keywords with strict boundaries
+    local destructive_regex="${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})${end_boundary}"
+    if [[ "$cmd_lower" =~ $destructive_regex ]]; then
         printf "dangerous\n"
         return 0
+    fi
+
+    # Check interpreter keywords with broad boundaries (to catch python3.11)
+    local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})${broad_end_boundary}"
+    if [[ "$cmd_lower" =~ $interpreter_regex ]]; then
+        # Negative lookahead alternative: ensure it is not a script file like python.sh
+        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})\.(sh|py|pl|rb|js) ]]; then
+             : # Matches script name, continue
+        else
+             printf "dangerous\n"
+             return 0
+        fi
+    fi
+
+    # Check network keywords with strict boundaries
+    local network_regex="${boundary}(${NETWORK_KEYWORDS//:/|})${end_boundary}"
+    if [[ "$cmd_lower" =~ $network_regex ]]; then
+        # Ensure it is not followed by .sh or .py which indicates a script name
+        if [[ "$cmd_lower" =~ ${boundary}(${NETWORK_KEYWORDS//:/|})\.(sh|py|pl|rb|js) ]]; then
+            : # Likely a script name, ignore
+        else
+            printf "dangerous\n"
+            return 0
+        fi
     fi
 
     # Check custom conditional patterns (E3)
