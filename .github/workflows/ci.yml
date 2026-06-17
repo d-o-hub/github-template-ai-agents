@@ -286,7 +286,7 @@ jobs:
 
           PR_BRANCH="ci/status-update"
           git checkout -b "$PR_BRANCH" 2>/dev/null || git checkout "$PR_BRANCH"
-          git commit -m "ci: update ci status artifacts"
+          git commit -m "ci: update ci status artifacts [skip ci]"
           git push origin --force -- "$PR_BRANCH"
 
           # Find-or-create the canonical CI status PR
@@ -315,15 +315,24 @@ jobs:
           # Auto-merge via squash; --admin bypasses required checks (ci/status-update
           # is itself one of them, so --auto would deadlock); [skip ci] prevents
           # the merge commit from re-triggering this workflow.
-          if gh pr merge "$NEW_PR" \
-            --squash \
-            --subject "ci: update ci status artifacts [skip ci]" \
-            --admin \
-            --delete-branch=false; then
-            printf "Auto-merged PR #%s\n" "$NEW_PR"
-          else
-            EXIT_CODE=$?
-            printf "WARNING: Auto-merge failed for PR #%s (exit %d)\n" \
-              "$NEW_PR" "$EXIT_CODE" >&2
-            printf "PR will be merged once required checks pass\n"
+          MERGE_SUCCESS=false
+          for attempt in 1 2 3; do
+            if gh pr merge "$NEW_PR" \
+              --squash \
+              --subject "ci: update ci status artifacts [skip ci]" \
+              --admin \
+              --delete-branch=false; then
+              printf "Auto-merged PR #%s on attempt %d\n" "$NEW_PR" "$attempt"
+              MERGE_SUCCESS=true
+              break
+            fi
+            printf "Merge attempt %d failed, waiting %ds before retry...\n" \
+              "$attempt" "$((attempt * 10))"
+            sleep "$((attempt * 10))"
+            gh pr update-branch "$NEW_PR" 2>/dev/null || true
+          done
+
+          if [ "$MERGE_SUCCESS" = "false" ]; then
+            printf "WARNING: All merge attempts failed for PR #%s\n" "$NEW_PR" >&2
+            printf "Cleanup workflow will handle it in the next scheduled run.\n"
           fi
