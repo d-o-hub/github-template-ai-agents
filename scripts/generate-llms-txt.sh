@@ -209,7 +209,9 @@ fi
             ' "$skill_file")
 
             if [[ -z "$s_name" ]]; then
-                s_name=$(basename "$skill_dir")
+                # Performance optimization: Use Bash parameter expansion instead of basename
+                s_name="${skill_dir%/}"
+                s_name="${s_name##*/}"
             fi
             if [[ -z "$s_desc" ]]; then
                 s_desc="No description available."
