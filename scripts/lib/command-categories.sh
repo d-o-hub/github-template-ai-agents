@@ -3,15 +3,16 @@
 # Source this file in other scripts to use categorize_command()
 set -euo pipefail
 
+# Security Hardening: 2026-06-20 - Prevented keyword merging bypasses.
 # Default categories (can be overridden in .command-verify.conf)
 SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get}"
-CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace}"
+CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl}"
 # Destructive and administrative commands (strict boundaries)
-DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo}"
+DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd}"
 # Language interpreters (broad boundaries to catch versioned ones like python3.11)
-INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php}"
+INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php:deno:bun}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
-NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap}"
+NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat}"
 
 # Custom patterns for categories (E3)
 SAFE_PATTERNS=()
@@ -30,23 +31,30 @@ categorize_command() {
     local cmd_lower
     # Security: Use printf for safe variable expansion and to prevent option injection.
     # Normalize input by removing common shell escapes/quotes and converting to lowercase.
-    # Strips metacharacters used for obfuscation: quotes, backslashes, backticks,
-    # dollar signs, braces, parentheses, and brackets.
+    # Normalize input by removing common shell escapes/quotes and converting to lowercase.
+    # Strips metacharacters used for obfuscation: quotes and backslashes are removed.
+    # Other shell metacharacters that act as separators (backticks, dollar signs, braces,
+    # parentheses, brackets, semicolons, etc.) are replaced with spaces to prevent
+    # keyword merging bypasses (e.g., curl${IFS}url).
     # Optimization: Use native Bash parameter expansion instead of tr pipeline to eliminate subshells.
-    # We strip characters sequentially to avoid complex escaping issues inside bracket expressions
-    # which vary between Bash versions, specifically for backslashes.
     cmd_lower="$cmd"
     cmd_lower="${cmd_lower//\'/}"
     cmd_lower="${cmd_lower//\"/}"
     cmd_lower="${cmd_lower//\\/}"
-    cmd_lower="${cmd_lower//\`/}"
-    cmd_lower="${cmd_lower//\$/}"
-    cmd_lower="${cmd_lower//\(/}"
-    cmd_lower="${cmd_lower//\)/}"
-    cmd_lower="${cmd_lower//\{/}"
-    cmd_lower="${cmd_lower//\}/}"
-    cmd_lower="${cmd_lower//\[/}"
-    cmd_lower="${cmd_lower//\]/}"
+    cmd_lower="${cmd_lower//\`/ }"
+    cmd_lower="${cmd_lower//\$/ }"
+    cmd_lower="${cmd_lower//\(/ }"
+    cmd_lower="${cmd_lower//\)/ }"
+    cmd_lower="${cmd_lower//\{/ }"
+    cmd_lower="${cmd_lower//\}/ }"
+    cmd_lower="${cmd_lower//\[/ }"
+    cmd_lower="${cmd_lower//\]/ }"
+    cmd_lower="${cmd_lower//;/ }"
+    cmd_lower="${cmd_lower//&/ }"
+    cmd_lower="${cmd_lower//|/ }"
+    cmd_lower="${cmd_lower//</ }"
+    cmd_lower="${cmd_lower//>/ }"
+    cmd_lower="${cmd_lower//,/ }"
 
     # Note: Using `cmd_lower="${cmd_lower,,}"` is supported as per repository memory for bash 4.0+.
     cmd_lower="${cmd_lower,,}"
