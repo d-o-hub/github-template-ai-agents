@@ -130,3 +130,8 @@
 **Vulnerability:** Attempting to optimize command categorization by stripping arguments (truncating to the first word) allowed dangerous commands to bypass detection when chained (e.g., `echo hi; rm -rf /`).
 **Learning:** Command security filters must analyze the entire input string. Truncating to the first word only secures the primary command and ignores subsequent commands separated by shell metacharacters (`;`, `&&`, `||`, `|`).
 **Prevention:** Always perform security categorization on the full normalized command string using robust word boundaries (`boundary` regex) that account for all shell delimiters.
+
+## 2026-06-20 - Command Categorization Bypass via Keyword Merging
+**Vulnerability:** Command categorization normalization stripped shell metacharacters like `$`, `{`, and `}`, which allowed bypasses like `curl${IFS}url` because they were merged into `curlifsurl`, evading boundary-based keyword detection.
+**Learning:** Stripping metacharacters used as separators or variable expansions can lead to "keyword merging" where the intended command and its adjacent syntax are joined, bypassing filters.
+**Prevention:** Normalize command input by replacing shell metacharacters (e.g., `;`, `&`, `|`, `$`, `{`, `}`, `(`, `)`, `[`, `]`, `<`, `>`, `,`) with spaces instead of stripping them. This ensures tokens remain separated and correctly identifiable by boundary-based regexes.
