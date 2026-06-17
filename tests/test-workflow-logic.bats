@@ -8,12 +8,11 @@
     grep -q "gh pr create" .github/workflows/ci.yml
 }
 
-@test "workflow omits skip ci from branch commit (allows checks to run)" {
-    grep -q "commit -m \"ci: update ci status artifacts\"" .github/workflows/ci.yml
-    ! grep -q "commit -m \"ci: update ci status artifacts \\[skip ci\\]\"" .github/workflows/ci.yml
+@test "workflow includes skip ci in branch commit to prevent race conditions" {
+    grep -q "commit -m \"ci: update ci status artifacts \[skip ci\]\"" .github/workflows/ci.yml
 }
 
-@test "workflow includes skip ci only in squash merge subject" {
+@test "workflow includes skip ci in squash merge subject" {
     grep -q '\-\-subject "ci: update ci status artifacts \[skip ci\]"' .github/workflows/ci.yml
 }
 
