@@ -11,6 +11,8 @@ PENALTY_DUPLICATE_HEAVY = 0.15
 PENALTY_NOISY = 0.10
 
 # Quality scoring bonuses
+BONUS_HAS_FRONTMATTER = 0.05
+BONUS_HAS_ANCHORS = 0.05
 
 # Acceptance threshold
 ACCEPTABLE_THRESHOLD = 0.65
@@ -51,7 +53,23 @@ def score_content(markdown: str, links: list[str] | None = None) -> QualityScore
     noise_count = sum(text_lower.count(signal) for signal in noisy_signals)
     noisy = noise_count > 6
 
-
+    # 2026 Standard Checks
+    required_yaml = [
+        "relevance_score:",
+        "intent_category:",
+        "token_estimate:",
+        "last_updated:",
+    ]
+    has_frontmatter = text.startswith("---") and all(field in text for field in required_yaml)
+    has_anchors = all(
+        anchor in text
+        for anchor in [
+            "[ANCHOR: SUMMARY]",
+            "[ANCHOR: TECHNICAL_DETAILS]",
+            "[ANCHOR: COMPARISON]",
+            "[ANCHOR: CITATIONS]",
+        ]
+    )
 
     score = 1.0
     if too_short:
@@ -63,7 +81,11 @@ def score_content(markdown: str, links: list[str] | None = None) -> QualityScore
     if noisy:
         score -= PENALTY_NOISY  # Reduced from 0.20
 
-
+    # Bonus for 2026 standards
+    if has_frontmatter:
+        score += BONUS_HAS_FRONTMATTER
+    if has_anchors:
+        score += BONUS_HAS_ANCHORS
 
     # Ensure range
     score = max(0.0, min(1.0, score))
