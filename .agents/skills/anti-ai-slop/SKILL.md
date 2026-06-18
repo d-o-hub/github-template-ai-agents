@@ -1,7 +1,7 @@
 ---
 name: anti-ai-slop
 description: >
-  Apply this skill to avoid generic "AI slop" in UI, UX, and copy. Triggers: "make this feel less AI", "audit my copy", "humanize this", "fix the UX writing", "anti-design".
+  Apply this skill to avoid generic "AI slop" in UI, UX, and copy. Use this skill when the user asks to make something feel less AI-generated, audit copy for AI slop, humanize text, fix UX writing, or improve anti-design — even if they just say "this feels robotic" or "make it sound human".
 version: "0.2.10"
 category: ui-ux
 license: MIT
@@ -10,6 +10,11 @@ license: MIT
 # Anti-AI-Slop Skill — 2026 Edition
 
 AI tools flooded the design and copy space. The result: a recognizable monoculture. This skill is a systematic antidote. Use it to audit existing work OR to guide new creation from scratch.
+
+## When to Use
+
+- User asks to make something feel less AI-generated or audit copy for AI slop
+- Need to humanize text, fix UX writing, or improve anti-design
 
 ## How to Use This Skill
 
@@ -223,7 +228,10 @@ Anti-slop isn't just negation. These are the affirmative principles:
 - **Write for one person.** Not "users". Not "teams". The specific human who will read this specific sentence.
 
 ---
+## See Also
 
+- `ui-ux-optimize` — UI/UX optimization with swarm agents
+- `css-render-performance` — CSS render performance optimization
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -231,20 +239,12 @@ Anti-slop isn't just negation. These are the affirmative principles:
 | "Users are used to this kind of UI anyway" | Familiarity with mediocrity isn't an excuse to propagate it. |
 | "It's faster to use the default AI-generated copy" | Fast slop is still slop. Quality requires human-like consideration and editing. |
 | "This doesn't need to be unique, it just needs to work" | Distinctiveness is part of 'working'. It builds brand trust and memorability. |
-
 ## Red Flags
-
 - [ ] Over-reliance on "modern" sans-serif fonts without stylistic justification
 - [ ] Using generic affirmations like "Absolutely!" in UX copy
 - [ ] Defaulting to 3-column feature grids for all content types
-
----
-
-## Reference Files
-
+## References
 - `references/ui-alternatives.md` — Component-by-component replacements for slop UI
 - `references/ux-alternatives.md` — Flow-by-flow replacements for slop UX patterns
 - `references/copy-rewrites.md` — Before/after rewrites for the most common AI copy sins
-- `references/inspiration.md` — Design references, typographers, movements to study
-
-Read these when you need specific replacements or need to justify a creative direction to the user.
+- `references/inspiration.md` — Design references and movements to study

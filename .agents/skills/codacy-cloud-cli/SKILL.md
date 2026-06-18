@@ -12,6 +12,13 @@ metadata:
 
 The Codacy Cloud CLI (`codacy`) is the command-line interface for Codacy Cloud. Use it whenever the user wants to interact with remote Codacy data. This is a different tool from the Codacy Analysis CLI (`codacy-analysis`), which runs static analysis locally.
 
+## When to Use
+
+- User wants to check code quality metrics on Codacy Cloud
+- Need to inspect remote PR analysis results or browse vulnerabilities
+- Enabling/disabling tools or searching patterns on Codacy Cloud
+- Even if they just say "check Codacy" or "what does Codacy think of this PR"
+
 ## Setup
 
 ```bash
@@ -102,8 +109,8 @@ See [references/cloud-workflows.md](references/cloud-workflows.md) for details.
 
 ## Rationalizations
 
-| Challenge | Rationale |
-|-----------|-----------|
+| Rationalization | Reality |
+|-----------------|---------|
 | "I'll check it later" | Remote data changes on every push; check now while context is fresh. |
 | "The CLI is too verbose" | Use `--output json` and `jq` for precise extraction. |
 | "I can just check the dashboard" | CLI is faster for automation and scripting than navigating a UI. |
@@ -113,3 +120,9 @@ See [references/cloud-workflows.md](references/cloud-workflows.md) for details.
 - [ ] Suppressing findings without verifying they are actual false positives.
 - [ ] Using the issue `hash` for CLI suppressions (requires numeric `resultDataId` or `issueId`).
 - [ ] Assuming configuration changes take effect immediately without reanalysis.
+
+## See Also
+
+- `codacy` — Local Codacy Analysis CLI
+- `static-analysis` — Generic linter triage
+- `code-review-assistant` — PR review workflow

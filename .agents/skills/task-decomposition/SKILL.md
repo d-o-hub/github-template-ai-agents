@@ -2,7 +2,7 @@
 name: task-decomposition
 version: "0.2.10"
 category: agent
-description: Break down complex tasks into atomic, actionable goals with clear dependencies and success criteria. Use when planning multi-step projects, coordinating agents, or decomposing complex requests.
+description: Break down complex tasks into atomic, actionable goals with clear dependencies and success criteria. Use this skill when planning multi-step projects, coordinating agents, or decomposing complex requests — even if they just say "break this down" or "what are the steps".
 license: MIT
 ---
 
@@ -158,6 +158,12 @@ GOAP Phase 1: Decomposition → Execution Plan → Monitor → Report
 
 Good decomposition enables optimal execution, clear validation, and higher quality.
 
+## See Also
+
+- `goap-agent` — Orchestrator that uses task decomposition
+- `agent-coordination` — Coordinate agents for decomposed tasks
+- `triz-analysis` — Analyze contradictions before decomposing
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -171,6 +177,6 @@ Good decomposition enables optimal execution, clear validation, and higher quali
 - [ ] Skipping dependency mapping between decomposed tasks
 - [ ] Creating tasks larger than 4 hours without further breakdown
 
-## Reference Files
+## References
 
 - **[references/guide.md](references/guide.md)** - Complete guide with detailed framework, process, patterns, examples, and GOAP integration

@@ -1,6 +1,6 @@
 ---
 name: api-design-first
-description: Design and document RESTful APIs using design-first principles with OpenAPI specifications. Use when users ask to 'design an API', 'create API spec', 'REST API', 'OpenAPI', 'Swagger', or 'API documentation'. Trigger on API design tasks, endpoint planning, request/response modeling, or API versioning discussions.
+description: Design and document RESTful APIs using design-first principles with OpenAPI specifications. Use this skill when the user asks to design an API, create an API spec, plan endpoints, model request/response schemas, or discuss API versioning — even if they just say "design the API" or "create the OpenAPI spec".
 version: "0.2.10"
 category: platform
 template_version: "0.2"
@@ -10,6 +10,13 @@ license: MIT
 # API Design First
 
 Design RESTful APIs using design-first principles with comprehensive OpenAPI 3.0 specifications.
+
+## When to Use
+
+- User asks to design an API or create an API spec
+- Planning endpoints, modeling request/response schemas
+- Discussing API versioning or OpenAPI/Swagger documentation
+- Even if they just say "design the API" or "create the OpenAPI spec"
 
 ## Design Principles
 
@@ -121,6 +128,11 @@ paths:
 1. **URL Path**: `/v1/users`, `/v2/users`
 2. **Header**: `Accept: application/vnd.api+json;version=2`
 3. **Query Param**: `/users?api-version=2`
+
+## See Also
+
+- `cloudflare-worker-api` — Cloudflare Worker API routes
+- `secure-invite-and-access` — Auth endpoints and permissions
 
 ## Rationalizations
 

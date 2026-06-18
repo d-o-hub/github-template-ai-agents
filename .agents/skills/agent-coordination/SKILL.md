@@ -2,13 +2,20 @@
 name: agent-coordination
 version: "0.2.10"
 category: agent
-description: Coordinate multiple agents for software development across any language. Use for parallel execution of independent tasks, sequential chains with dependencies, swarm analysis from multiple perspectives, or iterative refinement loops. Handles Python, JavaScript, Java, Go, Rust, C#, and other languages.
+description: Coordinate multiple agents for software development across any language. Use this skill when running parallel execution of independent tasks, sequential chains with dependencies, swarm analysis from multiple perspectives, or iterative refinement loops — even if they just say "run these in parallel" or "coordinate agents".
 license: MIT
 ---
 
 # Agent Coordination
 
 Coordinate multiple agents efficiently for complex development tasks across any programming language.
+
+## When to Use
+
+- User asks to run parallel execution of independent tasks
+- Need to coordinate sequential chains with dependencies
+- Planning swarm analysis or iterative refinement loops
+- Even if they just say "run these in parallel" or "coordinate agents"
 
 ## Quick Start
 
@@ -87,6 +94,13 @@ Between each phase, verify:
 - Security scans clean
 - Performance acceptable
 - No regressions introduced
+
+## See Also
+
+- `goap-agent` — Top-level orchestrator
+- `parallel-execution` — Detailed parallel execution patterns
+- `delegate` — Lightweight retrieval agent
+- `implementer` — Atomic code execution agent
 
 ## Rationalizations
 

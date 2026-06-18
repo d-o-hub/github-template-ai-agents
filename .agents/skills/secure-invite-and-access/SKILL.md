@@ -2,7 +2,7 @@
 version: "0.2.10"
 name: secure-invite-and-access
 description: >
-  Implement access control, authentication, and authorization patterns. Activate for auth endpoints, permission management, session/token logic, or signed URL generation. Generic template adaptable to any project's auth needs.
+  Implement access control, authentication, and authorization patterns. Use this skill when building auth endpoints, managing permissions, implementing session/token logic, or generating signed URLs — even if they just say "add auth" or "secure this endpoint". Generic template adaptable to any project's auth needs.
 category: workflow
 license: MIT
 ---
@@ -11,7 +11,7 @@ license: MIT
 
 Implement access-control rules (authentication, authorization, sessions, audit logging) for any web application.
 
-## When to run
+## When to Use
 
 - Working on authentication, authorization, or session management.
 - Implementing role-based access control (RBAC) or permission grants.
@@ -34,6 +34,11 @@ Implement access-control rules (authentication, authorization, sessions, audit l
 - [ ] Audit rows created for create/update/revoke/grant usage.
 - [ ] Rate limiting or abuse guard documented (even if stubbed).
 - [ ] Never expose whether an email/username exists in error messages.
+
+## See Also
+
+- `security-code-auditor` — Security audits
+- `privacy-first` — Email/personal data prevention
 
 ## Rationalizations
 
