@@ -46,10 +46,12 @@ jobs:
               --period-days 30 \
               --repo "${{ github.repository }}"
           else
-            echo "# DORA Report" > reports/DORA-REPORT.md
-            echo "Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> reports/DORA-REPORT.md
-            echo "" >> reports/DORA-REPORT.md
-            echo "Agent metrics entries: $(wc -l < .agents/metrics.jsonl)" >> reports/DORA-REPORT.md
+            {
+              echo "# DORA Report"
+              echo "Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              echo ""
+              echo "Agent metrics entries: $(wc -l < .agents/metrics.jsonl)"
+            } > reports/DORA-REPORT.md
           fi
 
       - name: Create Pull Request
