@@ -16,11 +16,60 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+      agents: ${{ steps.filter.outputs.agents }}
+      workflows: ${{ steps.filter.outputs.workflows }}
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
+      - uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590  # v3.0.3
+        id: filter
+        with:
+          filters: |
+            code:
+              - '**/*.py'
+              - '**/*.ts'
+              - '**/*.tsx'
+              - '**/*.js'
+              - '**/*.jsx'
+              - '**/*.sh'
+              - '**/*.yml'
+              - '**/*.yaml'
+              - '**/*.toml'
+              - 'pyproject.toml'
+              - 'requirements.txt'
+              - 'package.json'
+              - 'VERSION'
+            agents:
+              - 'AGENTS.md'
+              - 'CLAUDE.md'
+              - 'GEMINI.md'
+              - 'QWEN.md'
+              - '.agents/**'
+              - 'agents-docs/**'
+              - '.claude/**'
+              - '.qwen/**'
+            workflows:
+              - '.github/workflows/**'
+
   quality-gate:
     name: Quality Gate
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    needs: [changes]
+    if: |
+      always() &&
+      (needs.changes.outputs.code == 'true' ||
+       needs.changes.outputs.agents == 'true' ||
+       needs.changes.outputs.workflows == 'true')
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
@@ -132,7 +181,10 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    needs: quality-gate
+    needs: [changes, quality-gate]
+    if: |
+      always() &&
+      needs.changes.outputs.code == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
@@ -226,24 +278,18 @@ jobs:
             echo "No BATS tests found"
           fi
 
-  update-ci-status:
-    name: Update CI Status
+  ci-success:
+    name: CI Success
     runs-on: ubuntu-latest
     needs: [quality-gate, test]
-    if: |
-      always() &&
-      github.actor != 'dependabot[bot]' &&
-      github.event_name != 'pull_request'
-    concurrency:
-      group: ci-status-update
-      cancel-in-progress: true
+    if: always()
     permissions:
       contents: write
-      pull-requests: write
-      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
@@ -251,88 +297,41 @@ jobs:
           python-version: '3.11'
 
       - name: Update CI status artifacts
+        if: github.ref == 'refs/heads/main'
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
           WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: python3 scripts/update-ci-status.py
 
-      - name: Ensure ci-status label exists
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: >
-          gh label create ci-status --color d4c5f9
-          --description "CI status tracking PR - exempt from stale automation"
-          --force 2>/dev/null || true
+      - name: Upload CI status as artifact
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v4
+        with:
+          name: ci-status
+          path: |
+            .github/ci-status/ci-status.json
+            .github/ci-status/ci-summary.md
 
-      - name: Commit and create PR
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET_BRANCH: ${{ github.event.pull_request.base.ref || github.ref_name }}
+      - name: Persist CI data to main
+        if: github.ref == 'refs/heads/main' && always()
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
-          # Fetch and checkout the target branch directly to avoid rebasing the PR merge commit
-          git stash push .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
-          git fetch origin "$TARGET_BRANCH"
-          git checkout "origin/$TARGET_BRANCH"
-          git stash pop || true
-
-          git add .github/ci-status/ci-status.json .github/ci-status/ci-summary.md
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/ci-status/
           if git diff --staged --quiet; then
             printf "No changes to CI status\n"
             exit 0
           fi
-
-          PR_BRANCH="ci/status-update"
-          git checkout -b "$PR_BRANCH" 2>/dev/null || git checkout "$PR_BRANCH"
           git commit -m "ci: update ci status artifacts [skip ci]"
-          git push origin --force -- "$PR_BRANCH"
+          git push origin main
+        continue-on-error: true
 
-          # Find-or-create the canonical CI status PR
-          if ! EXISTING_PR=$(gh pr list --head "$PR_BRANCH" --state open \
-            --json number --jq ".[0].number" 2>/tmp/gh-pr-list-err.log); then
-            printf "WARNING: gh pr list failed: %s\n" \
-              "$(cat /tmp/gh-pr-list-err.log)" >&2
-            printf "Skipping PR creation/merge to avoid duplicates\n"
-            exit 0
-          fi
-
-          if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
-            printf "Reusing existing PR #%s for %s\n" "$EXISTING_PR" "$PR_BRANCH"
-            NEW_PR="$EXISTING_PR"
-          else
-            PR_URL=$(gh pr create \
-              --title "ci: update ci status artifacts" \
-              --body "Automated CI status update from workflow run ${GITHUB_RUN_ID}." \
-              --base "$TARGET_BRANCH" \
-              --head "$PR_BRANCH" \
-              --label "ci-status")
-            NEW_PR=$(gh pr view "$PR_URL" --json number --jq '.number')
-            printf "Created PR #%s\n" "$NEW_PR"
-          fi
-
-          # Auto-merge via squash; --admin bypasses required checks (ci/status-update
-          # is itself one of them, so --auto would deadlock); [skip ci] prevents
-          # the merge commit from re-triggering this workflow.
-          MERGE_SUCCESS=false
-          for attempt in 1 2 3; do
-            if gh pr merge "$NEW_PR" \
-              --squash \
-              --subject "ci: update ci status artifacts [skip ci]" \
-              --admin \
-              --delete-branch=false; then
-              printf "Auto-merged PR #%s on attempt %d\n" "$NEW_PR" "$attempt"
-              MERGE_SUCCESS=true
-              break
+      - name: Check all required jobs passed
+        run: |
+          for res in "${{ needs.quality-gate.result }}" "${{ needs.test.result }}"; do
+            if [[ "$res" == "failure" || "$res" == "cancelled" ]]; then
+              echo "Required job failed or was cancelled: $res"
+              exit 1
             fi
-            printf "Merge attempt %d failed, waiting %ds before retry...\n" \
-              "$attempt" "$((attempt * 10))"
-            sleep "$((attempt * 10))"
-            gh pr update-branch "$NEW_PR" 2>/dev/null || true
           done
-
-          if [ "$MERGE_SUCCESS" = "false" ]; then
-            printf "WARNING: All merge attempts failed for PR #%s\n" "$NEW_PR" >&2
-            printf "Cleanup workflow will handle it in the next scheduled run.\n"
-          fi
+          echo "All required jobs passed (or were correctly skipped)"
