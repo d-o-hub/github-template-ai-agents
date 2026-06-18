@@ -8,7 +8,7 @@ Execute multi-agent swarm analysis using git worktrees with optimized web resear
 Topic: $ARGUMENTS
 
 Steps:
-1. Load skills: `do-web-doc-resolver`, `agent-coordination`, `github-workflow`
+1. Load skills: `do-web-doc-resolver`, `agent-coordination`, `git-github-workflow`
 2. Create git worktree for isolated analysis
 3. Execute web research using the resolver skill with optimized cascade
 4. Launch 3-agent swarm in parallel using task tool

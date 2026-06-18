@@ -35,16 +35,13 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `anti-ai-slop` | `.agents/skills/anti-ai-slop` | Apply this skill to avoid generic "AI slop" in UI, UX, and c |
 | `api-design-first` | `.agents/skills/api-design-first` | Design and document RESTful APIs using design-first principl |
 | `architecture-diagram` | `.agents/skills/architecture-diagram` | Generate or update a project architecture SVG diagram by sca |
-| `atomic-commit` | `.agents/skills/atomic-commit` | Atomic git workflow - validates, commits, pushes, creates PR |
 | `cicd-pipeline` | `.agents/skills/cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, Gi |
 | `cloudflare-worker-api` | `.agents/skills/cloudflare-worker-api` | Structure Worker API routes and handlers. Activate for route |
 | `codacy-analysis-cli` | `.agents/skills/codacy` | Uses the Codacy Analysis CLI to run local static analysis on |
-| `code-quality` | `.agents/skills/code-quality` | Review and improve code quality across any programming langu |
 | `code-review-assistant` | `.agents/skills/code-review-assistant` | Automated code review with PR analysis, change summaries, an |
 | `codeberg-api` | `.agents/skills/codeberg-api` | Interact with Forgejo/Codeberg repositories via the REST API |
 | `css-render-performance` | `.agents/skills/css-render-performance` | Guide CSS render performance analysis and optimization. Use  |
 | `database-devops` | `.agents/skills/database-devops` | Database design, migration, and DevOps automation with safet |
-| `database-schema-migrations` | `.agents/skills/database-schema-migrations` | Design database schema and write migrations. Activate for ta |
 | `delegate` | `.agents/skills/delegate` | Lightweight retrieval and context agent skill for rapid info |
 | `dist-channel-selection` | `.agents/skills/dist-channel-selection` | Guide for selecting the correct distribution channel (npm, C |
 | `do-web-doc-resolver` | `.agents/skills/do-web-doc-resolver` | Python resolver for URLs and queries into compact, LLM-ready |
@@ -56,7 +53,6 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `eu-ai-act-compliance` | `.agents/skills/eu-ai-act-compliance` | EU AI Act compliance logging and requirements. Use for ensur |
 | `git-github-workflow` | `.agents/skills/git-github-workflow` | Unified atomic git workflow with GitHub integration - commit |
 | `github-pr-sentinel` | `.agents/skills/github-pr-sentinel` | Monitor a GitHub pull request until it's merged, green, or b |
-| `github-workflow` | `.agents/skills/github-workflow` | Complete GitHub workflow automation - push, create branch/PR |
 | `goap-agent` | `.agents/skills/goap-agent` | Invoke for complex multi-step tasks requiring intelligent pl |
 | `implementer` | `.agents/skills/implementer` | Execution agent skill focused on implementing changes based  |
 | `intent-classifier` | `.agents/skills/intent-classifier` | Classify user intents and route to appropriate skills, comma |

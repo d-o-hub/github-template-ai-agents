@@ -1,7 +1,7 @@
 ---
 name: triz-analysis
 version: "0.2.10"
-description: Run a systematic TRIZ contradiction audit against a codebase, architecture, or workflow to identify hidden trade-offs and innovation opportunities.
+description: Run a systematic TRIZ contradiction audit against a codebase, architecture, or workflow to identify hidden trade-offs and innovation opportunities. Use this skill when facing design trade-offs, contradictory requirements, or when needing to identify innovation opportunities through systematic contradiction analysis.
 category: analysis
 license: MIT
 ---

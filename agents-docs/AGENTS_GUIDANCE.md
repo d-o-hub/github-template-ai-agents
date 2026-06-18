@@ -23,7 +23,7 @@ Each agent writes its handoff summary to `.agents/metrics.jsonl` (Post-Task Prot
 ## Commit Strategy
 
 - One pre-existing issue per commit, even when multiple are fixed in one go.
-- Use the **atomic-commit** skill for the commit/PR/merge lifecycle.
+- Use the **git-github-workflow** skill for the commit/PR/merge lifecycle.
 - Reference the failing job/run URL in the commit body so future archeology is easy.
 
 ## CI Verification
