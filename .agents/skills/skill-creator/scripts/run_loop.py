@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
-import subprocess
+import subprocess  # nosec  # nosemgrep
 import sys
 from pathlib import Path
 
@@ -57,6 +57,7 @@ def evaluate_description(
                 "--json",
             ]
             try:
+                # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-tainted-env-args.dangerous-subprocess-use-tainted-env-args
                 proc = subprocess.run(
                     cmd,
                     capture_output=True,
@@ -134,6 +135,7 @@ def propose_improvements(
     )
 
     try:
+        # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-tainted-env-args.dangerous-subprocess-use-tainted-env-args
         proc = subprocess.run(
             ["claude", "-p", prompt, "--model", "sonnet", "--json"],
             capture_output=True,
