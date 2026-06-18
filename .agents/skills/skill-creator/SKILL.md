@@ -10,6 +10,12 @@ category: quality
 
 Create and improve skills following the Agent Skills specification. A skill extends agent capabilities with specialized knowledge, workflows, and tools.
 
+## When to Use
+
+- User wants to create a skill from scratch, edit, or optimize an existing skill
+- Need to run evals to test a skill or benchmark performance
+- Even if they just say "create a skill" or "optimize this skill's description"
+
 ## Core Loop
 
 1. **Capture intent** - What should the skill do? When should it trigger?
@@ -125,6 +131,11 @@ Use `.agents/skills/verification-template/SKILL.md` as a starting point.
 - Reduces onboarding time.
 - Ensures consistent debugging and verification approach.
 
+## See Also
+
+- `skill-evaluator` — Evaluate and score skills
+- `intent-classifier` — Route requests to appropriate skills
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -140,7 +151,7 @@ Use `.agents/skills/verification-template/SKILL.md` as a starting point.
 - [ ] Hardcoding project-specific paths or values instead of using relative references.
 - [ ] Omitting the `## Rationalizations` or `## Red Flags` sections from SKILL.md.
 
-## Reference Files
+## References
 
 - `references/guide.md` - Templates, examples, and best practices
 - `references/evaluating-skills.md` - Evaluating skill output quality

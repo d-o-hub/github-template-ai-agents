@@ -20,7 +20,7 @@ metadata:
 This skill guides you through creating a best-practice GitHub README.md for 2026,
 including a custom SVG logo and shields.io badges.
 
-## When to activate
+## When to Use
 
 - User asks to "write a README", "improve README", "add badges", or "create a logo"
 - User asks to analyze or audit an existing README.md
@@ -159,6 +159,11 @@ Before finalising, verify:
 - Image paths that work locally but break on GitHub (always use paths from repo root)
 - More than 8 badges (becomes noise)
 - Forgetting `<div align="center">` closing tag
+
+## See Also
+
+- `architecture-diagram` — Project architecture diagrams
+- `agents-md` — AGENTS.md best practices
 
 ## Rationalizations
 

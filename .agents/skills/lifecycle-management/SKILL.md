@@ -1,6 +1,6 @@
 ---
 name: lifecycle-management
-description: Manage application lifecycle, error handling, and resource cleanup to prevent memory leaks and ensure stability. Use this skill when handling startup/shutdown sequences, managing resource pools, implementing error boundaries, preventing memory leaks, or ensuring graceful degradation and cleanup.
+description: Manage application lifecycle, error handling, and resource cleanup to prevent memory leaks and ensure stability. Use this skill when handling startup/shutdown sequences, managing resource pools, implementing error boundaries, preventing memory leaks, or ensuring graceful degradation — even if they just say "clean up resources" or "fix the memory leak".
 version: "0.2.10"
 category: quality
 license: MIT
@@ -9,6 +9,12 @@ license: MIT
 # Lifecycle Management
 
 Generic patterns for managing application lifecycle, specifically for web applications to prevent memory leaks and handle global errors.
+
+## When to Use
+
+- User asks to handle startup/shutdown sequences or manage resource pools
+- Need to implement error boundaries or prevent memory leaks
+- Even if they just say "clean up resources" or "fix the memory leak"
 
 ## Patterns
 
@@ -59,10 +65,15 @@ window.addEventListener('resize', handleResize, { signal });
 controller.abort();
 ```
 
+## See Also
+
+- `security-code-auditor` — Security audits
+- `pwa-offline-sync` — Service workers and caching
+
 ## Rationalizations
 
-| Excuses | Counter-arguments |
-|---------|-------------------|
+| Rationalization | Reality |
+|-----------------|---------|
 | "It's just a small app, no leaks." | Memory leaks accumulate over time and affect performance and stability even in small apps. |
 | "I'll remove listeners manually." | Manual removal is error-prone and often forgotten. AbortController is a cleaner, more robust pattern. |
 

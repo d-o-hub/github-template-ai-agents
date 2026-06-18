@@ -80,6 +80,12 @@ Example: `analysis/triz-scripts-2025-05-20.md`
 ✓ Recommendations mapped to TRIZ inventive principles
 ✓ Findings saved to `analysis/triz-<scope>-YYYY-MM-DD.md`
 
+## See Also
+
+- `triz-solver` — Problem-solving mode (vs audit mode)
+- `goap-agent` — Orchestrator that uses TRIZ analysis
+- `task-decomposition` — Break down audit findings into tasks
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -93,7 +99,7 @@ Example: `analysis/triz-scripts-2025-05-20.md`
 - [ ] Defining contradictions too vaguely to map to specific TRIZ principles
 - [ ] Not saving findings to the analysis/ directory as specified
 
-## Reference Files
+## References
 
 - `references/principles.md` - All 40 TRIZ principles with software examples
 - `references/patterns.md` - Common software contradiction patterns and resolutions

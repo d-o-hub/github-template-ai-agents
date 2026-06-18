@@ -127,10 +127,15 @@ export default {
 
 - `references/rules.md` - Core rules, storage, concurrency, RPC, alarms
 
+## See Also
+
+- `cloudflare-worker-api` — Cloudflare Worker API routes
+- `turso-db` — Database development
+
 ## Rationalizations
 
-| Concern | Counter-Argument |
-|---------|------------------|
+| Rationalization | Reality |
+|-----------------|---------|
 | "I can handle state in a global variable." | Durable Objects provide persistence across restarts and evictions. |
 | "Writing to storage on every request is slow." | SQLite storage is extremely fast and ensures data integrity. |
 | "I'll just use fetch() for communication." | RPC methods provide better type safety and performance (no HTTP overhead). |

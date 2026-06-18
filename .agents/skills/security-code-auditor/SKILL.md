@@ -10,6 +10,12 @@ license: MIT
 
 Perform security audits on code, configurations, and repositories to identify vulnerabilities and security issues.
 
+## When to Use
+
+- User asks to audit, review, or check security of code
+- Need to perform vulnerability scans or OWASP Top 10 checks
+- Even if they just say "check for security issues" or "is this secure"
+
 ## Scope
 
 - **Includes:** Source code review, dependency scanning, configuration auditing, OWASP Top 10 checks
@@ -84,6 +90,12 @@ cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
 2. **Validate all user inputs**
 3. **Implement defense in depth**
 4. **Add security monitoring and logging**
+
+## See Also
+
+- `eu-ai-act-compliance` — EU AI Act specific compliance
+- `privacy-first` — Email/personal data prevention
+- `static-analysis` — Linter-based security checks
 
 ## Rationalizations
 

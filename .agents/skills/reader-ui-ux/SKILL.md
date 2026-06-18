@@ -2,7 +2,7 @@
 version: "0.2.10"
 name: reader-ui-ux
 description: >
-  Build localized, accessible reader/admin UI with responsive layouts, telemetry, and state management. Activate for React screens or UX polish. Generic pattern for any document reader application.
+  Build localized, accessible reader/admin UI with responsive layouts, telemetry, and state management. Use this skill when building React screens, polishing UX, or implementing responsive layouts for reader or admin interfaces — even if they just say "fix the UI" or "make it responsive". Generic pattern for any document reader application.
 category: workflow
 license: MIT
 ---
@@ -11,7 +11,7 @@ license: MIT
 
 Purpose: deliver intentional, localized, accessible reader/admin UX.
 
-## When to run
+## When to Use
 
 - Modifying reader/admin React screens, layout primitives, or shared UI components.
 - Adding localization copy, accessibility improvements, or design polish.
@@ -33,6 +33,11 @@ Purpose: deliver intentional, localized, accessible reader/admin UX.
 - [ ] Error states use ErrorBoundary + inline alerts.
 - [ ] Async effects cancel via AbortController; cleanup functions implemented.
 - [ ] UI interactions include aria-labels + focus traps where applicable.
+
+## See Also
+
+- `anti-ai-slop` — Avoid AI slop in UI/UX
+- `css-render-performance` — CSS render performance optimization
 
 ## Rationalizations
 

@@ -1,7 +1,7 @@
 ---
 name: testing-strategy
 version: "0.2.10"
-description: Design and implement comprehensive testing strategies for software projects. Use for test planning, property-based testing, visual regression, load testing, mutation testing, and E2E test generation. Handles Python, JavaScript, and other languages.
+description: Design and implement comprehensive testing strategies for software projects. Use this skill when planning test suites, choosing testing approaches like property-based testing, visual regression, load testing, mutation testing, or E2E test generation — even if they just say "how should we test this" or "what testing approach should we use".
 category: testing
 license: MIT
 ---
@@ -10,37 +10,62 @@ license: MIT
 
 Design and implement comprehensive testing strategies with modern techniques.
 
-## Strategy Selection
+## When to Use
 
-Choose the appropriate testing approach for your project:
+- User asks to plan test suites or choose testing approaches
+- Need to decide between property-based, visual regression, load testing, etc.
+- Even if they just say "how should we test this" or "what testing approach should we use"
 
-**Property-Based** - Discover edge cases with generative testing.
-**Visual Regression** - Detect UI changes with screenshot comparison.
-**Load & Stress** - Verify performance under pressure.
-**Mutation Testing** - Measure test suite effectiveness.
-**Test Maintenance** - Keep tests healthy and reliable.
+## Strategy Decision Tree
 
-## Available Patterns
+```
+What are you testing?
+├── Business logic / algorithms → Property-Based Testing
+│   └── Tool: Hypothesis (Python), fast-check (JS)
+├── UI appearance / visual state → Visual Regression
+│   └── Tool: Playwright screenshots, Percy, Chromatic
+├── Performance under load → Load & Stress Testing
+│   └── Tool: Locust (Python), k6 (JS), JMeter (Java)
+├── Test suite quality itself → Mutation Testing
+│   └── Tool: Mutmut (Python), Stryker (JS/Java/C#)
+└── End-to-end user flows → E2E Testing
+    └── Tool: Playwright, Cypress, Selenium
+```
 
-- **Load Testing**: Pre-configured scenarios for REST, GraphQL, and Browser tests.
-- **Mutation Testing**: Configuration and operators for Stryker, Mutmut, and PIT.
-- **Property-Based**: Patterns for stateful testing, custom strategies, and common properties.
-- **Visual Testing**: Guide for Playwright, Storybook, and masking dynamic content.
-- **Maintenance**: Health metrics, flaky test management, and AI-assisted diagnosis.
+## Strategy Reference
 
-## Language Support
+| Strategy | What It Catches | When To Use | Effort |
+|----------|----------------|-------------|--------|
+| **Property-Based** | Edge cases, boundary conditions | Algorithms, data transformations, parsers | Medium |
+| **Visual Regression** | UI layout shifts, rendering bugs | Any visual component, responsive design | Low |
+| **Load & Stress** | Performance bottlenecks, memory leaks | APIs, databases, critical paths | High |
+| **Mutation Testing** | Weak assertions, missing test cases | Any code with existing unit tests | Medium |
+| **E2E** | Integration bugs, user flow breaks | Critical user journeys, smoke tests | High |
 
-- Python (Hypothesis, Mutmut, Locust)
-- JavaScript/TypeScript (fast-check, Stryker, k6, Playwright)
-- Java (PIT, JMeter)
-- C# (Stryker.NET)
+## Language-Specific Tools
+
+| Language | Property-Based | Visual | Load | Mutation |
+|----------|---------------|--------|------|----------|
+| Python | Hypothesis | Playwright | Locust | Mutmut |
+| JavaScript | fast-check | Playwright/Percy | k6 | Stryker |
+| Java | jqwik | Selenium | JMeter | PIT |
+| C# | FsCheck | Playwright | NBomber | Stryker.NET |
 
 ## Quality Gates
 
 Integrate testing into CI/CD:
-- Check mutation score thresholds.
-- Monitor Core Web Vitals in load tests.
-- Auto-quarantine flaky tests.
+- Check mutation score thresholds (>80% target)
+- Monitor Core Web Vitals in load tests (LCP < 2.5s)
+- Auto-quarantine flaky tests after 3 consecutive failures
+- Fail build if coverage drops on new code
+
+## Gotchas
+
+- Property-based tests need shrinking configuration — without it, counterexamples are huge and unhelpful.
+- Visual regression tests are environment-sensitive — use fixed viewport sizes and font rendering settings.
+- Load tests against production data need anonymization — never use real customer data.
+- Mutation testing on legacy code produces many surviving mutants — start with a baseline and improve incrementally.
+- Flaky E2E tests erode trust — quarantine them immediately and fix root cause before re-enabling.
 
 ## Rationalizations
 
@@ -55,7 +80,14 @@ Integrate testing into CI/CD:
 - [ ] Declining code coverage on new features
 - [ ] Committing code with failing or bypassed tests
 - [ ] Ignoring flaky tests instead of identifying and fixing the root cause
+- [ ] Running all tests on every change instead of targeted test selection
 
 ## References
 
 - [Testing Strategy Patterns](../../../agents-docs/references/testing-patterns.md) - Comprehensive collection of testing patterns and strategies
+
+## See Also
+
+- `test-runner` — Execute tests and diagnose failures
+- `dogfood` — Exploratory testing of web applications
+- `testdata-builders` — Create test fixtures and factories

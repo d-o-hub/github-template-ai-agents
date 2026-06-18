@@ -2,7 +2,7 @@
 name: parallel-execution
 version: "0.2.10"
 category: agent
-description: Execute multiple independent tasks simultaneously using parallel agent coordination to maximize throughput and minimize execution time. Use when tasks have no dependencies, results can be aggregated, and agents are available for concurrent work.
+description: Execute multiple independent tasks simultaneously using parallel agent coordination to maximize throughput and minimize execution time. Use this skill when tasks have no dependencies, results can be aggregated, and agents are available for concurrent work — even if they just say "run these in parallel" or "do these at the same time".
 license: MIT
 ---
 
@@ -217,6 +217,11 @@ Used by **agent-coordination** for independent task strategy.
 
 Parallel execution maximizes efficiency through concurrent execution, independent validation, and synchronized aggregation.
 
+## See Also
+
+- `agent-coordination` — Strategy selection and agent routing
+- `goap-agent` — Top-level orchestrator
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -230,6 +235,6 @@ Parallel execution maximizes efficiency through concurrent execution, independen
 - [ ] Parallelizing tasks that share mutable state or write to the same files
 - [ ] Ignoring partial failures and not collecting available results
 
-## Reference Files
+## References
 
 - **[../../../agents-docs/references/orchestration-patterns.md](../../../agents-docs/references/orchestration-patterns.md)** - Complete guide with detailed steps, patterns, synchronization strategies, error handling, performance optimization, and troubleshooting

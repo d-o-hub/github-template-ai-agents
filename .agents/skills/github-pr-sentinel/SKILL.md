@@ -1,7 +1,7 @@
 ---
 name: github-pr-sentinel
 version: "0.2.10"
-description: Monitor a GitHub pull request until it's merged, green, or blocked. Polls CI checks, review comments, and mergeability state continuously. Diagnoses failures, retries flaky checks up to 3 times, auto-fixes branch-related issues when possible, and stops only when user help is required. Use when asked to "monitor a PR", "watch CI", "handle review comments", "sentinel a PR", or keep an eye on failures and feedback.
+description: Monitor a GitHub pull request until it's merged, green, or blocked. Polls CI checks, review comments, and mergeability state continuously. Use this skill when the user asks to monitor a PR, watch CI, handle review comments, sentinel a PR, babysit a PR, or keep an eye on failures and feedback — even if they just say "check on the PR" or "is it green yet".
 compatibility: Any CLI agent (OpenCode, Claude, Codex, Cursor, etc.)
 metadata:
   source: https://github.com/openai/codex/tree/main/.codex/skills/babysit-pr
@@ -13,6 +13,11 @@ license: MIT
 # PR Sentinel
 
 Monitor a GitHub pull request persistently until one of these terminal outcomes occurs.
+
+## When to Use
+
+- User asks to monitor a PR, watch CI, or babysit a pull request
+- Need to handle review comments or keep an eye on failures and feedback
 
 ## Terminal Outcomes (stop when any is true)
 
@@ -170,12 +175,6 @@ On a fresh state file, existing pending review feedback is surfaced immediately 
 11. If blocked on user-help issue — report the blocker and stop.
 12. Otherwise sleep per polling cadence and repeat.
 
-### Preferring `--watch`
-
-When the user asks to monitor/watch/babysit a PR, use `--watch` for autonomous polling. Use `--once` only for debugging or one-shot checks.
-
-Do **not** stop to ask whether to continue — poll autonomously until a strict stop condition or explicit user interruption.
-
 ## Polling Cadence (Adaptive)
 
 - **CI not green**: poll every 1 minute.
@@ -230,6 +229,10 @@ Include:
 - Flaky retry cycles used
 - Remaining unresolved failures or review comments
 
+## See Also
+
+- `git-github-workflow` — Full commit-to-merge lifecycle
+- `cicd-pipeline` — CI/CD pipeline design and troubleshooting
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -237,14 +240,11 @@ Include:
 | "CI is just being flaky, I'll just merge it" | Flakiness masks real bugs. Rerun or fix, never ignore. |
 | "A human will review this anyway, I don't need to be perfect" | The sentinel's job is to save human reviewers time by catching low-hanging fruit. |
 | "This PR is small, I can skip the full monitoring loop" | Small PRs can have big impacts. Consistency is key to reliability. |
-
 ## Red Flags
-
 - [ ] Stopping the monitoring loop before a terminal outcome is reached
 - [ ] Ignoring actionable review feedback in favor of automated checks
 - [ ] Rerunning failed checks more than 3 times without diagnosing the root cause
-
 ## References
 
-- `references/heuristics.md` - CI/Review decision tree for fix vs rerun vs stop
-- `references/github-api-notes.md` - GitHub CLI commands and endpoints used by the watcher
+- `references/heuristics.md` - CI/Review decision tree
+- `references/github-api-notes.md` - GitHub CLI commands used by the watcher

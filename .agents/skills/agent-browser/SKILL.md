@@ -11,6 +11,13 @@ license: MIT
 
 The CLI uses Chrome/Chromium via CDP directly. Install via `npm i -g agent-browser`, `brew install agent-browser`, or `cargo install agent-browser`. Run `agent-browser install` to download Chrome. Run `agent-browser upgrade` to update to the latest version.
 
+## When to Use
+
+- User asks to open a website, fill out a form, or click a button
+- Need to take screenshots or scrape data from a page
+- Testing web apps or automating browser actions
+- Even if they just say "open this URL" or "grab the content from that page"
+
 ## Core Workflow
 
 Every browser automation follows this pattern:
@@ -202,6 +209,11 @@ agent-browser batch --bail < commands.json
 
 Use `batch` when you have a known sequence of commands that don't depend on intermediate output. Use separate commands or `&&` chaining when you need to parse output between steps (e.g., snapshot to discover refs, then interact).
 
+## See Also
+
+- `web-search-researcher` — Web search and research
+- `do-web-doc-resolver` — Resolve web URLs to markdown
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -216,6 +228,6 @@ Use `batch` when you have a known sequence of commands that don't depend on inte
 - [ ] No re-snapshot after navigation or DOM mutation
 - [ ] Using `npx agent-browser` instead of direct binary (slower Node.js path)
 
-## Reference Files
+## References
 
 - `references/PATTERNS.md` - Common patterns, security, and advanced usage
