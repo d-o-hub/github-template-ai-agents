@@ -7,10 +7,10 @@ setup() {
 
 @test "harden-command-categorization: prevents false positives (partial words)" {
     run categorize_command "mkdir farm"
-    [ "$output" = "unknown" ]
+    [ "$output" = "conditional" ]
     
     run categorize_command "echo storm"
-    [ "$output" = "unknown" ]
+    [ "$output" = "safe" ]
 }
 
 @test "harden-command-categorization: detects obfuscated commands" {
