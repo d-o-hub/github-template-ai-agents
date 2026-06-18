@@ -90,8 +90,8 @@ Phase 6: RETRY LOOP
 |--------------|------------------|
 | Shell script errors | `shell-script-quality` |
 | YAML syntax | `cicd-pipeline` |
-| Python errors | `code-quality` |
-| TypeScript/JS errors | `code-quality` |
+| Python errors | `code-review-assistant` |
+| TypeScript/JS errors | `code-review-assistant` |
 | Markdown issues | `markdownlint` |
 | Security warnings | `security-code-auditor` |
 | Link/reference errors | `validate-links.sh` |
@@ -151,6 +151,5 @@ Loop succeeds when:
 
 ## See Also
 
-- `git-github-workflow/SKILL.md` - Full git workflow
-- `atomic-commit/SKILL.md` - Atomic commit pattern
+- `git-github-workflow/SKILL.md` - Unified atomic git workflow (supersedes atomic-commit)
 - `web-search-researcher/SKILL.md` - Web research skill

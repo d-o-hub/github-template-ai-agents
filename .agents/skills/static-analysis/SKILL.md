@@ -2,7 +2,7 @@
 name: static-analysis
 version: 1.0.0
 category: code-quality
-description: Language-agnostic static analysis and linter triage skill for cross-language projects.
+description: Triage and fix static analysis findings across any programming language. Use this skill when running linters (ruff, eslint, clippy, shellcheck), analyzing lint output, fixing warnings or errors, or managing cross-language static analysis results in a project. Trigger on "lint", "static analysis", "triage warnings", "fix findings".
 license: MIT
 ---
 

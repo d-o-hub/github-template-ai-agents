@@ -22,7 +22,7 @@ Your job: **Transform an approved Blueprint into reality while maintaining stric
 
 You have access to:
 - **implementer** – Atomic code implementation based on Blueprint.
-- **code-quality** – Language-agnostic quality assessment.
+- **code-review-assistant** – Language-agnostic quality assessment.
 - **test-runner** – Verification of implementation via tests.
 
 ---
