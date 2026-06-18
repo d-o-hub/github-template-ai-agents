@@ -1,0 +1,65 @@
+---
+name: Monthly DORA Report
+on:
+  schedule:
+    - cron: '0 0 1 * *'  # First of every month
+  workflow_dispatch:
+
+jobs:
+  dora-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        with:
+          python-version: '3.11'
+
+      - name: Fetch GitHub data
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api "/repos/${{ github.repository }}/releases" --paginate \
+            --jq '[.[] | {tag: .tag_name, published: .published_at}]' \
+            > /tmp/releases.json || echo '[]' > /tmp/releases.json
+          gh api "/repos/${{ github.repository }}/pulls?state=closed&base=main" --paginate \
+            --jq '[.[] | select(.merged_at != null) | {pr: .number, created: .created_at, merged: .merged_at}]' \
+            > /tmp/prs.json || echo '[]' > /tmp/prs.json
+
+      - name: Generate DORA Report
+        run: |
+          touch .agents/metrics.jsonl dora-metrics.jsonl
+          if [ -f .agents/skills/dora-report/scripts/compute_dora.py ]; then
+            python3 .agents/skills/dora-report/scripts/compute_dora.py \
+              --releases /tmp/releases.json \
+              --prs /tmp/prs.json \
+              --agent-metrics .agents/metrics.jsonl \
+              --dora-metrics dora-metrics.jsonl \
+              --output reports/DORA-REPORT.md \
+              --period-days 30 \
+              --repo "${{ github.repository }}"
+          else
+            echo "# DORA Report" > reports/DORA-REPORT.md
+            echo "Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> reports/DORA-REPORT.md
+            echo "" >> reports/DORA-REPORT.md
+            echo "Agent metrics entries: $(wc -l < .agents/metrics.jsonl)" >> reports/DORA-REPORT.md
+          fi
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c  # v6
+        with:
+          commit-message: "docs(dora): update reports/DORA-REPORT.md [skip ci]"
+          title: "docs(dora): monthly DORA performance report update"
+          body: "Automated monthly DORA report generation."
+          branch: "automation/dora-report"
+          base: main
+          labels: |
+            agentic
+            documentation

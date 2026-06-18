@@ -1,0 +1,66 @@
+---
+name: Patch Release on Label
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: |
+      github.event.pull_request.merged == true &&
+      (contains(github.event.pull_request.labels.*.name, 'release:patch') ||
+       contains(github.event.pull_request.labels.*.name, 'release:minor') ||
+       contains(github.event.pull_request.labels.*.name, 'release:major'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - name: Determine bump type
+        id: bump
+        env:
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: |
+          if echo "$LABELS" | grep -q 'release:major'; then
+            echo "bump=major" >> "$GITHUB_OUTPUT"
+          elif echo "$LABELS" | grep -q 'release:minor'; then
+            echo "bump=minor" >> "$GITHUB_OUTPUT"
+          else
+            echo "bump=patch" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bump VERSION
+        env:
+          BUMP: ${{ steps.bump.outputs.bump }}
+        run: |
+          CURRENT=$(cat VERSION)
+          IFS='.' read -r major minor patch <<< "$CURRENT"
+          case "$BUMP" in
+            major) major=$((major + 1)); minor=0; patch=0 ;;
+            minor) minor=$((minor + 1)); patch=0 ;;
+            patch) patch=$((patch + 1)) ;;
+          esac
+          NEW_VERSION="${major}.${minor}.${patch}"
+          echo "$NEW_VERSION" > VERSION
+          echo "Bumped $CURRENT -> $NEW_VERSION"
+
+      - name: Create tag and release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(cat VERSION)
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add VERSION
+          git commit -m "chore(release): v${VERSION} [skip ci]"
+          git tag "v${VERSION}"
+          git push origin main --tags
+          gh release create "v${VERSION}" \
+            --title "v${VERSION}" \
+            --generate-notes
