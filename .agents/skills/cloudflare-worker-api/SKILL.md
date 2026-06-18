@@ -2,7 +2,7 @@
 version: "0.2.10"
 name: cloudflare-worker-api
 description: >
-  Structure Worker API routes and handlers. Activate for route definition, response helpers, and typed handler patterns. Auth belongs to secure-invite-and-access.
+  Structure Worker API routes and handlers. Use this skill when defining Cloudflare Worker routes, building response helpers, or implementing typed handler patterns — even if they just say "set up the worker routes" or "add an API endpoint to the worker". Auth belongs to secure-invite-and-access.
 category: workflow
 license: MIT
 ---
@@ -10,6 +10,12 @@ license: MIT
 # Cloudflare Worker API
 
 Provide a standardized structure for Worker routes, auth middleware, and response helpers.
+
+## When to Use
+
+- User asks to define Cloudflare Worker routes or handlers
+- Building response helpers or typed handler patterns
+- Even if they just say "set up the worker routes" or "add an API endpoint to the worker"
 
 ## Key Responsibilities
 
@@ -47,6 +53,11 @@ src/routes/
 
 - `references/routing-patterns.md` - Common routing patterns for Workers
 - `references/response-helpers.md` - Consistent response formatting
+
+## See Also
+
+- `secure-invite-and-access` — Auth endpoints and permissions
+- `api-design-first` — API design and OpenAPI specs
 
 ## Rationalizations
 

@@ -2,7 +2,7 @@
 name: code-review-assistant
 version: "0.2.10"
 category: code-quality
-description: Automated code review with PR analysis, change summaries, quality checks, and code smell detection. Use for reviewing pull requests, generating review comments, checking against best practices, identifying code smells, and providing refactoring guidance. Includes style guide compliance, security issue detection, code smell detection, and review automation.
+description: Automated code review with PR analysis, change summaries, quality checks, and code smell detection. Use this skill when reviewing pull requests, generating review comments, checking against best practices, identifying code smells, or providing refactoring guidance — even if they just say "review this" or "look at this PR".
 license: MIT
 ---
 
@@ -75,24 +75,11 @@ Automated code review with intelligent analysis of changes, quality checks, and 
 
 ## Core Quality Principles
 
-**DRY** — Extract repeated logic into shared functions or constants.
+- **DRY** — Extract repeated logic into shared functions or constants
+- **Single Responsibility** — Each function/class should have one clear purpose
+- **No Magic Numbers** — Replace bare literals with named constants
 
-```python
-TAX_RATES = {'US': 0.08, 'EU': 0.20}
-def calc_tax(p, region): return p * TAX_RATES[region]
-```
-
-**Single Responsibility** — Each function/class should have one clear purpose.
-**No Magic Numbers** — Replace bare literals with named constants.
-
-## Tools by Language
-
-| Language | Linter | Formatter | Test |
-|----------|--------|-----------|------|
-| Python | ruff | black | pytest |
-| TypeScript | eslint | prettier | jest |
-| Rust | clippy | rustfmt | cargo test |
-| Go | golangci-lint | gofmt | go test |
+See `static-analysis` for linter tool registry and per-language commands.
 
 ## File Risk Assessment
 
@@ -113,69 +100,19 @@ def calc_tax(p, region): return p * TAX_RATES[region]
 | **Test Coverage** | < 80% | Flag for tests |
 | **TODO/FIXME** | > 3 | Needs triage |
 
-## Quality Checks
+## Review Feedback Format
 
-### Style Violations
+When reporting issues, use this structure:
 
-```python
-# Common patterns to check
-STYLE_CHECKS = {
-    'python': [
-        ('line_length', r'.{101,}'),
-        ('missing_docstrings', r'^def (?!__).*:\n(?!\s*""")'),
-    ],
-    'javascript': [
-        ('console_logs', r'console\.(log|debug)'),
-        ('var_usage', r'\bvar\s+'),
-    ],
-}
-```
+- **Issue**: clear description of the problem
+- **Suggestion**: specific actionable fix
+- **Why**: reasoning behind the suggestion
 
-### Security Patterns
-
-```python
-SECURITY_CHECKS = [
-    ('hardcoded_secrets', r'(password|secret|key)\s*=\s*["\'][^"\']+'),
-    ('sql_injection', r'execute\s*\([^)]*%'),
-    ('unsafe_eval', r'eval\s*\('),
-]
-```
-
-## Review Comment Templates
-
-### Issue Template
-
-```
-**Issue**: {description}
-
-**Suggestion**: {suggestion}
-
-**Why**: {explanation}
-```
-
-### Praise Template
-
-```
-✨ **Nice!** {description}
-
-This {practice} improves {benefit}.
-```
+For positive observations, highlight the practice and its benefit.
 
 ## GitHub Integration
 
 See `references/github-integration.md` for API usage, auto-approval criteria, and webhook setup.
-
-## Auto-Approve Criteria
-
-```python
-AUTO_APPROVE_CRITERIA = {
-    'max_files': 5,
-    'max_lines': 100,
-    'no_critical_files': True,
-    'test_coverage_threshold': 80,
-    'no_severity_blocking': True,
-}
-```
 
 ## Review Summary Template
 
@@ -198,45 +135,16 @@ AUTO_APPROVE_CRITERIA = {
 **{decision}** - {decision_reason}
 ```
 
-## CI Integration
-
-```yaml
-name: Automated Code Review
-version: "0.2.10"
-
-on:
-  pull_request:
-    types: [opened, synchronize]
-
-jobs:
-  review:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Run Code Review Assistant
-        uses: ./.github/actions/code-review
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-```
-
-## Quality Checklist
+## Review Checklist
 
 - [ ] No magic numbers (use named constants)
 - [ ] Functions/methods under 50 lines
 - [ ] DRY principle followed
-- [ ] No code smells detected
 - [ ] All new code has corresponding tests
 - [ ] No hardcoded secrets or credentials
 - [ ] Security-sensitive code properly reviewed
 - [ ] Documentation updated for API changes
-- [ ] Error handling added for new code paths
-- [ ] Performance implications considered
-- [ ] Style guide compliance verified
 - [ ] No debugging code left in (console.log, print)
-- [ ] Meaningful commit messages
-- [ ] Breaking changes documented
 
 ## Rationalizations
 
@@ -257,3 +165,9 @@ jobs:
 - `references/github-integration.md` - GitHub API integration
 - `references/security-patterns.md` - Security review patterns
 - `references/style-guides.md` - Common style guide configurations
+
+## See Also
+
+- `static-analysis` — Linter triage and fix workflows
+- `security-code-auditor` — Security audit workflows
+- `codacy` — Local Codacy CLI analysis

@@ -1,7 +1,7 @@
 ---
 name: docs-hook
 version: "0.2.10"
-description: Lightweight git hook integration for updating agents-docs with minimal tokens. Triggered on commit/merge events to sync documentation.
+description: Lightweight git hook integration for updating agents-docs with minimal tokens. Use this skill when updating agents-docs on commit or merge events to sync documentation — even if they just say "update the docs" or "sync the agent docs".
 category: workflow
 license: MIT
 ---
@@ -9,6 +9,12 @@ license: MIT
 # Docs Hook
 
 Ultra-lightweight documentation sync via git hooks.
+
+## When to Use
+
+- User asks to update agents-docs on commit or merge events
+- Need to sync documentation with minimal tokens
+- Even if they just say "update the docs" or "sync the agent docs"
 
 ## Trigger
 
@@ -39,6 +45,11 @@ Or add to `.git/hooks/post-commit`:
 ## Working Script
 
 See `scripts/docs-sync.sh` - the actual executable.
+
+## See Also
+
+- `learn` — Extract learnings into AGENTS.md
+- `agents-md` — AGENTS.md best practices
 
 ## Rationalizations
 

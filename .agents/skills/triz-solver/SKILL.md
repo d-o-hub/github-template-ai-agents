@@ -153,6 +153,12 @@ Result: Reliability maintained, context efficiency improved
 ✓ No new contradictions introduced
 ✓ Approaches ideal state (minimal added complexity)
 
+## See Also
+
+- `triz-analysis` — Audit mode (vs problem-solving mode)
+- `goap-agent` — Orchestrator that uses TRIZ problem-solving
+- `iterative-refinement` — Use contradiction analysis to guide refinement cycles
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -166,7 +172,7 @@ Result: Reliability maintained, context efficiency improved
 - [ ] Skipping IFR definition and jumping to implementation details
 - [ ] Introducing new contradictions without validating the solution
 
-## Reference Files
+## References
 
 - **[references/principles.md](references/principles.md)** - All 40 TRIZ principles with software examples
 - **[references/patterns.md](references/patterns.md)** - Common software contradiction patterns and resolutions

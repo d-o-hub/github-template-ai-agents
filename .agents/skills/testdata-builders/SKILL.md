@@ -2,7 +2,7 @@
 version: "0.2.10"
 name: testdata-builders
 description: >
-  Maintain deterministic builders/factories for test entities. Activate when authoring tests, extending test utilities, or adding schema fields that affect fixtures.
+  Maintain deterministic builders/factories for test entities. Use this skill when authoring tests, extending test utilities, or adding schema fields that affect fixtures — even if they just say "create test data" or "build a factory for this".
 category: quality
 license: MIT
 ---
@@ -11,7 +11,7 @@ license: MIT
 
 Provide consistent factories/builders for test entities to keep tests concise and deterministic.
 
-## When to run
+## When to Use
 
 - Authoring or refactoring tests.
 - Extending test utilities or seeding data for integration tests.
@@ -50,6 +50,12 @@ function makeUser(overrides: Partial<User> = {}): User {
 
 // Usage: const admin = makeUser({ role: 'admin', email: 'admin@test.com' });
 ```
+
+## See Also
+
+- `test-runner` — Execute tests and diagnose failures
+- `testing-strategy` — Choose testing approaches and plan test suites
+- `dogfood` — Exploratory testing of web applications
 
 ## Rationalizations
 

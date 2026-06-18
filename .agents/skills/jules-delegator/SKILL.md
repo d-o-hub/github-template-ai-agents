@@ -1,7 +1,7 @@
 ---
 name: jules-delegator
 version: "0.2.10"
-description: Use this skill to delegate complex coding tasks by creating Jules sessions via the Jules CLI. Jules is an AI coding agent that can autonomously implement features, fix bugs, and make code changes across repositories.
+description: Use this skill to delegate complex coding tasks by creating Jules sessions via the Jules CLI. Use this skill when the user asks to delegate a coding task to Jules, create a Jules session, or hand off implementation work — even if they just say "send this to Jules" or "let Jules handle it". Jules is an AI coding agent that can autonomously implement features, fix bugs, and make code changes across repositories.
 category: agent
 license: MIT
 ---
@@ -136,6 +136,11 @@ The rewriter:
 | `jules remote pull --session <id>` | Pull results from a session |
 | `jules completion <bash\|zsh>` | Generate autocompletion script |
 | `jules` | Launch interactive TUI |
+
+## See Also
+
+- `git-github-workflow` — Git workflow and PR lifecycle
+- `implementer` — Execute code changes
 
 ## Rationalizations
 

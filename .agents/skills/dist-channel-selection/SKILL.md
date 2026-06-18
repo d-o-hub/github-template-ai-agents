@@ -2,13 +2,19 @@
 name: dist-channel-selection
 version: "0.2.10"
 category: tool
-description: Guide for selecting the correct distribution channel (npm, Cargo, etc.) based on artifact type and target audience. Use when preparing to publish or release a new version of a package.
+description: Guide for selecting the correct distribution channel (npm, Cargo, etc.) based on artifact type and target audience. Use this skill when preparing to publish or release a new version of a package — even if they just say "publish this" or "release it".
 license: MIT
 ---
 
 # Distribution Channel Selection
 
 Ensure artifacts are published to the correct channels with appropriate verification.
+
+## When to Use
+
+- User asks to publish or release a new version of a package
+- Need to select the correct distribution channel (npm, Cargo, etc.)
+- Even if they just say "publish this" or "release it"
 
 ## Decision Matrix
 
@@ -45,6 +51,11 @@ Use the official toolchain for the selected channel.
 - Publishing WASM binaries without size verification.
 - Forgetting to sync the `VERSION` file across sub-packages.
 - Incomplete CHANGELOG leading to consumer confusion.
+
+## See Also
+
+- `cicd-pipeline` — CI/CD pipeline for publishing
+- `git-github-workflow` — Git workflow for releases
 
 ## Rationalizations
 

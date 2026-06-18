@@ -91,8 +91,8 @@ UNUSED_VAR="internal"
 
 ## Rationalizations
 
-| Challenge | Rationale |
-|-----------|-----------|
+| Rationalization | Reality |
+|-----------------|---------|
 | "Linting slows me down" | Automated linting prevents 80% of trivial PR feedback, saving time in the long run. |
 | "It's just a warning" | Warnings today are bugs tomorrow. Fixing them early maintains a "broken window" free codebase. |
 | "I'll fix it in the next PR" | Technical debt starts with a single "I'll fix it later." Fix it now while the context is fresh. |
@@ -103,3 +103,9 @@ UNUSED_VAR="internal"
 - [ ] Pushing code that fails local `./scripts/quality_gate.sh`.
 - [ ] Ignoring "style" findings that affect readability (e.g., inconsistent naming).
 - [ ] Manually fixing formatting instead of using automated tools.
+
+## See Also
+
+- `code-review-assistant` — PR review workflow with code smell detection
+- `codacy` — Local Codacy Analysis CLI for static analysis
+- `codacy-cloud-cli` — Cloud Codacy CLI for remote data queries

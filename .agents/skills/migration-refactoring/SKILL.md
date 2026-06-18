@@ -2,7 +2,7 @@
 name: migration-refactoring
 version: "0.2.10"
 category: code-quality
-description: Automate complex code migrations and refactorings with safety patterns. Use when upgrading dependencies, migrating frameworks (React class→hooks, Flask→FastAPI), modernizing languages (Python 2→3), or performing large-scale refactories. Includes breaking change analysis, automated fix application, rollback strategies, and cross-file dependency tracking.
+description: Automate complex code migrations and refactorings with safety patterns. Use this skill when upgrading dependencies, migrating frameworks (React class→hooks, Flask→FastAPI), modernizing languages (Python 2→3), or performing large-scale refactories — even if they just say "migrate this" or "refactor the whole thing". Includes breaking change analysis, automated fix application, rollback strategies, and cross-file dependency tracking.
 license: MIT
 ---
 
@@ -227,7 +227,10 @@ See `references/language-migrations.md` for framework-specific guides.
 - [ ] Documentation updated
 - [ ] Monitoring/alerting configured
 - [ ] Rollout plan with timings
+## See Also
 
+- `static-analysis` — Linter triage and fix workflows
+- `code-review-assistant` — PR review workflow
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -235,13 +238,11 @@ See `references/language-migrations.md` for framework-specific guides.
 | "We'll migrate everything at once in one big PR" | Big-bang migrations create untestable changesets with no safe rollback point. |
 | "The old version still works, no rush to migrate" | Unmaintained dependencies accumulate CVEs and block critical security patches. |
 | "Automated tests are enough validation" | Automated tests catch regressions; human review catches design and UX regressions. |
-
 ## Red Flags
 
 - [ ] Starting a migration without a documented rollback strategy
 - [ ] Migrating multiple major dependencies in a single commit
 - [ ] Skipping checkpoint validation between migration phases
-
 ## References
 
 - `references/migration-patterns.md` - Detailed pattern implementations

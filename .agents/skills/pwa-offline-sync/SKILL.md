@@ -2,7 +2,7 @@
 version: "0.2.10"
 name: pwa-offline-sync
 description: >
-  Design Cache Storage + IndexedDB strategy and sync queue. Activate for service worker, cache, or offline bug investigation. Generic pattern for any offline-first application.
+  Design Cache Storage + IndexedDB strategy and sync queue. Use this skill when building service workers, implementing caching strategies, or investigating offline bugs — even if they just say "make it work offline" or "add caching". Generic pattern for any offline-first application.
 category: workflow
 license: MIT
 ---
@@ -11,7 +11,7 @@ license: MIT
 
 Purpose: design, implement, and validate offline/PWA behavior (service worker, caches, IndexedDB, sync queue).
 
-## When to run
+## When to Use
 
 - Editing service worker, cache strategies, or sync orchestration.
 - Touching IndexedDB schema, permission caching, or zombie detection.
@@ -33,6 +33,11 @@ Purpose: design, implement, and validate offline/PWA behavior (service worker, c
 - [ ] Zombie detection notifies user + stops further reads upon revocation.
 - [ ] Service worker cleans up old caches.
 - [ ] Memory-safe listeners (remove event handlers when replaced).
+
+## See Also
+
+- `lifecycle-management` — Resource cleanup and error handling
+- `css-render-performance` — CSS render performance optimization
 
 ## Rationalizations
 

@@ -32,7 +32,7 @@ metadata:
 Automates Forgejo repository operations using the REST API (v1).
 Compatible with Codeberg and self-hosted Forgejo instances.
 
-## When to use this skill
+## When to Use
 
 Activate when you need to:
 - Read or write files in a Forgejo/Codeberg repository
@@ -202,6 +202,11 @@ jobs:
 ## Bundled Scripts
 
 - `scripts/forgejo_api.py` — Main CLI tool for Forgejo API operations
+
+## See Also
+
+- `git-github-workflow` — GitHub workflow and PR lifecycle
+- `cicd-pipeline` — CI/CD pipeline design
 
 ## Rationalizations
 

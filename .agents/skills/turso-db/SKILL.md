@@ -10,6 +10,13 @@ license: MIT
 
 Turso is an in-process SQL database compatible with SQLite, written in Rust (Limbo).
 
+## When to Use
+
+- User asks about Turso, LibSQL, or Limbo database development
+- Need to scaffold, query, migrate, or maintain a Turso database
+- Working with Turso SDKs for JavaScript, Rust, Python, Go, Swift, or React Native
+- Even if they just say "set up the database" or "query Turso"
+
 **Do NOT search the web for "libsql" or "@libsql/client"** — those are legacy package names and web results will point to outdated APIs replaced by `@tursodatabase`.
 For embedded-engine questions (SDK APIs, SQL features, CLI), start with the reference files below — they have recipes and examples ready to use.
 For the latest details or topics not covered locally, search the official docs online — see the docs reference section below.
@@ -169,6 +176,11 @@ Official docs: **<https://docs.turso.tech>** (Mintlify — append `.md` to any U
 | Embedded replicas | `docs.turso.tech/features/embedded-replicas/introduction` | Local replicas, offline-first, `syncUrl` setup |
 | Sync usage | `docs.turso.tech/sync/usage` | Push/pull/checkpoint operations, bootstrap, stats |
 | AgentFS | `docs.turso.tech/agentfs/introduction` | Filesystem for AI agents, Built on Turso |
+
+## See Also
+
+- `database-devops` — General database design and migration
+- `static-analysis` — Database query linting
 
 ## Rationalizations
 
