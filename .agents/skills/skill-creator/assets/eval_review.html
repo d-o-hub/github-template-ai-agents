@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eval Set Query Review</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+  h1 { color: #1a1a2e; }
+  .query-card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 14px; margin-bottom: 12px; }
+  .query-card textarea { width: 100%; min-height: 50px; margin: 6px 0; font-family: monospace; font-size: 13px; box-sizing: border-box; }
+  .query-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .query-actions label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+  .toggle-switch { position: relative; width: 44px; height: 22px; background: #e0e0e0; border-radius: 11px; cursor: pointer; display: inline-block; transition: background 0.2s; }
+  .toggle-switch.active { background: #4caf50; }
+  .toggle-switch::after { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: white; top: 2px; left: 2px; transition: left 0.2s; }
+  .toggle-switch.active::after { left: 24px; }
+  .btn { padding: 6px 14px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: #fff; font-size: 13px; }
+  .btn-primary { background: #4a6fa5; color: white; border-color: #3a5a80; }
+  .btn-danger { background: #c62828; color: white; border-color: #a02020; }
+  .btn:hover { opacity: 0.9; }
+  .controls { margin: 16px 0; display: flex; gap: 8px; flex-wrap: wrap; }
+  .stats { background: #e8eaf6; border-radius: 6px; padding: 10px; margin: 12px 0; font-size: 14px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: bold; }
+  .badge-trigger { background: #c8e6c9; color: #2e7d32; }
+  .badge-no-trigger { background: #ffcdd2; color: #c62828; }
+</style>
+</head>
+<body>
+<h1>Eval Set Query Review</h1>
+
+<div class="controls">
+  <button class="btn btn-primary" onclick="exportJSON()">Export eval_set.json</button>
+  <button class="btn" onclick="addEntry()">Add Entry</button>
+  <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
+</div>
+
+<div class="stats" id="stats">0 entries (0 trigger, 0 no-trigger)</div>
+
+<div id="queries-container"></div>
+
+<script>
+let queries = [
+  { query: "Example should-trigger query", should_trigger: true },
+  { query: "Example should-not-trigger query", should_trigger: false },
+];
+
+function render() {
+  const container = document.getElementById('queries-container');
+  container.innerHTML = '';
+  let triggerCount = 0;
+  queries.forEach((q, i) => {
+    if (q.should_trigger) triggerCount++;
+    const div = document.createElement('div');
+    div.className = 'query-card';
+    div.innerHTML = `
+      <textarea onchange="updateQuery(${i}, this.value)">${q.query.replace(/</g, '&lt;')}</textarea>
+      <div class="query-actions">
+        <label>
+          Should trigger:
+          <span class="toggle-switch ${q.should_trigger ? 'active' : ''}" onclick="toggleTrigger(${i})"></span>
+        </label>
+        <span class="badge ${q.should_trigger ? 'badge-trigger' : 'badge-no-trigger'}">
+          ${q.should_trigger ? 'TRIGGER' : 'NO TRIGGER'}
+        </span>
+        <button class="btn btn-danger" onclick="removeEntry(${i})" style="margin-left:auto;">Remove</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+  document.getElementById('stats').textContent =
+    `${queries.length} entries (${triggerCount} trigger, ${queries.length - triggerCount} no-trigger)`;
+}
+
+function updateQuery(index, value) {
+  queries[index].query = value;
+}
+
+function toggleTrigger(index) {
+  queries[index].should_trigger = !queries[index].should_trigger;
+  render();
+}
+
+function addEntry() {
+  queries.push({ query: "", should_trigger: true });
+  render();
+  const textareas = document.querySelectorAll('.query-card textarea');
+  if (textareas.length > 0) textareas[textareas.length - 1].focus();
+}
+
+function removeEntry(index) {
+  queries.splice(index, 1);
+  render();
+}
+
+function clearAll() {
+  if (confirm('Remove all entries?')) {
+    queries = [];
+    render();
+  }
+}
+
+function exportJSON() {
+  const data = { queries: queries.filter(q => q.query.trim().length > 0) };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'eval_set.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+render();
+</script>
+</body>
+</html>

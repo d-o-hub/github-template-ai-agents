@@ -96,7 +96,7 @@ cargo test test_name               # Rust
 ```bash
 pip list | grep pytest            # Python
 npm list jest                      # Node
-./scripts/setup-test-db.sh        # Test data
+# ./scripts/setup-test-db.sh       # Test data (create if needed for project)
 ```
 
 ## Coverage Analysis
