@@ -103,7 +103,7 @@ exit $EXIT_CODE
 
 2. **Created specialized skills**:
    - `agents-md` skill (96 lines): AGENTS.md creation guidance
-   - `code-quality` skill (124 lines): Code patterns and linting tools
+   - `code-review-assistant` skill (124 lines): Code patterns and linting tools
    - `test-runner` skill (160 lines): Framework commands and testing strategy
 
 3. **Reference naming standardization**:
@@ -123,7 +123,7 @@ exit $EXIT_CODE
 **Files Modified**:
 - `AGENTS.md` - Reduced from 278 to 146 lines
 - `.agents/skills/agents-md/SKILL.md` - Created
-- `.agents/skills/code-quality/SKILL.md` - Created
+- `.agents/skills/code-review-assistant/SKILL.md` - Created
 - `.agents/skills/test-runner/SKILL.md` - Created
 - `.agents/config.sh` - Created with centralized constants
 - 13 skills migrated: `references/` → `references/`
@@ -1145,7 +1145,7 @@ quality-gate:
 - Shellcheck reports "Declare and assign separately" warnings
 - Unused variable warnings (SC2034)
 - CI fails even though scripts execute correctly
-- 31+ warnings on large scripts like `github-workflow/run.sh`
+- 31+ warnings on large scripts like `git-github-workflow/run.sh`
 
 **Root Cause**:
 1. **Style vs Safety**: SC2155 is a style recommendation, not a bug
@@ -1328,5 +1328,85 @@ find . -name '*.md' \
 
 **Files Modified**:
 - `scripts/quality_gate.sh` - Changed `./node_modules/*` to `*/node_modules/*` and added `-not -path "./vendor/*"`
+
+---
+
+### LESSON-036 — Skill Merge Requires 5 Coordinated Doc Locations; markdownlint-cli2 "default: true" Is Not Obvious
+
+**Date**: 2026-06-18
+**Component**: Skills / Documentation / Quality Gate
+**Severity**: High
+
+**Issue**: Merging 4 skills into 3 (atomic-commit + github-workflow → git-github-workflow; code-quality → code-review-assistant; database-schema-migrations → database-devops) broke agent routing and command references because the doc update surface is larger than expected.
+
+**Symptoms**:
+- .opencode/commands/atomic-commit.md and github-workflow.md referenced deleted skills → dead-end commands
+- .claude/agents/analysis-swarm.md and .opencode/agents/analysis-swarm.md referenced `code-quality` → broken agent routing
+- skill-rules.json still had `code-quality` trigger rules → stale auto-activation
+- 60 markdownlint errors surfaced across skill .md files after merging (rules active that nobody expected)
+- git-github-workflow SKILL.md approached 250-line limit during enhancement → warning triggered
+
+**Root Causes**:
+
+1. **5 doc locations must be updated on skill merge** (non-obvious surface area):
+   - SKILL.md (the skill itself)
+   - `.agents/skills/skill-rules.json` (trigger rules / auto-activation)
+   - `agents-docs/AVAILABLE_SKILLS.md` + `agents-docs/AGENTS_REGISTRY.md` (registry docs)
+   - `llms-full.txt` + `agents-docs/skills-reference.md` (machine-readable catalogs)
+   - Agent config files (`.claude/agents/*.md`, `.opencode/agents/*.md`, `.opencode/commands/*.md`)
+
+2. **markdownlint-cli2 "default: true" is deceptive**: The config at `.markdownlint-cli2.jsonc` sets `"default": true` and then explicitly disables 15 rules. Every rule NOT in the disabled list is ACTIVE. Rules that caught 60 errors included: MD047 (single trailing newline), MD022 (blanks around headings), MD031 (blanks around fenced code), MD009 (trailing spaces), MD012 (multiple consecutive blank lines). These are not obvious because most developers look at what's disabled, not what remains enabled.
+
+3. **250-line SKILL.md limit is a WARNING not a FAILURE**: In `scripts/lib/skill-validation.sh` line 8, `MAX_SKILL_LINES=250`. The check at line 133-135 uses yellow ⚠ and does NOT increment the FAILED counter. This means skills CAN exceed 250 lines without blocking CI — the check alerts but doesn't enforce, which is intentional to avoid blocking legitimate long skills but also means the hard limit documented in AGENTS.md is aspirational, not enforced.
+
+4. **Skill description field serves dual purpose: documentation + intent classifier training**: Updated descriptions now include explicit "Use this skill when..." trigger phrases AND negative disambiguation (e.g., "This is the LOCAL CLI skill — NOT for querying Codacy Cloud"). The description is the primary signal for the intent classifier — well-crafted descriptions reduce misrouting.
+
+5. **Lessons.jsonl / LESSONS.md / self-learning-rules.md triple-write gap**: self-learning-rules.md references LESSON-029 through LESSON-035, but LESSONS.md only goes up to LESSON-028 and lessons.jsonl only up to LESSON-019. The triple-write requirement has failure modes when lessons are partially recorded.
+
+**Solution**:
+
+1. **For skill merge**: Created and used a 5-location checklist for every skill consolidation:
+   - SKILL.md changes → skill-rules.json → registry docs → llms-full.txt → agent configs
+   - All symlinked command files (.opencode/commands/) must redirect to new skill
+   - Run `./scripts/generate-llms-txt.sh` after any registry change to keep llms-full.txt in sync
+
+2. **For markdownlint errors**: To see which rules are implicitly active:
+
+   ```bash
+   # List all default markdownlint rules
+   npx markdownlint --help 2>/dev/null | grep -i md0
+   # Cross-reference against disabled rules in .markdownlint-cli2.jsonc
+   grep -E '"MD[0-9]+": false' .markdownlint-cli2.jsonc
+   # Result = enabled = all default minus disabled set
+   ```
+
+   Common fixable patterns: add trailing `\n` (MD047), add blank lines before/after code blocks (MD022/MD031), trim trailing spaces (MD009), collapse blank lines to max 2 (MD012).
+
+3. **For 250-line awareness**: The limit in `scripts/lib/skill-validation.sh` is `MAX_SKILL_LINES=${MAX_SKILL_LINES:-250}` and can be overridden via env var. The check is a warning, not a failure. When a skill legitimately exceeds 250 lines, suppress the warning with `MAX_SKILL_LINES=999` or accept it as yellow.
+
+4. **For description optimization**: Always include both positive trigger phrases ("Use this skill when...") and negative disambiguation ("This is the LOCAL skill — NOT for cloud queries"). The intent classifier reads descriptions to route requests — clarity reduces misrouting.
+
+**Prevention**:
+- Before removing or merging a skill, grep for ALL references across the repo: `git grep -l "atomic-commit\|code-quality\|github-workflow"`
+- Run markdownlint explicitly after bulk file changes: `npx markdownlint-cli2 "**/*.md" --config .markdownlint-cli2.jsonc`
+- Document the 5-location skill merge checklist in AGENTS.md
+- Audit lessons.jsonl quarterly for gaps vs self-learning-rules.md
+- The skill-creator's new `init_skill.py` auto-creates 3 eval cases to pass the `>= 3` minimum immediately
+
+**Tags**: #skills #merge #markdownlint #250-line-limit #triple-write #documentation-coordination
+
+**Files Modified** (63 files, +747/-4975 lines across entire repo):
+- `.agents/skills/git-github-workflow/SKILL.md` — Expanded to unified workflow (absorbed atomic-commit + github-workflow)
+- `.agents/skills/code-review-assistant/SKILL.md` — Added code smells detection (absorbed code-quality)
+- `.agents/skills/database-devops/SKILL.md` — Added naming conventions (absorbed database-schema-migrations)
+- `.agents/skills/skill-creator/SKILL.md` — Added agents/, eval-viewer/ directories, init_skill.py, packaging, benchmark aggregation, run_loop optimizer
+- `.agents/skills/skill-evaluator/SKILL.md` — Added workspace iteration automation, schemas.md reference
+- `.agents/skills/[codacy,codacy-cloud-cli,learn,lifecycle-management,memory-context,static-analysis,triz-analysis].md` — Description enhancements
+- `.agents/skills/skill-rules.json` — Removed code-quality trigger rules
+- `.claude/agents/analysis-swarm.md`, `.opencode/agents/*.md` — Updated skill references
+- `.opencode/commands/atomic-commit.md`, `github-workflow.md` — Redirected to git-github-workflow
+- `agents-docs/AVAILABLE_SKILLS.md`, `AGENTS_REGISTRY.md`, `skills-reference.md`, `ENVIRONMENT_VARIABLES.md`, `WORKFLOW.md`, `TROUBLESHOOTING.md` — Registry and doc updates
+- `llms-full.txt` — Regenerated after skill changes
+- `agents-docs/LESSONS.md`, `lessons.jsonl` — Updated references (code-quality → code-review-assistant, github-workflow → git-github-workflow)
 
 ---

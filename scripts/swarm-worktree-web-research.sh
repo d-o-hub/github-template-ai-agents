@@ -264,8 +264,8 @@ Analysis: ${ANALYSIS_DIR}/SWARM_SYNTHESIS.md"
 
     log_info "Creating PR and monitoring Actions..."
 
-    if [[ -f ".agents/skills/github-workflow/run.sh" ]]; then
-        bash .agents/skills/github-workflow/run.sh \
+    if [[ -f ".agents/skills/git-github-workflow/run.sh" ]]; then
+        bash .agents/skills/git-github-workflow/run.sh \
             --message "feat: swarm analysis with optimized web research" \
             --base-branch main \
             --branch-name "$branch_name" \

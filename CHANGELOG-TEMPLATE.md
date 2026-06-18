@@ -168,7 +168,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `database-devops`: Database design, migrations, and safety patterns.
   - `migration-refactoring`: Automated framework migrations (React, Flask, etc.).
   - `testing-strategy`: Comprehensive testing patterns and strategies.
-- `atomic-commit` command: A full atomic git workflow with CI verification and automatic rollback.
+- `git-github-workflow` command: A full atomic git workflow with CI verification and automatic rollback.
 - Enhanced `PULL_REQUEST_TEMPLATE.md` with comprehensive quality checklists and impact assessment.
 
 ### Fixed
