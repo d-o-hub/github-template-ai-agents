@@ -58,7 +58,6 @@ for skill_dir in "$SKILLS_DIR"/*/; do
   [ -d "$skill_dir/references" ] && has_refs="true"
   
   # 10. Has scripts dir
-  [ -d "$skill_dir/scripts" ] && has_scripts="true"
   
   # Calculate score
   score=0
