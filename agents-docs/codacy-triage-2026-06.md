@@ -123,7 +123,43 @@ Codacy's SonarPython S101 is a built-in engine — NOT exposed via CLI, API, or 
 4. ✅ Command injection false positives (7 Critical) — NOSONAR added or excluded
 5. ✅ File access false positive (1 Critical) — template excluded via `.codacy.yml`
 
-### Files Changed This Session
+---
+
+## Race Condition Incident — June 18, 2026
+
+### Summary
+
+The local `.github/workflows/codacy.yml` workflow created a race condition with itself:
+
+- `concurrency.group: codacy-${{ pr.number }}` + `cancel-in-progress: true`
+- Each force-push to `ci/status-update` (from `ci.yml:290`) triggered a new Codacy run, cancelling the in-flight previous one
+- The cancelled run never reported to the Checks API, leaving "Codacy Static Code Analysis" stuck in `expected` state indefinitely
+- All 3 retries in `ci.yml:319-333` silently failed (no stderr capture), so the deadlock went undetected
+
+### Resolution
+
+**Deleted** `.github/workflows/codacy.yml` — the Codacy GitHub App is the canonical integration. The App:
+- Reports under the identical check name "Codacy Static Code Analysis"
+- Runs on Codacy infrastructure (no Docker pull, no 15-min timeout)
+- Is not subject to GitHub Actions concurrency groups
+- Respects `.codacy.yml` exclusions and engine configuration
+
+Also **switched** `ci.yml:315-338` from `gh pr merge --admin` retry loop to `gh pr merge --auto` (native auto-merge), which GitHub handles reliably.
+
+### Lesson Learned
+
+Do not run a local Codacy Analysis CLI workflow alongside the Codacy GitHub App.
+The workflow's `cancel-in-progress: true` causes the check to remain in `expected` state,
+blocking all merges. Use the App only, and let GitHub native auto-merge handle the merge.
+
+### Files Changed (June 18)
+
+- `.github/workflows/codacy.yml` — deleted (rely on Codacy GitHub App instead)
+- `.github/workflows/ci.yml` — replaced `--admin` retry loop with `--auto` native auto-merge
+
+---
+
+## Files Changed This Session (June 3)
 
 - `tests/verify_optional_skills.py` — `shell=True` → `shlex.split()`
 - `scripts/lib/eval_executors.py` — NOSONAR comments for subprocess false positives
