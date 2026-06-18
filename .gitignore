@@ -63,4 +63,5 @@ htmlcov/
 llms.txt
 llms-full.txt
 
-commit*.txt
+commit*.txt.mimocode/
+.mimocode/
