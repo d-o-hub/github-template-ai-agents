@@ -1,6 +1,6 @@
 ---
 name: self-fix-loop
-description: Self-learning fix loop - commit, push, monitor CI, auto-fix failures using swarm agents with skills on demand, loop until all checks pass.
+description: "[DEPRECATED] Use git-github-workflow instead. Self-learning fix loop - commit, push, monitor CI, auto-fix failures using swarm agents with skills on demand, loop until all checks pass."
 version: "0.2.10"
 template_version: "0.2"
 category: workflow

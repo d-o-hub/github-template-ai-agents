@@ -17,7 +17,7 @@ Always use the plans/ folder for all files. Use `plans/GOAP_STATE.md` to track p
 - `execution-strategies.md` - Detailed guide on execution patterns
 - `references/guide.md` - Complete examples, templates, and advanced topics
 
-## When to Use This Skill
+## When to Use
 
 Use this skill when facing:
 - **Complex Multi-Step Tasks**: Tasks requiring 5+ distinct steps
@@ -151,6 +151,13 @@ See **[execution-strategies.md](execution-strategies.md)** for details.
 
 GOAP enables systematic planning through: Analysis, Decomposition, Strategy, Quality Assurance, and Coordinated Agents.
 
+## See Also
+
+- `task-decomposition` — Break down complex tasks into sub-goals
+- `agent-coordination` — Coordinate multiple agents
+- `triz-analysis` — Audit systems for contradictions
+- `triz-solver` — Solve specific problems using TRIZ
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -164,7 +171,7 @@ GOAP enables systematic planning through: Analysis, Decomposition, Strategy, Qua
 - [ ] Skipping ADR approval gate before decomposition
 - [ ] Assigning agents without matching skills to task requirements
 
-## Reference Files
+## References
 
 - `references/guide.md` - Complete templates, detailed examples, extended patterns, error handling, optimization
 - `execution-strategies.md` - Execution pattern details

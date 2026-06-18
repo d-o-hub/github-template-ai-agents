@@ -10,7 +10,7 @@ license: MIT
 
 Versioning in a **template** repository follows a different mental model than a regular project. `VERSION` is the consumer-side default (always `0.0.0`); the template's own release history is canonical in `CHANGELOG-TEMPLATE.md`; only `README.md` displays a template version badge; and the existing scripts (`propagate-version.sh`, `bump_patch_version.sh`) are general-purpose utilities that downstream consumers reuse unchanged.
 
-## When To Use
+## When to Use
 
 - Bumping the template's own release version (e.g., 0.2.10 → 0.3.0)
 - Fixing a stale template version badge in `README.md`, `QUICKSTART.md`, or `agents-docs/MIGRATION.md`
@@ -97,6 +97,11 @@ This catches stale badges, broken version references, and any propagation drift.
 - **Modifying `scripts/propagate-version.sh` or `bump_patch_version.sh` to read from `CHANGELOG-TEMPLATE.md`.** They are general-purpose utilities for downstream consumers. Keep their `VERSION`-based design.
 - **Manually editing the README badge instead of running `propagate-version.sh`.** The script is the source of truth; manual edits get overwritten on the next propagation.
 - **Forgetting to reset `VERSION` to `0.0.0` after a template release.** Downstream consumers clone the template and expect a clean starting point.
+
+## See Also
+
+- `skill-creator` — Create and improve skills
+- `readme-best-practices` — README best practices
 
 ## Rationalizations
 

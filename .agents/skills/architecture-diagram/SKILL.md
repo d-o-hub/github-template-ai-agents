@@ -18,7 +18,7 @@ compatibility:
 
 Generates an architecture SVG diagram by scanning the live project structure.
 
-## When to run
+## When to Use
 
 - User asks to update / regenerate / sync the architecture diagram
 - Skills, agents, or commands have changed
@@ -92,6 +92,11 @@ absent.
 ## Bundled Scripts
 
 - `scripts/generate_diagram.py` — Main generator script
+
+## See Also
+
+- `readme-best-practices` — README and documentation best practices
+- `skill-creator` — Create and improve skills
 
 ## Rationalizations
 

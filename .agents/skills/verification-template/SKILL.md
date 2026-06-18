@@ -2,7 +2,7 @@
 name: verification-template
 version: "0.2.10"
 category: quality
-description: Template for creating portable domain-specific verification skills. Use this as a starting point when defining systematic verification checklists for new features, modules, or domain-specific operations.
+description: Template for creating portable domain-specific verification skills. Use this as a starting point when defining systematic verification checklists for new features, modules, or domain-specific operations — even if they just say "create a verification checklist" or "add quality checks for this".
 license: MIT
 ---
 
@@ -41,6 +41,11 @@ Define systematic, portable verification checklists for common operations within
 3. **Draft Checklist**: Use the categories above to list specific checks.
 4. **Test Checklist**: Run through the checks on a real instance.
 5. **Iterate**: Refine the checklist based on discovered edge cases.
+
+## See Also
+
+- `skill-creator` — Create and improve skills
+- `skill-evaluator` — Evaluate and score skills
 
 ## Rationalizations
 

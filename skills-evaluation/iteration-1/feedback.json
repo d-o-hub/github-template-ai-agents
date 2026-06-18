@@ -1,0 +1,4 @@
+{
+  "overall": "Structural checks all pass. 30 skills need See Also sections. 1 skill (ui-ux-optimize) needs trigger phrasing in description. Otherwise all acceptance criteria met.",
+  "next_steps": "Add See Also to remaining 30 skills, fix ui-ux-optimize description"
+}

@@ -1,6 +1,6 @@
 ---
 name: eu-ai-act-compliance
-description: EU AI Act compliance logging and requirements. Use for ensuring transparency, human oversight, and record-keeping per Regulation (EU) 2024/1689.
+description: EU AI Act compliance logging and requirements. Use this skill when ensuring transparency, human oversight, and record-keeping per Regulation (EU) 2024/1689 — even if they just say "add compliance logging" or "make sure this is EU AI Act compliant".
 version: "0.2.10"
 category: compliance
 metadata:
@@ -13,7 +13,11 @@ license: MIT
 
 # EU AI Act Compliance
 
-Comprehensive logging and compliance framework for AI systems under the EU AI Act.
+## When to Use
+
+- User asks to ensure EU AI Act compliance for logging or transparency
+- Need to implement human oversight or record-keeping per Regulation (EU) 2024/1689
+- Even if they just say "add compliance logging" or "make sure this is EU AI Act compliant"
 
 ## Quick Start
 
@@ -85,10 +89,15 @@ interface AIActLogEntry {
 
 - `references/eu-ai-act-articles.md` - Key article analysis
 
+## See Also
+
+- `security-code-auditor` — General security audits
+- `privacy-first` — Email/personal data prevention
+
 ## Rationalizations
 
-| Concern | Counter-Argument |
-|---------|------------------|
+| Rationalization | Reality |
+|-----------------|---------|
 | "Small change, no logging." | AI interactions fall under transparency (Art. 50). |
 | "Oversight later." | Oversight-by-design is mandatory for high-risk (Art. 14). |
 

@@ -2,7 +2,7 @@
 name: web-search-researcher
 version: "0.2.10"
 category: tool
-description: Research topics using web search to find accurate, current information. Use when you need modern information, official documentation, best practices, or technical solutions beyond training data.
+description: Research topics using web search to find accurate, current information. Use this skill when you need modern information, official documentation, best practices, or technical solutions beyond training data — even if they just say "look this up" or "search for how to do X".
 license: MIT
 ---
 
@@ -216,6 +216,11 @@ site:github.com tokio spawn_blocking
 
 Analyze, Search strategically, Fetch authoritative, Synthesize with attribution.
 
+## See Also
+
+- `do-web-doc-resolver` — Resolve web URLs to markdown
+- `agent-browser` — Browser automation
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -229,6 +234,6 @@ Analyze, Search strategically, Fetch authoritative, Synthesize with attribution.
 - [ ] Omitting date checks — using outdated information as current fact
 - [ ] Relying on AI-generated aggregator content instead of official documentation
 
-## Reference Files
+## References
 
 - **[references/guide.md](references/guide.md)** - Complete guide with strategies, rounds, operators, depth levels, workflow, and examples

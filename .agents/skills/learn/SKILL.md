@@ -1,7 +1,7 @@
 ---
 name: learn
 version: "0.2.10"
-description: Extract non-obvious session learnings, patterns, and discoveries into scoped AGENTS.md files. Use this skill after completing non-trivial tasks, when the user says "extract learnings", "save patterns", "update AGENTS.md", or whenever the session has produced insights that should be captured for future reference.
+description: Extract non-obvious session learnings, patterns, and discoveries into scoped AGENTS.md files. Use this skill after completing non-trivial tasks, when the user says "extract learnings", "save patterns", "update AGENTS.md", or whenever the session has produced insights that should be captured for future reference — even if they just say "what did we learn" or "save this for later".
 category: knowledge-management
 trigger: after non-trivial task completion
 license: MIT
@@ -55,6 +55,11 @@ Every new non-obvious insight must be recorded in three places:
 - Fits within `MAX_LINES_AGENTS_MD=150` constraint.
 - Bulleted list under a "Learnings" or "Context" section.
 
+## See Also
+
+- `agents-md` — AGENTS.md best practices
+- `skill-creator` — Create and improve skills
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -68,7 +73,7 @@ Every new non-obvious insight must be recorded in three places:
 - [ ] Placing learnings in the wrong scope (project-wide for script-specific insights)
 - [ ] Skipping the dual-write to LESSONS.md for non-obvious findings
 
-## Reference Files
+## References
 
 - `agents-docs/LESSONS.md` - Legacy project-wide lessons.
 - `AGENTS.md` - Root agent guidance and constraints.

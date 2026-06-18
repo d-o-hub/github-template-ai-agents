@@ -2,7 +2,7 @@
 version: "0.2.10"
 name: document-rendering-and-locators
 description: >
-  Implement resilient document rendering and annotation anchoring. Activate for reader-core, TOC, locator, or highlight anchoring changes. Generic pattern applicable to EPUB, PDF, or any document format.
+  Implement resilient document rendering and annotation anchoring. Use this skill when working with reader-core rendering, TOC generation, locator systems, or highlight anchoring changes — even if they just say "fix the document rendering" or "the highlights aren't sticking". Generic pattern applicable to EPUB, PDF, or any document format.
 category: workflow
 license: MIT
 ---
@@ -11,7 +11,7 @@ license: MIT
 
 Purpose: implement resilient document rendering, locator extraction, and annotation anchoring.
 
-## When to run
+## When to Use
 
 - Integrating document rendering library or reader-core changes.
 - Working on TOC, locator, or highlight/comment anchoring logic.
@@ -33,6 +33,11 @@ Purpose: implement resilient document rendering, locator extraction, and annotat
 - [ ] Re-anchoring warns user when falling back.
 - [ ] Event handlers removed on unmount.
 - [ ] Telemetry events logged for load failures with trace IDs.
+
+## See Also
+
+- `reader-ui-ux` — Reader/admin UI with responsive layouts
+- `turso-db` — Database for document storage
 
 ## Rationalizations
 

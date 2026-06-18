@@ -10,6 +10,12 @@ license: MIT
 
 Systematically explore a web application, find issues, and produce a report with full reproduction evidence for every finding.
 
+## When to Use
+
+- User asks to dogfood, QA, or exploratory test a web application
+- Need to find bugs, UX issues, or other problems in a web app
+- Even if they just say "test this app" or "find issues in this site"
+
 ## Setup
 
 Only the **Target URL** is required. Everything else has sensible defaults -- use them unless the user explicitly provides an override.
@@ -131,6 +137,12 @@ Aim to find **5-10 well-documented issues**, then wrap up. Depth of evidence mat
 - **Never delete output files** mid-session. Work forward, not backward.
 - **Never read the target app's source code.** All findings must come from browser observation.
 - **Check the console.** Many issues are invisible in the UI but show as JS errors.
+
+## See Also
+
+- `test-runner` — Execute tests and diagnose failures
+- `testing-strategy` — Choose testing approaches
+- `accessibility-auditor` — Accessibility-specific testing
 
 ## Rationalizations
 

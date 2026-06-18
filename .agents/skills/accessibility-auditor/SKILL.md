@@ -2,13 +2,21 @@
 name: accessibility-auditor
 version: "0.2.10"
 category: ui-ux
-description: Audit web applications for WCAG 2.2 compliance, screen reader compatibility, keyboard navigation, and color contrast. Triggers on "accessibility audit", "a11y check", "WCAG compliance", "screen reader test", "keyboard navigation", "color contrast check", "ARIA validation", "wcag", " Section 508", "ADA compliance".
+description: Audit web applications for WCAG 2.2 compliance, screen reader compatibility, keyboard navigation, and color contrast. Use this skill when the user asks for an accessibility audit, a11y check, WCAG compliance review, screen reader test, keyboard navigation check, color contrast check, or ARIA validation — even if they don't explicitly mention "accessibility" or "WCAG". Also triggers on Section 508 and ADA compliance requests.
 license: MIT
 ---
 
 # Accessibility Auditor
 
 Audit web applications for WCAG 2.2 compliance, screen reader compatibility, keyboard navigation, and color contrast issues.
+
+## When to Use
+
+- User asks for an accessibility audit or a11y check
+- Reviewing WCAG 2.2 compliance or Section 508/ADA requirements
+- Testing screen reader compatibility or keyboard navigation
+- Checking color contrast or ARIA validation
+- Even if they just say "is this accessible" or "check for accessibility issues"
 
 ## Audit Workflow
 
@@ -34,6 +42,11 @@ Check these automatically using axe-core, Lighthouse, or WAVE:
 | **High** | Significant barrier | Fix before release |
 | **Medium** | Minor friction | Next sprint |
 | **Low** | Enhancement | Backlog |
+
+## See Also
+
+- `css-render-performance` — CSS render performance optimization
+- `ui-ux-optimize` — UI/UX optimization with swarm agents
 
 ## Rationalizations
 
