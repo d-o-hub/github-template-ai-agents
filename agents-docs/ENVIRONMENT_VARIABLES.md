@@ -7,7 +7,7 @@ Complete reference for all environment variables used across the AI agent templa
 ## Table of Contents
 
 - [Quality Gate Variables](#quality-gate-variables)
-- [Atomic Commit Variables](#atomic-commit-variables)
+- [Git-GitHub Workflow Variables](#git-github-workflow-variables)
 - [Validation Variables](#validation-variables)
 - [CI/CD Detection Variables](#cicd-detection-variables)
 - [Output Control Variables](#output-control-variables)
@@ -74,11 +74,11 @@ SKIP_GLOBAL_HOOKS_CHECK=true git commit -m "feat: add feature"
 
 ---
 
-## Atomic Commit Variables
+## Git-GitHub Workflow Variables
 
 ### `ATOMIC_COMMIT_TIMEOUT`
 
-**Description**: Timeout for atomic commit operations (in seconds).
+**Description**: Timeout for git-github-workflow operations (in seconds).
 
 **Default**: `1800` (30 minutes)
 
@@ -97,7 +97,7 @@ ATOMIC_COMMIT_TIMEOUT=3600 ./scripts/quality_gate.sh
 
 ### `ATOMIC_COMMIT_NO_ROLLBACK`
 
-**Description**: Disable automatic rollback on failure.
+**Description**: Disable automatic rollback on failure in git-github-workflow.
 
 **Default**: `0` (rollback enabled)
 
@@ -116,7 +116,7 @@ ATOMIC_COMMIT_NO_ROLLBACK=1 ./scripts/quality_gate.sh
 
 ### `ATOMIC_COMMIT_CI_MODE`
 
-**Description**: Enable CI-specific atomic commit behavior.
+**Description**: Enable CI-specific git-github-workflow behavior.
 
 **Default**: Not set (interactive mode)
 
@@ -245,9 +245,9 @@ FORCE_COLOR=0 ./scripts/quality_gate.sh        # Disable colors in terminal
 | `SKIP_TESTS` | boolean | `false` | Quality gate |
 | `SKIP_CLIPPY` | boolean | `false` | Quality gate (Rust) |
 | `SKIP_GLOBAL_HOOKS_CHECK` | boolean | `false` | Git hooks |
-| `ATOMIC_COMMIT_TIMEOUT` | integer | `1800` | Atomic commit |
-| `ATOMIC_COMMIT_NO_ROLLBACK` | boolean | `0` | Atomic commit |
-| `ATOMIC_COMMIT_CI_MODE` | boolean | not set | Atomic commit |
+| `ATOMIC_COMMIT_TIMEOUT` | integer | `1800` | Git-github-workflow |
+| `ATOMIC_COMMIT_NO_ROLLBACK` | boolean | `0` | Git-github-workflow |
+| `ATOMIC_COMMIT_CI_MODE` | boolean | not set | Git-github-workflow |
 | `MAX_SKILL_LINES` | integer | `250` | Skill validation |
 | `CI` | string | not set | CI detection |
 | `GITHUB_ACTIONS` | string | not set | CI detection |
@@ -260,7 +260,7 @@ FORCE_COLOR=0 ./scripts/quality_gate.sh        # Disable colors in terminal
 Multiple variables can be combined:
 
 ```bash
-# CI mode with no rollback for debugging
+# Git-github-workflow CI mode with no rollback for debugging
 ATOMIC_COMMIT_CI_MODE=true ATOMIC_COMMIT_NO_ROLLBACK=1 ./scripts/quality_gate.sh
 
 # Quick quality check (no tests, no clippy)
@@ -275,5 +275,5 @@ CI=true ATOMIC_COMMIT_TIMEOUT=3600 ./scripts/quality_gate.sh
 ## See Also
 
 - `./scripts/quality_gate.sh` - Quality gate documentation
-- `.agents/skills/atomic-commit/SKILL.md` - Atomic commit workflow
+- `.agents/skills/git-github-workflow/SKILL.md` - Git-github-workflow
 - `TROUBLESHOOTING.md` - Common issues and solutions

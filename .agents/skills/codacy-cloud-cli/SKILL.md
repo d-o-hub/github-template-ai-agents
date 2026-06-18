@@ -2,7 +2,7 @@
 name: codacy-cloud-cli
 version: "1.5.0"
 category: code-quality
-description: Uses the Codacy Cloud CLI to query repositories, issues, security findings, pull requests, tools, and patterns on Codacy Cloud. Use whenever the user mentions Codacy, asks about code quality metrics, wants to check issues or findings in a repo, inspect a pull request analysis, browse security vulnerabilities, enable or disable tools, search patterns, trigger a reanalysis, or interact with any remote Codacy data — even if they don't say "Codacy CLI" explicitly.
+description: Use the Codacy Cloud CLI to query Codacy Cloud remotely — repositories, issues, security findings, pull requests, tools, patterns, and reanalysis. Use when the user wants to check code quality metrics on Codacy Cloud, inspect remote PR analysis results, browse vulnerabilities, enable/disable tools, or search patterns — even if they don't say "Codacy CLI" explicitly. This is the CLOUD API skill — NOT for local CLI analysis (use codacy for local runs).
 license: MIT
 metadata:
   author: Codacy
