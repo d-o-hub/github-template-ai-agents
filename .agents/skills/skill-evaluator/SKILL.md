@@ -117,6 +117,44 @@ Organize eval results in a dedicated workspace directory (e.g., `<skill-name>-wo
 
 Plus `benchmark.json` and `feedback.json` at the iteration level.
 
+## Workspace Iteration Automation — Automate the eval loop: create iteration dirs, run cases, aggregate results.
+
+### 1. Create iteration directory
+
+```bash
+ITER="iteration-$(printf '%02d' $((++N)))"
+mkdir -p "<skill-name>-workspace/$ITER"
+```
+
+### 2. Set up subdirectories
+
+```bash
+for ID in $(jq -r '.evals[].id' evals/evals.json); do
+  mkdir -p "<skill-name>-workspace/$ITER/eval-$ID"/{with_skill,without_skill}
+done
+```
+
+### 3. Generate eval_metadata.json
+
+```bash
+jq '.evals[] | {id, prompt, expected_output, assertions}' evals/evals.json \
+  > "<skill-name>-workspace/$ITER/eval_metadata.json"
+```
+
+### 4. Capture timing data
+
+Write `timing.json` with `total_tokens` and `duration_ms` (schema in `references/schemas.md`).
+
+### 5. Run the grader
+
+### 6. Aggregate into benchmark.json
+
+Collect all grading and timing JSONs, compute per-config means/stddevs, write `benchmark.json` with delta.
+
+### 7. Record feedback
+
+Write actionable notes to `feedback.json`, improve the skill, then iterate again.
+
 ## Scoring Rubric
 
 Evaluate skills across these four dimensions (Score 1-5):
@@ -127,6 +165,8 @@ Evaluate skills across these four dimensions (Score 1-5):
 | **Completeness** | Does it cover common edge cases and include required sections (Rationalizations/Red Flags)? |
 | **Testability** | Does it include realistic and varied eval cases in `evals/evals.json`? |
 | **Reusability** | Can the skill be applied to multiple projects/contexts without hardcoded values? |
+
+Detailed JSON Schema definitions for all evaluation artifacts are available in `references/schemas.md`.
 
 ### Filing a Skill Improvement Issue
 

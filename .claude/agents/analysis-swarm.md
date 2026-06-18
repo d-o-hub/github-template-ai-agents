@@ -16,7 +16,7 @@ Coordinate three distinct AI personas to analyze code, architecture, and technic
 
 You have access to:
 - **analysis-swarm**: Core methodology and persona definitions
-- **code-quality**: For validating quality concerns
+- **code-review-assistant**: For validating quality concerns
 - **build-compile**: For testing implementation concerns
 - **test-runner**: For validating test coverage claims
 

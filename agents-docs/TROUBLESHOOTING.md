@@ -159,13 +159,13 @@ cat .agents/skills/<skill>/evals/evals.json | jq empty
 
 ## Git Issues
 
-### Atomic Commit Fails
+### git-github-workflow Fails
 
 **Symptom**: `./scripts/quality_gate.sh` fails mid-way
 
 **Common Causes**:
 1. **No changes to commit**: Stage some changes first
-2. **Merge conflicts**: Resolve before running atomic-commit
+2. **Merge conflicts**: Resolve before running git-github-workflow
 3. **Network timeout**: Check `MAX_OPERATION_SECONDS` in sync-and-push.sh
 4. **Permission denied**: Ensure scripts are executable
 
@@ -174,7 +174,7 @@ cat .agents/skills/<skill>/evals/evals.json | jq empty
 **Symptom**: `Push rejected - remote has new commits`
 
 **Solution**:
-- Atomic-commit handles this automatically with rebase
+- git-github-workflow handles this automatically with rebase
 - If manual fix needed:
 
   ```bash

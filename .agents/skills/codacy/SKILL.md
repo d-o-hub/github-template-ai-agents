@@ -2,7 +2,7 @@
 name: codacy
 version: "1.4.0"
 category: code-quality
-description: Uses the Codacy Analysis CLI to run local static analysis on repositories or specific files. Handles installation, initialization, dependency management, dry-runs, and analysis with JSON output. Use whenever the user wants to analyze code locally, run static analysis, scan for bugs or security issues, lint files, check code quality without pushing to Codacy, or run tools like ESLint, Ruff, Semgrep, RuboCop, or any other supported analyzer on their machine. Also trigger when the user asks to analyze staged changes, scan a PR locally, or set up local Codacy analysis.
+description: Use the Codacy Analysis CLI to run LOCAL static analysis on repositories or specific files. Use when the user wants to analyze code locally on their machine without pushing to Codacy Cloud, run CLI-based linting (ESLint, Ruff, Semgrep, RuboCop), scan staged changes or local PRs, or set up local Codacy tooling. This is the LOCAL CLI skill — NOT for querying Codacy Cloud (use codacy-cloud-cli for cloud queries).
 license: MIT
 metadata:
   author: Codacy
