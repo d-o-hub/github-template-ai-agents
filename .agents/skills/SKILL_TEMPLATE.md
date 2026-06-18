@@ -11,7 +11,7 @@ version: "0.1.0"
 
 One-sentence purpose statement.
 
-## When To Use
+## When to Use
 
 - Bullet trigger conditions
 
@@ -25,8 +25,8 @@ Numbered workflow the agent follows.
 
 ## Rationalizations
 
-| Excuse | Counter |
-|--------|---------|
+| Rationalization | Reality |
+|-----------------|---------|
 | "I don't need this because..." | "You do because..." |
 
 ## Red Flags
@@ -37,3 +37,7 @@ Numbered workflow the agent follows.
 ## References
 
 - `references/` — link relevant sub-documents
+
+## See Also
+
+- Related skill — brief description of when to use it instead

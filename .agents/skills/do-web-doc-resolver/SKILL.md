@@ -2,7 +2,7 @@
 name: do-web-doc-resolver
 version: "0.2.10"
 category: tool
-description: Python resolver for URLs and queries into compact, LLM-ready markdown. Uses progressive free-first cascade with quality scoring, circuit breakers, layered routing memory, trace-based evaluation, and agent-friendly docs validation. Use when fetching documentation, resolving web URLs, or building context from web sources.
+description: Python resolver for URLs and queries into compact, LLM-ready markdown. Use this skill when fetching documentation, resolving web URLs, or building context from web sources — even if they just say "read this doc page" or "get the docs for X". Uses progressive free-first cascade with quality scoring, circuit breakers, layered routing memory, trace-based evaluation, and agent-friendly docs validation.
 license: MIT
 compatibility: Python 3.10+, async/await
 allowed-tools: Bash(python:*|do-wdr:*) Read
@@ -16,7 +16,7 @@ metadata:
 
 Resolve URLs and queries into compact, LLM-ready markdown using a progressive, free-first cascade with 2026 production patterns.
 
-## When to use
+## When to Use
 
 - Fetch and parse documentation from a URL
 - Search for technical information across the web
@@ -104,6 +104,11 @@ scripts/
 ├── synthesis.py         # LLM synthesis gate
 └── utils.py             # Utilities
 ```
+
+## See Also
+
+- `web-search-researcher` — Web search and research
+- `agent-browser` — Browser automation
 
 ## Rationalizations
 

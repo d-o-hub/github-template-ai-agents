@@ -1,0 +1,1028 @@
+[
+  {
+    "skill": "accessibility-auditor",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 65,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "agent-browser",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 228,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "agent-coordination",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 120,
+    "eval_count": 5,
+    "assertion_count": 15,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "agents-md",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 133,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "anti-ai-slop",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 250,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "api-design-first",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 149,
+    "eval_count": 5,
+    "assertion_count": 19,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "architecture-diagram",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 108,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "cicd-pipeline",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 80,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "cloudflare-worker-api",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 69,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "codacy-cloud-cli",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 128,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "codacy",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 168,
+    "eval_count": 3,
+    "assertion_count": 6,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "code-review-assistant",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 173,
+    "eval_count": 6,
+    "assertion_count": 12,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "codeberg-api",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 221,
+    "eval_count": 5,
+    "assertion_count": 15,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "css-render-performance",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 115,
+    "eval_count": 3,
+    "assertion_count": 6,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "database-devops",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 244,
+    "eval_count": 8,
+    "assertion_count": 34,
+    "has_trigger": false,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "delegate",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 69,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "dist-channel-selection",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 71,
+    "eval_count": 3,
+    "assertion_count": 12,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "do-web-doc-resolver",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 128,
+    "eval_count": 4,
+    "assertion_count": 15,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "docs-hook",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 61,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "document-rendering-and-locators",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 54,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "dogfood",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 164,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "dora-report",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 66,
+    "eval_count": 3,
+    "assertion_count": 8,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "durable-objects",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 143,
+    "eval_count": 3,
+    "assertion_count": 10,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "eu-ai-act-compliance",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 107,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "git-github-workflow",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 235,
+    "eval_count": 9,
+    "assertion_count": 27,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "github-pr-sentinel",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 250,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "goap-agent",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 177,
+    "eval_count": 4,
+    "assertion_count": 15,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "implementer",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 75,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "intent-classifier",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 119,
+    "eval_count": 5,
+    "assertion_count": 15,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "iterative-refinement",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 242,
+    "eval_count": 3,
+    "assertion_count": 6,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "jules-delegator",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 163,
+    "eval_count": 4,
+    "assertion_count": 6,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "learn",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 74,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "lifecycle-management",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 79,
+    "eval_count": 3,
+    "assertion_count": 10,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "memory-context",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 90,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "migration-refactoring",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 249,
+    "eval_count": 3,
+    "assertion_count": 6,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "parallel-execution",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 240,
+    "eval_count": 4,
+    "assertion_count": 12,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "privacy-first",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 137,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "pwa-offline-sync",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 54,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "reader-ui-ux",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 54,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "readme-best-practices",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 175,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "secure-invite-and-access",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 56,
+    "eval_count": 5,
+    "assertion_count": 15,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "security-code-auditor",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 117,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "shell-script-quality",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 249,
+    "eval_count": 3,
+    "assertion_count": 6,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "skill-creator",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 243,
+    "eval_count": 6,
+    "assertion_count": 19,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "skill-evaluator",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 250,
+    "eval_count": 5,
+    "assertion_count": 16,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "static-analysis",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 111,
+    "eval_count": 3,
+    "assertion_count": 6,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "task-decomposition",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 182,
+    "eval_count": 4,
+    "assertion_count": 13,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "template-version-management",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 129,
+    "eval_count": 6,
+    "assertion_count": 24,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "test-runner",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 192,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "testdata-builders",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 77,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "testing-strategy",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 93,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "triz-analysis",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 106,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "triz-solver",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 179,
+    "eval_count": 5,
+    "assertion_count": 15,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "turso-db",
+    "score": 12,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 220,
+    "eval_count": 4,
+    "assertion_count": 16,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": true,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "ui-ux-optimize",
+    "score": 10,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 240,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": false,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "verification-template",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 61,
+    "eval_count": 3,
+    "assertion_count": 9,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": false,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+,
+  {
+    "skill": "web-search-researcher",
+    "score": 11,
+    "max_score": 14,
+    "verdict": "NEEDS_WORK",
+    "lines": 234,
+    "eval_count": 5,
+    "assertion_count": 16,
+    "has_trigger": true,
+    "has_when_to_use": true,
+    "has_see_also": false,
+    "has_references": true,
+    "wrong_headers": 0
+0,
+    "variant_headings": 0
+0
+  }
+
+]

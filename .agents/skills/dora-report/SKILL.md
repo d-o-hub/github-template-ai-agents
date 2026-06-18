@@ -1,6 +1,6 @@
 ---
 name: dora-report
-description: "Monthly DORA + agentic metrics reporting skill. Triggers on 'generate dora report', 'monthly metrics', 'agentic performance report', 'report DORA metrics', or when a monthly audit is required."
+description: "Generate monthly DORA and agentic metrics reports. Use this skill when the user asks to generate a DORA report, pull monthly metrics, create an agentic performance report, report DORA metrics, or when a monthly audit is required — even if they just say 'metrics' or 'performance report'."
 category: devops
 version: "0.2.10"
 template_version: "0.3"
@@ -46,6 +46,11 @@ Activate when:
 2. Verify the output in `agents-docs/dora-reports/YYYY-MM.md`.
 3. Add any qualitative analysis or TRIZ-based innovation opportunities to the generated file.
 
+## See Also
+
+- `learn` — Extract learnings into AGENTS.md
+- `readme-best-practices` — README and documentation best practices
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -60,7 +65,7 @@ Activate when:
 - [ ] Ignoring "agentic overhead" (e.g., extremely high token usage for simple tasks).
 - [ ] Metrics that lack a time-bound context (e.g., "total tasks" instead of "tasks per week").
 
-## Reference Files
+## References
 
 - `agents-docs/WORKFLOW.md` - Standard delivery process to measure against.
 - `scripts/analyze-codebase.sh` - Source for some raw performance data.

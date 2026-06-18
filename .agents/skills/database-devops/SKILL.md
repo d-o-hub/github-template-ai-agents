@@ -2,7 +2,7 @@
 name: database-devops
 version: "0.2.10"
 category: database
-description: Database design, migration, and DevOps automation with safety patterns. Use for schema design, migration planning, query optimization, multi-database orchestration, and Infrastructure-as-Code. Includes rollback strategies, performance analysis, and cross-database synchronization.
+description: Database design, migration, and DevOps automation with safety patterns. Use this skill when designing schemas, planning migrations, optimizing queries, or managing multi-database orchestration — even if they just say "set up the database" or "fix the migration". Includes rollback strategies, performance analysis, and cross-database synchronization.
 license: MIT
 ---
 
@@ -208,6 +208,11 @@ See `references/backup-strategies.md` for point-in-time recovery, automated back
 - [ ] Connection pooling configured
 - [ ] Monitoring/alerting for slow queries
 - [ ] Secrets managed externally
+
+## See Also
+
+- `turso-db` — Turso/LibSQL database development
+- `static-analysis` — Database query linting
 
 ## Rationalizations
 

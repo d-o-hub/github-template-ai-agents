@@ -14,6 +14,13 @@ The Codacy Analysis CLI (`codacy-analysis`) runs static analysis locally on a re
 
 Always use `--output-format json` for structured output in agentic workflows.
 
+## When to Use
+
+- User wants to analyze code locally without pushing to Codacy Cloud
+- Need to run CLI-based linting (ESLint, Ruff, Semgrep, RuboCop)
+- Scanning staged changes or setting up local Codacy tooling
+- Even if they just say "run codacy locally" or "check code quality"
+
 ## Setup
 
 ```bash
@@ -137,8 +144,8 @@ See [references/analysis-workflows.md](references/analysis-workflows.md) for det
 
 ## Rationalizations
 
-| Challenge | Rationale |
-|-----------|-----------|
+| Rationalization | Reality |
+|-----------------|---------|
 | "The CLI is slow" | Better to wait for local results than to wait 10+ minutes for a CI failure. |
 | "I'll just fix it later" | Unfixed quality gate failures compound technical debt and block others. |
 | "It's a false positive" | Suppress it via CLI immediately so the quality gate passes and stays clean. |
@@ -149,6 +156,12 @@ See [references/analysis-workflows.md](references/analysis-workflows.md) for det
 - [ ] Suppressing issues as "FalsePositive" without verifying they actually are.
 - [ ] Running `codacy-analysis analyze` without the `--pr` flag on a large codebase (may be slow).
 - [ ] Using the issue `hash` for CLI suppressions (requires numeric `resultDataId`).
+
+## See Also
+
+- `codacy-cloud-cli` — Cloud Codacy CLI for remote data queries
+- `static-analysis` — Generic linter triage across any language
+- `code-review-assistant` — PR review workflow
 
 ## Troubleshooting
 

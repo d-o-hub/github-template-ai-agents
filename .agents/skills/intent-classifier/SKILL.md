@@ -10,6 +10,13 @@ license: MIT
 
 Classify user requests and route them to the most appropriate skill, command, or specialized agent.
 
+## When to Use
+
+- User asks which skill to use or how to route a request
+- Need to determine which skill handles a given task
+- Multiple skills could handle a request and disambiguation is needed
+- Even if they just say "which skill should I use" or "route this"
+
 ## Classification Workflow
 
 ### 1. Intent Extraction
@@ -85,6 +92,12 @@ This scans `.agents/skills/` and regenerates the skill registry with:
 | "Audit my code for security issues" | Security audit | security-code-auditor |
 | "Design a REST API for users" | API design | api-design-first |
 | "Fix this bug in my Python script" | Code debugging | (general) |
+
+## See Also
+
+- `skill-creator` — Create and improve skills
+- `skill-evaluator` — Evaluate and score skills
+- `goap-agent` — Orchestrator for complex multi-step tasks
 
 ## Rationalizations
 

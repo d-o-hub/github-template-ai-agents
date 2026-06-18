@@ -2,8 +2,7 @@
 name: ui-ux-optimize
 description: >
   Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination,
-  confidence-scored autoresearch loops, and backpressure quality gates. Use for web apps,
-  mobile apps, games, dashboards, SaaS, e-commerce, kiosks, and any screen-based product.
+  confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, or any screen-based product.
 version: "0.2.10"
 category: ui-ux
 license: MIT
@@ -193,7 +192,7 @@ Run every step. Swarm coordinates handoffs.
 | `iterative-refinement` | Autoresearch loop |
 | `parallel-execution` | Parallel variant generation |
 
-## Reference Files Index
+## References
 
 | File | Purpose |
 |---|---|
@@ -224,6 +223,11 @@ Run every step. Swarm coordinates handoffs.
 | `scripts/validate-tokens.cjs` | Fast-fail: checks design docs + TOKENS export exist |
 | `scripts/check-output.cjs` | Eval assertion: contains/not_contains for code output |
 | `scripts/verify.py` | Browser verification: overlap, tap targets, scroll audit |
+
+## See Also
+
+- `anti-ai-slop` — Avoid AI slop in UI/UX
+- `css-render-performance` — CSS render performance optimization
 
 ## Rationalizations
 

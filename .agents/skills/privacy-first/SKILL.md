@@ -19,7 +19,7 @@ metadata:
 This skill ensures no email addresses or personal data leak into the codebase.
 It provides detection, prevention, and automated checking.
 
-## When to activate
+## When to Use
 
 - User asks: "prevent emails", "remove personal data", "privacy check", "never use email"
 - Before writing any new code, config, or documentation file
@@ -116,6 +116,11 @@ fi
 - Remove email fields from package metadata
 - Use test domains (`example.com`) only in test files
 - Link to SECURITY.md for vulnerability reporting
+
+## See Also
+
+- `security-code-auditor` — General security audits
+- `eu-ai-act-compliance` — EU AI Act compliance
 
 ## Rationalizations
 
