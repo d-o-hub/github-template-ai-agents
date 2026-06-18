@@ -35,7 +35,6 @@ for skill_dir in "$SKILLS_DIR"/*/; do
   lines=$(wc -l < "$skill_md")
   
   # 4. Description length
-  desc_len=$(sed -n '/^description:/,/^---/p' "$skill_md" | head -5 | wc -c)
   
   # 5. Trigger phrasing
   has_trigger=$(grep -ci "use this skill\|use when\|triggers on\|even if they" "$skill_md" 2>/dev/null || echo 0)
@@ -59,7 +58,6 @@ for skill_dir in "$SKILLS_DIR"/*/; do
   [ -d "$skill_dir/references" ] && has_refs="true"
   
   # 10. Has scripts dir
-  has_scripts="false"
   [ -d "$skill_dir/scripts" ] && has_scripts="true"
   
   # Calculate score
