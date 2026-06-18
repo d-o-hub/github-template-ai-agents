@@ -48,32 +48,6 @@
       "autoActivate": true
     },
     {
-      "skill": "code-quality",
-      "triggers": {
-        "keywords": [
-          "review",
-          "quality",
-          "refactor",
-          "clean code",
-          "best practice"
-        ],
-        "patterns": [
-          "review.*",
-          "quality.*",
-          "refactor.*"
-        ],
-        "files": [
-          "**/*.rs",
-          "**/*.ts",
-          "**/*.js",
-          "**/*.py",
-          "**/*.go"
-        ]
-      },
-      "priority": "medium",
-      "autoActivate": false
-    },
-    {
       "skill": "test-runner",
       "triggers": {
         "keywords": [

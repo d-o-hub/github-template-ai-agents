@@ -36,7 +36,7 @@ git checkout -b feat/your-feature-name
 # If checks fail, fix and retry
 ```
 
-See `.opencode/commands/atomic-commit.md` for the full command specification.
+See `.agents/skills/git-github-workflow/SKILL.md` for the full command specification.
 
 ## Post-Task Learning
 

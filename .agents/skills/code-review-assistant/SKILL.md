@@ -2,7 +2,7 @@
 name: code-review-assistant
 version: "0.2.10"
 category: code-quality
-description: Automated code review with PR analysis, change summaries, and quality checks. Use for reviewing pull requests, generating review comments, checking against best practices, and identifying potential issues. Includes style guide compliance, security issue detection, and review automation.
+description: Automated code review with PR analysis, change summaries, quality checks, and code smell detection. Use for reviewing pull requests, generating review comments, checking against best practices, identifying code smells, and providing refactoring guidance. Includes style guide compliance, security issue detection, code smell detection, and review automation.
 license: MIT
 ---
 
@@ -16,6 +16,8 @@ Automated code review with intelligent analysis of changes, quality checks, and 
 - **Change summarization** - Generate PR descriptions from code changes
 - **Quality checks** - Style guide compliance, best practices
 - **Security review** - Detect potential security issues in changes
+- **Code smell detection** - Identify bloaters, dispensables, and couplers
+- **Refactoring guidance** - Suggest targeted improvements
 - **Review automation** - Auto-approve simple changes, flag complex ones
 - **Learning tool** - Explain changes for knowledge sharing
 
@@ -43,6 +45,54 @@ Automated code review with intelligent analysis of changes, quality checks, and 
 3. **Suggest improvements** - Refactoring opportunities, optimizations
 4. **Highlight positives** - Good practices to reinforce
 5. **Generate review comments** - Specific, actionable feedback
+
+## Code Smells Detection
+
+### Bloaters
+
+- **Long Method** (>30 lines of logic)
+- **Large Class** (>300 lines)
+- **Long Parameter List** (>4 params)
+
+### Object-Orientation Abusers
+
+- **Switch Statements** (replace with polymorphism)
+- **Temporary Field**
+- **Refused Bequest**
+
+### Dispensables
+
+- **Duplicate Code**
+- **Lazy Class**
+- **Dead Code**
+- **Speculative Generality**
+
+### Couplers
+
+- **Feature Envy**
+- **Inappropriate Intimacy**
+- **Message Chains** (obj.getX().getY())
+
+## Core Quality Principles
+
+**DRY** — Extract repeated logic into shared functions or constants.
+
+```python
+TAX_RATES = {'US': 0.08, 'EU': 0.20}
+def calc_tax(p, region): return p * TAX_RATES[region]
+```
+
+**Single Responsibility** — Each function/class should have one clear purpose.
+**No Magic Numbers** — Replace bare literals with named constants.
+
+## Tools by Language
+
+| Language | Linter | Formatter | Test |
+|----------|--------|-----------|------|
+| Python | ruff | black | pytest |
+| TypeScript | eslint | prettier | jest |
+| Rust | clippy | rustfmt | cargo test |
+| Go | golangci-lint | gofmt | go test |
 
 ## File Risk Assessment
 
@@ -173,6 +223,10 @@ jobs:
 
 ## Quality Checklist
 
+- [ ] No magic numbers (use named constants)
+- [ ] Functions/methods under 50 lines
+- [ ] DRY principle followed
+- [ ] No code smells detected
 - [ ] All new code has corresponding tests
 - [ ] No hardcoded secrets or credentials
 - [ ] Security-sensitive code properly reviewed

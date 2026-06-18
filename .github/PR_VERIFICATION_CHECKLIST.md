@@ -1,7 +1,7 @@
 # PR Verification Checklist
 
 > **Atomic Commit Command Reference**  
-> For use with `gh atomic-commit` or manual PR verification.  
+> For use with `git-github-workflow` or manual PR verification.  
 > All items must be checked ✓ before merge. No exceptions.
 
 ---

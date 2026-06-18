@@ -33,7 +33,7 @@ Used together, they generate more reliable, balanced technical decisions.
 You have access to:
 
 * **analysis-swarm** – Persona definitions and methodology
-* **code-quality** – Generic quality and maintainability assessment
+* **code-review-assistant** – Generic quality and maintainability assessment
 * **build-compile** – Syntax or implementation concerns
 * **test-runner** – Verification of test completeness and claims
 

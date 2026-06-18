@@ -1,6 +1,6 @@
-# Skill Creator - Reference Guide
+# Skill Creator Reference Guide
 
-Complete templates and examples for creating Claude Code skills.
+Templates, examples, and best practices for creating and maintaining AI agent skills.
 
 ## Skill Templates
 
@@ -22,13 +22,12 @@ Brief overview of skill purpose and scope.
 
 - [Scenario 1: Specific situation]
 - [Scenario 2: Specific situation]
-- [Scenario 3: Specific situation]
 
 ## Process
 
 ### Step 1: [Action]
 
-[Clear instructions for this step]
+Clear instructions for this step.
 
 **Checklist**:
 - [ ] Task 1
@@ -36,120 +35,90 @@ Brief overview of skill purpose and scope.
 
 ### Step 2: [Action]
 
-[Clear instructions for this step]
-
-### Step 3: [Action]
-
-[Clear instructions for this step]
+Clear instructions for this step.
 
 ## Examples
 
 ### Example 1: [Name]
 
-```
-
-[Example workflow or code]
-
-```
-
-### Example 2: [Name]
-
-```
-
-[Example workflow or code]
-
+```text
+Example workflow or code
 ```
 
 ## Best Practices
 
 ### DO:
-✓ [Action to take]
-✓ [Action to take]
+
+- [Action to take]
 
 ### DON'T:
-✗ [Action to avoid]
-✗ [Action to avoid]
 
-## Integration
+- [Action to avoid]
 
-How this skill works with other skills and agents.
+## Rationalizations
+
+| Rationalization | Reality |
+|-----------------|---------|
+| "Excuse" | Why the excuse is wrong. |
+
+## Red Flags
+
+- [ ] Red flag to watch for
+
+## Reference Files
+
+- `references/guide.md` - Additional documentation
+
 ```
 
 ### Template 2: Knowledge Skill
 
-For skills that provide domain expertise:
-
 ```markdown
 ---
-name: skill-name
-description: [Domain] expertise and guidance. Use when [specific need for this knowledge].
+name: domain-knowledge
+description: [Domain] expertise and guidance. Use when [specific need].
 ---
 
-# Skill Title
+# Domain Knowledge
 
-Overview of the domain and why this knowledge matters.
+Overview of the domain and why it matters.
 
 ## Core Concepts
 
 ### Concept 1: [Name]
 
-[Explanation in 2-3 sentences]
-
-### Concept 2: [Name]
-
-[Explanation in 2-3 sentences]
+Explanation in 2-3 sentences.
 
 ## When to Use
 
 - When working with [domain element]
 - When needing [specific knowledge]
-- When deciding about [domain decision]
 
 ## Key Patterns
 
 ### Pattern 1: [Name]
 
-[Description and when to use]
-
-```
-
-[Example or diagram]
-
-```
-
-### Pattern 2: [Name]
-
-[Description and when to use]
+Description and when to use.
 
 ## Guidelines
 
 ### Best Practices
 - [Guideline 1]
-- [Guideline 2]
 
 ### Common Pitfalls
-- [Pitfall 1 to avoid]
-- [Pitfall 2 to avoid]
-
-## Examples
-
-### Example: [Scenario]
-
-[Detailed example showing concept application]
+- [Pitfall to avoid]
 
 ## Related Skills
 
-- **[skill-name](path)** - How it connects
+- **[related-skill](../related-skill/SKILL.md)** - How it connects
 ```
 
 ### Template 3: Tool Skill
 
-For skills about tool usage:
-
 ```markdown
 ---
-name: skill-name
-description: [Tool name] usage and best practices. Use when [tool operation needed].
+name: tool-usage
+description: [Tool] usage and best practices. Use when [tool operation needed].
 ---
 
 # Tool Name
@@ -170,46 +139,19 @@ Overview of the tool and its purpose.
 [Command syntax]
 ```
 
-**Options**:
-- `--flag`: Description
-- `-s`: Description
-
-### Command 2: [Name]
-
-```bash
-[Command syntax]
-```
-
 ## When to Use
 
 - [Use case 1]
-- [Use case 2]
 
 ## Best Practices
 
 ### DO:
 
-✓ [Practice 1]
-✓ [Practice 2]
+- [Action to take]
 
 ### DON'T:
 
-✗ [Anti-pattern 1]
-✗ [Anti-pattern 2]
-
-## Examples
-
-### Example 1: Common Task
-
-```bash
-[Command sequence]
-```
-
-### Example 2: Advanced Usage
-
-```bash
-[Command sequence]
-```
+- [Anti-pattern 1]
 
 ## Troubleshooting
 
@@ -217,404 +159,107 @@ Overview of the tool and its purpose.
 |-------|-------|----------|
 | [Error] | [Cause] | [Solution] |
 
-## Integration
-
-How this tool integrates with other skills and workflows.
-
 ```
 
-## Complete Creation Examples
-
-### Example: Episode Management Skill
-
-```markdown
----
-name: episode-management
-description: Manage learning episodes with start, log, and complete operations. Use when tracking self-learning sessions, recording patterns, or managing episode lifecycle.
----
-
-# Episode Management
-
-Manage learning episodes for the self-learning memory system.
-
-## When to Use
-
-- Starting a new learning session
-- Logging patterns discovered during episode
-- Completing episode with summary
-
-## Episode Lifecycle
-
-```
-
-START → LOG (multiple times) → COMPLETE
-
-```
-
-### Start Episode
-
-```bash
-python scripts/episode.py start "Learning about async Rust"
-```
-
-**Creates**:
-- Episode ID (UUID)
-- Start timestamp
-- Initial state: IN_PROGRESS
-
-### Log Pattern
-
-```bash
-python scripts/episode.py log EPISODE_ID "Pattern: Use tokio::spawn for independent tasks"
-```
-
-**Records**:
-- Pattern text
-- Timestamp
-- Category (optional)
-
-### Complete Episode
-
-```bash
-python scripts/episode.py complete EPISODE_ID "Summary of learnings"
-```
-
-**Finalizes**:
-- End timestamp
-- Summary
-- State: COMPLETED
-
-## Best Practices
-
-### DO:
-
-✓ Start episode before learning session
-✓ Log patterns as discovered
-✓ Complete with meaningful summary
-
-### DON'T:
-
-✗ Skip episode start (no tracking)
-✗ Log after long delay (lose context)
-✗ Complete without summary (lose value)
-
-## Integration
-
-- **pattern-extraction**: Extracts patterns from logged content
-- **memory-storage**: Stores completed episodes
-- **skill-creator**: This skill format
-
-```
-
-### Example: Test Debugging Skill
-
-```markdown
----
-name: test-debugging
-description: Debug and fix failing tests in Rust projects. Use when tests fail and you need to diagnose root causes, fix async/await issues, or handle race conditions.
----
-
-# Test Debugging
-
-Systematic approach to diagnosing and fixing failing tests.
-
-## When to Use
-
-- Test fails unexpectedly
-- Flaky test behavior
-- Async/await test issues
-- Race condition suspected
-
-## Debugging Process
-
-### Step 1: Reproduce
-
-```bash
-cargo test -- --nocapture
-```
-
-**Goal**: Consistent reproduction
-
-### Step 2: Isolate
-
-- Run single test: `cargo test test_name`
-- Remove unrelated code
-- Minimize test case
-
-### Step 3: Diagnose
-
-**Common Issues**:
-- Async runtime not started
-- Missing await
-- Shared state without synchronization
-- Timing-dependent assertions
-
-### Step 4: Fix
-
-Apply targeted fix based on diagnosis.
-
-### Step 5: Verify
-
-```bash
-cargo test -- --test-threads=1
-```
-
-## Common Patterns
-
-### Pattern 1: Async Test Missing Runtime
-
-**Symptom**: Panic about no reactor
-
-**Fix**: Add `#[tokio::test]` attribute
-
-### Pattern 2: Race Condition
-
-**Symptom**: Intermittent failures
-
-**Fix**: Use proper synchronization (Mutex, RwLock, channels)
-
-## Best Practices
-
-### DO:
-
-✓ Run tests with --nocapture for output
-✓ Isolate failing test first
-✓ Check for async issues in Rust
-✓ Use test-threads=1 for debugging
-
-### DON'T:
-
-✗ Ignore intermittent failures
-✗ Assume test is correct (it might not be)
-✗ Fix without understanding root cause
-
-```
-
-## Naming Examples
-
-### Good Names
-- `episode-management` - Clear purpose
-- `test-debugging` - Specific domain
-- `api-integration` - Well-defined scope
-- `code-quality` - Focused area
-- `documentation` - Clear responsibility
-
-### Bad Names
-- `helper` - Too vague
-- `stuff` - Not descriptive
-- `Episode_Management` - Wrong format (uppercase, underscore)
-- `test debugging` - Contains space
-- `very-long-skill-name-that-is-hard-to-type` - Too long
-
-## Description Examples
+## Description Writing
 
 ### Good Descriptions
 
-✅ **Specific and actionable**:
 ```yaml
 description: Debug and fix failing tests in Rust projects. Use this skill when tests fail and you need to diagnose root causes, fix async/await issues, or handle race conditions.
 ```
-
-✅ **Clear when-to-use**:
 
 ```yaml
 description: Implement new features systematically with proper testing and documentation. Use when adding new functionality to the codebase.
 ```
 
-✅ **Keyword-rich**:
-
-```yaml
-description: Create human-focused GitHub README.md files with 2026 best practices. Use when creating new projects, improving documentation, or making repositories more discoverable.
-```
-
 ### Bad Descriptions
-
-✗ **Too vague**:
 
 ```yaml
 description: Helps with testing
+# Too vague - no trigger scenarios
 ```
-
-✗ **Missing when-to-use**:
 
 ```yaml
 description: Provides guidance on building APIs
+# Missing when-to-use context
 ```
 
-✗ **Too long** (over 1024 chars):
+### Principles
 
-```yaml
-description: [Very long paragraph that goes on and on...]
+1. **Imperative phrasing**: "Use this skill when..." rather than "This skill does..."
+2. **Focus on user intent**: Describe what the user is trying to achieve
+3. **Err on pushy side**: Explicitly list contexts where the skill applies
+4. **Keep concise**: Max 1024 characters
+
+## Naming Conventions
+
+| Good Names | Bad Names |
+|------------|-----------|
+| `episode-management` | `helper` (too vague) |
+| `test-debugging` | `Episode_Management` (wrong format) |
+| `code-review` | `test debugging` (contains space) |
+| `api-integration` | `very-long-skill-name-that-is-hard-to-type` (too long) |
+
+Rules: lowercase, hyphens only, max 64 chars, descriptive.
+
+## Example: Creating a Skill via CLI
+
+```bash
+python -m scripts.init_skill \
+  --skill-name production-deploy \
+  --description "Deploy Rust applications safely with pre-deployment checks. Use when deploying to production."
 ```
 
-## Validation Checklist
+This creates full directory structure with SKILL.md, evals/evals.json (3 placeholder cases), scripts/example.py, and references/guide.md.
 
-After creating a skill, verify:
+## Best Practices
 
-### Structure
+### Start from Real Expertise
 
-- [ ] Directory exists at `.agents/skills/skill-name/`
-- [ ] SKILL.md file present
-- [ ] YAML frontmatter valid
-- [ ] Name matches directory name
+Avoid generating generic skills. Extract patterns from:
+- Real tasks completed with agents
+- Corrections made during execution
+- Existing internal documentation and runbooks
+- Code review comments and issue trackers
+- Real-world failure cases and their resolutions
 
-### YAML Frontmatter
+### Refine with Real Execution
 
-- [ ] `name:` field present and correct
-- [ ] `description:` field present
-- [ ] Description under 1024 characters
-- [ ] Name is lowercase with hyphens only
+Run the skill against real tasks, then feed results back:
+- What triggered false positives?
+- What was missed?
+- What could be cut?
 
-### Content
+### Effective Instruction Patterns
 
-- [ ] "When to Use" section present
-- [ ] Core process or concepts documented
-- [ ] At least one example provided
-- [ ] Best practices included
-- [ ] Integration with other skills noted
+1. **Gotchas sections** — highest-value content for project specifics
+2. **Templates for output format** — provide template rather than describing in prose
+3. **Checklists for multi-step workflows**
+4. **Validation loops**: Do work -> Validate -> Fix -> Repeat
 
-### Quality
+### Spend Context Wisely
 
-- [ ] Clear, concise language
-- [ ] Actionable instructions
-- [ ] Code examples tested
-- [ ] Markdown properly formatted
-- [ ] No broken links
-
-## Testing Your Skill
-
-### Manual Test
-
-1. Clear context: `/clear`
-2. Ask a question that should trigger the skill
-3. Verify skill is invoked appropriately
-4. Check guidance is helpful
-
-### Example Test
-
-For `test-debugging` skill:
-
-```
-User: "My test is failing with a panic about no reactor"
-Expected: Skill invokes and provides async test guidance
-```
-
-## Maintenance
-
-### Updating Skills
-
-When updating existing skills:
-1. Preserve backward compatibility where possible
-2. Update description if scope changes
-3. Add new sections without removing old ones
-4. Update examples to reflect current best practices
-5. Keep git history for tracking changes
-
-### Version Tracking
-
-Consider adding version info for frequently changing skills:
-
-```markdown
----
-name: skill-name
-version: 1.2.0
-last_updated: 2025-03-15
----
-```
-
-### Deprecation
-
-If a skill becomes obsolete:
-1. Update description to indicate deprecation
-2. Point to replacement skill
-3. Keep file for backward compatibility
-4. Remove after transition period (with notice)
-
-## Project-Specific Skills
-
-### For Rust Self-Learning Memory Project
-
-**Domain-Specific Skills**:
-- `episode-management` - Start, log, complete episodes
-- `pattern-extraction` - Extract patterns from content
-- `memory-storage` - Store and retrieve memories
-- `turso-sync` - Sync with Turso database
-- `redb-cache` - Manage redb caching
-
-**Naming Convention**:
-- `episode-[operation]` for episode-related
-- `storage-[operation]` for storage operations
-- `pattern-[operation]` for pattern handling
-- `memory-[operation]` for memory operations
-
-## Integration with Agent Creator
-
-When creating skills that work with agents:
-
-1. **Reference agents in skill**:
-
-   ```markdown
-   ## Integration
-   Used by: feature-implementer, debugger agents
-   ```
-
-2. **Skill-agent coordination**:
-   Ensure skill complements agent capabilities
-
-3. **Invocation clarity**:
-   Make clear when skill vs agent is appropriate
+Focus on what the agent would not know without the skill: project conventions, domain-specific procedures, non-obvious edge cases, particular APIs. Do not explain concepts like what HTTP or PDF is.
 
 ## Common Mistakes
 
-### Mistake 1: Vague Description
+| Mistake | Problem | Fix |
+|---------|---------|-----|
+| Vague description | Agent does not know when to invoke | Add specific scenarios and keywords |
+| No examples | Hard to understand usage | Include 2-3 concrete examples |
+| Too long | Exceeds context limits | Move details to reference files |
+| Wrong name format | Skill not recognized | Use lowercase with hyphens only |
+| Missing When-to-Use | Unclear invocation triggers | Add dedicated trigger section |
 
-**Problem**: Claude doesn't know when to invoke
-**Fix**: Add specific scenarios and keywords
-
-### Mistake 2: No Examples
-
-**Problem**: Hard to understand usage
-**Fix**: Include 2-3 concrete examples
-
-### Mistake 3: Too Long
-
-**Problem**: Exceeds context limits
-**Fix**: Move details to reference files
-
-### Mistake 4: Wrong Name Format
-
-**Problem**: Skill not recognized
-**Fix**: Use lowercase with hyphens only
-
-### Mistake 5: Missing When-to-Use
-
-**Problem**: Unclear invocation triggers
-**Fix**: Add dedicated "When to Use" section
-
-## Advanced Topics
-
-### Skill Dependencies
+## Skill Dependencies and Cross-References
 
 Skills can reference other skills:
 
 ```markdown
 ## Related Skills
 - **[task-decomposition](../task-decomposition/SKILL.md)** - Use before implementing
-- **[code-reviewer](../code-reviewer/SKILL.md)** - Use after implementing
 ```
-
-### Skill Hierarchies
-
-Organize related skills:
-
-```
-.agents/skills/
-├── episode-*.md (episode management skills)
-├── storage-*.md (storage operation skills)
-└── pattern-*.md (pattern handling skills)
-```
-
-### Cross-References
 
 Link between skills:
 
@@ -622,10 +267,51 @@ Link between skills:
 See also: **[parallel-execution](../parallel-execution/SKILL.md)** for concurrent task patterns.
 ```
 
-## Metrics
+## Output Patterns
 
-Track skill effectiveness:
-- **Invocation rate**: How often skill is used
-- **User satisfaction**: Feedback on helpfulness
-- **Task success rate**: Tasks completed with skill
-- **Context efficiency**: Lines used vs value provided
+### Template Pattern (Strict)
+
+For API responses or data formats, provide exact templates:
+
+```markdown
+## Report structure
+
+ALWAYS use this exact template:
+
+# [Title]
+## Executive summary
+[One-paragraph overview]
+
+## Key findings
+- Finding 1 with supporting data
+```
+
+### Template Pattern (Flexible)
+
+```markdown
+## Report structure
+
+Here is a sensible default, but adapt as needed:
+
+# [Title]
+## Executive summary
+[Overview]
+```
+
+### Examples Pattern
+
+For quality-sensitive output, provide input/output pairs to demonstrate style and level of detail.
+
+## Maintenance
+
+- **Versioning**: Use SemVer. Major (1.0.0) for breaking changes, Minor (0.1.0) for additions, Patch (0.0.1) for fixes.
+- **Updating**: Preserve backward compatibility. Update description if scope changes.
+- **Deprecation**: Update description to indicate deprecation, point to replacement, and remove after transition period.
+
+## Measuring Effectiveness
+
+Track skill performance with eval benchmarks:
+- **Pass rate**: Percentage of assertions passing
+- **Invocation accuracy**: Correct trigger vs. false trigger ratio
+- **Time delta**: Speed impact of skill invocation
+- **Token delta**: Context window impact of skill
