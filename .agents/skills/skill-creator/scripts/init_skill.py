@@ -242,7 +242,7 @@ def main() -> None:
         gitkeep.write_text("", encoding="utf-8")
 
     print(f"\nSkill '{skill_name}' initialized at {skill_path.absolute()}")
-    print(f"\nNext steps:")
+    print("\nNext steps:")
     print(f"  1. Edit {skill_md_path} with real instructions and examples")
     print(f"  2. Update {evals_path} with realistic test cases")
     print(f"  3. Run validation: python -m scripts.package_skill {skill_path}")

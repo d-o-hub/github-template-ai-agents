@@ -76,8 +76,6 @@ def aggregate_results(workspace_path: Path) -> dict:
     if "with_skill" in run_summary and "without_skill" in run_summary:
         run_summary["delta"] = {}
         for metric in ("pass_rate", "time_seconds", "tokens"):
-            ws = run_summary["with_skill"][metric]
-            wo = run_summary["without_skill"][metric]
             # Delta = with_skill - without_skill
             delta_values = []
             if metric == "pass_rate":
@@ -121,16 +119,16 @@ def generate_markdown(benchmark: dict) -> str:
     """Generate a human-readable markdown report from benchmark data."""
     rs = benchmark.get("run_summary", {})
     lines = [
-        f"# Benchmark Results",
-        f"",
+        "# Benchmark Results",
+        "",
         f"- **Workspace**: {benchmark.get('workspace', 'N/A')}",
         f"- **Total cases**: {benchmark.get('total_cases', 0)}",
         f"- **Runs per case**: {benchmark.get('runs_per_case', 0)}",
-        f"",
-        f"## Summary",
-        f"",
-        f"| Metric | With Skill | Without Skill | Delta |",
-        f"|--------|------------|---------------|-------|",
+        "",
+        "## Summary",
+        "",
+        "| Metric | With Skill | Without Skill | Delta |",
+        "|--------|------------|---------------|-------|",
     ]
 
     def fmt_val(val: dict) -> str:
@@ -148,17 +146,17 @@ def generate_markdown(benchmark: dict) -> str:
         "",
         "## Configuration Details",
         "",
-        f"### With Skill",
+        "### With Skill",
         f"- Pass rate: {fmt_val(rs.get('with_skill', {}).get('pass_rate', {}))}",
         f"- Avg time: {fmt_val(rs.get('with_skill', {}).get('time_seconds', {}))}",
         f"- Avg tokens: {fmt_val(rs.get('with_skill', {}).get('tokens', {}))}",
         "",
-        f"### Without Skill",
+        "### Without Skill",
         f"- Pass rate: {fmt_val(rs.get('without_skill', {}).get('pass_rate', {}))}",
         f"- Avg time: {fmt_val(rs.get('without_skill', {}).get('time_seconds', {}))}",
         f"- Avg tokens: {fmt_val(rs.get('without_skill', {}).get('tokens', {}))}",
         "",
-        f"### Delta (With - Without)",
+        "### Delta (With - Without)",
         f"- Pass rate: {fmt_val(rs.get('delta', {}).get('pass_rate', {}))}",
         f"- Time: {fmt_val(rs.get('delta', {}).get('time_seconds', {}))}",
         f"- Tokens: {fmt_val(rs.get('delta', {}).get('tokens', {}))}",

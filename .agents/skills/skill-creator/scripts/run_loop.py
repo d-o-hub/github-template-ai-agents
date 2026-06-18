@@ -7,7 +7,6 @@ import json
 import random
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 
@@ -262,7 +261,7 @@ def main() -> None:
 
     if args.verbose:
         validation_results = evaluate_description(best_description, validation_set, args.skill_path, args.model)
-        print(f"\nFinal selection:")
+        print("\nFinal selection:")
         print(f"  Description: {best_description}")
         print(f"  Validation pass rate: {validation_results['pass_rate']:.1%}")
         print(f"  True positives: {validation_results['true_positives']}")
