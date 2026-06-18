@@ -1,6 +1,8 @@
 {
-  "status": "passing",
-  "last_run": "2026-06-16T19:22:18.071050Z",
-  "failing_jobs": [],
-  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/27642027249"
+  "status": "failing",
+  "last_run": "2026-06-18T14:06:37.538350Z",
+  "failing_jobs": [
+    "test"
+  ],
+  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/27764932445"
 }
