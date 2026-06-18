@@ -14,6 +14,7 @@ Database lifecycle management with DevOps practices for safe schema evolution, q
 
 - **Schema design** - New database schema design and normalization
 - **Migration planning** - Safe schema evolution with data transformations
+- **Naming conventions** - Consistent naming for tables, columns, and migration files
 - **Query optimization** - Index recommendations, query rewriting, performance tuning
 - **Multi-database orchestration** - Cross-database transactions, data sync
 - **Infrastructure-as-Code** - Terraform/Pulumi database provisioning
@@ -29,6 +30,12 @@ Database lifecycle management with DevOps practices for safe schema evolution, q
 4. **Physical design** - Indexing, partitioning, storage considerations
 5. **Normalization review** - 3NF/BCNF compliance vs. denormalization needs
 
+### Naming Conventions
+
+- **Migration files** - `YYYYMMDD_description.sql` (timestamp-prefixed, one concern per file)
+- **Tables** - snake_case, plural (e.g., `resources`, `permissions`)
+- **Columns** - snake_case (e.g., `resource_id`, `created_at`)
+
 ### Migration Planning Phase
 
 1. **Analyze current schema** - Existing tables, constraints, indexes
@@ -36,6 +43,7 @@ Database lifecycle management with DevOps practices for safe schema evolution, q
 3. **Plan migration steps** - Ordered, idempotent operations
 4. **Assess data impact** - Data transformations needed
 5. **Design rollback** - Reversible operations where possible
+6. **Apply naming conventions** - Verify migration file names and schema follow naming standards
 
 ### Execution Phase
 
@@ -44,6 +52,7 @@ Database lifecycle management with DevOps practices for safe schema evolution, q
 3. **Execute migration** - Apply changes with monitoring
 4. **Verify integrity** - Check constraints, data consistency
 5. **Update applications** - Deploy code changes
+6. **Log migration** - Record migration in migration history table for tracking and rollback
 
 ## Schema Design Patterns
 
@@ -106,6 +115,20 @@ pt-online-schema-change \
     --alter "ADD COLUMN email_normalized VARCHAR(255)" \
     --execute \
     D=mydb,t=users
+```
+
+### Idempotent Migrations
+
+```sql
+-- Idempotent table creation
+CREATE TABLE IF NOT EXISTS resources (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    created_at INTEGER DEFAULT (unixepoch())
+);
+
+-- Safe index addition
+CREATE INDEX IF NOT EXISTS idx_resources_owner ON resources(owner_id);
 ```
 
 See `references/migration-patterns.md` for gh-ost, batching strategies, and zero-downtime patterns.
@@ -175,9 +198,11 @@ See `references/backup-strategies.md` for point-in-time recovery, automated back
 
 - [ ] Schema normalized to 3NF (or denormalization justified)
 - [ ] Indexes created for common query patterns
+- [ ] Indexes use `IF NOT EXISTS` (or `CONCURRENTLY` in production)
 - [ ] Foreign key constraints defined
 - [ ] Migrations are idempotent
 - [ ] Rollback procedure tested
+- [ ] Migration logged in migration history table
 - [ ] Full backup before destructive changes
 - [ ] Query performance benchmarked
 - [ ] Connection pooling configured
@@ -190,17 +215,21 @@ See `references/backup-strategies.md` for point-in-time recovery, automated back
 |-----------------|---------|
 | "We'll just run the migration in production — it's a small change." | Even small schema changes can lock tables, corrupt data, or cause cascading failures without staging validation and rollback plans. |
 | "We don't need indexes — the database is small enough." | Query performance degrades non-linearly with data growth; missing indexes compound into full table scans under load. |
+| "Schema changes don't need code review." | Migrations are code; unreviewed DDL can drop columns, leak data, or break transactions. |
 
 ## Red Flags
 
 - [ ] Running migrations directly in production without staging validation
 - [ ] Skipping backup before destructive schema changes
+- [ ] Running migrations without idempotent guards against partial failures
+- [ ] Skipping foreign key constraints for "performance reasons"
 - [ ] Using SELECT * in production queries instead of explicit column lists
 
 ## References
 
 - `references/schema-patterns.md` - Advanced schema design patterns
 - `references/migration-patterns.md` - Migration safety patterns
+- `references/rollback-strategies.md` - Forward and backward rollback strategies
 - `references/query-optimization.md` - Performance tuning guide
 - `references/iac-examples.md` - Terraform/Pulumi examples
 - `references/backup-strategies.md` - Backup and recovery
