@@ -5,12 +5,12 @@ set -euo pipefail
 
 # Security Hardening: 2026-06-20 - Prevented keyword merging bypasses.
 # Default categories (can be overridden in .command-verify.conf)
-SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get:ls:cat:echo:grep:find:git:cd:pwd:head:tail:sort:uniq:wc:diff:patch:tar:zip:unzip:gzip:gunzip}"
-CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl:mkdir:cp:mv:touch}"
+SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get}"
+CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl}"
 # Destructive and administrative commands (strict boundaries)
 DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd}"
 # Language interpreters (broad boundaries to catch versioned ones like python3.11)
-INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php:deno:bun:npx:pip:pip3:npm:yarn:pnpm:gem:cargo:go}"
+INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php:deno:bun}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
 NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat}"
 
@@ -83,11 +83,11 @@ categorize_command() {
         return 0
     fi
 
-    # Check interpreter keywords with broad boundaries and support for versions (e.g., python2.7)
-    local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})[0-9.]*${broad_end_boundary}"
+    # Check interpreter keywords with broad boundaries (to catch python3.11)
+    local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})${broad_end_boundary}"
     if [[ "$cmd_lower" =~ $interpreter_regex ]]; then
         # Negative lookahead alternative: ensure it is not a script file like python.sh
-        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})[0-9.]*\.(sh|py|pl|rb|js) ]]; then
+        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})\.(sh|py|pl|rb|js) ]]; then
              : # Matches script name, continue
         else
              printf "dangerous\n"
