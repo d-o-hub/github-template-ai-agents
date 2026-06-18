@@ -2,10 +2,13 @@
 """Path validation utilities for CLI scripts."""
 
 from __future__ import annotations
-import sys
 from pathlib import Path
 
 FORBIDDEN_OUTPUT_DIRS = frozenset({".git", "scripts", ".agents", ".github"})
+
+
+class PathValidationError(Exception):
+    """Raised when a path fails safe-path validation."""
 
 
 def validate_safe_path(
@@ -16,7 +19,7 @@ def validate_safe_path(
 ) -> Path:
     """
     Resolve `raw` relative to `base` and assert it stays within `base`.
-    Raises SystemExit(1) on violation.
+    Raises PathValidationError on violation.
     """
     base_resolved = base.resolve()
     candidate = Path(raw)
@@ -27,20 +30,16 @@ def validate_safe_path(
     try:
         candidate.relative_to(base_resolved)
     except ValueError:
-        print(
-            f"Error: --{param_name} resolves outside allowed directory "
-            f"({base_resolved}): {candidate}",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+        raise PathValidationError(
+            f"--{param_name} resolves outside allowed directory "
+            f"({base_resolved}): {candidate}"
+        ) from None
 
     if check_forbidden and candidate != base_resolved:
         top_level = candidate.relative_to(base_resolved).parts[0]
         if top_level in FORBIDDEN_OUTPUT_DIRS:
-            print(
-                f"Error: --{param_name} targets a forbidden directory: {top_level}/",
-                file=sys.stderr,
+            raise PathValidationError(
+                f"--{param_name} targets a forbidden directory: {top_level}/"
             )
-            sys.exit(1)
 
     return candidate
