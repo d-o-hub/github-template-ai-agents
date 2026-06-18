@@ -20,6 +20,7 @@ from pathlib import Path
 from lib.eval_executors import run_command_check, run_file_validation
 from lib.eval_types import EvalReport, EvalResult, EvalStatus, EvalType, SkillEvalResult
 from lib.eval_validators import load_evals_file, run_structure_check, validate_evals_format
+from lib.paths import validate_safe_path
 
 EVALS_FILENAME = "evals.json"
 EVALS_SUBDIR = "evals"
@@ -106,10 +107,10 @@ def discover_skills(skills_dir: Path, specific_skill: str | None = None) -> list
     """Discover all skills with evals/evals.json files."""
     if specific_skill:
         # Prevent path traversal
-        skill_path = Path(specific_skill)
-        if ".." in specific_skill or skill_path.is_absolute():
+        try:
+            skill_path = validate_safe_path(specific_skill, skills_dir, "skill")
+        except SystemExit:
             return []
-        skill_path = skills_dir / specific_skill
         evals_path = skill_path / EVALS_SUBDIR / EVALS_FILENAME
         if skill_path.is_dir() and evals_path.exists():
             return [skill_path]
@@ -252,9 +253,7 @@ Examples:
     parser.add_argument("--output", "-o",
                         help="Write report to file instead of stdout")
     args = parser.parse_args()
-    skills_dir = Path(args.path)
-    if not skills_dir.is_absolute():
-        skills_dir = Path.cwd() / skills_dir
+    skills_dir = validate_safe_path(args.path, Path.cwd(), "path")
     if not skills_dir.is_dir():
         print(f"Error: Skills directory not found: {skills_dir}", file=sys.stderr)
         return 1
@@ -296,7 +295,9 @@ Examples:
     else:
         output = generate_text_report(report)
     if args.output:
-        output_path = Path(args.output)
+        output_path = validate_safe_path(
+            args.output, Path.cwd(), "output", check_forbidden=True
+        )
         output_path.write_text(output, encoding="utf-8")
         print(f"Report written to: {output_path}", file=sys.stderr)
     else:
