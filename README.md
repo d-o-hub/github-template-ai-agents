@@ -8,7 +8,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Best for:** maintainers who use Claude Code, Gemini CLI, OpenCode, Qwen Code, Jules,
-Windsurf, Copilot Chat, or mixed agent stacks in the same repository.
+Windsurf, Cursor, Copilot Chat, or mixed agent stacks in the same repository.
 
 **This template gives you:**
 
@@ -34,7 +34,7 @@ Most AI coding setups break down in one of three ways:
 
 This template addresses each problem with an opinionated default:
 
-- ✓ **Multi-Agent Support**: Works with 6+ AI coding tools simultaneously
+- ✓ **Multi-Agent Support**: Works with 7+ AI coding tools simultaneously
 - ✓ **Skills System**: Reusable knowledge modules in canonical location
 - ✓ **Quality Gates**: Automatic lint, test, format before commits
 - ✓ **CI State Artifacts**: `.github/ci-status/ci-status.json` and `.github/ci-status/ci-summary.md` track CI health for agents
@@ -66,6 +66,7 @@ Use this template when you want a repository structure that survives:
 | **Jules** | `JULES.md` + `.jules/*.md` | `.agents/skills/` (direct read) | Override file + direct canonical path |
 | **Windsurf** | `.windsurf/` | `.windsurf/skills` → directory symlink to `.agents/skills/` | Directory config + directory symlink |
 | **CommandCode** | `.commandcode/` | `.agents/skills/` (direct read) | Directory config + taste learning |
+| **Cursor** | `.cursorrules` | `.cursor/rules.md` | Override file + rules adapter |
 | **Copilot Chat** | `AGENTS.md` | Via repo docs | Best-effort structured compatibility |
 
 All tools share the same canonical instruction source (`AGENTS.md`) and canonical skills
@@ -82,10 +83,11 @@ flowchart TD
     C --> E[".qwen/skills<br/>per-skill symlinks"]
     C --> F[".windsurf/skills<br/>directory symlink"]
     C --> G["Gemini / OpenCode / Jules / CommandCode<br/>direct reads"]
-    A --> H["Scripts & hooks"]
-    H --> I["pre-commit quality gate<br/>scripts/quality_gate.sh"]
-    H --> J["CI workflows<br/>.github/workflows/"]
-    J --> K[".github/ci-status/<br/>state artifacts"]
+    B --> H[".cursorrules<br/>Cursor adapter"]
+    A --> I["Scripts & hooks"]
+    I --> J["pre-commit quality gate<br/>scripts/quality_gate.sh"]
+    I --> K["CI workflows<br/>.github/workflows/"]
+    K --> L[".github/ci-status/<br/>state artifacts"]
 ```
 
 > **Rule:** `AGENTS.md` is the only place shared instructions live.
@@ -163,13 +165,14 @@ verification steps. If bootstrap fails, run `./scripts/doctor.sh` for diagnostic
 ### Single Source of Truth
 
 All agents read from `AGENTS.md` — CLI-specific files (`CLAUDE.md`, `GEMINI.md`,
-`QWEN.md`, `JULES.md`) contain only overrides.
+`QWEN.md`, `JULES.md`, `.cursorrules`) contain only overrides.
 
 ```text
 AGENTS.md → Single source of truth
 ├── CLAUDE.md → Overrides only (@AGENTS.md)
 ├── GEMINI.md → Overrides only (@AGENTS.md)
 ├── QWEN.md   → Overrides only (@AGENTS.md)
+├── .cursorrules → Cursor adapter
 └── opencode.json → Configuration
 ```
 
