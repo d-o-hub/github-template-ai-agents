@@ -40,21 +40,13 @@ Per the skill-evaluator spec:
 **Average delta**: +0.4 assertions
 **Key finding**: agent-browser and agent-coordination show skill value (snapshot refs and quality gates respectively)
 
-| Skill | Cluster | Focus |
-|-------|---------|-------|
-| accessibility-auditor | ui-ux | WCAG compliance audit workflow |
-| agent-browser | tool | Browser automation CLI triggering |
-| agent-coordination | agent | Strategy selection and coordination |
-| agents-md | documentation | AGENTS.md creation and quality gates |
-| anti-ai-slop | ui-ux | AI slop detection and avoidance |
-
 ## Month 2 — API & Pipeline
 
 | Skill | Cluster | Focus |
 |-------|---------|-------|
 | api-design-first | platform | OpenAPI spec creation |
 | architecture-diagram | documentation | SVG diagram generation |
-| cicd-pipeline | workflow | Pipeline design (optimized in session) |
+| cicd-pipeline | workflow | Pipeline design (description optimized in session) |
 | cloudflare-worker-api | workflow | Worker route definition |
 | codacy | code-quality | Local Codacy CLI analysis |
 
@@ -207,3 +199,32 @@ Append results to `.agents/metrics.jsonl` after each monthly eval cycle:
 - **Monthly**: Run full eval cycle on 5 skills
 - **Quarterly**: Review metrics trends, identify skills needing deeper optimization
 - **Annually**: Full audit of all 57 skills against latest agentskills.io spec
+
+## Session Summary (2026-06-19)
+
+### Completed this session
+
+- **57/57 skills** have pushy "even if they" trigger language
+- **57/57 skills** have negative triggers excluding overlapping skills
+- **57/57 skills** have `## When to Use`, `## Rationalizations`, `## Red Flags`, `## See Also`
+- **10 skills** fully optimized with real trigger testing (accuracy ≥ 85%)
+- **4 skills** enriched with actionable content (cicd-pipeline, testing-strategy, delegate, implementer)
+- **1 skill** trimmed (code-review-assistant: 259 → 167 lines)
+- **1 skill** deprecated (self-fix-loop → git-github-workflow)
+- **Month 1 evals** completed (5 skills, 15 assertions graded)
+- **2 PRs** merged to main
+
+### Skills with description optimization (trigger-tested)
+
+| Skill | Before | After |
+|-------|--------|-------|
+| git-github-workflow | 55% | 85% |
+| cicd-pipeline | 67% | 100% |
+| goap-agent | 75% | 100% |
+| agent-browser | 85% | 100% |
+| codeberg-api | 0 pushy | 2 pushy |
+| durable-objects | 0 pushy | 1 pushy |
+| turso-db | 0 pushy | 1 pushy |
+| privacy-first | 90% | 100% |
+| template-version-management | 0 pushy | 1 pushy |
+| security-code-auditor | 0 pushy | 1 pushy |
