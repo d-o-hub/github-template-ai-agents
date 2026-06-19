@@ -174,6 +174,6 @@ Result: Reliability maintained, context efficiency improved
 
 ## References
 
-- **[references/principles.md](references/principles.md)** - All 40 TRIZ principles with software examples
-- **[references/patterns.md](references/patterns.md)** - Common software contradiction patterns and resolutions
-- **[references/evolution.md](references/evolution.md)** - TRIZ evolution trends for system design
+- `references/principles.md` - All 40 TRIZ principles with software examples
+- `references/patterns.md` - Common software contradiction patterns and resolutions
+- `references/evolution.md` - TRIZ evolution trends for system design
