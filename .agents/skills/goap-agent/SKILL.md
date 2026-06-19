@@ -2,7 +2,7 @@
 name: goap-agent
 version: "0.2.10"
 category: workflow
-description: Invoke for complex multi-step tasks requiring intelligent planning and multi-agent coordination. Use when tasks need decomposition, dependency mapping, parallel/sequential/swarm/iterative execution strategies, or coordination of multiple specialized agents with quality gates.
+description: Orchestrates complex multi-step tasks with intelligent planning: analyze the problem, decompose into sub-goals, select execution strategy, assign agents, and coordinate with quality gates. Use this skill when the user asks to plan a large change, break down a complex problem, coordinate multiple agents, or systematically tackle a multi-file refactoring — even if they just say "plan this out" or "how should we approach this". Not for simple single-step tasks (use delegate), parallel-only execution (use parallel-execution), or implementing from an approved plan (use implementer).
 license: MIT
 ---
 

@@ -1,1 +1,38 @@
-{"skill_name":"static-analysis","evals":[{"id":1,"prompt":"CI is failing with shellcheck SC2086 errors in scripts/deploy.sh. How should I triage this?","expected_output":"Classify as Error severity (must fix), explain SC2086 means unquoted variables, provide the fix pattern, and suggest running shellcheck locally first.","files":[],"assertions":["classifies severity correctly","provides actionable fix"]},{"id":2,"prompt":"A Codacy PR comment shows 15 findings: 10 are style warnings and 5 are security errors. What's the triage approach?","expected_output":"Prioritize the 5 security errors for immediate fix, auto-fix the 10 style warnings if possible, and document any suppressions.","files":[],"assertions":["prioritizes security over style","suggests auto-fix for safe findings"]},{"id":3,"prompt":"I want to suppress a ruff lint rule that is a false positive. What format should the suppression comment use?","expected_output":"Use the required format: `# ruff: noqa <rule-id>: <reason> -- <agent-id> (<date>)` with documented reason.","files":[],"assertions":["uses required suppression format","includes reason and metadata"]}]}
+{
+  "skill_name": "static-analysis",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a mixed Python/Shell project. Codacy is flagging ruff findings in .py files and shellcheck findings in .sh files on the same PR. How do I triage both languages in a single pass without switching contexts?",
+      "expected_output": "Use the Linter Tool Registry to identify per-language tools, run targeted linters on changed files only, classify findings by severity, and batch fixes by language.",
+      "files": [],
+      "assertions": [
+        "references the Linter Tool Registry or lists per-language tools (ruff for Python, shellcheck for Shell)",
+        "recommends running linters on changed files only (not full repo)",
+        "classifies findings by severity (Error blocks merge, Warning is advisory)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to suppress a shellcheck finding where word splitting is intentional. The skill mandates a specific format for suppressions — what is it and why does it matter?",
+      "expected_output": "Use the [tool-disable] format with rule-id, reason, agent-id, and date. This format is required for auditability and traceability.",
+      "files": [],
+      "assertions": [
+        "uses the [tool-disable] format (not just # shellcheck disable)",
+        "includes all required fields: rule-id, reason, agent-id, date",
+        "explains why this format matters (auditability, traceability)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "After fixing lint errors locally, what should I do before pushing? Walk me through the pre-commit workflow.",
+      "expected_output": "Run quality_gate.sh, verify zero warnings, scan staged changes for secrets, then commit. The skill has a specific pre-commit workflow with these steps.",
+      "files": [],
+      "assertions": [
+        "references quality_gate.sh as the verification step",
+        "mentions scanning staged changes for secrets",
+        "follows the Pre-commit Workflow section's step sequence"
+      ]
+    }
+  ]
+}
