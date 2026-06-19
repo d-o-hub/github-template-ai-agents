@@ -8,9 +8,9 @@ set -euo pipefail
 SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get}"
 CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl}"
 # Destructive and administrative commands (strict boundaries)
-DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd}"
+DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:\\.}"
 # Language interpreters (broad boundaries to catch versioned ones like python3.11)
-INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php:deno:bun}"
+INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
 NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat}"
 
@@ -38,6 +38,8 @@ categorize_command() {
     # keyword merging bypasses (e.g., curl${IFS}url).
     # Optimization: Use native Bash parameter expansion instead of tr pipeline to eliminate subshells.
     cmd_lower="$cmd"
+    # Security: Remove backslash-newline combinations first to defeat multi-line obfuscation.
+    cmd_lower="${cmd_lower//\\$'\n'/}"
     cmd_lower="${cmd_lower//\'/}"
     cmd_lower="${cmd_lower//\"/}"
     cmd_lower="${cmd_lower//\\/}"
