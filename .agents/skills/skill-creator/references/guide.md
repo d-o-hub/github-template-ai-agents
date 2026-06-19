@@ -258,13 +258,13 @@ Skills can reference other skills:
 
 ```markdown
 ## Related Skills
-- **[task-decomposition](../task-decomposition/SKILL.md)** - Use before implementing
+- **[goap-agent](../goap-agent/SKILL.md)** - Use before implementing (Phase 2: decomposition)
 ```
 
 Link between skills:
 
 ```markdown
-See also: **[parallel-execution](../parallel-execution/SKILL.md)** for concurrent task patterns.
+See also: **[agent-coordination](../agent-coordination/SKILL.md)** for concurrent task patterns.
 ```
 
 ## Output Patterns

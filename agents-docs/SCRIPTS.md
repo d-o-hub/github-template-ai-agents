@@ -19,7 +19,7 @@
 | Script | Purpose | Usage |
 |--------|---------|-------|
 | `validate-skills.sh` | Validate skill symlinks and SKILL.md files | `./scripts/validate-skills.sh` |
-| `validate-skill-format.sh` | Validate SKILL.md frontmatter format | `./scripts/validate-skill-format.sh` |
+
 | `validate-git-hooks.sh` | Check git hooks configuration | `./scripts/validate-git-hooks.sh` |
 | `validate-links.sh` | Validate markdown links are not broken | `./scripts/validate-links.sh` |
 | `check_ci_status_freshness.sh` | Validate `.github/ci-status/ci-status.json` required fields, freshness, and optional `gh run list` parity | `./scripts/check_ci_status_freshness.sh` |
@@ -30,7 +30,7 @@
 |--------|---------|-------|
 | `update-agents-md.sh` | Regenerate skill table in AGENTS.md | `./scripts/update-agents-md.sh` |
 | `update-agents-registry.sh` | Update AGENTS_REGISTRY.md | `./scripts/update-agents-registry.sh` |
-| `generate-available-skills.py` | Auto-generate AVAILABLE_SKILLS.md | `./scripts/generate-available-skills.py` |
+
 | `generate-skills-readme.py` | Auto-generate .agents/skills/README.md | `./scripts/generate-skills-readme.py` |
 | `docs-sync.sh` | List changed markdown files (not actual sync) | `./scripts/docs-sync.sh` |
 
@@ -42,7 +42,7 @@
 | `self-fix-loop.sh` | Auto-fix CI failures in a loop | `./scripts/self-fix-loop.sh` |
 | `run-evals.py` | Skill evaluation framework | `python3 scripts/run-evals.py` |
 | `gh-labels-creator.sh` | Create GitHub labels | `./scripts/gh-labels-creator.sh --ci` |
-| `health-check.sh` | Verify environment dependencies | `./scripts/health-check.sh` |
+
 | `minimal_quality_gate.sh` | Fast-path quality gate (CI debug) | `./scripts/minimal_quality_gate.sh` |
 | `run_act_local.sh` | Optional local GitHub Actions rehearsal via `act` | `./scripts/run_act_local.sh` |
 
@@ -82,7 +82,7 @@
 ```mermaid
 graph TD
     A[quality_gate.sh] --> B[validate-skills.sh]
-    A --> C[validate-skill-format.sh]
+
     A --> D[validate-links.sh]
     A --> E[BATS tests]
     B --> F[lib/skill-validation.sh]

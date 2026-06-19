@@ -27,7 +27,7 @@
       "autoActivate": true
     },
     {
-      "skill": "task-decomposition",
+      "skill": "goap-agent",
       "triggers": {
         "keywords": [
           "plan",
@@ -73,17 +73,20 @@
       "autoActivate": true
     },
     {
-      "skill": "parallel-execution",
+      "skill": "agent-coordination",
       "triggers": {
         "keywords": [
           "parallel",
           "concurrent",
           "simultaneous",
-          "batch"
+          "batch",
+          "coordinate",
+          "swarm"
         ],
         "patterns": [
           "parallel.*",
-          "concurrent.*"
+          "concurrent.*",
+          "coordinate.*"
         ],
         "files": []
       },

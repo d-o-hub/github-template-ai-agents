@@ -237,7 +237,7 @@ npm install -g bats
 ## Getting Help
 
 1. **Check LESSONS.md**: `cat agents-docs/LESSONS.md`
-2. **Run health check**: `./scripts/health-check.sh`
+2. **Run health check**: `./scripts/doctor.sh`
 3. **Review CI logs**: Check the latest GitHub Actions run
 4. **Open an issue**: Include error message and reproduction steps
 
@@ -247,7 +247,7 @@ npm install -g bats
 
 ```bash
 # Verify environment
-./scripts/health-check.sh
+./scripts/doctor.sh
 
 # Check all skills valid
 ./scripts/validate-skills.sh

@@ -71,7 +71,7 @@ Example: `analysis/triz-scripts-2025-05-20.md`
 ## Integration with Other Skills
 
 - **agent-coordination**: Can be orchestrated as a swarm sub-task where multiple agents analyze different parts of the scope.
-- **task-decomposition**: Use to break down a large repository audit into smaller, scoped TRIZ analyses.
+- **goap-agent**: Use to break down a large repository audit into smaller, scoped TRIZ analyses (Phase 2).
 
 ## Quality Checklist
 

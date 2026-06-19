@@ -2,7 +2,7 @@
 name: goap-agent
 version: "0.2.10"
 category: workflow
-description: Orchestrates complex multi-step tasks with intelligent planning: analyze the problem, decompose into sub-goals, select execution strategy, assign agents, and coordinate with quality gates. Use this skill when the user asks to plan a large change, break down a complex problem, coordinate multiple agents, or systematically tackle a multi-file refactoring — even if they just say "plan this out" or "how should we approach this". Not for simple single-step tasks (use delegate), parallel-only execution (use parallel-execution), or implementing from an approved plan (use implementer).
+description: Orchestrates complex multi-step tasks with intelligent planning: analyze the problem, decompose into sub-goals, select execution strategy, assign agents, and coordinate with quality gates. Use this skill when the user asks to plan a large change, break down a complex problem, coordinate multiple agents, or systematically tackle a multi-file refactoring — even if they just say "plan this out" or "how should we approach this". Not for simple single-step tasks (use delegate) or implementing from an approved plan (use implementer).
 license: MIT
 ---
 
@@ -53,7 +53,27 @@ Context: Use Explore agent, check past patterns, perform TRIZ analysis, and reco
 
 ## Phase 2: Task Decomposition
 
-Use **task-decomposition** skill:
+Decompose high-level objectives into manageable, testable sub-tasks.
+
+### Decomposition Framework
+
+1. **Requirements Analysis**: Extract primary objective, implicit requirements, constraints, success criteria.
+2. **Goal Hierarchy**: Top-down decomposition into sub-goals and atomic tasks.
+3. **Dependency Mapping**: Sequential (A→B→C), Parallel (A,B,C), Converging (A,B,C→D).
+4. **Success Criteria**: Define inputs, outputs, quality standards.
+
+### Atomic Criteria
+
+Each task must be: Single action, defined inputs/outputs, one agent, testable.
+
+### Decomposition Patterns
+
+- **Layer-Based**: Data → Business Logic → API → Testing → Docs
+- **Feature-Based**: Core MVP → Error Handling → Performance → Integration → Testing → Docs
+- **Phase-Based**: Research → Foundation → Implementation → Integration → Polish → Release
+- **Problem-Solution**: Reproduce → Diagnose → Design → Fix → Verify → Prevent
+
+### Output Format
 
 ```markdown
 ### Sub-Goals
@@ -61,7 +81,7 @@ Use **task-decomposition** skill:
 2. [Component 2] - Priority: P1, Deps: Component 1
 ```
 
-Principles: Atomic, Testable, Independent, Assigned
+Principles: Atomic, Testable, Independent, Assigned. No task >4 hours.
 
 ## Phase 3: Strategy Selection
 
@@ -144,8 +164,7 @@ See **[execution-strategies.md](execution-strategies.md)** for details.
 
 ## Integration
 
-- **task-decomposition**: Phase 2
-- **parallel-execution**: Strategy implementation
+- **agent-coordination**: Strategy implementation (parallel, sequential, swarm)
 
 ## Summary
 
@@ -153,7 +172,6 @@ GOAP enables systematic planning through: Analysis, Decomposition, Strategy, Qua
 
 ## See Also
 
-- `task-decomposition` — Break down complex tasks into sub-goals
 - `agent-coordination` — Coordinate multiple agents
 - `triz-analysis` — Audit systems for contradictions
 - `triz-solver` — Solve specific problems using TRIZ

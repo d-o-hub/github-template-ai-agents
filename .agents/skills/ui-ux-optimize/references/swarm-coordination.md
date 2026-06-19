@@ -175,8 +175,8 @@ output_contract:
 | Skill | Role |
 |---|---|
 | `web-search-researcher` | Deep research for Research Scout |
-| `anti-ai-slop` | Pattern database for Anti-Slop Sentinel |
+| Anti-Slop Sentinel | Built-in (see Anti-AI-Slop Guide in SKILL.md) |
 | `agent-coordination` | Orchestration patterns |
 | `iterative-refinement` | Autoresearch loop patterns |
-| `parallel-execution` | Parallel variant generation |
+| `agent-coordination` | Parallel variant generation |
 | `task-decomposition` | Multi-screen decomposition |

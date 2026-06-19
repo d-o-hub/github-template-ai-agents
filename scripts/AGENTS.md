@@ -26,7 +26,7 @@ Never hardcode paths.
 
 ## Non-Obvious Lessons
 
-- `validate-skills.sh` and `validate-skill-format.sh` must use `set +e` explicitly to allow full error report (LESSON-011)
+- `validate-skills.sh` must use `set +e` explicitly to allow full error report (LESSON-011)
 - Avoid generic Bash variables like `temp_table` in global scope; use script-specific prefixes (LESSON-012)
 - CI hangs can be caused by BATS recursion if a script under test calls BATS itself (LESSON-013)
 - Use `--severity=error` in Shellcheck CI to prevent style warnings from blocking functional PRs (LESSON-014)

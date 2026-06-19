@@ -32,7 +32,7 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `agent-browser` | `.agents/skills/agent-browser` | Browser automation CLI for AI agents. Use when the user need |
 | `agent-coordination` | `.agents/skills/agent-coordination` | Coordinate multiple agents for software development across a |
 | `agents-md` | `.agents/skills/agents-md` | Create AGENTS.md files with production-ready best practices. |
-| `anti-ai-slop` | `.agents/skills/anti-ai-slop` | Apply this skill to avoid generic "AI slop" in UI, UX, and c |
+
 | `api-design-first` | `.agents/skills/api-design-first` | Design and document RESTful APIs using design-first principl |
 | `architecture-diagram` | `.agents/skills/architecture-diagram` | Generate or update a project architecture SVG diagram by sca |
 | `cicd-pipeline` | `.agents/skills/cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, Gi |
@@ -62,19 +62,19 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `lifecycle-management` | `.agents/skills/lifecycle-management` | Manage application lifecycle, error handling, and resource c |
 | `memory-context` | `.agents/skills/memory-context` | Retrieve semantically relevant past learnings and analysis o |
 | `migration-refactoring` | `.agents/skills/migration-refactoring` | Automate complex code migrations and refactorings with safet |
-| `parallel-execution` | `.agents/skills/parallel-execution` | Execute multiple independent tasks simultaneously using para |
+
 | `privacy-first` | `.agents/skills/privacy-first` | Prevent email addresses and personal data from entering the  |
 | `pwa-offline-sync` | `.agents/skills/pwa-offline-sync` | Design Cache Storage + IndexedDB strategy and sync queue. Ac |
 | `reader-ui-ux` | `.agents/skills/reader-ui-ux` | Build localized, accessible reader/admin UI with responsive  |
 | `readme-best-practices` | `.agents/skills/readme-best-practices` | Create, audit, and improve GitHub README.md files following  |
 | `secure-invite-and-access` | `.agents/skills/secure-invite-and-access` | Implement access control, authentication, and authorization  |
 | `security-code-auditor` | `.agents/skills/security-code-auditor` | Perform security audits on code to identify vulnerabilities, |
-| `self-fix-loop` | `.agents/skills/self-fix-loop` | Self-learning fix loop - commit, push, monitor CI, auto-fix  |
+
 | `shell-script-quality` | `.agents/skills/shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use w |
 | `skill-creator` | `.agents/skills/skill-creator` | Create new skills, modify and improve existing skills, and m |
 | `skill-evaluator` | `.agents/skills/skill-evaluator` | Reusable skill for evaluating other skills with structure ch |
 | `static-analysis` | `.agents/skills/static-analysis` | Language-agnostic static analysis and linter triage skill fo |
-| `task-decomposition` | `.agents/skills/task-decomposition` | Break down complex tasks into atomic, actionable goals with  |
+
 | `test-runner` | `.agents/skills/test-runner` | Execute tests, analyze results, and diagnose failures across |
 | `testdata-builders` | `.agents/skills/testdata-builders` | Maintain deterministic builders/factories for test entities. |
 | `testing-strategy` | `.agents/skills/testing-strategy` | Design and implement comprehensive testing strategies for so |

@@ -107,7 +107,7 @@ cp /tmp/ai-agent-template/scripts/setup-skills.sh your-project/scripts/
 cp /tmp/ai-agent-template/scripts/validate-skills.sh your-project/scripts/
 cp /tmp/ai-agent-template/scripts/quality_gate.sh your-project/scripts/
 cp /tmp/ai-agent-template/scripts/pre-commit-hook.sh your-project/scripts/
-cp /tmp/ai-agent-template/scripts/validate-skill-format.sh your-project/scripts/
+
 
 # Make scripts executable
 chmod +x your-project/scripts/*.sh

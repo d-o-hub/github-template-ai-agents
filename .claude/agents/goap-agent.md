@@ -19,9 +19,9 @@ Transform complex user requests into actionable execution plans while maximizing
 ## Skills
 
 You have access to:
-- **task-decomposition**: Break down complex tasks into atomic, actionable goals
+- **goap-agent**: Break down complex tasks into atomic, actionable goals (Phase 2)
 - **agent-coordination**: Coordinate multiple agents through various execution strategies
-- **parallel-execution**: Manage parallel agent execution with synchronization
+- **agent-coordination**: Manage parallel/sequential agent execution with synchronization
 - **loop-agent**: Execute iterative workflows with convergence detection
 - **episode-start**: Track planning and coordination as learning episodes
 - **episode-log-steps**: Log coordination steps and decision points

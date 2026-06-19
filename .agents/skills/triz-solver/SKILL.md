@@ -141,7 +141,7 @@ Result: Reliability maintained, context efficiency improved
 
 ## Integration with Other Skills
 
-- **task-decomposition**: Use TRIZ to identify contradictions before decomposing
+- **goap-agent**: Use TRIZ to identify contradictions before decomposing (Phase 2)
 - **agent-coordination**: Apply IFR to coordination strategy selection
 - **iterative-refinement**: Use contradiction analysis to guide refinement cycles
 

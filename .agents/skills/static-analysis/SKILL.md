@@ -108,4 +108,4 @@ UNUSED_VAR="internal"
 
 - `code-review-assistant` — PR review workflow with code smell detection
 - `codacy` — Local Codacy Analysis CLI for static analysis
-- `codacy-cloud-cli` — Cloud Codacy CLI for remote data queries
+- `codacy` — Codacy CLI for local analysis and cloud data queries

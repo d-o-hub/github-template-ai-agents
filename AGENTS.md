@@ -39,7 +39,7 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 
 3. **EXECUTE & COORDINATE (Phase 3)**
    - **Action**: Execute tasks systematically using atomic commit workflow.
-   - **Action**: Use `self-fix-loop` or equivalent until all CI checks pass.
+   - **Action**: Use `git-github-workflow` or run `./scripts/self-fix-loop.sh` until all CI checks pass.
 
 4. **SYNTHESIZE (Phase 4)**
    - **Action**: Run `learn` skill to extract discoveries and update `AGENTS.md`.
@@ -153,7 +153,7 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 - **Self-Execute**: 1 trivial isolated edit (e.g., typos, single-line constants).
 - **Delegate**: 2+ files, architectural changes, or tasks requiring judgment.
 - **Swarm**: 5+ similar independent tasks (e.g., batch doc normalization, multi-file refactors).
-- **Route to**: `delegate` (retrieval/context) → `implementer` (execution) → `parallel-execution` (parallel batch).
+- **Route to**: `delegate` (retrieval/context) → `implementer` (execution) → `agent-coordination` (swarm dispatch).
 
 ## Metrics File
 

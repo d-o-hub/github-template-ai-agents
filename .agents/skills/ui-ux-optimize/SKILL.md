@@ -2,8 +2,8 @@
 name: ui-ux-optimize
 description: >
   Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination,
-  confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, or any screen-based product — even if they just say "improve the UI" or "optimize the UX". Not for anti-ai-slop, css-render-performance.
-version: "0.2.10"
+  confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, or any screen-based product — even if they just say "improve the UI" or "optimize the UX" or "make it sound human" or "this feels robotic". Not for css-render-performance.
+version: "0.3.0"
 category: ui-ux
 license: MIT
 ---
@@ -41,6 +41,75 @@ Supported: web apps, mobile apps, dashboards, admin tools, e-commerce, SaaS, web
 - Backend architecture with no UI component
 - Marketing copy without interface context
 - Already implementation-ready requests
+
+## Anti-AI-Slop Guide
+
+AI tools flooded the design and copy space. The result: a recognizable monoculture. This section is a systematic antidote for detecting and avoiding generic AI patterns in UI, UX, and copy.
+
+### Audit Modes
+
+1. **Audit mode** — User shares existing UI/copy/UX flow. Run through diagnostic checklists. Call out every pattern by name. Suggest replacements.
+2. **Creation mode** — User wants new UI/copy/flow. Read the "What to do instead" sections first, then produce work that avoids all listed patterns.
+3. **Spot-fix mode** — User points to one specific element. Diagnose it, explain why it's sloppy, rewrite/redesign it.
+
+Always **name the sin** before fixing it. Specificity builds trust.
+
+### UI Slop Patterns (Visual Design)
+
+| Pattern | What it looks like | Why it's slop |
+|---|---|---|
+| **Purple gradient hero** | `#7c3aed → #2563eb` on white bg | Default Tailwind AI app palette |
+| **Glassmorphism cards** | Frosted glass, `backdrop-blur`, `bg-white/10` | Overused since iOS 15 |
+| **Rounded everything** | `border-radius: 24px+` on every element | Removes personality |
+| **Inter / DM Sans / Space Grotesk** | Default "modern" sans | Signal "AI-generated UI" |
+| **Emojis as icons in headers** | ✨ Supercharge your workflow 🚀 | Startup theater |
+| **Hero headline formula** | `[Verb] your [noun] with [product]` | Indistinguishable from 10,000 others |
+| **Three-column feature grid** | Icon + bold label + 1 sentence | Every SaaS landing page since 2019 |
+| **CTA: "Get started for free"** | Large button, primary color | Meaningless |
+
+**What to do instead:** Typography first (research type history), commit to one extreme (brutally minimal OR maximally dense), use real color theory, let content shape the layout, reference actual design movements (Swiss grid, Bauhaus, Brutalist web).
+
+### UX Slop Patterns (Interaction & Flow)
+
+| Pattern | Why it's slop |
+|---|---|
+| **Onboarding modal** | Interrupts before context |
+| **5-step wizard** | Treats users as suspects |
+| **Tooltip tours** | Teaches wrong interface instead of fixing it |
+| **"Are you sure?"** | Trust issues. Use undo instead |
+| **Toast notifications** | Noise. Users ignore them in 2 sessions |
+| **Hamburger menu** | Discovery failure |
+
+**What to do instead:** Undo over confirm, empty states with one specific next action, progressive disclosure, optimistic UI, contextual notifications (inline, not toast).
+
+### Copy Slop Patterns
+
+| Slop Type | Examples | Fix |
+|---|---|---|
+| **Hollow Affirmations** | Absolutely!, Certainly!, Of course! | Delete them. Start with content. |
+| **AI Superlatives** | Powerful, seamless, intuitive, robust | Use specific claims and data. |
+| **Listicle Reflex** | Bullet points for everything | Write prose. Use lists only for genuine enumerable sets. |
+| **Transition Theater** | "In conclusion...", "To summarize..." | Just say the thing. |
+| **Emoji Inflation** | 🚀 💡 ✨ ⚡ 🔥 as substitutes for meaning | Use zero emojis unless genuinely casual/social. |
+| **Feature Announcement Formula** | "We're excited to announce..." | What does it do, concretely? |
+
+### Audit Workflow
+
+1. **Scan for patterns** — Check all three canons (UI, UX, Copy). List every match by name.
+2. **Score severity** — 🔴 Structural (redesign), 🟡 Surface (easy fix), 🟢 Cosmetic (polish).
+3. **Prioritize** — Fix structural first.
+4. **Rewrite/redesign** — Provide specific replacements, not generic advice.
+5. **Explain the why** — Name the design principle behind each fix.
+
+### Positive Design Doctrine
+
+- **Specificity > universality.** Design for this user, this task, this moment.
+- **Tension is interest.** Contrast, asymmetry, and friction are memorable.
+- **Constraints create identity.** Impose a real restriction and design within it.
+- **Respect the user's time.** Every click, form field, and modal is a tax.
+- **Be opinionated.** Show users the best path.
+- **Specific > general.** "Saves 3 hours per week" > "Saves time"
+- **Write for one person.** Not "users". The specific human who will read this sentence.
 
 ## Swarm Architecture
 
@@ -132,7 +201,7 @@ Run every step. Swarm coordinates handoffs.
 
 **Step 0 — Research Scout: Auto-Research.** Research domain trends, platform guidelines, competitor patterns via `websearch`. Handoff → `research_context`. See → `references/auto-research.md`
 
-**Step 1 — Anti-Slop Sentinel: Translate.** Convert vague words to measurable constraints. Cross-ref `anti-ai-slop` skill. Handoff → `anti_slop_warnings`. See → `references/anti-slop-rules.md`
+**Step 1 — Anti-Slop Sentinel: Translate.** Convert vague words to measurable constraints. Use the Anti-AI-Slop Guide above for pattern detection. Handoff → `anti_slop_warnings`. See → `references/anti-slop-rules.md`
 
 ### Phase 2: Token & Structure
 
@@ -187,10 +256,8 @@ Run every step. Swarm coordinates handoffs.
 | Skill | Integration |
 |---|---|
 | `web-search-researcher` | Research Scout — deep research |
-| `anti-ai-slop` | Anti-Slop Sentinel — pattern detection |
-| `agent-coordination` | Swarm orchestration |
+| `agent-coordination` | Swarm orchestration, parallel variant generation |
 | `iterative-refinement` | Autoresearch loop |
-| `parallel-execution` | Parallel variant generation |
 
 ## References
 
@@ -226,7 +293,6 @@ Run every step. Swarm coordinates handoffs.
 
 ## See Also
 
-- `anti-ai-slop` — Avoid AI slop in UI/UX
 - `css-render-performance` — CSS render performance optimization
 
 ## Rationalizations

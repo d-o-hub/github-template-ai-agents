@@ -388,7 +388,7 @@ phase_analyze_fix() {
             log "→ Skill validation issue detected"
             "$REPO_ROOT/scripts/setup-skills.sh" 2>&1 || true
             "$REPO_ROOT/scripts/validate-skills.sh" 2>&1 || true
-            "$REPO_ROOT/scripts/validate-skill-format.sh" 2>&1 || true
+
             fix_applied=true
         fi
 

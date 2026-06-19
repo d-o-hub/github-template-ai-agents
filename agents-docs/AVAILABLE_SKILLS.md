@@ -12,8 +12,8 @@
 | `implementer` | Execution agent skill focused on implementing changes based on an approved Blueprint. Use this skill for targeted, atomic code changes once the plan is solid — even if they just say "implement this" or "make the changes". Gated by human or primary agent approval of the implementation strategy. |
 | `intent-classifier` | Classify user intents and route to appropriate skills, commands, or workflows. Use when determining which skill to invoke, routing requests to specialized agents, or building skill selection logic. Trigger on 'which skill should I use', 'route this to', 'classify this request', 'skill selection', or when multiple skills could handle a task. |
 | `jules-delegator` | Use this skill to delegate complex coding tasks by creating Jules sessions via the Jules CLI. Use this skill when the user asks to delegate a coding task to Jules, create a Jules session, or hand off implementation work — even if they just say "send this to Jules" or "let Jules handle it". Jules is an AI coding agent that can autonomously implement features, fix bugs, and make code changes across repositories. |
-| `parallel-execution` | Execute multiple independent tasks simultaneously using parallel agent coordination to maximize throughput and minimize execution time. Use this skill when tasks have no dependencies, results can be aggregated, and agents are available for concurrent work — even if they just say "run these in parallel" or "do these at the same time". |
-| `task-decomposition` | Break down complex tasks into atomic, actionable goals with clear dependencies and success criteria. Use this skill when planning multi-step projects, coordinating agents, or decomposing complex requests — even if they just say "break this down" or "what are the steps". |
+
+
 
 ## Analysis
 
@@ -25,8 +25,7 @@
 
 | Skill | Description |
 |-------|-------------|
-| `codacy` | Use the Codacy Analysis CLI to run LOCAL static analysis on repositories or specific files. Use when the user wants to analyze code locally on their machine without pushing to Codacy Cloud, run CLI-based linting (ESLint, Ruff, Semgrep, RuboCop), scan staged changes or local PRs, or set up local Codacy tooling. This is the LOCAL CLI skill — NOT for querying Codacy Cloud (use codacy-cloud-cli for cloud queries). |
-| `codacy-cloud-cli` | Use the Codacy Cloud CLI to query Codacy Cloud remotely — repositories, issues, security findings, pull requests, tools, patterns, and reanalysis. Use when the user wants to check code quality metrics on Codacy Cloud, inspect remote PR analysis results, browse vulnerabilities, enable/disable tools, or search patterns — even if they don't say "Codacy CLI" explicitly. This is the CLOUD API skill — NOT for local CLI analysis (use codacy for local runs). |
+| `codacy` | Use the Codacy CLI for local static analysis and cloud data queries. Use the Analysis CLI (`codacy-analysis`) to run local analysis without pushing to Codacy Cloud, or the Cloud CLI (`codacy`) to query remote repositories, issues, security findings, pull requests, and patterns. |
 | `code-review-assistant` | Automated code review with PR analysis, change summaries, quality checks, and code smell detection. Use this skill when reviewing pull requests, generating review comments, checking against best practices, identifying code smells, or providing refactoring guidance — even if they just say "review this" or "look at this PR". |
 | `css-render-performance` | Guide CSS render performance analysis and optimization. Use this skill when reviewing or writing CSS animations, transitions, scroll-heavy UIs, or long lists — even if they just say "this animation is janky" or "optimize the CSS". Covers compositor layer promotion, paint vs composite, and content-visibility. |
 | `iterative-refinement` | Execute iterative refinement workflows with validation loops until quality criteria are met. Use this skill for test-fix cycles, code quality improvement, performance optimization, or any task requiring repeated action-validate-improve cycles — even if they just say "keep improving until it passes" or "iterate on this". |
@@ -127,7 +126,7 @@
 | Skill | Description |
 |-------|-------------|
 | `accessibility-auditor` | Audit web applications for WCAG 2.2 compliance, screen reader compatibility, keyboard navigation, and color contrast. Use this skill when the user asks for an accessibility audit, a11y check, WCAG compliance review, screen reader test, keyboard navigation check, color contrast check, or ARIA validation — even if they don't explicitly mention "accessibility" or "WCAG". Also triggers on Section 508 and ADA compliance requests. |
-| `anti-ai-slop` | Apply this skill to avoid generic "AI slop" in UI, UX, and copy. Use this skill when the user asks to make something feel less AI-generated, audit copy for AI slop, humanize text, fix UX writing, or improve anti-design — even if they just say "this feels robotic" or "make it sound human". |
+
 | `ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination, confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, or any screen-based product. |
 
 ## Workflow
@@ -144,7 +143,7 @@
 | `pwa-offline-sync` | Design Cache Storage + IndexedDB strategy and sync queue. Use this skill when building service workers, implementing caching strategies, or investigating offline bugs — even if they just say "make it work offline" or "add caching". Generic pattern for any offline-first application. |
 | `reader-ui-ux` | Build localized, accessible reader/admin UI with responsive layouts, telemetry, and state management. Use this skill when building React screens, polishing UX, or implementing responsive layouts for reader or admin interfaces — even if they just say "fix the UI" or "make it responsive". Generic pattern for any document reader application. |
 | `secure-invite-and-access` | Implement access control, authentication, and authorization patterns. Use this skill when building auth endpoints, managing permissions, implementing session/token logic, or generating signed URLs — even if they just say "add auth" or "secure this endpoint". Generic template adaptable to any project's auth needs. |
-| `self-fix-loop` | [DEPRECATED] Use git-github-workflow instead. Self-learning fix loop - commit, push, monitor CI, auto-fix failures using swarm agents with skills on demand, loop until all checks pass. |
+
 
 ## Usage
 

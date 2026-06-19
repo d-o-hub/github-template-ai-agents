@@ -2,7 +2,7 @@
 version: "0.2.10"
 name: reader-ui-ux
 description: >
-  Build localized, accessible reader/admin UI with responsive layouts, telemetry, and state management. Use this skill when building React screens, polishing UX, or implementing responsive layouts for reader or admin interfaces — even if they just say "fix the UI" or "make it responsive". Generic pattern for any document reader application. Not for document-rendering-and-locators, anti-ai-slop.
+  Build localized, accessible reader/admin UI with responsive layouts, telemetry, and state management. Use this skill when building React screens, polishing UX, or implementing responsive layouts for reader or admin interfaces — even if they just say "fix the UI" or "make it responsive". Generic pattern for any document reader application. Not for document-rendering-and-locators.
 category: workflow
 license: MIT
 ---

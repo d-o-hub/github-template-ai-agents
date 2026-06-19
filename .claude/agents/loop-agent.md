@@ -70,7 +70,7 @@ Execute workflows in loops, monitoring progress across iterations, evaluating co
 ### NOT Appropriate For
 
 - Single-pass tasks (use appropriate specialized agent)
-- Purely parallel work (use parallel-execution)
+- Purely parallel work (use agent-coordination)
 - Simple linear workflows (use sequential coordination)
 - One-time analysis (use appropriate analysis agent)
 
