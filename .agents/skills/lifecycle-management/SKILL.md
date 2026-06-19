@@ -1,6 +1,6 @@
 ---
 name: lifecycle-management
-description: Manage application lifecycle, error handling, and resource cleanup to prevent memory leaks and ensure stability. Use this skill when handling startup/shutdown sequences, managing resource pools, implementing error boundaries, preventing memory leaks, or ensuring graceful degradation — even if they just say "clean up resources" or "fix the memory leak".
+description: Manage application lifecycle, error handling, and resource cleanup to prevent memory leaks and ensure stability. Use this skill when handling startup/shutdown sequences, managing resource pools, implementing error boundaries, preventing memory leaks, or ensuring graceful degradation — even if they just say "clean up resources" or "fix the memory leak". Not for security-code-auditor.
 version: "0.2.10"
 category: quality
 license: MIT

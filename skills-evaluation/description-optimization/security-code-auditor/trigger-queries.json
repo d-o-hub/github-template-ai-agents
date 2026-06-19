@@ -1,0 +1,22 @@
+[
+  {"query": "audit this codebase for security vulnerabilities", "should_trigger": true},
+  {"query": "check for OWASP Top 10 issues in my API", "should_trigger": true},
+  {"query": "review this PR for security problems", "should_trigger": true},
+  {"query": "scan my dependencies for known CVEs", "should_trigger": true},
+  {"query": "is this code secure against injection attacks", "should_trigger": true},
+  {"query": "perform a security assessment before launch", "should_trigger": true},
+  {"query": "check for hardcoded secrets in the codebase", "should_trigger": true},
+  {"query": "review the authentication implementation for weaknesses", "should_trigger": true},
+  {"query": "make sure there are no email addresses in the code", "should_trigger": false},
+  {"query": "ensure we comply with the EU AI Act logging requirements", "should_trigger": false},
+  {"query": "run the linter and fix all warnings", "should_trigger": false},
+  {"query": "review this PR for code quality and style issues", "should_trigger": false},
+  {"query": "check if my CSS has render performance issues", "should_trigger": false},
+  {"query": "set up a pre-commit hook to scan for secrets", "should_trigger": false},
+  {"query": "run ruff to check my Python code", "should_trigger": false},
+  {"query": "monitor this PR until all checks pass", "should_trigger": false},
+  {"query": "create a GitHub issue for this vulnerability", "should_trigger": false},
+  {"query": "deploy my app to production securely", "should_trigger": false},
+  {"query": "fix the failing CI checks on my PR", "should_trigger": false},
+  {"query": "review the access control implementation", "should_trigger": true}
+]

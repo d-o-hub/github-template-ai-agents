@@ -2,7 +2,7 @@
 name: parallel-execution
 version: "0.2.10"
 category: agent
-description: Execute multiple independent tasks simultaneously using parallel agent coordination to maximize throughput and minimize execution time. Use this skill when tasks have no dependencies, results can be aggregated, and agents are available for concurrent work — even if they just say "run these in parallel" or "do these at the same time".
+description: Execute multiple independent tasks simultaneously using parallel agent coordination to maximize throughput and minimize execution time. Use this skill when tasks have no dependencies, results can be aggregated, and agents are available for concurrent work — even if they just say "run these in parallel" or "do these at the same time". Not for goap-agent, agent-coordination.
 license: MIT
 ---
 

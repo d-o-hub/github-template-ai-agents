@@ -6,7 +6,8 @@ description: >
   Create, audit, and improve GitHub README.md files following 2026 best practices.
   Use this skill when a user asks to write, rewrite, or review a README.md for a
   GitHub repository, add shields.io badges, create a project SVG logo, improve
-  documentation structure, or make a repository more discoverable and professional.
+  documentation structure, or make a repository more discoverable and professional
+  — even if they just say "write the README" or "make the repo look professional". Not for agents-md, architecture-diagram.
 license: MIT
 compatibility: Requires access to the repository file tree. Works with Claude Code, OpenCode, and similar agents. Network access recommended for shields.io badge validation.
 metadata:

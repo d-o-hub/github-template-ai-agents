@@ -2,7 +2,7 @@
 version: "0.2.10"
 name: testdata-builders
 description: >
-  Maintain deterministic builders/factories for test entities. Use this skill when authoring tests, extending test utilities, or adding schema fields that affect fixtures — even if they just say "create test data" or "build a factory for this".
+  Maintain deterministic builders/factories for test entities. Use this skill when authoring tests, extending test utilities, or adding schema fields that affect fixtures — even if they just say "create test data" or "build a factory for this". Not for test-runner, testing-strategy.
 category: quality
 license: MIT
 ---

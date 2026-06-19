@@ -1,7 +1,7 @@
 ---
 name: git-github-workflow
 version: "0.3.0"
-description: Unified atomic git workflow with GitHub integration — validates, commits conventionally, checks issues, creates PR, monitors ALL Actions with pre-existing detection, uses swarm/web research, auto-merges with strategy selection, and post-merge validates. Use this skill when the user asks to commit code, create a PR, push changes, merge, or manage the full git lifecycle — even if they just say "push it" or "ship it".
+description: Orchestrates the full git-to-merge lifecycle: validate → commit → check issues → create PR → monitor ALL GitHub Actions (including pre-existing failures) → fix via swarm/web research → merge with strategy selection → post-merge validate. Use this skill when the user asks to ship changes end-to-end, manage a PR through CI, or handle the complete commit-to-merge workflow — even if they just say "push it" or "ship it". Not for simple one-off git operations (revert, squash, cherry-pick) or isolated tasks (just review, just test, just lint).
 category: workflow
 license: MIT
 ---

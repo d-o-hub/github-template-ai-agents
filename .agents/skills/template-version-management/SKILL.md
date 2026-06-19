@@ -2,7 +2,7 @@
 name: template-version-management
 version: "0.2.10"
 category: tool
-description: Manage versioning in a template repository. Use when working with template repos where `VERSION` is intentionally pinned to 0.0.0, when bumping the template's own release version, when fixing stale version badges, or when answering questions about how versioning flows from `VERSION`/`CHANGELOG-TEMPLATE.md` to `README.md`. Triggers on "template version", "bump template", "changelog-template", "version badge", "propagate-version", "bump_patch_version", "what's the template version", "stale version badge".
+description: Manage versioning in a template repository. Use when working with template repos where `VERSION` is intentionally pinned to 0.0.0, when bumping the template's own release version, when fixing stale version badges, or when answering questions about how versioning flows from `VERSION`/`CHANGELOG-TEMPLATE.md` to `README.md` — even if they just say "bump the template version", "fix the stale badge", or "how does versioning work here". Not for bumping versions in npm packages, Cargo.toml, or non-template projects (use your package manager's versioning).
 license: MIT
 ---
 

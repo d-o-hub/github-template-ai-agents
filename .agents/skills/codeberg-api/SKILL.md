@@ -5,11 +5,10 @@ category: platform
 description: >-
   Interact with Forgejo/Codeberg repositories via the REST API — read or write
   files, manage issues, create pull requests, list branches/tags, search repos,
-  and automate CI/CD workflows. Use this skill when the user wants to: read file
-  contents from a Forgejo repo, create or update files, manage issues (create,
-  list, close), list repositories for a user, search, set up Forgejo Actions
-  workflows, or automate any git-forge operation. Works without authentication
-  for public repos; requires FORGEJO_TOKEN for private repos and write operations.
+  and automate CI/CD workflows. Use this skill when the user wants to interact
+  with a Forgejo or Codeberg repository, even if they just say "read a file from
+  Codeberg" or "create an issue on my Forgejo repo". Not for GitHub (use
+  git-github-workflow) or GitLab (use cicd-pipeline).
 license: MIT
 compatibility: Requires Python 3.10+, httpx or requests. Needs FORGEJO_TOKEN env var for write operations.
 allowed-tools: Bash(python:*|curl:*) Read

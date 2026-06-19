@@ -1,6 +1,6 @@
 ---
 name: eu-ai-act-compliance
-description: EU AI Act compliance logging and requirements. Use this skill when ensuring transparency, human oversight, and record-keeping per Regulation (EU) 2024/1689 — even if they just say "add compliance logging" or "make sure this is EU AI Act compliant".
+description: EU AI Act compliance logging and requirements. Use this skill when ensuring transparency, human oversight, and record-keeping per Regulation (EU) 2024/1689 — even if they just say "add compliance logging" or "make sure this is EU AI Act compliant". Not for security-code-auditor, privacy-first.
 version: "0.2.10"
 category: compliance
 metadata:

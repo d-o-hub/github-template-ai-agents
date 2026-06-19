@@ -2,7 +2,7 @@
 name: agent-browser
 version: "0.2.10"
 category: tool
-description: Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. Triggers include requests to "open a website", "fill out a form", "click a button", "take a screenshot", "scrape data from a page", "test this web app", "login to a site", "automate browser actions", or any task requiring programmatic web interaction.
+description: Browser automation CLI for AI agents. Use when the user needs to interact with websites — navigating pages, filling forms, clicking buttons, taking screenshots, scraping data, testing web apps, or automating any browser task. Even if they just say "open this website", "click that button", "take a screenshot", or "fill out this form". Not for web search (use web-search-researcher), fetching documentation (use do-web-doc-resolver), or reading URLs (use do-web-doc-resolver).
 allowed-tools: Bash(npx agent-browser:*), Bash(agent-browser:*)
 license: MIT
 ---

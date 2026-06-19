@@ -1,7 +1,7 @@
 ---
 name: docs-hook
 version: "0.2.10"
-description: Lightweight git hook integration for updating agents-docs with minimal tokens. Use this skill when updating agents-docs on commit or merge events to sync documentation — even if they just say "update the docs" or "sync the agent docs".
+description: Lightweight git hook integration for updating agents-docs with minimal tokens. Use this skill when updating agents-docs on commit or merge events to sync documentation — even if they just say "update the docs" or "sync the agent docs". Not for learn, agents-md.
 category: workflow
 license: MIT
 ---

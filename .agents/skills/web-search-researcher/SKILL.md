@@ -2,7 +2,7 @@
 name: web-search-researcher
 version: "0.2.10"
 category: tool
-description: Research topics using web search to find accurate, current information. Use this skill when you need modern information, official documentation, best practices, or technical solutions beyond training data — even if they just say "look this up" or "search for how to do X".
+description: Research topics using web search to find accurate, current information. Use this skill when you need modern information, official documentation, best practices, or technical solutions beyond training data — even if they just say "look this up" or "search for how to do X". Not for do-web-doc-resolver, agent-browser.
 license: MIT
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: api-design-first
-description: Design and document RESTful APIs using design-first principles with OpenAPI specifications. Use this skill when the user asks to design an API, create an API spec, plan endpoints, model request/response schemas, or discuss API versioning — even if they just say "design the API" or "create the OpenAPI spec".
+description: Design and document RESTful APIs using design-first principles with OpenAPI specifications. Use this skill when the user asks to design an API, create an API spec, plan endpoints, model request/response schemas, or discuss API versioning — even if they just say "design the API" or "create the OpenAPI spec". Not for cloudflare-worker-api.
 version: "0.2.10"
 category: platform
 template_version: "0.2"

@@ -3,35 +3,35 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Where is the validation script that checks for shell script errors located?",
-      "expected_output": "The agent uses grep/glob to locate the validation script and returns the file path with a brief description of its purpose.",
+      "prompt": "Find where the validate-skills.sh script checks for the Rationalizations section, and trace what happens when a skill is missing it.",
+      "expected_output": "Use grep to locate the check in the script, read the relevant function, and trace the logic to determine the output (warning vs failure).",
       "files": [],
       "assertions": [
-        "The agent uses grep or glob to search for the script",
-        "The agent returns a concrete file path",
-        "The agent does not modify any files during retrieval"
+        "uses grep or a search tool to locate the Rationalizations check in the script",
+        "reads the script content to understand the check logic",
+        "reports whether missing Rationalizations causes a warning or failure"
       ]
     },
     {
       "id": 2,
-      "prompt": "What does the quality_gate.sh script do and what tools does it invoke?",
-      "expected_output": "The agent reads quality_gate.sh, summarizes its purpose, and lists the tools/commands it invokes.",
+      "prompt": "I want to improve how quality_gate.sh scopes linting to changed files. Walk me through the current detection logic so I can figure out what needs to change.",
+      "expected_output": "The agent retrieves the current detection logic, explains how it works, identifies what could be improved (e.g., the find-based fallback, the cache staleness issue), and — per the delegate skill's 'When to Hand Off' section — recognizes this is a code modification task and hands off to an implementer with a structured summary.",
       "files": [],
       "assertions": [
-        "The agent reads the script content",
-        "The agent summarizes the script's purpose",
-        "The agent lists specific tools or commands called by the script"
+        "retrieves the file-detection logic using grep or search (not just describes from memory)",
+        "identifies at least one concrete improvement opportunity in the current logic",
+        "explicitly hands off to an implementer (mentions 'implementer', 'handoff', 'hand off', or says 'this needs a code change') rather than providing a code fix directly"
       ]
     },
     {
       "id": 3,
-      "prompt": "Assess the current state of the .agents/skills/ directory — how many skills exist and which ones have evals?",
-      "expected_output": "The agent counts skills, checks for evals/evals.json in each, and returns a structured summary.",
+      "prompt": "I just ran validate-skills.sh and got a weird error about a missing symlink in .claude/skills/. Find where the script checks symlinks, read the validation logic, and assess whether this is a real issue or a false positive.",
+      "expected_output": "The agent retrieves the symlink check logic, reads the relevant code, assesses the issue, and determines whether it needs a fix or can be ignored.",
       "files": [],
       "assertions": [
-        "The agent provides a count of skills",
-        "The agent identifies which skills have evals",
-        "The output is structured and scannable"
+        "uses grep or search to locate the symlink validation logic in the script",
+        "reads and explains the symlink check (not just reports the error message)",
+        "provides an assessment: either 'this is a real issue that needs fixing' (hand off) or 'this is expected/false positive' with reasoning"
       ]
     }
   ]

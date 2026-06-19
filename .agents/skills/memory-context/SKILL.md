@@ -1,6 +1,6 @@
 ---
 name: memory-context
-description: Retrieve semantically relevant past learnings, analysis outputs, and project context using the csm CLI (HDC encoder with hybrid BM25 retrieval). Use this skill when the user needs context retrieval, past session memory, learning recall, or wants to query the memory system for relevant documents or patterns — even if they just say "remember when we..." or "did we solve this before".
+description: Retrieve semantically relevant past learnings, analysis outputs, and project context using the csm CLI (HDC encoder with hybrid BM25 retrieval). Use this skill when the user needs context retrieval, past session memory, learning recall, or wants to query the memory system for relevant documents or patterns — even if they just say "remember when we..." or "did we solve this before". Not for learn, delegate.
 version: "0.2.10"
 category: knowledge
 license: MIT

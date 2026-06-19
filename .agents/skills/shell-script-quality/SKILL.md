@@ -2,7 +2,7 @@
 name: shell-script-quality
 version: "0.2.10"
 category: code-quality
-description: Lint and test shell scripts using ShellCheck and BATS. Use this skill when checking bash/sh scripts for errors, writing shell script tests, fixing ShellCheck warnings, setting up CI/CD for shell scripts, or improving bash code quality — even if they just say "fix this script" or "add tests for the shell script".
+description: Lint and test shell scripts using ShellCheck and BATS. Use this skill when checking bash/sh scripts for errors, writing shell script tests, fixing ShellCheck warnings, setting up CI/CD for shell scripts, or improving bash code quality — even if they just say "fix this script" or "add tests for the shell script". Not for static-analysis, cicd-pipeline.
 license: MIT
 ---
 

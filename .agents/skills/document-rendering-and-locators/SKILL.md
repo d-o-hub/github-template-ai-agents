@@ -2,7 +2,7 @@
 version: "0.2.10"
 name: document-rendering-and-locators
 description: >
-  Implement resilient document rendering and annotation anchoring. Use this skill when working with reader-core rendering, TOC generation, locator systems, or highlight anchoring changes — even if they just say "fix the document rendering" or "the highlights aren't sticking". Generic pattern applicable to EPUB, PDF, or any document format.
+  Implement resilient document rendering and annotation anchoring. Use this skill when working with reader-core rendering, TOC generation, locator systems, or highlight anchoring changes — even if they just say "fix the document rendering" or "the highlights aren't sticking". Generic pattern applicable to EPUB, PDF, or any document format. Not for reader-ui-ux.
 category: workflow
 license: MIT
 ---
