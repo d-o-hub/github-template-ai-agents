@@ -7,18 +7,18 @@ Rotate through all 57 skills, testing 5 per month. Each month runs:
 
 ## Workspace Structure
 
-Per the skill-evaluator spec:
+Per the skill-evaluator spec, workspaces live inside `.agents/skills/`:
 
 ```
-<skill-name>-workspace/
+.agents/skills/<skill-name>-workspace/
 └── iteration-1/
     ├── eval-1/
     │   ├── with_skill/
-    │   │   ├── response.md
+    │   │   ├── outputs/response.md
     │   │   ├── timing.json
     │   │   └── grading.json
     │   └── without_skill/
-    │       ├── response.md
+    │       ├── outputs/response.md
     │       ├── timing.json
     │       └── grading.json
     ├── eval-2/...

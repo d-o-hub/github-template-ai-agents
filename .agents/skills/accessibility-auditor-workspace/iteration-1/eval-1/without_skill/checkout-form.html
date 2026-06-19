@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .checkout-form { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        h1 { color: #333; }
+        .form-group { margin-bottom: 15px; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn-submit { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .btn-submit:hover { background: #0056b3; }
+        .error { color: red; font-size: 12px; }
+        .required { color: red; }
+        .card-icons { display: flex; gap: 10px; margin-bottom: 10px; }
+        .card-icon { width: 40px; height: 25px; background: #ddd; border: 1px solid #999; }
+        .order-summary { background: #f9f9f9; padding: 15px; border-radius: 4px; margin-bottom: 20px; }
+        .order-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
+        .total { font-weight: bold; font-size: 18px; margin-top: 10px; }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; }
+        .checkbox-group input { width: auto; }
+        .radio-group { display: flex; gap: 15px; margin-top: 5px; }
+        .radio-option { display: flex; align-items: center; gap: 5px; }
+        .radio-option input { width: auto; }
+        .helper-text { color: #666; font-size: 12px; margin-top: 3px; }
+        .section-title { font-size: 18px; font-weight: bold; margin: 20px 0 10px; color: #333; border-bottom: 2px solid #007bff; padding-bottom: 5px; }
+        .payment-methods { display: flex; gap: 10px; margin-bottom: 15px; }
+        .payment-method { flex: 1; padding: 10px; border: 2px solid #ddd; border-radius: 4px; cursor: pointer; text-align: center; }
+        .payment-method.active { border-color: #007bff; background: #f0f7ff; }
+        .tooltip { position: relative; }
+        .tooltip:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; white-space: nowrap; z-index: 100; }
+        .skip-link { position: absolute; top: -40px; left: 0; background: #007bff; color: white; padding: 8px; z-index: 100; }
+        .skip-link:focus { top: 0; }
+        .password-requirements { font-size: 12px; color: #666; margin-top: 5px; }
+        .password-requirement { display: flex; align-items: center; gap: 5px; }
+        .password-requirement.met { color: green; }
+        .timer { font-size: 14px; color: #666; text-align: center; margin: 10px 0; }
+        .timer span { font-weight: bold; color: #007bff; }
+        .captcha { background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin: 15px 0; text-align: center; }
+        .captcha-image { background: #eee; height: 60px; display: flex; align-items: center; justify-content: center; margin: 10px 0; font-family: monospace; font-size: 24px; letter-spacing: 5px; }
+        .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .loading-spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; }
+        @media (max-width: 768px) {
+            .checkout-form { padding: 10px; }
+            .form-group input { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <main id="main-content">
+        <div class="checkout-form">
+            <h1>Checkout</h1>
+            
+            <div class="order-summary">
+                <h2>Order Summary</h2>
+                <div class="order-item">
+                    <span>Product A</span>
+                    <span>$29.99</span>
+                </div>
+                <div class="order-item">
+                    <span>Product B</span>
+                    <span>$49.99</span>
+                </div>
+                <div class="order-item">
+                    <span>Shipping</span>
+                    <span>$5.99</span>
+                </div>
+                <div class="order-item">
+                    <span>Tax</span>
+                    <span>$6.40</span>
+                </div>
+                <div class="total">
+                    <span>Total</span>
+                    <span>$92.37</span>
+                </div>
+            </div>
+            
+            <form id="checkout-form" action="/process-checkout" method="POST">
+                <div class="section-title">Contact Information</div>
+                
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Email address" required>
+                    <div class="helper-text">We'll send your receipt to this email</div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="tel" name="phone" placeholder="Phone number">
+                    <div class="helper-text">For delivery updates only</div>
+                </div>
+                
+                <div class="section-title">Shipping Address</div>
+                
+                <div class="form-group">
+                    <input type="text" name="fullName" placeholder="Full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" name="address1" placeholder="Address line 1" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" name="address2" placeholder="Address line 2 (optional)">
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" name="city" placeholder="City" required>
+                </div>
+                
+                <div class="form-group">
+                    <select name="state" required>
+                        <option value="">Select state</option>
+                        <option value="CA">California</option>
+                        <option value="NY">New York</option>
+                        <option value="TX">Texas</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" name="zip" placeholder="ZIP code" required pattern="[0-9]{5}">
+                </div>
+                
+                <div class="form-group">
+                    <select name="country" required>
+                        <option value="US">United States</option>
+                        <option value="CA">Canada</option>
+                        <option value="UK">United Kingdom</option>
+                    </select>
+                </div>
+                
+                <div class="section-title">Payment Method</div>
+                
+                <div class="payment-methods">
+                    <div class="payment-method active" onclick="selectPayment('card')">
+                        <div class="card-icons">
+                            <div class="card-icon">VISA</div>
+                            <div class="card-icon">MC</div>
+                        </div>
+                        <div>Credit Card</div>
+                    </div>
+                    <div class="payment-method" onclick="selectPayment('paypal')">
+                        <div>PayPal</div>
+                    </div>
+                    <div class="payment-method" onclick="selectPayment('applepay')">
+                        <div>Apple Pay</div>
+                    </div>
+                </div>
+                
+                <div id="card-payment">
+                    <div class="form-group">
+                        <input type="text" name="cardNumber" placeholder="Card number" required maxlength="19">
+                        <div class="helper-text">Enter your 16-digit card number</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="text" name="cardName" placeholder="Name on card" required>
+                    </div>
+                    
+                    <div class="form-group" style="display: flex; gap: 10px;">
+                        <input type="text" name="expiry" placeholder="MM/YY" required maxlength="5">
+                        <input type="text" name="cvv" placeholder="CVV" required maxlength="4">
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="text" name="billingZip" placeholder="Billing ZIP code" required>
+                    </div>
+                </div>
+                
+                <div class="section-title">Additional Options</div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" name="saveInfo" id="saveInfo">
+                    <label for="saveInfo">Save my information for faster checkout</label>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" name="newsletter" id="newsletter" checked>
+                    <label for="newsletter">Subscribe to newsletter for deals and updates</label>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" name="giftWrap" id="giftWrap">
+                    <label for="giftWrap">Add gift wrapping (+$5.99)</label>
+                </div>
+                
+                <div class="form-group">
+                    <div>Shipping method</div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="shipping" value="standard" checked>
+                            <span>Standard (5-7 days) - $5.99</span>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="shipping" value="express">
+                            <span>Express (2-3 days) - $12.99</span>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="shipping" value="overnight">
+                            <span>Overnight - $24.99</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="tooltip" data-tooltip="Add a special message for the recipient">
+                        <textarea name="giftMessage" placeholder="Gift message (optional)" rows="3"></textarea>
+                    </div>
+                </div>
+                
+                <div class="captcha">
+                    <div>Prove you're not a robot</div>
+                    <div class="captcha-image">A7x9K2</div>
+                    <input type="text" name="captcha" placeholder="Enter the code above" required>
+                </div>
+                
+                <div class="timer">
+                    Your cart will expire in <span id="countdown">15:00</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="terms" required>
+                        I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-submit">Complete Order</button>
+            </form>
+        </div>
+    </main>
+    
+    <div id="loading" class="loading-overlay">
+        <div class="loading-spinner">
+            <div>Processing your order...</div>
+            <div>Please do not close this window</div>
+        </div>
+    </div>
+    
+    <script>
+        function selectPayment(method) {
+            document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('active'));
+            event.target.closest('.payment-method').classList.add('active');
+            document.getElementById('card-payment').style.display = method === 'card' ? 'block' : 'none';
+        }
+        
+        // Countdown timer
+        let timeLeft = 900;
+        const countdownEl = document.getElementById('countdown');
+        setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                countdownEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
+        
+        // Form submission
+        document.getElementById('checkout-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('loading').style.display = 'block';
+            // Simulate processing
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                alert('Order placed successfully!');
+            }, 2000);
+        });
+        
+        // Card number formatting
+        document.querySelector('input[name="cardNumber"]').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
+            let formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formatted;
+        });
+        
+        // Expiry date formatting
+        document.querySelector('input[name="expiry"]').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            }
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

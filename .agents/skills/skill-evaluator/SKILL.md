@@ -107,15 +107,25 @@ End with one of:
 
 ## Workspace Layout
 
-Organize eval results in a dedicated workspace directory (e.g., `<skill-name>-workspace/`). Each iteration of the eval loop produces structured artifacts.
+Organize eval results in a dedicated workspace directory inside `.agents/skills/`. Each iteration of the eval loop produces structured artifacts.
 
 ```text
-<skill-name>-workspace/iteration-N/eval-<id>/
-├── with_skill/          # outputs/, timing.json, grading.json
-└── without_skill/       # outputs/, timing.json, grading.json
+.agents/skills/<skill-name>-workspace/
+└── iteration-N/
+    ├── eval-<id>/
+    │   ├── with_skill/
+    │   │   ├── outputs/
+    │   │   │   └── response.md
+    │   │   ├── timing.json
+    │   │   └── grading.json
+    │   └── without_skill/
+    │       ├── outputs/
+    │       │   └── response.md
+    │       ├── timing.json
+    │       └── grading.json
+    ├── benchmark.json
+    └── grading.json
 ```
-
-Plus `benchmark.json` and `feedback.json` at the iteration level.
 
 ## Workspace Iteration Automation — Automate the eval loop: create iteration dirs, run cases, aggregate results.
 
@@ -123,14 +133,14 @@ Plus `benchmark.json` and `feedback.json` at the iteration level.
 
 ```bash
 ITER="iteration-$(printf '%02d' $((++N)))"
-mkdir -p "<skill-name>-workspace/$ITER"
+mkdir -p ".agents/skills/<skill-name>-workspace/$ITER"
 ```
 
 ### 2. Set up subdirectories
 
 ```bash
 for ID in $(jq -r '.evals[].id' evals/evals.json); do
-  mkdir -p "<skill-name>-workspace/$ITER/eval-$ID"/{with_skill,without_skill}
+  mkdir -p ".agents/skills/<skill-name>-workspace/$ITER/eval-$ID"/{with_skill,without_skill}
 done
 ```
 
