@@ -1,0 +1,20 @@
+{
+  "eval_id": 1,
+  "with_skill": {
+    "summary": {
+      "passed": 2,
+      "failed": 1,
+      "total": 3,
+      "pass_rate": 0.6666666666666666
+    }
+  },
+  "without_skill": {
+    "summary": {
+      "passed": 2,
+      "failed": 1,
+      "total": 3,
+      "pass_rate": 0.6666666666666666
+    }
+  },
+  "note": "localhost:3000 not running"
+}
