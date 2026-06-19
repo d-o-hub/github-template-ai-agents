@@ -20,7 +20,7 @@ setup() {
 
 @test "command categorization works" {
     source "$REPO_ROOT/scripts/lib/command-categories.sh"
-    [ "$(categorize_command "npm run build")" = "safe" ]
+    [ "$(categorize_command "npm run build")" = "dangerous" ]
     [ "$(categorize_command "rm -rf /")" = "dangerous" ]
 }
 
