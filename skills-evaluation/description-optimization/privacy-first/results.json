@@ -1,0 +1,20 @@
+{
+  "skill": "privacy-first",
+  "optimization_round": 1,
+  "before": {
+    "description": "Prevent email addresses and personal data from entering the codebase. Use when user asks to 'prevent emails', 'remove personal data', 'privacy check', 'no email', or when writing/ editing any code, config, or documentation files.",
+    "keyword_accuracy": 0.9,
+    "pushy_markers": 0
+  },
+  "after": {
+    "description": "Prevent email addresses and personal data from entering the codebase. Use this skill when the user asks to prevent emails, remove personal data, run a privacy check, scan for PII, or ensure no email addresses leak into source code or documentation — even if they just say 'no email' or 'check for personal data'. Not for security audits (use security-code-auditor), EU AI Act compliance (use eu-ai-act-compliance), or hardcoded secrets (use security-code-auditor).",
+    "keyword_accuracy": 1.0,
+    "pushy_markers": 1
+  },
+  "key_changes": [
+    "Added 'even if they' pushy trigger language",
+    "Added negative triggers: 'Not for security audits', 'EU AI Act compliance', 'hardcoded secrets'",
+    "Broadened trigger list: 'scan for PII', 'ensure no email addresses leak'",
+    "Removed restrictive 'when writing/editing any code' (too broad)"
+  ]
+}

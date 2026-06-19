@@ -1,1 +1,38 @@
-{"skill_name":"css-render-performance","evals":[{"id":1,"prompt":"This CSS animates width and height transitions. Is there a performance issue?","expected_output":"Identify that width/height trigger layout (expensive), recommend animating transform/opacity instead for GPU compositing.","files":[],"assertions":["identifies layout-triggering properties","recommends transform/opacity alternatives"]},{"id":2,"prompt":"I added will-change: transform to 50 elements on the page. Is this okay?","expected_output":"Flag that 50 simultaneous will-change layers waste GPU memory and may cause compositing jank, especially on mobile. Suggest applying dynamically only when needed.","files":[],"assertions":["flags excessive layer promotion","suggests dynamic application"]},{"id":3,"prompt":"How can I improve scroll performance for a long list of items?","expected_output":"Recommend content-visibility: auto for off-screen items and CSS containment to isolate sub-trees from layout/paint.","files":[],"assertions":["recommends content-visibility","mentions CSS containment"]}]}
+{
+  "skill_name": "css-render-performance",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a long virtualized list (5000 items) that janks during scroll. I already added content-visibility: auto but it's still slow. What else should I check according to the decision flowchart?",
+      "expected_output": "Follow the decision flowchart: check if elements animate layout-triggering properties, verify will-change budget, apply CSS containment to isolate DOM sub-trees, and check for unnecessary repaints on state changes.",
+      "files": [],
+      "assertions": [
+        "references the decision flowchart or follows its branching logic",
+        "mentions CSS containment (contain: layout paint) for isolating DOM sub-trees",
+        "checks for unnecessary repaints on state changes (the 'No → Is it in a scrollable container? → No' branch)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "My animation uses both width and transform on the same element. The skill has a specific technique for this case — what is it?",
+      "expected_output": "Use the FLIP technique: capture the initial state, apply the final layout change, then animate the difference using transform. This avoids layout thrashing while achieving the visual result.",
+      "files": [],
+      "assertions": [
+        "mentions the FLIP technique by name",
+        "explains that FLIP captures initial state, applies final layout, then animates the delta with transform",
+        "explains why this avoids layout thrashing"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Walk me through the Quick Check audit for CSS render performance. What are the 5 things I should verify?",
+      "expected_output": "The Quick Check section lists: profile with DevTools Performance tab, check which properties trigger layout/paint/composite, verify will-change is used sparingly (max 2-3 elements), test on throttled CPU, confirm no layout-triggering properties in animations.",
+      "files": [],
+      "assertions": [
+        "references the Quick Check section or lists its 5 checklist items",
+        "mentions profiling with Chrome DevTools Performance tab",
+        "mentions testing on throttled CPU (4x) to simulate user devices"
+      ]
+    }
+  ]
+}

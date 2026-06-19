@@ -1,0 +1,160 @@
+<svg width="100%" viewBox="0 0 680 1348" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
+  markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+  <path d="M2 1L8 5L2 9" fill="none" stroke="#94a3b8"
+    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+<filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+  <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.08"/>
+</filter>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+  .th{font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:600;fill:#0f172a;letter-spacing:-0.01em}
+  .ts{font-family:'Inter',system-ui,sans-serif;font-size:11px;font-weight:400;fill:#64748b}
+  .tl{font-family:'Inter',system-ui,sans-serif;font-size:15px;font-weight:700;fill:#0f172a;letter-spacing:-0.02em}
+  .arr{fill:none;stroke:#94a3b8;stroke-width:1.2}
+  .leader{fill:none;stroke:#cbd5e1;stroke-width:0.5;stroke-dasharray:3 3}
+  .card{filter:url(#shadow)}
+</style>
+</defs>
+<text class="th" x="340" y="28" text-anchor="middle" dominant-baseline="central">Project Architecture</text>
+<line x1="60" y1="38" x2="620" y2="38" stroke="#ccc" stroke-width="0.5" opacity="0.4"/>
+<text class="ts" x="21" y="54" opacity="0.55">Workflow pipeline</text>
+<g class="card">
+<rect x="21" y="54" width="140" height="36" rx="8" fill="#f0fdf9" stroke="#0d9488" stroke-width="1.5"/>
+<text class="th" x="91" y="72" text-anchor="middle" dominant-baseline="central">build</text>
+</g>
+<g class="card">
+<rect x="173" y="54" width="140" height="36" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+<text class="th" x="243" y="72" text-anchor="middle" dominant-baseline="central">test</text>
+</g>
+<line x1="161" y1="72" x2="173" y2="72" class="arr" marker-end="url(#arrow)"/>
+<g class="card">
+<rect x="325" y="54" width="140" height="36" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+<text class="th" x="395" y="72" text-anchor="middle" dominant-baseline="central">deploy</text>
+</g>
+<line x1="313" y1="72" x2="325" y2="72" class="arr" marker-end="url(#arrow)"/>
+<line x1="20" y1="100" x2="660" y2="100" stroke="#ccc" stroke-width="0.5" opacity="0.18"/>
+<g class="card">
+<rect x="20" y="106" width="310" height="1028" rx="8" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+<text class="th" x="175" y="120" text-anchor="middle" dominant-baseline="central">58 skills</text>
+<text class="ts" x="175" y="134" text-anchor="middle" dominant-baseline="central">.agents/skills/</text>
+</g>
+<text class="ts" x="32" y="150">accessibility-auditor</text>
+<text class="ts" x="32" y="167">agent-browser</text>
+<text class="ts" x="32" y="184">agent-coordination</text>
+<text class="ts" x="32" y="201">agents-md</text>
+<text class="ts" x="32" y="218">anti-ai-slop</text>
+<text class="ts" x="32" y="235">api-design-first</text>
+<text class="ts" x="32" y="252">architecture-diagram</text>
+<text class="ts" x="32" y="269">cicd-pipeline</text>
+<text class="ts" x="32" y="286">cloudflare-worker-api</text>
+<text class="ts" x="32" y="303">codacy</text>
+<text class="ts" x="32" y="320">codacy-cloud-cli</text>
+<text class="ts" x="32" y="337">code-review-assistant</text>
+<text class="ts" x="32" y="354">codeberg-api</text>
+<text class="ts" x="32" y="371">css-render-performance</text>
+<text class="ts" x="32" y="388">database-devops</text>
+<text class="ts" x="32" y="405">delegate</text>
+<text class="ts" x="32" y="422">dist-channel-selection</text>
+<text class="ts" x="32" y="439">do-web-doc-resolver</text>
+<text class="ts" x="32" y="456">docs-hook</text>
+<text class="ts" x="32" y="473">document-rendering-and-locators</text>
+<text class="ts" x="32" y="490">dogfood</text>
+<text class="ts" x="32" y="507">dora-report</text>
+<text class="ts" x="32" y="524">durable-objects</text>
+<text class="ts" x="32" y="541">eu-ai-act-compliance</text>
+<text class="ts" x="32" y="558">git-github-workflow</text>
+<text class="ts" x="32" y="575">github-pr-sentinel</text>
+<text class="ts" x="32" y="592">goap-agent</text>
+<text class="ts" x="32" y="609">implementer</text>
+<text class="ts" x="32" y="626">intent-classifier</text>
+<text class="ts" x="32" y="643">iterative-refinement</text>
+<text class="ts" x="32" y="660">jules-delegator</text>
+<text class="ts" x="32" y="677">learn</text>
+<text class="ts" x="32" y="694">lifecycle-management</text>
+<text class="ts" x="32" y="711">memory-context</text>
+<text class="ts" x="32" y="728">migration-refactoring</text>
+<text class="ts" x="32" y="745">parallel-execution</text>
+<text class="ts" x="32" y="762">privacy-first</text>
+<text class="ts" x="32" y="779">pwa-offline-sync</text>
+<text class="ts" x="32" y="796">reader-ui-ux</text>
+<text class="ts" x="32" y="813">readme-best-practices</text>
+<text class="ts" x="32" y="830">secure-invite-and-access</text>
+<text class="ts" x="32" y="847">security-code-auditor</text>
+<text class="ts" x="32" y="864">self-fix-loop</text>
+<text class="ts" x="32" y="881">shell-script-quality</text>
+<text class="ts" x="32" y="898">skill-creator</text>
+<text class="ts" x="32" y="915">skill-evaluator</text>
+<text class="ts" x="32" y="932">static-analysis</text>
+<text class="ts" x="32" y="949">task-decomposition</text>
+<text class="ts" x="32" y="966">template-version-management</text>
+<text class="ts" x="32" y="983">test-runner</text>
+<text class="ts" x="32" y="1000">testdata-builders</text>
+<text class="ts" x="32" y="1017">testing-strategy</text>
+<text class="ts" x="32" y="1034">triz-analysis</text>
+<text class="ts" x="32" y="1051">triz-solver</text>
+<text class="ts" x="32" y="1068">turso-db</text>
+<text class="ts" x="32" y="1085">ui-ux-optimize</text>
+<text class="ts" x="32" y="1102">verification-template</text>
+<text class="ts" x="32" y="1119">web-search-researcher</text>
+<g class="card">
+<rect x="350" y="106" width="310" height="1028" rx="8" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+<text class="th" x="505" y="120" text-anchor="middle" dominant-baseline="central">9 agents</text>
+<text class="ts" x="505" y="134" text-anchor="middle" dominant-baseline="central">.opencode/agents/</text>
+</g>
+<text class="ts" x="362" y="150">analysis-swarm</text>
+<text class="ts" x="362" y="167">create-agent</text>
+<text class="ts" x="362" y="184">delegate</text>
+<text class="ts" x="362" y="201">git-worktree-manager</text>
+<text class="ts" x="362" y="218">github-action-editor</text>
+<text class="ts" x="362" y="235">goap-agent</text>
+<text class="ts" x="362" y="252">implementer</text>
+<text class="ts" x="362" y="269">perplexity-researcher-pro</text>
+<text class="ts" x="362" y="286">perplexity-researcher-reasoning-pro</text>
+<line x1="20" y1="1144" x2="660" y2="1144" stroke="#ccc" stroke-width="0.5" opacity="0.18"/>
+<text class="th" x="340" y="1164" text-anchor="middle" dominant-baseline="central">10 slash commands</text>
+<text class="ts" x="340" y="1178" text-anchor="middle" dominant-baseline="central">.opencode/commands/</text>
+<g class="card">
+<rect x="20" y="1188" width="300" height="20" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+<text class="ts" x="170" y="1198" text-anchor="middle" dominant-baseline="central">/atomic-commit</text>
+</g>
+<g class="card">
+<rect x="350" y="1188" width="300" height="20" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+<text class="ts" x="500" y="1198" text-anchor="middle" dominant-baseline="central">/commit</text>
+</g>
+<g class="card">
+<rect x="20" y="1212" width="300" height="20" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+<text class="ts" x="170" y="1222" text-anchor="middle" dominant-baseline="central">/git-github-workflow</text>
+</g>
+<g class="card">
+<rect x="350" y="1212" width="300" height="20" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+<text class="ts" x="500" y="1222" text-anchor="middle" dominant-baseline="central">/github-workflow</text>
+</g>
+<g class="card">
+<rect x="20" y="1236" width="300" height="20" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+<text class="ts" x="170" y="1246" text-anchor="middle" dominant-baseline="central">/resume</text>
+</g>
+<g class="card">
+<rect x="350" y="1236" width="300" height="20" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+<text class="ts" x="500" y="1246" text-anchor="middle" dominant-baseline="central">/self-fix-loop</text>
+</g>
+<g class="card">
+<rect x="20" y="1260" width="300" height="20" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+<text class="ts" x="170" y="1270" text-anchor="middle" dominant-baseline="central">/swarm-analyze</text>
+</g>
+<g class="card">
+<rect x="350" y="1260" width="300" height="20" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+<text class="ts" x="500" y="1270" text-anchor="middle" dominant-baseline="central">/swarm-web-research</text>
+</g>
+<g class="card">
+<rect x="20" y="1284" width="300" height="20" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+<text class="ts" x="170" y="1294" text-anchor="middle" dominant-baseline="central">/update-docs</text>
+</g>
+<g class="card">
+<rect x="350" y="1284" width="300" height="20" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+<text class="ts" x="500" y="1294" text-anchor="middle" dominant-baseline="central">/verify-commands</text>
+</g>
+<text class="ts" x="340" y="1328" text-anchor="middle" opacity="0.32">My Project · maintainer</text>
+</svg>

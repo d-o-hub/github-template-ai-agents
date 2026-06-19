@@ -2,7 +2,7 @@
 name: agent-coordination
 version: "0.2.10"
 category: agent
-description: Coordinate multiple agents for software development across any language. Use this skill when running parallel execution of independent tasks, sequential chains with dependencies, swarm analysis from multiple perspectives, or iterative refinement loops — even if they just say "run these in parallel" or "coordinate agents".
+description: Coordinate multiple agents for software development across any language. Use this skill when running parallel execution of independent tasks, sequential chains with dependencies, swarm analysis from multiple perspectives, or iterative refinement loops — even if they just say "run these in parallel" or "coordinate agents". Not for goap-agent, parallel-execution.
 license: MIT
 ---
 

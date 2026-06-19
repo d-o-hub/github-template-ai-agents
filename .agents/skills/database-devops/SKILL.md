@@ -2,7 +2,7 @@
 name: database-devops
 version: "0.2.10"
 category: database
-description: Database design, migration, and DevOps automation with safety patterns. Use this skill when designing schemas, planning migrations, optimizing queries, or managing multi-database orchestration — even if they just say "set up the database" or "fix the migration". Includes rollback strategies, performance analysis, and cross-database synchronization.
+description: Database design, migration, and DevOps automation with safety patterns. Use this skill when designing schemas, planning migrations, optimizing queries, or managing multi-database orchestration — even if they just say "set up the database" or "fix the migration". Includes rollback strategies, performance analysis, and cross-database synchronization. Not for turso-db.
 license: MIT
 ---
 

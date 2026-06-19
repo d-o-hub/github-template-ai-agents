@@ -1,0 +1,34 @@
+{
+  "skill": "delegate",
+  "eval_id": 2,
+  "prompt": "Fix quality_gate.sh to scope linting to changed files",
+  "assertions": [
+    "retrieves the current file-detection logic using grep or search",
+    "explicitly hands off to an implementer for the fix",
+    "provides a structured summary of what needs to change"
+  ],
+  "with_skill": {
+    "passed": 2,
+    "total": 3,
+    "evidence": [
+      "Retrieved find-based logic at lines 380/400, identified lint_batch_if_changed",
+      "FAIL: Provided code fix directly ('Proposed changes to quality_gate.sh') instead of handing off to implementer. Agent tried to fix the issue itself.",
+      "Provided structured proposed changes with helper function, replacement lines"
+    ],
+    "note": "Agent provided excellent analysis and code but did NOT trigger the handoff workflow. The prompt 'Fix the script' overrides the skill's handoff guidance."
+  },
+  "without_skill": {
+    "passed": 2,
+    "total": 3,
+    "evidence": [
+      "Retrieved find-based logic, identified quality_gate.sh file detection",
+      "FAIL: Directly modified scripts/quality_gate.sh (added _changed_files_z function). Did NOT hand off — fixed the issue itself.",
+      "Provided structured function with null-delimited I/O pattern"
+    ],
+    "note": "Agent fixed the file directly. Without the skill, no handoff concept was considered."
+  },
+  "analysis": {
+    "root_cause": "The prompt 'Fix the script' creates a task where the agent naturally implements the fix. The delegate skill's handoff concept ('task requires modifying code → hand off to implementer') is overridden by the explicit 'fix' instruction.",
+    "fix_needed": "To truly test handoff, the prompt should be a retrieval task that ACCIDENTALLY reveals a bug — e.g., 'Show me how quality_gate.sh detects changed files' — so the agent retrieves context, discovers the bug, and must decide whether to hand off or keep reading."
+  }
+}

@@ -306,6 +306,37 @@ if [[ ${#DETECTED_LANGUAGES[@]} -eq 0 ]]; then
 fi
 printf "\n"
 
+# --- Get changed files for scoped linting ---
+_changed_files_z() {
+    local source_files=""
+
+    # In CI PR context, compare against base branch
+    if [[ -n "${GITHUB_BASE_REF:-}" ]]; then
+        source_files=$(git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" 2>/dev/null || true)
+    fi
+
+    # Fallback: staged + unstaged changes vs HEAD
+    if [[ -z "$source_files" ]]; then
+        source_files=$(git diff --name-only HEAD 2>/dev/null || true)
+    fi
+
+    # If nothing changed (or first commit), fall back to all tracked files
+    if [[ -z "$source_files" ]]; then
+        source_files=$(git ls-files 2>/dev/null || true)
+    fi
+
+    # If still empty (no git), fall back to find
+    if [[ -z "$source_files" ]]; then
+        find . -type f -not -path "./.git/*" -not -path "./target/*" -not -path "*/node_modules/*" -print0 2>/dev/null || true
+        return
+    fi
+
+    # Convert newline-delimited to null-delimited
+    local IFS=$'\n'
+    # shellcheck disable=SC2046
+    printf '%s\0' $source_files
+}
+
 # --- Run language-specific checks ---
 
 # Rust checks
@@ -377,7 +408,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
     printf "%bRunning Shell script checks...%b\n" "${BLUE}" "${NC}"
     if command -v shellcheck &> /dev/null; then
         TMP_SH_LIST=$(mktemp)
-        find . -name "*.sh" -not -path "$GIT_EXCLUDE" -not -path "./target/*" -print0 2>/dev/null > "$TMP_SH_LIST" || true
+        _changed_files_z | grep -z '\.sh$' > "$TMP_SH_LIST" 2>/dev/null || true
         if [[ -s "$TMP_SH_LIST" ]]; then
             # Do not pass -f quiet so errors are visible in CI
             if ! lint_batch_if_changed "$TMP_SH_LIST" "shellcheck" ".shellcheckrc" shellcheck --severity=error; then
@@ -386,6 +417,8 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " shell " ]]; then
             else
                 printf "%b  ✓ shellcheck passed%b\n" "${GREEN}" "${NC}"
             fi
+        else
+            printf "%b  ✓ No changed shell files to check%b\n" "${GREEN}" "${NC}"
         fi
         rm -f -- "$TMP_SH_LIST"
     fi
@@ -397,7 +430,7 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
     printf "%bRunning Markdown checks...%b\n" "${BLUE}" "${NC}"
     if command -v markdownlint-cli2 &> /dev/null; then
         TMP_MD_LIST=$(mktemp)
-        find . -name "*.md" -not -path "*/node_modules/*" -not -path "./target/*" -not -path "$GIT_EXCLUDE" -not -path "./vendor/*" -print0 2>/dev/null > "$TMP_MD_LIST" || true
+        _changed_files_z | grep -z '\.md$' > "$TMP_MD_LIST" 2>/dev/null || true
         if [[ -s "$TMP_MD_LIST" ]]; then
             if ! lint_batch_if_changed "$TMP_MD_LIST" "markdownlint" ".markdownlint-cli2.jsonc" markdownlint-cli2 >/dev/null 2>&1; then
                 printf "%b  ✗ markdownlint-cli2 failed (run 'markdownlint-cli2 "**/*.md"' locally to see details)%b\n" "${RED}" "${NC}"
@@ -405,6 +438,8 @@ if [[ " ${DETECTED_LANGUAGES[*]} " =~ " markdown " ]]; then
             else
                 printf "%b  ✓ markdownlint-cli2 passed%b\n" "${GREEN}" "${NC}"
             fi
+        else
+            printf "%b  ✓ No changed markdown files to check%b\n" "${GREEN}" "${NC}"
         fi
         rm -f -- "$TMP_MD_LIST"
     fi

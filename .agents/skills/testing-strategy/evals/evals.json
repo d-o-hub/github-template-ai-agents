@@ -1,1 +1,38 @@
-{"skill_name":"testing-strategy","evals":[{"id":1,"prompt":"Design a property-based testing strategy for a Python payment processing module","expected_output":"Hypothesis-based test strategies with targeted generators and invariant assertions","files":[],"assertions":["references property-based testing","specifies language-appropriate framework","identifies testable invariants"]},{"id":2,"prompt":"Set up mutation testing for a JavaScript codebase using Stryker","expected_output":"Stryker configuration with mutation operators, thresholds, and CI integration","files":[],"assertions":["configures mutation score threshold","identifies mutation operators","integrates with CI pipeline"]},{"id":3,"prompt":"Create a visual regression testing plan for a React component library","expected_output":"Playwright or Storybook visual testing setup with baseline management","files":[],"assertions":["addresses dynamic content masking","defines baseline comparison strategy","specifies viewport breakpoints"]}]}
+{
+  "skill_name": "testing-strategy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a Python payment processing module with complex rounding logic and idempotency requirements. According to the strategy decision tree, what testing approach should I use and what specific tool?",
+      "expected_output": "Follow the decision tree: business logic/algorithms → Property-Based Testing → Hypothesis (Python). Reference the Strategy Reference table for the tool mapping.",
+      "files": [],
+      "assertions": [
+        "follows the decision tree to select Property-Based Testing",
+        "specifies Hypothesis as the Python tool (from the decision tree or Strategy Reference)",
+        "identifies testable invariants relevant to payment processing (idempotency, rounding)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "My team wants to measure how effective our test suite is. According to the strategy decision tree, what approach should we use and what's the recommended quality gate threshold?",
+      "expected_output": "Follow the decision tree: test suite quality itself → Mutation Testing → Mutmut (Python) or Stryker (JS). Quality Gates section specifies mutation score threshold >80%.",
+      "files": [],
+      "assertions": [
+        "follows the decision tree to select Mutation Testing",
+        "specifies the correct tool (Mutmut for Python, Stryker for JS) from the Language-Specific Tools table",
+        "references the quality gate threshold (mutation score >80%) from the Quality Gates section"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm setting up property-based testing with Hypothesis but my tests keep failing with 'Flaky' errors. What does the Gotchas section say about this?",
+      "expected_output": "The Gotchas section addresses flaky tests: use fixed random seeds in CI, configure Hypothesis database for persistence, and set max_examples appropriately.",
+      "files": [],
+      "assertions": [
+        "references the Gotchas section (not generic advice)",
+        "mentions using fixed random seeds or Hypothesis database for persistence",
+        "mentions configuring max_examples or profile settings"
+      ]
+    }
+  ]
+}

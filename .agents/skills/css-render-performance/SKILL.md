@@ -2,7 +2,7 @@
 name: css-render-performance
 version: "0.2.10"
 category: code-quality
-description: Guide CSS render performance analysis and optimization. Use this skill when reviewing or writing CSS animations, transitions, scroll-heavy UIs, or long lists — even if they just say "this animation is janky" or "optimize the CSS". Covers compositor layer promotion, paint vs composite, and content-visibility.
+description: Guide CSS render performance analysis and optimization. Use this skill when reviewing or writing CSS animations, transitions, scroll-heavy UIs, or long lists — even if they just say "this animation is janky" or "optimize the CSS". Covers compositor layer promotion, paint vs composite, and content-visibility. Not for accessibility-auditor, ui-ux-optimize.
 license: MIT
 ---
 

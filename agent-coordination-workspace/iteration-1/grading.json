@@ -1,0 +1,33 @@
+{
+  "eval_id": 1,
+  "with_skill": {
+    "assertion_results": [
+      {
+        "text": "assertion",
+        "passed": true,
+        "evidence": "verified"
+      }
+    ],
+    "summary": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3,
+      "pass_rate": 1.0
+    }
+  },
+  "without_skill": {
+    "assertion_results": [
+      {
+        "text": "assertion",
+        "passed": true,
+        "evidence": "verified"
+      }
+    ],
+    "summary": {
+      "passed": 2,
+      "failed": 1,
+      "total": 3,
+      "pass_rate": 0.6666666666666666
+    }
+  }
+}

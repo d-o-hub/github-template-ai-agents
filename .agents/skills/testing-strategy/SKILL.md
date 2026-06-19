@@ -1,7 +1,7 @@
 ---
 name: testing-strategy
 version: "0.2.10"
-description: Design and implement comprehensive testing strategies for software projects. Use this skill when planning test suites, choosing testing approaches like property-based testing, visual regression, load testing, mutation testing, or E2E test generation — even if they just say "how should we test this" or "what testing approach should we use".
+description: Design and implement comprehensive testing strategies for software projects. Use this skill when planning test suites, choosing testing approaches like property-based testing, visual regression, load testing, mutation testing, or E2E test generation — even if they just say "how should we test this" or "what testing approach should we use". Not for test-runner, testdata-builders.
 category: testing
 license: MIT
 ---

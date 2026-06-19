@@ -2,7 +2,7 @@
 name: task-decomposition
 version: "0.2.10"
 category: agent
-description: Break down complex tasks into atomic, actionable goals with clear dependencies and success criteria. Use this skill when planning multi-step projects, coordinating agents, or decomposing complex requests — even if they just say "break this down" or "what are the steps".
+description: Break down complex tasks into atomic, actionable goals with clear dependencies and success criteria. Use this skill when planning multi-step projects, coordinating agents, or decomposing complex requests — even if they just say "break this down" or "what are the steps". Not for goap-agent, agent-coordination.
 license: MIT
 ---
 

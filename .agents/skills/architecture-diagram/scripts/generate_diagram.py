@@ -25,14 +25,16 @@ DEFAULT_CONFIG = {
     ],
 }
 
-# ── Color palette (light 50, border 600, text 800) ─────────────────────────
+# ── Color palette (modern 2026: soft pastels with depth) ────────────────────
 
 COLORS = {
-    "teal":   {"fill": "#E1F5EE", "stroke": "#0F6E56", "text": "#085041"},
-    "blue":   {"fill": "#E6F1FB", "stroke": "#185FA5", "text": "#0C447C"},
-    "purple": {"fill": "#EEEDFE", "stroke": "#534AB7", "text": "#3C3489"},
-    "green":  {"fill": "#EAF3DE", "stroke": "#3B6D11", "text": "#27500A"},
-    "gray":   {"fill": "#F1EFE8", "stroke": "#5F5E5A", "text": "#444441"},
+    "teal":   {"fill": "#f0fdf9", "stroke": "#0d9488", "text": "#115e59"},
+    "blue":   {"fill": "#eff6ff", "stroke": "#2563eb", "text": "#1e40af"},
+    "purple": {"fill": "#f5f3ff", "stroke": "#7c3aed", "text": "#5b21b6"},
+    "green":  {"fill": "#f0fdf4", "stroke": "#16a34a", "text": "#166534"},
+    "gray":   {"fill": "#f8fafc", "stroke": "#94a3b8", "text": "#334155"},
+    "rose":   {"fill": "#fff1f2", "stroke": "#e11d48", "text": "#9f1239"},
+    "amber":  {"fill": "#fffbeb", "stroke": "#d97706", "text": "#92400e"},
 }
 
 
@@ -115,20 +117,24 @@ def _section_line(y) -> str:
 def _container(x, y, w, h, label, sublabel=None) -> str:
     c = COLORS["gray"]
     parts = [
-        _rect(x, y, w, h, rx=6, fill="none", stroke=c["stroke"],
-              sw=0.5, dash=True),
+        f'<g class="card">',
+        _rect(x, y, w, h, rx=8, fill="none", stroke=c["stroke"],
+              sw=1, dash=True),
         _text(x + w // 2, y + 14, label, cls="th"),
     ]
     if sublabel:
         parts.append(_text(x + w // 2, y + 28, sublabel, cls="ts"))
+    parts.append("</g>")
     return "\n".join(parts)
 
 
 def _pill(x, y, w, h, label) -> str:
     c = COLORS["gray"]
     return "\n".join([
-        _rect(x, y, w, h, rx=h // 2, fill=c["fill"], stroke=c["stroke"]),
+        f'<g class="card">',
+        _rect(x, y, w, h, rx=h // 2, fill=c["fill"], stroke=c["stroke"], sw=1),
         _text(x + w // 2, y + h // 2, label, cls="ts"),
+        "</g>",
     ])
 
 
@@ -137,14 +143,20 @@ def _pill(x, y, w, h, label) -> str:
 DEFS = """<defs>
 <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
   markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-  <path d="M2 1L8 5L2 9" fill="none" stroke="#888"
+  <path d="M2 1L8 5L2 9" fill="none" stroke="#94a3b8"
     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 </marker>
+<filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+  <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.08"/>
+</filter>
 <style>
-  .th{font-family:system-ui,sans-serif;font-size:14px;font-weight:500;fill:#1a1a1a}
-  .ts{font-family:system-ui,sans-serif;font-size:12px;font-weight:400;fill:#555}
-  .arr{fill:none;stroke:#888;stroke-width:1.2}
-  .leader{fill:none;stroke:#aaa;stroke-width:0.5;stroke-dasharray:3 3}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+  .th{font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:600;fill:#0f172a;letter-spacing:-0.01em}
+  .ts{font-family:'Inter',system-ui,sans-serif;font-size:11px;font-weight:400;fill:#64748b}
+  .tl{font-family:'Inter',system-ui,sans-serif;font-size:15px;font-weight:700;fill:#0f172a;letter-spacing:-0.02em}
+  .arr{fill:none;stroke:#94a3b8;stroke-width:1.2}
+  .leader{fill:none;stroke:#cbd5e1;stroke-width:0.5;stroke-dasharray:3 3}
+  .card{filter:url(#shadow)}
 </style>
 </defs>"""
 
@@ -182,8 +194,10 @@ def build_svg(cfg: dict, skills: list[str], agents: list[str],
         prev_right = None
         for s in stages:
             c = COLORS.get(s.get("color", "teal"), COLORS["teal"])
-            push(_rect(x, y, bw, row_h, fill=c["fill"], stroke=c["stroke"]))
-            push(_text(x + bw // 2, y + row_h // 2, s["name"], cls="ts"))
+            push(f'<g class="card">')
+            push(_rect(x, y, bw, row_h, rx=8, fill=c["fill"], stroke=c["stroke"], sw=1.5))
+            push(_text(x + bw // 2, y + row_h // 2, s["name"], cls="th"))
+            push("</g>")
             if prev_right is not None:
                 push(_line(prev_right, y + row_h // 2,
                            prev_right + gap, y + row_h // 2))

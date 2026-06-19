@@ -1,0 +1,18 @@
+{
+  "skill": "durable-objects",
+  "optimization_round": 1,
+  "before": {
+    "description": "Create and review Cloudflare Durable Objects. Use when building stateful coordination (chat rooms, multiplayer games, booking systems), implementing RPC methods, SQLite storage, alarms, WebSockets, or reviewing DO code for best practices. Covers Workers integration, wrangler config, and testing with Vitest. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
+    "keyword_accuracy": 1.0,
+    "pushy_markers": 0
+  },
+  "after": {
+    "description": "Create and review Cloudflare Durable Objects. Use when building stateful coordination (chat rooms, multiplayer games, booking systems), implementing RPC methods, SQLite storage, alarms, WebSockets, or reviewing DO code for best practices. Even if they just say 'create a Durable Object', 'add RPC methods', or 'set up SQLite in a DO'. Covers Workers integration, wrangler config, and testing with Vitest. Biases towards retrieval from Cloudflare docs over pre-trained knowledge. Not for Worker API routes (use cloudflare-worker-api) or general Workers deployment.",
+    "keyword_accuracy": 1.0,
+    "pushy_markers": 1
+  },
+  "key_changes": [
+    "Added 'even if they' pushy trigger language",
+    "Added negative triggers: 'Not for Worker API routes' and 'general Workers deployment'"
+  ]
+}

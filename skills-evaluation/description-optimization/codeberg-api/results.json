@@ -1,0 +1,23 @@
+{
+  "skill": "codeberg-api",
+  "optimization_round": 1,
+  "before": {
+    "description": "Interact with Forgejo/Codeberg repositories via the REST API — read or write files, manage issues, create pull requests, list branches/tags, search repos, and automate CI/CD workflows. Use this skill when the user wants to: read file contents from a Forgejo repo, create or update files, manage issues (create, list, close), list repositories for a user, search, set up Forgejo Actions workflows, or automate any git-forge operation. Works without authentication for public repos; requires FORGEJO_TOKEN for private repos and write operations.",
+    "keyword_accuracy": 1.0,
+    "pushy_markers": 0
+  },
+  "after": {
+    "description": "Interact with Forgejo/Codeberg repositories via the REST API — read or write files, manage issues, create pull requests, list branches/tags, search repos, and automate CI/CD workflows. Use this skill when the user wants to interact with a Forgejo or Codeberg repository, even if they just say 'read a file from Codeberg' or 'create an issue on my Forgejo repo'. Not for GitHub (use git-github-workflow) or GitLab (use cicd-pipeline).",
+    "keyword_accuracy": 1.0,
+    "pushy_markers": 2
+  },
+  "key_changes": [
+    "Added 'even if they just say' pushy trigger language",
+    "Added negative triggers: 'Not for GitHub or GitLab'",
+    "Simplified trigger list to intent-based phrasing",
+    "Removed implementation details (auth, token scope) from description"
+  ],
+  "trigger_tests": [
+    {"query": "read a file from my Codeberg repository", "correctly_triggered": "codeberg-api", "correct": true}
+  ]
+}

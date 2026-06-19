@@ -4,8 +4,12 @@ version: "0.2.10"
 category: security
 description: >
   Prevent email addresses and personal data from entering the codebase.
-  Use when user asks to "prevent emails", "remove personal data", "privacy check",
-  "no email", or when writing/ editing any code, config, or documentation files.
+  Use this skill when the user asks to prevent emails, remove personal data,
+  run a privacy check, scan for PII, or ensure no email addresses leak into
+  source code or documentation — even if they just say "no email" or "check
+  for personal data". Not for security audits (use security-code-auditor),
+  EU AI Act compliance (use eu-ai-act-compliance), or hardcoded secrets
+  (use security-code-auditor).
 license: MIT
 compatibility: Works with Claude Code, OpenCode, and similar agents. No external dependencies.
 metadata:

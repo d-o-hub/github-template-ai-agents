@@ -1,0 +1,53 @@
+{
+  "eval_id": 1,
+  "with_skill": {
+    "assertion_results": [
+      {
+        "text": "names each sin",
+        "passed": true,
+        "evidence": "Identified revolutionary, cutting-edge, world-class, leverage, innovation patterns"
+      },
+      {
+        "text": "provides concrete rewrites",
+        "passed": true,
+        "evidence": "Provided specific rewrite suggestions"
+      },
+      {
+        "text": "scores severity",
+        "passed": true,
+        "evidence": "Provided severity ratings"
+      }
+    ],
+    "summary": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3,
+      "pass_rate": 1.0
+    }
+  },
+  "without_skill": {
+    "assertion_results": [
+      {
+        "text": "names each sin",
+        "passed": true,
+        "evidence": "Identified superlatives, buzzwords, cliches"
+      },
+      {
+        "text": "provides concrete rewrites",
+        "passed": true,
+        "evidence": "Provided rewrite suggestions"
+      },
+      {
+        "text": "scores severity",
+        "passed": true,
+        "evidence": "Provided severity ratings"
+      }
+    ],
+    "summary": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3,
+      "pass_rate": 1.0
+    }
+  }
+}
