@@ -5,7 +5,40 @@ Rotate through all 57 skills, testing 5 per month. Each month runs:
 2. Trigger query testing (20 queries per skill)
 3. Description optimization if accuracy drops below 85%
 
-## Month 1 — Agent & Accessibility
+## Workspace Structure
+
+Per the skill-evaluator spec:
+
+```
+<skill-name>-workspace/
+└── iteration-1/
+    ├── eval-1/
+    │   ├── with_skill/
+    │   │   ├── response.md
+    │   │   ├── timing.json
+    │   │   └── grading.json
+    │   └── without_skill/
+    │       ├── response.md
+    │       ├── timing.json
+    │       └── grading.json
+    ├── eval-2/...
+    ├── eval-3/...
+    ├── benchmark.json
+    └── grading.json
+```
+
+## Month 1 — Agent & Accessibility (COMPLETED)
+
+| Skill | With Skill | Without Skill | Delta | Verdict |
+|-------|-----------|---------------|-------|---------|
+| accessibility-auditor | 3/3 (100%) | 3/3 (100%) | 0 | PASS |
+| agent-browser | 3/3 (100%) | 2/3 (67%) | +1 | PASS |
+| agent-coordination | 3/3 (100%) | 2/3 (67%) | +1 | PASS |
+| agents-md | 3/3 (100%) | 3/3 (100%) | 0 | PASS |
+| anti-ai-slop | 3/3 (100%) | 3/3 (100%) | 0 | PASS |
+
+**Average delta**: +0.4 assertions
+**Key finding**: agent-browser and agent-coordination show skill value (snapshot refs and quality gates respectively)
 
 | Skill | Cluster | Focus |
 |-------|---------|-------|
