@@ -1,0 +1,24 @@
+{
+  "skill": "goap-agent",
+  "optimization_round": 1,
+  "before": {
+    "description": "Invoke for complex multi-step tasks requiring intelligent planning and multi-agent coordination. Use when tasks need decomposition, dependency mapping, parallel/sequential/swarm/iterative execution strategies, or coordination of multiple specialized agents with quality gates.",
+    "keyword_accuracy": 0.75,
+    "pushy_markers": 0
+  },
+  "after": {
+    "description": "Orchestrates complex multi-step tasks with intelligent planning: analyze the problem, decompose into sub-goals, select execution strategy, assign agents, and coordinate with quality gates. Use this skill when the user asks to plan a large change, break down a complex problem, coordinate multiple agents, or systematically tackle a multi-file refactoring — even if they just say 'plan this out' or 'how should we approach this'. Not for simple single-step tasks (use delegate), parallel-only execution (use parallel-execution), or implementing from an approved plan (use implementer).",
+    "keyword_accuracy": 1.0,
+    "pushy_markers": 2
+  },
+  "key_changes": [
+    "Added lifecycle flow: analyze → decompose → strategize → assign → coordinate",
+    "Added pushy triggers: 'plan a large change', 'break down a complex problem', 'systematically tackle'",
+    "Added 'even if they' language: 'plan this out', 'how should we approach this'",
+    "Added negative triggers: 'Not for simple single-step tasks', 'parallel-only execution', 'implementing from an approved plan'"
+  ],
+  "trigger_tests": [
+    {"query": "plan out how to implement this feature across the codebase", "correctly_triggered": "goap-agent", "correct": true},
+    {"query": "run these three tasks in parallel", "correctly_triggered": "parallel-execution", "correct": true}
+  ]
+}
