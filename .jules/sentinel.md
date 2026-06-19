@@ -135,3 +135,8 @@
 **Vulnerability:** Command categorization normalization stripped shell metacharacters like `$`, `{`, and `}`, which allowed bypasses like `curl${IFS}url` because they were merged into `curlifsurl`, evading boundary-based keyword detection.
 **Learning:** Stripping metacharacters used as separators or variable expansions can lead to "keyword merging" where the intended command and its adjacent syntax are joined, bypassing filters.
 **Prevention:** Normalize command input by replacing shell metacharacters (e.g., `;`, `&`, `|`, `$`, `{`, `}`, `(`, `)`, `[`, `]`, `<`, `>`, `,`) with spaces instead of stripping them. This ensures tokens remain separated and correctly identifiable by boundary-based regexes.
+
+## 2026-06-25 - Command Categorization Bypass via Multi-line Obfuscation and Script Execution
+**Vulnerability:** Command categorization could be bypassed using backslash-newline combinations (e.g., `r\nm`) which Bash interprets as a single command. Additionally, `source` and `.` (dot command) were not flagged, allowing arbitrary script execution.
+**Learning:** Security filters must account for all shell-level obfuscation, including multi-line splits. Administrative commands and script execution primitives (`source`, `.`) and package managers (`npm`, `pnpm`, `cargo`, etc.) are high-risk vectors that should be categorized as dangerous/interpreters.
+**Prevention:** Normalize command strings by removing backslash-newline (`\n`) as the first step of normalization. Include `source`, literal dot `\.`, and all common package managers/build tools in the dangerous/interpreter keyword lists.
