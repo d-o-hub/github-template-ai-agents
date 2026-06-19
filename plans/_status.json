@@ -34,6 +34,10 @@
     "adr-028-ci-status-staleness-external-dep.md": {
       "status": "accepted",
       "date": "2026-06-19"
+    },
+    "adr-029-add-cli-interface.md": {
+      "status": "accepted",
+      "date": "2026-06-19"
     }
   }
 }

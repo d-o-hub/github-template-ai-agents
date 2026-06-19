@@ -1,4 +1,4 @@
-.PHONY: all ci fmt lint test quality bootstrap doctor help
+.PHONY: all ci fmt lint test quality bootstrap doctor help cli
 
 all: ci
 
@@ -28,4 +28,7 @@ bootstrap: ## Bootstrap the repo (skills, hooks, validation)
 
 doctor: ## Run environment diagnostics
 	@./scripts/doctor.sh
+
+cli: ## Show CLI help
+	@./bin/agent-toolkit help
 

@@ -61,6 +61,7 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 ```bash
 ./scripts/bootstrap.sh # One-command setup: skills + hook + validate + quality gate
 ./scripts/doctor.sh    # Run anytime to diagnose environment issues
+./bin/agent-toolkit    # Unified CLI: setup, doctor, quality, validate, analyze, fix, eval, docs
 ```
 
 ## Session Bootstrap

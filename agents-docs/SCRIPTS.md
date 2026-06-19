@@ -7,6 +7,7 @@
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
+| `agent-toolkit.sh` | Unified CLI — wraps all scripts under one command | `./bin/agent-toolkit help` |
 | `bootstrap.sh` | Single-command first-time setup (skills + hook + validate + gate) | `./scripts/bootstrap.sh` |
 | `doctor.sh` | Environment diagnostics for self-service troubleshooting | `./scripts/doctor.sh` |
 | `quality_gate.sh` | Multi-language quality gate (lint, test, format) | `./scripts/quality_gate.sh` |

@@ -41,6 +41,17 @@ Bootstrap complete. Repository is ready for AI agent workflows.
 
 `bootstrap.sh` is idempotent — re-run it any time to repair the environment.
 
+### CLI (optional)
+
+After setup, you can use the unified `agent-toolkit` CLI instead of calling scripts directly:
+
+```bash
+./bin/agent-toolkit help       # Show all commands
+./bin/agent-toolkit doctor     # Environment diagnostics
+./bin/agent-toolkit quality    # Run quality gate
+./bin/agent-toolkit validate skills  # Validate skills only
+```
+
 ### Use this template on GitHub
 
 If you are starting from scratch, click **"Use this template"** on GitHub before
