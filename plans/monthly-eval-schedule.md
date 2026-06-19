@@ -40,15 +40,18 @@ Per the skill-evaluator spec:
 **Average delta**: +0.4 assertions
 **Key finding**: agent-browser and agent-coordination show skill value (snapshot refs and quality gates respectively)
 
-## Month 2 — API & Pipeline
+## Month 2 — API & Pipeline (COMPLETED)
 
-| Skill | Cluster | Focus |
-|-------|---------|-------|
-| api-design-first | platform | OpenAPI spec creation |
-| architecture-diagram | documentation | SVG diagram generation |
-| cicd-pipeline | workflow | Pipeline design (description optimized in session) |
-| cloudflare-worker-api | workflow | Worker route definition |
-| codacy | code-quality | Local Codacy CLI analysis |
+| Skill | With Skill | Without Skill | Delta | Verdict |
+|-------|-----------|---------------|-------|---------|
+| api-design-first | 4/4 (100%) | 4/4 (100%) | 0 | PASS |
+| architecture-diagram | 3/3 (100%) | 2/3 (67%) | +1 | PASS |
+| cicd-pipeline | 3/3 (100%) | 3/3 (100%) | 0 | PASS |
+| cloudflare-worker-api | 3/3 (100%) | 3/3 (100%) | 0 | PASS |
+| codacy | 2/2 (100%) | 2/2 (100%) | 0 | PASS |
+
+**Average delta**: +0.2 assertions
+**Key finding**: architecture-diagram shows skill value (script scanning live structure vs manual approach)
 
 ## Month 3 — Code Quality & Database
 
