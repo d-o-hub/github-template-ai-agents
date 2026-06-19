@@ -68,6 +68,7 @@ All start simultaneously.
 ### Patterns
 
 **Homogeneous Parallel** — Same agent type, different inputs:
+
 ```
 ├─ test-runner: Test module A
 ├─ test-runner: Test module B
@@ -75,6 +76,7 @@ All start simultaneously.
 ```
 
 **Heterogeneous Parallel** — Different agent types:
+
 ```
 ├─ code-reviewer: Quality analysis
 ├─ test-runner: Test execution
@@ -82,6 +84,7 @@ All start simultaneously.
 ```
 
 **Parallel with Convergence** — Parallel execution → Single synthesis:
+
 ```
 Phase 1: Parallel investigation
 Phase 2: Synthesize findings
@@ -96,6 +99,7 @@ Phase 2: Synthesize findings
 ### Error Handling
 
 One failing doesn't stop others:
+
 ```
 ├─ Agent A: ✓ Success
 ├─ Agent B: ✗ Failed
@@ -127,6 +131,7 @@ For dependent tasks with quality gates between phases:
 ## Common Patterns
 
 **Analysis + Execution**:
+
 ```text
 1. Swarm analysis (parallel agents gather insights)
 2. Sequential execution (apply findings)
@@ -134,6 +139,7 @@ For dependent tasks with quality gates between phases:
 ```
 
 **Test-Driven Workflow**:
+
 ```text
 1. test-runner: Run existing tests
 2. feature-implementer: Add functionality
@@ -142,6 +148,7 @@ For dependent tasks with quality gates between phases:
 ```
 
 **Performance Optimization**:
+
 ```text
 Loop with performance-optimizer until:
 - Metrics meet targets

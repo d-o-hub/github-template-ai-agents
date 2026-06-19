@@ -44,6 +44,10 @@
     "**/target/**",
     "**/vendor/**",
     ".git/**",
-    ".jules/**"
+    ".jules/**",
+    "**/*-workspace/**",
+    "**/skills-evaluation/**",
+    ".windsurf/**",
+    ".mimocode/**"
   ]
 }
