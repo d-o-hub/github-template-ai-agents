@@ -18,9 +18,9 @@
     grep -q "Reusing existing PR" .github/workflows/update-llms-txt.yml
 }
 
-@test "llms-txt workflow performs auto-merge with admin bypass" {
+@test "llms-txt workflow performs auto-merge" {
     grep -q 'gh pr merge "$NEW_PR"' .github/workflows/update-llms-txt.yml
-    grep -q "\-\-admin" .github/workflows/update-llms-txt.yml
+    grep -q "\-\-auto" .github/workflows/update-llms-txt.yml
     grep -q "\-\-squash" .github/workflows/update-llms-txt.yml
     grep -q "\-\-delete-branch=false" .github/workflows/update-llms-txt.yml
 }

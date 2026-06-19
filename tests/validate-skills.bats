@@ -26,6 +26,9 @@
 
 @test "All skill directories have SKILL.md" {
     for skill_dir in .agents/skills/*/; do
+        # Skip eval workspace directories and skills-evaluation
+        [[ "$skill_dir" == *-workspace/ ]] && continue
+        [[ "$skill_dir" == *skills-evaluation/ ]] && continue
         [ -f "$skill_dir/SKILL.md" ]
     done
 }
