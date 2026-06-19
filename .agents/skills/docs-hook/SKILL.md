@@ -1,6 +1,6 @@
 ---
 name: docs-hook
-version: "0.2.10"
+version: "0.3.0"
 description: Lightweight git hook integration for updating agents-docs with minimal tokens. Use this skill when updating agents-docs on commit or merge events to sync documentation — even if they just say "update the docs" or "sync the agent docs". Not for learn, agents-md.
 category: workflow
 license: MIT
@@ -25,16 +25,32 @@ Ultra-lightweight documentation sync via git hooks.
 ## Usage
 
 ```bash
-# After any commit that modifies .md files:
+# Full automatic sync (recommended):
+./scripts/post-commit-docs-sync.sh
+
+# Or use the lightweight docs-sync only:
 ./scripts/docs-sync.sh HEAD~1 HEAD
 ```
 
-Or add to `.git/hooks/post-commit`:
+## Automatic Sync on Commit
 
-```bash
-#!/bin/bash
-./scripts/docs-sync.sh HEAD~1 HEAD
-```
+The `post-commit-docs-sync.sh` script provides comprehensive documentation syncing:
+
+1. **Skill table updates**: Regenerates AGENTS.md skill table when `.agents/skills/` changes
+2. **LLM context regeneration**: Updates `llms.txt` and `llms-full.txt` when markdown changes
+3. **Agent registry sync**: Updates `AGENTS_REGISTRY.md` when agent configs change
+4. **Docs file sync**: Copies changed docs to appropriate directories
+5. **Commit amendment**: Automatically amends commit with updated documentation
+
+### Configuration
+
+Environment variables control behavior:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DOCS_SYNC_ENABLED` | `true` | Enable/disable docs sync |
+| `DOCS_SYNC_QUIET` | `false` | Suppress output messages |
+| `DOCS_SYNC_LLM_TXT` | `true` | Regenerate LLM context files |
 
 ## Minimal Token Workflow
 
@@ -42,9 +58,10 @@ Or add to `.git/hooks/post-commit`:
 2. **Sync**: Copy to target directory
 3. **Done**: No ML, no logging, no metrics
 
-## Working Script
+## Working Scripts
 
-See `scripts/docs-sync.sh` - the actual executable.
+- `scripts/post-commit-docs-sync.sh` - Full documentation sync orchestrator
+- `scripts/docs-sync.sh` - Lightweight file synchronization only
 
 ## See Also
 
