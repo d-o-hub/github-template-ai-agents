@@ -66,15 +66,18 @@ Per the skill-evaluator spec, workspaces live inside `.agents/skills/`:
 **Average delta**: +0.25 (excluding blocked)
 **Key finding**: css-render-performance shows skill value (decision flowchart and containment guidance)
 
-## Month 4 — Retrieval & Docs
+## Month 4 — Retrieval & Docs (COMPLETED)
 
-| Skill | Cluster | Focus |
-|-------|---------|-------|
-| delegate | agent | Context retrieval and handoff (optimized in session) |
-| dist-channel-selection | tool | Package publishing channel |
-| do-web-doc-resolver | tool | URL to markdown resolution |
-| docs-hook | workflow | Git hook documentation sync |
-| document-rendering-and-locators | workflow | Document rendering and anchoring |
+| Skill | With Skill | Without Skill | Delta | Verdict |
+|-------|-----------|---------------|-------|---------|
+| delegate | 3/3 (100%) | 3/3 (100%) | 0 | PASS |
+| dist-channel-selection | 4/5 (80%) | 3/5 (60%) | +1 | PASS |
+| do-web-doc-resolver | 4/4 (100%) | 3/4 (75%) | +1 | PASS |
+| docs-hook | 3/3 (100%) | 2/3 (67%) | +1 | PASS |
+| document-rendering-and-locators | 3/3 (100%) | 2/3 (67%) | +1 | PASS |
+
+**Average delta**: +0.8 assertions
+**Key finding**: 4 of 5 skills show skill value — dist-channel (VERSION/CHANGELOG guidance), do-web-doc (quality scoring), docs-hook (minimal overhead), document-rendering (fallback chain)
 
 ## Month 5 — Quality & Git
 
