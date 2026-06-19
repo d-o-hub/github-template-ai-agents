@@ -53,19 +53,17 @@ jobs:
             NEW_PR=$(gh pr view "$PR_URL" --json number --jq '.number')
             printf "Created PR #%s\n" "$NEW_PR"
           fi
-          # Auto-merge via squash; --admin bypasses required checks to avoid deadlock;
+          # Auto-merge via squash; --auto enables GitHub native auto-merge
+          # which waits for required checks then merges automatically.
           # [skip ci] prevents the merge commit from re-triggering this workflow.
-          if gh pr merge "$NEW_PR" \
-            --squash \
+          if gh pr merge "$NEW_PR" --auto --squash \
             --subject "ci: regenerate llms.txt and llms-full.txt [skip ci]" \
-            --admin \
             --delete-branch=false; then
-            printf "Auto-merged PR #%s\n" "$NEW_PR"
+            printf "Auto-merge enabled for PR #%s\n" "$NEW_PR"
           else
             EXIT_CODE=$?
             printf "WARNING: Auto-merge failed for PR #%s (exit %d)\n" \
               "$NEW_PR" "$EXIT_CODE" >&2
-            printf "PR will be merged once required checks pass\n"
           fi
         env:
           GH_TOKEN: ${{ github.token }}
