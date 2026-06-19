@@ -5,7 +5,7 @@ category: agent
 description: Execution agent skill focused on implementing changes based on an approved Blueprint. Use this skill for targeted, atomic code changes once the plan is solid — even if they just say "implement this" or "make the changes". Gated by human or primary agent approval of the implementation strategy.
 changelog:
   - 0.1.1: Initial stable version with mandatory TRIZ gate.
-  - 0.1.0: Draft version.
+  - 0.1.0: Draft version. Not for delegate, goap-agent.
 license: MIT
 ---
 

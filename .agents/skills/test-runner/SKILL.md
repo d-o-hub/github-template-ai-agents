@@ -1,6 +1,6 @@
 ---
 name: test-runner
-description: Execute tests, analyze results, and diagnose failures across any testing framework. Use this skill when running test suites, debugging failing tests, or configuring CI/CD testing pipelines — even if they just say "run the tests" or "why is this test failing".
+description: Execute tests, analyze results, and diagnose failures across any testing framework. Use this skill when running test suites, debugging failing tests, or configuring CI/CD testing pipelines — even if they just say "run the tests" or "why is this test failing". Not for testing-strategy, testdata-builders.
 version: "0.2.10"
 category: testing
 template_version: "0.2"

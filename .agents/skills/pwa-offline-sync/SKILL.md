@@ -2,7 +2,7 @@
 version: "0.2.10"
 name: pwa-offline-sync
 description: >
-  Design Cache Storage + IndexedDB strategy and sync queue. Use this skill when building service workers, implementing caching strategies, or investigating offline bugs — even if they just say "make it work offline" or "add caching". Generic pattern for any offline-first application.
+  Design Cache Storage + IndexedDB strategy and sync queue. Use this skill when building service workers, implementing caching strategies, or investigating offline bugs — even if they just say "make it work offline" or "add caching". Generic pattern for any offline-first application. Not for lifecycle-management.
 category: workflow
 license: MIT
 ---

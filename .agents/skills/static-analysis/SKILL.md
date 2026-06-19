@@ -2,7 +2,7 @@
 name: static-analysis
 version: 1.0.0
 category: code-quality
-description: Triage and fix static analysis findings across any programming language. Use this skill when running linters (ruff, eslint, clippy, shellcheck), analyzing lint output, fixing warnings or errors, or managing cross-language static analysis results in a project — even if they just say "run the linter" or "fix the lint warnings". Trigger on "lint", "static analysis", "triage warnings", "fix findings".
+description: Triage and fix static analysis findings across any programming language. Use this skill when running linters (ruff, eslint, clippy, shellcheck), analyzing lint output, fixing warnings or errors, or managing cross-language static analysis results in a project — even if they just say "run the linter" or "fix the lint warnings". Trigger on "lint", "static analysis", "triage warnings", "fix findings". Not for code-review-assistant, security-code-auditor.
 license: MIT
 ---
 

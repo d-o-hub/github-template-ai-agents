@@ -2,7 +2,7 @@
 version: "0.2.10"
 name: secure-invite-and-access
 description: >
-  Implement access control, authentication, and authorization patterns. Use this skill when building auth endpoints, managing permissions, implementing session/token logic, or generating signed URLs — even if they just say "add auth" or "secure this endpoint". Generic template adaptable to any project's auth needs.
+  Implement access control, authentication, and authorization patterns. Use this skill when building auth endpoints, managing permissions, implementing session/token logic, or generating signed URLs — even if they just say "add auth" or "secure this endpoint". Generic template adaptable to any project's auth needs. Not for security-code-auditor, api-design-first.
 category: workflow
 license: MIT
 ---

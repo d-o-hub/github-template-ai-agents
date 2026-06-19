@@ -2,7 +2,7 @@
 name: ui-ux-optimize
 description: >
   Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination,
-  confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, or any screen-based product — even if they just say "improve the UI" or "optimize the UX".
+  confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, or any screen-based product — even if they just say "improve the UI" or "optimize the UX". Not for anti-ai-slop, css-render-performance.
 version: "0.2.10"
 category: ui-ux
 license: MIT

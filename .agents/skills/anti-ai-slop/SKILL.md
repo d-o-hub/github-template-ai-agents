@@ -1,7 +1,7 @@
 ---
 name: anti-ai-slop
 description: >
-  Apply this skill to avoid generic "AI slop" in UI, UX, and copy. Use this skill when the user asks to make something feel less AI-generated, audit copy for AI slop, humanize text, fix UX writing, or improve anti-design — even if they just say "this feels robotic" or "make it sound human".
+  Apply this skill to avoid generic "AI slop" in UI, UX, and copy. Use this skill when the user asks to make something feel less AI-generated, audit copy for AI slop, humanize text, fix UX writing, or improve anti-design — even if they just say "this feels robotic" or "make it sound human". Not for ui-ux-optimize.
 version: "0.2.10"
 category: ui-ux
 license: MIT

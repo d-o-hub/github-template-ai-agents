@@ -2,7 +2,7 @@
 version: "0.2.10"
 name: cloudflare-worker-api
 description: >
-  Structure Worker API routes and handlers. Use this skill when defining Cloudflare Worker routes, building response helpers, or implementing typed handler patterns — even if they just say "set up the worker routes" or "add an API endpoint to the worker". Auth belongs to secure-invite-and-access.
+  Structure Worker API routes and handlers. Use this skill when defining Cloudflare Worker routes, building response helpers, or implementing typed handler patterns — even if they just say "set up the worker routes" or "add an API endpoint to the worker". Auth belongs to secure-invite-and-access. Not for api-design-first, cicd-pipeline.
 category: workflow
 license: MIT
 ---

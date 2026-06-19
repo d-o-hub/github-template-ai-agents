@@ -2,7 +2,7 @@
 name: security-code-auditor
 version: "0.2.10"
 category: security
-description: Perform security audits on code to identify vulnerabilities, misconfigurations, and security anti-patterns. Use when users ask to 'audit', 'review', or 'check security' of code, configurations, or repositories — even if they just say "check for security issues" or "is this secure". Trigger on keywords like 'security review', 'vulnerability scan', 'OWASP', 'secure coding', 'penetration test', or 'security assessment'.
+description: Perform security audits on code to identify vulnerabilities, misconfigurations, and security anti-patterns. Use when users ask to 'audit', 'review', or 'check security' of code, configurations, or repositories — even if they just say "check for security issues" or "is this secure". Trigger on keywords like 'security review', 'vulnerability scan', 'OWASP', 'secure coding', 'penetration test', or 'security assessment'. Not for email/PII checks (use privacy-first), EU AI Act compliance (use eu-ai-act-compliance), or linter-based checks (use static-analysis).
 license: MIT
 ---
 

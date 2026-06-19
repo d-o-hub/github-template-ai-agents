@@ -1,7 +1,7 @@
 ---
 name: learn
 version: "0.2.10"
-description: Extract non-obvious session learnings, patterns, and discoveries into scoped AGENTS.md files. Use this skill after completing non-trivial tasks, when the user says "extract learnings", "save patterns", "update AGENTS.md", or whenever the session has produced insights that should be captured for future reference — even if they just say "what did we learn" or "save this for later".
+description: Extract non-obvious session learnings, patterns, and discoveries into scoped AGENTS.md files. Use this skill after completing non-trivial tasks, when the user says "extract learnings", "save patterns", "update AGENTS.md", or whenever the session has produced insights that should be captured for future reference — even if they just say "what did we learn" or "save this for later". Not for agents-md, skill-creator.
 category: knowledge-management
 trigger: after non-trivial task completion
 license: MIT

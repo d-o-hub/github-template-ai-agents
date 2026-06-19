@@ -2,7 +2,7 @@
 name: agents-md
 version: "0.2.10"
 category: documentation
-description: Create AGENTS.md files with production-ready best practices. Use this skill when creating new AGENTS.md files, implementing quality gates, or updating agent documentation — even if they just say "add an AGENTS.md" or "set up agent guidance".
+description: Create AGENTS.md files with production-ready best practices. Use this skill when creating new AGENTS.md files, implementing quality gates, or updating agent documentation — even if they just say "add an AGENTS.md" or "set up agent guidance". Not for readme-best-practices, skill-creator.
 license: MIT
 ---
 

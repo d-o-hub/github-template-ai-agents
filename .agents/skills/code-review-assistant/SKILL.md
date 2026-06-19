@@ -2,7 +2,7 @@
 name: code-review-assistant
 version: "0.2.10"
 category: code-quality
-description: Automated code review with PR analysis, change summaries, quality checks, and code smell detection. Use this skill when reviewing pull requests, generating review comments, checking against best practices, identifying code smells, or providing refactoring guidance — even if they just say "review this" or "look at this PR".
+description: Automated code review with PR analysis, change summaries, quality checks, and code smell detection. Use this skill when reviewing pull requests, generating review comments, checking against best practices, identifying code smells, or providing refactoring guidance — even if they just say "review this" or "look at this PR". Not for static-analysis, security-code-auditor.
 license: MIT
 ---
 

@@ -2,7 +2,7 @@
 name: dist-channel-selection
 version: "0.2.10"
 category: tool
-description: Guide for selecting the correct distribution channel (npm, Cargo, etc.) based on artifact type and target audience. Use this skill when preparing to publish or release a new version of a package — even if they just say "publish this" or "release it".
+description: Guide for selecting the correct distribution channel (npm, Cargo, etc.) based on artifact type and target audience. Use this skill when preparing to publish or release a new version of a package — even if they just say "publish this" or "release it". Not for cicd-pipeline.
 license: MIT
 ---
 

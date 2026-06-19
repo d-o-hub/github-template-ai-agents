@@ -5,7 +5,7 @@ description: Monitor a GitHub pull request until it's merged, green, or blocked.
 compatibility: Any CLI agent (OpenCode, Claude, Codex, Cursor, etc.)
 metadata:
   source: https://github.com/openai/codex/tree/main/.codex/skills/babysit-pr
-  version: "1.0.0"
+  version: "1.0.0". Not for git-github-workflow.
 category: workflow
 license: MIT
 ---
