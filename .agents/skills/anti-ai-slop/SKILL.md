@@ -228,10 +228,12 @@ Anti-slop isn't just negation. These are the affirmative principles:
 - **Write for one person.** Not "users". Not "teams". The specific human who will read this specific sentence.
 
 ---
+
 ## See Also
 
 - `ui-ux-optimize` — UI/UX optimization with swarm agents
 - `css-render-performance` — CSS render performance optimization
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -239,11 +241,15 @@ Anti-slop isn't just negation. These are the affirmative principles:
 | "Users are used to this kind of UI anyway" | Familiarity with mediocrity isn't an excuse to propagate it. |
 | "It's faster to use the default AI-generated copy" | Fast slop is still slop. Quality requires human-like consideration and editing. |
 | "This doesn't need to be unique, it just needs to work" | Distinctiveness is part of 'working'. It builds brand trust and memorability. |
+
 ## Red Flags
+
 - [ ] Over-reliance on "modern" sans-serif fonts without stylistic justification
 - [ ] Using generic affirmations like "Absolutely!" in UX copy
 - [ ] Defaulting to 3-column feature grids for all content types
+
 ## References
+
 - `references/ui-alternatives.md` — Component-by-component replacements for slop UI
 - `references/ux-alternatives.md` — Flow-by-flow replacements for slop UX patterns
 - `references/copy-rewrites.md` — Before/after rewrites for the most common AI copy sins

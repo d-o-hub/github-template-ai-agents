@@ -127,5 +127,10 @@ fi
 
 # Count skills processed
 # Use printf to prevent option injection if SKILL_DATA starts with -
-SKILL_COUNT=$(printf "%s\n" "$SKILL_DATA" | grep -c "^" || echo 0)
+# perf: Use wc -l instead of grep -c to eliminate regex parsing overhead
+if [[ -z "$SKILL_DATA" ]]; then
+    SKILL_COUNT=0
+else
+    SKILL_COUNT=$(printf "%s\n" "$SKILL_DATA" | wc -l)
+fi
 echo "Generated $OUTPUT_FILE with $SKILL_COUNT skills"

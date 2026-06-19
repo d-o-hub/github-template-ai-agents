@@ -224,6 +224,7 @@ For quality-critical operations:
 4. **Only proceed when validation passes**
 5. Run tests: `bats tests/script.bats`
 6. If tests fail, return to step 1
+
 ## References
 
 - **[SHELLCHECK.md](SHELLCHECK.md)** - Complete ShellCheck guide and fix patterns
@@ -232,10 +233,12 @@ For quality-critical operations:
 - **[PATTERNS.md](PATTERNS.md)** - Common patterns and examples
 - **[CONFIG.md](CONFIG.md)** - Configuration and setup details
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
+
 ## See Also
 
 - `static-analysis` — Linter triage across any language
 - `cicd-pipeline` — CI/CD for shell script testing
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -243,6 +246,7 @@ For quality-critical operations:
 | "ShellCheck warnings are false positives" | Most SC warnings catch real bugs; suppress with documented reason, not dismissal. |
 | "BATS tests take too long to write" | Untested scripts break silently in production; test time is investment, not waste. |
 | "set -e is too strict for my script" | Scripts without -e silently swallow errors and leave systems in inconsistent states. |
+
 ## Red Flags
 
 - [ ] Running shell scripts without set -euo pipefail
