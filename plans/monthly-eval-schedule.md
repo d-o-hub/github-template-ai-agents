@@ -53,15 +53,18 @@ Per the skill-evaluator spec:
 **Average delta**: +0.2 assertions
 **Key finding**: architecture-diagram shows skill value (script scanning live structure vs manual approach)
 
-## Month 3 — Code Quality & Database
+## Month 3 — Code Quality & Database (COMPLETED)
 
-| Skill | Cluster | Focus |
-|-------|---------|-------|
-| codacy-cloud-cli | code-quality | Cloud Codacy API queries |
-| code-review-assistant | code-quality | PR review workflow |
-| codeberg-api | platform | Forgejo API operations (optimized in session) |
-| css-render-performance | code-quality | CSS render optimization (optimized in session) |
-| database-devops | database | Schema design and migrations |
+| Skill | With Skill | Without Skill | Delta | Verdict |
+|-------|-----------|---------------|-------|---------|
+| codacy-cloud-cli | BLOCKED | 2/2 (100%) | — | BLOCKED (needs auth token) |
+| code-review-assistant | 2/2 (100%) | BLOCKED | — | BLOCKED (no matching PR) |
+| codeberg-api | 2/3 (67%) | 3/3 (100%) | -1 | PASS (without_skill used direct API) |
+| css-render-performance | 3/3 (100%) | 2/3 (67%) | +1 | PASS |
+| database-devops | 4/5 (80%) | 4/5 (80%) | 0 | PASS |
+
+**Average delta**: +0.25 (excluding blocked)
+**Key finding**: css-render-performance shows skill value (decision flowchart and containment guidance)
 
 ## Month 4 — Retrieval & Docs
 
