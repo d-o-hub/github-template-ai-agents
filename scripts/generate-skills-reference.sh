@@ -162,5 +162,10 @@ mkdir -p "$(dirname -- "$OUTPUT_FILE")"
     done
 } > "$OUTPUT_FILE"
 
-SKILL_COUNT=$(printf '%s\n' "$SKILL_DATA" | grep -c '^' || true)
+# perf: Use wc -l instead of grep -c to eliminate regex parsing overhead
+if [[ -z "$SKILL_DATA" ]]; then
+    SKILL_COUNT=0
+else
+    SKILL_COUNT=$(printf '%s\n' "$SKILL_DATA" | wc -l)
+fi
 printf 'Generated %s with %s skills\n' "$OUTPUT_FILE" "$SKILL_COUNT"

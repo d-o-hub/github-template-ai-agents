@@ -91,7 +91,8 @@ fi
 
 COMMAND_COUNT=0
 if [[ -n "$DISCOVERED_COMMANDS" ]]; then
-    COMMAND_COUNT=$(printf "%s\n" "$DISCOVERED_COMMANDS" | grep -c . || printf "0")
+    # perf: Use wc -l instead of grep -c to eliminate regex parsing overhead
+    COMMAND_COUNT=$(printf "%s\n" "$DISCOVERED_COMMANDS" | wc -l || printf "0")
 fi
 
 if ! $SILENT; then
@@ -118,7 +119,8 @@ if type get_changed_files &> /dev/null; then
 fi
 CHANGED_COUNT=0
 if [[ -n "$CHANGED_FILES" ]]; then
-    CHANGED_COUNT=$(printf "%s\n" "$CHANGED_FILES" | grep -c . || printf "0")
+    # perf: Use wc -l instead of grep -c to eliminate regex parsing overhead
+    CHANGED_COUNT=$(printf "%s\n" "$CHANGED_FILES" | wc -l || printf "0")
 fi
 
 if ! $SILENT; then
