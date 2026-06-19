@@ -42,3 +42,12 @@
 ✓ Pre-existing CI issue fixed
 ✓ Quality gate green
 ✓ PR created
+
+---
+
+# Blocked: CI Status Staleness
+
+**Status**: blocked
+**ADR**: `plans/adr-028-ci-status-staleness-external-dep.md`
+**Root Cause**: `.github/ci-status/ci-status.json` is stale because GitHub Actions hasn't completed a run on `main` after the latest push. This is an external dependency — the agent cannot update the CI status file directly.
+**Resolution**: Will self-resolve when the next CI run completes and `update-ci-status.py` updates the file. Expected window: 10–30 minutes after push.

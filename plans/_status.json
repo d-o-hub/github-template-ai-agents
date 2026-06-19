@@ -30,6 +30,10 @@
     "adr-027-ci-node24-migration.md": {
       "status": "accepted",
       "date": "2026-06-16"
+    },
+    "adr-028-ci-status-staleness-external-dep.md": {
+      "status": "accepted",
+      "date": "2026-06-19"
     }
   }
 }

@@ -54,6 +54,8 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 
 **Workflow for pre-existing issues**: load `.agents/skills/goap-agent/SKILL.md` (orchestrator) and `.agents/skills/agent-coordination/SKILL.md` (swarm dispatch). Retriever / Implementer / Verifier in parallel, atomic commits per issue, verify green before moving on. Full playbook: `agents-docs/AGENTS_GUIDANCE.md`.
 
+**Triage protocol for unfixable issues**: If a pre-existing failure cannot be fixed in the current run (e.g., external CI service stale, upstream dependency broken, requires human credential): (1) Create an ADR in `plans/` documenting the issue, root cause, and why it's out of scope. (2) Create a GOAP task in `plans/GOAP_STATE.md` with status `blocked` and the ADR link. (3) Ensure the current commit's quality gate passes — the branch must be green even if inherited issues remain. (4) Never skip, suppress, or mark as `done` an issue that remains open.
+
 ## Setup
 
 ```bash

@@ -24,7 +24,7 @@ This repository provides a unified harness for AI coding agents with consistent 
 
 - [task-decomposition](.agents/skills/task-decomposition/): Break complex tasks into atomic, actionable goals.
 - [goap-agent](.agents/skills/goap-agent/): Coordinate complex workflows using goal-oriented planning.
-- [self-fix-loop](.agents/skills/self-fix-loop/): Automatically fix CI and linting errors in an iterative loop.
+- [git-github-workflow](.agents/skills/git-github-workflow/): Orchestrate the full git-to-merge lifecycle with CI monitoring and auto-fix.
 - [shell-script-quality](.agents/skills/shell-script-quality/): Ensure high-quality shell scripts with ShellCheck and BATS.
 
 ## Optional
