@@ -235,16 +235,20 @@ PASS | NEEDS_WORK | FAIL — <one sentence>
 
 - `skill-creator` — Create and improve skills
 - `intent-classifier` — Route requests to appropriate skills
+
 ## Rationalizations
 
 | Rationalization | Reality |
 |-----------------|---------|
 | "The skill looks fine, I don't need to evaluate it" | Without structured evaluation, gaps in coverage and weak assertions remain invisible until production failure. |
 | "One eval case is enough to test the skill" | Single eval cases miss edge cases; multiple diverse cases reveal coverage gaps. |
+
 ## Red Flags
+
 - [ ] Skipping baseline comparison when evaluating skill improvement
 - [ ] Using vague or subjective assertions without concrete evidence paths
 - [ ] Declaring PASS without running at least one live prompt through the skill
+
 ## References
 
 - `references/evaluating-skills.md` — condensed eval workflow and grading guidance

@@ -233,6 +233,7 @@ Include:
 
 - `git-github-workflow` — Full commit-to-merge lifecycle
 - `cicd-pipeline` — CI/CD pipeline design and troubleshooting
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -240,10 +241,13 @@ Include:
 | "CI is just being flaky, I'll just merge it" | Flakiness masks real bugs. Rerun or fix, never ignore. |
 | "A human will review this anyway, I don't need to be perfect" | The sentinel's job is to save human reviewers time by catching low-hanging fruit. |
 | "This PR is small, I can skip the full monitoring loop" | Small PRs can have big impacts. Consistency is key to reliability. |
+
 ## Red Flags
+
 - [ ] Stopping the monitoring loop before a terminal outcome is reached
 - [ ] Ignoring actionable review feedback in favor of automated checks
 - [ ] Rerunning failed checks more than 3 times without diagnosing the root cause
+
 ## References
 
 - `references/heuristics.md` - CI/Review decision tree
