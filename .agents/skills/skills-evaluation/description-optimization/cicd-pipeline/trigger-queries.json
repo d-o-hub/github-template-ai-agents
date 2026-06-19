@@ -1,0 +1,22 @@
+[
+  {"query": "set up a GitHub Actions workflow for my Node.js project", "should_trigger": true},
+  {"query": "my CI pipeline is failing with a timeout error", "should_trigger": true},
+  {"query": "how do I add caching to my GitHub Actions workflow", "should_trigger": true},
+  {"query": "create a GitLab CI config for deploying to AWS", "should_trigger": true},
+  {"query": "my Forgejo Actions workflow isn't triggering on push", "should_trigger": true},
+  {"query": "optimize my pipeline to run jobs in parallel", "should_trigger": true},
+  {"query": "how do I manage secrets in my CI/CD pipeline", "should_trigger": true},
+  {"query": "set up a canary deployment strategy in my pipeline", "should_trigger": true},
+  {"query": "my CI checks are failing on my PR, fix them", "should_trigger": false},
+  {"query": "monitor this PR until all checks pass", "should_trigger": false},
+  {"query": "commit my changes and create a PR", "should_trigger": false},
+  {"query": "run the tests on my code", "should_trigger": false},
+  {"query": "lint my shell scripts", "should_trigger": false},
+  {"query": "check for security vulnerabilities in dependencies", "should_trigger": false},
+  {"query": "set up a pre-commit hook", "should_trigger": false},
+  {"query": "revert the last commit", "should_trigger": false},
+  {"query": "create a GitHub issue for this bug", "should_trigger": false},
+  {"query": "review this PR for code quality", "should_trigger": false},
+  {"query": "deploy my app to production", "should_trigger": false},
+  {"query": "set up a Docker container for my app", "should_trigger": false}
+]

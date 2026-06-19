@@ -1,0 +1,27 @@
+{
+  "skill": "cicd-pipeline",
+  "optimization_round": 1,
+  "before": {
+    "description": "Design and implement CI/CD pipelines with GitHub Actions, GitLab CI, and Forgejo Actions. Use this skill when the user asks to set up, optimize, or troubleshoot CI/CD pipelines, configure workflow triggers, manage secrets in pipelines, handle pipeline failures, or implement deployment strategies — even if they don't say 'CI/CD' explicitly.",
+    "length": 376,
+    "keyword_accuracy": 0.95,
+    "real_trigger_accuracy": 0.67
+  },
+  "after": {
+    "description": "Design and configure CI/CD pipelines with GitHub Actions, GitLab CI, and Forgejo Actions. Use this skill when the user asks to create a new workflow, set up pipeline triggers, configure caching or matrix builds, manage CI secrets, troubleshoot pipeline failures, or compare pipeline platforms — even if they don't say 'CI/CD' explicitly. Not for monitoring an existing PR's CI (use git-github-workflow) or executing deployments (use deployment-specific tooling).",
+    "length": 497,
+    "keyword_accuracy": 1.0,
+    "real_trigger_accuracy": 1.0
+  },
+  "key_changes": [
+    "Changed 'implement' to 'configure' (more specific to pipeline design)",
+    "Replaced generic 'set up, optimize, or troubleshoot' with specific actions: 'create a new workflow', 'set up pipeline triggers', 'configure caching or matrix builds'",
+    "Added 'compare pipeline platforms' (leverages the Platform Comparison section)",
+    "Added negative triggers: 'Not for monitoring an existing PR's CI (use git-github-workflow) or executing deployments (use deployment-specific tooling)'"
+  ],
+  "trigger_tests": [
+    {"query": "deploy my app to production", "correctly_not_triggered": true, "correct": true},
+    {"query": "set up a GitHub Actions workflow", "correctly_triggered": "cicd-pipeline", "correct": true},
+    {"query": "my CI checks are failing on my PR", "correctly_triggered": "git-github-workflow", "correct": true}
+  ]
+}
