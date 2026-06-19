@@ -62,6 +62,7 @@ cat > "$HOOKS_DIR/post-commit" << 'HOOK'
 #!/bin/bash
 # Auto-update documentation when skills/agents change
 # Runs after each commit to keep docs in sync
+# Uses post-commit-docs-sync.sh for full documentation lifecycle
 
 # Get the repository root dynamically
 # Why git rev-parse? The hook runs from .git/hooks/, not repo root.
@@ -69,43 +70,9 @@ cat > "$HOOKS_DIR/post-commit" << 'HOOK'
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo ".")"
 cd "$REPO_ROOT" || exit 1
 
-# Get the previous commit hash
-# HEAD~1 = parent of current commit (what changed since last commit)
-PREV_COMMIT=$(git rev-parse HEAD~1 2>/dev/null || echo "")
-
-if [[ -z "$PREV_COMMIT" ]]; then
-    # First commit - skip (nothing to diff against)
-    exit 0
-fi
-
-# Get list of changed files between previous and current commit
-# We use this to determine if we need to regenerate docs
-CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
-
-# Update skill table if skills changed
-# The pattern matches any file under .agents/skills/ directory
-printf "%s\n" "$CHANGED_FILES" | grep -q -- ".agents/skills/" && {
-    echo "Skills changed - updating AGENTS.md..."
-    "$REPO_ROOT/scripts/update-agents-md.sh"
-    git add AGENTS.md
-    # Amend the commit to include the updated AGENTS.md
-    if ! git commit --amend --no-edit 2>/dev/null; then
-        echo "Warning: Failed to amend commit with updated AGENTS.md"
-    fi
-}
-
-# Update registry if agents changed  
-# The pattern matches files in .claude/, .opencode/, etc. agent directories
-printf "%s\n" "$CHANGED_FILES" | grep -qE -- "\.(claude|opencode)/agents/" && {
-    echo "Agents changed - updating AGENTS_REGISTRY.md..."
-    "$REPO_ROOT/scripts/update-agents-registry.sh"
-    git add agents-docs/AGENTS_REGISTRY.md
-    if ! git commit --amend --no-edit 2>/dev/null; then
-        echo "Warning: Failed to amend commit with updated AGENTS_REGISTRY.md"
-    fi
-}
-
-exit 0
+# Delegate to the comprehensive docs sync script
+# This handles: skill table updates, LLM context regeneration, docs-sync, and commit amendment
+exec "$REPO_ROOT/scripts/post-commit-docs-sync.sh"
 HOOK
 
 chmod +x -- "$HOOKS_DIR/post-commit"

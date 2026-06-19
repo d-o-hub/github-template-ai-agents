@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "metadata": {
+    "source": "local",
+    "provider": null,
+    "organization": null,
+    "repositoryId": null,
+    "repositoryName": null,
+    "createdAt": "2026-06-19T09:51:01.050Z",
+    "updatedAt": "2026-06-19T09:51:01.050Z",
+    "languages": [
+      "HTML",
+      "JSON",
+      "Javascript",
+      "Markdown",
+      "Python",
+      "Shell",
+      "TypeScript",
+      "YAML"
+    ]
+  },
+  "tools": [
+    {
+      "toolId": "shellcheck",
+      "localConfigurationFile": "/workspaces/github-template-ai-agents/.shellcheckrc",
+      "useLocalConfigurationFile": true,
+      "patterns": []
+    }
+  ],
+  "exclude": [
+    "target/**",
+    "node_modules/**",
+    "vendor/**",
+    "**/dist/**",
+    "**/build/**",
+    ".claude/skills/**",
+    ".qwen/skills/**",
+    ".agents/skills/do-web-doc-resolver/scripts/providers/docling.py",
+    ".agents/skills/skill-creator/scripts/run_loop.py",
+    ".agents/skills/do-web-doc-resolver/tests/integration/**",
+    "tests/test_update_ci_status.py",
+    ".agents/skills/agent-browser/templates/**"
+  ]
+}
