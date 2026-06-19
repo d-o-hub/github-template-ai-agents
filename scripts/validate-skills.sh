@@ -49,8 +49,8 @@ for skill_path in "$SKILLS_SRC"/*/; do
     skill_name="${skill_path%/}"
     skill_name="${skill_name##*/}"
     
-    # Skip consolidated/backup folders
-    if [[ "$skill_name" == _* ]]; then
+    # Skip consolidated/backup folders, eval workspace directories, and skills-evaluation
+    if [[ "$skill_name" == _* ]] || [[ "$skill_name" == *-workspace ]] || [[ "$skill_name" == skills-evaluation ]]; then
         continue
     fi
     
@@ -133,8 +133,8 @@ for skill_path in "$SKILLS_SRC"/*/; do
     skill_name="${skill_path%/}"
     skill_name="${skill_name##*/}"
 
-    # Skip consolidated/backup folders
-    if [[ "$skill_name" == _* ]]; then
+    # Skip consolidated/backup folders, eval workspace directories, and skills-evaluation
+    if [[ "$skill_name" == _* ]] || [[ "$skill_name" == *-workspace ]] || [[ "$skill_name" == skills-evaluation ]]; then
         continue
     fi
 
