@@ -79,15 +79,18 @@ Per the skill-evaluator spec, workspaces live inside `.agents/skills/`:
 **Average delta**: +0.8 assertions
 **Key finding**: 4 of 5 skills show skill value — dist-channel (VERSION/CHANGELOG guidance), do-web-doc (quality scoring), docs-hook (minimal overhead), document-rendering (fallback chain)
 
-## Month 5 — Quality & Git
+## Month 5 — Quality & Git (COMPLETED)
 
-| Skill | Cluster | Focus |
-|-------|---------|-------|
-| dogfood | quality | Web app exploratory testing |
-| dora-report | devops | Monthly metrics reporting |
-| durable-objects | platform | Cloudflare DO patterns (optimized in session) |
-| eu-ai-act-compliance | compliance | EU AI Act requirements |
-| git-github-workflow | workflow | Full lifecycle (optimized in session) |
+| Skill | With Skill | Without Skill | Delta | Verdict |
+|-------|-----------|---------------|-------|---------|
+| dogfood | 2/3 (67%) | 2/3 (67%) | 0 | PASS (localhost not running) |
+| dora-report | 3/3 (100%) | 2/3 (67%) | +1 | PASS |
+| durable-objects | 4/4 (100%) | 3/4 (75%) | +1 | PASS |
+| eu-ai-act-compliance | 3/3 (100%) | 3/3 (100%) | 0 | PASS |
+| git-github-workflow | 3/3 (100%) | 3/3 (100%) | 0 | PASS |
+
+**Average delta**: +0.4 assertions
+**Key finding**: dora-report shows skill value (agentic metrics and TRIZ opportunities), durable-objects shows skill value (RPC methods and SQLite schema)
 
 ## Month 6 — Orchestration
 
