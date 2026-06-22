@@ -140,3 +140,13 @@
 **Vulnerability:** Command categorization could be bypassed using backslash-newline combinations (e.g., `r\nm`) which Bash interprets as a single command. Additionally, `source` and `.` (dot command) were not flagged, allowing arbitrary script execution.
 **Learning:** Security filters must account for all shell-level obfuscation, including multi-line splits. Administrative commands and script execution primitives (`source`, `.`) and package managers (`npm`, `pnpm`, `cargo`, etc.) are high-risk vectors that should be categorized as dangerous/interpreters.
 **Prevention:** Normalize command strings by removing backslash-newline (`\n`) as the first step of normalization. Include `source`, literal dot `\.`, and all common package managers/build tools in the dangerous/interpreter keyword lists.
+
+## 2026-06-26 - Command Categorization Bypass via Versioned Interpreters and env Wrapper
+**Vulnerability:** Command categorization logic used strict keyword matching for interpreters, allowing versioned binaries (e.g., `python2`, `node16`) to bypass detection. Additionally, the `env` command was not flagged, allowing it to be used as an execution wrapper to potentially bypass environment-based security controls.
+**Learning:** Security filters must account for versioning suffixes in command names and flag generic execution wrappers that can be used to manipulate the execution environment.
+**Prevention:** Use regex patterns that allow for optional version numbers and dots after known interpreter keywords. Include `env` in the dangerous/destructive keyword lists to ensure it is flagged for review.
+
+## 2026-06-26 - Standardized Path Validation in Eval Executors
+**Vulnerability:** The `run_file_validation` function in `scripts/lib/eval_executors.py` used a custom, potentially incomplete implementation for path traversal protection instead of the centralized utility.
+**Learning:** Decentralized security logic leads to inconsistent enforcement and increased maintenance surface. Standardized utilities should be used across all components.
+**Prevention:** Enforce the use of `validate_safe_path` from `scripts/lib/paths.py` for all path-related security checks to ensure consistent traversal prevention and forbidden directory enforcement.
