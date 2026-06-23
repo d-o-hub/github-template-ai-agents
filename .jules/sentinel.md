@@ -150,3 +150,8 @@
 **Vulnerability:** The `run_file_validation` function in `scripts/lib/eval_executors.py` used a custom, potentially incomplete implementation for path traversal protection instead of the centralized utility.
 **Learning:** Decentralized security logic leads to inconsistent enforcement and increased maintenance surface. Standardized utilities should be used across all components.
 **Prevention:** Enforce the use of `validate_safe_path` from `scripts/lib/paths.py` for all path-related security checks to ensure consistent traversal prevention and forbidden directory enforcement.
+
+## 2026-06-27 - Hardening Command Categorization and Fixing Versioned Script False Positives
+**Vulnerability:** Versioned scripts (e.g., `python3.11.sh`) were incorrectly flagged as dangerous while unversioned ones (`python.sh`) were correctly ignored due to overly specific negative lookahead regexes. Additionally, administrative commands (`su`, `systemctl`) and package managers (`composer`, `bundle`) were missing from security keyword lists.
+**Learning:** Regex-based security filters must account for versioning suffixes in command names to ensure consistent application of categorization and exclusion rules.
+**Prevention:** Utilize `[0-9.]*` in command name regexes when matching or excluding interpreters to handle versioned binaries consistently across the security library.
