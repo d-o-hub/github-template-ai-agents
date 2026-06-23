@@ -4,6 +4,10 @@ module.exports = {
   // due to long URLs in changelog/release notes references
   ignores: [
     (commit) => commit.includes('Signed-off-by: dependabot[bot]'),
+    // Ignore bot-generated merge/squash commits (emoji prefix in PR title)
+    (message) => /^\p{Emoji_Presentation}/u.test(message.split('\n')[0]),
+    // Ignore commits with bot co-author trailers (squash merge body)
+    (message) => /^\* /m.test(message) && /^Co-authored-by:.*\[bot\]/m.test(message),
   ],
   rules: {
     'header-max-length': [2, 'always', 150],
