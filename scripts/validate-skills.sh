@@ -143,34 +143,8 @@ for skill_path in "$SKILLS_SRC"/*/; do
 
     skill_failed=0
 
-    # Extract frontmatter and section checks in a single native pass to avoid subshell overhead
-    skill_front_name=""
-    has_category=""
-    has_rationalizations=0
-    has_red_flags=0
-
-    # Load content natively to avoid multiple grep/awk processes per skill
-    content=$(< "$skill_file")
-
-    # Extract frontmatter safely using bash parameter expansion
-    content_no_top="${content#---$'\n'}"
-    fm="${content_no_top%%$'\n'---*}"
-
-    if [[ "$fm" =~ (^|$'\n')name:[[:space:]]*([^$'\n'$'\r']+) ]]; then
-        skill_front_name="${BASH_REMATCH[2]}"
-    fi
-
-    if [[ "$fm" =~ (^|$'\n')category: ]]; then
-        has_category="yes"
-    fi
-
-    if [[ "$content" =~ (^|$'\n')"## Rationalizations" ]]; then
-        has_rationalizations=1
-    fi
-
-    if [[ "$content" =~ (^|$'\n')"## Red Flags" ]]; then
-        has_red_flags=1
-    fi
+    # Extract name field from frontmatter
+    skill_front_name=$(awk '/^---$/{n++} n==1 && /^name:/{sub(/^name:[ \t]*/, ""); print; exit}' "$skill_file")
 
     # Check: name field must not contain uppercase, spaces, or non-hyphen special chars
     if [[ -n "$skill_front_name" ]]; then
@@ -181,18 +155,21 @@ for skill_path in "$SKILLS_SRC"/*/; do
     fi
 
     # Check: frontmatter must contain category field
+    has_category=$(awk '/^---$/{n++} n==1 && /^category:/{print "yes"; exit}' "$skill_file")
     if [[ -z "$has_category" ]]; then
         printf "  ${RED}✗${NC} %s: Missing 'category' field in frontmatter\n" "$skill_name"
         skill_failed=1
     fi
 
     # Check: body must contain ## Rationalizations heading
+    has_rationalizations=$(grep -c "^## Rationalizations" "$skill_file" || true)
     if [[ "$has_rationalizations" -eq 0 ]]; then
         printf "  ${RED}✗${NC} %s: Missing '## Rationalizations' section\n" "$skill_name"
         skill_failed=1
     fi
 
     # Check: body must contain ## Red Flags heading
+    has_red_flags=$(grep -c "^## Red Flags" "$skill_file" || true)
     if [[ "$has_red_flags" -eq 0 ]]; then
         printf "  ${RED}✗${NC} %s: Missing '## Red Flags' section\n" "$skill_name"
         skill_failed=1
@@ -204,11 +181,7 @@ for skill_path in "$SKILLS_SRC"/*/; do
         printf "  ${RED}✗${NC} %s: Missing evals/evals.json\n" "$skill_name"
         skill_failed=1
     else
-        if command -v jq >/dev/null 2>&1; then
-            eval_count=$(jq '.evals | length' "$evals_file" 2>/dev/null || echo 0)
-        else
-            eval_count=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(len(d.get('evals', [])))" "$evals_file" 2>/dev/null || echo 0)
-        fi
+        eval_count=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(len(d.get('evals', [])))" "$evals_file" 2>/dev/null || echo 0)
         if [[ "$eval_count" -lt 3 ]]; then
             printf "  ${RED}✗${NC} %s: evals/evals.json has %d eval cases (need >= 3)\n" "$skill_name" "$eval_count"
             skill_failed=1
@@ -244,24 +217,13 @@ echo ""
 echo "Checking skill-rules.json..."
 RULES_FILE="$REPO_ROOT/.agents/skill-rules.json"
 if [[ -f "$RULES_FILE" ]]; then
-    if command -v jq >/dev/null 2>&1; then
-        if ! jq . "$RULES_FILE" >/dev/null 2>&1; then
-            printf "  ${RED}✗${NC} skill-rules.json: Invalid JSON\n" >&2
-            FAILED=1
-        else
-            RULES_COUNT=$(jq 'length' "$RULES_FILE" 2>/dev/null || echo 0)
-            printf "  ${GREEN}✓${NC} skill-rules.json: Valid JSON\n"
-            printf "  ${GREEN}✓${NC} skill-rules.json: %s rules defined\n" "$RULES_COUNT"
-        fi
+    if ! python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$RULES_FILE" 2>/dev/null; then
+        printf "  ${RED}✗${NC} skill-rules.json: Invalid JSON\n" >&2
+        FAILED=1
     else
-        if ! python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$RULES_FILE" 2>/dev/null; then
-            printf "  ${RED}✗${NC} skill-rules.json: Invalid JSON\n" >&2
-            FAILED=1
-        else
-            RULES_COUNT=$(python3 -c "import json, sys; print(len(json.load(open(sys.argv[1]))))" "$RULES_FILE")
-            printf "  ${GREEN}✓${NC} skill-rules.json: Valid JSON\n"
-            printf "  ${GREEN}✓${NC} skill-rules.json: %s rules defined\n" "$RULES_COUNT"
-        fi
+        RULES_COUNT=$(python3 -c "import json, sys; print(len(json.load(open(sys.argv[1]))))" "$RULES_FILE")
+        printf "  ${GREEN}✓${NC} skill-rules.json: Valid JSON\n"
+        printf "  ${GREEN}✓${NC} skill-rules.json: %s rules defined\n" "$RULES_COUNT"
     fi
 else
     echo "  (No skill-rules.json found)"
