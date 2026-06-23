@@ -8,9 +8,9 @@ set -euo pipefail
 SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get}"
 CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl}"
 # Destructive and administrative commands (strict boundaries)
-DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:\\.:env}"
+DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:\\.:env:su:systemctl}"
 # Language interpreters (broad boundaries to catch versioned ones like python3.11)
-INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip}"
+INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip:composer:bundle}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
 NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat}"
 
@@ -89,8 +89,8 @@ categorize_command() {
     # Allows optional trailing digits and dots immediately after the keyword.
     local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})[0-9.]*${broad_end_boundary}"
     if [[ "$cmd_lower" =~ $interpreter_regex ]]; then
-        # Negative lookahead alternative: ensure it is not a script file like python.sh
-        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})\.(sh|py|pl|rb|js) ]]; then
+        # Negative lookahead alternative: ensure it is not a script file like python3.11.sh
+        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})[0-9.]*\.(sh|py|pl|rb|js) ]]; then
              : # Matches script name, continue
         else
              printf "dangerous\n"
