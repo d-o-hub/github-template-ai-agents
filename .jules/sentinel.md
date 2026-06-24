@@ -155,3 +155,9 @@
 **Vulnerability:** Versioned scripts (e.g., `python3.11.sh`) were incorrectly flagged as dangerous while unversioned ones (`python.sh`) were correctly ignored due to overly specific negative lookahead regexes. Additionally, administrative commands (`su`, `systemctl`) and package managers (`composer`, `bundle`) were missing from security keyword lists.
 **Learning:** Regex-based security filters must account for versioning suffixes in command names to ensure consistent application of categorization and exclusion rules.
 **Prevention:** Utilize `[0-9.]*` in command name regexes when matching or excluding interpreters to handle versioned binaries consistently across the security library.
+
+## 2026-06-28 - Hardening Command Categorization and Path Validation
+
+**Vulnerability:** Dangerous commands like `shred` and `mkfs` were not explicitly flagged in security filters. Path validation allowed writing to sensitive directories like `bin`, `hooks`, and agent configurations.
+**Learning:** Security boundaries must be comprehensive and account for both command execution and file system access. Versioned destructive commands (e.g., `mkfs.ext4`) can bypass simple keyword filters if the regex is too restrictive. Agents should be programmatically prevented from tampering with their own orchestration, verification logic, or IDE configurations.
+**Prevention:** Add `shred` and `mkfs` to `DESTRUCTIVE_KEYWORDS`. Use a more robust regex `(\.[a-z0-9]+|[0-9.]*)?` for destructive command matching to catch extensions and versions while avoiding script name false positives. Expand `FORBIDDEN_OUTPUT_DIRS` in `scripts/lib/paths.py` to protect all sensitive repository areas.
