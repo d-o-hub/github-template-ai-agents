@@ -96,7 +96,7 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 ./scripts/archive-stale-plans.sh # Archive plans older than 60 days
 ```
 
-**Guard Rails:** Temporary files in `/tmp` only. Gitleaks enforced via CI. Pre-commit validates git config (`SKIP_GLOBAL_HOOKS_CHECK=true` to bypass).
+**Guard Rails:** Temporary files in `/tmp` only. Never create debug, scripts, reports, or similar temporary files in the repository root. Gitleaks enforced via CI. Pre-commit validates git config (`SKIP_GLOBAL_HOOKS_CHECK=true` to bypass).
 
 ## Code Style
 

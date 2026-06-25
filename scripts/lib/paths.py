@@ -4,7 +4,24 @@
 from __future__ import annotations
 from pathlib import Path
 
-FORBIDDEN_OUTPUT_DIRS = frozenset({".git", "scripts", ".agents", ".github"})
+FORBIDDEN_OUTPUT_DIRS = frozenset({
+    ".git",
+    "scripts",
+    ".agents",
+    ".github",
+    "bin",
+    "hooks",
+    ".githooks",
+    "plans",
+    "agents-docs",
+    ".claude",
+    ".qwen",
+    ".gemini",
+    ".windsurf",
+    ".cursor",
+    ".opencode",
+    ".commandcode",
+})
 
 
 class PathValidationError(Exception):
