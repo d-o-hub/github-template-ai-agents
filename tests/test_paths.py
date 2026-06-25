@@ -42,7 +42,11 @@ def test_validate_safe_path_forbidden(tmp_path):
     base = tmp_path / "repo"
     base.mkdir()
     for forbidden in FORBIDDEN_OUTPUT_DIRS:
-        (base / forbidden).mkdir()
+        # Create parent directories if forbidden is nested (none are now, but good practice)
+        forbidden_path = base / forbidden
+        forbidden_path.parent.mkdir(parents=True, exist_ok=True)
+        forbidden_path.mkdir(exist_ok=True)
+
         with pytest.raises(PathValidationError):
             validate_safe_path(forbidden, base, "test", check_forbidden=True)
         with pytest.raises(PathValidationError):
