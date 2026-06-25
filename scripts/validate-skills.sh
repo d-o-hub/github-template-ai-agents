@@ -143,8 +143,23 @@ for skill_path in "$SKILLS_SRC"/*/; do
 
     skill_failed=0
 
+    # Performance optimization: Read file once and use native Bash parameter expansion/regex
+    # to avoid multiple awk/grep subprocesses per file
+    content=$(< "$skill_file")
+
+    frontmatter=""
+    if [[ "$content" == ---$'\n'*$'\n'---* ]] || [[ "$content" == ---$'\r'$'\n'*$'\r'$'\n'---* ]]; then
+        rest="${content#---$'\n'}"
+        rest="${rest#---$'\r'$'\n'}"
+        frontmatter="${rest%%$'\n'---*}"
+    fi
+
     # Extract name field from frontmatter
-    skill_front_name=$(awk '/^---$/{n++} n==1 && /^name:/{sub(/^name:[ \t]*/, ""); print; exit}' "$skill_file")
+    skill_front_name=""
+    if [[ -n "$frontmatter" ]] && [[ "$frontmatter" =~ (^|$'\n')name:[[:space:]]*([^$'\n']*) ]]; then
+        skill_front_name="${BASH_REMATCH[2]}"
+        skill_front_name="${skill_front_name%$'\r'}"
+    fi
 
     # Check: name field must not contain uppercase, spaces, or non-hyphen special chars
     if [[ -n "$skill_front_name" ]]; then
@@ -155,22 +170,23 @@ for skill_path in "$SKILLS_SRC"/*/; do
     fi
 
     # Check: frontmatter must contain category field
-    has_category=$(awk '/^---$/{n++} n==1 && /^category:/{print "yes"; exit}' "$skill_file")
+    has_category=""
+    if [[ -n "$frontmatter" ]] && [[ "$frontmatter" =~ (^|$'\n')category:[[:space:]]*([^$'\n']*) ]]; then
+        has_category="yes"
+    fi
     if [[ -z "$has_category" ]]; then
         printf "  ${RED}✗${NC} %s: Missing 'category' field in frontmatter\n" "$skill_name"
         skill_failed=1
     fi
 
     # Check: body must contain ## Rationalizations heading
-    has_rationalizations=$(grep -c "^## Rationalizations" "$skill_file" || true)
-    if [[ "$has_rationalizations" -eq 0 ]]; then
+    if [[ "$content" != *$'\n'"## Rationalizations"* ]] && [[ "$content" != "## Rationalizations"* ]]; then
         printf "  ${RED}✗${NC} %s: Missing '## Rationalizations' section\n" "$skill_name"
         skill_failed=1
     fi
 
     # Check: body must contain ## Red Flags heading
-    has_red_flags=$(grep -c "^## Red Flags" "$skill_file" || true)
-    if [[ "$has_red_flags" -eq 0 ]]; then
+    if [[ "$content" != *$'\n'"## Red Flags"* ]] && [[ "$content" != "## Red Flags"* ]]; then
         printf "  ${RED}✗${NC} %s: Missing '## Red Flags' section\n" "$skill_name"
         skill_failed=1
     fi
@@ -181,7 +197,8 @@ for skill_path in "$SKILLS_SRC"/*/; do
         printf "  ${RED}✗${NC} %s: Missing evals/evals.json\n" "$skill_name"
         skill_failed=1
     else
-        eval_count=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(len(d.get('evals', [])))" "$evals_file" 2>/dev/null || echo 0)
+        # Performance optimization: Use jq for much faster JSON parsing in bash loops, falling back to python3
+        eval_count=$(jq '.evals | length' "$evals_file" 2>/dev/null || python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(len(d.get('evals', [])))" "$evals_file" 2>/dev/null || echo 0)
         if [[ "$eval_count" -lt 3 ]]; then
             printf "  ${RED}✗${NC} %s: evals/evals.json has %d eval cases (need >= 3)\n" "$skill_name" "$eval_count"
             skill_failed=1
@@ -217,11 +234,11 @@ echo ""
 echo "Checking skill-rules.json..."
 RULES_FILE="$REPO_ROOT/.agents/skill-rules.json"
 if [[ -f "$RULES_FILE" ]]; then
-    if ! python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$RULES_FILE" 2>/dev/null; then
+    if ! jq empty "$RULES_FILE" 2>/dev/null; then
         printf "  ${RED}✗${NC} skill-rules.json: Invalid JSON\n" >&2
         FAILED=1
     else
-        RULES_COUNT=$(python3 -c "import json, sys; print(len(json.load(open(sys.argv[1]))))" "$RULES_FILE")
+        RULES_COUNT=$(jq 'length' "$RULES_FILE" 2>/dev/null || python3 -c "import json, sys; print(len(json.load(open(sys.argv[1]))))" "$RULES_FILE")
         printf "  ${GREEN}✓${NC} skill-rules.json: Valid JSON\n"
         printf "  ${GREEN}✓${NC} skill-rules.json: %s rules defined\n" "$RULES_COUNT"
     fi
