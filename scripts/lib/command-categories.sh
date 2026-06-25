@@ -8,9 +8,9 @@ set -euo pipefail
 SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get}"
 CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl}"
 # Destructive and administrative commands (strict boundaries)
-DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:\\.:env:su:systemctl}"
+DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:\\.:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown}"
 # Language interpreters (broad boundaries to catch versioned ones like python3.11)
-INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip:composer:bundle}"
+INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip:composer:bundle:pipenv:poetry:conda:mamba:uv}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
 NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat}"
 
@@ -78,19 +78,25 @@ categorize_command() {
         fi
     done
 
-    # Check destructive keywords with strict boundaries
-    local destructive_regex="${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})${end_boundary}"
+    # Check destructive keywords with broad boundaries (to catch mkfs.ext4)
+    # Allows optional trailing alphanumeric chars and dots immediately after the keyword.
+    local destructive_regex="${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})[a-z0-9.]*${broad_end_boundary}"
     if [[ "$cmd_lower" =~ $destructive_regex ]]; then
-        printf "dangerous\n"
-        return 0
+        # Negative lookahead alternative: ensure it is not a script file like rm.sh
+        if [[ "$cmd_lower" =~ ${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})[a-z0-9.]*\.(sh|py|pl|rb|js) ]]; then
+             : # Matches script name, continue
+        else
+             printf "dangerous\n"
+             return 0
+        fi
     fi
 
     # Check interpreter keywords with broad boundaries (to catch python3.11)
-    # Allows optional trailing digits and dots immediately after the keyword.
-    local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})[0-9.]*${broad_end_boundary}"
+    # Allows optional trailing alphanumeric chars and dots immediately after the keyword.
+    local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})[a-z0-9.]*${broad_end_boundary}"
     if [[ "$cmd_lower" =~ $interpreter_regex ]]; then
         # Negative lookahead alternative: ensure it is not a script file like python3.11.sh
-        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})[0-9.]*\.(sh|py|pl|rb|js) ]]; then
+        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})[a-z0-9.]*\.(sh|py|pl|rb|js) ]]; then
              : # Matches script name, continue
         else
              printf "dangerous\n"
