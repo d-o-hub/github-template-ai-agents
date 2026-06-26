@@ -215,31 +215,22 @@ fi
 if [[ -f ".agents/metrics.jsonl" ]]; then
     printf "%bValidating .agents/metrics.jsonl...%b\n" "${BLUE}" "${NC}"
     METRICS_VALID=0
-
-    # 1. First, check if the file is valid JSONL format
-    # The jq empty filter "." checks parsing; redirecting output to /dev/null ensures it runs fast.
-    if ! jq -c . .agents/metrics.jsonl >/dev/null 2>&1; then
-        printf "%b  ✗ Invalid JSON in metrics.jsonl%b\n" "${RED}" "${NC}"
-        METRICS_VALID=1
-    fi
-
-    # 2. If JSON is valid, check timestamps using jq which is much faster than grep
-    if [[ $METRICS_VALID -eq 0 ]]; then
-        # This will extract records where timestamp is missing or doesn't match the pattern.
-        # If the output is empty, all timestamps are valid.
-        bad_ts=$(jq -r 'select((.timestamp == null) or (.timestamp | type != "string") or (.timestamp | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$") | not)) | (.timestamp | if . == "" then "empty" else . end // "missing")' .agents/metrics.jsonl 2>/dev/null || echo "jq-error")
-
-        if [[ "$bad_ts" == "jq-error" ]]; then
-            printf "%b  ✗ Failed to parse timestamps in metrics.jsonl%b\n" "${RED}" "${NC}"
+    while IFS= read -r line; do
+        if [[ -z "${line// }" ]]; then continue; fi
+        # Validate valid JSON per line
+        if ! printf "%s\n" "$line" | python3 -m json.tool > /dev/null 2>&1; then
+            printf "%b  ✗ Invalid JSON in metrics.jsonl: %s%b\n" "${RED}" "$line" "${NC}"
             METRICS_VALID=1
-        elif [[ -n "$bad_ts" ]]; then
-            # Extract first bad timestamp for error message
-            first_bad_ts=$(printf "%s\n" "$bad_ts" | head -n 1)
-            printf "%b  ✗ Bad timestamp format \"%s\" in metrics.jsonl — must be YYYY-MM-DDTHH:MM:SSZ%b\n" "${RED}" "$first_bad_ts" "${NC}"
-            METRICS_VALID=1
+            break
         fi
-    fi
-
+        # Validate timestamp format YYYY-MM-DDTHH:MM:SSZ
+        ts=$(printf "%s\n" "$line" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("timestamp",""))')
+        if ! printf "%s\n" "$ts" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$' ; then
+            printf "%b  ✗ Bad timestamp format \"%s\" in metrics.jsonl — must be YYYY-MM-DDTHH:MM:SSZ%b\n" "${RED}" "$ts" "${NC}"
+            METRICS_VALID=1
+            break
+        fi
+    done < .agents/metrics.jsonl
     if [[ $METRICS_VALID -eq 0 ]]; then
         printf "%b  ✓ .agents/metrics.jsonl is valid%b\n" "${GREEN}" "${NC}"
     else
