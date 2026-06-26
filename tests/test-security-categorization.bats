@@ -9,7 +9,7 @@ setup() {
     run categorize_command "mkdir farm"
     [ "$output" = "unknown" ]
     
-    run categorize_command "echo storm"
+    run categorize_command "printf storm"
     [ "$output" = "unknown" ]
 }
 
