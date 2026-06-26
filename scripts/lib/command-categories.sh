@@ -5,10 +5,10 @@ set -euo pipefail
 
 # Security Hardening: 2026-06-20 - Prevented keyword merging bypasses.
 # Default categories (can be overridden in .command-verify.conf)
-SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get}"
+SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get:ls:cat:echo:grep:find:pwd:diff:cd:head:tail:sort:uniq:wc:git:log:pgrep:type:which:df:du:free:top:ps:history}"
 CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl}"
 # Destructive and administrative commands (strict boundaries)
-DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:\\.:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown}"
+DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown:pkill}"
 # Language interpreters (broad boundaries to catch versioned ones like python3.11)
 INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip:composer:bundle:pipenv:poetry:conda:mamba:uv}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
@@ -64,10 +64,18 @@ categorize_command() {
     # Regex for word boundaries including common shell metacharacters, commas, slashes, and colons.
     # Slashes are included to detect path-prefixed commands (e.g., /bin/rm).
     # Colons are included to handle colon-prefixed commands or multi-command strings.
-    local boundary="(^|[[:space:]]|[|&;()<>,\/:])"
-    local end_boundary="($|[[:space:]]|[|&;()<>,\/:])"
+    # Use -- as a boundary to detect dangerous flags like --force without matching mid-word hyphens.
+    local boundary="(^|[[:space:]]|[|&;()<>,\/:]|--)"
+    local end_boundary="($|[[:space:]]|[|&;()<>,\/:]|--)"
     # Broad boundary to catch versioned interpreters (e.g., python3.11)
     local broad_end_boundary="($|[[:space:]]|[|&;()<>,\/:\.])"
+
+    # Specific check for dot (.) as source command
+    # Matches ". " at start of string or after a separator
+    if [[ "$cmd_lower" =~ (^|[[:space:]]|[|&;()<>,\/:])\.[[:space:]] ]]; then
+        printf "dangerous\n"
+        return 0
+    fi
 
     # Check custom dangerous patterns first (E3)
     for pattern in "${DANGEROUS_PATTERNS[@]:-}"; do
