@@ -65,3 +65,9 @@ llms-full.txt
 
 commit*.txt.mimocode/
 .mimocode/
+.agents/skills/impeccable/
+.claude/skills/impeccable/
+.cursor/skills/impeccable/
+.gemini/skills/impeccable/
+.opencode/skills/impeccable/
+.github/skills/impeccable/
