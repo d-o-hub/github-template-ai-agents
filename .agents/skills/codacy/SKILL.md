@@ -7,8 +7,7 @@ license: MIT
 metadata:
   author: Codacy
 ---
-
-> **Glossary:** See [glossary.md](references/glossary.md) for shared definitions of Codacy concepts (issues, findings, severity, coverage, tools, patterns, etc.).
+> **Glossary:** See [glossary.md](references/glossary.md) for shared definitions of Codacy concepts (issues, findings, severity, coverage, tools, patterns, etc).
 
 Codacy provides two CLI tools:
 - **Analysis CLI** (`codacy-analysis`): Runs static analysis locally without pushing code to Codacy Cloud
@@ -111,6 +110,23 @@ codacy-analysis analyze --output-format json
 
 See [references/analysis-interpret.md](references/analysis-interpret.md) for details.
 
+### Git-Aware Scoping
+
+Analyze only changed files instead of the full repository:
+
+```bash
+# Only files staged for commit (pre-commit check)
+codacy-analysis analyze --staged --output-format json
+
+# Changes relative to current branch's merge base
+codacy-analysis analyze --diff --output-format json
+
+# Changes in a pull request (compares against PR target branch)
+codacy-analysis analyze --pr --output-format json
+```
+
+These flags work with `--tool` and `--files`. When combined with `--files`, the intersection is used.
+
 ## Cloud Queries (Cloud CLI)
 
 The Cloud CLI (`codacy`) queries remote Codacy data. Auto-detects provider, organization, and repository from git remote.
@@ -124,6 +140,18 @@ codacy repository
 
 # Inspect a pull request
 codacy pull-request 42
+
+# Annotated git diff with coverage and inline issues
+codacy pull-request --diff
+
+# Security findings
+codacy findings gh my-org my-repo
+codacy findings gh my-org my-repo --severities Critical,High
+
+# Tools and patterns
+codacy tools gh my-org my-repo
+codacy patterns gh my-org my-repo eslint
+codacy pattern gh my-org my-repo eslint no-unused-vars --disable
 
 # Trigger reanalysis and wait
 codacy repository --reanalyze-and-wait
@@ -163,6 +191,40 @@ The analyzed repository is **never modified outside of `.codacy/`**.
 - Cloud queries: See [references/cloud-workflows.md](references/cloud-workflows.md)
 - Cloud commands: See [references/cloud-commands.md](references/cloud-commands.md)
 
+## Configuration Operations
+
+### Import local config to Codacy Cloud
+
+```bash
+# Import from default path (.codacy/codacy.config.json)
+codacy tools gh my-org my-repo --import
+
+# Import from custom path
+codacy tools gh my-org my-repo --import ./custom-config.json
+
+# Skip confirmation
+codacy tools gh my-org my-repo --import -y
+```
+
+### Combine configuration files
+
+```bash
+# Merge — union of tools/patterns from source into dest
+codacy-analysis config --merge --source .codacy/extra.json
+
+# Intersect — keep only tools/patterns in BOTH files
+codacy-analysis config --intersect --source a.json --dest b.json
+
+# Diff — keep tools/patterns in dest NOT in source
+codacy-analysis config --diff --source baseline.json --dest .codacy/codacy.config.json
+```
+
+### Discover repository stack
+
+```bash
+codacy-analysis discover --output-format json --output /tmp/codacy-discover.json
+```
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -183,7 +245,4 @@ The analyzed repository is **never modified outside of `.codacy/`**.
 
 - `static-analysis` — Generic linter triage across any language
 - `code-review-assistant` — PR review workflow
-
-## Troubleshooting
-
-See [references/analysis-troubleshooting.md](references/analysis-troubleshooting.md) for details.
+- See [references/analysis-troubleshooting.md](references/analysis-troubleshooting.md) for troubleshooting.

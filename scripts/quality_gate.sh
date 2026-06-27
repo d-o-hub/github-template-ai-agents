@@ -215,22 +215,36 @@ fi
 if [[ -f ".agents/metrics.jsonl" ]]; then
     printf "%bValidating .agents/metrics.jsonl...%b\n" "${BLUE}" "${NC}"
     METRICS_VALID=0
-    while IFS= read -r line; do
-        if [[ -z "${line// }" ]]; then continue; fi
-        # Validate valid JSON per line
-        if ! printf "%s\n" "$line" | python3 -m json.tool > /dev/null 2>&1; then
+    err_msg=$(jq -R -c '
+      select(length > 0) |
+      . as $raw |
+      try
+        (fromjson |
+          if type != "object" then
+            "INVALID_JSON:\($raw)" | halt_error(1)
+          elif .timestamp == null or (.timestamp | type != "string") or (.timestamp | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$") | not) then
+            "BAD_TS:\(.timestamp // "")" | halt_error(1)
+          else
+            empty
+          end
+        )
+      catch
+        ("INVALID_JSON:\($raw)" | halt_error(1))
+    ' .agents/metrics.jsonl 2>&1 >/dev/null)
+
+    if [[ $? -ne 0 ]]; then
+        if [[ "$err_msg" == INVALID_JSON:* ]]; then
+            line="${err_msg#INVALID_JSON:}"
             printf "%b  ✗ Invalid JSON in metrics.jsonl: %s%b\n" "${RED}" "$line" "${NC}"
-            METRICS_VALID=1
-            break
-        fi
-        # Validate timestamp format YYYY-MM-DDTHH:MM:SSZ
-        ts=$(printf "%s\n" "$line" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("timestamp",""))')
-        if ! printf "%s\n" "$ts" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$' ; then
+        elif [[ "$err_msg" == BAD_TS:* ]]; then
+            ts="${err_msg#BAD_TS:}"
             printf "%b  ✗ Bad timestamp format \"%s\" in metrics.jsonl — must be YYYY-MM-DDTHH:MM:SSZ%b\n" "${RED}" "$ts" "${NC}"
-            METRICS_VALID=1
-            break
+        else
+            printf "%b  ✗ Invalid JSON in metrics.jsonl%b\n" "${RED}" "${NC}"
         fi
-    done < .agents/metrics.jsonl
+        METRICS_VALID=1
+    fi
+
     if [[ $METRICS_VALID -eq 0 ]]; then
         printf "%b  ✓ .agents/metrics.jsonl is valid%b\n" "${GREEN}" "${NC}"
     else

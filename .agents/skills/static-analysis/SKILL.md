@@ -68,6 +68,39 @@ Follow this structured process when responding to analysis findings:
 | **Go** | `golangci-lint` | `golangci-lint run` |
 | **Secrets** | `gitleaks` | `gitleaks detect --source . -v` |
 
+## Codacy Git-Aware Analysis
+
+Use the Codacy Analysis CLI for targeted pre-commit and PR-scoped analysis:
+
+```bash
+# Pre-commit: analyze only staged files
+codacy-analysis analyze --staged --output-format json
+
+# Branch analysis: all changes vs merge base
+codacy-analysis analyze --diff --output-format json
+
+# PR analysis: changes vs PR target branch
+codacy-analysis analyze --pr --output-format json
+
+# Combine with specific tools
+codacy-analysis analyze --staged --tool Ruff --tool ESLint9 --output-format json
+```
+
+**When to use:**
+- `--staged` — Before committing; catches issues in exactly the code you're about to commit
+- `--diff` — During development; sees all uncommitted + committed changes on the branch
+- `--pr` — During PR review; compares against the PR's target branch
+
+Parse results with jq for triage:
+
+```bash
+# Count issues by severity
+codacy-analysis analyze --staged --output-format json | jq '.issues | group_by(.severity) | map({severity: .[0].severity, count: length})'
+
+# Get critical/high only
+codacy-analysis analyze --staged --output-format json | jq '[.issues[] | select(.severity == "Error" or .severity == "High")]'
+```
+
 ## Codacy Integration
 
 If `codacy.yml` or a Codacy project exists:

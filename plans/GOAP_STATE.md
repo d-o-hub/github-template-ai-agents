@@ -1,53 +1,68 @@
-# GOAP State: Adopt P0 Primitives from do-gist-hub
+# GOAP State: Codacy Skill Improvements
 
-## Task Analysis
+## Goal
 
-**Primary Goal**: Implement Issue #581 — adopt 6 P0 generic primitives from do-gist-hub.
-**Constraints**: Node 24 deadline Sep 16, 2026 (~13 weeks).
-**Complexity**: Medium (5 files to create/modify, 0 architectural changes).
-**ADR Link**: `plans/adr-011-adopt-p0-primitives-from-do-gist-hub.md`
+Enrich existing skills with Codacy integration patterns from codacy/codacy-skills, without creating new skills.
+
+## Status
+
+IN_PROGRESS
 
 ## Sub-Goals
 
-| # | Component | Priority | Deps | Strategy |
-|---|-----------|----------|------|----------|
-| 1 | `scripts/sha-pin-actions.sh` | P0 | none | parallel |
-| 2 | `.github/workflows/audit-actions.yml` | P0 | none | parallel |
-| 3 | `.github/workflows/track-gitleaks-release.yml` | P0 | none | parallel |
-| 4 | `plans/adr-027-ci-node24-android-hardening.md` | P0 | none | parallel |
-| 5 | `agents-docs/ci-maintenance.md` enhancement | P0 | none | parallel |
-| 6 | Fix pre-existing CI (skills-reference.md stale) | P0 | none | parallel |
-| 7 | Quality gate | P0 | 1-6 | sequential |
-| 8 | Commit + PR | P0 | 7 | sequential |
+### 1. SKILL_TEMPLATE metadata convention
 
-## Execution Plan
+- **Priority**: P0, Deps: none
+- **Task**: Add `metadata` (author/version) frontmatter to SKILL_TEMPLATE.md
+- **Status**: completed
+- **Agent**: implementer
 
-- **Strategy**: Parallel (items 1-6), then sequential (7-8)
-- **Quality Gates**: 1 checkpoint (quality gate before commit)
+### 2. Enrich codacy/SKILL.md
 
-### Phase 1 — Implement (parallel)
+- **Priority**: P1, Deps: 1
+- **Task**: Add git-aware scoping (--staged/--diff/--pr), config operations (--import, config --merge), discover command, expanded command reference
+- **Status**: completed
+- **Agent**: implementer
 
-- Tasks 1-6: Launch swarm agents
-- Quality Gate: All files written, no syntax errors
+### 3. Enrich static-analysis/SKILL.md
 
-### Phase 2 — Validate & Submit
+- **Priority**: P1, Deps: 1
+- **Task**: Add Codacy git-aware scoping section (--staged, --diff, --pr for pre-commit analysis)
+- **Status**: completed
+- **Agent**: implementer
 
-- Run `./scripts/quality_gate.sh`
-- If fails, iterative refinement
-- Commit and create PR
+### 4. Enrich code-review-assistant/SKILL.md
 
-## Summary
+- **Priority**: P1, Deps: 1
+- **Task**: Add Codacy PR review workflow steps (codacy pull-request, coverage delta, quality gate)
+- **Status**: completed
+- **Agent**: implementer
 
-✓ 5 files created/modified
-✓ Pre-existing CI issue fixed
-✓ Quality gate green
-✓ PR created
+### 5. Enrich cicd-pipeline/SKILL.md
 
----
+- **Priority**: P1, Deps: 1
+- **Task**: Add coverage generation and Codacy upload steps for GitHub Actions, GitLab CI
+- **Status**: completed
+- **Agent**: implementer
 
-# Blocked: CI Status Staleness
+### 6. Validate all changes
 
-**Status**: blocked
-**ADR**: `plans/adr-028-ci-status-staleness-external-dep.md`
-**Root Cause**: `.github/ci-status/ci-status.json` is stale because GitHub Actions hasn't completed a run on `main` after the latest push. This is an external dependency — the agent cannot update the CI status file directly.
-**Resolution**: Will self-resolve when the next CI run completes and `update-ci-status.py` updates the file. Expected window: 10–30 minutes after push.
+- **Priority**: P0, Deps: 2,3,4,5
+- **Task**: Run validate-skills.sh, check line counts, verify frontmatter
+- **Status**: completed
+- **Agent**: test-runner
+
+## Execution Strategy
+
+Hybrid
+
+- Phase 1 (Sequential): SKILL_TEMPLATE update (foundational)
+- Phase 2 (Parallel/Swarm): 4 skill enrichments in parallel
+- Phase 3 (Sequential): Validation
+
+## Quality Gates
+
+- All skills under 250 lines
+- All have valid frontmatter
+- validate-skills.sh passes
+- No broken cross-references

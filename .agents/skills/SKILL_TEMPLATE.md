@@ -5,6 +5,8 @@ description: |
 category: <category>
 license: MIT
 version: "0.1.0"
+metadata:
+  author: your-name
 ---
 
 # Skill Title

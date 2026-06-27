@@ -87,12 +87,11 @@ categorize_command() {
     done
 
     # Check destructive keywords with broad boundaries (to catch mkfs.ext4)
-    # Allows optional trailing alphanumeric chars and dots immediately after the keyword,
-    # but requires the suffix to start with a digit or dot to prevent matching unrelated words.
-    local destructive_regex="${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})([.][a-z0-9]+|[0-9][a-z0-9.]*)?${broad_end_boundary}"
+    # Allows optional trailing alphanumeric chars and dots immediately after the keyword.
+    local destructive_regex="${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})[a-z0-9.]*${broad_end_boundary}"
     if [[ "$cmd_lower" =~ $destructive_regex ]]; then
         # Negative lookahead alternative: ensure it is not a script file like rm.sh
-        if [[ "$cmd_lower" =~ ${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})([.][a-z0-9]+|[0-9][a-z0-9.]*)?\.(sh|py|pl|rb|js) ]]; then
+        if [[ "$cmd_lower" =~ ${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})[a-z0-9.]*\.(sh|py|pl|rb|js) ]]; then
              : # Matches script name, continue
         else
              printf "dangerous\n"
@@ -101,12 +100,11 @@ categorize_command() {
     fi
 
     # Check interpreter keywords with broad boundaries (to catch python3.11)
-    # Allows optional trailing alphanumeric chars and dots immediately after the keyword,
-    # but requires the suffix to start with a digit or dot to prevent matching unrelated words.
-    local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})([.][a-z0-9]+|[0-9][a-z0-9.]*)?${broad_end_boundary}"
+    # Allows optional trailing alphanumeric chars and dots immediately after the keyword.
+    local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})[a-z0-9.]*${broad_end_boundary}"
     if [[ "$cmd_lower" =~ $interpreter_regex ]]; then
         # Negative lookahead alternative: ensure it is not a script file like python3.11.sh
-        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})([.][a-z0-9]+|[0-9][a-z0-9.]*)?\.(sh|py|pl|rb|js) ]]; then
+        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})[a-z0-9.]*\.(sh|py|pl|rb|js) ]]; then
              : # Matches script name, continue
         else
              printf "dangerous\n"
