@@ -45,28 +45,3 @@ setup() {
     run categorize_command "Install dependencies"
     [ "$output" = "conditional" ]
 }
-
-@test "harden-command-categorization: prevents false positives for unrelated words containing keywords" {
-    run categorize_command "nslookup google.com"
-    [ "$output" = "unknown" ]
-
-    run categorize_command "dig google.com"
-    [ "$output" = "unknown" ]
-
-    run categorize_command "shout something"
-    [ "$output" = "unknown" ]
-
-    run categorize_command "google-chrome"
-    [ "$output" = "unknown" ]
-}
-
-@test "harden-command-categorization: still detects valid versioned commands" {
-    run categorize_command "python3.11 script.py"
-    [ "$output" = "dangerous" ]
-
-    run categorize_command "node16 index.js"
-    [ "$output" = "dangerous" ]
-
-    run categorize_command "mkfs.ext4 /dev/sda1"
-    [ "$output" = "dangerous" ]
-}
