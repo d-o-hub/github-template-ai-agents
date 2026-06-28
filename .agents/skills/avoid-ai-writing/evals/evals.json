@@ -1,0 +1,65 @@
+{
+  "skill_name": "avoid-ai-writing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Rewrite this paragraph to remove AI-isms: 'Certainly! Acme Analytics, a vibrant startup nestled in the heart of Boulder's thriving tech ecosystem, has secured $40M in Series B funding — marking a watershed moment for the observability landscape. The platform serves as a unified hub, featuring real-time dashboards, boasting sub-second queries, and presenting a seamless integration layer.'",
+      "expected_output": "A rewrite that removes 'Certainly!', 'vibrant', 'nestled', 'thriving', 'watershed moment', 'landscape', 'serves as', 'featuring', 'boasting', 'seamless', and em dashes.",
+      "assertions": [
+        "The output does not contain 'Certainly!'",
+        "The output does not contain 'watershed moment'",
+        "The output does not contain 'landscape'",
+        "The output includes a 'Second-pass audit' section"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Detect AI patterns in this text (audit only): 'In the rapidly evolving world of decentralized compute, it is important to note that the integration of AI with DePIN could potentially unlock long-term sustainability. Moreover, we must delve into the intricacies of these synergies.'",
+      "expected_output": "An audit flagging 'In the rapidly evolving world of', 'it is important to note that', 'integration of', 'could potentially', 'long-term sustainability', 'Moreover', 'delve into', 'intricacies', and 'synergies'.",
+      "assertions": [
+        "Issues found section includes 'delve into'",
+        "Issues found section includes 'could potentially'",
+        "Assessment section notes which flags are clear problems"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Rewrite this in a blunt voice: 'I recently had the pleasure of exploring the latest cutting-edge features of your robust platform. It's not just a tool — it's a paradigm shift.'",
+      "expected_output": "A short, direct rewrite without 'pleasure of exploring', 'cutting-edge', 'robust', or 'paradigm shift'.",
+      "assertions": [
+        "The output is shorter than the input",
+        "The output does not contain 'paradigm shift'",
+        "The output does not contain 'cutting-edge'"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Audit for Tier 2 clusters (P1): 'We aim to harness the power of AI to foster innovation. Our goal is to unleash new potential and elevate the user experience.'",
+      "expected_output": "Should flag 'harness', 'foster', 'unleash', and 'elevate' as a cluster.",
+      "assertions": [
+        "Audit identifies cluster of Tier 2 words: harness, foster, unleash, elevate",
+        "Severity is marked as P1"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Detect P0 credibility killers: 'While specific details are limited based on available information, I hope this helps! Experts believe this is a game-changer.'",
+      "expected_output": "Should flag 'While specific details are limited', 'I hope this helps!', and 'Experts believe' as P0.",
+      "assertions": [
+        "Flags 'While specific details are limited' as P0",
+        "Flags 'I hope this helps!' as P0",
+        "Flags 'Experts believe' as P0"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Detect P2 stylistic polish: 'Moreover, the future looks bright. In conclusion, Acme is a leader.'",
+      "expected_output": "Should flag 'Moreover', 'the future looks bright', and 'In conclusion' as P2.",
+      "assertions": [
+        "Flags 'Moreover' as P2",
+        "Flags 'the future looks bright' as P2",
+        "Flags 'In conclusion' as P2"
+      ]
+    }
+  ]
+}
