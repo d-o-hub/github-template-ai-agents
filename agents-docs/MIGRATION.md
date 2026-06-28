@@ -322,7 +322,7 @@ cat > your-project/MIGRATION_NOTES.md << 'EOF'
 # Migration Notes
 
 Migration completed on: $(date +%Y-%m-%d)
-Template version: 0.0.1
+Template version: 0.2.10
 
 ## Changes Made
 

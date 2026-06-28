@@ -7,13 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.1] - 2026-06-28
-
 ### Changed
 
-- Bolt: [eliminate subshells in metrics.jsonl validation] (#631)
-
-
+- sec(paths): harden path validation by protecting critical root files
 
 ## [0.2.10] - 2026-05-29
 
