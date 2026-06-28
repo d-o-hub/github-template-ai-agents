@@ -4,7 +4,7 @@
 > delivery with shared instructions, quality gates, and low-context-rot workflows.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Template Version](https://img.shields.io/badge/version-0.2.10-blue)](CHANGELOG-TEMPLATE.md)
+[![Template Version](https://img.shields.io/badge/version-0.0.1-blue)](CHANGELOG-TEMPLATE.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Best for:** maintainers who use Claude Code, Gemini CLI, OpenCode, Qwen Code, Jules,

@@ -21,6 +21,16 @@ FORBIDDEN_OUTPUT_DIRS = frozenset({
     ".cursor",
     ".opencode",
     ".commandcode",
+    ".env",
+    ".envrc",
+    "Makefile",
+    ".gitignore",
+    "package.json",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "bun.lockb",
+    "LICENSE",
+    "VERSION",
 })
 
 
