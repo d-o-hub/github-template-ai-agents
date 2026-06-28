@@ -196,3 +196,9 @@ See `agents-docs/self-learning-rules.md` for all learnings (LESSON-026 through L
 ## Recovery & Advanced Topics
 
 - **Local CI rehearsal with `act`**: `agents-docs/ACT.md` plus `./scripts/run_act_local.sh` (never blocks the quality gate; opt-in).
+
+## Skills
+
+| Category | Skills |
+|----------|--------|
+| **Quality** | `avoid-ai-writing`, `dogfood`, `lifecycle-management`, `skill-creator`, `skill-evaluator`, `static-analysis`, `testdata-builders`, `verification-template` |
