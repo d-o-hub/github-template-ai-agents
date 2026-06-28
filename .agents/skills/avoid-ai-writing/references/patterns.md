@@ -7,6 +7,7 @@ Exhaustive catalog of AI writing patterns, vocabulary tiers, and structural tell
 Words and phrases are organized into three tiers based on how reliably they signal AI-generated text.
 
 ### Tier 1 — Always Replace
+
 Replace these on sight. They appear 5–20x more often in AI text than human text.
 
 | Word/Phrase | Alternatives |
@@ -71,6 +72,7 @@ Replace these on sight. They appear 5–20x more often in AI text than human tex
 | embrace (metaphor) | adopt, accept, use, switch to |
 
 ### Tier 2 — Flag in Clusters
+
 Individually fine, but two or more in the same paragraph is a strong AI signal.
 
 | Word/Phrase | Alternatives |
@@ -115,6 +117,7 @@ Individually fine, but two or more in the same paragraph is a strong AI signal.
 | underpinning / underpinnings | basis, foundation, what supports |
 
 ### Tier 3 — Flag by Density
+
 Common words that AI overuses. Flag when they make up roughly 3%+ of total words.
 
 - significant / significantly
@@ -131,6 +134,7 @@ Common words that AI overuses. Flag when they make up roughly 3%+ of total words
 - world-class / state-of-the-art / best-in-class
 
 ### Tier 3 Phrases — Flag at Density or in Clusters
+
 Flag at 2+ uses of the same phrase, or when 3+ distinct phrases appear in one piece.
 
 - emerging sector / emerging space / emerging category
@@ -147,6 +151,7 @@ Flag at 2+ uses of the same phrase, or when 3+ distinct phrases appear in one pi
 ## Structural Patterns
 
 ### Content Tells
+
 - **Significance inflation**: Inflating routine events into history-making ones ("watershed moment for the industry").
 - **Notability name-dropping**: Piling on prestigious citations ("cited in NYT, BBC, and Wired") without context.
 - **Superficial -ing analyses**: Strings of present participles ("symbolizing progress, reflecting investment").
@@ -156,6 +161,7 @@ Flag at 2+ uses of the same phrase, or when 3+ distinct phrases appear in one pi
 - **Novelty inflation**: Treating established concepts as if the speaker invented them.
 
 ### Language Tells
+
 - **Copula avoidance**: Substituting "is" and "has" with "serves as," "features," "boasts," etc.
 - **Synonym cycling**: Conspicuously rotating synonyms (developers... engineers... practitioners... builders).
 - **Template phrases**: "a [adj] step towards [adj] infrastructure."
@@ -164,6 +170,7 @@ Flag at 2+ uses of the same phrase, or when 3+ distinct phrases appear in one pi
 - **Parenthetical hedging**: Inserting parenthetical asides to sound nuanced without committing.
 
 ### Structural Tells
+
 - **Uniformity**: Metronomic sentence and paragraph length.
 - **Formulaic openings**: Broad context before the point ("In the rapidly evolving world of...").
 - **Inline-header lists**: Bullet items starting with a bold header that repeats itself.
