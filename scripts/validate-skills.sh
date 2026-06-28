@@ -162,15 +162,15 @@ for skill_path in "$SKILLS_SRC"/*/; do
     fi
 
     # Check: body must contain ## Rationalizations heading
-    has_rationalizations=$(grep -c "^## Rationalizations" "$skill_file" || true)
-    if [[ "$has_rationalizations" -eq 0 ]]; then
+    # perf: Use grep -q to exit on first match and avoid parsing the entire file or using subshells
+    if ! grep -q "^## Rationalizations" "$skill_file"; then
         printf "  ${RED}✗${NC} %s: Missing '## Rationalizations' section\n" "$skill_name"
         skill_failed=1
     fi
 
     # Check: body must contain ## Red Flags heading
-    has_red_flags=$(grep -c "^## Red Flags" "$skill_file" || true)
-    if [[ "$has_red_flags" -eq 0 ]]; then
+    # perf: Use grep -q to exit on first match and avoid parsing the entire file or using subshells
+    if ! grep -q "^## Red Flags" "$skill_file"; then
         printf "  ${RED}✗${NC} %s: Missing '## Red Flags' section\n" "$skill_name"
         skill_failed=1
     fi
