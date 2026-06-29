@@ -31,8 +31,7 @@ run_test() {
     local status=$?
 
     if [[ "$expected_fail" == "true" ]]; then
-        # perf: Use native Bash parameter matching instead of grep to eliminate fork overhead
-        if [[ $status -ne 0 ]] && [[ "$output" == *"$expected_message"* ]]; then
+        if [[ $status -ne 0 ]] && grep -q "$expected_message" <<< "$output"; then
             printf "${GREEN}PASSED${NC}\n"
         else
             printf "${RED}FAILED${NC} (expected failure matching %s)${NC}\n" "$expected_message"
