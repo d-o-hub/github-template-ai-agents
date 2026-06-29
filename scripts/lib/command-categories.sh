@@ -6,13 +6,13 @@ set -euo pipefail
 # Security Hardening: 2026-06-20 - Prevented keyword merging bypasses.
 # Default categories (can be overridden in .command-verify.conf)
 SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get:ls:cat:echo:grep:find:pwd:diff:cd:head:tail:sort:uniq:wc:git:log:pgrep:type:which:df:du:free:top:ps:history}"
-CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl}"
+CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl:ssh-keygen:openssl:gpg}"
 # Destructive and administrative commands (strict boundaries)
-DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown:pkill}"
+DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:killall:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown:pkill:sed:truncate:unlink:tee:-f:-y}"
 # Language interpreters (broad boundaries to catch versioned ones like python3.11)
-INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip:composer:bundle:pipenv:poetry:conda:mamba:uv}"
+INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:pip3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip:composer:bundle:pipenv:poetry:conda:mamba:uv}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
-NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat}"
+NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat:nslookup:dig:host:nc.openbsd:nc.traditional}"
 
 # Custom patterns for categories (E3)
 SAFE_PATTERNS=()
@@ -87,11 +87,12 @@ categorize_command() {
     done
 
     # Check destructive keywords with broad boundaries (to catch mkfs.ext4)
-    # Allows optional trailing alphanumeric chars and dots immediately after the keyword.
-    local destructive_regex="${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})[a-z0-9.]*${broad_end_boundary}"
+    # Allows optional trailing alphanumeric chars, dots, and hyphens immediately after the keyword.
+    # Security: Use a hardened suffix pattern to avoid false positives from unrelated words.
+    local destructive_regex="${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
     if [[ "$cmd_lower" =~ $destructive_regex ]]; then
         # Negative lookahead alternative: ensure it is not a script file like rm.sh
-        if [[ "$cmd_lower" =~ ${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})[a-z0-9.]*\.(sh|py|pl|rb|js) ]]; then
+        if [[ "$cmd_lower" =~ ${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?\.(sh|py|pl|rb|js) ]]; then
              : # Matches script name, continue
         else
              printf "dangerous\n"
@@ -100,11 +101,12 @@ categorize_command() {
     fi
 
     # Check interpreter keywords with broad boundaries (to catch python3.11)
-    # Allows optional trailing alphanumeric chars and dots immediately after the keyword.
-    local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})[a-z0-9.]*${broad_end_boundary}"
+    # Allows optional trailing alphanumeric chars, dots, and hyphens immediately after the keyword.
+    # Security: Use a hardened suffix pattern to avoid false positives from unrelated words.
+    local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
     if [[ "$cmd_lower" =~ $interpreter_regex ]]; then
         # Negative lookahead alternative: ensure it is not a script file like python3.11.sh
-        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})[a-z0-9.]*\.(sh|py|pl|rb|js) ]]; then
+        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?\.(sh|py|pl|rb|js) ]]; then
              : # Matches script name, continue
         else
              printf "dangerous\n"
@@ -112,11 +114,12 @@ categorize_command() {
         fi
     fi
 
-    # Check network keywords with strict boundaries
-    local network_regex="${boundary}(${NETWORK_KEYWORDS//:/|})${end_boundary}"
+    # Check network keywords with broad boundaries
+    # Allows optional trailing alphanumeric chars, dots, and hyphens immediately after the keyword.
+    local network_regex="${boundary}(${NETWORK_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
     if [[ "$cmd_lower" =~ $network_regex ]]; then
         # Ensure it is not followed by .sh or .py which indicates a script name
-        if [[ "$cmd_lower" =~ ${boundary}(${NETWORK_KEYWORDS//:/|})\.(sh|py|pl|rb|js) ]]; then
+        if [[ "$cmd_lower" =~ ${boundary}(${NETWORK_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?\.(sh|py|pl|rb|js) ]]; then
             : # Likely a script name, ignore
         else
             printf "dangerous\n"
