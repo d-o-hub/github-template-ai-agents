@@ -82,3 +82,8 @@ controller.abort();
 - [ ] `addEventListener` used without a corresponding `removeEventListener` or `signal`.
 - [ ] No global error handling implementation.
 - [ ] In-flight requests not cancelled during navigation or component unmounting.
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

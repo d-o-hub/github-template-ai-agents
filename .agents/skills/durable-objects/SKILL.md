@@ -146,3 +146,8 @@ export default {
 - [ ] Performing external API calls inside `blockConcurrencyWhile()`.
 - [ ] Lack of a migration strategy for SQLite schema updates.
 - [ ] Using `newUniqueId()` without storing the ID elsewhere (lost reference).
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.
