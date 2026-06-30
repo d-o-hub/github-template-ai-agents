@@ -136,8 +136,3 @@ See `agents-docs/SKILLS.md` for tier details.
 - `agents-docs/SKILLS.md` - Skill framework
 - `agents-docs/SUB-AGENTS.md` - Sub-agent patterns
 - https://agents.md - Official spec
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

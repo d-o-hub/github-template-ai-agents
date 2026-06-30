@@ -242,8 +242,3 @@ See `references/backup-strategies.md` for point-in-time recovery, automated back
 ## Integration with other skills
 
 - **turso-db**: Use `turso-db` for Turso-specific SDKs, bidirectional sync patterns, and experimental features like MVCC, vector search, and encryption. Use `database-devops` for general schema design, migration safety, and Infrastructure-as-Code.
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

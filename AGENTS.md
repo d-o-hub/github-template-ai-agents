@@ -50,7 +50,6 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 - **Parallelism**: Use parallel tool calls for independent operations when supported by the runtime.
 - **Direct Action**: Proceed with actions immediately when intent and context are clear.
 - **Diff-Oriented**: Report changes using concise, diff-focused summaries instead of long prose.
-- **Voice & Context**: Adapt tone via `voice-profiles`. Default: `professional`+`blog`. Auto-detects context from cues (code, README, hashtags).
 - **Always-Fix Pre-Existing Issues**: No discussion. No deferral. If a CI check, lint warning, or quality-gate finding is failing on `main` (regardless of who introduced it), agents MUST fix it as part of the current task. The only acceptable exit is a green CI for the current commit's run, with no new regressions and no inherited failures.
 
 **Workflow for pre-existing issues**: load `.agents/skills/goap-agent/SKILL.md` (orchestrator) and `.agents/skills/agent-coordination/SKILL.md` (swarm dispatch). Retriever / Implementer / Verifier in parallel, atomic commits per issue, verify green before moving on. Full playbook: `agents-docs/AGENTS_GUIDANCE.md`.
@@ -93,6 +92,8 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 ./scripts/analyze-codebase.sh   # Autonomous analysis and self-learning
 ./scripts/check-adr-compliance.sh # Verify ADR registration and patterns
 ./scripts/run-evals.py --skill dora-report # Mandatory monthly report
+./scripts/check-plan-numbering.sh # Ensure plan counters are consistent
+./scripts/archive-stale-plans.sh # Archive plans older than 60 days
 ```
 
 **Guard Rails:** Temporary files in `/tmp` only. Never create debug, scripts, reports, or similar temporary files in the repository root. Gitleaks enforced via CI. Pre-commit validates git config (`SKIP_GLOBAL_HOOKS_CHECK=true` to bypass).
@@ -152,17 +153,10 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 
 ## Delegation Routing
 
+- **Self-Execute**: 1 trivial isolated edit (e.g., typos, single-line constants).
+- **Delegate**: 2+ files, architectural changes, or tasks requiring judgment.
+- **Swarm**: 5+ similar independent tasks (e.g., batch doc normalization, multi-file refactors).
 - **Route to**: `delegate` (retrieval/context) → `implementer` (execution) → `agent-coordination` (swarm dispatch).
-
-## Metrics File
-
-Append to `.agents/metrics.jsonl` after every task (see Post-Task Protocol).
-
-- **Timestamp format**: `YYYY-MM-DDTHH:MM:SSZ` (UTC, no microseconds, no offset)
-- **Merge conflicts**: `.gitattributes` sets `merge=union` — the CI bot auto-resolves
-  positional conflicts. If you see conflict markers locally, run:
-  `git fetch origin main && git merge origin/main`
-- **Never sort or rewrite** the file; append-only, insertion order preserved.
 
 ## Post-Task Protocol
 
@@ -197,4 +191,4 @@ See `agents-docs/self-learning-rules.md` for all learnings (LESSON-026 through L
 
 | Category | Skills |
 |----------|--------|
-| **Quality** | `avoid-ai-writing`, `dogfood`, `lifecycle-management`, `skill-creator`, `skill-evaluator`, `static-analysis`, `testdata-builders`, `verification-template`, `voice-profiles` |
+| **Quality** | `avoid-ai-writing`, `dogfood`, `lifecycle-management`, `skill-creator`, `skill-evaluator`, `static-analysis`, `testdata-builders`, `verification-template` |

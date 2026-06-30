@@ -308,8 +308,3 @@ Run every step. Swarm coordinates handoffs.
 - [ ] Token scaffold modified after Phase 2 freeze
 - [ ] Anti-slop audit skipped to save time
 - [ ] Variants generated without shared token foundation
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

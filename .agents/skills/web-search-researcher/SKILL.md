@@ -237,8 +237,3 @@ Analyze, Search strategically, Fetch authoritative, Synthesize with attribution.
 ## References
 
 - `references/guide.md` - Complete guide with strategies, rounds, operators, depth levels, workflow, and examples
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

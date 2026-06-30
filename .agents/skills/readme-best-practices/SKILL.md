@@ -179,8 +179,3 @@ Before finalising, verify:
 - [ ] README contains placeholder text or lorem ipsum
 - [ ] Badge URLs point to non-existent workflow files
 - [ ] Quick Start requires API keys or credentials without mention
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

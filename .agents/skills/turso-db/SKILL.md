@@ -218,8 +218,3 @@ Official docs: **<https://docs.turso.tech>** (Mintlify — append `.md` to any U
 | `sdks/rust.md` | turso crate: Builder, async execute/query, sync feature |
 | `sdks/python.md` | pyturso: DB-API 2.0, turso.aio async, turso.sync remote |
 | `sdks/go.md` | tursogo: database/sql driver, no CGO, sync driver |
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

@@ -113,8 +113,3 @@ Is the element animating?
 ## See Also
 
 - `ui-ux-optimize` — UI/UX optimization with swarm agents
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

@@ -200,8 +200,3 @@ This coordination skill works with:
 ## References
 
 - **[../../../agents-docs/references/orchestration-patterns.md](../../../agents-docs/references/orchestration-patterns.md)** - Complete guide with detailed steps, patterns, synchronization strategies, error handling, performance optimization, and troubleshooting
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.
