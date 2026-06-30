@@ -166,3 +166,8 @@ The rewriter:
 - `AGENTS.md` - Repository standards and quality gates.
 - `scripts/normalize-commits.sh` - Commit-message rewriter for Jules branches.
 - `ADR-008` - Why this step is mandatory.
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.
