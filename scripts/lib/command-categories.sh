@@ -6,13 +6,13 @@ set -euo pipefail
 # Security Hardening: 2026-06-20 - Prevented keyword merging bypasses.
 # Default categories (can be overridden in .command-verify.conf)
 SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get:ls:cat:echo:grep:find:pwd:diff:cd:head:tail:sort:uniq:wc:git:log:pgrep:type:which:df:du:free:top:ps:history}"
-CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl:ssh-keygen:openssl:gpg}"
+CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl:ssh-keygen:openssl:gpg:mv:cp:ln:link:patch:tar:zip:unzip:gzip:gunzip:bzip2:xz}"
 # Destructive and administrative commands (strict boundaries)
-DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:killall:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown:pkill:sed:truncate:unlink:tee:-f:-y}"
+DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:killall:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown:pkill:sed:truncate:unlink:tee:parted:fdisk:gdisk:sfdisk:wipe:srm:badblocks:alias:unalias:-f:-y}"
 # Language interpreters (broad boundaries to catch versioned ones like python3.11)
 INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:pip3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip:composer:bundle:pipenv:poetry:conda:mamba:uv}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
-NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat:nslookup:dig:host:nc.openbsd:nc.traditional}"
+NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat:nslookup:dig:host:nc.openbsd:nc.traditional:telnet:ftp:tftp:ssh-add:ssh-agent:ncat:tcpdump:wireshark:tshark}"
 
 # Custom patterns for categories (E3)
 SAFE_PATTERNS=()
