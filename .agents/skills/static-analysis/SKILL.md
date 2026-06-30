@@ -109,3 +109,8 @@ UNUSED_VAR="internal"
 - `code-review-assistant` — PR review workflow with code smell detection
 - `codacy` — Local Codacy Analysis CLI for static analysis
 - `codacy` — Codacy CLI for local analysis and cloud data queries
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

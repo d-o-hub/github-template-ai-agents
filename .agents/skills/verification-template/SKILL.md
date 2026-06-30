@@ -64,3 +64,8 @@ Define systematic, portable verification checklists for common operations within
 
 - `AGENTS.md` - Repository standards and quality gates
 - `scripts/quality_gate.sh` - Automated verification entry point
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

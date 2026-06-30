@@ -111,3 +111,8 @@ absent.
 - [ ] Committing architecture changes without regenerating the diagram
 - [ ] Manually editing the SVG instead of using the generator script
 - [ ] Ignoring diagram regeneration when adding/removing skills or agents
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.
