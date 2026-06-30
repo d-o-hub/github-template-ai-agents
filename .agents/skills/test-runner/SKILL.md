@@ -190,8 +190,3 @@ for i in {1..10}; do pytest || echo "Failed run $i"; done
 ## References
 
 - `agents-docs/SKILLS.md` - Skill framework guide
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

@@ -193,8 +193,3 @@ GOAP enables systematic planning through: Analysis, Decomposition, Strategy, Qua
 
 - `references/guide.md` - Complete templates, detailed examples, extended patterns, error handling, optimization
 - `execution-strategies.md` - Execution pattern details
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

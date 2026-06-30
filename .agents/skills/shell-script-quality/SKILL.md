@@ -252,8 +252,3 @@ For quality-critical operations:
 - [ ] Running shell scripts without set -euo pipefail
 - [ ] Skipping ShellCheck linting before committing shell scripts
 - [ ] Suppressing SC warnings without documenting the reason and date
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

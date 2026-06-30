@@ -74,8 +74,3 @@ Use the official toolchain for the selected channel.
 
 - `AGENTS.md` - Version management policy
 - `scripts/wasm_size_gate.sh` - WASM size enforcement
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

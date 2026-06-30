@@ -105,8 +105,3 @@ interface AIActLogEntry {
 
 - [ ] Deploying without interaction disclosure.
 - [ ] High-risk systems without automated record-keeping.
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

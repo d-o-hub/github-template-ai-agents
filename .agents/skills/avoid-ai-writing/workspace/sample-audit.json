@@ -1,164 +1,54 @@
 {
   "filename": ".agents/skills/avoid-ai-writing/workspace/sample-input.md",
-  "score": 100,
-  "label": "Heavy AI patterns",
+  "score": 46,
+  "label": "Moderate AI signals",
   "issues": [
-    {
-      "type": "tier1",
-      "text": "vibrant",
-      "severity": "high",
-      "suggestion": "describe what makes it active"
-    },
-    {
-      "type": "tier1",
-      "text": "nestled",
-      "severity": "high",
-      "suggestion": "is located, sits"
-    },
-    {
-      "type": "tier1",
-      "text": "thriving",
-      "severity": "high",
-      "suggestion": "growing, active"
-    },
-    {
-      "type": "tier1",
-      "text": "seamless",
-      "severity": "high",
-      "suggestion": "smooth, easy, without friction"
-    },
-    {
-      "type": "tier1",
-      "text": "delve",
-      "severity": "high",
-      "suggestion": "explore, dig into, look at"
-    },
-    {
-      "type": "tier1",
-      "text": "robust",
-      "severity": "high",
-      "suggestion": "strong, reliable, solid"
-    },
-    {
-      "type": "tier1",
-      "text": "cutting-edge",
-      "severity": "high",
-      "suggestion": "latest, newest, advanced"
-    },
-    {
-      "type": "tier1",
-      "text": "tapestry",
-      "severity": "high",
-      "suggestion": "describe the actual complexity"
-    },
-    {
-      "type": "tier1",
-      "text": "delve into",
-      "severity": "high",
-      "suggestion": "explore, dig into"
-    },
-    {
-      "type": "tier1",
-      "text": "landscape",
-      "severity": "high",
-      "suggestion": "field, space, industry"
-    },
-    {
-      "type": "tier1",
-      "text": "realm",
-      "severity": "high",
-      "suggestion": "area, field, domain"
-    },
-    {
-      "type": "tier1",
-      "text": "watershed moment",
-      "severity": "high",
-      "suggestion": "turning point, shift"
-    },
-    {
-      "type": "tier1",
-      "text": "the future looks bright",
-      "severity": "high",
-      "suggestion": "cut or say something specific"
-    },
-    {
-      "type": "tier1",
-      "text": "serves as",
-      "severity": "high",
-      "suggestion": "is"
-    },
-    {
-      "type": "tier2",
-      "text": "ecosystem",
-      "severity": "medium",
-      "suggestion": "system, community, network"
-    },
-    {
-      "type": "tier2",
-      "text": "poised",
-      "severity": "medium",
-      "suggestion": "ready, set, about to"
-    },
     {
       "type": "transition",
       "text": "Moreover",
-      "index": 370,
+      "index": 375,
       "severity": "medium",
       "suggestion": null
     },
     {
       "type": "transition",
       "text": "In conclusion",
-      "index": 434,
+      "index": 438,
       "severity": "medium",
       "suggestion": null
     },
     {
       "type": "chatbot",
       "text": "I hope this helps",
-      "index": 528,
+      "index": 539,
       "severity": "critical",
-      "suggestion": null
-    },
-    {
-      "type": "generic-conclusion",
-      "text": "the future looks bright",
-      "index": 449,
-      "severity": "medium",
-      "suggestion": null
-    },
-    {
-      "type": "significance-inflation",
-      "text": "a watershed moment for",
-      "index": 174,
-      "severity": "high",
       "suggestion": null
     },
     {
       "type": "vague-attribution",
       "text": "experts believe",
-      "index": 380,
+      "index": 385,
       "severity": "critical",
       "suggestion": null
     },
     {
       "type": "cutoff-disclaimer",
       "text": "Based on available information",
-      "index": 492,
+      "index": 503,
       "severity": "critical",
       "suggestion": null
     },
     {
       "type": "ai-placeholder",
       "text": "[Your Name]",
-      "index": 568,
+      "index": 579,
       "severity": "critical",
       "suggestion": null
     },
     {
       "type": "ai-citation-markup",
       "text": "citeturn0search0",
-      "index": 549,
+      "index": 560,
       "severity": "critical",
       "suggestion": null
     }

@@ -57,8 +57,3 @@ Purpose: design, implement, and validate offline/PWA behavior (service worker, c
 
 - `references/offline-strategies.md` - Offline-first architecture patterns
 - `references/sync-queue.md` - Sync queue design and conflict resolution
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.
