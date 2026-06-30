@@ -78,8 +78,3 @@ Design and implement efficient, secure, and reliable CI/CD pipelines.
 
 - `git-github-workflow` — Full commit-to-merge lifecycle including CI monitoring
 - `github-pr-sentinel` — Specialized PR monitoring with CI failure diagnosis
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

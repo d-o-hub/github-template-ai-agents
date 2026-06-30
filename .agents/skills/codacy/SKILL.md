@@ -187,8 +187,3 @@ The analyzed repository is **never modified outside of `.codacy/`**.
 ## Troubleshooting
 
 See [references/analysis-troubleshooting.md](references/analysis-troubleshooting.md) for details.
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

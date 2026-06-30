@@ -72,8 +72,3 @@ src/routes/
 - [ ] Returning raw error stack traces in API responses
 - [ ] Skipping input validation because "the client should handle it"
 - [ ] Deploying without CORS configuration on public endpoints
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.
