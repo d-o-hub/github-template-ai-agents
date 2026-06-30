@@ -231,3 +231,8 @@ Use `batch` when you have a known sequence of commands that don't depend on inte
 ## References
 
 - `references/PATTERNS.md` - Common patterns, security, and advanced usage
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

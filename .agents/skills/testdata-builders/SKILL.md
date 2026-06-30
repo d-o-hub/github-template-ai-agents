@@ -75,3 +75,8 @@ function makeUser(overrides: Partial<User> = {}): User {
 
 - `references/builder-patterns.md` - Common factory/builder patterns
 - `references/test-data-strategy.md` - Test data management strategy
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.
