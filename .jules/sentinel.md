@@ -9,3 +9,9 @@
 **Vulnerability:** Greedy suffix matching `[a-z0-9.]*` caused false positives on common words (e.g., `show` matched `sh`, `google` matched `go`).
 **Learning:** Suffix patterns for command matching must distinguish between versioned/hyphenated variants and unrelated words. A more restrictive pattern `([.][a-z0-9]+|[0-9-][a-z0-9.]*)?` allows for `python3.11`, `mkfs.ext4`, and `nc-traditional` while rejecting words where the keyword is just a prefix.
 **Prevention:** Use structured suffix regexes that require a dot, digit, or hyphen immediately following the keyword when matching command variants.
+
+## 2026-06-30 - Expanded Sensitive Command and Path Coverage
+
+**Vulnerability:** Gaps in command categorization and forbidden path lists allowed potential execution of sensitive system tools and access to credential files.
+**Learning:** Security boundaries must be frequently audited to include data-exfiltration tools (tar, zip), networking utilities (telnet, ftp), and ecosystem-specific configuration files (.npmrc, .ssh).
+**Prevention:** Maintain comprehensive lists of sensitive keywords and paths that prioritize "fail-secure" defaults for agent operations.
