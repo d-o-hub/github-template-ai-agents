@@ -245,8 +245,3 @@ I4: 88% → Write tests → 91% ✓
 - [ ] Running more than 15 iterations without convergence or re-evaluation
 - [ ] Skipping validator execution between iterations
 - [ ] Losing context from previous iterations leading to repeated failed approaches
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

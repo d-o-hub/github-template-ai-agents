@@ -73,8 +73,3 @@ If the Blueprint is missing or incomplete, stop and request it before proceeding
 
 - `delegate` — Context retrieval before implementation
 - `goap-agent` — Orchestrator that assigns implementer tasks
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

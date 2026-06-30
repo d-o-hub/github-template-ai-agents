@@ -93,8 +93,3 @@ This enforces an approximate token ceiling even if retrieval output is verbose.
 - [ ] Skipping index creation and assuming retrieval will work without it
 - [ ] Ignoring token budget limits and flooding context with unfiltered results
 - [ ] Using only keyword search when semantic relationships are needed
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

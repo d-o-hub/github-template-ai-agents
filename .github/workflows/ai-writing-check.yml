@@ -1,0 +1,136 @@
+---
+name: AI-ism Detection
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - '**.md'
+  pull_request:
+    branches: ['**']
+    paths:
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  ai-ism-check:
+    name: AI-ism Detection Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e  # v6.4.0
+        with:
+          node-version: '20'
+
+      - name: Get changed files
+        id: changed-files
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          if [ "$EVENT_NAME" == "pull_request" ]; then
+            FILES=$(git diff --name-only "origin/$BASE_REF...HEAD" | grep '\.md$' || true)
+          else
+            FILES=$(git diff --name-only "$BEFORE_SHA" "$HEAD_SHA" | grep '\.md$' || true)
+          fi
+          {
+            echo "files<<EOF"
+            echo "$FILES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run AI-ism detection
+        if: steps.changed-files.outputs.files != ''
+        id: detection
+        env:
+          FILES: ${{ steps.changed-files.outputs.files }}
+        run: |
+          # Use P0,P1 severity for CI (fail on P0)
+          echo "$FILES" | while IFS= read -r file; do
+            if [ -n "$file" ]; then
+              ./bin/avoid-ai-writing --mode detect --severity P0,P1 --context docs "$file"
+            fi
+          done > audit_report.txt 2>&1 || true
+          cat audit_report.txt
+
+          if grep -q "\[P0\]" audit_report.txt; then
+            echo "p0_detected=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "p0_detected=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if grep -q "\[P1\]" audit_report.txt; then
+            echo "p1_detected=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "p1_detected=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Auto-fix AI-isms on release branches
+        if: |
+          (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' ||
+           startsWith(github.ref, 'refs/heads/release/')) &&
+          steps.changed-files.outputs.files != ''
+        env:
+          FILES: ${{ steps.changed-files.outputs.files }}
+        run: |
+          echo "$FILES" | while IFS= read -r file; do
+            if [ -n "$file" ]; then
+              ./bin/avoid-ai-writing --mode edit --severity P0,P1,P2 --iterate 1 "$file"
+            fi
+          done
+          if ! git diff --quiet; then
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add .
+            git commit -m "chore: auto-fix AI-isms in markdown files"
+            git push
+          fi
+
+      - name: Post PR comment
+        if: |
+          github.event_name == 'pull_request' &&
+          (steps.detection.outputs.p0_detected == 'true' || steps.detection.outputs.p1_detected == 'true')
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
+        env:
+          P0_DETECTED: ${{ steps.detection.outputs.p0_detected }}
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('audit_report.txt', 'utf8');
+            const p0 = process.env.P0_DETECTED === 'true';
+
+            let body = '### 🤖 AI-ism Detection Report\n\n';
+            if (p0) {
+              body += '❌ **Critical AI-isms (P0) found!** Please fix these to pass the quality gate.\n\n';
+            } else {
+              body += '⚠️ **AI-isms (P1) found.** These are warnings and do not ' +
+                      'block merge, but review is recommended.\n\n';
+            }
+            body += '```\n' + report + '\n```\n';
+            body += '\n*Tip: You can run `./bin/avoid-ai-writing --mode edit <file>` ' +
+                    'locally to auto-fix some issues.*';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Fail if P0 detected
+        if: steps.detection.outputs.p0_detected == 'true'
+        run: |
+          echo "❌ P0 AI-isms detected. Failing build."
+          exit 1

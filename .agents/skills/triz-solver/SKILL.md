@@ -177,8 +177,3 @@ Result: Reliability maintained, context efficiency improved
 - `references/principles.md` - All 40 TRIZ principles with software examples
 - `references/patterns.md` - Common software contradiction patterns and resolutions
 - `references/evolution.md` - TRIZ evolution trends for system design
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

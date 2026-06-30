@@ -57,8 +57,3 @@ Purpose: deliver intentional, localized, accessible reader/admin UX.
 
 - `references/responsive-patterns.md` - Responsive layout patterns
 - `references/accessibility-checklist.md` - WCAG compliance checklist
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

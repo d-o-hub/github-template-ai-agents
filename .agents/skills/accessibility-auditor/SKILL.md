@@ -68,8 +68,3 @@ Check these automatically using axe-core, Lighthouse, or WAVE:
 - `references/aria-guide.md` - ARIA authoring practices
 - `references/screen-reader-testing.md` - Testing procedures
 - `references/color-contrast.md` - Contrast calculations
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

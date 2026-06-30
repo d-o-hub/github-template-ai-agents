@@ -81,8 +81,3 @@ Environment variables control behavior:
 - [ ] Disabling the docs hook to speed up commits
 - [ ] Manually copying docs instead of using the sync script
 - [ ] Ignoring sync failures after documentation changes
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

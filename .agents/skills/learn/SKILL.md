@@ -77,8 +77,3 @@ Every new non-obvious insight must be recorded in three places:
 
 - `agents-docs/LESSONS.md` - Legacy project-wide lessons.
 - `AGENTS.md` - Root agent guidance and constraints.
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

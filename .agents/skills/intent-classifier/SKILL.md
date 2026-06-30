@@ -117,8 +117,3 @@ This scans `.agents/skills/` and regenerates the skill registry with:
 - `references/classification-rules.md` - Detailed classification algorithm
 - `references/skill-catalog.md` - Auto-generated skill registry
 - `references/workflow-patterns.md` - Multi-skill orchestration patterns
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

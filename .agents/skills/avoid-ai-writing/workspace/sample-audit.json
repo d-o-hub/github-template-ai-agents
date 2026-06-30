@@ -1,0 +1,56 @@
+{
+  "filename": ".agents/skills/avoid-ai-writing/workspace/sample-input.md",
+  "score": 46,
+  "label": "Moderate AI signals",
+  "issues": [
+    {
+      "type": "transition",
+      "text": "Moreover",
+      "index": 375,
+      "severity": "medium",
+      "suggestion": null
+    },
+    {
+      "type": "transition",
+      "text": "In conclusion",
+      "index": 438,
+      "severity": "medium",
+      "suggestion": null
+    },
+    {
+      "type": "chatbot",
+      "text": "I hope this helps",
+      "index": 539,
+      "severity": "critical",
+      "suggestion": null
+    },
+    {
+      "type": "vague-attribution",
+      "text": "experts believe",
+      "index": 385,
+      "severity": "critical",
+      "suggestion": null
+    },
+    {
+      "type": "cutoff-disclaimer",
+      "text": "Based on available information",
+      "index": 503,
+      "severity": "critical",
+      "suggestion": null
+    },
+    {
+      "type": "ai-placeholder",
+      "text": "[Your Name]",
+      "index": 579,
+      "severity": "critical",
+      "suggestion": null
+    },
+    {
+      "type": "ai-citation-markup",
+      "text": "citeturn0search0",
+      "index": 560,
+      "severity": "critical",
+      "suggestion": null
+    }
+  ]
+}

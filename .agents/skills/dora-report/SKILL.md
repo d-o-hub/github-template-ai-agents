@@ -69,8 +69,3 @@ Activate when:
 
 - `agents-docs/WORKFLOW.md` - Standard delivery process to measure against.
 - `scripts/analyze-codebase.sh` - Source for some raw performance data.
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.
