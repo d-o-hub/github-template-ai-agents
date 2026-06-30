@@ -34,45 +34,65 @@ jobs:
 
       - name: Get changed files
         id: changed-files
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '\.md$' || true)
+          if [ "$EVENT_NAME" == "pull_request" ]; then
+            # Compare against the base branch
+            FILES=$(git diff --name-only "origin/$BASE_REF...HEAD" | grep '\.md$' | \
+              grep -v "^.agents/skills/avoid-ai-writing/workspace/" || true)
           else
-            FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.md$' || true)
+            # Compare against the previous commit
+            FILES=$(git diff --name-only "$BEFORE_SHA" "$HEAD_SHA" | grep '\.md$' | \
+              grep -v "^.agents/skills/avoid-ai-writing/workspace/" || true)
           fi
-          echo "files<<EOF" >> $GITHUB_OUTPUT
-          echo "$FILES" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo "files<<EOF"
+            echo "$FILES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Run AI-ism detection
         if: steps.changed-files.outputs.files != ''
         id: detection
+        env:
+          FILES: ${{ steps.changed-files.outputs.files }}
         run: |
           # Use P0,P1 severity for CI (fail on P0)
-          # Pass severity: --severity P0,P1 for CI (fast)
-          echo "${{ steps.changed-files.outputs.files }}" | xargs ./bin/avoid-ai-writing --mode detect --severity P0,P1 --context docs > audit_report.txt 2>&1
+          # Use env var to avoid script injection and shell word splitting
+          set +e
+          echo "$FILES" | xargs ./bin/avoid-ai-writing --mode detect \
+            --severity P0,P1 --context docs > audit_report.txt 2>&1
           EXIT_CODE=$?
+          set -e
           cat audit_report.txt
 
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "p0_detected=true" >> $GITHUB_OUTPUT
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo "p0_detected=true" >> "$GITHUB_OUTPUT"
           else
-            echo "p0_detected=false" >> $GITHUB_OUTPUT
+            echo "p0_detected=false" >> "$GITHUB_OUTPUT"
           fi
 
           # Check for P1 warnings even if P0 passed
           if grep -q "\[P1\]" audit_report.txt; then
-            echo "p1_detected=true" >> $GITHUB_OUTPUT
+            echo "p1_detected=true" >> "$GITHUB_OUTPUT"
           else
-            echo "p1_detected=false" >> $GITHUB_OUTPUT
+            echo "p1_detected=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Auto-fix AI-isms on release branches
         if: |
-          (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) &&
+          (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' ||
+           startsWith(github.ref, 'refs/heads/release/')) &&
           steps.changed-files.outputs.files != ''
+        env:
+          FILES: ${{ steps.changed-files.outputs.files }}
         run: |
-          echo "${{ steps.changed-files.outputs.files }}" | xargs ./bin/avoid-ai-writing --mode edit --severity P0,P1,P2 --iterate 1
+          echo "$FILES" | xargs ./bin/avoid-ai-writing --mode edit \
+            --severity P0,P1,P2 --iterate 1
           if ! git diff --quiet; then
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
@@ -84,22 +104,28 @@ jobs:
       - name: Post PR comment
         if: |
           github.event_name == 'pull_request' &&
-          (steps.detection.outputs.p0_detected == 'true' || steps.detection.outputs.p1_detected == 'true')
+          (steps.detection.outputs.p0_detected == 'true' ||
+           steps.detection.outputs.p1_detected == 'true')
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
+        env:
+          P0_DETECTED: ${{ steps.detection.outputs.p0_detected }}
         with:
           script: |
             const fs = require('fs');
             const report = fs.readFileSync('audit_report.txt', 'utf8');
-            const p0 = '${{ steps.detection.outputs.p0_detected }}' === 'true';
+            const p0 = process.env.P0_DETECTED === 'true';
 
             let body = '### 🤖 AI-ism Detection Report\n\n';
             if (p0) {
-              body += '❌ **Critical AI-isms (P0) found!** Please fix these to pass the quality gate.\n\n';
+              body += '❌ **Critical AI-isms (P0) found!** ' +
+                      'Please fix these to pass the quality gate.\n\n';
             } else {
-              body += '⚠️ **AI-isms (P1) found.** These are warnings and do not block merge, but review is recommended.\n\n';
+              body += '⚠️ **AI-isms (P1) found.** These are warnings and do not ' +
+                      'block merge, but review is recommended.\n\n';
             }
             body += '```\n' + report + '\n```\n';
-            body += '\n*Tip: You can run `./bin/avoid-ai-writing --mode edit <file>` locally to auto-fix some issues.*';
+            body += '\n*Tip: You can run `./bin/avoid-ai-writing --mode edit <file>` ' +
+                    'locally to auto-fix some issues.*';
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
