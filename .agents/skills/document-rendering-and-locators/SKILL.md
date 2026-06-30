@@ -57,3 +57,8 @@ Purpose: implement resilient document rendering, locator extraction, and annotat
 
 - `references/locator-patterns.md` - Document locator strategies
 - `references/anchoring.md` - Annotation anchoring techniques
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

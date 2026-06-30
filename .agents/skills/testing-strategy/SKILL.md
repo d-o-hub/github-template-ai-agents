@@ -91,3 +91,8 @@ Integrate testing into CI/CD:
 - `test-runner` — Execute tests and diagnose failures
 - `dogfood` — Exploratory testing of web applications
 - `testdata-builders` — Create test fixtures and factories
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

@@ -139,3 +139,8 @@ fi
 - [ ] Adding email fields to package metadata or config files
 - [ ] Using real email addresses in documentation examples
 - [ ] Skipping email scans in CI because "it's just a test file"
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

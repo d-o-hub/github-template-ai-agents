@@ -223,3 +223,8 @@ jobs:
 ## References
 
 - `agents-docs/SKILLS.md` - Skill authoring guide
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

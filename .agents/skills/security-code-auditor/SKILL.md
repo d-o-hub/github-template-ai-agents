@@ -115,3 +115,8 @@ cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
 
 - [Security Checklist](../../../agents-docs/references/security-checklist.md) - Comprehensive security audit checklist, OWASP Top 10, and CI/CD security scanning.
 - `references/remediation-guide.md` - Step-by-step vulnerability remediation
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

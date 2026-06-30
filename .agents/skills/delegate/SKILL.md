@@ -67,3 +67,8 @@ Delegate should hand off to an Implementer when:
 
 - `implementer` — Execute code changes after delegation
 - `goap-agent` — Orchestrator that uses delegate for context gathering
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.
