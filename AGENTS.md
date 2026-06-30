@@ -2,6 +2,24 @@
 
 <!-- Agent-specific guidance: CLAUDE.md, GEMINI.md, QWEN.md, JULES.md -->
 
+## Named Constants
+
+```bash
+# File size limits (lines)
+readonly MAX_LINES_PER_SOURCE_FILE=500
+readonly MAX_LINES_PER_SKILL_MD=250
+readonly MAX_LINES_AGENTS_MD=200
+
+# Retry and polling configuration
+readonly DEFAULT_MAX_RETRIES=3
+readonly DEFAULT_RETRY_DELAY_SECONDS=5
+readonly DEFAULT_POLL_INTERVAL_SECONDS=5
+readonly DEFAULT_MAX_POLL_ATTEMPTS=12
+readonly DEFAULT_TIMEOUT_SECONDS=1800
+
+# Git/PR configuration
+readonly MAX_COMMIT_SUBJECT_LENGTH=150
+readonly MAX_PR_TITLE_LENGTH=150
 ```
 
 ## Development Phases
@@ -102,6 +120,16 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 - `scripts/`: Setup/validation; `analysis/` & `reports/`: Generated outputs
 - `.claude/`: Agent-specific symlinks (see `scripts/setup-skills.sh`)
 - `plans/`: ADRs define decisions; progress updates track implementation status.
+
+## PR & Commit Instructions
+
+- **MANDATORY (ADR-008)**: PR titles MUST follow `type(scope): subject`.
+- **Validation**: `echo "title" | npx commitlint --config commitlint.config.cjs` (or `gh pr edit`)
+- PR Title: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
+- Commit Header: `type(scope): subject` (max `${MAX_COMMIT_SUBJECT_LENGTH}` chars total, lowercase)
+- Commit Body: no hard limit (body-max-length disabled in commitlint; enforced at PR level as 1000 chars). Wrap at 100 chars per line. Footer: max 1000 chars.
+- Branch per feature; One concern per PR; Never commit to `main`.
+
 ### Commit Type Mapping
 
 | Intent                        | Type     | Scope suggestion |
@@ -129,16 +157,6 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 - **Delegate**: 2+ files, architectural changes, or tasks requiring judgment.
 - **Swarm**: 5+ similar independent tasks (e.g., batch doc normalization, multi-file refactors).
 - **Route to**: `delegate` (retrieval/context) → `implementer` (execution) → `agent-coordination` (swarm dispatch).
-
-## Metrics File
-
-Append to `.agents/metrics.jsonl` after every task (see Post-Task Protocol).
-
-- **Timestamp format**: `YYYY-MM-DDTHH:MM:SSZ` (UTC, no microseconds, no offset)
-- **Merge conflicts**: `.gitattributes` sets `merge=union` — the CI bot auto-resolves
-  positional conflicts. If you see conflict markers locally, run:
-  `git fetch origin main && git merge origin/main`
-- **Never sort or rewrite** the file; append-only, insertion order preserved.
 
 ## Post-Task Protocol
 
