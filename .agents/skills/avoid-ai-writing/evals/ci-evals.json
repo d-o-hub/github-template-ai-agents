@@ -1,0 +1,40 @@
+{
+  "skill_name": "avoid-ai-writing-cli",
+  "evals": [
+    {
+      "id": 101,
+      "name": "CLI Detection - P0 Artifact",
+      "command": "./bin/avoid-ai-writing --mode detect --severity P0 --json",
+      "stdin": "Based on available information, I hope this helps! citeturn0search0",
+      "expected_output": "P0",
+      "assertions": [
+        "exit_code == 1",
+        "stdout contains 'cutoff-disclaimer'",
+        "stdout contains 'ai-citation-markup'"
+      ]
+    },
+    {
+      "id": 102,
+      "name": "CLI Detection - P1 Vocabulary",
+      "command": "./bin/avoid-ai-writing --mode detect --severity P1 --json",
+      "stdin": "We will delve into the robust landscape of this cutting-edge platform.",
+      "expected_output": "P1",
+      "assertions": [
+        "exit_code == 0",
+        "stdout contains 'tier1'",
+        "stdout contains 'delve'"
+      ]
+    },
+    {
+      "id": 103,
+      "name": "CLI Edit - Auto-fix Tier 1",
+      "command": "./bin/avoid-ai-writing --mode edit --severity P1",
+      "stdin": "We will delve into the robust landscape.",
+      "expected_output": "explore",
+      "assertions": [
+        "stdout contains 'explore'",
+        "stdout contains 'strong'"
+      ]
+    }
+  ]
+}
