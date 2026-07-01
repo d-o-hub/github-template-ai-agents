@@ -15,3 +15,9 @@
 **Vulnerability:** Gaps in command categorization and forbidden path lists allowed potential execution of sensitive system tools and access to credential files.
 **Learning:** Security boundaries must be frequently audited to include data-exfiltration tools (tar, zip), networking utilities (telnet, ftp), and ecosystem-specific configuration files (.npmrc, .ssh).
 **Prevention:** Maintain comprehensive lists of sensitive keywords and paths that prioritize "fail-secure" defaults for agent operations.
+
+## 2026-07-01 - Credential and Firewall Tool Hardening
+
+**Vulnerability:** Agent access to cloud/container credentials (.aws, .kube, .docker) and firewall tools (iptables, ufw) was not explicitly restricted.
+**Learning:** Security-focused agents require explicit boundaries for infrastructure-level configuration and credentials to prevent unauthorized exfiltration or network modification.
+**Prevention:** Proactively include cloud, container, and network security toolsets in `FORBIDDEN_PATHS` and `DESTRUCTIVE_KEYWORDS` lists.
