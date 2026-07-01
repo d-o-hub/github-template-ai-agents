@@ -37,7 +37,8 @@ fi
 DOCS_UPDATED=false
 
 # 1. Sync skill documentation if skills changed
-if printf "%s\n" "$CHANGED_FILES" | grep -q -- ".agents/skills/"; then
+# perf: replace `grep -q` with native bash string match
+if [[ "$CHANGED_FILES" == *".agents/skills/"* ]]; then
     if [[ "$DOCS_SYNC_QUIET" != "true" ]]; then
         echo "Skills changed - updating documentation..."
     fi
@@ -50,7 +51,8 @@ if printf "%s\n" "$CHANGED_FILES" | grep -q -- ".agents/skills/"; then
     fi
     
     # Update agents registry if agent configs changed
-    if printf "%s\n" "$CHANGED_FILES" | grep -qE -- "\.(claude|opencode)/agents/"; then
+    # perf: replace `grep -qE` with native bash regex match
+    if [[ "$CHANGED_FILES" =~ \.(claude|opencode)/agents/ ]]; then
         if [[ -f "$REPO_ROOT/scripts/update-agents-registry.sh" ]]; then
             "$REPO_ROOT/scripts/update-agents-registry.sh" 2>/dev/null || true
             git add agents-docs/AGENTS_REGISTRY.md 2>/dev/null || true
@@ -59,7 +61,8 @@ if printf "%s\n" "$CHANGED_FILES" | grep -q -- ".agents/skills/"; then
 fi
 
 # 2. Regenerate LLM context files if markdown changed
-if [[ "$DOCS_SYNC_LLM_TXT" == "true" ]] && printf "%s\n" "$CHANGED_FILES" | grep -qE -- '\.(md|txt)$'; then
+# perf: replace `grep -qE` with native bash regex match handling line boundaries
+if [[ "$DOCS_SYNC_LLM_TXT" == "true" ]] && [[ "$CHANGED_FILES" =~ \.(md|txt)($|$'\n') ]]; then
     if [[ "$DOCS_SYNC_QUIET" != "true" ]]; then
         echo "Documentation changed - regenerating LLM context files..."
     fi
@@ -72,7 +75,8 @@ if [[ "$DOCS_SYNC_LLM_TXT" == "true" ]] && printf "%s\n" "$CHANGED_FILES" | grep
 fi
 
 # 3. Run docs-sync for lightweight file synchronization
-if printf "%s\n" "$CHANGED_FILES" | grep -qE -- '\.(md)$'; then
+# perf: replace `grep -qE` with native bash regex match handling line boundaries
+if [[ "$CHANGED_FILES" =~ \.(md)($|$'\n') ]]; then
     if [[ "$DOCS_SYNC_QUIET" != "true" ]]; then
         echo "Running docs sync..."
     fi

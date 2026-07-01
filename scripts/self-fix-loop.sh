@@ -249,25 +249,27 @@ phase_monitor_ci() {
         # Analyze status
         local has_pending=false has_failure=false
 
-        if printf "%s\n" "$checks_output" | grep -qiE "(pending|queued|in progress|running|waiting)"; then
+        # perf: using native bash regex/string matching instead of external grep to eliminate process forks
+        if [[ "${checks_output,,}" =~ (pending|queued|in[[:space:]]progress|running|waiting) ]]; then
             has_pending=true
         fi
-        if printf "%s\n" "$checks_output" | grep -qiE "(fail|error|✗|×)"; then
+        if [[ "${checks_output,,}" =~ (fail|error|✗|×) ]]; then
             has_failure=true
         fi
 
         # Check workflow runs
         local workflow_runs
         workflow_runs=$(gh run list --branch "$BRANCH_NAME" --limit 5 --json status,conclusion 2>/dev/null || echo "[]")
-        if printf "%s\n" "$workflow_runs" | grep -q '"status":"in_progress"'; then
+        # perf: using native bash string matching instead of external grep to eliminate process forks
+        if [[ "$workflow_runs" == *'"status":"in_progress"'* ]]; then
             has_pending=true
         fi
-        if printf "%s\n" "$workflow_runs" | grep -q '"conclusion":"failure"'; then
+        if [[ "$workflow_runs" == *'"conclusion":"failure"'* ]]; then
             has_failure=true
         fi
 
         if [[ "$has_pending" == true ]]; then
-            if [[ $(( $(date +%s) - start_time )) -gt $(( TIMEOUT / 2 )) ]]; then
+        if [[ $(( $(date +%s) - start_time )) -gt $(( TIMEOUT / 2 )) ]]; then
                 log "Still waiting... (${elapsed}s elapsed)"
             fi
             sleep "$POLL_INTERVAL"
@@ -323,9 +325,12 @@ phase_analyze_fix() {
 
     for failure in "${LAST_FAILURES[@]}"; do
         log "Analyzing: $failure"
+        # perf: use lowercase expansion to perform case-insensitive match natively
+        local failure_lower="${failure,,}"
 
         # Shell script failures
-        if printf "%s\n" "$failure" | grep -qiE "(shellcheck|shell|bash|sh)"; then
+        # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
+        if [[ "$failure_lower" =~ (shellcheck|shell|bash|sh) ]]; then
             log "→ Shell script issue detected"
             if command -v shellcheck &>/dev/null; then
                 local shell_scripts
@@ -339,7 +344,8 @@ phase_analyze_fix() {
         fi
 
         # YAML/Actions failures
-        if printf "%s\n" "$failure" | grep -qiE "(yaml|yml|action|workflow)"; then
+        # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
+        if [[ "$failure_lower" =~ (yaml|yml|action|workflow) ]]; then
             log "→ YAML/Actions issue detected"
             if command -v yamllint &>/dev/null; then
                 yamllint -d "{extends: default, rules: {line-length: {max: 120}}}" .github/ 2>&1 || true
@@ -348,7 +354,8 @@ phase_analyze_fix() {
         fi
 
         # Markdown failures
-        if printf "%s\n" "$failure" | grep -qiE "(markdown|md|markdownlint)"; then
+        # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
+        if [[ "$failure_lower" =~ (markdown|md|markdownlint) ]]; then
             log "→ Markdown issue detected"
             if command -v markdownlint &>/dev/null; then
                 markdownlint "**/*.md" --ignore node_modules --ignore target 2>&1 || true
@@ -357,7 +364,8 @@ phase_analyze_fix() {
         fi
 
         # Python failures
-        if printf "%s\n" "$failure" | grep -qiE "(python|ruff|black|pytest|flake8)"; then
+        # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
+        if [[ "$failure_lower" =~ (python|ruff|black|pytest|flake8) ]]; then
             log "→ Python issue detected"
             if command -v ruff &>/dev/null; then
                 ruff check --fix . 2>&1 || true
@@ -370,7 +378,8 @@ phase_analyze_fix() {
         fi
 
         # TypeScript/JavaScript failures
-        if printf "%s\n" "$failure" | grep -qiE "(typescript|javascript|eslint|tsc|npm|pnpm)"; then
+        # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
+        if [[ "$failure_lower" =~ (typescript|javascript|eslint|tsc|npm|pnpm) ]]; then
             log "→ TypeScript/JavaScript issue detected"
             if [[ -f "package.json" ]]; then
                 if command -v pnpm &>/dev/null; then
@@ -384,7 +393,8 @@ phase_analyze_fix() {
         fi
 
         # Skill validation failures
-        if printf "%s\n" "$failure" | grep -qiE "(skill|symlink|SKILL\.md)"; then
+        # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
+        if [[ "$failure_lower" =~ (skill|symlink|skill\.md) ]]; then
             log "→ Skill validation issue detected"
             "$REPO_ROOT/scripts/setup-skills.sh" 2>&1 || true
             "$REPO_ROOT/scripts/validate-skills.sh" 2>&1 || true
@@ -393,7 +403,8 @@ phase_analyze_fix() {
         fi
 
         # Link validation failures
-        if printf "%s\n" "$failure" | grep -qiE "(link|reference|broken)"; then
+        # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
+        if [[ "$failure_lower" =~ (link|reference|broken) ]]; then
             log "→ Link validation issue detected"
             "$REPO_ROOT/scripts/validate-links.sh" 2>&1 || true
             fix_applied=true
