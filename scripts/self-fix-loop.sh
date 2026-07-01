@@ -3,27 +3,22 @@
 # Uses swarm agents with skills on demand until all GitHub Actions pass.
 # Exit 0 = all checks passed, non-zero = max retries/timeout/fatal error.
 set -uo pipefail
-
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT" || exit 1
-
 # Configuration
 MAX_RETRIES="${SELF_FIX_LOOP_MAX_RETRIES:-5}"
 TIMEOUT="${SELF_FIX_LOOP_TIMEOUT:-1800}"
 POLL_INTERVAL="${SELF_FIX_LOOP_POLL_INTERVAL:-30}"
 AUTO_RESEARCH="${SELF_FIX_LOOP_AUTO_RESEARCH:-1}"
 STRICT_VALIDATION="${SELF_FIX_LOOP_STRICT_VALIDATION:-1}"
-
 DRY_RUN=false
 FIX_ISSUES=true
 BASE_BRANCH="main"
-
 # State
 RETRY_COUNT=0
 PR_NUMBER=""
 BRANCH_NAME=""
 LAST_FAILURES=()
-
 # Colors
 if [[ -t 1 ]] && [[ "${FORCE_COLOR:-}" != "0" ]]; then
     RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
@@ -31,14 +26,12 @@ if [[ -t 1 ]] && [[ "${FORCE_COLOR:-}" != "0" ]]; then
 else
     RED=''; GREEN=''; YELLOW=''; BLUE=''; CYAN=''; MAGENTA=''; NC=''
 fi
-
 log() { local msg="$*"; printf "${BLUE}[$(date +%H:%M:%S)]${NC} %s\n" "$msg"; return $?; }
 info() { local msg="$*"; printf "${CYAN}[$(date +%H:%M:%S)] INFO:${NC} %s\n" "$msg"; return $?; }
 error() { local msg="$*"; printf "${RED}[$(date +%H:%M:%S)] ERROR:${NC} %s\n" "$msg" >&2; return $?; }
 success() { local msg="$*"; printf "${GREEN}[$(date +%H:%M:%S)]${NC} %s\n" "$msg"; return $?; }
 warn() { local msg="$*"; printf "${YELLOW}[$(date +%H:%M:%S)] WARNING:${NC} %s\n" "$msg"; return $?; }
 phase() { local phase_num="$1"; local desc="$2"; printf "${MAGENTA}[$(date +%H:%M:%S)] PHASE %s:${NC} %s\n" "$phase_num" "$desc"; return $?; }
-
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -68,7 +61,6 @@ while [[ $# -gt 0 ]]; do
         *) error "Unknown option: $1"; exit 1 ;;
     esac
 done
-
 # Security: Validate numeric configuration AFTER parsing to prevent injection via CLI flags
 for var in MAX_RETRIES TIMEOUT POLL_INTERVAL AUTO_RESEARCH STRICT_VALIDATION; do
     if [[ ! "${!var}" =~ ^[0-9]+$ ]]; then
@@ -76,24 +68,20 @@ for var in MAX_RETRIES TIMEOUT POLL_INTERVAL AUTO_RESEARCH STRICT_VALIDATION; do
         exit 1
     fi
 done
-
 # Phase 1: Commit & Push
 phase_commit_push() {
     phase 1 "Commit & Push"
     log "═══════════════════════════════════════════════════════════════════"
-
     # Check git status
     if ! git rev-parse --git-dir &>/dev/null; then
         error "Not a git repository"
         return 1
     fi
-
     # Check for changes
     if [[ -z "$(git status --porcelain)" ]]; then
         warn "No changes to commit"
         return 0
     fi
-
     # Generate branch name if not on feature branch
     local current_branch
     current_branch=$(git branch --show-current)
@@ -110,7 +98,6 @@ phase_commit_push() {
     else
         BRANCH_NAME="$current_branch"
     fi
-
     # Run quality gate
     log "Running quality gate..."
     if [[ -x "$REPO_ROOT/scripts/quality_gate.sh" ]]; then
@@ -122,7 +109,6 @@ phase_commit_push() {
     else
         warn "quality_gate.sh not found or not executable"
     fi
-
     # Stage and commit
     local commit_msg
     commit_msg="fix: self-fix-loop iteration $((RETRY_COUNT + 1)) of $MAX_RETRIES"
@@ -134,7 +120,6 @@ phase_commit_push() {
     else
         log "[DRY-RUN] Would commit: $commit_msg"
     fi
-
     # Push
     log "Pushing to origin/$BRANCH_NAME..."
     if [[ "$DRY_RUN" != true ]]; then
@@ -143,30 +128,24 @@ phase_commit_push() {
     else
         log "[DRY-RUN] Would push to origin/$BRANCH_NAME"
     fi
-
     return 0
 }
-
 # Phase 2: Create/Update PR
 phase_create_pr() {
     phase 2 "Create/Update PR"
     log "═══════════════════════════════════════════════════════════════════"
-
     if ! command -v gh &>/dev/null; then
         error "GitHub CLI (gh) required for PR operations"
         return 1
     fi
-
     if [[ "$DRY_RUN" == true ]]; then
         log "[DRY-RUN] Would create/update PR"
         PR_NUMBER="DRY-RUN"
         return 0
     fi
-
     # Check for existing PR
     local existing_pr
     existing_pr=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number' 2>/dev/null || echo "")
-
     if [[ -n "$existing_pr" && "$existing_pr" != "null" ]]; then
         PR_NUMBER="$existing_pr"
         log "Updating existing PR #$PR_NUMBER"
@@ -175,20 +154,16 @@ phase_create_pr() {
     else
         log "Creating new PR..."
         local pr_body="## Self-Fix Loop
-
 Automated fix loop - iteration $((RETRY_COUNT + 1))
-
 - **Branch:** \`$BRANCH_NAME\`
 - **Base:** \`$BASE_BRANCH\`
 - **Max Retries:** $MAX_RETRIES
 - **Auto-Research:** $AUTO_RESEARCH
-
 ## Checklist
 - [x] Changes committed
 - [x] Quality gate passed
 - [x] Pushed to remote
 - [ ] All GitHub Actions passing"
-
         local pr_output
         if ! pr_output=$(gh pr create \
             --title "fix: self-fix-loop iteration $((RETRY_COUNT + 1))" \
@@ -198,42 +173,34 @@ Automated fix loop - iteration $((RETRY_COUNT + 1))
             error "Failed to create PR: $pr_output"
             return 1
         fi
-
         PR_NUMBER=$(printf "%s\n" "$pr_output" | grep -oE '[0-9]+$' || echo "")
         if [[ -z "$PR_NUMBER" ]]; then
             PR_NUMBER=$(gh pr view --json number --jq '.number' 2>/dev/null || echo "")
         fi
         success "Created PR #$PR_NUMBER"
     fi
-
     return 0
 }
-
 # Phase 3: Monitor CI
 phase_monitor_ci() {
     phase 3 "Monitor CI"
     log "═══════════════════════════════════════════════════════════════════"
     log "PR: #$PR_NUMBER | Timeout: ${TIMEOUT}s | Poll: ${POLL_INTERVAL}s"
-
     if [[ "$DRY_RUN" == true ]]; then
         log "[DRY-RUN] Would monitor CI checks"
         return 0
     fi
-
     local start_time
     start_time=$(date +%s)
-
     while true; do
         local elapsed=$(( $(date +%s) - start_time ))
         if [[ $elapsed -gt $TIMEOUT ]]; then
             error "Timeout after ${elapsed}s (limit: ${TIMEOUT}s)"
             return 4
         fi
-
         # Get PR checks
         local checks_output
         checks_output=$(gh pr checks "$PR_NUMBER" 2>&1 || true)
-
         # Check PR state
         local pr_state
         pr_state=$(gh pr view "$PR_NUMBER" --json state --jq '.state' 2>/dev/null || echo "OPEN")
@@ -245,10 +212,8 @@ phase_monitor_ci() {
             error "PR was closed"
             return 1
         fi
-
         # Analyze status
         local has_pending=false has_failure=false
-
         # perf: using native bash regex/string matching instead of external grep to eliminate process forks
         if [[ "${checks_output,,}" =~ (pending|queued|in[[:space:]]progress|running|waiting) ]]; then
             has_pending=true
@@ -256,7 +221,6 @@ phase_monitor_ci() {
         if [[ "${checks_output,,}" =~ (fail|error|✗|×) ]]; then
             has_failure=true
         fi
-
         # Check workflow runs
         local workflow_runs
         workflow_runs=$(gh run list --branch "$BRANCH_NAME" --limit 5 --json status,conclusion 2>/dev/null || echo "[]")
@@ -267,7 +231,6 @@ phase_monitor_ci() {
         if [[ "$workflow_runs" == *'"conclusion":"failure"'* ]]; then
             has_failure=true
         fi
-
         if [[ "$has_pending" == true ]]; then
         if [[ $(( $(date +%s) - start_time )) -gt $(( TIMEOUT / 2 )) ]]; then
                 log "Still waiting... (${elapsed}s elapsed)"
@@ -275,13 +238,11 @@ phase_monitor_ci() {
             sleep "$POLL_INTERVAL"
             continue
         fi
-
         # All checks complete
         if [[ "$has_failure" == false ]]; then
             success "ALL CHECKS PASSED"
             return 0
         fi
-
         # Failures detected - capture them
         error "CI CHECKS FAILED"
         LAST_FAILURES=()
@@ -295,39 +256,31 @@ phase_monitor_ci() {
         if [[ ${#LAST_FAILURES[@]} -eq 0 || ( ${#LAST_FAILURES[@]} -eq 1 && -z "${LAST_FAILURES[0]:-}" ) ]]; then
             LAST_FAILURES=("Unknown failure")
         fi
-
         log "Failures:"
         for f in "${LAST_FAILURES[@]}"; do
             log "  - $f"
         done
-
         return 1
     done
 }
-
 # Phase 4: Analyze & Fix
 phase_analyze_fix() {
     phase 4 "Analyze & Fix"
     log "═══════════════════════════════════════════════════════════════════"
-
     if [[ "$FIX_ISSUES" != true ]]; then
         error "Auto-fix disabled"
         return 1
     fi
-
     if [[ "$DRY_RUN" == true ]]; then
         log "[DRY-RUN] Would analyze and fix failures"
         return 0
     fi
-
     # Determine failure categories and apply fixes
     local fix_applied=false
-
     for failure in "${LAST_FAILURES[@]}"; do
         log "Analyzing: $failure"
         # perf: use lowercase expansion to perform case-insensitive match natively
         local failure_lower="${failure,,}"
-
         # Shell script failures
         # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
         if [[ "$failure_lower" =~ (shellcheck|shell|bash|sh) ]]; then
@@ -342,7 +295,6 @@ phase_analyze_fix() {
                 fix_applied=true
             fi
         fi
-
         # YAML/Actions failures
         # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
         if [[ "$failure_lower" =~ (yaml|yml|action|workflow) ]]; then
@@ -352,7 +304,6 @@ phase_analyze_fix() {
                 fix_applied=true
             fi
         fi
-
         # Markdown failures
         # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
         if [[ "$failure_lower" =~ (markdown|md|markdownlint) ]]; then
@@ -362,7 +313,6 @@ phase_analyze_fix() {
                 fix_applied=true
             fi
         fi
-
         # Python failures
         # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
         if [[ "$failure_lower" =~ (python|ruff|black|pytest|flake8) ]]; then
@@ -376,7 +326,6 @@ phase_analyze_fix() {
                 fix_applied=true
             fi
         fi
-
         # TypeScript/JavaScript failures
         # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
         if [[ "$failure_lower" =~ (typescript|javascript|eslint|tsc|npm|pnpm) ]]; then
@@ -391,17 +340,14 @@ phase_analyze_fix() {
                 fi
             fi
         fi
-
         # Skill validation failures
         # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
         if [[ "$failure_lower" =~ (skill|symlink|skill\.md) ]]; then
             log "→ Skill validation issue detected"
             "$REPO_ROOT/scripts/setup-skills.sh" 2>&1 || true
             "$REPO_ROOT/scripts/validate-skills.sh" 2>&1 || true
-
             fix_applied=true
         fi
-
         # Link validation failures
         # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
         if [[ "$failure_lower" =~ (link|reference|broken) ]]; then
@@ -410,7 +356,6 @@ phase_analyze_fix() {
             fix_applied=true
         fi
     done
-
     if [[ "$fix_applied" == false && "$AUTO_RESEARCH" == "1" ]]; then
         log "No local fix found - would use web research"
         log "In full implementation, this would:"
@@ -419,7 +364,6 @@ phase_analyze_fix() {
         log "  3. Apply fixes using relevant skills"
         warn "Web research integration requires manual agent invocation"
     fi
-
     # Stage any fixes
     if [[ -n "$(git status --porcelain)" ]]; then
         log "Staging fixes..."
@@ -429,14 +373,11 @@ phase_analyze_fix() {
     else
         warn "No fixable changes detected"
     fi
-
     return 0
 }
-
 # Main loop
 main() {
     readonly SEP="═══════════════════════════════════════════════════════════════════"
-
     log ""
     log "$SEP"
     log "║     SELF-FIX LOOP - Automated Commit, Push, Monitor, Fix         ║"
@@ -451,26 +392,22 @@ main() {
     log "  Poll interval: ${POLL_INTERVAL}s"
     log "  Dry run: $DRY_RUN"
     log ""
-
     while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
         RETRY_COUNT=$((RETRY_COUNT + 1))
         log "$SEP"
         log "  ITERATION $RETRY_COUNT of $MAX_RETRIES"
         log "$SEP"
         log ""
-
         # Phase 1: Commit & Push
         if ! phase_commit_push; then
             error "Phase 1 failed - cannot continue"
             exit 2
         fi
-
         # Phase 2: Create/Update PR
         if ! phase_create_pr; then
             error "Phase 2 failed - cannot continue"
             exit 5
         fi
-
         # Phase 3: Monitor CI
         if phase_monitor_ci; then
             success ""
@@ -484,7 +421,6 @@ main() {
             log "  PR: #$PR_NUMBER"
             exit 0
         fi
-
         # Phase 4: Analyze & Fix (if retries remaining)
         if [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; then
             log ""
@@ -507,5 +443,4 @@ main() {
     done
     return 0
 }
-
 main "$@"
