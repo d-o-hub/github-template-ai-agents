@@ -46,22 +46,7 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 
 ## Behavioral Defaults
 
-- **Automation-First**: Execute tasks autonomously within approved plans; minimize confirmation loops.
-- **Parallelism**: Use parallel tool calls for independent operations when supported by the runtime.
-- **Direct Action**: Proceed with actions immediately when intent and context are clear.
-- **Diff-Oriented**: Report changes using concise, diff-focused summaries instead of long prose.
-- **Voice & Context**: Adapt tone via `voice-profiles`. Default: `professional`+`blog`. Auto-detects context from cues (code, README, hashtags).
-- **Always-Fix Pre-Existing Issues**: No discussion. No deferral. If a CI check, lint warning, or quality-gate finding is failing on `main` (regardless of who introduced it), agents MUST fix it as part of the current task. The only acceptable exit is a green CI for the current commit's run, with no new regressions and no inherited failures.
-
-**Workflow for pre-existing issues**: load `.agents/skills/goap-agent/SKILL.md` (orchestrator) and `.agents/skills/agent-coordination/SKILL.md` (swarm dispatch). Retriever / Implementer / Verifier in parallel, atomic commits per issue, verify green before moving on. Full playbook: `agents-docs/AGENTS_GUIDANCE.md`.
-
-**Triage protocol for unfixable issues**: If a pre-existing failure cannot be fixed in the current run (e.g., external CI service stale, upstream dependency broken, requires human credential): (1) Create an ADR in `plans/` documenting the issue, root cause, and why it's out of scope. (2) Create a GOAP task in `plans/GOAP_STATE.md` with status `blocked` and the ADR link. (3) Ensure the current commit's quality gate passes — the branch must be green even if inherited issues remain. (4) Never skip, suppress, or mark as `done` an issue that remains open.
-
-### Agentic Abstention
-
-When environment-revealed infeasibility makes further tool calls wasteful,
-agents MUST follow the stopping rules in:
-`.agents/skills/agentic-abstention/SKILL.md`
+See `agents-docs/BEHAVIORAL_DEFAULTS.md` for automation-first, parallelism, direct action, diff-oriented, voice, and pre-existing issue handling rules.
 
 ## Setup
 
@@ -151,47 +136,17 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 ## Delegation Routing
 
 - **Route to**: `delegate` (retrieval/context) → `implementer` (execution) → `agent-coordination` (swarm dispatch).
+- **Parallel agents**: See `agents-docs/AGENT_TEAMS_GUIDE.md` for Agent Teams, Dynamic Workflows, and Worktrees.
 
-## Metrics File
+## Metrics & Post-Task Protocol
 
-Append to `.agents/metrics.jsonl` after every task (see Post-Task Protocol). Timestamp: `YYYY-MM-DDTHH:MM:SSZ` (UTC). `.gitattributes` sets `merge=union` for auto-resolving positional conflicts. Append-only; never sort or rewrite.
-
-## Post-Task Protocol
-
-#### Metrics Logging (required after every task)
-
-After every completed task, append one JSON line to `.agents/metrics.jsonl`.
-
-**If task completed normally:**
-
-```json
-{"timestamp": "<ISO8601>", "agent": "<name>", "task": "<description>"}
-```
-
-**If task ended with ABSTAIN (per agentic-abstention skill):**
-
-```json
-{
-  "timestamp": "<ISO8601>",
-  "agent": "<name>",
-  "task": "<description>",
-  "abstained": true,
-  "abstention_reason": "<reason_code>",
-  "stopped_at_step": <N>,
-  "infeasibility_signals": ["<signal_1>"],
-  "resume_hint": "<optional hint for next agent>"
-}
-```
-
-- `dora-report` skill reads this file for its monthly summary.
-
-#### Recent Project-Wide Learnings
-
-See `agents-docs/self-learning-rules.md` for all learnings (LESSON-026 through LESSON-035 and Integration Learnings).
+See `agents-docs/METRICS.md` for metrics logging (`.agents/metrics.jsonl`), DORA reports, and post-task protocol.
 
 ## Recovery & Advanced Topics
 
 - **Local CI rehearsal with `act`**: `agents-docs/ACT.md` + `./scripts/run_act_local.sh` (never blocks the quality gate; opt-in).
+- **Harness architecture**: `agents-docs/HARNESS.md`
+- **Context engineering**: `agents-docs/CONTEXT.md`
 
 ## Skills
 

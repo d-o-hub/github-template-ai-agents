@@ -50,7 +50,7 @@ Run `./scripts/setup-skills.sh` to create symlinks for Claude Code and Qwen Code
 
 - Running the full test suite after every change
 - Reading large file trees into context
-- Installing many MCP servers just in case
+- Installing many MCP servers just in case (use MCP Tool Search to load on demand)
 - One very long session for a multi-day project
 - Using larger context windows as a substitute for context isolation
 - Auto-generating AGENTS.md (hurts performance; always human-written)
