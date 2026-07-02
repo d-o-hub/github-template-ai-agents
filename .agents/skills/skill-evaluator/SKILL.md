@@ -262,3 +262,8 @@ PASS | NEEDS_WORK | FAIL — <one sentence>
 ## References
 
 - `references/evaluating-skills.md` — condensed eval workflow and grading guidance
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

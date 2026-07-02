@@ -1,0 +1,47 @@
+{
+  "skill_name": "voice-profiles",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Identify the context profile for this content: 'Check out our latest release! #tech #innovation'",
+      "expected_output": "linkedin",
+      "assertions": [
+        "The output contains 'linkedin'"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Identify the context profile for this content: '```python\nprint(\"hello\")\n```\nThis implementation uses a decorator pattern.'",
+      "expected_output": "technical-blog",
+      "assertions": [
+        "The output contains 'technical-blog'"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Identify the context profile for this content: '# Project Title\n## Installation\nRun `npm install`.'",
+      "expected_output": "docs",
+      "assertions": [
+        "The output contains 'docs'"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Rewrite the following using the 'blunt' voice: 'I would like to kindly inform you that the server is currently undergoing some maintenance and might be unavailable for a short period of time.'",
+      "expected_output": "Server down for maintenance. Unavailable briefly.",
+      "assertions": [
+        "The output is significantly shorter",
+        "The output uses short declaratives"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Rewrite using 'warm' voice and 'linkedin' context: 'We have updated our API documentation.'",
+      "expected_output": "Hey everyone! We've just updated our API docs for you. Check them out! 🚀 #API #Devs",
+      "assertions": [
+        "The output uses direct address ('you')",
+        "The output includes hashtags or emojis"
+      ]
+    }
+  ]
+}

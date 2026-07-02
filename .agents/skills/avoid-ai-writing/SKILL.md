@@ -81,3 +81,8 @@ Adjusts rule strictness for specific audiences.
 
 - `ui-ux-optimize` — For optimizing UI/UX specific copy and layouts.
 - `readme-best-practices` — For documentation structure and discovery.
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

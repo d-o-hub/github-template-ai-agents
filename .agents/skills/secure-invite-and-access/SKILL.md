@@ -59,3 +59,8 @@ Implement access-control rules (authentication, authorization, sessions, audit l
 
 - `references/auth-patterns.md` - Common authentication patterns
 - `references/threat-model.md` - Auth threat modeling guide
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.
