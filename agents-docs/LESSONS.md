@@ -1410,3 +1410,20 @@ find . -name '*.md' \
 - `agents-docs/LESSONS.md`, `lessons.jsonl` — Updated references (code-quality → code-review-assistant, github-workflow → git-github-workflow)
 
 ---
+
+# LESSON-037 — SKILL.md Line Limit Management
+
+**Issue**: Adding complex skills like `avoid-ai-writing` with exhaustive pattern catalogs can easily exceed the 250-line `SKILL.md` limit, leading to context window bloat and linting warnings.
+
+**Root Cause**: Directly porting large documentation or rule sets into the primary instruction file.
+
+**Solution**:
+1. **Refactor for Conciseness**: Extract exhaustive tables, word lists, and secondary examples into a `references/patterns.md` file.
+2. **Instruction-First SKILL.md**: Keep `SKILL.md` focused on *how* to use the skill, its modes, and its high-level logic, referencing the external pattern file for details.
+3. **Linting Compliance**: New Markdown files must strictly follow MD022 (blank lines around headings).
+
+**Prevention**:
+- Monitor line counts during skill creation (`wc -l SKILL.md`).
+- Use the `references/` directory for any content that isn't a core operational instruction.
+
+**Tags**: #skills #documentation #linting #context-optimization

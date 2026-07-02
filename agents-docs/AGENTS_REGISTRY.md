@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-06-11 09:55 UTC
+> Last updated: 2026-06-28 20:53 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -32,13 +32,13 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `agent-browser` | `.agents/skills/agent-browser` | Browser automation CLI for AI agents. Use when the user need |
 | `agent-coordination` | `.agents/skills/agent-coordination` | Coordinate multiple agents for software development across a |
 | `agents-md` | `.agents/skills/agents-md` | Create AGENTS.md files with production-ready best practices. |
-
 | `api-design-first` | `.agents/skills/api-design-first` | Design and document RESTful APIs using design-first principl |
 | `architecture-diagram` | `.agents/skills/architecture-diagram` | Generate or update a project architecture SVG diagram by sca |
-| `cicd-pipeline` | `.agents/skills/cicd-pipeline` | Design and implement CI/CD pipelines with GitHub Actions, Gi |
-| `cloudflare-worker-api` | `.agents/skills/cloudflare-worker-api` | Structure Worker API routes and handlers. Activate for route |
-| `codacy-analysis-cli` | `.agents/skills/codacy` | Uses the Codacy Analysis CLI to run local static analysis on |
-| `code-review-assistant` | `.agents/skills/code-review-assistant` | Automated code review with PR analysis, change summaries, an |
+| `avoid-ai-writing` | `.agents/skills/avoid-ai-writing` | Audit and rewrite content to remove AI writing patterns (AI- |
+| `cicd-pipeline` | `.agents/skills/cicd-pipeline` | Design and configure CI/CD pipelines with GitHub Actions, Gi |
+| `cloudflare-worker-api` | `.agents/skills/cloudflare-worker-api` | Structure Worker API routes and handlers. Use this skill whe |
+| `codacy` | `.agents/skills/codacy` | Use the Codacy CLI for local static analysis and cloud data  |
+| `code-review-assistant` | `.agents/skills/code-review-assistant` | Automated code review with PR analysis, change summaries, qu |
 | `codeberg-api` | `.agents/skills/codeberg-api` | Interact with Forgejo/Codeberg repositories via the REST API |
 | `css-render-performance` | `.agents/skills/css-render-performance` | Guide CSS render performance analysis and optimization. Use  |
 | `database-devops` | `.agents/skills/database-devops` | Database design, migration, and DevOps automation with safet |
@@ -48,33 +48,31 @@ See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
 | `docs-hook` | `.agents/skills/docs-hook` | Lightweight git hook integration for updating agents-docs wi |
 | `document-rendering-and-locators` | `.agents/skills/document-rendering-and-locators` | Implement resilient document rendering and annotation anchor |
 | `dogfood` | `.agents/skills/dogfood` | Systematically explore and test a web application to find bu |
-| `dora-report` | `.agents/skills/dora-report` | Monthly DORA + agentic metrics reporting skill. Triggers on  |
+| `dora-report` | `.agents/skills/dora-report` | Generate monthly DORA and agentic metrics reports. Use this  |
 | `durable-objects` | `.agents/skills/durable-objects` | Create and review Cloudflare Durable Objects. Use when build |
-| `eu-ai-act-compliance` | `.agents/skills/eu-ai-act-compliance` | EU AI Act compliance logging and requirements. Use for ensur |
-| `git-github-workflow` | `.agents/skills/git-github-workflow` | Unified atomic git workflow with GitHub integration - commit |
+| `eu-ai-act-compliance` | `.agents/skills/eu-ai-act-compliance` | EU AI Act compliance logging and requirements. Use this skil |
+| `git-github-workflow` | `.agents/skills/git-github-workflow` | Orchestrates the full git-to-merge lifecycle: validate → com |
 | `github-pr-sentinel` | `.agents/skills/github-pr-sentinel` | Monitor a GitHub pull request until it's merged, green, or b |
-| `goap-agent` | `.agents/skills/goap-agent` | Invoke for complex multi-step tasks requiring intelligent pl |
+| `goap-agent` | `.agents/skills/goap-agent` | Orchestrates complex multi-step tasks with intelligent plann |
 | `implementer` | `.agents/skills/implementer` | Execution agent skill focused on implementing changes based  |
 | `intent-classifier` | `.agents/skills/intent-classifier` | Classify user intents and route to appropriate skills, comma |
 | `iterative-refinement` | `.agents/skills/iterative-refinement` | Execute iterative refinement workflows with validation loops |
 | `jules-delegator` | `.agents/skills/jules-delegator` | Use this skill to delegate complex coding tasks by creating  |
-| `learn` | `.agents/skills/learn` | Extract non-obvious session learnings into scoped AGENTS.md  |
+| `learn` | `.agents/skills/learn` | Extract non-obvious session learnings, patterns, and discove |
 | `lifecycle-management` | `.agents/skills/lifecycle-management` | Manage application lifecycle, error handling, and resource c |
-| `memory-context` | `.agents/skills/memory-context` | Retrieve semantically relevant past learnings and analysis o |
+| `memory-context` | `.agents/skills/memory-context` | Retrieve semantically relevant past learnings, analysis outp |
 | `migration-refactoring` | `.agents/skills/migration-refactoring` | Automate complex code migrations and refactorings with safet |
-
 | `privacy-first` | `.agents/skills/privacy-first` | Prevent email addresses and personal data from entering the  |
-| `pwa-offline-sync` | `.agents/skills/pwa-offline-sync` | Design Cache Storage + IndexedDB strategy and sync queue. Ac |
+| `pwa-offline-sync` | `.agents/skills/pwa-offline-sync` | Design Cache Storage + IndexedDB strategy and sync queue. Us |
 | `reader-ui-ux` | `.agents/skills/reader-ui-ux` | Build localized, accessible reader/admin UI with responsive  |
 | `readme-best-practices` | `.agents/skills/readme-best-practices` | Create, audit, and improve GitHub README.md files following  |
 | `secure-invite-and-access` | `.agents/skills/secure-invite-and-access` | Implement access control, authentication, and authorization  |
 | `security-code-auditor` | `.agents/skills/security-code-auditor` | Perform security audits on code to identify vulnerabilities, |
-
-| `shell-script-quality` | `.agents/skills/shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use w |
+| `shell-script-quality` | `.agents/skills/shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use t |
 | `skill-creator` | `.agents/skills/skill-creator` | Create new skills, modify and improve existing skills, and m |
 | `skill-evaluator` | `.agents/skills/skill-evaluator` | Reusable skill for evaluating other skills with structure ch |
-| `static-analysis` | `.agents/skills/static-analysis` | Language-agnostic static analysis and linter triage skill fo |
-
+| `static-analysis` | `.agents/skills/static-analysis` | Triage and fix static analysis findings across any programmi |
+| `template-version-management` | `.agents/skills/template-version-management` | Manage versioning in a template repository. Use when working |
 | `test-runner` | `.agents/skills/test-runner` | Execute tests, analyze results, and diagnose failures across |
 | `testdata-builders` | `.agents/skills/testdata-builders` | Maintain deterministic builders/factories for test entities. |
 | `testing-strategy` | `.agents/skills/testing-strategy` | Design and implement comprehensive testing strategies for so |
@@ -105,7 +103,6 @@ tools: Read, Grep, Glob, Bash
 # Agent Name
 
 System prompt for the agent...
-
 ```
 
 ## Adding New Skills
@@ -126,7 +123,6 @@ description: What this skill does. Use when [specific scenarios].
 # Skill Name
 
 Skill instructions...
-
 ```
 
 ---
@@ -148,7 +144,6 @@ Add to `.vscode/settings.json`:
     ".agents/skills/**/SKILL.md"
   ]
 }
-
 ```
 
 Then use a task to run the update script on file changes.
@@ -159,10 +154,8 @@ Then use a task to run the update script on file changes.
 npm install -g chokidar-cli
 
 # Watch for changes and update registry
-
 chokidar ".claude/agents/*.md" ".opencode/agents/*.md" ".agents/skills/*/SKILL.md" \
   -c "./scripts/update-agents-registry.sh && git add AGENTS_REGISTRY.md"
-
 ```
 
 ### Git Hook (Post-Merge)
@@ -173,7 +166,6 @@ Add to `.git/hooks/post-merge`:
 #!/bin/bash
 ./scripts/update-agents-registry.sh
 git add AGENTS_REGISTRY.md
-
 ```
 
 ---

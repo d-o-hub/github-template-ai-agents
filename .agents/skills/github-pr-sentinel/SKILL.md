@@ -252,3 +252,8 @@ Include:
 
 - `references/heuristics.md` - CI/Review decision tree
 - `references/github-api-notes.md` - GitHub CLI commands used by the watcher
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

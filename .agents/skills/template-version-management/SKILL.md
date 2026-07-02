@@ -132,3 +132,8 @@ This catches stale badges, broken version references, and any propagation drift.
 - `scripts/propagate-version.sh` — Reads `VERSION`, propagates to consumer files
 - `scripts/bump_patch_version.sh` — Bumps patch version, updates `CHANGELOG-TEMPLATE.md`
 - `.github/workflows/version-propagation.yml` — CI workflow that runs propagation on `VERSION` changes
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

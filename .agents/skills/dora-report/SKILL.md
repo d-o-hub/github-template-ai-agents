@@ -1,6 +1,6 @@
 ---
 name: dora-report
-description: "Generate monthly DORA and agentic metrics reports. Use this skill when the user asks to generate a DORA report, pull monthly metrics, create an agentic performance report, report DORA metrics, or when a monthly audit is required — even if they just say 'metrics' or 'performance report'.". Not for readme-best-practices.
+description: Generate monthly DORA and agentic metrics reports. Use this skill when the user asks for a DORA report, monthly metrics, or a monthly audit. Not for readme-best-practices.
 category: devops
 version: "0.2.10"
 template_version: "0.3"
@@ -69,3 +69,8 @@ Activate when:
 
 - `agents-docs/WORKFLOW.md` - Standard delivery process to measure against.
 - `scripts/analyze-codebase.sh` - Source for some raw performance data.
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

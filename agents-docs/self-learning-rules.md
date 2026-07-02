@@ -36,3 +36,4 @@
 
 - **Optional Skills**: Implemented `SKILLS_OPTIONAL` in `setup-skills.sh` for opt-in knowledge.
 - **Compliance Category**: Established "Compliance & Governance" for regulatory patterns.
+- **LESSON-037 — SKILL.md Line Limit Management**: Adhere to `MAX_LINES_PER_SKILL_MD=250` by moving exhaustive pattern tables and vocabulary lists to `references/patterns.md`. This keeps the main instruction set concise for the agent's context window while preserving full reference capability. Ensure all new Markdown files follow MD022 (blank lines around headings) to prevent CI failures.

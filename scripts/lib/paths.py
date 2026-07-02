@@ -4,7 +4,7 @@
 from __future__ import annotations
 from pathlib import Path
 
-FORBIDDEN_OUTPUT_DIRS = frozenset({
+FORBIDDEN_PATHS = frozenset({
     ".git",
     "scripts",
     ".agents",
@@ -21,6 +21,29 @@ FORBIDDEN_OUTPUT_DIRS = frozenset({
     ".cursor",
     ".opencode",
     ".commandcode",
+    ".env",
+    ".envrc",
+    "Makefile",
+    ".gitignore",
+    "package.json",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "bun.lockb",
+    "composer.json",
+    "composer.lock",
+    "requirements.txt",
+    "pyproject.toml",
+    "Gemfile",
+    "Gemfile.lock",
+    ".npmrc",
+    ".netrc",
+    ".ssh",
+    ".bashrc",
+    ".zshrc",
+    ".profile",
+    ".bash_profile",
+    "LICENSE",
+    "VERSION",
 })
 
 
@@ -54,9 +77,9 @@ def validate_safe_path(
 
     if check_forbidden and candidate != base_resolved:
         top_level = candidate.relative_to(base_resolved).parts[0]
-        if top_level in FORBIDDEN_OUTPUT_DIRS:
+        if top_level in FORBIDDEN_PATHS:
             raise PathValidationError(
-                f"--{param_name} targets a forbidden directory: {top_level}/"
+                f"--{param_name} targets a forbidden path: {top_level}"
             )
 
     return candidate

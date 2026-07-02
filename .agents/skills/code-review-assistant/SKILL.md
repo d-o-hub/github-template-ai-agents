@@ -217,3 +217,8 @@ codacy pull-request gh my-org my-repo <prNumber> --ignore-issue <issueId> --igno
 - `static-analysis` — Linter triage and fix workflows
 - `security-code-auditor` — Security audit workflows
 - `codacy` — Local Codacy CLI analysis
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

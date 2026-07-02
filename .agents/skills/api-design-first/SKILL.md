@@ -152,3 +152,8 @@ paths:
 - `references/rest-guidelines.md` - Comprehensive REST design guidelines
 - `references/openapi-examples.md` - Complete OpenAPI 3.0 specification examples
 - `references/naming-conventions.md` - Resource and field naming standards
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.
