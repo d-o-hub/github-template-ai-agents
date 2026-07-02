@@ -57,6 +57,12 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 
 **Triage protocol for unfixable issues**: If a pre-existing failure cannot be fixed in the current run (e.g., external CI service stale, upstream dependency broken, requires human credential): (1) Create an ADR in `plans/` documenting the issue, root cause, and why it's out of scope. (2) Create a GOAP task in `plans/GOAP_STATE.md` with status `blocked` and the ADR link. (3) Ensure the current commit's quality gate passes — the branch must be green even if inherited issues remain. (4) Never skip, suppress, or mark as `done` an issue that remains open.
 
+### Agentic Abstention
+
+When environment-revealed infeasibility makes further tool calls wasteful,
+agents MUST follow the stopping rules in:
+`.agents/skills/agentic-abstention/SKILL.md`
+
 ## Setup
 
 ```bash
@@ -67,8 +73,7 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 
 ## Session Bootstrap
 
-Agents use a `SessionStart` hook to auto-inject project context (docs map + latest changelog) at startup.
-This is configured via `docflow.json` and agent-specific settings (e.g., `.claude/settings.json`).
+Agents use a `SessionStart` hook to auto-inject project context (docs map + latest changelog) at startup; configured via `docflow.json` and agent-specific settings (e.g., `.claude/settings.json`).
 
 ```bash
 ./hooks/session-start.sh # Manual execution to verify context injection
@@ -103,14 +108,7 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 - `SKILL.md` must start with frontmatter and include **Rationalizations** and **Red Flags** sections.
 - **No hardcoded values**: Use relative paths, runtime derivation, env vars, or named constants.
 - Shell: `shellcheck` (severity=error); Markdown: `markdownlint`; Diagrams: `mermaid`
-- **YAML Workflow Files**: All new `.github/workflows/*.yml` files must include `# yamllint disable-line rule:truthy` on the `on:` line (line 4) to suppress the PyYAML boolean interpretation warning. Example:
-
-  ```yaml
-  on:  # yamllint disable-line rule:truthy
-    pull_request:
-  ```
-
-  CI yamllint uses strict rules (line-length: 120, indentation: 2 spaces).
+- **YAML Workflow Files**: All new `.github/workflows/*.yml` files must include `# yamllint disable-line rule:truthy` on the `on:` line (line 4). CI yamllint uses strict rules (line-length: 120, indentation: 2 spaces).
 
 ## Repository Structure
 
@@ -156,33 +154,35 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 
 ## Metrics File
 
-Append to `.agents/metrics.jsonl` after every task (see Post-Task Protocol).
-
-- **Timestamp format**: `YYYY-MM-DDTHH:MM:SSZ` (UTC, no microseconds, no offset)
-- **Merge conflicts**: `.gitattributes` sets `merge=union` — the CI bot auto-resolves
-  positional conflicts. If you see conflict markers locally, run:
-  `git fetch origin main && git merge origin/main`
-- **Never sort or rewrite** the file; append-only, insertion order preserved.
+Append to `.agents/metrics.jsonl` after every task (see Post-Task Protocol). Timestamp: `YYYY-MM-DDTHH:MM:SSZ` (UTC). `.gitattributes` sets `merge=union` for auto-resolving positional conflicts. Append-only; never sort or rewrite.
 
 ## Post-Task Protocol
 
-After **every** completed task, the agent MUST append a JSON entry to `.agents/metrics.jsonl`:
+#### Metrics Logging (required after every task)
+
+After every completed task, append one JSON line to `.agents/metrics.jsonl`.
+
+**If task completed normally:**
+
+```json
+{"timestamp": "<ISO8601>", "agent": "<name>", "task": "<description>"}
+```
+
+**If task ended with ABSTAIN (per agentic-abstention skill):**
 
 ```json
 {
-  "timestamp": "YYYY-MM-DDTHH:MM:SSZ",
-  "agent": "<agent-id>",
+  "timestamp": "<ISO8601>",
+  "agent": "<name>",
   "task": "<description>",
-  "skill_used": "<skill or null>",
-  "status": "completed" | "failed" | "partial",
-  "tokens_used": <int>,
-  "duration_seconds": <int>,
-  "notes": "<text>"
+  "abstained": true,
+  "abstention_reason": "<reason_code>",
+  "stopped_at_step": <N>,
+  "infeasibility_signals": ["<signal_1>"],
+  "resume_hint": "<optional hint for next agent>"
 }
 ```
 
-- JSONL format; Append-only; Never truncate or delete.
-- If task fails mid-way, still append with `"status": "failed"`.
 - `dora-report` skill reads this file for its monthly summary.
 
 #### Recent Project-Wide Learnings
@@ -191,7 +191,7 @@ See `agents-docs/self-learning-rules.md` for all learnings (LESSON-026 through L
 
 ## Recovery & Advanced Topics
 
-- **Local CI rehearsal with `act`**: `agents-docs/ACT.md` plus `./scripts/run_act_local.sh` (never blocks the quality gate; opt-in).
+- **Local CI rehearsal with `act`**: `agents-docs/ACT.md` + `./scripts/run_act_local.sh` (never blocks the quality gate; opt-in).
 
 ## Skills
 

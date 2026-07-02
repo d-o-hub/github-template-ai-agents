@@ -281,6 +281,27 @@
       "autoActivate": true
     },
     {
+      "skill": "agentic-abstention",
+      "triggers": {
+        "keywords": [
+          "abstain",
+          "stopping rules",
+          "stop acting",
+          "infeasible",
+          "give up",
+          "halt"
+        ],
+        "patterns": [
+          "stop.*act",
+          "abstain.*",
+          "infeasib.*"
+        ],
+        "files": []
+      },
+      "priority": "medium",
+      "autoActivate": false
+    },
+    {
       "skill": "cicd-pipeline",
       "triggers": {
         "keywords": [
