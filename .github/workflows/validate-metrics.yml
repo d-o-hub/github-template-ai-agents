@@ -9,6 +9,9 @@ on:  # yamllint disable-line rule:truthy
     paths:
       - '.agents/metrics.jsonl'
 
+permissions:
+  contents: read
+
 jobs:
   validate-metrics:
     runs-on: ubuntu-latest
