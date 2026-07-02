@@ -4,6 +4,9 @@ version: 1.0.0
 category: code-quality
 description: Triage and fix static analysis findings across any programming language. Use this skill when running linters (ruff, eslint, clippy, shellcheck), analyzing lint output, fixing warnings or errors, or managing cross-language static analysis results in a project — even if they just say "run the linter" or "fix the lint warnings". Trigger on "lint", "static analysis", "triage warnings", "fix findings". Not for code-review-assistant, security-code-auditor.
 license: MIT
+metadata:
+  author: opencode
+  lastUpdated: "2026-07-02"
 ---
 
 # Static Analysis & Linter Triage
@@ -67,6 +70,39 @@ Follow this structured process when responding to analysis findings:
 | **Rust** | `clippy` | `cargo clippy` |
 | **Go** | `golangci-lint` | `golangci-lint run` |
 | **Secrets** | `gitleaks` | `gitleaks detect --source . -v` |
+
+## Codacy Git-Aware Analysis
+
+Use the Codacy Analysis CLI for targeted pre-commit and PR-scoped analysis:
+
+```bash
+# Pre-commit: analyze only staged files
+codacy-analysis analyze --staged --output-format json
+
+# Branch analysis: all changes vs merge base
+codacy-analysis analyze --diff --output-format json
+
+# PR analysis: changes vs PR target branch
+codacy-analysis analyze --pr --output-format json
+
+# Combine with specific tools
+codacy-analysis analyze --staged --tool Ruff --tool ESLint9 --output-format json
+```
+
+**When to use:**
+- `--staged` — Before committing; catches issues in exactly the code you're about to commit
+- `--diff` — During development; sees all uncommitted + committed changes on the branch
+- `--pr` — During PR review; compares against the PR's target branch
+
+Parse results with jq for triage:
+
+```bash
+# Count issues by severity
+codacy-analysis analyze --staged --output-format json | jq '.issues | group_by(.severity) | map({severity: .[0].severity, count: length})'
+
+# Get critical/high only
+codacy-analysis analyze --staged --output-format json | jq '[.issues[] | select(.severity == "Error" or .severity == "High")]'
+```
 
 ## Codacy Integration
 

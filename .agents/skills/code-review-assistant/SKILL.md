@@ -4,6 +4,9 @@ version: "0.2.10"
 category: code-quality
 description: Automated code review with PR analysis, change summaries, quality checks, and code smell detection. Use this skill when reviewing pull requests, generating review comments, checking against best practices, identifying code smells, or providing refactoring guidance — even if they just say "review this" or "look at this PR". Not for static-analysis, security-code-auditor.
 license: MIT
+metadata:
+  author: opencode
+  lastUpdated: "2026-07-02"
 ---
 
 # Code Review Assistant
@@ -113,6 +116,49 @@ For positive observations, highlight the practice and its benefit.
 ## GitHub Integration
 
 See `references/github-integration.md` for API usage, auto-approval criteria, and webhook setup.
+
+## Codacy PR Review Integration
+
+Enhance reviews with Codacy quality data. Run these alongside the standard review workflow.
+
+### Fetch PR Quality Data
+
+```bash
+# PR summary (status, issues, coverage, changed files)
+codacy pull-request gh my-org my-repo <prNumber>
+
+# Annotated git diff with inline coverage and issues
+codacy pull-request gh my-org my-repo <prNumber> --diff
+
+# Local analysis of PR changes (instant, no push needed)
+codacy-analysis analyze --pr --output-format json
+```
+
+### Quality Gate Check
+
+```bash
+# Check if PR passes quality gate
+codacy pull-request gh my-org my-repo <prNumber> --output json | jq '.upToStandards'
+```
+
+### Coverage Review
+
+```bash
+# Get coverage delta for the PR
+codacy pull-request gh my-org my-repo <prNumber> --output json | jq '.coverage'
+```
+
+### Issue Triage
+
+```bash
+# List new issues introduced by the PR
+codacy pull-request gh my-org my-repo <prNumber> --output json | jq '.issues'
+
+# Ignore a false positive
+codacy pull-request gh my-org my-repo <prNumber> --ignore-issue <issueId> --ignore-reason FalsePositive
+```
+
+**Integration with review workflow:** When reviewing a PR, run local analysis first (`codacy-analysis analyze --pr`) for immediate results, then fetch cloud data for coverage and quality gate status. Combine both into the review summary.
 
 ## Review Summary Template
 
