@@ -156,9 +156,12 @@ check_skill_health() {
     for f in .agents/skills/*/SKILL.md; do
         [[ -L "$f" ]] && continue
         total=$((total + 1))
-        grep -q '^version:' "$f" 2>/dev/null && with_version=$((with_version + 1))
-        grep -q '^license:' "$f" 2>/dev/null && with_license=$((with_license + 1))
-        grep -q '^description:' "$f" 2>/dev/null || missing_desc=$((missing_desc + 1))
+
+        # perf: replace grep -q with native bash match to eliminate process fork overhead
+        content=$(< "$f")
+        [[ "$content" =~ (^|$'\n')version: ]] && with_version=$((with_version + 1))
+        [[ "$content" =~ (^|$'\n')license: ]] && with_license=$((with_license + 1))
+        [[ "$content" =~ (^|$'\n')description: ]] || missing_desc=$((missing_desc + 1))
     done
     shopt -u nullglob
 
