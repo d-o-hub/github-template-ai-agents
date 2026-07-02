@@ -1,68 +1,46 @@
-# GOAP State: Codacy Skill Improvements
+# GOAP State: Codacy Skills Enrichment (PR #661 Replacement)
 
 ## Goal
 
-Enrich existing skills with Codacy integration patterns from codacy/codacy-skills, without creating new skills.
+Enrich existing skills with Codacy best practices from upstream `codacy/codacy-skills` and add skill rules.
+
+## Current State
+
+- PR #661 closed (analysis-only, zero implementation)
+- 6 upstream skills fetched and compared
+- Local skills already have substantial Codacy integration
+- `skill-rules.json` now has 12 rules (9 original + 3 Codacy)
+
+## World State (Updated)
+
+- `codacy/SKILL.md`: v2.0.0 — has metadata ✓
+- `static-analysis/SKILL.md`: v1.3.0 — has metadata ✓
+- `code-review-assistant/SKILL.md`: v1.1.0 — has metadata ✓
+- `cicd-pipeline/SKILL.md`: v0.2.10 — has metadata ✓
+- `skill-rules.json`: 12 rules including Codacy ✓
+- `SKILL_TEMPLATE.md`: has `metadata.author` field ✓
+
+## Operations (Plan)
+
+### Phase 1: Parallel Metadata Enrichment (3 agents)
+
+- [x] Agent 1: Add `metadata` block to `static-analysis/SKILL.md` frontmatter
+- [x] Agent 2: Add `metadata` block to `code-review-assistant/SKILL.md` frontmatter
+- [x] Agent 3: Add `metadata` block to `cicd-pipeline/SKILL.md` frontmatter
+
+### Phase 2: Skill Rules (1 agent)
+
+- [x] Agent 4: Add Codacy rules to `skill-rules.json`
+
+### Phase 3: Validation & Commit
+
+- [ ] Run `validate-skills.sh` on all 4 modified skills
+- [ ] Verify all files under 250 lines
+- [ ] Verify `skill-rules.json` is valid JSON
+- [ ] Commit and create PR
 
 ## Status
 
-IN_PROGRESS
-
-## Sub-Goals
-
-### 1. SKILL_TEMPLATE metadata convention
-
-- **Priority**: P0, Deps: none
-- **Task**: Add `metadata` (author/version) frontmatter to SKILL_TEMPLATE.md
-- **Status**: completed
-- **Agent**: implementer
-
-### 2. Enrich codacy/SKILL.md
-
-- **Priority**: P1, Deps: 1
-- **Task**: Add git-aware scoping (--staged/--diff/--pr), config operations (--import, config --merge), discover command, expanded command reference
-- **Status**: completed
-- **Agent**: implementer
-
-### 3. Enrich static-analysis/SKILL.md
-
-- **Priority**: P1, Deps: 1
-- **Task**: Add Codacy git-aware scoping section (--staged, --diff, --pr for pre-commit analysis)
-- **Status**: completed
-- **Agent**: implementer
-
-### 4. Enrich code-review-assistant/SKILL.md
-
-- **Priority**: P1, Deps: 1
-- **Task**: Add Codacy PR review workflow steps (codacy pull-request, coverage delta, quality gate)
-- **Status**: completed
-- **Agent**: implementer
-
-### 5. Enrich cicd-pipeline/SKILL.md
-
-- **Priority**: P1, Deps: 1
-- **Task**: Add coverage generation and Codacy upload steps for GitHub Actions, GitLab CI
-- **Status**: completed
-- **Agent**: implementer
-
-### 6. Validate all changes
-
-- **Priority**: P0, Deps: 2,3,4,5
-- **Task**: Run validate-skills.sh, check line counts, verify frontmatter
-- **Status**: completed
-- **Agent**: test-runner
-
-## Execution Strategy
-
-Hybrid
-
-- Phase 1 (Sequential): SKILL_TEMPLATE update (foundational)
-- Phase 2 (Parallel/Swarm): 4 skill enrichments in parallel
-- Phase 3 (Sequential): Validation
-
-## Quality Gates
-
-- All skills under 250 lines
-- All have valid frontmatter
-- validate-skills.sh passes
-- No broken cross-references
+- [x] Phase 1: Parallel Metadata Enrichment — completed
+- [x] Phase 2: Skill Rules — completed
+- [ ] Phase 3: Validation & Commit — in_progress

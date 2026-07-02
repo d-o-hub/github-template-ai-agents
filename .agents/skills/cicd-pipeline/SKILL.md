@@ -4,6 +4,9 @@ version: "0.2.10"
 description: Design and configure CI/CD pipelines with GitHub Actions, GitLab CI, and Forgejo Actions. Use this skill when the user asks to create a new workflow, set up pipeline triggers, configure caching or matrix builds, manage CI secrets, troubleshoot pipeline failures, or compare pipeline platforms — even if they don't say "CI/CD" explicitly. Not for monitoring an existing PR's CI (use git-github-workflow) or executing deployments (use deployment-specific tooling).
 category: workflow
 license: MIT
+metadata:
+  author: opencode
+  lastUpdated: "2026-07-02"
 ---
 
 # CI/CD Pipeline
