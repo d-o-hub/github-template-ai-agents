@@ -1,5 +1,5 @@
 ---
-name: delegate
+name: delegator
 version: "0.1.1"
 category: agent
 description: Lightweight retrieval and context agent skill for rapid information gathering and environment assessment. Use this skill when you need quick context lookups, finding code patterns, or assessing current state without full implementation overhead — even if they just say "find where X is defined" or "what's the current state of Y".

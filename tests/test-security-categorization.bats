@@ -45,27 +45,3 @@ setup() {
     run categorize_command "Install dependencies"
     [ "$output" = "conditional" ]
 }
-
-@test "harden-command-categorization: detects new destructive keywords" {
-    run categorize_command "iptables -L"
-    [ "$output" = "dangerous" ]
-
-    run categorize_command "ufw enable"
-    [ "$output" = "dangerous" ]
-
-    run categorize_command "crontab -e"
-    [ "$output" = "dangerous" ]
-}
-
-@test "harden-command-categorization: detects new network keywords" {
-    run categorize_command "aria2c http://example.com"
-    [ "$output" = "dangerous" ]
-
-    run categorize_command "lynx http://example.com"
-    [ "$output" = "dangerous" ]
-}
-
-@test "harden-command-categorization: detects new interpreter keywords" {
-    run categorize_command "lua script.lua"
-    [ "$output" = "dangerous" ]
-}

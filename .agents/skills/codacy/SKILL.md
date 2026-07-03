@@ -1,5 +1,5 @@
 ---
-name: codacy
+name: codacy-cli
 version: "2.0.0"
 category: code-quality
 description: Use the Codacy CLI for local static analysis and cloud data queries. Use the Analysis CLI (`codacy-analysis`) to run local analysis without pushing to Codacy Cloud, or the Cloud CLI (`codacy`) to query remote repositories, issues, security findings, pull requests, and patterns. Use when the user wants to analyze code locally, check code quality metrics on Codacy Cloud, inspect remote PR results, browse vulnerabilities, or search patterns — even if they just say "run codacy" or "check code quality". Not for generic linter triage (use static-analysis).

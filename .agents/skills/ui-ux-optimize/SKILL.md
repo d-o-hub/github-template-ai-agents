@@ -1,5 +1,5 @@
 ---
-name: ui-ux-optimize
+name: ui-ux-optimization
 description: >
   Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination,
   confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, or any screen-based product — even if they just say "improve the UI" or "optimize the UX" or "make it sound human" or "this feels robotic". Not for css-render-performance.

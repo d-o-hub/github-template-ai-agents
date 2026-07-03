@@ -1,5 +1,5 @@
 ---
-name: dogfood
+name: dogfooding
 version: "0.2.10"
 category: quality
 description: Systematically explore and test a web application to find bugs, UX issues, and other problems. Use when asked to "dogfood", "QA", "exploratory test", "find issues", "bug hunt", "test this app/site/platform", or review the quality of a web application. Produces a structured report with full reproduction evidence. Not for test-runner, accessibility-auditor.
