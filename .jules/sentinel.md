@@ -15,3 +15,9 @@
 **Vulnerability:** Gaps in command categorization and forbidden path lists allowed potential execution of sensitive system tools and access to credential files.
 **Learning:** Security boundaries must be frequently audited to include data-exfiltration tools (tar, zip), networking utilities (telnet, ftp), and ecosystem-specific configuration files (.npmrc, .ssh).
 **Prevention:** Maintain comprehensive lists of sensitive keywords and paths that prioritize "fail-secure" defaults for agent operations.
+
+## 2026-07-03 - Hardening Command Categorization and Forbidden Paths
+
+**Vulnerability:** Gaps in forbidden path denylists and command categorization allowed potential access to cloud provider credentials (e.g., .aws, .kube) and execution of system-critical tools (e.g., firewall-cmd, crontab).
+**Learning:** Security boundaries must be frequently audited to include infrastructure-specific configuration files and administrative utilities that could be used for persistence or lateral movement.
+**Prevention:** Expand `FORBIDDEN_PATHS` and command keyword lists to cover ecosystem-specific secrets and administrative tools.
