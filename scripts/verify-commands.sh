@@ -157,8 +157,12 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
                         ((CACHE_HITS++))
                         CACHED=true
 
-                        # Extract category from cached result using jq to handle formatting variations safely
-                        cached_cat=$(printf "%s\n" "$cached_result" | jq -r --arg unknown "$UNKNOWN_CATEGORY" '.category // $unknown' 2>/dev/null || printf "%s\n" "$UNKNOWN_CATEGORY")
+                        # Extract category from cached result natively to eliminate jq subshell overhead
+                        if [[ "$cached_result" =~ \"category\":\"([^\"]+)\" ]]; then
+                            cached_cat="${BASH_REMATCH[1]}"
+                        else
+                            cached_cat="$UNKNOWN_CATEGORY"
+                        fi
 
                         # Security: Validate category against whitelist to prevent injection in arithmetic expansion
                         if [[ ! "$cached_cat" =~ ^(safe|conditional|dangerous|$UNKNOWN_CATEGORY)$ ]]; then
@@ -194,10 +198,14 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
 
         # Save to cache
         if type save_cached_result &> /dev/null; then
-            # Security: Use jq to safely generate JSON and prevent injection
+            # Security: Escape special characters natively to eliminate jq subshell overhead
             # Note: We use -c to produce compact JSON. This is crucial for avoiding multi-line issues later
-            result=$(jq -n -c --arg cat "$category" --arg cmd "$cmd" \
-                '{"valid":true, "category":$cat, "command":$cmd}')
+            escaped_cmd="${cmd//\\/\\\\}"
+            escaped_cmd="${escaped_cmd//\"/\\\"}"
+            escaped_cmd="${escaped_cmd//$'\n'/\\n}"
+            escaped_cmd="${escaped_cmd//$'\r'/\\r}"
+            escaped_cmd="${escaped_cmd//$'\t'/\\t}"
+            result="{\"valid\":true, \"category\":\"$category\", \"command\":\"$escaped_cmd\"}"
             save_cached_result "$cmd" "$file" "$line" "$result" 2>/dev/null || true
         fi
 
