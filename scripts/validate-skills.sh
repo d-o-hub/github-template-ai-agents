@@ -151,13 +151,14 @@ for skill_path in "$SKILLS_SRC"/*/; do
     has_red_flags=0
 
     # Parse frontmatter natively to avoid external process fork overhead
-    if [[ "$content" == ---$'\n'*$'\n'---* ]] || [[ "$content" == ---$'\r'$'\n'*$'\r'$'\n'---* ]]; then
-        frontmatter="${content#---$'\n'}"
-        frontmatter="${frontmatter#---$'\r'$'\n'}"
-        frontmatter="${frontmatter%%$'\n'---*}"
-        frontmatter="${frontmatter%%$'\r'$'\n'---*}"
+    nl=$'\n'; cr=$'\r'
+    if [[ "$content" == ---$nl*${nl}---* ]] || [[ "$content" == ---${cr}${nl}*${cr}${nl}---* ]]; then
+        frontmatter="${content#---$nl}"
+        frontmatter="${frontmatter#---${cr}${nl}}"
+        frontmatter="${frontmatter%%${nl}---*}"
+        frontmatter="${frontmatter%%${cr}${nl}---*}"
 
-        if [[ "$frontmatter" =~ (^|$'\n')name:[[:space:]]*([^\r\n]+) ]]; then
+        if [[ "$frontmatter" =~ (^|$nl)name:[[:space:]]*([^$nl$cr]+) ]]; then
             skill_front_name="${BASH_REMATCH[2]}"
             # Trim trailing spaces just in case
             skill_front_name="${skill_front_name%"${skill_front_name##*[![:space:]]}"}"

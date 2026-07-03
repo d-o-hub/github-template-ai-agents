@@ -1469,3 +1469,49 @@ find . -name '*.md' \
 - `agents-docs/CONTEXT.md` — Added MCP Tool Search note
 - `.agents/skills/agent-coordination/SKILL.md` — Added native capability comparison table
 - `CHANGELOG-TEMPLATE.md` — Added restructuring entries
+
+---
+
+### LESSON-039 — Bash Regex `[^\r\n]` Does Not Match CR/LF — It Matches Literal `\`, `r`, `n`
+
+**Date**: 2026-07-03
+**Component**: Scripts / Bash / Regex
+**Severity**: High
+
+**Issue**: The bash regex `[^\r\n]` inside `[[ ... =~ ... ]]` does NOT match "any character except CR/LF" as it would in Perl/Python. It matches "any character except `\`, `r`, `n`". This caused the `validate-skills.sh` name field check to capture name values across line boundaries (e.g., `codacy\nve` from `codacy\nversion:`).
+
+**Symptoms**:
+- 6 skills falsely flagged: `codacy`, `database-devops`, `delegate`, `docs-hook`, `dogfood`, `ui-ux-optimize`
+- Error message: `name field contains invalid characters: 'codacy\nve'` (newline embedded in captured value)
+- The `[^a-z0-9-]` regex at line 182 correctly rejected these because the newline character 0x0a matched `[^a-z0-9-]`
+- Only the `ui-ux-optimize` skill error showed `desc` suffix (from `description:` field) instead of `ve` (from `version:` field) because block-scalar `>` multi-line description appears after the `name:` line in its frontmatter
+
+**Root Cause**:
+1. **Bash regex does not interpret `\r`/`\n` as escape sequences**: Unlike PCRE/Python/JavaScript, bash's `=~` operator inside `[[ ]]` treats `\r` and `\n` in character classes as literal characters `\`, `r`, `n` (0x5c, 0x72, 0x6e)
+2. **`[^\r\n]` matches newline (0x0a)**: Since 0x0a is not `\`, `r`, or `n`, it passes through the exclusion
+3. **Same applies to `$'\r'`/`$'\n'` inside character classes**: ANSI-C quoting (`$'\n'`) does NOT work inside `[...]` in bash regex — they must be assigned to variables first
+
+**Solution**:
+
+```bash
+# Before (broken): \r and \n are literal characters in character classes
+[[ "$frontmatter" =~ (^|$'\n')name:[[:space:]]*([^\r\n]+) ]]
+
+# After (correct): use variables with actual CR/LF characters
+nl=$'\n'; cr=$'\r'
+[[ "$frontmatter" =~ (^|$nl)name:[[:space:]]*([^$nl$cr]+) ]]
+```
+
+Also applied consistently across the frontmatter parsing block by replacing all `$'\n'` and `$'\r'$'\n'` usages with `$nl` and `${cr}${nl}` variables.
+
+**Prevention**:
+- NEVER use `\r`/`\n` as escape sequences inside bash `[[ ... =~ ... ]]` regex character classes — they are literal
+- Always assign special characters to variables first: `nl=$'\n'; cr=$'\r'`, then use `[^$nl$cr]` in the regex
+- Test bash regex with known-newline-containing input before deploying
+- Add a regression test in `validate-skills.bats` that exercises the name field extraction with a multi-line frontmatter
+
+**Tags**: #bash #regex #carriage-return #newline #scripts
+
+**Files Modified**:
+- `scripts/validate-skills.sh` — Fixed `[^\r\n]` → `[^$nl$cr]` in name regex; normalized all ANSI-C quoted newline/CR references to variables
+- `.agents/skills/agentic-abstention/evals/evals.json` — Created with 6 eval cases covering all 5 stopping rules + 1 negative case
