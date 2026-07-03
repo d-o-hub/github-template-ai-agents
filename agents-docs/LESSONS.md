@@ -1427,3 +1427,45 @@ find . -name '*.md' \
 - Use the `references/` directory for any content that isn't a core operational instruction.
 
 **Tags**: #skills #documentation #linting #context-optimization
+
+---
+
+### LESSON-038 — AGENTS.md Restructure: agents-docs/ Split Requires 4 Coordinated Updates
+
+**Date**: 2026-07-03
+**Component**: Documentation / AGENTS.md / Knowledge Architecture
+**Severity**: Medium
+
+**Issue**: Restructuring AGENTS.md by splitting behavioral defaults and agent teams into `agents-docs/` files requires updating references in 4+ coordinated locations, not just AGENTS.md itself.
+
+**Symptoms**:
+- Running `./scripts/quality_gate.sh` triggers `./scripts/update-all-docs.sh` which auto-regenerates `llms-full.txt` and `agents-docs/skills-reference.md`
+- Markdownlint may catch new files with MD031 (blanks around fenced code blocks) — the `default: true` config means many rules are implicitly active
+- Pre-existing SKILL.md line-limit warnings (skill-evaluator 269, ui-ux-optimize 315, etc.) are non-blocking in CI
+
+**Root Causes**:
+1. **AGENTS.md is NOT the only file**: Quality gate infrastructure (llms generation scripts, skills-reference generator) scans `agents-docs/` and can detect content drift
+2. **New files trigger markdownlint**: Every new `.md` file in `agents-docs/` is scanned by markdownlint-cli2 — must follow MD022 (blanks around headings), MD031 (blanks around fenced code blocks), MD047 (trailing newline)
+3. **quality_gate.sh emits warnings for pre-existing issues**: The line-limit checks are warnings (yellow ⚠), not failures — they do not increment the FAILED counter — but they can cause confusion when reviewing output
+
+**Solution**:
+1. **Run quality gate before committing** to catch any new lint/sync issues early
+2. **Check markdownlint errors specifically** with `npx markdownlint-cli2 <file>` on new/modified files
+3. **Cross-reference staged changes** with `git diff --stat` before committing to avoid committing hook artifacts (metrics.jsonl, GOAP_STATE.md)
+4. **Stage only intentional changes** when hook-generated files are also modified
+
+**Prevention**:
+- Run `./scripts/quality_gate.sh` before any commit that adds or restructures docs
+- Use `--authoritative` staging: `git add <file1> <file2> ...` instead of `git add .`
+- After any AGENTS.md restructure, verify all cross-references work: `git grep "agents-docs/" AGENTS.md`
+
+**Tags**: #documentation #restructure #quality-gate #markdownlint #agents-docs
+
+**Files Modified**:
+- `AGENTS.md` — Trimmed from ~350 to ~120 lines
+- `agents-docs/AGENT_TEAMS_GUIDE.md` — Created (new file)
+- `agents-docs/BEHAVIORAL_DEFAULTS.md` — Created (new file)
+- `agents-docs/HARNESS.md` — Enriched with observability, MCP Tool Search, agent capabilities
+- `agents-docs/CONTEXT.md` — Added MCP Tool Search note
+- `.agents/skills/agent-coordination/SKILL.md` — Added native capability comparison table
+- `CHANGELOG-TEMPLATE.md` — Added restructuring entries

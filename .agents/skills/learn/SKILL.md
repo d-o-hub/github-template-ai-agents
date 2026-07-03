@@ -52,7 +52,7 @@ Every new non-obvious insight must be recorded in three places:
 ### Format
 
 - 1–3 lines per insight in `AGENTS.md`.
-- Fits within `MAX_LINES_AGENTS_MD=150` constraint.
+- Fits within `MAX_LINES_AGENTS_MD=200` constraint.
 - Bulleted list under a "Learnings" or "Context" section.
 
 ## See Also
