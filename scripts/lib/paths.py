@@ -86,10 +86,10 @@ def validate_safe_path(
         ) from None
 
     if check_forbidden and candidate != base_resolved:
-        top_level = candidate.relative_to(base_resolved).parts[0]
-        if top_level in FORBIDDEN_PATHS:
-            raise PathValidationError(
-                f"--{param_name} targets a forbidden path: {top_level}"
-            )
+        for part in candidate.relative_to(base_resolved).parts:
+            if part in FORBIDDEN_PATHS:
+                raise PathValidationError(
+                    f"--{param_name} targets a forbidden path: {part}"
+                )
 
     return candidate
