@@ -21,3 +21,9 @@
 **Vulnerability:** Gaps in forbidden path denylists and command categorization allowed potential access to cloud provider credentials (e.g., .aws, .kube) and execution of system-critical tools (e.g., firewall-cmd, crontab).
 **Learning:** Security boundaries must be frequently audited to include infrastructure-specific configuration files and administrative utilities that could be used for persistence or lateral movement.
 **Prevention:** Expand `FORBIDDEN_PATHS` and command keyword lists to cover ecosystem-specific secrets and administrative tools.
+
+## 2026-07-04 - Fix Path Validation Bypass for Nested Forbidden Paths
+
+**Vulnerability:** The `validate_safe_path` function only checked if the top-level component of a path was in `FORBIDDEN_PATHS`, allowing bypasses for nested sensitive files (e.g., `subdir/.env`).
+**Learning:** Security validation must be recursive or iterative over all user-controllable path components. Checking only the root of a relative path is insufficient when subdirectories are allowed.
+**Prevention:** Always iterate through all parts of a resolved path when checking against a denylist of forbidden files or directories.
