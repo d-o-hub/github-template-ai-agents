@@ -54,6 +54,11 @@ def test_validate_safe_path_forbidden(tmp_path):
         with pytest.raises(PathValidationError):
             validate_safe_path(f"{forbidden}/file.txt", base, "test", check_forbidden=True)
 
+    # Test nested forbidden path
+    (base / "subdir").mkdir()
+    with pytest.raises(PathValidationError):
+        validate_safe_path("subdir/.env", base, "test", check_forbidden=True)
+
 
 def test_validate_safe_path_symlink_escape(tmp_path):
     base = tmp_path / "repo"
