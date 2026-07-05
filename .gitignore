@@ -41,8 +41,6 @@ analysis/
 # Editors and IDEs
 .vscode/
 .idea/
-*.swp
-*.swo
 
 # System files
 .DS_Store
@@ -51,7 +49,6 @@ Thumbs.db
 # Coverage
 coverage/
 htmlcov/
-.coverage
 
 # Cache directories
 .mypy_cache/
@@ -63,5 +60,9 @@ htmlcov/
 llms.txt
 llms-full.txt
 
-commit*.txt.mimocode/
+commit*.txt
 .mimocode/
+
+# Skill evaluation artifacts
+.agents/skills/*-workspace/
+.agents/skills/skills-evaluation/
