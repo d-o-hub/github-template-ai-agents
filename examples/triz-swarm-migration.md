@@ -15,7 +15,7 @@ risk and rollback complexity.
 # Skills used:
 # - triz-solver: Identify and resolve the contradiction
 # - agent-coordination (swarm): Multi-perspective investigation
-# - task-decomposition: Break into atomic migration tasks
+# - goap-agent: Break into atomic migration tasks
 ```
 
 ## Step 1: TRIZ Contradiction Analysis
@@ -93,7 +93,7 @@ Gradual transition resolves both without compromise.
 
 ## Step 5: Decompose into Tasks
 
-Using `task-decomposition`, break into atomic tasks:
+Using `goap-agent`, break into atomic tasks:
 
 ```markdown
 ### Migration Plan
@@ -149,5 +149,5 @@ skill triz-solver
 # 3 agents: consistency, rollback, performance
 
 # 5. Synthesize and decompose
-# task-decomposition skill for atomic plan
+# goap-agent skill for atomic plan
 ```

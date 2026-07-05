@@ -125,10 +125,10 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 - No hardcoded values: use relative paths, runtime derivation, env vars
 ```
 
-### A skill directory (`.agents/skills/task-decomposition/`)
+### A skill directory (`.agents/skills/goap-agent/`)
 
 ```text
-.agents/skills/task-decomposition/
+.agents/skills/goap-agent/
 └── SKILL.md        ← instructions for breaking complex tasks into atomic goals
 ```
 
@@ -184,9 +184,9 @@ directly from `.agents/skills/`:
 
 ```text
 .agents/skills/           # Canonical source (single location)
-├── task-decomposition/
+├── goap-agent/
 ├── shell-script-quality/
-└── github-readme/
+└── readme-best-practices/
 
 .claude/skills/           # Per-skill symlinks → ../../.agents/skills/<skill>
 .qwen/skills/             # Per-skill symlinks → ../../.agents/skills/<skill>

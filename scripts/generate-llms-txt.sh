@@ -143,7 +143,6 @@ fi
     printf -- "- **Context Isolation**: Use sub-agents to isolate complex tasks and prevent context rot.\n\n"
 
     printf "## Essential Skills\n\n"
-    printf -- "- [task-decomposition](.agents/skills/task-decomposition/): Break complex tasks into atomic, actionable goals.\n"
     printf -- "- [goap-agent](.agents/skills/goap-agent/): Coordinate complex workflows using goal-oriented planning.\n"
     printf -- "- [git-github-workflow](.agents/skills/git-github-workflow/): Orchestrate the full git-to-merge lifecycle with CI monitoring and auto-fix.\n"
     printf -- "- [shell-script-quality](.agents/skills/shell-script-quality/): Ensure high-quality shell scripts with ShellCheck and BATS.\n\n"
