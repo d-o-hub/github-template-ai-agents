@@ -53,18 +53,28 @@ if [ -z "$CHANGED_FILES" ]; then
     exit 0
 fi
 
+# perf: eliminate subshells in loop iterations by using localized IFS and native array
+# assignment instead of echo | while read -r
+old_opts="$-"
+set -f # Prevent globbing
+old_ifs="$IFS"
+IFS=$'\n'
+changed_array=($CHANGED_FILES)
+IFS="$old_ifs"
+[[ "$old_opts" != *f* ]] && set +f
+
 log_info "Found changed files:"
-echo "$CHANGED_FILES" | while read -r file; do
+for file in "${changed_array[@]}"; do
     echo "  - $file"
 done
 
 # Count files for summary
-FILE_COUNT=$(echo "$CHANGED_FILES" | wc -l)
+FILE_COUNT=${#changed_array[@]}
 SYNCED=0
 SKIPPED=0
 
 # Process each changed file
-echo "$CHANGED_FILES" | while read -r file; do
+for file in "${changed_array[@]}"; do
     # Skip if file doesn't exist (deleted)
     if [ ! -f "$file" ]; then
         log_warn "Skipping deleted file: $file"
