@@ -89,43 +89,49 @@ categorize_command() {
     # Check destructive keywords with broad boundaries (to catch mkfs.ext4)
     # Allows optional trailing alphanumeric chars, dots, and hyphens immediately after the keyword.
     # Security: Use a hardened suffix pattern to avoid false positives from unrelated words.
+    # Optimization: Use a loop to validate EVERY match to prevent bypasses where a safe-looking
+    # script name in the same command string causes the whole string to be exempt.
     local destructive_regex="${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
-    if [[ "$cmd_lower" =~ $destructive_regex ]]; then
-        # Negative lookahead alternative: ensure it is not a script file like rm.sh
-        if [[ "$cmd_lower" =~ ${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?\.(sh|py|pl|rb|js) ]]; then
-             : # Matches script name, continue
-        else
-             printf "dangerous\n"
-             return 0
+    local temp_destructive="$cmd_lower"
+    while [[ "$temp_destructive" =~ $destructive_regex ]]; do
+        local full_match="${BASH_REMATCH[0]}"
+        local suffix="${BASH_REMATCH[3]}"
+        # If any match is NOT a script file, mark as dangerous
+        if [[ ! "$suffix" =~ \.(sh|py|pl|rb|js)$ ]]; then
+            printf "dangerous\n"
+            return 0
         fi
-    fi
+        # Match was a script, advance to check remaining string
+        temp_destructive="${temp_destructive#*"$full_match"}"
+    done
 
     # Check interpreter keywords with broad boundaries (to catch python3.11)
     # Allows optional trailing alphanumeric chars, dots, and hyphens immediately after the keyword.
-    # Security: Use a hardened suffix pattern to avoid false positives from unrelated words.
     local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
-    if [[ "$cmd_lower" =~ $interpreter_regex ]]; then
-        # Negative lookahead alternative: ensure it is not a script file like python3.11.sh
-        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?\.(sh|py|pl|rb|js) ]]; then
-             : # Matches script name, continue
-        else
-             printf "dangerous\n"
-             return 0
+    local temp_interpreter="$cmd_lower"
+    while [[ "$temp_interpreter" =~ $interpreter_regex ]]; do
+        local full_match="${BASH_REMATCH[0]}"
+        local suffix="${BASH_REMATCH[3]}"
+        if [[ ! "$suffix" =~ \.(sh|py|pl|rb|js)$ ]]; then
+            printf "dangerous\n"
+            return 0
         fi
-    fi
+        temp_interpreter="${temp_interpreter#*"$full_match"}"
+    done
 
     # Check network keywords with broad boundaries
     # Allows optional trailing alphanumeric chars, dots, and hyphens immediately after the keyword.
     local network_regex="${boundary}(${NETWORK_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
-    if [[ "$cmd_lower" =~ $network_regex ]]; then
-        # Ensure it is not followed by .sh or .py which indicates a script name
-        if [[ "$cmd_lower" =~ ${boundary}(${NETWORK_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?\.(sh|py|pl|rb|js) ]]; then
-            : # Likely a script name, ignore
-        else
+    local temp_network="$cmd_lower"
+    while [[ "$temp_network" =~ $network_regex ]]; do
+        local full_match="${BASH_REMATCH[0]}"
+        local suffix="${BASH_REMATCH[3]}"
+        if [[ ! "$suffix" =~ \.(sh|py|pl|rb|js)$ ]]; then
             printf "dangerous\n"
             return 0
         fi
-    fi
+        temp_network="${temp_network#*"$full_match"}"
+    done
 
     # Check custom conditional patterns (E3)
     for pattern in "${CONDITIONAL_PATTERNS[@]:-}"; do
