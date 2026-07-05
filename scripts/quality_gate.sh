@@ -12,10 +12,6 @@ set -uo pipefail
 # Use named constants for common exclusions
 readonly GIT_EXCLUDE="./.git/*"
 
-# --- Configuration ---
-# Use named constants for common exclusions
-
-
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT" || exit 1
 

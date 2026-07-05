@@ -3,8 +3,8 @@
 # Usage: agent-toolkit <command> [args]
 set -euo pipefail
 
-VERSION="0.0.0"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+VERSION=$(cat "${REPO_ROOT}/VERSION" 2>/dev/null || echo "0.0.0")
 
 # Colors (disabled when NO_COLOR is set or not a terminal)
 if [[ -z "${NO_COLOR:-}" ]] && [[ -t 1 ]]; then

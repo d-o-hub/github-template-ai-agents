@@ -13,7 +13,7 @@
 | architecture-diagram | Generate or update a project architecture SVG diagram by scanning the live project structure. Use when users ask to regenerate, refresh, or update the architecture diagram. | architecture, diagram, SVG, regenerate |
 | codeberg-api | Interact with Forgejo/Codeberg repositories via the REST API. Use when users want to read files, manage issues, create pull requests, or automate workflows on Codeberg. | Codeberg, Forgejo, git, API, PR, issues |
 | docs-hook | Lightweight git hook integration for updating agents-docs with minimal tokens. Triggered on commit/merge events to sync documentation. | git hook, documentation, sync, commit |
-| github-readme | Create human-focused GitHub README.md files with 2026 best practices. Use when creating new projects, improving documentation, adding quick start guides, writing contribution guidelines. | README, GitHub, documentation, quick start |
+| readme-best-practices | Create human-focused GitHub README.md files with 2026 best practices. Use when creating new projects, improving documentation, adding quick start guides, writing contribution guidelines. | README, GitHub, documentation, quick start |
 | goap-agent | Invoke for complex multi-step tasks requiring intelligent planning and multi-agent coordination. Use when tasks need decomposition, dependency mapping, or coordination of multiple specialized agents. | complex, multi-step, plan, coordinate, GOAP |
 | intent-classifier | Classify user intents and route to appropriate skills, commands, or workflows. Use when determining which skill to invoke, routing requests, or building skill selection logic. | classify, route, which skill, intent |
 | iterative-refinement | Execute iterative refinement workflows with validation loops until quality criteria are met. Use for test-fix cycles, code quality improvement, performance optimization. | iterative, refine, loop, test-fix, optimize |
@@ -35,7 +35,7 @@
 - agent-coordination
 - goap-agent
 - parallel-execution
-- task-decomposition
+- goap-agent
 
 ### Code Quality
 
@@ -45,7 +45,7 @@
 
 ### Documentation
 
-- github-readme
+- readme-best-practices
 - docs-hook
 - api-design-first
 
