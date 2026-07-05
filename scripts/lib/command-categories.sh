@@ -13,6 +13,11 @@ DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge
 INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:pip3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip:composer:bundle:pipenv:poetry:conda:mamba:uv:lua}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
 NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat:nslookup:dig:host:nc.openbsd:nc.traditional:telnet:ftp:tftp:ssh-add:ssh-agent:ncat:tcpdump:wireshark:tshark:aria2c:lynx:links:elinks}"
+# Script extensions treated as safe — a keyword followed by one of these is a script, not a bare command
+SAFE_EXTENSIONS=(sh py pl rb js ts mjs bash zsh csh ksh fish)
+_ext_str="${SAFE_EXTENSIONS[*]}"
+SAFE_EXT_PATTERN="\.(${_ext_str// /|})$"
+unset _ext_str
 
 # Custom patterns for categories (E3)
 SAFE_PATTERNS=()
@@ -89,43 +94,50 @@ categorize_command() {
     # Check destructive keywords with broad boundaries (to catch mkfs.ext4)
     # Allows optional trailing alphanumeric chars, dots, and hyphens immediately after the keyword.
     # Security: Use a hardened suffix pattern to avoid false positives from unrelated words.
+    # Optimization: Use a loop to validate EVERY match to prevent bypasses where a safe-looking
+    # script name in the same command string causes the whole string to be exempt.
     local destructive_regex="${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
-    if [[ "$cmd_lower" =~ $destructive_regex ]]; then
-        # Negative lookahead alternative: ensure it is not a script file like rm.sh
-        if [[ "$cmd_lower" =~ ${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?\.(sh|py|pl|rb|js) ]]; then
-             : # Matches script name, continue
-        else
-             printf "dangerous\n"
-             return 0
+    local temp_destructive="$cmd_lower"
+    local full_match suffix
+    while [[ "$temp_destructive" =~ $destructive_regex ]]; do
+        full_match="${BASH_REMATCH[0]}"
+        suffix="${BASH_REMATCH[3]}"
+        # If any match is NOT a script file, mark as dangerous
+        if [[ ! "$suffix" =~ $SAFE_EXT_PATTERN ]]; then
+            printf "dangerous\n"
+            return 0
         fi
-    fi
+        # Match was a script, advance to check remaining string
+        temp_destructive="${temp_destructive#*"$full_match"}"
+    done
 
     # Check interpreter keywords with broad boundaries (to catch python3.11)
     # Allows optional trailing alphanumeric chars, dots, and hyphens immediately after the keyword.
-    # Security: Use a hardened suffix pattern to avoid false positives from unrelated words.
     local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
-    if [[ "$cmd_lower" =~ $interpreter_regex ]]; then
-        # Negative lookahead alternative: ensure it is not a script file like python3.11.sh
-        if [[ "$cmd_lower" =~ ${boundary}(${INTERPRETER_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?\.(sh|py|pl|rb|js) ]]; then
-             : # Matches script name, continue
-        else
-             printf "dangerous\n"
-             return 0
+    local temp_interpreter="$cmd_lower"
+    while [[ "$temp_interpreter" =~ $interpreter_regex ]]; do
+        full_match="${BASH_REMATCH[0]}"
+        suffix="${BASH_REMATCH[3]}"
+        if [[ ! "$suffix" =~ $SAFE_EXT_PATTERN ]]; then
+            printf "dangerous\n"
+            return 0
         fi
-    fi
+        temp_interpreter="${temp_interpreter#*"$full_match"}"
+    done
 
     # Check network keywords with broad boundaries
     # Allows optional trailing alphanumeric chars, dots, and hyphens immediately after the keyword.
     local network_regex="${boundary}(${NETWORK_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
-    if [[ "$cmd_lower" =~ $network_regex ]]; then
-        # Ensure it is not followed by .sh or .py which indicates a script name
-        if [[ "$cmd_lower" =~ ${boundary}(${NETWORK_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?\.(sh|py|pl|rb|js) ]]; then
-            : # Likely a script name, ignore
-        else
+    local temp_network="$cmd_lower"
+    while [[ "$temp_network" =~ $network_regex ]]; do
+        full_match="${BASH_REMATCH[0]}"
+        suffix="${BASH_REMATCH[3]}"
+        if [[ ! "$suffix" =~ $SAFE_EXT_PATTERN ]]; then
             printf "dangerous\n"
             return 0
         fi
-    fi
+        temp_network="${temp_network#*"$full_match"}"
+    done
 
     # Check custom conditional patterns (E3)
     for pattern in "${CONDITIONAL_PATTERNS[@]:-}"; do

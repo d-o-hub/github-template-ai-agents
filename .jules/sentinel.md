@@ -27,3 +27,8 @@
 **Vulnerability:** The `validate_safe_path` function only checked if the top-level component of a path was in `FORBIDDEN_PATHS`, allowing bypasses for nested sensitive files (e.g., `subdir/.env`).
 **Learning:** Security validation must be recursive or iterative over all user-controllable path components. Checking only the root of a relative path is insufficient when subdirectories are allowed.
 **Prevention:** Always iterate through all parts of a resolved path when checking against a denylist of forbidden files or directories.
+
+## 2026-07-05 - Fix Command Categorization Masking Bypass
+**Vulnerability:** Command strings containing both a dangerous command (e.g., \`rm -rf /\`) and a safe-looking script name (e.g., \`rm.sh\`) were incorrectly exempt from dangerous categorization. This occurred because a single positive script-pattern match would short-circuit the entire validation logic.
+**Learning:** Security validation of command strings must be exhaustive. If a command string contains multiple occurrences of a keyword, every occurrence must be validated against safety patterns. A single "safe" instance cannot be allowed to mask other dangerous instances in the same string.
+**Prevention:** Use iterative matching (e.g., a \`while\` loop with \`BASH_REMATCH\`) to ensure every keyword instance in a command string is inspected. If any instance fails the safety check, the entire string must be treated as dangerous.
