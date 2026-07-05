@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Validates reference links in SKILL.md files.
+# Validates reference links in SKILL.md, top-level docs, agents-docs, and llms*.txt files.
 # Checks that all markdown links point to existing files.
-# Checks for consistent reference format: `references?/filename.md` - Description
+# Checks for consistent reference format in SKILL.md: `references?/filename.md` - Description
 # Exit 0 if all links valid, non-zero if broken links or format errors found.
 # shellcheck disable=SC2094
 set -uo pipefail
@@ -21,6 +21,7 @@ NC='\033[0m' # No Color
 # This makes the script portable - works whether run from repo root or scripts folder
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$REPO_ROOT/.agents/skills"
+AGENTS_DOCS_DIR="$REPO_ROOT/agents-docs"
 
 # Performance optimization: Pre-resolve REPO_ROOT once
 # This avoids hundreds of realpath/subshell calls during link validation
@@ -206,8 +207,7 @@ check_reference_format() {
 # This eliminates per-file process forks, providing significant speedup.
 
 if [[ ! -d "$SKILLS_DIR" ]]; then
-    printf "${YELLOW}⚠${NC} Skills directory not found: %s\n" "$SKILLS_DIR"
-    exit 0
+    printf "%b\n" "${YELLOW}⚠${NC} Skills directory not found: $SKILLS_DIR (continuing with docs)."
 fi
 
 # Collect all SKILL.md files, skipping backup folders (underscore prefix)
@@ -226,16 +226,17 @@ done
 shopt -u nullglob
 
 if [[ ${#SKILL_FILES[@]} -eq 0 ]]; then
-    echo "No skills found to validate."
-    exit 0
+    printf "%b\n" "${YELLOW}⚠${NC} No SKILL.md files found (continuing with docs)."
 fi
 
-current_file=""
+current_skill_file=""
 file_broken=0
 file_format_errors=0
 
 # Process all files with a single awk call.
 # Format: FILENAME:LINE_NUM:IN_REF:CONTENT
+
+if [[ ${#SKILL_FILES[@]} -gt 0 ]]; then
 
 old_opts="$-"
 old_ifs="$IFS"
@@ -262,14 +263,14 @@ for array_line in "${lines_array[@]}"; do
     line="${rest#*:}"
 
     # Handle file transition and reporting
-    if [[ "$skill_file" != "$current_file" ]]; then
-        if [[ -n "$current_file" ]]; then
+    if [[ "$skill_file" != "$current_skill_file" ]]; then
+        if [[ -n "$current_skill_file" ]]; then
             if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
-                skill_dir="${current_file%/*}"
+                skill_dir="${current_skill_file%/*}"
                 printf "  ${GREEN}✓${NC} %s: All links valid\n" "${skill_dir##*/}"
             fi
         fi
-        current_file="$skill_file"
+        current_skill_file="$skill_file"
         file_broken=0
         file_format_errors=0
         FILES_CHECKED=$((FILES_CHECKED + 1))
@@ -342,11 +343,119 @@ for array_line in "${lines_array[@]}"; do
     fi
 done
 
-# Final report for the last file
-if [[ -n "$current_file" ]]; then
-    if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
-        skill_dir="${current_file%/*}"
-        printf "  ${GREEN}✓${NC} %s: All links valid\n" "${skill_dir##*/}"
+    # Final report for the last SKILL.md file
+    if [[ -n "$current_skill_file" ]]; then
+        if [[ $file_broken -eq 0 && $file_format_errors -eq 0 ]]; then
+            skill_dir="${current_skill_file%/*}"
+            printf "  ${GREEN}✓${NC} %s: All links valid\n" "${skill_dir##*/}"
+        fi
+    fi
+
+fi # end of SKILL_FILES processing
+
+# ============================================================================
+# Phase 2: Validate links in top-level docs, agents-docs, and llms*.txt
+# These files use standard markdown links but don't have SKILL.md-specific
+# reference format rules. We only check that link targets exist.
+# ============================================================================
+
+# Collect top-level markdown files
+TOPLEVEL_FILES=()
+for toplevel_name in README.md QUICKSTART.md AGENTS.md; do
+    toplevel_path="$REPO_ROOT/$toplevel_name"
+    if [[ -f "$toplevel_path" ]]; then
+        TOPLEVEL_FILES+=("$toplevel_path")
+    fi
+done
+
+# Collect llms*.txt files
+LLMS_FILES=()
+shopt -s nullglob
+for llms_path in "$REPO_ROOT"/llms*.txt; do
+    if [[ -f "$llms_path" ]]; then
+        LLMS_FILES+=("$llms_path")
+    fi
+done
+shopt -u nullglob
+
+# Collect agents-docs/*.md files (excluding references/ subdirectory)
+AGENTS_DOCS_FILES=()
+shopt -s nullglob
+for agents_doc in "$AGENTS_DOCS_DIR"/*.md; do
+    if [[ -f "$agents_doc" ]]; then
+        AGENTS_DOCS_FILES+=("$agents_doc")
+    fi
+done
+shopt -u nullglob
+
+# Combine all non-skill docs into one array
+ALL_DOCS_FILES=("${TOPLEVEL_FILES[@]}" "${LLMS_FILES[@]}" "${AGENTS_DOCS_FILES[@]}")
+
+if [[ ${#ALL_DOCS_FILES[@]} -gt 0 ]]; then
+    current_file=""
+    file_broken=0
+
+    old_opts="$-"
+    old_ifs="$IFS"
+    set -f
+    IFS=$'\n'
+    docs_lines_array=($(awk '
+        FNR == 1 { print FILENAME ":0:__START__" }
+        /\[[^]]+\]\([^)]+\)/ { print FILENAME ":" FNR ":" $0 }
+    ' "${ALL_DOCS_FILES[@]}"))
+    [[ "$old_opts" != *f* ]] && set +f
+    IFS="$old_ifs"
+
+    for array_line in "${docs_lines_array[@]}"; do
+        doc_file="${array_line%%:*}"
+        rest="${array_line#*:}"
+        line_num="${rest%%:*}"
+        line="${rest#*:}"
+
+        # Handle file transition and reporting
+        if [[ "$doc_file" != "$current_file" ]]; then
+            if [[ -n "$current_file" ]]; then
+                if [[ $file_broken -eq 0 ]]; then
+                    display_path="${current_file#"$REPO_ROOT"/}"
+                    printf "  ${GREEN}✓${NC} %s: All links valid\n" "$display_path"
+                fi
+            fi
+            current_file="$doc_file"
+            file_broken=0
+            FILES_CHECKED=$((FILES_CHECKED + 1))
+            # Skip processing for the start-of-file marker
+            [[ "$line_num" == "0" ]] && continue
+        fi
+
+        # Compute the directory of the source file for relative link resolution
+        doc_dir="${doc_file%/*}"
+
+        # Find all markdown links in this line
+        temp_line="$line"
+        while [[ "$temp_line" =~ $LINK_REGEX ]]; do
+            full_match="${BASH_REMATCH[0]}"
+            link_path="${BASH_REMATCH[2]}"
+            temp_line="${temp_line#*"$full_match"}"
+
+            # Skip image links
+            if [[ "$line" =~ example[[:space:]]*[:\(] ]] || [[ "$link_path" =~ \.(svg|png|jpg|jpeg|gif)$ ]]; then
+                continue
+            fi
+
+            LINKS_CHECKED=$((LINKS_CHECKED + 1))
+            if ! check_link "$doc_dir" "$link_path" "$doc_file" "$line_num"; then
+                BROKEN_COUNT=$((BROKEN_COUNT + 1))
+                file_broken=1
+            fi
+        done
+    done
+
+    # Final report for the last docs file
+    if [[ -n "$current_file" ]]; then
+        if [[ $file_broken -eq 0 ]]; then
+            display_path="${current_file#"$REPO_ROOT"/}"
+            printf "  ${GREEN}✓${NC} %s: All links valid\n" "$display_path"
+        fi
     fi
 fi
 
@@ -365,11 +474,11 @@ if [[ $TOTAL_ERRORS -gt 0 ]]; then
     printf "  ${RED}Format errors: %s${NC}\n" "$FORMAT_ERRORS" >&2
     echo "" >&2
     echo "  Fix broken links by:" >&2
-    echo "    1. Creating missing reference files" >&2
-    echo "    2. Updating link paths in SKILL.md" >&2
+    echo "    1. Creating missing referenced files" >&2
+    echo "    2. Updating link paths in source files" >&2
     echo "    3. Removing obsolete links" >&2
     echo "" >&2
-    echo "  Reference format should be:" >&2
+    echo "  Reference format in SKILL.md should be:" >&2
     echo "    - \`references?/filename.md\` - Description" >&2
     exit 1
 else

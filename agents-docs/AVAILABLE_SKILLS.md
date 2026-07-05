@@ -8,6 +8,7 @@
 | Skill | Description |
 |-------|-------------|
 | `agent-coordination` | Coordinate multiple agents for software development across any language. Use this skill when running parallel execution of independent tasks, sequential chains with dependencies, swarm analysis from multiple perspectives, or iterative refinement loops — even if they just say "run these in parallel" or "coordinate agents". Not for goap-agent. |
+| `agentic-abstention` |  |
 | `delegate` | Lightweight retrieval and context agent skill for rapid information gathering and environment assessment. Use this skill when you need quick context lookups, finding code patterns, or assessing current state without full implementation overhead — even if they just say "find where X is defined" or "what's the current state of Y". |
 | `implementer` | Execution agent skill focused on implementing changes based on an approved Blueprint. Use this skill when implementing targeted, atomic code changes once the plan is solid — even if they just say "implement this" or "make the changes". Gated by human or primary agent approval of the implementation strategy. |
 | `intent-classifier` | Classify user intents and route to appropriate skills, commands, or workflows. Use when determining which skill to invoke, routing requests to specialized agents, or building skill selection logic. Trigger on 'which skill should I use', 'route this to', 'classify this request', 'skill selection', or when multiple skills could handle a task. Not for skill-creator, skill-evaluator. |
@@ -95,6 +96,7 @@
 | `skill-evaluator` | "Reusable skill for evaluating other skills with structure checks, eval coverage review, and real usage spot checks. Use when you need to check a skill, add evals, benchmark a skill, validate outputs against assertions, or compare current skill behavior against a baseline — even if they just say "evaluate this skill" or "check if this skill works".". Not for skill-creator. |
 | `testdata-builders` | Maintain deterministic builders/factories for test entities. Use this skill when authoring tests, extending test utilities, or adding schema fields that affect fixtures — even if they just say "create test data" or "build a factory for this". Not for test-runner, testing-strategy. |
 | `verification-template` | Template for creating portable domain-specific verification skills. Use this skill when creating a verification checklist as a starting point for defining systematic verification checklists for new features, modules, or domain-specific operations — even if they just say "create a verification checklist" or "add quality checks for this". Not for skill-creator. |
+| `voice-profiles` |  |
 
 ## Security
 
