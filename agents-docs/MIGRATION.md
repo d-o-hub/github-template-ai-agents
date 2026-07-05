@@ -174,7 +174,7 @@ Copy default skills from the template:
 
 ```bash
 # Copy example skills (select based on your needs)
-cp -r /tmp/ai-agent-template/.agents/skills/task-decomposition your-project/.agents/skills/
+cp -r /tmp/ai-agent-template/.agents/skills/goap-agent your-project/.agents/skills/
 cp -r /tmp/ai-agent-template/.agents/skills/shell-script-quality your-project/.agents/skills/
 
 # Copy skill rules
@@ -309,7 +309,7 @@ claude "Implement user authentication"
 claude "Review the changes in src/"
 \`\`\`
 
-See [AGENTS.md](AGENTS.md) for detailed instructions.
+See [AGENTS.md](../AGENTS.md) for detailed instructions.
 ```
 
 #### 6.2 Create MIGRATION.md (Optional)
@@ -797,7 +797,7 @@ my-project/
 
 After migration:
 
-1. **Train Your Team**: Share this guide and [QUICKSTART.md](QUICKSTART.md)
+1. **Train Your Team**: Share this guide and [QUICKSTART.md](../QUICKSTART.md)
 2. **Customize AGENTS.md**: Add project-specific patterns and conventions
 3. **Add More Skills**: Copy additional skills from the template as needed
 4. **Create Sub-Agents**: Define specialized agents for common tasks
@@ -809,13 +809,13 @@ After migration:
 
 | Resource | Purpose |
 |----------|---------|
-| [README.md](README.md) | Template overview |
-| [QUICKSTART.md](QUICKSTART.md) | 5-minute setup guide |
-| [AGENTS.md](AGENTS.md) | Agent instruction format |
-| [agents-docs/SKILLS.md](agents-docs/SKILLS.md) | Skill authoring guide |
-| [agents-docs/SUB-AGENTS.md](agents-docs/SUB-AGENTS.md) | Sub-agent patterns |
-| [agents-docs/HOOKS.md](agents-docs/HOOKS.md) | Hook configuration |
+| [README.md](../README.md) | Template overview |
+| [QUICKSTART.md](../QUICKSTART.md) | 5-minute setup guide |
+| [AGENTS.md](../AGENTS.md) | Agent instruction format |
+| [SKILLS.md](SKILLS.md) | Skill authoring guide |
+| [SUB-AGENTS.md](SUB-AGENTS.md) | Sub-agent patterns |
+| [HOOKS.md](HOOKS.md) | Hook configuration |
 
 ---
 
-**Need Help?** Open an issue on [GitHub](../../issues).
+**Need Help?** Open an issue on [GitHub](https://github.com/your-org/your-project/issues).

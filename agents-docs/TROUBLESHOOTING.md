@@ -153,7 +153,7 @@ cat .agents/skills/<skill>/evals/evals.json | jq empty
 
 **Solution**:
 - Use correct format: `` `references/filename.md` - Description ``
-- Don't use: `@references/` or markdown links `[text](url)`
+- Don't use: `@references/` or markdown links `[text](path/to/file)`
 
 ---
 
