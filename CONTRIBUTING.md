@@ -246,7 +246,7 @@ SKIP_TESTS=true ./scripts/quality_gate.sh   # Skip tests
 ## Documentation Updates
 
 **When updating documentation:**
-- Keep `AGENTS.md` under 150 lines (use progressive disclosure)
+- Keep `AGENTS.md` under 200 lines (use progressive disclosure)
 - Put detailed content in `agents-docs/`
 - Update `CHANGELOG.md` for user-facing changes
 - Update `README.md` for feature additions

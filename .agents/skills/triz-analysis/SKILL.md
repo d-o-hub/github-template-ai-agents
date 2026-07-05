@@ -84,7 +84,7 @@ Example: `analysis/triz-scripts-2025-05-20.md`
 
 - `triz-solver` — Problem-solving mode (vs audit mode)
 - `goap-agent` — Orchestrator that uses TRIZ analysis
-- `task-decomposition` — Break down audit findings into tasks
+- `goap-agent` — Break down audit findings into tasks
 
 ## Rationalizations
 

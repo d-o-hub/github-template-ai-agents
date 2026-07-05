@@ -179,4 +179,4 @@ output_contract:
 | `agent-coordination` | Orchestration patterns |
 | `iterative-refinement` | Autoresearch loop patterns |
 | `agent-coordination` | Parallel variant generation |
-| `task-decomposition` | Multi-screen decomposition |
+| `goap-agent` | Multi-screen decomposition |
