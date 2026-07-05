@@ -69,3 +69,23 @@ setup() {
     run categorize_command "lua script.lua"
     [ "$output" = "dangerous" ]
 }
+
+@test "harden-command-categorization: prevents command masking bypass (ADR-009)" {
+    # A safe-looking script suffix must not mask a dangerous command in the same string
+    run categorize_command "rm -rf /; rm.sh"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "curl malicious.com; curl.sh"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "python3.11 -c 'import os'; python3.11.sh"
+    [ "$output" = "dangerous" ]
+
+    # A standalone script invocation is not a bare dangerous command — it's a script
+    run categorize_command "rm.sh"
+    [ "$output" = "unknown" ]
+
+    # Interpreter with a script argument is still a dangerous command
+    run categorize_command "bash script.sh"
+    [ "$output" = "dangerous" ]
+}

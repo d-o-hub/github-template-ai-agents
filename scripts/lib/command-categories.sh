@@ -13,6 +13,11 @@ DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge
 INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:pip3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip:composer:bundle:pipenv:poetry:conda:mamba:uv:lua}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
 NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat:nslookup:dig:host:nc.openbsd:nc.traditional:telnet:ftp:tftp:ssh-add:ssh-agent:ncat:tcpdump:wireshark:tshark:aria2c:lynx:links:elinks}"
+# Script extensions treated as safe — a keyword followed by one of these is a script, not a bare command
+SAFE_EXTENSIONS=(sh py pl rb js ts mjs bash zsh csh ksh fish)
+_ext_str="${SAFE_EXTENSIONS[*]}"
+SAFE_EXT_PATTERN="\.(${_ext_str// /|})$"
+unset _ext_str
 
 # Custom patterns for categories (E3)
 SAFE_PATTERNS=()
@@ -93,11 +98,12 @@ categorize_command() {
     # script name in the same command string causes the whole string to be exempt.
     local destructive_regex="${boundary}(${DESTRUCTIVE_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
     local temp_destructive="$cmd_lower"
+    local full_match suffix
     while [[ "$temp_destructive" =~ $destructive_regex ]]; do
-        local full_match="${BASH_REMATCH[0]}"
-        local suffix="${BASH_REMATCH[3]}"
+        full_match="${BASH_REMATCH[0]}"
+        suffix="${BASH_REMATCH[3]}"
         # If any match is NOT a script file, mark as dangerous
-        if [[ ! "$suffix" =~ \.(sh|py|pl|rb|js)$ ]]; then
+        if [[ ! "$suffix" =~ $SAFE_EXT_PATTERN ]]; then
             printf "dangerous\n"
             return 0
         fi
@@ -110,9 +116,9 @@ categorize_command() {
     local interpreter_regex="${boundary}(${INTERPRETER_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
     local temp_interpreter="$cmd_lower"
     while [[ "$temp_interpreter" =~ $interpreter_regex ]]; do
-        local full_match="${BASH_REMATCH[0]}"
-        local suffix="${BASH_REMATCH[3]}"
-        if [[ ! "$suffix" =~ \.(sh|py|pl|rb|js)$ ]]; then
+        full_match="${BASH_REMATCH[0]}"
+        suffix="${BASH_REMATCH[3]}"
+        if [[ ! "$suffix" =~ $SAFE_EXT_PATTERN ]]; then
             printf "dangerous\n"
             return 0
         fi
@@ -124,9 +130,9 @@ categorize_command() {
     local network_regex="${boundary}(${NETWORK_KEYWORDS//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
     local temp_network="$cmd_lower"
     while [[ "$temp_network" =~ $network_regex ]]; do
-        local full_match="${BASH_REMATCH[0]}"
-        local suffix="${BASH_REMATCH[3]}"
-        if [[ ! "$suffix" =~ \.(sh|py|pl|rb|js)$ ]]; then
+        full_match="${BASH_REMATCH[0]}"
+        suffix="${BASH_REMATCH[3]}"
+        if [[ ! "$suffix" =~ $SAFE_EXT_PATTERN ]]; then
             printf "dangerous\n"
             return 0
         fi
