@@ -54,6 +54,10 @@ FORBIDDEN_PATHS = frozenset({
     "LICENSE",
     "VERSION",
     ".secrets",
+    ".env.local",
+    ".env.development",
+    ".env.test",
+    ".env.production",
 })
 
 
