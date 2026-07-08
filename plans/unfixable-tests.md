@@ -12,4 +12,5 @@ Tests ignored/failing:
 These tests should be reviewed in the upstream repo or adapted for the local execution environment later.
 
 ## Quality gate failure
+
 The quality gate is also failing due to `SKILL.md` length limits in `.agents/skills` directories outside `do-web-doc-resolver` (e.g. `skill-evaluator`, `shell-script-quality`). These exceed the 250 LOC rule but are part of the broader workspace and not the skill itself. These should be addressed globally.
