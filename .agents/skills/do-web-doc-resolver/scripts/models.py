@@ -4,7 +4,7 @@ Data models and Enums for the Web Doc Resolver.
 
 from dataclasses import asdict, dataclass, field
 from enum import Enum
-from typing import Any
+from typing import Any, Protocol, runtime_checkable
 
 
 class ErrorType(Enum):
@@ -20,6 +20,7 @@ class ErrorType(Enum):
     INVALID_RESPONSE = "invalid_response"
     SSRF_BLOCKED = "ssrf_blocked"
     CONTENT_TOO_LARGE = "content_too_large"
+    BOT_CHALLENGE = "bot_challenge"
     UNKNOWN = "unknown"
 
 
@@ -50,6 +51,18 @@ class Profile(Enum):
         return 4
 
 
+class FetchTier(int, Enum):
+    """Escalation cost tier for fetch providers.
+    Lower = cheaper, always tried first."""
+
+    FREE_STATIC = 0  # llms_txt: static text file, zero cost
+    FREE_DIRECT = 1  # direct_fetch: plain httpx, zero cost
+    FREE_SEARCH = 2  # duckduckgo: free web search
+    PAID_LITE = 3  # jina, firecrawl: paid but cheap per-call
+    STEALTH = 4  # anti-bot bypass tier
+    PAID_BROWSER = 5  # mistral_browser: paid + JS execution
+
+
 class ProviderType(Enum):
     """Available providers for resolution."""
 
@@ -71,6 +84,7 @@ class ProviderType(Enum):
     # New providers
     DOCLING = "docling"
     OCR = "ocr"
+    VISUAL_CLIP = "visual_clip"
 
     def is_paid(self) -> bool:
         return self in (
@@ -80,6 +94,7 @@ class ProviderType(Enum):
             ProviderType.FIRECRAWL,
             ProviderType.MISTRAL_WEBSEARCH,
             ProviderType.MISTRAL_BROWSER,
+            ProviderType.VISUAL_CLIP,
         )
 
     def is_fast(self) -> bool:
@@ -156,3 +171,38 @@ class ResolvedResult:
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return asdict(self)
+
+
+@runtime_checkable
+class ReadonlyResolverProtocol(Protocol):
+    """Protocol for resolver provider callables used in cascade_map.
+
+    In the cascade, providers are wrapped as zero-argument lambdas that capture
+    url/query and max_chars in their closure. The cascade calls them via
+    asyncio.to_thread(func) with no arguments.
+
+    A resolver MUST:
+    - Be callable with no arguments (captures context via closure)
+    - Return ResolvedResult, str, or None on completion
+    - Never write to disk, mutate global state, or open files
+    - Be safe to call concurrently (no shared mutable state)
+
+    A resolver MUST NOT:
+    - Write files or modify environment variables
+    - Spawn subprocesses with side effects
+    - Access databases except via the semantic cache interface
+    """
+
+    def __call__(self) -> ResolvedResult | str | None: ...
+
+
+__all__ = [
+    "ErrorType",
+    "Profile",
+    "ProviderType",
+    "ValidationResult",
+    "ProviderMetric",
+    "ResolveMetrics",
+    "ResolvedResult",
+    "ReadonlyResolverProtocol",
+]

@@ -1,13 +1,12 @@
 """
-HTTP utilities for the Web Doc Resolver.
-Uses httpx.Client for sync operations.
+Async HTTP utilities for the Web Doc Resolver.
+Uses httpx.AsyncClient for non-blocking HTTP requests.
 """
 
 import asyncio
 import ipaddress
 import logging
 import socket
-import threading
 import time
 from functools import lru_cache
 from urllib.parse import urljoin, urlparse
@@ -25,51 +24,39 @@ from scripts.models import ValidationResult
 
 logger = logging.getLogger(__name__)
 
-_global_client: httpx.Client | None = None
-_client_lock = threading.Lock()
+_global_client: httpx.AsyncClient | None = None
+_client_lock = asyncio.Lock()
 
 
-def create_client_with_retry() -> httpx.Client:
-    """Create an httpx.Client with retry configuration."""
-    return httpx.Client(
-        http2=True,
-        timeout=httpx.Timeout(30.0),
-        follow_redirects=False,
-        headers={
-            "User-Agent": USER_AGENT,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.5",
-        },
-        limits=httpx.Limits(
-            max_connections=100,
-            max_keepalive_connections=20,
-            keepalive_expiry=30,
-        ),
-        transport=httpx.HTTPTransport(retries=3),
-        verify=True,
-    )
-
-
-def get_session() -> httpx.Client:
-    """Get or create the global sync HTTP client (backward compatible name)."""
+async def get_async_client() -> httpx.AsyncClient:
+    """Get or create the global async HTTP client."""
     global _global_client
-    with _client_lock:
-        if _global_client is None or _global_client.is_closed:
-            _global_client = create_client_with_retry()
+    if _global_client is None or _global_client.is_closed:
+        _global_client = httpx.AsyncClient(
+            http2=True,
+            timeout=httpx.Timeout(30.0),
+            follow_redirects=False,
+            headers={
+                "User-Agent": USER_AGENT,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5",
+            },
+            limits=httpx.Limits(
+                max_connections=100,
+                max_keepalive_connections=20,
+                keepalive_expiry=30,
+            ),
+            verify=True,
+        )
     return _global_client
 
 
-def close_session() -> None:
-    """Close the global sync HTTP client."""
+async def close_async_client() -> None:
+    """Close the global async HTTP client."""
     global _global_client
-    with _client_lock:
-        if _global_client is not None and not _global_client.is_closed:
-            _global_client.close()
-            _global_client = None
-
-
-# Keep create_session_with_retry as alias for backward compatibility
-create_session_with_retry = create_client_with_retry
+    if _global_client is not None and not _global_client.is_closed:
+        await _global_client.aclose()
+        _global_client = None
 
 
 @lru_cache(maxsize=1024)
@@ -79,16 +66,13 @@ def _getaddrinfo_bucketed(host: str, port: int | str | None, bucket: int) -> lis
 
 
 def _getaddrinfo_cached(host: str, port: int | str | None = None) -> list[tuple]:
-    """Cached version of socket.getaddrinfo with TTL to balance performance and security."""
+    """Cached version of socket.getaddrinfo with TTL."""
     bucket = int(time.time() // DNS_CACHE_TTL)
     return _getaddrinfo_bucketed(host, port, bucket)
 
 
 def _normalize_host(hostname: str) -> str:
-    """Normalise encoded IP representations to dotted-decimal.
-
-    Handles decimal integer notation, hex notation, and IPv4-mapped IPv6.
-    """
+    """Normalise encoded IP representations to dotted-decimal."""
     h = hostname.strip().lower()
     if h.isdigit():
         try:
@@ -153,25 +137,23 @@ def is_safe_url(url: str) -> bool:
         return False
 
 
-def _safe_request(
+async def async_safe_request(
     method: str,
     url: str,
-    client: httpx.Client | None = None,
     *,
     max_redirects: int = 5,
     **kwargs,
 ) -> httpx.Response:
-    """Perform an HTTP request while validating each redirect hop for SSRF."""
+    """Perform an async HTTP request while validating each redirect hop for SSRF."""
+    client = await get_async_client()
     current_url = url
     history: list[httpx.Response] = []
-    kwargs.pop("allow_redirects", None)
-    active_client = client or get_session()
 
     for _ in range(max_redirects + 1):
         if not is_safe_url(current_url):
             raise httpx.RequestError(f"SSRF blocked: {current_url}")
 
-        response = active_client.request(method, current_url, **kwargs)
+        response = await client.request(method, current_url, **kwargs)
 
         if response.is_redirect:
             history.append(response)
@@ -190,8 +172,10 @@ def _safe_request(
     raise httpx.TooManyRedirects(f"Exceeded {max_redirects} redirects")
 
 
-def validate_url(url: str, timeout: int = 10, check_ssrf: bool = True) -> ValidationResult:
-    """Validate a URL."""
+async def async_validate_url(
+    url: str, timeout: int = 10, check_ssrf: bool = True
+) -> ValidationResult:
+    """Validate a URL asynchronously."""
     if not url or not url.strip():
         return ValidationResult(is_valid=False, error="Empty URL")
     from scripts.utils.urls import is_url
@@ -199,11 +183,11 @@ def validate_url(url: str, timeout: int = 10, check_ssrf: bool = True) -> Valida
     if not is_url(url):
         return ValidationResult(is_valid=False, error="Invalid URL format")
     try:
-        client = get_session()
         if check_ssrf:
-            response = _safe_request("HEAD", url, client=client, timeout=timeout)
+            response = await async_safe_request("HEAD", url, timeout=timeout)
         else:
-            response = client.head(url, follow_redirects=True, timeout=timeout)
+            client = await get_async_client()
+            response = await client.head(url, follow_redirects=True, timeout=timeout)
         redirect_chain = [str(h.url) for h in response.history] + [str(response.url)]
         if response.status_code >= 400:
             return ValidationResult(
@@ -224,10 +208,12 @@ def validate_url(url: str, timeout: int = 10, check_ssrf: bool = True) -> Valida
         return ValidationResult(is_valid=False, error=str(e))
 
 
-def _validate_single_link(link: str, timeout: int, client: httpx.Client) -> str | None:
-    """Validate a single link."""
+async def _async_validate_single_link(
+    link: str, timeout: int, client: httpx.AsyncClient
+) -> str | None:
+    """Validate a single link asynchronously."""
     try:
-        response = _safe_request("HEAD", link, client=client, timeout=timeout)
+        response = await async_safe_request("HEAD", link, timeout=timeout)
         if response.status_code < 400:
             return link
     except Exception:
@@ -236,33 +222,17 @@ def _validate_single_link(link: str, timeout: int, client: httpx.Client) -> str 
     return None
 
 
-def validate_links(links: list[str], timeout: int = 5) -> list[str]:
+async def async_validate_links(links: list[str], timeout: int = 5) -> list[str]:
     """Validate a list of links in parallel, preserving input order."""
     if not links:
         return []
 
-    client = get_session()
+    client = await get_async_client()
+    tasks = [_async_validate_single_link(link, timeout, client) for link in links]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
 
-    async def _validate_all():
-        tasks = [_validate_single_link_async(link, timeout, client) for link in links]
-        return await asyncio.gather(*tasks)
-
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = None
-
-    if loop and loop.is_running():
-        import concurrent.futures
-
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-            results = pool.submit(asyncio.run, _validate_all()).result()
-    else:
-        results = asyncio.run(_validate_all())
-
-    return [link for link, valid in zip(links, results, strict=False) if valid]
-
-
-async def _validate_single_link_async(link: str, timeout: int, client: httpx.Client) -> str | None:
-    """Validate a single link asynchronously."""
-    return await asyncio.to_thread(_validate_single_link, link, timeout, client)
+    return [
+        link
+        for link, result in zip(links, results, strict=False)
+        if result and not isinstance(result, Exception)
+    ]
