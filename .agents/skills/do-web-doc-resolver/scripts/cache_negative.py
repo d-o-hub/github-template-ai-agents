@@ -53,3 +53,18 @@ def write_negative_cache(
         "metadata": metadata,
     }
     cache.set(f"neg:{provider}:{key}", entry, expire=ttl_seconds)
+
+
+def should_skip_from_bot_challenge_cache(
+    provider: str,
+    url: str,
+    bot_challenge_cache: dict[str, set[str]],
+) -> bool:
+    """Skip plain-fetch providers for URLs known to serve bot challenges."""
+    from urllib.parse import urlparse
+
+    try:
+        domain = urlparse(url).netloc
+        return provider in ("direct_fetch",) and domain in bot_challenge_cache.get(provider, set())
+    except Exception:
+        return False

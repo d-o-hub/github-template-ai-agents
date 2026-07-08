@@ -6,7 +6,7 @@ from typing import Any
 
 import scripts.routing
 from scripts._cascade import cascade_stream
-from scripts.models import Profile, ProviderType, ResolveMetrics
+from scripts.models import Profile, ProviderType, ReadonlyResolverProtocol, ResolveMetrics
 from scripts.providers_impl import (
     resolve_with_duckduckgo,
     resolve_with_exa,
@@ -107,7 +107,7 @@ def resolve_query_stream(
     provider_names = scripts.routing.plan_provider_order(
         target=query, is_url=False, skip_providers=skip, routing_memory=_routing_memory
     )
-    cascade_map = {
+    cascade_map: dict[str, tuple[ProviderType, ReadonlyResolverProtocol]] = {
         "exa_mcp": (ProviderType.EXA_MCP, lambda: resolve_with_exa_mcp(query, max_chars)),
         "exa": (ProviderType.EXA, lambda: resolve_with_exa(query, max_chars)),
         "tavily": (ProviderType.TAVILY, lambda: resolve_with_tavily(query, max_chars)),
