@@ -6,7 +6,7 @@ import logging
 from typing import cast
 from urllib.parse import urlparse
 
-from scripts.constants import DEFAULT_TIMEOUT, MAX_CHARS
+from scripts.constants import CLEAN_CONTENT, DEFAULT_TIMEOUT, MAX_CHARS
 from scripts.models import ResolvedResult
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def fetch_url_content(
     url: str, timeout: int = DEFAULT_TIMEOUT, max_chars: int = MAX_CHARS
 ) -> ResolvedResult | None:
-    from scripts.utils import _safe_request, extract_text_from_html, get_session, validate_url
+    from scripts.utils import _safe_request, get_session, validate_url
 
     validation = validate_url(url, timeout=timeout // 2)
     if not validation.is_valid:
@@ -24,19 +24,50 @@ def fetch_url_content(
         session = get_session()
         response = _safe_request("GET", url, session=session, timeout=timeout, verify=True)
         if response.status_code >= 400:
+            # Check for bot challenge even on error status codes (e.g., 403 Forbidden)
+            from scripts.quality import is_bot_challenge
+
+            if is_bot_challenge(response.text):
+                raise ValueError(f"Bot challenge detected (HTTP {response.status_code})")
             return None
-        content = (
-            extract_text_from_html(response.text, url)
-            if "text/html" in response.headers.get("Content-Type", "")
-            else response.text
-        )
+        raw_html = response.text
+
+        from scripts.quality import is_bot_challenge
+
+        if is_bot_challenge(raw_html):
+            raise ValueError("Bot challenge detected")
+
+        is_html = "text/html" in response.headers.get("Content-Type", "")
+
+        if is_html and CLEAN_CONTENT:
+            from scripts.utils.content_clean import clean_content
+
+            content = clean_content(raw_html, url=url, max_chars=max_chars)
+        elif is_html:
+            from scripts.utils import extract_text_from_html
+
+            content = extract_text_from_html(raw_html, url)[:max_chars]
+        else:
+            content = raw_html[:max_chars]
+
         return ResolvedResult(
             source="direct_fetch",
-            content=content[:max_chars],
+            content=content,
             url=validation.final_url or url,
-            metadata={"status_code": response.status_code},
+            metadata={
+                "status_code": response.status_code,
+                "cleaned": is_html and CLEAN_CONTENT,
+                "raw_length": len(raw_html),
+            },
         )
-    except Exception:
+    except Exception as e:
+        # Surface bot challenges to the cascade
+        from scripts.models import ErrorType
+        from scripts.utils import _detect_error_type
+
+        if _detect_error_type(e) == ErrorType.BOT_CHALLENGE:
+            raise
+
         logger.debug("Direct fetch failed: %s", url, exc_info=True)
         return None
 
