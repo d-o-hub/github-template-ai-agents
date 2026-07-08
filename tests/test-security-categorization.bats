@@ -89,3 +89,34 @@ setup() {
     run categorize_command "bash script.sh"
     [ "$output" = "dangerous" ]
 }
+
+@test "harden-command-categorization: detects new administrative and network keywords" {
+    run categorize_command "pkexec ls"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "mount /dev/sdb1 /mnt"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "rclone copy /local /remote"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "expect script.exp"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "aws s3 ls"
+    [ "$output" = "dangerous" ]
+}
+
+@test "harden-command-categorization: detects dangerous git remote helper" {
+    run categorize_command "git remote add origin ext::ssh user@host"
+    [ "$output" = "dangerous" ]
+}
+
+@test "harden-command-categorization: escapes dots in keywords (ADR-010)" {
+    # nc.openbsd should be dangerous, but ncxopenbsd should be unknown
+    run categorize_command "nc.openbsd"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "ncxopenbsd"
+    [ "$output" = "unknown" ]
+}
