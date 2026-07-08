@@ -58,6 +58,17 @@ FORBIDDEN_PATHS = frozenset({
     ".env.development",
     ".env.test",
     ".env.production",
+    ".bash_history",
+    ".zsh_history",
+    ".python_history",
+    ".node_repl_history",
+    "id_rsa",
+    "id_ed25519",
+    "id_ecdsa",
+    "id_dsa",
+    "known_hosts",
+    "authorized_keys",
+    ".git-credentials",
 })
 
 
