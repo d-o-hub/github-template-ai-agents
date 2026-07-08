@@ -12,7 +12,12 @@ from scripts.providers.firecrawl import resolve_with_firecrawl
 from scripts.providers.jina import resolve_with_jina
 from scripts.providers.mistral import resolve_with_mistral_browser, resolve_with_mistral_websearch
 from scripts.providers.serper import resolve_with_serper
+from scripts.providers.stealth import resolve_with_stealth
 from scripts.providers.tavily import resolve_with_tavily
+from scripts.providers.visual_clip import (
+    resolve_with_visual_clip,
+    resolve_with_visual_clip_async,
+)
 
 # Rate limiting functions
 _rate_limits: dict[str, float] = {}
@@ -54,6 +59,9 @@ __all__ = [
     "resolve_with_mistral_websearch",
     "resolve_with_docling",
     "resolve_with_ocr",
+    "resolve_with_visual_clip",
+    "resolve_with_stealth",
+    "resolve_with_visual_clip_async",
     "_is_rate_limited",
     "_set_rate_limit",
     "_clear_rate_limits",
