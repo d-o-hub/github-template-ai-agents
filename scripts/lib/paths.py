@@ -1,4 +1,5 @@
 # scripts/lib/paths.py
+# Security Hardening: 2026-07-06 - Expanded forbidden paths.
 """Path validation utilities for CLI scripts."""
 
 from __future__ import annotations
@@ -54,6 +55,17 @@ FORBIDDEN_PATHS = frozenset({
     "LICENSE",
     "VERSION",
     ".secrets",
+    ".git-credentials",
+    ".bash_history",
+    ".zsh_history",
+    ".python_history",
+    ".node_repl_history",
+    "id_rsa",
+    "id_ed25519",
+    "id_ecdsa",
+    "id_dsa",
+    "known_hosts",
+    "authorized_keys",
     ".env.local",
     ".env.development",
     ".env.test",
