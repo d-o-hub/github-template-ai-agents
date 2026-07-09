@@ -139,6 +139,7 @@ cp "$PROJECT_ROOT/scripts/propagate-version.sh" "$TEST_ROOT/bump_test/scripts/"
 (
     cd "$TEST_ROOT/bump_test"
     echo "0.1.08" > "VERSION"
+    mkdir -p .templates
     echo "## [Unreleased]" > ".templates/CHANGELOG-TEMPLATE.md"
     git init -q
     git config user.email "test@example.com"

@@ -12,6 +12,7 @@ setup() {
 
     # Create required files
     echo "1.2.3" > VERSION
+    mkdir -p .templates
     cat << 'MARKDOWN' > .templates/CHANGELOG-TEMPLATE.md
 # Changelog
 
