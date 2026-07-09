@@ -255,6 +255,13 @@ if ! ./scripts/loc_gate.sh; then
 fi
 printf "\n"
 
+# --- Secretlint checks ---
+if [[ -f ".secretlintrc.json" ]]; then
+    if ! ./scripts/secretlint_gate.sh; then
+        FAILED=1
+    fi
+fi
+
 # --- Enforce WASM size limits ---
 printf "%bEnforcing WASM size limits...%b\n" "${BLUE}" "${NC}"
 if ! ./scripts/wasm_size_gate.sh; then
@@ -263,48 +270,20 @@ fi
 printf "\n"
 
 # --- Auto-detect project languages ---
-printf "%bDetecting project languages...%b\n" "${BLUE}" "${NC}"
-
-# Rust detection
-if [[ -f "Cargo.toml" ]]; then
-    printf "  %b✓%b Rust (Cargo.toml)\n" "${GREEN}" "${NC}"
-    DETECTED_LANGUAGES+=("rust")
-fi
-
-# TypeScript/JavaScript detection
-if [[ -f "package.json" ]]; then
-    printf "  %b✓%b TypeScript/JavaScript (package.json)\n" "${GREEN}" "${NC}"
-    DETECTED_LANGUAGES+=("typescript")
-fi
-
-# Python detection
-if [[ -f "requirements.txt" ]] || [[ -f "pyproject.toml" ]] || [[ -f "setup.py" ]]; then
-    printf "  %b✓%b Python (requirements.txt/pyproject.toml)\n" "${GREEN}" "${NC}"
-    DETECTED_LANGUAGES+=("python")
-fi
-
-# Go detection
-if [[ -f "go.mod" ]]; then
-    printf "  %b✓%b Go (go.mod)\n" "${GREEN}" "${NC}"
-    DETECTED_LANGUAGES+=("go")
-fi
-
-# Shell script detection
-if find . -name "*.sh" -not -path "$GIT_EXCLUDE" -print -quit | grep -q .; then
-    printf "  %b✓%b Shell scripts detected\n" "${GREEN}" "${NC}"
-    DETECTED_LANGUAGES+=("shell")
-fi
-
-# Markdown detection
-if find . -name "*.md" -not -path "$GIT_EXCLUDE" -print -quit | grep -q .; then
-    printf "  %b✓%b Markdown files detected\n" "${GREEN}" "${NC}"
-    DETECTED_LANGUAGES+=("markdown")
-fi
-
-if [[ ${#DETECTED_LANGUAGES[@]} -eq 0 ]]; then
-    printf "%b  No recognized project files found.%b\n" "${YELLOW}" "${NC}"
-fi
-printf "\n"
+printf "%bDetecting project languages...%b
+" "" ""
+[[ -f "Cargo.toml" ]] && DETECTED_LANGUAGES+=("rust") && printf "  %b✓%b Rust
+" "" ""
+[[ -f "package.json" ]] && DETECTED_LANGUAGES+=("typescript") && printf "  %b✓%b TypeScript
+" "" ""
+([[ -f "requirements.txt" ]] || [[ -f "pyproject.toml" ]] || [[ -f "setup.py" ]]) && DETECTED_LANGUAGES+=("python") && printf "  %b✓%b Python
+" "" ""
+[[ -f "go.mod" ]] && DETECTED_LANGUAGES+=("go") && printf "  %b✓%b Go
+" "" ""
+find . -name "*.sh" -not -path "" -print -quit | grep -q . && DETECTED_LANGUAGES+=("shell") && printf "  %b✓%b Shell
+" "" ""
+find . -name "*.md" -not -path "" -print -quit | grep -q . && DETECTED_LANGUAGES+=("markdown") && printf "  %b✓%b Markdown
+" "" ""
 
 # --- Get changed files for scoped linting ---
 _changed_files_z() {
