@@ -235,6 +235,7 @@ Run every step. Swarm coordinates handoffs.
 ## See Also
 
 - `css-render-performance` — CSS render performance optimization
+
 ## Rationalizations
 
 | Rationalization | Reality |
