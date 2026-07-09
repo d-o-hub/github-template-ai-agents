@@ -18,13 +18,23 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('.agents/skills/turso-db/SKILL.md') != '' }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
 
+      - name: Check if turso-db skill exists
+        id: check_skill
+        run: |
+          if [[ -f ".agents/skills/turso-db/SKILL.md" ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "turso-db skill not found — skipping sync"
+          fi
+
       - name: Fetch latest Turso release and llms.txt
+        if: steps.check_skill.outputs.exists == 'true'
         run: |
           set -euo pipefail
           LATEST_RELEASE="$(curl -fsSL \
@@ -35,6 +45,7 @@ jobs:
           echo "LATEST_RELEASE=$LATEST_RELEASE" >> "$GITHUB_ENV"
 
       - name: Compare llms.txt with cached version
+        if: steps.check_skill.outputs.exists == 'true'
         id: check_changes
         run: |
           set -euo pipefail
