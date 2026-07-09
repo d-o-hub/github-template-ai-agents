@@ -20,13 +20,13 @@ This template ships three version-related scripts. All three are **general-purpo
 - Adds `[Unreleased]` section to `CHANGELOG.md` if missing
 - Exits 0 on success, 1 on validation failure
 
-**Template-repo behavior:** Updates `README.md` to `version-0.0.0` (because `VERSION=0.0.0`). Does not touch `CHANGELOG-TEMPLATE.md` (which is the template's own history).
+**Template-repo behavior:** Updates `README.md` to `version-0.0.0` (because `VERSION=0.0.0`). Does not touch `.templates/CHANGELOG-TEMPLATE.md` (which is the template's own history).
 
 **Consumer-repo behavior:** Updates `README.md`, `QUICKSTART.md`, `agents-docs/MIGRATION.md`, `CHANGELOG.md` to the consumer's `VERSION` value.
 
 **Files updated (as of last edit):**
 - `README.md`
-- `CHANGELOG-TEMPLATE.md`
+- `.templates/CHANGELOG-TEMPLATE.md`
 - `agents-docs/VERSION.md`
 - `analysis/SWARM_ANALYSIS.md`
 
@@ -36,23 +36,23 @@ This template ships three version-related scripts. All three are **general-purpo
 
 ## `scripts/bump_patch_version.sh`
 
-**Purpose:** Bump the patch version, append a new entry to `CHANGELOG-TEMPLATE.md`, and propagate.
+**Purpose:** Bump the patch version, append a new entry to `.templates/CHANGELOG-TEMPLATE.md`, and propagate.
 
 **Inputs:**
 - `VERSION` file (current version)
-- `CHANGELOG-TEMPLATE.md` (target file)
+- `.templates/CHANGELOG-TEMPLATE.md` (target file)
 - `git log` (last 15 non-merge commits, excluding version bumps)
 
 **Behavior:**
 - Reads `VERSION`, computes `MAJOR.MINOR.(PATCH+1)`
 - Generates a changelog summary from `git log` (Added/Fixed/Changed sections)
-- Inserts `## [X.Y.Z] - YYYY-MM-DD` into `CHANGELOG-TEMPLATE.md` after `## [Unreleased]`
+- Inserts `## [X.Y.Z] - YYYY-MM-DD` into `.templates/CHANGELOG-TEMPLATE.md` after `## [Unreleased]`
 - Writes new version to `VERSION`
 - Runs `propagate-version.sh`
 
 **Template-repo behavior:** Reads `VERSION=0.0.0`, computes `0.0.1`, inserts new entry, writes `0.0.1` to `VERSION`, then resets via `propagate-version.sh` reading the new value.
 
-**Consumer-repo behavior:** Reads consumer `VERSION`, appends to consumer's `CHANGELOG.md` (note: consumer would rename `CHANGELOG-TEMPLATE.md` to `CHANGELOG.md` per the bootstrap flow).
+**Consumer-repo behavior:** Reads consumer `VERSION`, appends to consumer's `CHANGELOG.md` (note: consumer would rename `.templates/CHANGELOG-TEMPLATE.md` to `CHANGELOG.md` per the bootstrap flow).
 
 **Triggers:**
 - Manual invocation: `./scripts/bump_patch_version.sh`
@@ -62,10 +62,10 @@ This template ships three version-related scripts. All three are **general-purpo
 `tests/bump_patch_version.bats` validates:
 - Version is incremented correctly
 - New entry contains Added/Fixed/Changed sections from recent commits
-- Both `VERSION` and `CHANGELOG-TEMPLATE.md` are updated
+- Both `VERSION` and `.templates/CHANGELOG-TEMPLATE.md` are updated
 
 ## When NOT to Modify These Scripts
 
-The scripts are designed for downstream consumers. **Do not change their semantics to read from `CHANGELOG-TEMPLATE.md` instead of `VERSION`** — that would break every consumer repo using this template.
+The scripts are designed for downstream consumers. **Do not change their semantics to read from `.templates/CHANGELOG-TEMPLATE.md` instead of `VERSION`** — that would break every consumer repo using this template.
 
-If a template-specific behavior is needed (e.g., a `propagate-template-version.sh` that reads the latest `## [X.Y.Z]` heading from `CHANGELOG-TEMPLATE.md`), add a **new** script rather than modifying these.
+If a template-specific behavior is needed (e.g., a `propagate-template-version.sh` that reads the latest `## [X.Y.Z]` heading from `.templates/CHANGELOG-TEMPLATE.md`), add a **new** script rather than modifying these.

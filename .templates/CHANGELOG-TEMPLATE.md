@@ -64,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix(security): harden scripts against injection
 - fix(security): address PR feedback on ai-commit.sh and sentinel.md
 - fix(security): prevent structural and option injection in ai-commit.sh
-- fix: explicitly add missing 0.2.7 entry to CHANGELOG-TEMPLATE.md
+- fix: explicitly add missing 0.2.7 entry to .templates/CHANGELOG-TEMPLATE.md
 - fix: resolve jules-delegator CI issues and harden doc scripts
 - fix: resolve jules-delegator CI issues and harden doc scripts
 - fix(security): prevent message injection in ai-commit.sh (#307)

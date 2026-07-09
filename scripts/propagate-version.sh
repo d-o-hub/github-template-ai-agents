@@ -34,7 +34,7 @@ FILES_TO_UPDATE=(
     "README.md"
     "QUICKSTART.md"
     "agents-docs/MIGRATION.md"
-    "CHANGELOG-TEMPLATE.md"
+    ".templates/CHANGELOG-TEMPLATE.md"
     "agents-docs/VERSION.md"
     "analysis/SWARM_ANALYSIS.md"
 )

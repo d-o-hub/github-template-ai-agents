@@ -1468,7 +1468,7 @@ find . -name '*.md' \
 - `agents-docs/HARNESS.md` — Enriched with observability, MCP Tool Search, agent capabilities
 - `agents-docs/CONTEXT.md` — Added MCP Tool Search note
 - `.agents/skills/agent-coordination/SKILL.md` — Added native capability comparison table
-- `CHANGELOG-TEMPLATE.md` — Added restructuring entries
+- `.templates/CHANGELOG-TEMPLATE.md` — Added restructuring entries
 
 ---
 

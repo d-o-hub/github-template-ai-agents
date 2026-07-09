@@ -218,7 +218,7 @@ Run every step. Swarm coordinates handoffs.
 
 ### Phase 3: Generate & Verify
 
-**Step 4 — Coordinator: Assemble Prompt.** See → `templates/optimize-prompt-template.md`
+**Step 4 — Coordinator: Assemble Prompt.**
 - Copy the frozen Token Scaffold keys as a comment header into every generated file.
 - Reference only token keys — never raw values — in component code.
 - Output must include responsive styles for all four breakpoints defined in `breakpoints` token.
@@ -227,7 +227,7 @@ Run every step. Swarm coordinates handoffs.
 
 **Step 5 — Variant Generator: 3 Variants.** Default: editorial/product/expressive. Game: immersive/competitive/minimal-hud. See → `references/variant-worktree-flow.md`
 
-**Step 6 — Layout Engineer: Safety Audit.** Overlap, wrapping, truncation at all breakpoints. Fill `templates/design-audit-template.md`.
+**Step 6 — Layout Engineer: Safety Audit.** Overlap, wrapping, truncation at all breakpoints.
 
 **Step 6a — Token Validation (pre-check).** Run `node .agents/skills/ui-ux-optimize/scripts/validate-tokens.cjs` to fast-fail if `docs/design/design-tokens.json` or `src/lib/design-system.tsx` are missing or misaligned. Fix before browser verification.
 
@@ -280,8 +280,6 @@ Run every step. Swarm coordinates handoffs.
 | `references/variant-worktree-flow.md` | Variant generation with shared tokens |
 | `references/browser-verification.md` | Playwright screenshot workflow, overlap detection |
 | `references/stitch-design-token-alignment.md` | Design-first workflow, token DNA normalization |
-| `templates/optimize-prompt-template.md` | Structured prompt assembly template |
-| `templates/design-audit-template.md` | Fill-in audit checklist for Step 6 |
 
 ## Scripts
 
