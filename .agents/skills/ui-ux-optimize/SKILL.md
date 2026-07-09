@@ -12,27 +12,23 @@ license: MIT
 
 ## Compliance Mandate
 
-You are operating as a **constrained design executor**, not a free creative agent, once tokens are frozen.
+You are a **constrained design executor** once tokens are frozen.
 
-- Style decisions not listed in the project Token Scaffold: **FORBIDDEN** after Phase 2.
-- Font substitution mid-session: **FORBIDDEN**.
-- Color variation ("similar to...", "a shade of..."): **FORBIDDEN** after freeze.
-- Inventing new token names not in the scaffold: **FORBIDDEN**.
-- When a required token category is missing: output a warning and ask the user — do NOT infer a value.
-- Before Phase 2: full creative freedom to research and propose. After Phase 2 freeze: zero discretion.
-- **FREEZE ENFORCEMENT**: `scripts/validate-tokens.cjs` programmatically enforces the freeze. Any attempt to modify a locked token after its initial commit will cause a validation failure.
+- Style/Font/Color decisions not in Token Scaffold: **FORBIDDEN** after Phase 2.
+- Missing required token category: warn and ask user — do NOT infer.
+- Before Phase 2: full creative freedom. After Phase 2 freeze: zero discretion.
+- **FREEZE ENFORCEMENT**: `scripts/validate-tokens.cjs` enforces the freeze programmatically.
 
-Swarm-powered skill for generating implementation-ready UI/UX prompts. Uses a **swarm of 7 specialized agents** with handoff coordination, an **autoresearch loop** (try → score → keep/revert → repeat), and **backpressure quality gates** to converge on high-quality output.
+Swarm-powered skill for generating implementation-ready UI/UX prompts. Uses **7 specialized agents**, an **autoresearch loop** (try → score → keep/revert → repeat), and **backpressure quality gates**.
 
 ## When to Use
 
 - UI/UX design help, redesign, or critique for any digital product
 - Prompt optimization for a design or coding agent
 - A structured design brief from a vague idea
-- A design audit of an existing interface
-- Variant generation for a design system or component
+- A design audit or variant generation for a design system
 
-Supported: web apps, mobile apps, dashboards, admin tools, e-commerce, SaaS, web/mobile games, kiosk/touch UIs, internal tools, prototypes.
+Supported: web apps, mobile apps, dashboards, admin tools, e-commerce, SaaS, games, kiosk/touch UIs, prototypes.
 
 ## When NOT to Use
 
@@ -40,85 +36,65 @@ Supported: web apps, mobile apps, dashboards, admin tools, e-commerce, SaaS, web
 - Motion graphics or video production
 - Backend architecture with no UI component
 - Marketing copy without interface context
-- Already implementation-ready requests
 
 ## Anti-AI-Slop Guide
 
-AI tools flooded the design and copy space. The result: a recognizable monoculture. This section is a systematic antidote for detecting and avoiding generic AI patterns in UI, UX, and copy.
-
-### Audit Modes
-
-1. **Audit mode** — User shares existing UI/copy/UX flow. Run through diagnostic checklists. Call out every pattern by name. Suggest replacements.
-2. **Creation mode** — User wants new UI/copy/flow. Read the "What to do instead" sections first, then produce work that avoids all listed patterns.
-3. **Spot-fix mode** — User points to one specific element. Diagnose it, explain why it's sloppy, rewrite/redesign it.
-
-Always **name the sin** before fixing it. Specificity builds trust.
+Systematic antidote for detecting and avoiding generic AI patterns in UI, UX, and copy. **Audit modes:** (1) Audit — run diagnostic checklists on existing UI; (2) Creation — read "What to do instead" before producing work; (3) Spot-fix — diagnose one element. Always **name the sin** before fixing.
 
 ### UI Slop Patterns (Visual Design)
 
 | Pattern | What it looks like | Why it's slop |
 |---|---|---|
-| **Purple gradient hero** | `#7c3aed → #2563eb` on white bg | Default Tailwind AI app palette |
-| **Glassmorphism cards** | Frosted glass, `backdrop-blur`, `bg-white/10` | Overused since iOS 15 |
-| **Rounded everything** | `border-radius: 24px+` on every element | Removes personality |
-| **Inter / DM Sans / Space Grotesk** | Default "modern" sans | Signal "AI-generated UI" |
-| **Emojis as icons in headers** | ✨ Supercharge your workflow 🚀 | Startup theater |
-| **Hero headline formula** | `[Verb] your [noun] with [product]` | Indistinguishable from 10,000 others |
-| **Three-column feature grid** | Icon + bold label + 1 sentence | Every SaaS landing page since 2019 |
-| **CTA: "Get started for free"** | Large button, primary color | Meaningless |
+| Purple gradient hero | `#7c3aed → #2563eb` | Default Tailwind AI palette |
+| Glassmorphism cards | Frosted glass, `backdrop-blur` | Overused since iOS 15 |
+| Rounded everything | `border-radius: 24px+` | Removes personality |
+| Inter / DM Sans / Space Grotesk | Default "modern" sans | Signals "AI-generated UI" |
+| Emojis in headers | ✨ 🚀 | Startup theater |
+| Hero headline formula | `[Verb] your [noun] with [product]` | Indistinguishable from 10,000 others |
+| Three-column feature grid | Icon + bold label + 1 sentence | Every SaaS landing page since 2019 |
+| CTA: "Get started for free" | Large primary button | Meaningless |
 
-**What to do instead:** Typography first (research type history), commit to one extreme (brutally minimal OR maximally dense), use real color theory, let content shape the layout, reference actual design movements (Swiss grid, Bauhaus, Brutalist web).
+**What to do instead:** Typography first, commit to one extreme (brutally minimal OR maximally dense), use real color theory, let content shape the layout, reference design movements (Swiss grid, Bauhaus, Brutalist web).
 
 ### UX Slop Patterns (Interaction & Flow)
 
 | Pattern | Why it's slop |
 |---|---|
-| **Onboarding modal** | Interrupts before context |
-| **5-step wizard** | Treats users as suspects |
-| **Tooltip tours** | Teaches wrong interface instead of fixing it |
-| **"Are you sure?"** | Trust issues. Use undo instead |
-| **Toast notifications** | Noise. Users ignore them in 2 sessions |
-| **Hamburger menu** | Discovery failure |
+| Onboarding modal | Interrupts before context |
+| 5-step wizard | Treats users as suspects |
+| Tooltip tours | Teaches wrong interface instead of fixing it |
+| "Are you sure?" | Trust issues. Use undo instead |
+| Toast notifications | Noise. Users ignore them in 2 sessions |
+| Hamburger menu | Discovery failure |
 
-**What to do instead:** Undo over confirm, empty states with one specific next action, progressive disclosure, optimistic UI, contextual notifications (inline, not toast).
+**What to do instead:** Undo over confirm, empty states with one specific next action, progressive disclosure, optimistic UI, inline notifications.
 
 ### Copy Slop Patterns
 
 | Slop Type | Examples | Fix |
 |---|---|---|
-| **Hollow Affirmations** | Absolutely!, Certainly!, Of course! | Delete them. Start with content. |
-| **AI Superlatives** | Powerful, seamless, intuitive, robust | Use specific claims and data. |
-| **Listicle Reflex** | Bullet points for everything | Write prose. Use lists only for genuine enumerable sets. |
-| **Transition Theater** | "In conclusion...", "To summarize..." | Just say the thing. |
-| **Emoji Inflation** | 🚀 💡 ✨ ⚡ 🔥 as substitutes for meaning | Use zero emojis unless genuinely casual/social. |
-| **Feature Announcement Formula** | "We're excited to announce..." | What does it do, concretely? |
+| Hollow Affirmations | Absolutely!, Certainly!, Of course! | Delete them. Start with content. |
+| AI Superlatives | Powerful, seamless, intuitive, robust | Use specific claims and data. |
+| Listicle Reflex | Bullet points for everything | Write prose. Use lists only for genuine sets. |
+| Transition Theater | "In conclusion...", "To summarize..." | Just say the thing. |
+| Emoji Inflation | 🚀 💡 ✨ ⚡ 🔥 | Use zero emojis unless genuinely casual/social. |
+| Feature Announcement | "We're excited to announce..." | What does it do, concretely? |
 
 ### Audit Workflow
 
-1. **Scan for patterns** — Check all three canons (UI, UX, Copy). List every match by name.
-2. **Score severity** — 🔴 Structural (redesign), 🟡 Surface (easy fix), 🟢 Cosmetic (polish).
-3. **Prioritize** — Fix structural first.
-4. **Rewrite/redesign** — Provide specific replacements, not generic advice.
-5. **Explain the why** — Name the design principle behind each fix.
+1. Scan all three canons (UI, UX, Copy). List every match by name.
+2. Score severity: 🔴 Structural (redesign), 🟡 Surface (easy fix), 🟢 Cosmetic (polish).
+3. Fix structural first. Provide specific replacements, name the design principle.
 
 ### Positive Design Doctrine
 
-- **Specificity > universality.** Design for this user, this task, this moment.
-- **Tension is interest.** Contrast, asymmetry, and friction are memorable.
-- **Constraints create identity.** Impose a real restriction and design within it.
-- **Respect the user's time.** Every click, form field, and modal is a tax.
-- **Be opinionated.** Show users the best path.
-- **Specific > general.** "Saves 3 hours per week" > "Saves time"
-- **Write for one person.** Not "users". The specific human who will read this sentence.
+- Specificity > universality. Design for this user, this task, this moment.
+- Tension is interest. Contrast, asymmetry, and friction are memorable.
+- Constraints create identity. Respect the user's time. Be opinionated.
 
 ## Swarm Architecture
 
-7 specialized agents with handoff coordination. Full details → `references/swarm-coordination.md`
-
-```
-RESEARCH SCOUT → TOKEN ARCHITECT → LAYOUT ENGINEER → VARIANT GENERATOR → BROWSER VERIFIER → QUALITY AUDITOR
-                                    └── ANTI-SLOP SENTINEL (cross-cutting) ──┘
-```
+7 specialized agents. Full details → `references/swarm-coordination.md`
 
 | Agent | Domain |
 |---|---|
@@ -132,66 +108,47 @@ RESEARCH SCOUT → TOKEN ARCHITECT → LAYOUT ENGINEER → VARIANT GENERATOR →
 
 ## Autoresearch Loop
 
-Inspired by pi-autoresearch: try → measure → keep/revert → repeat until score stabilizes.
+Try → measure → keep/revert → repeat. Full details → `references/swarm-coordination.md`
 
 1. Run full swarm pipeline
-2. Quality Auditor scores with confidence (MAD-based)
-   - Game products: 0–66 (all 10 sections), threshold 60
-   - Non-game products: 0–57 (9 sections, game-specific N/A), threshold 52
-   - Use **effective percentage** (score/max_applicable) for keep decision
+2. Quality Auditor scores (MAD-based): Game 0–66, Non-game 0–57. Use **effective percentage** (score/max_applicable).
 3. Effective ≥ 91% AND confidence ≥ 2.0× → **KEEP**
-4. Effective < 91% OR confidence < 1.0× → **REVISE** (re-run weak agent downstream)
-5. Score regresses → **REVERT** (discard, try different approach)
+4. Effective < 91% OR confidence < 1.0× → **REVISE**
+5. Score regresses → **REVERT**
 6. Max 5 iterations per session
-
-Full details → `references/swarm-coordination.md`
 
 ## Session Files
 
-Two files persist across runs (matching pi-autoresearch pattern):
-- `ui-ux-session.md` — living document: objective, what's been tried, key wins, dead ends
+- `ui-ux-session.md` — living document: objective, wins, dead ends
 - `ui-ux-session.jsonl` — append-only log: one JSON line per iteration
 
-These files are for developer-led regression testing:
-- `evals/golden-tokens.json` — Reference token snapshot: the canonical correct tokens for regression testing.
-- `evals/eval-prompt.md` — The exact prompt that produced the golden output.
-
-> Before submitting output, compare against `evals/golden-tokens.json` if it exists.
-> If your output deviates in color, font, spacing, or radius from the frozen tokens, revise before responding.
+Compare against `evals/golden-tokens.json` if it exists. Revise if output deviates.
 
 ## Gotchas
 
-These failure modes recur across sessions. Keep as quick-reference.
+- **AI Slop gravity:** Agents default to Inter, purple gradients, three-column grids. Override with opinionated font choices.
+- **Mobile horizontal overflow:** Nav/lists break on <768px. Enforce `overflow-x-auto` on horizontal nav, `overflow-x-hidden` on root.
+- **Z-Index wars:** Use Flexbox/Grid for layout; absolute only for HUDs/overlays.
+- **Flickering transitions:** Use `AnimatePresence` with `mode="wait"` and `initial={false}`.
+- **Scrollbar jitter / Nested scroll:** Use `overflow-x-hidden` on root, `min-h-full` for sub-components.
 
-- **AI Slop gravity:** Agents default to Inter, purple gradients, three-column feature grids. Override explicitly with opinionated font choices and precedent products.
-- **Mobile horizontal overflow:** Horizontal nav/lists break on mobile <768px. Always enforce `overflow-x-auto` for horizontal navigation, `overflow-x-hidden` on root container.
-- **Z-Index wars:** Absolute positioning for core layout causes overlapping elements. Enforce flow-based layouts (Flexbox/Grid). Absolute only for HUDs/overlays with defined safe zones.
-- **Flickering transitions:** State transitions without presence guards flicker. Use `AnimatePresence` with `mode="wait"` and `initial={false}`. High-motion elements need `will-change-transform transform-gpu backface-visibility-hidden`.
-- **Scrollbar jitter:** Unstable scrollbars cause layout shifts between viewports. Enforce `overflow-x-hidden` on root, `overflow-y-auto` for content containers.
-- **Nested scroll contexts:** `min-h-screen` in sub-components inside scrollable parents creates double scrollbars. Use `min-h-full` for sub-components.
+## Token Scaffold (Phase 2, Frozen for All Subsequent Phases)
 
-## Token Scaffold (Populated in Phase 2, Frozen for All Subsequent Phases)
-
-Before any code or prompt is generated, the Token Architect MUST define and commit all of the following categories to `docs/design/design-tokens.json` (W3C Design Tokens format). Values are chosen by the model based on project context and research — but once written, they are FROZEN for the session.
-
-**Required categories:**
+Define and commit all categories to `docs/design/design-tokens.json` (W3C Design Tokens format). FROZEN once written.
 
 | Category | Required keys |
 |---|---|
 | `colors` | `primary`, `background`, `surface`, `text_primary`, `text_muted`, `accent`, `error`, `success` |
 | `typography` | `font_family`, `scale_px[]`, `weight{}`, `line_height{}` |
-| `spacing` | `unit` (must be 4 or 8), `gutter` |
+| `spacing` | `unit` (4 or 8), `gutter` |
 | `radius` | `sm`, `md`, `lg`, `pill` |
 | `shadow` | single string value |
 | `breakpoints` | `[mobile, tablet, desktop, wide]` as px values |
 | `effects` | `antiFlicker` string |
 
-**FREEZE RULE:** Once written to `docs/design/design-tokens.json`, no token value may change without an explicit user instruction in the chat. All phases read from this file — never re-invent.
+**FREEZE RULE:** No token value may change without explicit user instruction. All phases read from this file.
 
-**CREATIVE FREEDOM:** The actual values are fully up to the model's judgment based on:
-- Research Scout findings (domain trends, competitor patterns)
-- Anti-Slop Sentinel translation (what "premium" or "minimal" actually means for this product)
-- Platform guidelines (iOS HIG, Material 3, game genre conventions, etc.)
+**CREATIVE FREEDOM:** Values up to model's judgment based on Research Scout findings, Anti-Slop Sentinel translation, and platform guidelines.
 
 ## Required Workflow
 
@@ -199,39 +156,29 @@ Run every step. Swarm coordinates handoffs.
 
 ### Phase 1: Research & Translate
 
-**Step 0 — Research Scout: Auto-Research.** Research domain trends, platform guidelines, competitor patterns via `websearch`. Handoff → `research_context`. See → `references/auto-research.md`
+**Step 0 — Research Scout: Auto-Research.** Domain trends, platform guidelines, competitor patterns via `websearch`. Handoff → `research_context`. See → `references/auto-research.md`
 
-**Step 1 — Anti-Slop Sentinel: Translate.** Convert vague words to measurable constraints. Use the Anti-AI-Slop Guide above for pattern detection. Handoff → `anti_slop_warnings`. See → `references/anti-slop-rules.md`
+**Step 1 — Anti-Slop Sentinel: Translate.** Convert vague words to measurable constraints. Handoff → `anti_slop_warnings`. See → `references/anti-slop-rules.md`
 
 ### Phase 2: Token & Structure
 
-**Step 2 — Token Architect: Build & Freeze Tokens.**
-1. **If `docs/design/design-tokens.json` exists:** READ it — do NOT modify unless the user explicitly instructs an override.
-2. **If it does not exist:** Populate all Token Scaffold categories creatively based on `research_context` and `anti_slop_warnings`. Write to `docs/design/design-tokens.json`.
-3. **DIFF check:** For any proposed style value, compare against the local `docs/design/design-tokens.json`. Reject divergence — output a warning listing the conflicting value and revert to the frozen token.
-4. **NEVER** generate new token category names outside the scaffold.
-5. Handoff → `design_tokens`. See → `references/design-tokens.md`
+**Step 2 — Token Architect: Build & Freeze Tokens.** If `docs/design/design-tokens.json` exists, READ only. Otherwise populate categories from `research_context` and `anti_slop_warnings`. DIFF check against frozen tokens. Handoff → `design_tokens`. See → `references/design-tokens.md`
 
-**Step 3 — Layout Engineer: Navigation & Composition.** Nav model, screen map, responsive spec. See → `references/navigation-clarity.md`, `references/layout-composition.md`
-
-**Step 3a — Game Layer** *(skip if not game).* HUD, menus, safe zones. See → `references/game-ui-rules.md`
+**Step 3 — Layout Engineer.** Nav model, screen map, responsive spec. See → `references/navigation-clarity.md`, `references/layout-composition.md`. Game Layer *(skip if not game)*: HUD, menus, safe zones. See → `references/game-ui-rules.md`
 
 ### Phase 3: Generate & Verify
 
-**Step 4 — Coordinator: Assemble Prompt.**
-- Copy the frozen Token Scaffold keys as a comment header into every generated file.
-- Reference only token keys — never raw values — in component code.
-- Output must include responsive styles for all four breakpoints defined in `breakpoints` token.
+**Step 4 — Coordinator: Assemble Prompt.** Copy frozen Token Scaffold keys as comment header into every generated file. Reference only token keys — never raw values. Include responsive styles for all four breakpoints.
 
-**Step 4a — Sync Code.** Run `node .agents/skills/ui-ux-optimize/scripts/sync-tokens.cjs` to generate `src/lib/design-system.tsx` from your JSON tokens. Never edit the `.tsx` file directly.
+**Step 4a — Sync Code.** Run `node .agents/skills/ui-ux-optimize/scripts/sync-tokens.cjs` to generate `src/lib/design-system.tsx`. Never edit the `.tsx` file directly.
 
 **Step 5 — Variant Generator: 3 Variants.** Default: editorial/product/expressive. Game: immersive/competitive/minimal-hud. See → `references/variant-worktree-flow.md`
 
 **Step 6 — Layout Engineer: Safety Audit.** Overlap, wrapping, truncation at all breakpoints.
 
-**Step 6a — Token Validation (pre-check).** Run `node .agents/skills/ui-ux-optimize/scripts/validate-tokens.cjs` to fast-fail if `docs/design/design-tokens.json` or `src/lib/design-system.tsx` are missing or misaligned. Fix before browser verification.
+**Step 6a — Token Validation.** Run `node .agents/skills/ui-ux-optimize/scripts/validate-tokens.cjs` to fast-fail if tokens or design system are misaligned.
 
-**Step 6b — Browser Verifier: Screenshots** *(when HTML available).* Playwright at 375/768/1024/1440px. If no HTML prototype exists, **SKIP** with a `browser_verification.status: "SKIPPED"` note describing what would be verified. See → `references/browser-verification.md`
+**Step 6b — Browser Verifier** *(when HTML available).* Playwright at 375/768/1024/1440px. If no HTML, **SKIP**. See → `references/browser-verification.md`
 
 ### Phase 4: Audit & Learn
 
@@ -239,17 +186,13 @@ Run every step. Swarm coordinates handoffs.
 
 **Step 8 — Quality Auditor: Score & Gate.** Score against checklist (0–66). See → `references/review-checklist.md`
 
-**Step 9 — Quality Auditor: Record Lessons.** Append to session files. See → `references/self-learning-loop.md`
+**Step 9 — Record Lessons.** Append to session files. See → `references/self-learning-loop.md`
 
 ## Quality Bar
 
-- Navigation defined before aesthetics
-- No vague adjectives in optimized prompt
-- All token roles have semantic names
-- Layouts pass overlap check at all breakpoints
-- Anti-slop audit passed
-- Confidence ≥ 2.0× (or marginal flag)
-- Lessons recorded in session files
+- Navigation defined before aesthetics, no vague adjectives, semantic token names
+- Layouts pass overlap check at all breakpoints, anti-slop audit passed
+- Confidence ≥ 2.0× (or marginal flag), lessons recorded in session files
 
 ## Cross-Skill Integration
 
@@ -273,7 +216,7 @@ Run every step. Swarm coordinates handoffs.
 | `references/navigation-clarity.md` | Navigation models, labels, cross-screen rules |
 | `references/responsive-screen-rules.md` | Per-breakpoint behavior, no-overlap validation |
 | `references/game-ui-rules.md` | HUD, controls, safe zones, menu systems |
-| `references/anti-slop-rules.md` | Banned phrases, banned clichés |
+| `references/anti-slop-rules.md` | Banned phrases and clichés |
 | `references/prompt-patterns.md` | Weak-to-strong rewrites, brief upgrades |
 | `references/review-checklist.md` | Pass/fail quality checks (0–66 scoring) |
 | `references/self-learning-loop.md` | Lesson capture, rule distillation |
@@ -292,22 +235,16 @@ Run every step. Swarm coordinates handoffs.
 ## See Also
 
 - `css-render-performance` — CSS render performance optimization
-
 ## Rationalizations
 
 | Rationalization | Reality |
 |-----------------|---------|
 | "I can skip the token freeze and just eyeball it" | Without frozen tokens, visual drift accumulates silently across components and sessions. |
 | "Research Scout is optional for a simple UI" | Even simple UIs benefit from domain context; skipping research leads to generic slop. |
-| "The autoresearch loop takes too long, ship the first draft" | First drafts rarely converge on quality; the loop exists to catch regressions before users do. |
+| "The autoresearch loop takes too long, ship the first draft" | The loop catches regressions before users do; first drafts rarely converge on quality. |
 
 ## Red Flags
 
 - [ ] Token scaffold modified after Phase 2 freeze
 - [ ] Anti-slop audit skipped to save time
 - [ ] Variants generated without shared token foundation
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

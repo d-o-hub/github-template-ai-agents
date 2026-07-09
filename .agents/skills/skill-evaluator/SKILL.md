@@ -107,63 +107,36 @@ End with one of:
 
 ## Workspace Layout
 
-Organize eval results in a dedicated workspace directory inside `.agents/skills/`. Each iteration of the eval loop produces structured artifacts.
+Organize eval results in `.agents/skills/<skill-name>-workspace/iteration-N/`. Each iteration produces structured artifacts.
 
 ```text
 .agents/skills/<skill-name>-workspace/
 └── iteration-N/
     ├── eval-<id>/
-    │   ├── with_skill/
-    │   │   ├── outputs/
-    │   │   │   └── response.md
-    │   │   ├── timing.json
-    │   │   └── grading.json
-    │   └── without_skill/
-    │       ├── outputs/
-    │       │   └── response.md
-    │       ├── timing.json
-    │       └── grading.json
+    │   ├── with_skill/ (outputs/, timing.json, grading.json)
+    │   └── without_skill/ (outputs/, timing.json, grading.json)
     ├── benchmark.json
     └── grading.json
 ```
 
-## Workspace Iteration Automation — Automate the eval loop: create iteration dirs, run cases, aggregate results.
-
-### 1. Create iteration directory
+## Workspace Iteration Automation
 
 ```bash
+# Create iteration directory
 ITER="iteration-$(printf '%02d' $((++N)))"
 mkdir -p ".agents/skills/<skill-name>-workspace/$ITER"
-```
 
-### 2. Set up subdirectories
-
-```bash
+# Set up subdirectories
 for ID in $(jq -r '.evals[].id' evals/evals.json); do
   mkdir -p ".agents/skills/<skill-name>-workspace/$ITER/eval-$ID"/{with_skill,without_skill}
 done
-```
 
-### 3. Generate eval_metadata.json
-
-```bash
+# Generate eval_metadata.json
 jq '.evals[] | {id, prompt, expected_output, assertions}' evals/evals.json \
   > "<skill-name>-workspace/$ITER/eval_metadata.json"
 ```
 
-### 4. Capture timing data
-
-Write `timing.json` with `total_tokens` and `duration_ms` (schema in `references/schemas.md`).
-
-### 5. Run the grader
-
-### 6. Aggregate into benchmark.json
-
-Collect all grading and timing JSONs, compute per-config means/stddevs, write `benchmark.json` with delta.
-
-### 7. Record feedback
-
-Write actionable notes to `feedback.json`, improve the skill, then iterate again.
+Capture timing in `timing.json` with `total_tokens` and `duration_ms`. Run grader, aggregate into `benchmark.json`, record feedback to `feedback.json`.
 
 ## Scoring Rubric
 
@@ -187,10 +160,9 @@ When a skill fails evaluation:
 
 ### Deprecation Process
 
-Outdated or redundant skills should follow this lifecycle:
-1. **Deprecation Notice**: Add `[DEPRECATED]` to the `description` in `SKILL.md` and link to the replacement.
-2. **Issue Creation**: File an issue to remove the skill in the next major version.
-3. **Removal**: Delete the skill directory and update all registries after the notice period.
+1. Add `[DEPRECATED]` to the `description` in `SKILL.md` and link to the replacement.
+2. File an issue to remove the skill in the next major version.
+3. Delete the skill directory and update all registries after the notice period.
 
 ## Assertion Rules
 
@@ -258,12 +230,3 @@ PASS | NEEDS_WORK | FAIL — <one sentence>
 - [ ] Skipping baseline comparison when evaluating skill improvement
 - [ ] Using vague or subjective assertions without concrete evidence paths
 - [ ] Declaring PASS without running at least one live prompt through the skill
-
-## References
-
-- `references/evaluating-skills.md` — condensed eval workflow and grading guidance
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

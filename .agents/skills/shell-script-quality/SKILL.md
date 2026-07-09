@@ -113,69 +113,30 @@ Quick integration:
 
 ## Script Template
 
-Use this template for new scripts:
-
 ```bash
 #!/bin/bash
 set -euo pipefail
-
-# Script directory (portable)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# Error handler
-error_exit() {
-    echo "ERROR: $1" >&2
-    exit "${2:-1}"
-}
-
-# Main function
+error_exit() { echo "ERROR: $1" >&2; exit "${2:-1}"; }
 main() {
-    [[ $# -lt 1 ]] && {
-        echo "Usage: $0 <argument>" >&2
-        exit 1
-    }
-
+    [[ $# -lt 1 ]] && { echo "Usage: $0 <argument>" >&2; exit 1; }
     # Your logic here
 }
-
-# Run if executed directly
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    main "$@"
-fi
+[[ "${BASH_SOURCE[0]}" == "${0}" ]] && main "$@"
 ```
 
 ## Installation
 
-**ShellCheck**:
-
 ```bash
-brew install shellcheck         # macOS
-sudo apt-get install shellcheck # Linux
-```
-
-**BATS**:
-
-```bash
-brew install bats-core          # macOS
-sudo apt-get install bats       # Linux
+brew install shellcheck         # macOS | sudo apt-get install shellcheck # Linux
+brew install bats-core          # macOS | sudo apt-get install bats       # Linux
 ```
 
 ## Configuration
 
-**.shellcheckrc** in project root:
-
-```bash
-shell=bash
-disable=SC1090
-enable=all
-source-path=SCRIPTDIR
-```
-
-**For configuration details**: See [CONFIG.md](CONFIG.md)
+`.shellcheckrc` in project root: `shell=bash`, `disable=SC1090`, `enable=all`, `source-path=SCRIPTDIR`. See [CONFIG.md](CONFIG.md).
 
 ## Testing Claude Code Plugins
-
-**Test scripts using CLAUDE_PLUGIN_ROOT**:
 
 ```bash
 @test "plugin script works" {
@@ -183,11 +144,7 @@ source-path=SCRIPTDIR
     run bash "$CLAUDE_PLUGIN_ROOT/scripts/search.sh" "query"
     [ "$status" -eq 0 ]
 }
-```
 
-**Test hooks with JSON**:
-
-```bash
 @test "hook provides suggestions" {
     local input='{"tool":"Edit","params":{"file_path":"test.txt"}}'
     run bash "$HOOK_DIR/pre-edit.sh" <<< "$input"
@@ -196,34 +153,21 @@ source-path=SCRIPTDIR
 }
 ```
 
-**More plugin patterns**: See [PATTERNS.md](PATTERNS.md)
+**More patterns**: See [PATTERNS.md](PATTERNS.md)
 
 ## Troubleshooting
 
-**ShellCheck**:
-- SC1090 warnings: Add `# shellcheck source=path/to/file.sh`
-- False positives: Use `# shellcheck disable=SCxxxx`
+- **ShellCheck**: SC1090 → add `# shellcheck source=path/to/file.sh`. False positives → `# shellcheck disable=SCxxxx`.
+- **BATS**: Tests interfere → ensure proper `teardown()`. Can't source → add main execution guard. Path issues → use `$BATS_TEST_DIRNAME`.
 
-**BATS**:
-- Tests interfere: Ensure proper `teardown()` cleanup
-- Can't source script: Add main execution guard
-- Path issues: Use `$BATS_TEST_DIRNAME` for relative paths
-
-**Detailed troubleshooting**: See [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ## Validation Loop Pattern
 
-For quality-critical operations:
-
-1. Make changes to script
-2. **Validate immediately**: `shellcheck script.sh`
-3. If validation fails:
-   - Review error messages carefully
-   - Fix the issues
-   - Run validation again
-4. **Only proceed when validation passes**
-5. Run tests: `bats tests/script.bats`
-6. If tests fail, return to step 1
+1. Make changes → `shellcheck script.sh` immediately.
+2. If fails: review errors, fix, re-run.
+3. Only proceed when validation passes → `bats tests/script.bats`.
+4. If tests fail, return to step 1.
 
 ## References
 
@@ -252,8 +196,3 @@ For quality-critical operations:
 - [ ] Running shell scripts without set -euo pipefail
 - [ ] Skipping ShellCheck linting before committing shell scripts
 - [ ] Suppressing SC warnings without documenting the reason and date
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

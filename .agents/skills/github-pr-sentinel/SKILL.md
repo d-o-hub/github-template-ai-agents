@@ -54,27 +54,17 @@ Accept any of:
 
 ## Commands
 
-### One-shot snapshot
-
 ```bash
+# One-shot snapshot
 python3 .agents/skills/github-pr-sentinel/scripts/gh_pr_watch.py --pr auto --once
-```
 
-### Continuous watch (JSONL)
-
-```bash
+# Continuous watch (JSONL)
 python3 .agents/skills/github-pr-sentinel/scripts/gh_pr_watch.py --pr auto --watch
-```
 
-### Trigger flaky retry cycle
-
-```bash
+# Trigger flaky retry cycle
 python3 .agents/skills/github-pr-sentinel/scripts/gh_pr_watch.py --pr auto --retry-failed-now
-```
 
-### Explicit PR target
-
-```bash
+# Explicit PR target
 python3 .agents/skills/github-pr-sentinel/scripts/gh_pr_watch.py --pr <number-or-url> --once
 ```
 
@@ -145,10 +135,8 @@ On a fresh state file, existing pending review feedback is surfaced immediately 
 
 ## Git Safety Rules
 
-- Work **only** on the PR head branch.
-- Avoid destructive git commands.
-- Do not switch branches unless necessary to recover context.
-- Before editing, check for unrelated uncommitted changes. If present, **stop and ask the user**.
+- Work **only** on the PR head branch. Avoid destructive git commands.
+- Before editing, check for unrelated uncommitted changes — if present, **stop and ask the user**.
 - After each fix, commit and `git push`, then re-run the watcher.
 - If you interrupted `--watch` to fix, **restart `--watch` immediately** after the push.
 - Do not run multiple concurrent `--watch` processes for the same PR.
@@ -162,18 +150,17 @@ On a fresh state file, existing pending review feedback is surfaced immediately 
 
 ## Monitoring Loop Pattern
 
-1. Run `--once`.
-2. Read `actions`.
-3. Check if PR is merged/closed — if so, report terminal state and stop.
-4. Check CI summary, new review items, mergeability/conflict status.
-5. Diagnose CI failures; classify branch-related vs flaky.
-6. Process actionable review comments **before** flaky reruns when both are present.
-7. Retry failed checks only when `retry_failed_checks` is present and you are not about to replace the current SHA.
-8. If you pushed a commit or triggered a rerun, report briefly and continue polling.
-9. After a review-fix push, **proactively restart `--watch`** in the same turn.
-10. If everything is passing, mergeable, no unaddressed reviews, and not blocked on approval — report success and stop.
-11. If blocked on user-help issue — report the blocker and stop.
-12. Otherwise sleep per polling cadence and repeat.
+1. Run `--once` and read `actions`.
+2. Check if PR is merged/closed — report terminal state and stop.
+3. Check CI summary, new review items, mergeability/conflict status.
+4. Diagnose CI failures; classify branch-related vs flaky.
+5. Process actionable review comments **before** flaky reruns when both are present.
+6. Retry failed checks only when `retry_failed_checks` is present and not about to replace current SHA.
+7. If you pushed or triggered a rerun, report briefly and continue polling.
+8. After a review-fix push, **proactively restart `--watch`** in the same turn.
+9. If passing, mergeable, no unaddressed reviews, and not blocked — report success and stop.
+10. If blocked on user-help issue — report blocker and stop.
+11. Otherwise sleep per polling cadence and repeat.
 
 ## Polling Cadence (Adaptive)
 
@@ -252,8 +239,3 @@ Include:
 
 - `references/heuristics.md` - CI/Review decision tree
 - `references/github-api-notes.md` - GitHub CLI commands used by the watcher
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.

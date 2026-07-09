@@ -165,55 +165,19 @@ See `references/safety-patterns.md` for more patterns.
 
 ## Rollback Strategies
 
-### Strategy 1: Git Revert
-
-```bash
-# If migration is in single commit
-git revert <migration-commit>
-```
-
-**Best for**: Small, isolated migrations
-
-### Strategy 2: Feature Flag Disable
-
-```python
-USE_NEW_PARSER = False  # Env var or config
-```
-
-**Best for**: Gradual rollouts
-
-### Strategy 3: Database Rollback
-
-```sql
--- Migration down script
-ALTER TABLE users DROP COLUMN email_normalized;
-```
-
-**Best for**: Schema changes with data loss concerns
+| Strategy | Best for | Example |
+|---|---|---|
+| Git Revert | Small, isolated migrations | `git revert <migration-commit>` |
+| Feature Flag Disable | Gradual rollouts | `USE_NEW_PARSER = False` |
+| Database Rollback | Schema changes with data loss | `ALTER TABLE users DROP COLUMN ...` |
 
 See `references/rollback-strategies.md` for platform-specific guides.
 
 ## Examples
 
-### React Class to Hooks
+**React Class to Hooks:** `componentDidMount`/`componentWillUnmount` → `useEffect`, `componentDidUpdate` → `useEffect` with deps, `this.state` → `useState`, `this.props` → destructured.
 
-1. Convert `componentDidMount` + `componentWillUnmount` → `useEffect`
-2. Convert `componentDidUpdate` → `useEffect` with dependency array
-3. Convert `this.state` → `useState`
-4. Convert `this.props` → destructured props
-5. Remove `this` bindings
-
-### Python 2 to 3
-
-```bash
-# Generate patch
-2to3 -w --output-dir=src_py3 src/
-
-# Review changes
-# Fix imports, print statements, string handling
-```
-
-See `references/language-migrations.md` for framework-specific guides.
+**Python 2 to 3:** `2to3 -w --output-dir=src_py3 src/` then fix imports, print, string handling. See `references/language-migrations.md`.
 
 ## Quality Checklist
 
@@ -225,8 +189,6 @@ See `references/language-migrations.md` for framework-specific guides.
 - [ ] Performance regression testing done
 - [ ] Code review completed
 - [ ] Documentation updated
-- [ ] Monitoring/alerting configured
-- [ ] Rollout plan with timings
 
 ## See Also
 
@@ -252,8 +214,3 @@ See `references/language-migrations.md` for framework-specific guides.
 - `references/migration-patterns.md` - Detailed pattern implementations
 - `references/dependency-analysis.md` - Cross-file dependency tracking
 - `references/language-migrations.md` - Framework migration guides
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.
