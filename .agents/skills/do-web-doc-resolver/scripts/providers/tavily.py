@@ -2,6 +2,7 @@
 Tavily provider implementation.
 """
 
+import asyncio
 import logging
 import os
 
@@ -10,6 +11,54 @@ from scripts.models import ResolvedResult
 from scripts.utils import _get_from_cache, _save_to_cache
 
 logger = logging.getLogger(__name__)
+
+
+async def resolve_with_tavily_async(
+    query: str, max_chars: int = MAX_CHARS
+) -> ResolvedResult | None:
+    """Async version of Tavily resolver."""
+    cached = _get_from_cache(query, "tavily")
+    if cached:
+        return ResolvedResult(**cached)
+    api_key = os.getenv("TAVILY_API_KEY")
+    if not api_key:
+        logger.debug("Tavily skipped: no API key")
+        return None
+    from scripts.providers import _is_rate_limited, _set_rate_limit
+
+    if _is_rate_limited("tavily"):
+        logger.debug("Tavily skipped: rate limited")
+        return None
+    try:
+        from tavily import TavilyClient
+
+        from scripts.utils.thread_pool import get_shared_pool
+
+        def _sync_search():
+            client = TavilyClient(api_key=api_key)
+            return client.search(query, max_results=TAVILY_RESULTS)
+
+        loop = asyncio.get_event_loop()
+        res = await loop.run_in_executor(get_shared_pool(), _sync_search)
+        if not res or not res.get("results"):
+            logger.warning("Tavily returned no results for query: %s", query)
+            return None
+        content = "\n\n---\n\n".join([f"## {r['title']}\n\n{r['content']}" for r in res["results"]])
+        result = ResolvedResult(source="tavily", content=content[:max_chars], query=query)
+        _save_to_cache(query, "tavily", result.to_dict())
+        return result
+    except Exception as e:
+        status = getattr(e, "status_code", None)
+        if status == 401:
+            logger.warning("Tavily failed: 401 Unauthorized — API key may be invalid or expired")
+        elif status == 429:
+            logger.warning("Tavily failed: 429 Rate limited — setting cooldown")
+            _set_rate_limit("tavily")
+        elif status == 403:
+            logger.warning("Tavily failed: 403 Forbidden — %s", e)
+        else:
+            logger.warning("Tavily resolution failed: %s: %s", type(e).__name__, e)
+        return None
 
 
 def resolve_with_tavily(query: str, max_chars: int = MAX_CHARS) -> ResolvedResult | None:
