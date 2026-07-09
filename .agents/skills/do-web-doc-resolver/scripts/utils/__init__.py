@@ -7,6 +7,13 @@ import os
 import typing
 from typing import Any
 
+from scripts.utils.async_http import (
+    async_safe_request,
+    async_validate_links,
+    async_validate_url,
+    close_async_client,
+    get_async_client,
+)
 from scripts.utils.cache import (
     _cache_key,
     _get_cache,
@@ -15,6 +22,7 @@ from scripts.utils.cache import (
     get_cache,
     get_ttl,
 )
+from scripts.utils.content_clean import clean_content
 from scripts.utils.fetch import (
     fetch_llms_txt,
     fetch_url_content,
@@ -108,6 +116,18 @@ def _detect_error_type(error: Exception):
         return ErrorType.NOT_FOUND
     if any(code in error_msg for code in ["ssrf", "blocked", "private ip", "localhost"]):
         return ErrorType.SSRF_BLOCKED
+    if any(
+        code in error_msg
+        for code in [
+            "bot_challenge",
+            "bot challenge",
+            "cloudflare",
+            "cf-ray",
+            "checking your browser",
+            "just a moment",
+        ]
+    ):
+        return ErrorType.BOT_CHALLENGE
     if any(code in error_msg for code in ["too large", "content size", "exceeds"]):
         return ErrorType.CONTENT_TOO_LARGE
     return ErrorType.UNKNOWN
@@ -116,7 +136,7 @@ def _detect_error_type(error: Exception):
 __all__ = [
     # Config
     "get_config_data",
-    # HTTP utilities
+    # HTTP utilities (sync)
     "create_session_with_retry",
     "get_session",
     "close_session",
@@ -124,10 +144,17 @@ __all__ = [
     "is_safe_url",
     "validate_url",
     "validate_links",
+    # HTTP utilities (async)
+    "get_async_client",
+    "close_async_client",
+    "async_safe_request",
+    "async_validate_url",
+    "async_validate_links",
     # HTML utilities
     "EnhancedHTMLParser",
     "extract_text_from_html",
     "compact_content",
+    "clean_content",
     # Cache utilities
     "_cache_key",
     "_get_cache",
