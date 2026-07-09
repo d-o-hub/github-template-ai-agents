@@ -55,6 +55,15 @@ setup() {
 
     run categorize_command "crontab -e"
     [ "$output" = "dangerous" ]
+
+    run categorize_command "pkexec id"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "mount /dev/sdb1 /mnt"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "strace -p 123"
+    [ "$output" = "dangerous" ]
 }
 
 @test "harden-command-categorization: detects new network keywords" {
@@ -63,11 +72,43 @@ setup() {
 
     run categorize_command "lynx http://example.com"
     [ "$output" = "dangerous" ]
+
+    run categorize_command "rclone sync /local /remote"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "aws s3 ls"
+    [ "$output" = "dangerous" ]
 }
 
 @test "harden-command-categorization: detects new interpreter keywords" {
     run categorize_command "lua script.lua"
     [ "$output" = "dangerous" ]
+}
+
+@test "harden-command-categorization: detects new conditional keywords" {
+    run categorize_command "apt update"
+    [ "$output" = "conditional" ]
+
+    run categorize_command "brew install jq"
+    [ "$output" = "conditional" ]
+
+    run categorize_command "pipx run cowsay hello"
+    [ "$output" = "conditional" ]
+}
+
+@test "harden-command-categorization: detects custom dangerous patterns" {
+    run categorize_command "git clone ext::sh -c 'echo vulnerability'"
+    [ "$output" = "dangerous" ]
+}
+
+@test "harden-command-categorization: handles literal dots in keywords" {
+    # nc.openbsd is a keyword, so it should be dangerous
+    run categorize_command "nc.openbsd -l 1234"
+    [ "$output" = "dangerous" ]
+
+    # but "ncXopenbsd" should not match if it were treated as a regex dot
+    run categorize_command "ncXopenbsd -l 1234"
+    [ "$output" = "unknown" ]
 }
 
 @test "harden-command-categorization: prevents command masking bypass (ADR-009)" {
