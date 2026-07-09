@@ -59,6 +59,14 @@ def test_validate_safe_path_forbidden(tmp_path):
     with pytest.raises(PathValidationError):
         validate_safe_path("subdir/.env", base, "test", check_forbidden=True)
 
+    # Test newly added forbidden paths
+    with pytest.raises(PathValidationError):
+        validate_safe_path(".git-credentials", base, "test", check_forbidden=True)
+    with pytest.raises(PathValidationError):
+        validate_safe_path(".bash_history", base, "test", check_forbidden=True)
+    with pytest.raises(PathValidationError):
+        validate_safe_path("id_rsa", base, "test", check_forbidden=True)
+
 
 def test_validate_safe_path_symlink_escape(tmp_path):
     base = tmp_path / "repo"

@@ -1,0 +1,10 @@
+🛡️ Sentinel: Security Hardening
+
+Severity: MEDIUM
+Vulnerability: Gaps in command/path validation and broad regex matching.
+Fix:
+- Expanded restricted keywords.
+- Escaped literal dots in keyword regexes.
+- Detected ext:: Git remote helpers.
+- Protected SSH keys and history files.
+Verification: Passed security tests and quality gate.
