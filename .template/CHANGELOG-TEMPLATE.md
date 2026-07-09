@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - docs(harness): add parallel capabilities column to Supported AI Agents table
 - docs(agent-coordination): add native capabilities vs. custom coordination comparison table
 - fix(paths): harden path validation by protecting critical root files
+- refactor(template): move `templates/` to `.template/` for cleaner root structure
+- fix(portability): replace `realpath --relative-to` with portable function in setup-skills.sh
+- fix(portability): add Bash 4+ guard for `declare -A` in lint_cache.sh with graceful fallback
+- fix(portability): wrap `python3` calls in `command -v` guards in quality_gate.sh
+- fix(portability): remove GNU `xargs -r` flag from loc_gate.sh, eval-skills.sh, discover-commands.sh, lint_cache.sh
+- fix(portability): replace GNU `date -d` with portable date detection in archive-stale-plans.sh
+- fix(hooks): remove install-hooks.sh (superseded by bootstrap.sh + .githooks/)
+- fix(template): remove hardcoded org fallback in cleanup-ci-status-prs.sh
+- fix(hooks): downgrade global hooks check from error to warning in validate-git-hooks.sh
+- fix(ci): add skill existence condition to sync-turso-skill.yml workflow
+- perf(ci): add concurrency groups to markdown-lint, yaml-lint, commitlint, gitleaks workflows
+- fix(template): derive PROJECT_NAME from git in .envrc instead of hardcoding
+- fix(template): read VERSION from file in agent-toolkit.sh instead of hardcoding
 
 ### Fixed
 

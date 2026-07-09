@@ -1,6 +1,6 @@
 ---
 # Codacy configuration for github-template-ai-agents
-# See: templates/codacy/.codacy.yml for reference template
+# See: .template/codacy/.codacy.yml for reference template
 # See: .agents/skills/codacy/references/config-format.md for format docs
 
 exclude_paths:

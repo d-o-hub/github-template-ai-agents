@@ -18,6 +18,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    if: ${{ hashFiles('.agents/skills/turso-db/SKILL.md') != '' }}
 
     steps:
       - name: Checkout repository

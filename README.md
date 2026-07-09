@@ -4,7 +4,7 @@
 > delivery with shared instructions, quality gates, and low-context-rot workflows.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Template Version](https://img.shields.io/badge/version-0.2.10-blue)](.templates/CHANGELOG-TEMPLATE.md)
+[![Template Version](https://img.shields.io/badge/version-0.2.10-blue)](.template/CHANGELOG-TEMPLATE.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Best for:** maintainers who use Claude Code, Gemini CLI, OpenCode, Qwen Code, Jules,
@@ -210,8 +210,8 @@ graph LR
 ## Documentation
 
 - [AGENTS.md](AGENTS.md) — main agent instructions (single source of truth)
-- [EVALS.md](templates/EVALS.md) — (Template) Agent quality and performance tracking
-- [USE_RESTRICTIONS.md](templates/USE_RESTRICTIONS.md) — (Template) Agent usage policies
+- [EVALS.md](.template/EVALS.md) — (Template) Agent quality and performance tracking
+- [USE_RESTRICTIONS.md](.template/USE_RESTRICTIONS.md) — (Template) Agent usage policies
 - [Quick Start](QUICKSTART.md) — setup, troubleshooting, per-tool verification
 - [Harness Overview](agents-docs/HARNESS.md) — architecture and patterns
 - [Skills Guide](agents-docs/SKILLS.md) — creating reusable skills

@@ -5,7 +5,10 @@
 
 set -e
 
-REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null || printf "%s\n" "d-o-hub/github-template-ai-agents")
+REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null) || {
+    printf "ERROR: Cannot determine repository name. Ensure 'gh' is authenticated.\n" >&2
+    exit 1
+}
 
 # Fail fast if gh is not authenticated
 gh auth status >/dev/null 2>&1 || { printf "ERROR: gh not authenticated\n" >&2; exit 1; }

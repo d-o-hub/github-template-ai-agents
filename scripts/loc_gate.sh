@@ -42,7 +42,7 @@ fi
 # Optimization: Use xargs wc -l and awk for single-pass validation to avoid per-file process forks
 # Note: SKILL.md line count is a WARNING (not failure) to allow pre-existing skills over the limit
 if ! find .agents/skills -name "SKILL.md" -not -path "*/node_modules/*" -print0 | \
-    xargs -0 -r wc -l -- | \
+    xargs -0 wc -l -- | \
     awk -v max="${MAX_SKILL_OVERRIDE:-$MAX_SKILL}" -- '
     BEGIN { warn = 0; if (max ~ /^0[0-9]+/) max = substr(max, 2) }
     $NF == "total" { next }
@@ -68,7 +68,7 @@ if ! find . -type f \( -name "*.py" -o -name "*.rs" -o -name "*.ts" -o -name "*.
     -not -path "./dist/*" \
     -not -path "./build/*" \
     -not -path "./.agents/skills/*" -print0 | \
-    xargs -0 -r wc -l -- | \
+    xargs -0 wc -l -- | \
     awk -v max="${MAX_SOURCE_OVERRIDE:-$MAX_SOURCE}" -- '
     BEGIN { err = 0; if (max ~ /^0[0-9]+/) max = substr(max, 2) }
     $NF == "total" { next }
