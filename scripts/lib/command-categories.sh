@@ -3,7 +3,7 @@
 # Source this file in other scripts to use categorize_command()
 set -euo pipefail
 
-# Security Hardening: 2026-06-20 - Prevented keyword merging bypasses.
+# Security Hardening: 2026-07-06 - Hardened regex matching and expanded keywords.
 # Default categories (can be overridden in .command-verify.conf)
 SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get:ls:cat:echo:grep:find:pwd:diff:cd:head:tail:sort:uniq:wc:git:log:pgrep:type:which:df:du:free:top:ps:history}"
 CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl:ssh-keygen:openssl:gpg:mv:cp:ln:link:patch:tar:zip:unzip:gzip:gunzip:bzip2:xz:make:touch:gh:xargs:apt:apt-get:yum:dnf:zypper:brew:pipx}"

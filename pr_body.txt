@@ -1,14 +1,10 @@
-🛡️ Sentinel: [security improvement]
+🛡️ Sentinel: Security Hardening
 
-🚨 Severity: MEDIUM
-💡 Vulnerability: Gaps in command/path validation allowed execution of sensitive tools (cloud CLIs, debuggers) and access to secrets (SSH keys, history). Keywords with dots had overly broad regex matching.
-🎯 Impact: Unauthorized admin command execution or credential exfiltration.
-🔧 Fix:
-1. Expanded restricted keywords for destructive, network, and conditional commands.
-2. Escaped literal dots in keywords for exact regex matching.
-3. Detected dangerous Git remote helpers (`ext::`).
-4. Added SSH keys and history files to `FORBIDDEN_PATHS`.
-✅ Verification: Passed `bats` and `pytest` security suites. Full quality gate passed.
-
----
-*PR created automatically by Jules for task [9881265722953834521](https://jules.google.com/task/9881265722953834521) started by @d-o-hub*
+Severity: MEDIUM
+Vulnerability: Gaps in command/path validation and broad regex matching.
+Fix:
+- Expanded restricted keywords.
+- Escaped literal dots in keyword regexes.
+- Detected ext:: Git remote helpers.
+- Protected SSH keys and history files.
+Verification: Passed security tests and quality gate.
