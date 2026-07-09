@@ -83,8 +83,7 @@ Example: `analysis/triz-scripts-2025-05-20.md`
 ## See Also
 
 - `triz-solver` — Problem-solving mode (vs audit mode)
-- `goap-agent` — Orchestrator that uses TRIZ analysis
-- `task-decomposition` — Break down audit findings into tasks
+- `goap-agent` — Orchestrator that uses TRIZ analysis; also breaks down audit findings into tasks
 
 ## Rationalizations
 
@@ -104,3 +103,8 @@ Example: `analysis/triz-scripts-2025-05-20.md`
 - `references/principles.md` - All 40 TRIZ principles with software examples
 - `references/patterns.md` - Common software contradiction patterns and resolutions
 - `references/evolution.md` - TRIZ evolution trends for system design
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

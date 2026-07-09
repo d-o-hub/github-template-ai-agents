@@ -235,6 +235,100 @@
       },
       "priority": "high",
       "autoActivate": true
+    },
+    {
+      "skill": "codacy",
+      "triggers": {
+        "keywords": [
+          "codacy",
+          "code quality",
+          "static analysis",
+          "lint analysis",
+          "code coverage",
+          "quality gate"
+        ],
+        "patterns": [
+          "codacy.*",
+          "quality.*gate",
+          "code.*quality"
+        ],
+        "files": [
+          ".codacy.yaml",
+          ".codacy.yml"
+        ]
+      },
+      "priority": "high",
+      "autoActivate": true
+    },
+    {
+      "skill": "code-review-assistant",
+      "triggers": {
+        "keywords": [
+          "review",
+          "code review",
+          "pr review",
+          "pull request review",
+          "review comments"
+        ],
+        "patterns": [
+          "review.*pr",
+          "review.*pull",
+          "code.*review"
+        ],
+        "files": []
+      },
+      "priority": "high",
+      "autoActivate": true
+    },
+    {
+      "skill": "agentic-abstention",
+      "triggers": {
+        "keywords": [
+          "abstain",
+          "stopping rules",
+          "stop acting",
+          "infeasible",
+          "give up",
+          "halt"
+        ],
+        "patterns": [
+          "stop.*act",
+          "abstain.*",
+          "infeasib.*"
+        ],
+        "files": []
+      },
+      "priority": "medium",
+      "autoActivate": false
+    },
+    {
+      "skill": "cicd-pipeline",
+      "triggers": {
+        "keywords": [
+          "ci",
+          "cd",
+          "pipeline",
+          "workflow",
+          "github actions",
+          "gitlab ci",
+          "forgejo",
+          "coverage upload"
+        ],
+        "patterns": [
+          "ci.*cd",
+          "pipeline.*",
+          "workflow.*",
+          "github.*actions",
+          "gitlab.*ci"
+        ],
+        "files": [
+          ".github/workflows/*.yml",
+          ".gitlab-ci.yml",
+          ".forgejo/workflows/*.yml"
+        ]
+      },
+      "priority": "high",
+      "autoActivate": true
     }
   ],
   "settings": {

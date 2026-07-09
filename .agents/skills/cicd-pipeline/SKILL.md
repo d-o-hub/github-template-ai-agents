@@ -4,6 +4,9 @@ version: "0.2.10"
 description: Design and configure CI/CD pipelines with GitHub Actions, GitLab CI, and Forgejo Actions. Use this skill when the user asks to create a new workflow, set up pipeline triggers, configure caching or matrix builds, manage CI secrets, troubleshoot pipeline failures, or compare pipeline platforms — even if they don't say "CI/CD" explicitly. Not for monitoring an existing PR's CI (use git-github-workflow) or executing deployments (use deployment-specific tooling).
 category: workflow
 license: MIT
+metadata:
+  author: opencode
+  lastUpdated: "2026-07-02"
 ---
 
 # CI/CD Pipeline
@@ -52,6 +55,73 @@ Design and implement efficient, secure, and reliable CI/CD pipelines.
 - Matrix builds multiply cost — a 3x3 matrix runs 9 jobs, not 3.
 - Artifact retention defaults vary by platform — set explicit retention to avoid storage costs.
 
+## Coverage Integration
+
+### Generate Coverage Reports
+
+**JavaScript/TypeScript (Jest):**
+
+```json
+{ "collectCoverage": true, "coverageReporters": ["lcov"] }
+```
+
+**Python (pytest):**
+
+```bash
+pytest --cov --cov-report=xml:cobertura.xml
+```
+
+**Go:**
+
+```bash
+go test -coverprofile=coverage.out ./...
+```
+
+**Java (Maven + JaCoCo):** Add JaCoCo plugin to pom.xml, then:
+
+```bash
+mvn test jacoco:report
+```
+
+### Upload Coverage to Codacy
+
+```bash
+bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r <coverage-report-file>
+```
+
+**GitHub Actions:**
+
+```yaml
+- name: Upload coverage to Codacy
+  env:
+    CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+  run: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
+```
+
+**GitLab CI:**
+
+```yaml
+upload-coverage:
+  stage: test
+  script:
+    - bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
+  variables:
+    CODACY_PROJECT_TOKEN: $CODACY_PROJECT_TOKEN
+```
+
+**Multiple reports (monorepos):**
+
+```bash
+bash <(curl -Ls https://coverage.codacy.com/get.sh) report --partial -r report1.xml
+bash <(curl -Ls https://coverage.codacy.com/get.sh) report --partial -r report2.xml
+bash <(curl -Ls https://coverage.codacy.com/get.sh) final
+```
+
+**Key notes:**
+- Coverage must be uploaded for every push to be useful for PR analysis
+- File paths in reports must be relative to repository root
+- Set `CODACY_PROJECT_TOKEN` as a CI/CD secret (from Codacy > Repository Settings > Coverage)
+
 ## Rationalizations
 
 | Rationalization | Reality |
@@ -78,3 +148,8 @@ Design and implement efficient, secure, and reliable CI/CD pipelines.
 
 - `git-github-workflow` — Full commit-to-merge lifecycle including CI monitoring
 - `github-pr-sentinel` — Specialized PR monitoring with CI failure diagnosis
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

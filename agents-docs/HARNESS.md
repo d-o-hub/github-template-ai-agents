@@ -34,15 +34,29 @@ See `agents-docs/SKILLS.md`.
 - Prefer well-known CLIs (GitHub, Docker, databases) over MCP
 - Write thin CLI wrappers with concise output rather than verbose MCP responses
 - Never connect to untrusted MCP servers - they are a prompt injection vector
+- **MCP Tool Search** (Claude Code v2.1+): Reduces MCP context overhead by ~85%
+  via on-demand tool loading. Enable in settings to avoid loading all tool schemas
+  at session start.
+
+## Observability
+
+Track agent behavior for debugging and cost control:
+
+- **Task-level**: Append to `.agents/metrics.jsonl` after every task (see `AGENTS.md` Post-Task Protocol)
+- **Session-level**: Use `claude --verbose` for detailed session tracing
+- **Monthly**: Run `dora-report` skill for aggregated metrics
+- **Cost attribution**: Add `session_id` to metrics.jsonl entries to group work by session
 
 ## Supported AI Agents
 
-| Agent | Skills Location | Sub-agents |
-|-------|-----------------|------------|
-| Claude Code | `.claude/skills/` (symlinks) | `.claude/agents/` |
-| Gemini CLI | `.agents/skills/` (direct) | `.gemini/agents/` |
-| OpenCode | `.agents/skills/` (direct) | `.opencode/agents/` |
-| Qwen Code | `.qwen/skills/` (symlinks) | - |
+| Agent | Skills Location | Sub-agents | Parallel Capabilities |
+|-------|-----------------|------------|----------------------|
+| Claude Code | `.claude/skills/` (symlinks) | `.claude/agents/` | Agent Teams, Agent View, Dynamic Workflows, Worktrees |
+| Gemini CLI | `.agents/skills/` (direct) | `.gemini/agents/` | Sub-agents |
+| OpenCode | `.agents/skills/` (direct) | `.opencode/agents/` | Sub-agents |
+| Qwen Code | `.qwen/skills/` (symlinks) | - | - |
+
+For Agent Teams, Dynamic Workflows, and Worktrees details, see `AGENT_TEAMS_GUIDE.md`.
 
 ## Further Reading
 

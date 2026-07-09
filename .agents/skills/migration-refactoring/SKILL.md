@@ -252,3 +252,8 @@ See `references/language-migrations.md` for framework-specific guides.
 - `references/migration-patterns.md` - Detailed pattern implementations
 - `references/dependency-analysis.md` - Cross-file dependency tracking
 - `references/language-migrations.md` - Framework migration guides
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

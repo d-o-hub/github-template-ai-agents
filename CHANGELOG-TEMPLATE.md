@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- feat(harness): add Agent Teams, Dynamic Workflows, and Worktrees guide (`AGENT_TEAMS_GUIDE.md`)
+- feat(harness): add behavioral defaults reference doc (`BEHAVIORAL_DEFAULTS.md`)
+- feat(harness): add observability section to HARNESS.md
+
+### Changed
+
+- refactor(harness): trim AGENTS.md from 200 to 155 lines; move detailed sections to agents-docs/
+- docs(harness): add MCP Tool Search guidance to HARNESS.md and CONTEXT.md
+- docs(harness): add parallel capabilities column to Supported AI Agents table
+- docs(agent-coordination): add native capabilities vs. custom coordination comparison table
+- fix(paths): harden path validation by protecting critical root files
+
+### Fixed
+
+- fix(refs): replace broken task-decomposition/github-readme skill references with goap-agent/readme-best-practices
+- docs(agents): regenerate AGENTS.md skills table from catalog (17 categories, 56 skills)
+- fix(version): agent-toolkit.sh reads VERSION file instead of hardcoding
+- feat(validate): extend link-check to top-level docs and agents-docs/
+- fix(links): resolve broken relative links in agents-docs/MIGRATION.md and AGENTS_REGISTRY.md
+- chore: gitignore eval workspaces; remove 354 committed eval artifacts
+- docs: align AGENTS.md line-limit guidance to 200 in CONTRIBUTING.md
+- docs: sync QUICKSTART bootstrap output with bootstrap.sh
+- chore: fix .gitignore malformed pattern and dedupe entries
+- chore: remove duplicate comment block in quality_gate.sh
+
 ## [0.2.10] - 2026-05-29
 
 ### Added

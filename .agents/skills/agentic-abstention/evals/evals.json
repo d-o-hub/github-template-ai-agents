@@ -1,0 +1,71 @@
+{
+    "skill_name": "agentic-abstention",
+    "evals": [
+        {
+            "id": 1,
+            "prompt": "I keep getting empty results when searching for 'nonexistent.txt' with glob. Should I try again with a different pattern?",
+            "expected_output": "After 2 consecutive empty results, the agent triggers Rule 1 (Empty-Result Repetition) and emits ABSTAIN with rule 'empty-result-repetition' instead of retrying.",
+            "files": [],
+            "assertions": [
+                "The agent identifies 2+ consecutive empty results as a stopping condition",
+                "The agent emits structured ABSTAIN JSON with rule name",
+                "The agent halts without retrying with a different pattern"
+            ]
+        },
+        {
+            "id": 2,
+            "prompt": "The API endpoint /api/v1/users/999 returns a 404. Should I try /api/v2/ or a different ID?",
+            "expected_output": "The agent triggers Rule 2 (Resource Unavailable) on the first 404 and emits ABSTAIN with rule 'resource-unavailable' instead of trying alternative paths.",
+            "files": [],
+            "assertions": [
+                "The agent treats HTTP 404 as an immediate stopping condition",
+                "The agent does NOT retry with alternative URLs",
+                "The agent emits ABSTAIN with rule 'resource-unavailable'"
+            ]
+        },
+        {
+            "id": 3,
+            "prompt": "I've been trying to compile this file for the 4th time and it keeps failing with the same error. What should I do?",
+            "expected_output": "The agent checks number of steps since last progress (>= DEFAULT_MAX_RETRIES=3), triggers Rule 3 (No-Progress Step Budget), and emits ABSTAIN with rule 'no-progress-step-budget'.",
+            "files": [],
+            "assertions": [
+                "The agent counts steps since last progress",
+                "The agent references DEFAULT_MAX_RETRIES as the threshold",
+                "The agent halts instead of retrying a 4th time"
+            ]
+        },
+        {
+            "id": 4,
+            "prompt": "The deployment tool says 'this operation cannot be completed because the environment does not support it'. Should I try a different approach?",
+            "expected_output": "The agent detects the explicit infeasibility signal 'cannot be completed', triggers Rule 4, and emits ABSTAIN with rule 'infeasibility-signal' without rephrasing or retrying.",
+            "files": [],
+            "assertions": [
+                "The agent recognizes 'cannot be completed' as an infeasibility keyword",
+                "The agent halts immediately without attempting alternatives",
+                "The agent emits ABSTAIN with rule 'infeasibility-signal'"
+            ]
+        },
+        {
+            "id": 5,
+            "prompt": "This task has been running for 35 minutes. I'm almost done — should I keep going?",
+            "expected_output": "The agent checks elapsed time (35 min > DEFAULT_TIMEOUT_SECONDS=1800s), triggers Rule 5 (Timeout Budget Exceeded), and emits ABSTAIN with rule 'timeout-budget-exceeded' regardless of how close to completion.",
+            "files": [],
+            "assertions": [
+                "The agent compares elapsed time against DEFAULT_TIMEOUT_SECONDS",
+                "The agent does NOT continue based on 'almost done' reasoning",
+                "The agent emits ABSTAIN with rule 'timeout-budget-exceeded'"
+            ]
+        },
+        {
+            "id": 6,
+            "prompt": "I searched for 'config.json' with glob and got an empty result. This is my first attempt. What next?",
+            "expected_output": "The agent does NOT trigger Rule 1 because a single empty result is below the 2+ threshold. The agent continues with an alternative approach (e.g., checking a different location, using find command).",
+            "files": [],
+            "assertions": [
+                "The agent recognizes that Rule 1 requires 2+ consecutive empty results",
+                "The agent does NOT emit ABSTAIN for a single empty result",
+                "The agent proposes an alternative action instead of halting"
+            ]
+        }
+    ]
+}

@@ -1410,3 +1410,108 @@ find . -name '*.md' \
 - `agents-docs/LESSONS.md`, `lessons.jsonl` — Updated references (code-quality → code-review-assistant, github-workflow → git-github-workflow)
 
 ---
+
+# LESSON-037 — SKILL.md Line Limit Management
+
+**Issue**: Adding complex skills like `avoid-ai-writing` with exhaustive pattern catalogs can easily exceed the 250-line `SKILL.md` limit, leading to context window bloat and linting warnings.
+
+**Root Cause**: Directly porting large documentation or rule sets into the primary instruction file.
+
+**Solution**:
+1. **Refactor for Conciseness**: Extract exhaustive tables, word lists, and secondary examples into a `references/patterns.md` file.
+2. **Instruction-First SKILL.md**: Keep `SKILL.md` focused on *how* to use the skill, its modes, and its high-level logic, referencing the external pattern file for details.
+3. **Linting Compliance**: New Markdown files must strictly follow MD022 (blank lines around headings).
+
+**Prevention**:
+- Monitor line counts during skill creation (`wc -l SKILL.md`).
+- Use the `references/` directory for any content that isn't a core operational instruction.
+
+**Tags**: #skills #documentation #linting #context-optimization
+
+---
+
+### LESSON-038 — AGENTS.md Restructure: agents-docs/ Split Requires 4 Coordinated Updates
+
+**Date**: 2026-07-03
+**Component**: Documentation / AGENTS.md / Knowledge Architecture
+**Severity**: Medium
+
+**Issue**: Restructuring AGENTS.md by splitting behavioral defaults and agent teams into `agents-docs/` files requires updating references in 4+ coordinated locations, not just AGENTS.md itself.
+
+**Symptoms**:
+- Running `./scripts/quality_gate.sh` triggers `./scripts/update-all-docs.sh` which auto-regenerates `llms-full.txt` and `agents-docs/skills-reference.md`
+- Markdownlint may catch new files with MD031 (blanks around fenced code blocks) — the `default: true` config means many rules are implicitly active
+- Pre-existing SKILL.md line-limit warnings (skill-evaluator 269, ui-ux-optimize 315, etc.) are non-blocking in CI
+
+**Root Causes**:
+1. **AGENTS.md is NOT the only file**: Quality gate infrastructure (llms generation scripts, skills-reference generator) scans `agents-docs/` and can detect content drift
+2. **New files trigger markdownlint**: Every new `.md` file in `agents-docs/` is scanned by markdownlint-cli2 — must follow MD022 (blanks around headings), MD031 (blanks around fenced code blocks), MD047 (trailing newline)
+3. **quality_gate.sh emits warnings for pre-existing issues**: The line-limit checks are warnings (yellow ⚠), not failures — they do not increment the FAILED counter — but they can cause confusion when reviewing output
+
+**Solution**:
+1. **Run quality gate before committing** to catch any new lint/sync issues early
+2. **Check markdownlint errors specifically** with `npx markdownlint-cli2 <file>` on new/modified files
+3. **Cross-reference staged changes** with `git diff --stat` before committing to avoid committing hook artifacts (metrics.jsonl, GOAP_STATE.md)
+4. **Stage only intentional changes** when hook-generated files are also modified
+
+**Prevention**:
+- Run `./scripts/quality_gate.sh` before any commit that adds or restructures docs
+- Use `--authoritative` staging: `git add <file1> <file2> ...` instead of `git add .`
+- After any AGENTS.md restructure, verify all cross-references work: `git grep "agents-docs/" AGENTS.md`
+
+**Tags**: #documentation #restructure #quality-gate #markdownlint #agents-docs
+
+**Files Modified**:
+- `AGENTS.md` — Trimmed from ~350 to ~120 lines
+- `agents-docs/AGENT_TEAMS_GUIDE.md` — Created (new file)
+- `agents-docs/BEHAVIORAL_DEFAULTS.md` — Created (new file)
+- `agents-docs/HARNESS.md` — Enriched with observability, MCP Tool Search, agent capabilities
+- `agents-docs/CONTEXT.md` — Added MCP Tool Search note
+- `.agents/skills/agent-coordination/SKILL.md` — Added native capability comparison table
+- `CHANGELOG-TEMPLATE.md` — Added restructuring entries
+
+---
+
+### LESSON-039 — Bash Regex `[^\r\n]` Does Not Match CR/LF — It Matches Literal `\`, `r`, `n`
+
+**Date**: 2026-07-03
+**Component**: Scripts / Bash / Regex
+**Severity**: High
+
+**Issue**: The bash regex `[^\r\n]` inside `[[ ... =~ ... ]]` does NOT match "any character except CR/LF" as it would in Perl/Python. It matches "any character except `\`, `r`, `n`". This caused the `validate-skills.sh` name field check to capture name values across line boundaries (e.g., `codacy\nve` from `codacy\nversion:`).
+
+**Symptoms**:
+- 6 skills falsely flagged: `codacy`, `database-devops`, `delegate`, `docs-hook`, `dogfood`, `ui-ux-optimize`
+- Error message: `name field contains invalid characters: 'codacy\nve'` (newline embedded in captured value)
+- The `[^a-z0-9-]` regex at line 182 correctly rejected these because the newline character 0x0a matched `[^a-z0-9-]`
+- Only the `ui-ux-optimize` skill error showed `desc` suffix (from `description:` field) instead of `ve` (from `version:` field) because block-scalar `>` multi-line description appears after the `name:` line in its frontmatter
+
+**Root Cause**:
+1. **Bash regex does not interpret `\r`/`\n` as escape sequences**: Unlike PCRE/Python/JavaScript, bash's `=~` operator inside `[[ ]]` treats `\r` and `\n` in character classes as literal characters `\`, `r`, `n` (0x5c, 0x72, 0x6e)
+2. **`[^\r\n]` matches newline (0x0a)**: Since 0x0a is not `\`, `r`, or `n`, it passes through the exclusion
+3. **Same applies to `$'\r'`/`$'\n'` inside character classes**: ANSI-C quoting (`$'\n'`) does NOT work inside `[...]` in bash regex — they must be assigned to variables first
+
+**Solution**:
+
+```bash
+# Before (broken): \r and \n are literal characters in character classes
+[[ "$frontmatter" =~ (^|$'\n')name:[[:space:]]*([^\r\n]+) ]]
+
+# After (correct): use variables with actual CR/LF characters
+nl=$'\n'; cr=$'\r'
+[[ "$frontmatter" =~ (^|$nl)name:[[:space:]]*([^$nl$cr]+) ]]
+```
+
+Also applied consistently across the frontmatter parsing block by replacing all `$'\n'` and `$'\r'$'\n'` usages with `$nl` and `${cr}${nl}` variables.
+
+**Prevention**:
+- NEVER use `\r`/`\n` as escape sequences inside bash `[[ ... =~ ... ]]` regex character classes — they are literal
+- Always assign special characters to variables first: `nl=$'\n'; cr=$'\r'`, then use `[^$nl$cr]` in the regex
+- Test bash regex with known-newline-containing input before deploying
+- Add a regression test in `validate-skills.bats` that exercises the name field extraction with a multi-line frontmatter
+
+**Tags**: #bash #regex #carriage-return #newline #scripts
+
+**Files Modified**:
+- `scripts/validate-skills.sh` — Fixed `[^\r\n]` → `[^$nl$cr]` in name regex; normalized all ANSI-C quoted newline/CR references to variables
+- `.agents/skills/agentic-abstention/evals/evals.json` — Created with 6 eval cases covering all 5 stopping rules + 1 negative case

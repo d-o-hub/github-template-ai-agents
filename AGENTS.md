@@ -46,15 +46,7 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 
 ## Behavioral Defaults
 
-- **Automation-First**: Execute tasks autonomously within approved plans; minimize confirmation loops.
-- **Parallelism**: Use parallel tool calls for independent operations when supported by the runtime.
-- **Direct Action**: Proceed with actions immediately when intent and context are clear.
-- **Diff-Oriented**: Report changes using concise, diff-focused summaries instead of long prose.
-- **Always-Fix Pre-Existing Issues**: No discussion. No deferral. If a CI check, lint warning, or quality-gate finding is failing on `main` (regardless of who introduced it), agents MUST fix it as part of the current task. The only acceptable exit is a green CI for the current commit's run, with no new regressions and no inherited failures.
-
-**Workflow for pre-existing issues**: load `.agents/skills/goap-agent/SKILL.md` (orchestrator) and `.agents/skills/agent-coordination/SKILL.md` (swarm dispatch). Retriever / Implementer / Verifier in parallel, atomic commits per issue, verify green before moving on. Full playbook: `agents-docs/AGENTS_GUIDANCE.md`.
-
-**Triage protocol for unfixable issues**: If a pre-existing failure cannot be fixed in the current run (e.g., external CI service stale, upstream dependency broken, requires human credential): (1) Create an ADR in `plans/` documenting the issue, root cause, and why it's out of scope. (2) Create a GOAP task in `plans/GOAP_STATE.md` with status `blocked` and the ADR link. (3) Ensure the current commit's quality gate passes — the branch must be green even if inherited issues remain. (4) Never skip, suppress, or mark as `done` an issue that remains open.
+See `agents-docs/BEHAVIORAL_DEFAULTS.md` for automation-first, parallelism, direct action, diff-oriented, voice, and pre-existing issue handling rules.
 
 ## Setup
 
@@ -66,8 +58,7 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
 
 ## Session Bootstrap
 
-Agents use a `SessionStart` hook to auto-inject project context (docs map + latest changelog) at startup.
-This is configured via `docflow.json` and agent-specific settings (e.g., `.claude/settings.json`).
+Agents use a `SessionStart` hook to auto-inject project context (docs map + latest changelog) at startup; configured via `docflow.json` and agent-specific settings (e.g., `.claude/settings.json`).
 
 ```bash
 ./hooks/session-start.sh # Manual execution to verify context injection
@@ -92,11 +83,9 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 ./scripts/analyze-codebase.sh   # Autonomous analysis and self-learning
 ./scripts/check-adr-compliance.sh # Verify ADR registration and patterns
 ./scripts/run-evals.py --skill dora-report # Mandatory monthly report
-./scripts/check-plan-numbering.sh # Ensure plan counters are consistent
-./scripts/archive-stale-plans.sh # Archive plans older than 60 days
 ```
 
-**Guard Rails:** Temporary files in `/tmp` only. Gitleaks enforced via CI. Pre-commit validates git config (`SKIP_GLOBAL_HOOKS_CHECK=true` to bypass).
+**Guard Rails:** Temporary files in `/tmp` only. Never create debug, scripts, reports, or similar temporary files in the repository root. Gitleaks enforced via CI. Pre-commit validates git config (`SKIP_GLOBAL_HOOKS_CHECK=true` to bypass).
 
 ## Code Style
 
@@ -104,14 +93,7 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 - `SKILL.md` must start with frontmatter and include **Rationalizations** and **Red Flags** sections.
 - **No hardcoded values**: Use relative paths, runtime derivation, env vars, or named constants.
 - Shell: `shellcheck` (severity=error); Markdown: `markdownlint`; Diagrams: `mermaid`
-- **YAML Workflow Files**: All new `.github/workflows/*.yml` files must include `# yamllint disable-line rule:truthy` on the `on:` line (line 4) to suppress the PyYAML boolean interpretation warning. Example:
-
-  ```yaml
-  on:  # yamllint disable-line rule:truthy
-    pull_request:
-  ```
-
-  CI yamllint uses strict rules (line-length: 120, indentation: 2 spaces).
+- **YAML Workflow Files**: All new `.github/workflows/*.yml` files must include `# yamllint disable-line rule:truthy` on the `on:` line (line 4). CI yamllint uses strict rules (line-length: 120, indentation: 2 spaces).
 
 ## Repository Structure
 
@@ -153,46 +135,37 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 
 ## Delegation Routing
 
-- **Self-Execute**: 1 trivial isolated edit (e.g., typos, single-line constants).
-- **Delegate**: 2+ files, architectural changes, or tasks requiring judgment.
-- **Swarm**: 5+ similar independent tasks (e.g., batch doc normalization, multi-file refactors).
 - **Route to**: `delegate` (retrieval/context) → `implementer` (execution) → `agent-coordination` (swarm dispatch).
+- **Parallel agents**: See `agents-docs/AGENT_TEAMS_GUIDE.md` for Agent Teams, Dynamic Workflows, and Worktrees.
 
-## Metrics File
+## Metrics & Post-Task Protocol
 
-Append to `.agents/metrics.jsonl` after every task (see Post-Task Protocol).
-
-- **Timestamp format**: `YYYY-MM-DDTHH:MM:SSZ` (UTC, no microseconds, no offset)
-- **Merge conflicts**: `.gitattributes` sets `merge=union` — the CI bot auto-resolves
-  positional conflicts. If you see conflict markers locally, run:
-  `git fetch origin main && git merge origin/main`
-- **Never sort or rewrite** the file; append-only, insertion order preserved.
-
-## Post-Task Protocol
-
-After **every** completed task, the agent MUST append a JSON entry to `.agents/metrics.jsonl`:
-
-```json
-{
-  "timestamp": "YYYY-MM-DDTHH:MM:SSZ",
-  "agent": "<agent-id>",
-  "task": "<description>",
-  "skill_used": "<skill or null>",
-  "status": "completed" | "failed" | "partial",
-  "tokens_used": <int>,
-  "duration_seconds": <int>,
-  "notes": "<text>"
-}
-```
-
-- JSONL format; Append-only; Never truncate or delete.
-- If task fails mid-way, still append with `"status": "failed"`.
-- `dora-report` skill reads this file for its monthly summary.
-
-#### Recent Project-Wide Learnings
-
-See `agents-docs/self-learning-rules.md` for all learnings (LESSON-026 through LESSON-035 and Integration Learnings).
+See `agents-docs/METRICS.md` for metrics logging (`.agents/metrics.jsonl`), DORA reports, and post-task protocol.
 
 ## Recovery & Advanced Topics
 
-- **Local CI rehearsal with `act`**: `agents-docs/ACT.md` plus `./scripts/run_act_local.sh` (never blocks the quality gate; opt-in).
+- **Local CI rehearsal with `act`**: `agents-docs/ACT.md` + `./scripts/run_act_local.sh` (never blocks the quality gate; opt-in).
+- **Harness architecture**: `agents-docs/HARNESS.md`
+- **Context engineering**: `agents-docs/CONTEXT.md`
+
+## Skills
+
+| Category | Skills |
+|----------|--------|
+| **Agent** | `agentic-abstention`, `agent-coordination`, `delegate`, `implementer`, `intent-classifier`, `jules-delegator` |
+| **Analysis** | `triz-analysis` |
+| **Code Quality** | `codacy`, `code-review-assistant`, `css-render-performance`, `iterative-refinement`, `migration-refactoring`, `shell-script-quality`, `static-analysis` |
+| **Compliance** | `eu-ai-act-compliance` |
+| **Database** | `database-devops`, `turso-db` |
+| **DevOps** | `dora-report` |
+| **Documentation** | `agents-md`, `architecture-diagram`, `readme-best-practices` |
+| **Innovation Problem Solving** | `triz-solver` |
+| **Knowledge** | `memory-context` |
+| **Knowledge Management** | `learn` |
+| **Platform** | `api-design-first`, `codeberg-api`, `durable-objects` |
+| **Quality** | `avoid-ai-writing`, `dogfood`, `lifecycle-management`, `skill-creator`, `skill-evaluator`, `testdata-builders`, `verification-template`, `voice-profiles` |
+| **Security** | `privacy-first`, `security-code-auditor` |
+| **Testing** | `test-runner`, `testing-strategy` |
+| **Tool** | `agent-browser`, `dist-channel-selection`, `do-web-doc-resolver`, `template-version-management`, `web-search-researcher` |
+| **UI/UX** | `accessibility-auditor`, `ui-ux-optimize` |
+| **Workflow** | `cicd-pipeline`, `cloudflare-worker-api`, `docs-hook`, `document-rendering-and-locators`, `git-github-workflow`, `github-pr-sentinel`, `goap-agent`, `pwa-offline-sync`, `reader-ui-ux`, `secure-invite-and-access` |

@@ -143,8 +143,40 @@ for skill_path in "$SKILLS_SRC"/*/; do
 
     skill_failed=0
 
-    # Extract name field from frontmatter
-    skill_front_name=$(awk '/^---$/{n++} n==1 && /^name:/{sub(/^name:[ \t]*/, ""); print; exit}' "$skill_file")
+    content=$(< "$skill_file")
+
+    skill_front_name=""
+    has_category=""
+    has_rationalizations=0
+    has_red_flags=0
+
+    # Parse frontmatter natively to avoid external process fork overhead
+    nl=$'\n'; cr=$'\r'
+    if [[ "$content" == ---$nl*${nl}---* ]] || [[ "$content" == ---${cr}${nl}*${cr}${nl}---* ]]; then
+        frontmatter="${content#---$nl}"
+        frontmatter="${frontmatter#---${cr}${nl}}"
+        frontmatter="${frontmatter%%${nl}---*}"
+        frontmatter="${frontmatter%%${cr}${nl}---*}"
+
+        if [[ "$frontmatter" =~ (^|$nl)name:[[:space:]]*([^$nl$cr]+) ]]; then
+            skill_front_name="${BASH_REMATCH[2]}"
+            # Trim trailing spaces just in case
+            skill_front_name="${skill_front_name%"${skill_front_name##*[![:space:]]}"}"
+        fi
+
+        if [[ "$frontmatter" =~ (^|$'\n')category: ]]; then
+            has_category="yes"
+        fi
+    fi
+
+    # Check for sections using native bash matching
+    if [[ "$content" == *$'\n## Rationalizations'* ]] || [[ "$content" == "## Rationalizations"* ]]; then
+        has_rationalizations=1
+    fi
+
+    if [[ "$content" == *$'\n## Red Flags'* ]] || [[ "$content" == "## Red Flags"* ]]; then
+        has_red_flags=1
+    fi
 
     # Check: name field must not contain uppercase, spaces, or non-hyphen special chars
     if [[ -n "$skill_front_name" ]]; then
@@ -155,21 +187,18 @@ for skill_path in "$SKILLS_SRC"/*/; do
     fi
 
     # Check: frontmatter must contain category field
-    has_category=$(awk '/^---$/{n++} n==1 && /^category:/{print "yes"; exit}' "$skill_file")
     if [[ -z "$has_category" ]]; then
         printf "  ${RED}✗${NC} %s: Missing 'category' field in frontmatter\n" "$skill_name"
         skill_failed=1
     fi
 
     # Check: body must contain ## Rationalizations heading
-    has_rationalizations=$(grep -c "^## Rationalizations" "$skill_file" || true)
     if [[ "$has_rationalizations" -eq 0 ]]; then
         printf "  ${RED}✗${NC} %s: Missing '## Rationalizations' section\n" "$skill_name"
         skill_failed=1
     fi
 
     # Check: body must contain ## Red Flags heading
-    has_red_flags=$(grep -c "^## Red Flags" "$skill_file" || true)
     if [[ "$has_red_flags" -eq 0 ]]; then
         printf "  ${RED}✗${NC} %s: Missing '## Red Flags' section\n" "$skill_name"
         skill_failed=1

@@ -175,6 +175,24 @@ This coordination skill works with:
 - Rust (Actix, Rocket)
 - C# (.NET, ASP.NET Core)
 
+## Native Capabilities vs. Custom Coordination
+
+When running in Claude Code, native capabilities may replace custom patterns:
+
+| This Skill's Pattern | Claude Code Native Equivalent | When to Use Native |
+|---------------------|-------------------------------|-------------------|
+| Parallel (heterogeneous) | **Sub-agents** | Quick focused tasks needing noise isolation |
+| Parallel (homogeneous) | **Agent View** | Multiple independent tasks to monitor |
+| Swarm (peer coordination) | **Agent Teams** | Workers need to share findings during execution |
+| Hybrid (multi-phase) | **Dynamic Workflows** | Reusable procedures with verification loops |
+| Parallel branch edits | **Worktrees** | Multiple agents editing same files |
+
+**Rule of thumb**: Use native capabilities when available in Claude Code. Fall back to
+this skill's patterns for tool-agnostic runtimes (OpenCode, Gemini CLI, Qwen Code) or
+when native capabilities don't match the coordination topology you need.
+
+For detailed guidance, see `agents-docs/AGENT_TEAMS_GUIDE.md`.
+
 ## See Also
 
 - `goap-agent` — Top-level orchestrator
@@ -200,3 +218,8 @@ This coordination skill works with:
 ## References
 
 - **[../../../agents-docs/references/orchestration-patterns.md](../../../agents-docs/references/orchestration-patterns.md)** - Complete guide with detailed steps, patterns, synchronization strategies, error handling, performance optimization, and troubleshooting
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

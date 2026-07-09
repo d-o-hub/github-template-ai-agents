@@ -241,3 +241,8 @@ python eval-viewer/generate_review.py \
 ```
 
 Generates standalone HTML with Outputs and Benchmark tabs for human review.
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

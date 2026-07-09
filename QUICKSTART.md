@@ -29,8 +29,8 @@ cd your-project
   ✓ git present and inside a repository
 ==> Setting up skills
   ✓ Skills ready
-==> Installing pre-commit hook
-  ✓ pre-commit hook installed
+==> Configuring git hooks via .githooks
+  ✓ git hooks configured (core.hooksPath = .githooks)
 ==> Validating skills
   ✓ Skills valid
 ==> Running quality gate

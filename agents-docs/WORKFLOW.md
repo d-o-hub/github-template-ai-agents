@@ -1,7 +1,7 @@
 # Workflow Reference
 
 > Detailed workflow procedures referenced by AGENTS.md.
-> Keep procedures here, not in AGENTS.md, to stay within `MAX_LINES_AGENTS_MD=150`.
+> Keep procedures here, not in AGENTS.md, to stay within `MAX_LINES_AGENTS_MD=200`.
 
 ## Pre-Existing Issue Resolution
 

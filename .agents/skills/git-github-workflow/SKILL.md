@@ -233,3 +233,8 @@ Workflow succeeds when:
 - `references/IMPLEMENTATION_GITHUB_WORKFLOW.md` - GitHub API, merge strategies, troubleshooting (migrated)
 - `run.sh` - Workflow implementation script
 - `evals/README.md` - Consolidated test scenarios
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.

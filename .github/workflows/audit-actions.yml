@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # pinned from v4
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # pinned from v4
 
       - name: Audit actions for deprecated Node runtimes
         id: audit
@@ -71,7 +71,7 @@ jobs:
 
       - name: Open issue on failure
         if: failure()
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # pinned from v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9.0.0
         env:
           DEPRECATED_ACTIONS: ${{ steps.audit.outputs.deprecated_actions }}
         with:

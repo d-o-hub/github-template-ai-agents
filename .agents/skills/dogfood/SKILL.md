@@ -162,3 +162,8 @@ Aim to find **5-10 well-documented issues**, then wrap up. Depth of evidence mat
 
 - `references/issue-taxonomy.md` - What to look for, severity levels, exploration checklist
 - `templates/dogfood-report-template.md` - Copy into output directory as the report file
+
+## Voice & Context
+
+- **Default**: `professional` + `blog`
+- **Reference**: `voice-profiles` skill for definitions and auto-detection.
