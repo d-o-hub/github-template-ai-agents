@@ -22,19 +22,29 @@ classifiers = [
 ]
 keywords = ["llm", "markdown", "web-scraping", "documentation", "agent", "skill"]
 dependencies = [
-    "exa-py>=1.0.0",
-    "tavily-python>=0.3.0",
-    "firecrawl-py>=0.0.5",
     "ddgs>=9.0.0",
     "httpx[http2]>=0.28.1",
-    "sentence-transformers>=5.5.1",
-    "sqlite-vec>=0.1.0",
-    "pysqlite3-binary>=0.5.0",
     "trafilatura>=1.10.0",
     "readability-lxml>=0.8.1",
+    "diskcache>=5.6.0",
 ]
 
 [project.optional-dependencies]
+providers = [
+    "exa-py>=1.0.0",
+    "tavily-python>=0.3.0",
+    "firecrawl-py>=0.0.5",
+]
+ml = [
+    "sentence-transformers>=5.5.1",
+]
+db = [
+    "sqlite-vec>=0.1.0",
+    "pysqlite3-binary>=0.5.0",
+]
+all = [
+    "do-web-doc-resolver[providers,ml,db]",
+]
 dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
