@@ -1,4 +1,5 @@
 # scripts/lib/paths.py
+# Security Hardening: 2026-07-06 - Expanded forbidden paths.
 """Path validation utilities for CLI scripts."""
 
 from __future__ import annotations
