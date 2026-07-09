@@ -47,29 +47,32 @@ for file in "${FILES_TO_UPDATE[@]}"; do
         continue
     fi
 
+    # perf: read file content once to eliminate multiple grep subshells
+    content=$(<"$file")
+
     # Update version badges: version-0.X.Y -> version-NEW_VERSION
-    if grep -q "version-[0-9]" "$file" 2>/dev/null; then
+    if [[ "$content" == *"version-"[0-9]* ]]; then
         sed -i "s/version-[0-9]\+\.[0-9]\+\.[0-9]\+/version-${VERSION}/g" "$file"
         UPDATED=1
         echo "  Updated version badge in $file"
     fi
 
     # Update "Template version: X.Y.Z" text
-    if grep -q "Template version:" "$file" 2>/dev/null; then
+    if [[ "$content" == *"Template version:"* ]]; then
         sed -i "s/Template version: [0-9]\+\.[0-9]\+\.[0-9]\+/Template version: ${VERSION}/g" "$file"
         UPDATED=1
         echo "  Updated template version in $file"
     fi
 
     # Update "**Version:** X.Y.Z" text
-    if grep -q "\*\*Version:\*\* [0-9]\+\.[0-9]\+\.[0-9]\+" "$file" 2>/dev/null; then
+    if [[ "$content" =~ \*\*Version:\*\*\ [0-9]+\.[0-9]+\.[0-9]+ ]]; then
         sed -i "s/\*\*Version:\*\* [0-9]\+\.[0-9]\+\.[0-9]\+/\*\*Version:\*\* ${VERSION}/g" "$file"
         UPDATED=1
         echo "  Updated **Version:** text in $file"
     fi
 
     # Update "| \`VERSION\` | \`X.Y.Z\` |" text in tables
-    if grep -q "| \`VERSION\` | \`[0-9]\+\.[0-9]\+\.[0-9]\+\` |" "$file" 2>/dev/null; then
+    if [[ "$content" =~ \|\ \`VERSION\`\ \|\ \`[0-9]+\.[0-9]+\.[0-9]+\`\ \| ]]; then
         sed -i "s/| \`VERSION\` | \`[0-9]\+\.[0-9]\+\.[0-9]\+\` |/| \`VERSION\` | \`${VERSION}\` |/g" "$file"
         UPDATED=1
         echo "  Updated table VERSION text in $file"
@@ -78,7 +81,9 @@ done
 
 # Update CHANGELOG.md - add unreleased section if missing
 if [[ -f "CHANGELOG.md" ]]; then
-    if ! grep -q "^## \[Unreleased\]" CHANGELOG.md 2>/dev/null; then
+    # perf: replace grep subshell with native bash regex match
+    content=$(<CHANGELOG.md)
+    if [[ ! "$content" =~ (^|$'\n')##\ \[Unreleased\] ]]; then
         sed -i "1a\\\\n## [Unreleased]\n" CHANGELOG.md
         echo "  Added [Unreleased] section to CHANGELOG.md"
         UPDATED=1
