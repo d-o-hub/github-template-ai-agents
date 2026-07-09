@@ -61,6 +61,9 @@ llms.txt
 llms-full.txt
 
 commit*.txt
+pr_body.txt
+pr_*.txt
+*.body.txt
 .mimocode/
 
 # Skill evaluation artifacts
