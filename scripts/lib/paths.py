@@ -1,5 +1,6 @@
 # scripts/lib/paths.py
 # Security Hardening: 2026-07-06 - Expanded forbidden paths.
+# Security Hardening: 2026-07-07 - Case-insensitive forbidden path validation.
 """Path validation utilities for CLI scripts."""
 
 from __future__ import annotations
@@ -72,6 +73,9 @@ FORBIDDEN_PATHS = frozenset({
     ".env.production",
 })
 
+# Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
+FORBIDDEN_PATHS_LOWER = frozenset({p.lower() for p in FORBIDDEN_PATHS})
+
 
 class PathValidationError(Exception):
     """Raised when a path fails safe-path validation."""
@@ -103,7 +107,7 @@ def validate_safe_path(
 
     if check_forbidden and candidate != base_resolved:
         for part in candidate.relative_to(base_resolved).parts:
-            if part in FORBIDDEN_PATHS:
+            if part.lower() in FORBIDDEN_PATHS_LOWER:
                 raise PathValidationError(
                     f"--{param_name} targets a forbidden path: {part}"
                 )
