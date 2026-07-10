@@ -158,11 +158,12 @@ build_invalidation_report() {
         affected=$(get_affected_commands "$file" "$commands_json")
         local count
         # Security: Ignore grep's nonzero exit and ensure count has a default value to prevent duplicate zeros or empty values.
-        # perf: Use wc -l instead of grep -c to eliminate regex parsing overhead
+        # perf: Use native array length evaluation instead of spawning sub-processes like wc -l
         if [[ -z "$affected" ]]; then
             count=0
         else
-            count=$(printf "%s\n" "$affected" | wc -l)
+            IFS_BAK="$IFS"; IFS=$'\n'; set -f; _cmd_arr=($affected); set +f; IFS="$IFS_BAK"
+            count=${#_cmd_arr[@]}
         fi
         count=${count:-0}
 
