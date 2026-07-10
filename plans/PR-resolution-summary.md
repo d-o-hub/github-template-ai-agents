@@ -14,6 +14,7 @@ Three open PRs were analyzed and fixed. No merge conflicts were found (all PRs w
 **Files changed:** 2 (SKILL.md, references/llms.txt)
 
 ### Issues Fixed
+
 1. **Run Tests failure**: `tests/turso-db.bats` expected version `0.6.0` but SKILL.md had `0.6.1`. Updated test to expect `0.6.1`.
 2. **Outdated Critical Rules**: Codacy flagged that Critical Rules about VACUUM and multi-process access were outdated. Updated:
    - "No multi-process access" → "Multi-process access is experimental (multiprocess WAL coordinator)"
@@ -29,6 +30,7 @@ Three open PRs were analyzed and fixed. No merge conflicts were found (all PRs w
 **Note:** This PR was based on an outdated version of main. The Dependabot SHA updates were already superseded by newer versions on main. Rebased onto current main with only the applicable fixes.
 
 ### Issues Fixed
+
 1. **commitlint failure**: Commit message body exceeded line length (100 chars) and total length (1000 chars) limits. Fixed by creating clean commit from main.
 2. **CodeQL SARIF JSON parsing**: Shell-style yamllint comment (`# yamllint disable-line rule:line-length`) was inside a JSON heredoc, causing SARIF upload failures. Removed the comment.
 3. **Category mislabeling**: Hardcoded `category: "/language:javascript"` would mislabel Python analysis results. Changed to `category: shell-scripts`.
@@ -43,11 +45,13 @@ Three open PRs were analyzed and fixed. No merge conflicts were found (all PRs w
 **Files changed:** 14 (13 scripts + tests/test-security-fixes.sh + sentinel.md)
 
 ### Issues Fixed
+
 1. **commitlint failure**: Commit used `security:` type which is not in allowed conventional commit types. Squashed 3 commits into 1 with proper `fix:` type.
 
 **Commit:** `9481c3d` - `fix: harden utility scripts against option injection in awk and wc`
 
 ### Review Comments (Not Fixed - Documented)
+
 - **Codacy**: Flagged that `tests/test-security-fixes.sh` is referenced in PR description but was not visible in the diff at review time. The file IS present on the PR branch.
 - **Codacy**: Concern about `scripts/validate-links.sh` robustness with empty input. This is a pre-existing issue in the script design and was not introduced by this PR. Recommend follow-up investigation.
 
