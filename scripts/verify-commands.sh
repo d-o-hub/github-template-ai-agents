@@ -91,8 +91,9 @@ fi
 
 COMMAND_COUNT=0
 if [[ -n "$DISCOVERED_COMMANDS" ]]; then
-    # perf: Use wc -l instead of grep -c to eliminate regex parsing overhead
-    COMMAND_COUNT=$(printf "%s\n" "$DISCOVERED_COMMANDS" | wc -l || printf "0")
+    # perf: Use native array length evaluation instead of spawning sub-processes like wc -l
+    IFS_BAK="$IFS"; IFS=$'\n'; set -f; _cmd_arr=($DISCOVERED_COMMANDS); set +f; IFS="$IFS_BAK"
+    COMMAND_COUNT=${#_cmd_arr[@]}
 fi
 
 if ! $SILENT; then
@@ -119,8 +120,9 @@ if type get_changed_files &> /dev/null; then
 fi
 CHANGED_COUNT=0
 if [[ -n "$CHANGED_FILES" ]]; then
-    # perf: Use wc -l instead of grep -c to eliminate regex parsing overhead
-    CHANGED_COUNT=$(printf "%s\n" "$CHANGED_FILES" | wc -l || printf "0")
+    # perf: Use native array length evaluation instead of spawning sub-processes like wc -l
+    IFS_BAK="$IFS"; IFS=$'\n'; set -f; _cmd_arr=($CHANGED_FILES); set +f; IFS="$IFS_BAK"
+    CHANGED_COUNT=${#_cmd_arr[@]}
 fi
 
 if ! $SILENT; then
