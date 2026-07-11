@@ -159,8 +159,12 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
                         ((CACHE_HITS++))
                         CACHED=true
 
-                        # Extract category from cached result using jq to handle formatting variations safely
-                        cached_cat=$(printf "%s\n" "$cached_result" | jq -r --arg unknown "$UNKNOWN_CATEGORY" '.category // $unknown' 2>/dev/null || printf "%s\n" "$UNKNOWN_CATEGORY")
+                        # perf: Use native bash regex matching for JSON extraction to eliminate jq subshell fork overhead
+                        if [[ "$cached_result" =~ \"category\":\"([^\"]+)\" ]]; then
+                            cached_cat="${BASH_REMATCH[1]}"
+                        else
+                            cached_cat="$UNKNOWN_CATEGORY"
+                        fi
 
                         # Security: Validate category against whitelist to prevent injection in arithmetic expansion
                         if [[ ! "$cached_cat" =~ ^(safe|conditional|dangerous|$UNKNOWN_CATEGORY)$ ]]; then
@@ -196,10 +200,14 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
 
         # Save to cache
         if type save_cached_result &> /dev/null; then
-            # Security: Use jq to safely generate JSON and prevent injection
-            # Note: We use -c to produce compact JSON. This is crucial for avoiding multi-line issues later
-            result=$(jq -n -c --arg cat "$category" --arg cmd "$cmd" \
-                '{"valid":true, "category":$cat, "command":$cmd}')
+            # perf: Use native string substitution for JSON generation to eliminate jq subshell fork overhead
+            # Note: We produce compact JSON. This is crucial for avoiding multi-line issues later
+            safe_cmd="${cmd//\\/\\\\}"
+            safe_cmd="${safe_cmd//\"/\\\"}"
+            safe_cmd="${safe_cmd//$'\n'/\\n}"
+            safe_cmd="${safe_cmd//$'\r'/\\r}"
+            safe_cmd="${safe_cmd//$'\t'/\\t}"
+            result="{\"valid\":true, \"category\":\"$category\", \"command\":\"$safe_cmd\"}"
             save_cached_result "$cmd" "$file" "$line" "$result" 2>/dev/null || true
         fi
 
