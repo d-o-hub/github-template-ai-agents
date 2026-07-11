@@ -4,12 +4,19 @@ import shutil
 import subprocess
 import sys
 
-QWEN_SKILLS_DIR = ".qwen/skills"
-QWEN_DIR = ".qwen"
-VALIDATE_SKILLS_SCRIPT = "./scripts/validate-skills.sh"
 CLAUDE_SKILLS_DIR = ".claude/skills"
+# Qwen Code's local skill cache: gitignored and intentionally absent from the tracked
+# tree. Tests verify validate-skills.sh doesn't require it.
+QWEN_SKILLS_DIR = ".qwen/skills"
+VALIDATE_SKILLS_SCRIPT = "./scripts/validate-skills.sh"
 
-OPTIONAL_SKILLS = ["eu-ai-act-compliance", "durable-objects"]
+# Domain packs skipped unless LINK_OPTIONAL=true
+OPTIONAL_SKILLS = [
+    "eu-ai-act-compliance",
+    "durable-objects",
+    "cloudflare-worker-api",
+    "turso-db",
+]
 SKILL_MD = ".agents/skills/eu-ai-act-compliance/SKILL.md"
 SKILL_IMPL = ".agents/skills/eu-ai-act-compliance/eu-ai-act-compliance.ts"
 
@@ -19,30 +26,32 @@ def run(cmd, env=None):
     if isinstance(cmd, str):
         cmd = shlex.split(cmd)
     merged_env = {**os.environ, **(env or {})}
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=merged_env)
+    # Popen is invoked with list-form args (never shell=True); inputs are controlled test commands.
+    process = subprocess.Popen(  # nosec B603 # noqa: S603
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=merged_env
+    )
     stdout, stderr = process.communicate()
     return process.returncode, stdout.decode(), stderr.decode()
 
+
 def cleanup():
-    for d in [CLAUDE_SKILLS_DIR, QWEN_SKILLS_DIR]:
-        if os.path.exists(d):
-            # We only want to remove the specific optional skills we added
-            # to avoid breaking other tests if they run in parallel (unlikely here but good practice)
-            for f in OPTIONAL_SKILLS:
-                path = os.path.join(d, f)
-                if os.path.islink(path):
-                    os.unlink(path)
-                elif os.path.isdir(path):
-                    shutil.rmtree(path)
+    if not os.path.exists(CLAUDE_SKILLS_DIR):
+        return
+    for f in OPTIONAL_SKILLS:
+        path = os.path.join(CLAUDE_SKILLS_DIR, f)
+        if os.path.islink(path):
+            os.unlink(path)
+        elif os.path.isdir(path):
+            shutil.rmtree(path)
+
 
 def _test_default_skip() -> bool:
     """Test 1: Optional skills skipped by default."""
     cleanup()
     _, out, _ = run("./scripts/setup-skills.sh")
-    expected_claude = "skip (optional): .claude/skills/eu-ai-act-compliance"
-    expected_qwen = f"skip (optional): {QWEN_SKILLS_DIR}/eu-ai-act-compliance"
-    if expected_claude in out and expected_qwen in out:
-        print("✓ Test 1 Passed: skipped optional skill by default for all CLIs")
+    expected = "skip (optional): .claude/skills/eu-ai-act-compliance"
+    if expected in out and QWEN_SKILLS_DIR not in out:
+        print(f"✓ Test 1 Passed: skipped optional skill by default (Claude only; no {QWEN_SKILLS_DIR})")
         return True
     print("✗ Test 1 Failed: optional skill not skipped correctly")
     print(out)
@@ -53,11 +62,14 @@ def _test_link_optional() -> bool:
     """Test 2: LINK_OPTIONAL=true links optional skills."""
     cleanup()
     _, out, _ = run("./scripts/setup-skills.sh", env={"LINK_OPTIONAL": "true"})
-    expected_claude = "linked: .claude/skills/eu-ai-act-compliance"
-    expected_qwen = f"linked: {QWEN_SKILLS_DIR}/eu-ai-act-compliance"
-    if expected_claude in out and expected_qwen in out:
-        print("✓ Test 2 Passed: linked optional skill when requested for all CLIs")
-        return True
+    expected = "linked: .claude/skills/eu-ai-act-compliance"
+    # may also say skip (exists) if left from prior run
+    alt = "skip (exists): .claude/skills/eu-ai-act-compliance"
+    relinked = "relinked: .claude/skills/eu-ai-act-compliance"
+    if expected in out or alt in out or relinked in out:
+        if os.path.islink(os.path.join(CLAUDE_SKILLS_DIR, "eu-ai-act-compliance")):
+            print("✓ Test 2 Passed: linked optional skill when requested")
+            return True
     print("✗ Test 2 Failed: optional skill not linked correctly")
     print(out)
     return False
@@ -66,7 +78,7 @@ def _test_link_optional() -> bool:
 def _test_validate_missing_optional() -> bool:
     """Test 3: validate-skills.sh handles missing optional skills."""
     cleanup()
-    code, _, err = run(VALIDATE_SKILLS_SCRIPT)
+    code, out, err = run(VALIDATE_SKILLS_SCRIPT)
     if code == 0:
         print("✓ Test 3 Passed: validate-skills.sh handles missing optional skills in CLI dirs")
         return True
@@ -83,17 +95,23 @@ def _test_validate_skill_format() -> bool:
         return False
     bak_md = SKILL_MD + ".bak"
     os.rename(SKILL_MD, bak_md)
-    with open(SKILL_MD, "w") as f:
-        f.write("Invalid content\n")
-    _, _, err = run(VALIDATE_SKILLS_SCRIPT)
-    os.remove(SKILL_MD)
-    os.rename(bak_md, SKILL_MD)
-    if code == 2 and "Must start with '---'" in err:
-        print("✓ Test 4 Passed: validate-skills.sh still checks SKILL.md format")
-        return True
-    print(f"✗ Test 4 Failed: validate-skills.sh did not report error for invalid SKILL.md (code {code})")
-    print(err)
-    return False
+    try:
+        with open(SKILL_MD, "w", encoding="utf-8") as f:
+            f.write("Invalid content\n")
+        code, out, err = run(VALIDATE_SKILLS_SCRIPT)
+        combined = out + err
+        if code == 2 and "Must start with '---'" in combined:
+            print("✓ Test 4 Passed: validate-skills.sh still checks SKILL.md format")
+            return True
+        print(
+            f"✗ Test 4 Failed: validate-skills.sh did not report error for invalid SKILL.md (code {code})"
+        )
+        print(combined)
+        return False
+    finally:
+        if os.path.exists(SKILL_MD):
+            os.remove(SKILL_MD)
+        os.rename(bak_md, SKILL_MD)
 
 
 def _test_ai_act_logger() -> bool:
@@ -105,17 +123,15 @@ def _test_ai_act_logger() -> bool:
     return False
 
 
-def _test_missing_cli_dir() -> bool:
-    """Test 6: validate-skills.sh handles missing CLI directory."""
+def _test_no_qwen_skills_required() -> bool:
+    """Test 6: validate-skills.sh does not require the qwen skills dir."""
     if os.path.exists(QWEN_SKILLS_DIR):
         shutil.rmtree(QWEN_SKILLS_DIR)
-    if os.path.exists(QWEN_DIR) and not os.listdir(QWEN_DIR):
-        os.rmdir(QWEN_DIR)
-    code, _, err = run(VALIDATE_SKILLS_SCRIPT)
-    if code == 0:
-        print("✓ Test 6 Passed: validate-skills.sh passes when a CLI directory is entirely missing")
+    code, out, err = run(VALIDATE_SKILLS_SCRIPT)
+    if code == 0 and QWEN_SKILLS_DIR not in (out + err):
+        print(f"✓ Test 6 Passed: validate-skills.sh does not require {QWEN_SKILLS_DIR}")
         return True
-    print(f"✗ Test 6 Failed: validate-skills.sh failed on missing CLI directory (code {code})")
+    print(f"✗ Test 6 Failed: validate-skills.sh failed without {QWEN_SKILLS_DIR} (code {code})")
     print(err)
     return False
 
@@ -126,7 +142,7 @@ _TESTS = [
     _test_validate_missing_optional,
     _test_validate_skill_format,
     _test_ai_act_logger,
-    _test_missing_cli_dir,
+    _test_no_qwen_skills_required,
 ]
 
 
@@ -137,6 +153,7 @@ def test():
             return False
     print("\nAll Optional Skills Tests Passed!")
     return True
+
 
 if __name__ == "__main__":
     if not test():

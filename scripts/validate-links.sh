@@ -1,51 +1,29 @@
 #!/usr/bin/env bash
-# Validates reference links in SKILL.md, top-level docs, agents-docs, and llms*.txt files.
-# Checks that all markdown links point to existing files.
-# Checks for consistent reference format in SKILL.md: `references?/filename.md` - Description
-# Exit 0 if all links valid, non-zero if broken links or format errors found.
+# Validate markdown links in SKILL.md, top-level docs, agents-docs, llms*.txt.
+# Also checks SKILL.md reference bullet format. Exit non-zero on broken links.
 # shellcheck disable=SC2094
 set -uo pipefail
 
-# Color codes for output
-# These use ANSI escape sequences to provide visual feedback:
-# - RED for errors (broken links, format violations)
-# - GREEN for success (valid links)
-# - YELLOW for warnings (missing files, skipped checks)
-# - NC (No Color) resets formatting to prevent color bleeding
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Resolve repository root using BASH_SOURCE to handle being called from any directory
-# This makes the script portable - works whether run from repo root or scripts folder
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$REPO_ROOT/.agents/skills"
 AGENTS_DOCS_DIR="$REPO_ROOT/agents-docs"
 
-# Performance optimization: Pre-resolve REPO_ROOT once
-# This avoids hundreds of realpath/subshell calls during link validation
 RESOLVED_ROOT=""
 if command -v realpath &> /dev/null; then
     RESOLVED_ROOT=$(realpath -m "$REPO_ROOT")
 fi
 
-# Counters for the final summary report
-# We track these across all files to provide actionable statistics
 BROKEN_COUNT=0
 FORMAT_ERRORS=0
 FILES_CHECKED=0
 LINKS_CHECKED=0
 
-# Regex to match markdown links: [text](path)
-# Captures two groups: [1]=link text, [2]=link destination
-# Example: [SKILLS.md](agents-docs/SKILLS.md) -> BASH_REMATCH[1]=SKILLS.md, BASH_REMATCH[2]=agents-docs/SKILLS.md
 LINK_REGEX='\[([^]]+)\]\(([^)]+)\)'
-
-# Regex to detect deprecated @references format
-# The @ prefix was replaced with backtick format to avoid shell interpretation issues
-# This pattern catches @reference/filename.md or @references/filename.md
-# Why deprecated? @ looks like a mention, backticks clearly indicate code/ reference format
 AT_REF_REGEX='@references?/[^[:space:]]+'
 
 # Regex to validate proper reference format: - `references?/filename.md` - description
@@ -233,9 +211,7 @@ current_skill_file=""
 file_broken=0
 file_format_errors=0
 
-# Process all files with a single awk call.
-# Format: FILENAME:LINE_NUM:IN_REF:CONTENT
-
+# awk format: FILENAME:LINE_NUM:IN_REF:CONTENT (skip awk when no files)
 if [[ ${#SKILL_FILES[@]} -gt 0 ]]; then
 
 old_opts="$-"
@@ -390,6 +366,11 @@ shopt -u nullglob
 
 # Combine all non-skill docs into one array
 ALL_DOCS_FILES=("${TOPLEVEL_FILES[@]}" "${LLMS_FILES[@]}" "${AGENTS_DOCS_FILES[@]}")
+
+if [[ ${#SKILL_FILES[@]} -eq 0 && ${#ALL_DOCS_FILES[@]} -eq 0 ]]; then
+    printf "%b\n" "${YELLOW}⚠${NC} No markdown files found to validate."
+    exit 0
+fi
 
 if [[ ${#ALL_DOCS_FILES[@]} -gt 0 ]]; then
     current_file=""

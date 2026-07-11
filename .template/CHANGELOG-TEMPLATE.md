@@ -7,45 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.11] - 2026-07-11
+
 ### Added
 
-- feat(harness): add Agent Teams, Dynamic Workflows, and Worktrees guide (`AGENT_TEAMS_GUIDE.md`)
-- feat(harness): add behavioral defaults reference doc (`BEHAVIORAL_DEFAULTS.md`)
-- feat(harness): add observability section to HARNESS.md
+- feat(skills): shared `scripts/lib/skill-dirs.sh` for CLI dirs + optional domain packs
+- feat(skills): setup-skills reconcile mode (prune broken, workspace, renamed, unrequested optional)
+- feat(skills): validate-skills fails on broken/orphan CLI skill symlinks
+- feat(docs): Day-1 checklist in QUICKSTART (bootstrap without GOAP/ADR)
+- feat(docs): version model table (template CHANGELOG vs project `VERSION`)
+- feat(plans): restore `plans/GOAP_STATE.md` and fix `_status.json` next ADR pointer
+- feat(harness): Agent Teams, Dynamic Workflows, and Worktrees guide (`AGENT_TEAMS_GUIDE.md`)
+- feat(harness): behavioral defaults reference (`BEHAVIORAL_DEFAULTS.md`)
+- feat(harness): observability section in HARNESS.md
 
 ### Changed
 
-- refactor(harness): trim AGENTS.md from 200 to 155 lines; move detailed sections to agents-docs/
-- docs(harness): add MCP Tool Search guidance to HARNESS.md and CONTEXT.md
-- docs(harness): add parallel capabilities column to Supported AI Agents table
-- docs(agent-coordination): add native capabilities vs. custom coordination comparison table
-- fix(paths): harden path validation by protecting critical root files
-- refactor(template): move `templates/` to `.template/` for cleaner root structure
-- fix(portability): replace `realpath --relative-to` with portable function in setup-skills.sh
-- fix(portability): add Bash 4+ guard for `declare -A` in lint_cache.sh with graceful fallback
-- fix(portability): wrap `python3` calls in `command -v` guards in quality_gate.sh
-- fix(portability): remove GNU `xargs -r` flag from loc_gate.sh, eval-skills.sh, discover-commands.sh, lint_cache.sh
-- fix(portability): replace GNU `date -d` with portable date detection in archive-stale-plans.sh
-- fix(hooks): remove install-hooks.sh (superseded by bootstrap.sh + .githooks/)
-- fix(template): remove hardcoded org fallback in cleanup-ci-status-prs.sh
-- fix(hooks): downgrade global hooks check from error to warning in validate-git-hooks.sh
-- fix(ci): add skill existence condition to sync-turso-skill.yml workflow
-- perf(ci): add concurrency groups to markdown-lint, yaml-lint, commitlint, gitleaks workflows
-- fix(template): derive PROJECT_NAME from git in .envrc instead of hardcoding
-- fix(template): read VERSION from file in agent-toolkit.sh instead of hardcoding
+- refactor(skills): remove `.qwen/skills/` — Qwen Code reads `.agents/skills/` directly
+- refactor(skills): expand optional domain packs (Cloudflare, Turso, reader/PWA, EU AI Act, Codeberg, …)
+- docs(version): clarify template badge in README vs consumer `VERSION` propagation
+- docs(migration): slim `migration-guide.md` to optional packs; full path remains `MIGRATION.md`
+- fix(ci): long-stale CI status without `gh` is a non-fatal warning (ADR-028)
+- refactor(harness): trim AGENTS.md; move detail to agents-docs/
+- docs(harness): MCP Tool Search guidance; parallel capabilities column
+- fix(portability): portable path/date/xargs/python guards across scripts
+- refactor(template): move `templates/` to `.template/`
+- perf(ci): concurrency groups on lint/gitleaks workflows
 
 ### Fixed
 
-- fix(refs): replace broken task-decomposition/github-readme skill references with goap-agent/readme-best-practices
-- docs(agents): regenerate AGENTS.md skills table from catalog (17 categories, 56 skills)
-- fix(version): agent-toolkit.sh reads VERSION file instead of hardcoding
-- feat(validate): extend link-check to top-level docs and agents-docs/
-- fix(links): resolve broken relative links in agents-docs/MIGRATION.md and AGENTS_REGISTRY.md
-- chore: gitignore eval workspaces; remove 354 committed eval artifacts
-- docs: align AGENTS.md line-limit guidance to 200 in CONTRIBUTING.md
-- docs: sync QUICKSTART bootstrap output with bootstrap.sh
-- chore: fix .gitignore malformed pattern and dedupe entries
-- chore: remove duplicate comment block in quality_gate.sh
+- fix(skills): prune 65+ broken CLI symlinks (`*-workspace`, renamed skills)
+- fix(skills): doctor detects broken `.claude/skills` links
+- fix(links): empty discovery path in validate-links (no hang on empty file lists)
+- fix(validate): Gemini TOML validator works on Python 3.10 via tomli fallback
+- fix(plans): refresh pre-existing-issues and monthly-eval skill rename (anti-ai-slop → avoid-ai-writing)
+- fix(refs): task-decomposition/github-readme → goap-agent/readme-best-practices
+- docs(agents): regenerate skills catalog; gitignore eval workspaces
+- chore: .gitignore `.qwen/skills/`; stop committing eval workspace symlinks
 
 ## [0.2.10] - 2026-05-29
 
