@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-011"
+    "adr": "adr-030"
   },
   "active_plan": "plans/GOAP_STATE.md",
   "phases": [],
@@ -39,5 +39,6 @@
       "status": "accepted",
       "date": "2026-06-19"
     }
-  }
+  },
+  "notes": "ADR numbers 012-026 were never assigned in this repo history (gap is intentional)."
 }
