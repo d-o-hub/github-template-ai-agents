@@ -71,6 +71,15 @@ FORBIDDEN_PATHS = frozenset({
     ".env.development",
     ".env.test",
     ".env.production",
+    ".sh_history",
+    ".lesshst",
+    ".viminfo",
+    ".mysql_history",
+    ".psql_history",
+    ".sqlite_history",
+    "terraform.tfstate",
+    "terraform.tfstate.backup",
+    ".terraform",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
