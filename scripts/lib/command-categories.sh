@@ -8,7 +8,7 @@ set -euo pipefail
 SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get:ls:cat:echo:grep:find:pwd:diff:cd:head:tail:sort:uniq:wc:git:log:pgrep:type:which:df:du:free:top:ps:history}"
 CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl:ssh-keygen:openssl:gpg:mv:cp:ln:link:patch:tar:zip:unzip:gzip:gunzip:bzip2:xz:make:touch:gh:xargs:apt:apt-get:yum:dnf:zypper:brew:pipx}"
 # Destructive and administrative commands (strict boundaries)
-DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:killall:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown:pkill:sed:truncate:unlink:tee:parted:fdisk:gdisk:sfdisk:wipe:srm:badblocks:alias:unalias:iptables:nft:ufw:firewall-cmd:crontab:pkexec:mount:umount:chroot:unshare:nsenter:git-remote-ext:poweroff:halt:swapon:swapoff:modprobe:insmod:rmmod:sysctl:strace:gdb:-f:-y}"
+DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:killall:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown:pkill:sed:truncate:unlink:tee:parted:fdisk:gdisk:sfdisk:wipe:srm:badblocks:alias:unalias:iptables:nft:ufw:firewall-cmd:crontab:pkexec:mount:umount:chroot:unshare:nsenter:git-remote-ext:poweroff:halt:swapon:swapoff:modprobe:insmod:rmmod:sysctl:strace:gdb:chattr:setenforce:iptables-save:iptables-restore:write:wall:-f:-y}"
 # Language interpreters (broad boundaries to catch versioned ones like python3.11)
 INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:pip3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip:composer:bundle:pipenv:poetry:conda:mamba:uv:lua:awk}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
@@ -77,7 +77,7 @@ categorize_command() {
 
     # Specific check for dot (.) as source command
     # Matches ". " at start of string or after a separator
-    if [[ "$cmd_lower" =~ (^|[[:space:]]|[|&;()<>,\/:])\.[[:space:]] ]]; then
+    if [[ "$cmd_lower" =~ (^|[|&;()<>,\/:])[[:space:]]*\.[[:space:]] ]]; then
         printf "dangerous\n"
         return 0
     fi
