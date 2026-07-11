@@ -1,29 +1,19 @@
 #!/usr/bin/env bash
-# Creates symlinks from CLI-specific folders -> .agents/skills/ (canonical source)
+# Creates and reconciles symlinks from CLI-specific folders -> .agents/skills/
 # Run once after cloning: ./scripts/setup-skills.sh
-# Note: OpenCode reads skills directly from .agents/skills/ - no symlinks needed.
+# Note: Qwen, OpenCode, Gemini, Jules read skills directly from .agents/skills/
+#       — no symlinks for those tools.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)"
 SKILLS_SRC="$REPO_ROOT/.agents/skills"
 
-# CLI folders that should contain symlinks to canonical skills
-# (OpenCode reads directly from .agents/skills/ - not included here)
-# (Qwen CLI also reads directly from .agents/skills/ - directory created for consistency)
-SKILLS_OPTIONAL=(
-  "eu-ai-act-compliance"
-  "durable-objects"
-)
-
-CLI_SKILL_DIRS=(
-  ".claude/skills"
-  ".qwen/skills"
-)
+# shellcheck source=scripts/lib/skill-dirs.sh
+source "$REPO_ROOT/scripts/lib/skill-dirs.sh"
 
 # Portable relative path computation (works on macOS/BSD without GNU realpath)
 _portable_relpath() {
     local target="$1" base="$2"
-    # Normalize: resolve symlinks if possible, fall back to cd+pwd
     target=$(cd "$target" 2>/dev/null && pwd || echo "$target")
     base=$(cd "$base" 2>/dev/null && pwd || echo "$base")
 
@@ -57,37 +47,73 @@ for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
   target_dir="$REPO_ROOT/$cli_dir"
   mkdir -p -- "$target_dir"
 
-  # Performance optimization: Pre-calculate relative path base once per target dir
-  # to avoid O(N) subshell calls in the inner loop.
   rel_base=$(_portable_relpath "$SKILLS_SRC" "$target_dir")
 
+  # --- Reconcile: remove broken, workspace, stale, and unrequested optional links ---
+  shopt -s nullglob
+  for existing in "$target_dir"/*; do
+    name="${existing##*/}"
+
+    # Always remove eval workspaces and known skip patterns
+    if skill_name_is_skipped "$name"; then
+      rm -f -- "$existing" 2>/dev/null || true
+      printf "  pruned (skip pattern): %s/%s\n" "$cli_dir" "$name"
+      continue
+    fi
+
+    # Remove broken symlinks
+    if [[ -L "$existing" ]] && [[ ! -e "$existing" ]]; then
+      rm -f -- "$existing"
+      printf "  pruned (broken): %s/%s\n" "$cli_dir" "$name"
+      continue
+    fi
+
+    # Remove optional skills when LINK_OPTIONAL is not true
+    if skill_name_is_optional "$name" && [[ "${LINK_OPTIONAL:-false}" != "true" ]]; then
+      if [[ -L "$existing" ]]; then
+        rm -f -- "$existing"
+        printf "  pruned (optional): %s/%s\n" "$cli_dir" "$name"
+      fi
+      continue
+    fi
+
+    # Remove links that no longer map to a canonical skill directory
+    if [[ -L "$existing" ]] && [[ ! -d "$SKILLS_SRC/$name" ]]; then
+      rm -f -- "$existing"
+      printf "  pruned (no canonical skill): %s/%s\n" "$cli_dir" "$name"
+      continue
+    fi
+  done
+  shopt -u nullglob
+
+  # --- Create missing links for core (and optional when requested) skills ---
   for skill_path in "$SKILLS_SRC"/*/; do
     [ -d "$skill_path" ] || continue
 
-    # Performance optimization: Use Bash parameter expansion instead of basename
     skill_name="${skill_path%/}"
     skill_name="${skill_name##*/}"
 
-    # Check if skill is optional
-    is_optional=false
-    for opt in "${SKILLS_OPTIONAL[@]}"; do
-      if [[ "$skill_name" == "$opt" ]]; then
-        is_optional=true
-        break
-      fi
-    done
+    if skill_name_is_skipped "$skill_name"; then
+      continue
+    fi
 
-    if [[ "$is_optional" == true ]] && [[ "${LINK_OPTIONAL:-false}" != "true" ]]; then
+    if skill_name_is_optional "$skill_name" && [[ "${LINK_OPTIONAL:-false}" != "true" ]]; then
       printf "  skip (optional): %s/%s\n" "$cli_dir" "$skill_name"
       continue
     fi
 
     link="$target_dir/$skill_name"
-    # Performance optimization: Use pre-calculated base
     rel="$rel_base/$skill_name"
 
     if [[ -L "$link" ]]; then
-      printf "  skip (exists): %s/%s\n" "$cli_dir" "$skill_name"
+      # Repair wrong target if needed
+      current=$(readlink -- "$link" 2>/dev/null || true)
+      if [[ "$current" != "$rel" ]]; then
+        ln -sfn -- "$rel" "$link"
+        printf "  relinked: %s/%s -> %s\n" "$cli_dir" "$skill_name" "$rel"
+      else
+        printf "  skip (exists): %s/%s\n" "$cli_dir" "$skill_name"
+      fi
     elif [[ -d "$link" ]]; then
       printf "  WARN: real dir exists at %s/%s - skipping\n" "$cli_dir" "$skill_name"
     else
@@ -98,4 +124,5 @@ for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
 done
 
 printf "\n"
-printf "Skill symlinks created. Run scripts/validate-skills.sh to verify.\n"
+printf "Skill symlinks reconciled. Run scripts/validate-skills.sh to verify.\n"
+printf "Tip: LINK_OPTIONAL=true ./scripts/setup-skills.sh links domain skill packs.\n"

@@ -5,17 +5,28 @@
 ## Canonical Location
 
 All skills live in `.agents/skills/` (the canonical source).
-Claude Code and Qwen Code use symlinks; Gemini CLI and OpenCode read directly:
+Claude Code uses per-skill symlinks; Qwen Code, Gemini CLI, OpenCode, and Jules
+read `.agents/skills/` directly:
 
 ```text
 .agents/skills/<name>/          <- CANONICAL (all agents read from here)
 .claude/skills/<name>           -> symlink -> ../../.agents/skills/<name>
-.qwen/skills/<name>             -> symlink -> ../../.agents/skills/<name>
 ```
 
-Run `./scripts/setup-skills.sh` after cloning to create symlinks
-for Claude Code and Qwen Code.
+Run `./scripts/setup-skills.sh` after cloning to create/reconcile Claude symlinks
+(prunes broken, workspace, renamed, and unrequested optional links).
 Run `./scripts/validate-skills.sh` to verify integrity.
+
+### Core vs domain skill packs
+
+Core workflow/quality skills are linked by default. Domain packs
+(Cloudflare, Turso, document reader, PWA, EU AI Act, Codeberg, …) are **optional**:
+
+```bash
+LINK_OPTIONAL=true ./scripts/setup-skills.sh
+```
+
+Shared lists live in `scripts/lib/skill-dirs.sh`.
 
 ## Why .agents/ as Canonical?
 

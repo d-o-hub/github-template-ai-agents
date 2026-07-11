@@ -10,16 +10,8 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_SRC="$REPO_ROOT/.agents/skills"
 # shellcheck source=lib/skill-validation.sh
 source "$REPO_ROOT/scripts/lib/skill-validation.sh"
-
-SKILLS_OPTIONAL=(
-  "eu-ai-act-compliance"
-  "durable-objects"
-)
-
-CLI_SKILL_DIRS=(
-  ".claude/skills"
-  ".qwen/skills"
-)
+# shellcheck source=lib/skill-dirs.sh
+source "$REPO_ROOT/scripts/lib/skill-dirs.sh"
 
 FAILED=0
 WARNINGS=0
@@ -50,52 +42,38 @@ for skill_path in "$SKILLS_SRC"/*/; do
     skill_name="${skill_name##*/}"
     
     # Skip consolidated/backup folders, eval workspace directories, and skills-evaluation
-    if [[ "$skill_name" == _* ]] || [[ "$skill_name" == *-workspace ]] || [[ "$skill_name" == skills-evaluation ]]; then
+    if skill_name_is_skipped "$skill_name"; then
         continue
     fi
-    
+
     # Check 1: SKILL.md format and frontmatter
     skill_file="${skill_path}SKILL.md"
     if ! validate_skill_file "$skill_file"; then
-        # Check if it was a failure or just a warning (validate_skill_file returns non-zero for errors)
-        # Note: validate_skill_file in library handles printing the status line
         FAILED=1
     else
-        # If valid, print the success line like validate-skill-format.sh does
         printf "  ${GREEN}✓${NC} %s: %s lines\n" "$skill_name" "$SKILL_LINE_COUNT"
     fi
 
     # Check 2: Circular symlink detection for the skill directory
-    # On Windows, we skip this check as MSYS/Cygwin symlinks appear as files
     if [[ "$IS_WINDOWS" == "false" ]] && [[ -L "$skill_path" ]]; then
         printf "  ${RED}✗${NC} %s: Circular symlink detected\n" "$skill_name" >&2
         FAILED=1
     fi
 
-    # Check 3: Validate CLI symlinks
-    # Performance optimization: Pre-calculate expected target once per skill
+    # Check 3: Validate CLI symlinks for core skills (optional may be absent)
     expected_target=""
     if { [[ "${CHECK_SYMLINK_TARGETS:-false}" == "true" ]] || [[ -n "${CI:-}" ]]; } && [[ "$HAS_READLINK_F" -eq 1 ]]; then
         expected_target=$(readlink -f -- "$skill_path" 2>/dev/null || printf "")
     fi
 
     for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
-        # Skip validation if the CLI skill directory doesn't exist
         if [[ ! -d "$REPO_ROOT/$cli_dir" ]]; then
             continue
         fi
 
         link="$REPO_ROOT/$cli_dir/$skill_name"
 
-        # Skip optional skills that are not linked
-        is_optional=false
-        for opt in "${SKILLS_OPTIONAL[@]}"; do
-            if [[ "$skill_name" == "$opt" ]]; then
-                is_optional=true
-                break
-            fi
-        done
-        if [[ "$is_optional" == true ]] && [[ ! -L "$link" ]] && [[ ! -f "$link" ]]; then
+        if skill_name_is_optional "$skill_name" && [[ ! -L "$link" ]] && [[ ! -f "$link" ]]; then
             continue
         fi
 
@@ -103,13 +81,9 @@ for skill_path in "$SKILLS_SRC"/*/; do
             printf "  ${RED}✗${NC} MISSING symlink: %s/%s\n" "$cli_dir" "$skill_name" >&2
             FAILED=1
         elif [[ ! -d "$link" ]] && { [[ "$IS_WINDOWS" == "false" ]] || [[ ! -f "$link" ]]; }; then
-            # Optimized: check if target exists without subshell if possible
-            # -d on a symlink already checks target existence
             printf "  ${RED}✗${NC} BROKEN symlink: %s/%s\n" "$cli_dir" "$skill_name" >&2
             FAILED=1
         else
-            # Verify symlink points to correct location
-            # Only do this expensive check if explicitly requested or in CI
             if [[ -n "$expected_target" ]]; then
                 target=$(readlink -f -- "$link" 2>/dev/null || printf "")
 
@@ -124,6 +98,33 @@ for skill_path in "$SKILLS_SRC"/*/; do
     done
 done
 
+# Check 3b: Fail on any broken or orphan symlinks remaining in CLI skill dirs
+echo ""
+echo "Checking CLI skill dirs for broken/orphan symlinks..."
+for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
+    target_dir="$REPO_ROOT/$cli_dir"
+    [[ -d "$target_dir" ]] || continue
+    shopt -s nullglob
+    for entry in "$target_dir"/*; do
+        name="${entry##*/}"
+        if skill_name_is_skipped "$name"; then
+            printf "  ${RED}✗${NC} STALE entry (should not exist): %s/%s\n" "$cli_dir" "$name" >&2
+            FAILED=1
+            continue
+        fi
+        if [[ -L "$entry" ]] && [[ ! -e "$entry" ]]; then
+            printf "  ${RED}✗${NC} BROKEN symlink: %s/%s\n" "$cli_dir" "$name" >&2
+            FAILED=1
+            continue
+        fi
+        if [[ -L "$entry" ]] && [[ ! -d "$SKILLS_SRC/$name" ]]; then
+            printf "  ${RED}✗${NC} ORPHAN symlink (no canonical skill): %s/%s\n" "$cli_dir" "$name" >&2
+            FAILED=1
+        fi
+    done
+    shopt -u nullglob
+done
+
 # Check 4: Authoring compliance checks (per-skill SKILL.md requirements)
 echo ""
 echo "Checking skill authoring compliance..."
@@ -133,8 +134,7 @@ for skill_path in "$SKILLS_SRC"/*/; do
     skill_name="${skill_path%/}"
     skill_name="${skill_name##*/}"
 
-    # Skip consolidated/backup folders, eval workspace directories, and skills-evaluation
-    if [[ "$skill_name" == _* ]] || [[ "$skill_name" == *-workspace ]] || [[ "$skill_name" == skills-evaluation ]]; then
+    if skill_name_is_skipped "$skill_name"; then
         continue
     fi
 
@@ -264,7 +264,8 @@ if [[ $FAILED -ne 0 ]]; then
     echo -e "${RED}│ ✗ Skill Validation FAILED                                     │${NC}"
     echo -e "${RED}─────────────────────────────────────────────────────────────────${NC}"
     echo ""
-    echo "Run: ./scripts/setup-skills.sh to fix missing symlinks."
+    echo "Run: ./scripts/setup-skills.sh to reconcile symlinks (prunes broken/stale)."
+    echo "Tip: LINK_OPTIONAL=true ./scripts/setup-skills.sh for domain skill packs."
     echo "See: agents-docs/SKILLS.md for skill authoring guide."
     exit 2
 fi

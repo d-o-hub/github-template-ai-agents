@@ -35,7 +35,7 @@ Per the skill-evaluator spec, workspaces live inside `.agents/skills/`:
 | agent-browser | 3/3 (100%) | 2/3 (67%) | +1 | PASS |
 | agent-coordination | 3/3 (100%) | 2/3 (67%) | +1 | PASS |
 | agents-md | 3/3 (100%) | 3/3 (100%) | 0 | PASS |
-| anti-ai-slop | 3/3 (100%) | 3/3 (100%) | 0 | PASS |
+| avoid-ai-writing (was anti-ai-slop) | 3/3 (100%) | 3/3 (100%) | 0 | PASS |
 
 **Average delta**: +0.4 assertions
 **Key finding**: agent-browser and agent-coordination show skill value (snapshot refs and quality gates respectively)
