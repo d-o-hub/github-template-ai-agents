@@ -41,6 +41,7 @@ skill_name_is_skipped() {
     # shellcheck disable=SC2254
     case "$skill_name" in
       $pattern) return 0 ;;
+      *) : ;;
     esac
   done
   return 1

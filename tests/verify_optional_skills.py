@@ -5,6 +5,9 @@ import subprocess
 import sys
 
 CLAUDE_SKILLS_DIR = ".claude/skills"
+# Qwen Code's local skill cache: gitignored and intentionally absent from the tracked
+# tree. Tests verify validate-skills.sh doesn't require it.
+QWEN_SKILLS_DIR = ".qwen/skills"
 VALIDATE_SKILLS_SCRIPT = "./scripts/validate-skills.sh"
 
 # Domain packs skipped unless LINK_OPTIONAL=true
@@ -47,8 +50,8 @@ def _test_default_skip() -> bool:
     cleanup()
     _, out, _ = run("./scripts/setup-skills.sh")
     expected = "skip (optional): .claude/skills/eu-ai-act-compliance"
-    if expected in out and ".qwen/skills" not in out:
-        print("✓ Test 1 Passed: skipped optional skill by default (Claude only; no .qwen/skills)")
+    if expected in out and QWEN_SKILLS_DIR not in out:
+        print(f"✓ Test 1 Passed: skipped optional skill by default (Claude only; no {QWEN_SKILLS_DIR})")
         return True
     print("✗ Test 1 Failed: optional skill not skipped correctly")
     print(out)
@@ -121,14 +124,14 @@ def _test_ai_act_logger() -> bool:
 
 
 def _test_no_qwen_skills_required() -> bool:
-    """Test 6: validate-skills.sh does not require .qwen/skills."""
-    if os.path.exists(".qwen/skills"):
-        shutil.rmtree(".qwen/skills")
+    """Test 6: validate-skills.sh does not require the qwen skills dir."""
+    if os.path.exists(QWEN_SKILLS_DIR):
+        shutil.rmtree(QWEN_SKILLS_DIR)
     code, out, err = run(VALIDATE_SKILLS_SCRIPT)
-    if code == 0 and ".qwen/skills" not in (out + err):
-        print("✓ Test 6 Passed: validate-skills.sh does not require .qwen/skills")
+    if code == 0 and QWEN_SKILLS_DIR not in (out + err):
+        print(f"✓ Test 6 Passed: validate-skills.sh does not require {QWEN_SKILLS_DIR}")
         return True
-    print(f"✗ Test 6 Failed: validate-skills.sh failed without .qwen/skills (code {code})")
+    print(f"✗ Test 6 Failed: validate-skills.sh failed without {QWEN_SKILLS_DIR} (code {code})")
     print(err)
     return False
 
