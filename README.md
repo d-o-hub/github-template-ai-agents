@@ -4,7 +4,7 @@
 > delivery with shared instructions, quality gates, and low-context-rot workflows.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Template Version](https://img.shields.io/badge/version-0.2.10-blue)](.template/CHANGELOG-TEMPLATE.md)
+[![Template Version](https://img.shields.io/badge/version-0.2.11-blue)](.template/CHANGELOG-TEMPLATE.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Best for:** maintainers who use Claude Code, Gemini CLI, OpenCode, Qwen Code, Jules,
@@ -60,7 +60,7 @@ Use this template when you want a repository structure that survives:
 | Tool | Root config | Skills source | Integration style |
 |---|---|---|---|
 | **Claude Code** | `CLAUDE.md` | `.claude/skills/` → individual symlinks to `.agents/skills/` | Override file + per-skill symlinks |
-| **Qwen Code** | `QWEN.md` | `.qwen/skills/` → individual symlinks to `.agents/skills/` | Override file + per-skill symlinks |
+| **Qwen Code** | `QWEN.md` | `.agents/skills/` (direct read) | Override file + direct canonical path |
 | **Gemini CLI** | `GEMINI.md` + `.gemini/config.yaml` | `.agents/skills/` (direct read) | Override file + direct canonical path |
 | **OpenCode** | `opencode.json` | `.agents/skills/` (direct read) | JSON config + direct canonical path |
 | **Jules** | `JULES.md` + `.jules/*.md` | `.agents/skills/` (direct read) | Override file + direct canonical path |
@@ -80,9 +80,8 @@ flowchart TD
     A["AGENTS.md<br/>canonical instructions"] --> B["Tool overrides<br/>CLAUDE.md / GEMINI.md<br/>QWEN.md / JULES.md"]
     A --> C[".agents/skills/<br/>canonical skills"]
     C --> D[".claude/skills<br/>per-skill symlinks"]
-    C --> E[".qwen/skills<br/>per-skill symlinks"]
     C --> F[".windsurf/skills<br/>directory symlink"]
-    C --> G["Gemini / OpenCode / Jules / CommandCode<br/>direct reads"]
+    C --> G["Qwen / Gemini / OpenCode / Jules / CommandCode<br/>direct reads"]
     B --> H[".cursorrules<br/>Cursor adapter"]
     A --> I["Scripts & hooks"]
     I --> J["pre-commit quality gate<br/>scripts/quality_gate.sh"]
@@ -178,8 +177,8 @@ AGENTS.md → Single source of truth
 
 ### Skills with Progressive Disclosure
 
-Skills live canonically in `.agents/skills/`. Claude Code and Qwen Code use per-skill
-symlinks; Windsurf uses a directory symlink; Gemini CLI, OpenCode, and Jules read
+Skills live canonically in `.agents/skills/`. Claude Code uses per-skill symlinks;
+Windsurf uses a directory symlink; Qwen Code, Gemini CLI, OpenCode, and Jules read
 directly from `.agents/skills/`:
 
 ```text
@@ -189,9 +188,26 @@ directly from `.agents/skills/`:
 └── readme-best-practices/
 
 .claude/skills/           # Per-skill symlinks → ../../.agents/skills/<skill>
-.qwen/skills/             # Per-skill symlinks → ../../.agents/skills/<skill>
 .windsurf/skills          # Directory symlink → ../.agents/skills
 ```
+
+**Domain packs** (Cloudflare, Turso, reader/PWA, EU AI Act, Codeberg, …) stay in
+`.agents/skills/` but are optional for Claude symlinks. Link them with:
+
+```bash
+LINK_OPTIONAL=true ./scripts/setup-skills.sh
+```
+
+### Versioning (template vs your project)
+
+| What | Where | Who uses it |
+|------|-------|-------------|
+| **Template release** | `.template/CHANGELOG-TEMPLATE.md` + badge above | Template maintainers / adopters reading this repo |
+| **Project version** | `VERSION` (starts at `0.0.0`) | Your codebase after you use this template |
+
+When you create a repo from this template, set `VERSION` to your app version and run
+`./scripts/propagate-version.sh` — that updates **your** `README.md` badge from `VERSION`.
+Template history stays in `.template/CHANGELOG-TEMPLATE.md` (safe to remove downstream).
 
 ### Sub-Agent Patterns
 
