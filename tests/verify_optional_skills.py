@@ -27,7 +27,7 @@ def run(cmd, env=None):
         cmd = shlex.split(cmd)
     merged_env = {**os.environ, **(env or {})}
     # Popen is invoked with list-form args (never shell=True); inputs are controlled test commands.
-    process = subprocess.Popen(  # nosec B603
+    process = subprocess.Popen(  # nosec B603  # nosemgrep: dangerous-subprocess-use-audit
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=merged_env
     )  # noqa: S603
     stdout, stderr = process.communicate()
