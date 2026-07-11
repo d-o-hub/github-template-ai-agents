@@ -140,9 +140,18 @@ if last_run is not None:
     if age_seconds < 0:
         warnings.append("last_run is in the future relative to this system clock")
     elif age_seconds > max_age_seconds:
-        errors.append(
-            f"{STALE_STATUS_MESSAGE}: age={int(age_seconds)}s max={max_age_seconds}s"
+        # Multi-day staleness without gh: treat as unknown external dep (ADR-028),
+        # not a local fixable error. Still ERROR when gh can compare remote runs.
+        days = int(age_seconds // 86400)
+        msg = (
+            f"{STALE_STATUS_MESSAGE}: age={int(age_seconds)}s "
+            f"max={max_age_seconds}s (~{days}d). Treat status as unknown until "
+            "the next main-branch CI run updates ci-status.json (ADR-028)."
         )
+        if gh_checked:
+            errors.append(msg)
+        else:
+            warnings.append(msg + " (no gh auth — cannot verify remote; non-fatal)")
 
 remote_runs = []
 if gh_checked:

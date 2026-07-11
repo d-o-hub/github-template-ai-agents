@@ -60,24 +60,27 @@ else
   bad ".agents/skills missing (run setup-skills.sh)"
 fi
 
-# Check expected symlinks
-for link in .claude/skills .qwen/skills; do
-  if [[ -L "$link" ]]; then
-    target="$(readlink "$link")"
-    pass "$link -> $target"
-  elif [[ -d "$link" ]]; then
-    # Directory of symlinks rather than a single symlink is also fine
-    if [[ -n "$(find "$link" -maxdepth 1 -type l 2>/dev/null | head -n 1)" ]]; then
-      pass "$link populated with skill symlinks"
-    else
-      warn "$link exists but contains no symlinks (run setup-skills.sh)"
+# Claude Code uses per-skill symlinks; Qwen/Gemini/OpenCode/Jules read .agents/skills/
+if [[ -d .claude/skills ]]; then
+  broken_count=0
+  while IFS= read -r -d '' link; do
+    if [[ ! -e "$link" ]]; then
+      broken_count=$((broken_count + 1))
     fi
-  elif [[ -e "$link" ]]; then
-    bad "$link exists but is NOT a symlink or skills directory"
+  done < <(find .claude/skills -maxdepth 1 -type l -print0 2>/dev/null)
+  if [[ "$broken_count" -gt 0 ]]; then
+    bad ".claude/skills has $broken_count broken symlink(s) (run: ./scripts/setup-skills.sh)"
+  elif [[ -n "$(find .claude/skills -maxdepth 1 -type l 2>/dev/null | head -n 1)" ]]; then
+    pass ".claude/skills populated with skill symlinks"
   else
-    warn "$link not present (run setup-skills.sh if you use this tool)"
+    warn ".claude/skills exists but contains no symlinks (run setup-skills.sh)"
   fi
-done
+else
+  warn ".claude/skills not present (run setup-skills.sh if you use Claude Code)"
+fi
+if [[ -e .qwen/skills ]]; then
+  warn ".qwen/skills present but unused — Qwen reads .agents/skills/ directly (safe to remove)"
+fi
 
 # ---- Git hooks ----
 sect "Git hooks"
