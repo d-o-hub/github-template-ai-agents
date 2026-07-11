@@ -27,11 +27,16 @@ Author runs ./scripts/bump_patch_version.sh
                 └── updates README.md badge to "version-0.0.0"
 ```
 
-**Wait — does that mean the README badge is always `0.0.0`?**
+**Template repo vs consumer repo**
 
-Yes. In a template repo, the README badge shows `VERSION` (0.0.0), not the template's release version. The template's release history is in `.template/CHANGELOG-TEMPLATE.md`. The README badge in a template repo therefore intentionally displays `0.0.0` — it's the consumer-side value, not the template release version.
+| Repo type | README badge shows | Source |
+|-----------|--------------------|--------|
+| **This template** | Template release (e.g. `0.2.11`) | Latest `## [X.Y.Z]` in `.template/CHANGELOG-TEMPLATE.md` (manual badge edit on release) |
+| **Consumer project** | Project version | `VERSION` via `propagate-version.sh` |
 
-If the README should display the template release version (e.g., `0.2.10`), the maintainer manually edits the badge or the propagation script is updated — but updating the script breaks downstream consumers, so manual edits are the conventional approach for templates.
+`VERSION` stays `0.0.0` in the template so new codebases start clean. Do **not**
+change `propagate-version.sh` to read `.template/CHANGELOG-TEMPLATE.md` — that
+script is for consumers.
 
 ## What Goes Wrong
 

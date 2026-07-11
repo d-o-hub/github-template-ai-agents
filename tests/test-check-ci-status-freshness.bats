@@ -38,13 +38,16 @@ PY
     [[ "$output" == *"skipping remote CI comparison"* ]]
 }
 
-@test "stale committed CI status fails" {
+@test "stale committed CI status warns without gh (non-fatal)" {
     write_status_file "$(utc_timestamp_seconds_ago 120)"
 
+    # Without authenticated gh, long-stale status is a WARNING (ADR-028 external dep),
+    # not a local hard failure. Exit 0 so doctor/bootstrap can stay non-blocking.
     run env CI_STATUS_MAX_AGE_SECONDS=1 "$TEST_REPO/scripts/check_ci_status_freshness.sh"
 
-    [ "$status" -eq 1 ]
+    [ "$status" -eq 0 ]
     [[ "$output" == *"CI status is stale"* ]]
+    [[ "$output" == *"WARNING:"* ]] || [[ "$output" == *"non-fatal"* ]]
 }
 
 @test "missing required CI status fields fail validation" {
