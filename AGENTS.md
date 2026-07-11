@@ -76,7 +76,7 @@ Agents use a `SessionStart` hook to auto-inject project context (docs map + late
 
 ## Quality Gate (Required Before Commit)
 
-Use the `static-analysis` skill to triage and fix any findings before committing.
+Use the `static-analysis` skill to triage and fix any findings before committing. For `Codacy Static Code Analysis` CI failures, load the `codacy` skill (`.agents/skills/codacy/SKILL.md`); inspect with `codacy pull-request <N>`, re-trigger with `codacy repository --reanalyze-and-wait`. Drift policy: `agents-docs/codacy-triage-2026-06.md`.
 
 ```bash
 ./scripts/quality_gate.sh # Always run before committing. Fix all errors.
