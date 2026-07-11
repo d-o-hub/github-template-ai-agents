@@ -57,6 +57,20 @@ After setup, you can use the unified `agent-toolkit` CLI instead of calling scri
 If you are starting from scratch, click **"Use this template"** on GitHub before
 cloning. The bootstrap step is the same.
 
+## Day-1 checklist (no GOAP/ADR required)
+
+1. `./scripts/bootstrap.sh` — skills, hooks, quality gate  
+2. `./scripts/doctor.sh` — environment green  
+3. Edit `AGENTS.md` for your project (stack, setup commands)  
+4. Set `VERSION` to your project version (starts at `0.0.0`) and run  
+   `./scripts/propagate-version.sh` so **your** README badge tracks `VERSION`  
+5. Optional domain skills: `LINK_OPTIONAL=true ./scripts/setup-skills.sh`  
+6. Start coding — use GOAP/ADRs only for multi-step work later  
+
+**Version note:** In this *template* repository, the README badge is the
+**template** version (see `.template/CHANGELOG-TEMPLATE.md`). After you fork or
+use the template, `VERSION` becomes the only source for your README badge.
+
 ## Configure for Your Project
 
 Edit `AGENTS.md` to add your project details:

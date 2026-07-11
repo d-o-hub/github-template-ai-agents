@@ -456,7 +456,7 @@ timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
 
 **Root Cause**:
 1. **Missing `setup-skills.sh` step**: The standalone `quality-gate.yml` workflow and test job in `ci-and-labels.yml` didn't run `./scripts/setup-skills.sh` before `validate-skills.sh`
-2. **Missing `.qwen/skills/` symlinks**: Fresh checkout doesn't have any CLI agent symlinks (`.qwen/skills/`, `.claude/skills/`)
+2. **Missing `.claude/skills/` symlinks**: Fresh checkout may lack Claude skill symlinks (Qwen reads `.agents/skills/` directly; no `.qwen/skills/`)
 3. **`validate-skills.sh` fails hard**: Returns exit code 2 when any CLI symlink directory exists but has missing symlinks
 4. **Out-of-date `llms-full.txt`**: Regenerated version differs from committed version, causing drift detection to fail
 5. **Cascading failure**: Test job depends on quality-gate job, so quality-gate failure blocks tests
@@ -475,7 +475,7 @@ timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
 **Prevention**:
 - Any CI job that runs `validate-skills.sh` MUST run `setup-skills.sh` first
 - Run `./scripts/generate-llms-txt.sh` whenever skill docs change
-- Consider adding `.qwen/skills/` to `.gitignore` and auto-creating in CI only (like llms files)
+- `.qwen/skills/` is gitignored; Qwen does not use per-skill symlinks
 - Add a CI check that verifies `setup-skills.sh` was run before `validate-skills.sh`
 - Document this dependency in workflow YAML comments
 
@@ -483,7 +483,7 @@ timeout $MAX_OPERATION_SECONDS git push origin "$branch" || {
 - `.github/workflows/quality-gate.yml` - Added setup-skills.sh step
 - `.github/workflows/ci-and-labels.yml` - Added setup-skills.sh step to test job
 - `llms-full.txt` - Regenerated
-- `.qwen/skills/` - Created missing symlinks
+- `.claude/skills/` - Created missing symlinks (Qwen uses canonical path)
 
 ---
 

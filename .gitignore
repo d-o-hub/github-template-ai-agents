@@ -69,3 +69,6 @@ pr_*.txt
 # Skill evaluation artifacts
 .agents/skills/*-workspace/
 .agents/skills/skills-evaluation/
+
+# Qwen reads .agents/skills/ directly — never commit per-skill symlinks here
+.qwen/skills/
