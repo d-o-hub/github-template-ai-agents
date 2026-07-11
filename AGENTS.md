@@ -54,7 +54,13 @@ See `agents-docs/BEHAVIORAL_DEFAULTS.md` for automation-first, parallelism, dire
 ./scripts/bootstrap.sh # One-command setup: skills + hook + validate + quality gate
 ./scripts/doctor.sh    # Run anytime to diagnose environment issues
 ./bin/agent-toolkit    # Unified CLI: setup, doctor, quality, validate, analyze, fix, eval, docs
+# Optional domain skill packs (Cloudflare, Turso, reader, compliance, …):
+LINK_OPTIONAL=true ./scripts/setup-skills.sh
 ```
+
+**Versions:** template release history is `.template/CHANGELOG-TEMPLATE.md` (README
+badge in this repo). Project version is the root `VERSION` file (use that after
+adopting the template).
 
 ## Session Bootstrap
 
@@ -70,7 +76,7 @@ Agents use a `SessionStart` hook to auto-inject project context (docs map + late
 
 ## Quality Gate (Required Before Commit)
 
-Use the `static-analysis` skill to triage and fix any findings before committing.
+Use the `static-analysis` skill to triage and fix any findings before committing. For `Codacy Static Code Analysis` CI failures, load the `codacy` skill (`.agents/skills/codacy/SKILL.md`); inspect with `codacy pull-request <N>`, re-trigger with `codacy repository --reanalyze-and-wait`. Drift policy: `agents-docs/codacy-triage-2026-06.md`.
 
 ```bash
 ./scripts/quality_gate.sh # Always run before committing. Fix all errors.
