@@ -3,21 +3,23 @@
 > Single source of truth: `VERSION` file at project root.
 >
 > **Template note:** in a template repository, `VERSION` is intentionally
-> pinned to `0.0.0`. The template's own release history is tracked in
-> `.template/CHANGELOG-TEMPLATE.md`, and `README.md` is the only doc that displays a
-> template version badge.
+> pinned to `0.0.0` for **downstream projects**. The template's own release
+> history is tracked in `.template/CHANGELOG-TEMPLATE.md`. In *this* template
+> repo, `README.md` shows the **template** version badge (from the latest
+> `## [X.Y.Z]` in `.template/CHANGELOG-TEMPLATE.md`). After you use the
+> template, only `VERSION` drives the README badge.
 
 ## Overview
 
-Version propagation is fully automated. You only edit the `VERSION` file — everything else updates automatically.
+**Two different version concepts:**
 
-In a **template** repository, `VERSION` is intentionally pinned to
-`0.0.0`. The template's own release history lives in
-`.template/CHANGELOG-TEMPLATE.md`; the only version badge the template displays
-is in `README.md`, and `scripts/propagate-version.sh` keeps it in sync
-with the value of `VERSION` at the time it was last run. Downstream
-consumer repositories reset `VERSION` to their own version on first
-use.
+| Concept | Source of truth | Displayed in |
+|---------|-----------------|--------------|
+| Template release | `.template/CHANGELOG-TEMPLATE.md` | README badge **in the template repo only** |
+| Project / consumer version | `VERSION` (start `0.0.0`) | README badge **after** you adopt the template |
+
+For a **consumer** repository: edit `VERSION`, then `propagate-version.sh`
+(or the pre-commit hook) updates README and related files.
 
 ## How It Works
 
@@ -42,14 +44,13 @@ git commit -m "chore: bump version to 0.3.0"
 ```
 
 The pre-commit hook detects the VERSION change and runs `propagate-version.sh`, which updates:
-- `README.md` - version badge (single source of truth for the template version)
+- `README.md` - project version badge (consumer repos)
 - `CHANGELOG.md` - adds `[Unreleased]` section if missing
 
-For the template's own version history (the human-readable record of
-template releases), edit `.template/CHANGELOG-TEMPLATE.md` directly or run
-`./scripts/bump_patch_version.sh`. `QUICKSTART.md` and
-`agents-docs/MIGRATION.md` do **not** display a template version
-badge — `README.md` is the only one.
+For the **template's own** release history, edit `.template/CHANGELOG-TEMPLATE.md`
+and set the README template badge to match the new `## [X.Y.Z]` heading.
+Do not change `VERSION` away from `0.0.0` in the template repo.
+`QUICKSTART.md` and `agents-docs/MIGRATION.md` do **not** display a version badge.
 
 ## Manual Propagation
 
