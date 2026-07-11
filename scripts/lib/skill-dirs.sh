@@ -6,6 +6,8 @@
 
 # CLI folders that receive per-skill symlinks to .agents/skills/
 # Qwen Code, Gemini CLI, OpenCode, and Jules read .agents/skills/ directly.
+# Consumed by scripts/setup-skills.sh and scripts/validate-skills.sh via source.
+# shellcheck disable=SC2034
 CLI_SKILL_DIRS=(
   ".claude/skills"
 )

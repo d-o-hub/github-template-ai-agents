@@ -23,7 +23,8 @@ def run(cmd, env=None):
     if isinstance(cmd, str):
         cmd = shlex.split(cmd)
     merged_env = {**os.environ, **(env or {})}
-    process = subprocess.Popen(
+    # Popen is invoked with list-form args (never shell=True); inputs are controlled test commands.
+    process = subprocess.Popen(  # nosec B603 # noqa: S603
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=merged_env
     )
     stdout, stderr = process.communicate()
