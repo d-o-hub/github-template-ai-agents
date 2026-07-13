@@ -3,12 +3,12 @@
 # Source this file in other scripts to use categorize_command()
 set -euo pipefail
 
-# Security Hardening: 2026-07-06 - Hardened regex matching and expanded keywords.
+# Security Hardening: 2026-07-13 - Hardened regex matching and expanded keywords.
 # Default categories (can be overridden in .command-verify.conf)
 SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get:ls:cat:echo:grep:find:pwd:diff:cd:head:tail:sort:uniq:wc:git:log:pgrep:type:which:df:du:free:top:ps:history}"
 CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl:ssh-keygen:openssl:gpg:mv:cp:ln:link:patch:tar:zip:unzip:gzip:gunzip:bzip2:xz:make:touch:gh:xargs:apt:apt-get:yum:dnf:zypper:brew:pipx}"
 # Destructive and administrative commands (strict boundaries)
-DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:killall:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown:pkill:sed:truncate:unlink:tee:parted:fdisk:gdisk:sfdisk:wipe:srm:badblocks:alias:unalias:iptables:nft:ufw:firewall-cmd:crontab:pkexec:mount:umount:chroot:unshare:nsenter:git-remote-ext:poweroff:halt:swapon:swapoff:modprobe:insmod:rmmod:sysctl:strace:gdb:-f:-y}"
+DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:killall:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown:pkill:sed:truncate:unlink:tee:parted:fdisk:gdisk:sfdisk:wipe:srm:badblocks:alias:unalias:iptables:nft:ufw:firewall-cmd:crontab:pkexec:mount:umount:chroot:unshare:nsenter:git-remote-ext:poweroff:halt:swapon:swapoff:modprobe:insmod:rmmod:sysctl:strace:gdb:-f:-y:chattr:setenforce:iptables-save:iptables-restore:write:wall}"
 # Language interpreters (broad boundaries to catch versioned ones like python3.11)
 INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:pip3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip:composer:bundle:pipenv:poetry:conda:mamba:uv:lua:awk}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
@@ -98,7 +98,7 @@ categorize_command() {
     # Optimization: Use a loop to validate EVERY match to prevent bypasses where a safe-looking
     # script name in the same command string causes the whole string to be exempt.
     local escaped_destructive="${DESTRUCTIVE_KEYWORDS//./\\.}"
-    local destructive_regex="${boundary}(${escaped_destructive//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
+    local destructive_regex="${boundary}(${escaped_destructive//:/|})([.][a-z0-9.]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
     local temp_destructive="$cmd_lower"
     local full_match suffix
     while [[ "$temp_destructive" =~ $destructive_regex ]]; do
@@ -116,7 +116,7 @@ categorize_command() {
     # Check interpreter keywords with broad boundaries (to catch python3.11)
     # Allows optional trailing alphanumeric chars, dots, and hyphens immediately after the keyword.
     local escaped_interpreter="${INTERPRETER_KEYWORDS//./\\.}"
-    local interpreter_regex="${boundary}(${escaped_interpreter//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
+    local interpreter_regex="${boundary}(${escaped_interpreter//:/|})([.][a-z0-9.]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
     local temp_interpreter="$cmd_lower"
     while [[ "$temp_interpreter" =~ $interpreter_regex ]]; do
         full_match="${BASH_REMATCH[0]}"
@@ -131,7 +131,7 @@ categorize_command() {
     # Check network keywords with broad boundaries
     # Allows optional trailing alphanumeric chars, dots, and hyphens immediately after the keyword.
     local escaped_network="${NETWORK_KEYWORDS//./\\.}"
-    local network_regex="${boundary}(${escaped_network//:/|})([.][a-z0-9]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
+    local network_regex="${boundary}(${escaped_network//:/|})([.][a-z0-9.]+|[0-9-][a-z0-9.]*)?${broad_end_boundary}"
     local temp_network="$cmd_lower"
     while [[ "$temp_network" =~ $network_regex ]]; do
         full_match="${BASH_REMATCH[0]}"
