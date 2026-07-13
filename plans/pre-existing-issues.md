@@ -1,19 +1,24 @@
 # Pre-existing Issues
 
-These issues existed on the main branch before the PR resolution and were not addressed in this session. They are documented for follow-up.
+Follow-up tracker for known debt. Update when resolved.
 
-## Quality Gate Warnings
+## Resolved (2026-07-11 hygiene)
 
-The quality gate reports 31 skills missing the optional `version:` field in their SKILL.md frontmatter. This is a pre-existing convention issue affecting the following skills:
+| Issue | Resolution |
+|-------|------------|
+| Skills missing `version:` frontmatter | All skills now declare `version:` |
+| Broken `*-workspace` CLI symlinks | Pruned; setup-skills reconciles |
+| Stale renamed skill links (e.g. anti-ai-slop) | Pruned; `.qwen/skills/` removed |
+| `plans/_status.json` nextAvailable stuck at adr-011 | Updated to adr-030; GOAP_STATE restored |
 
-accessibility-auditor, agent-coordination, agents-md, anti-ai-slop, architecture-diagram, atomic-commit, cicd-pipeline, code-quality, code-review-assistant, codeberg-api, database-devops, do-web-doc-resolver, docs-hook, git-github-workflow, github-readme, github-workflow, goap-agent, intent-classifier, iterative-refinement, learn, migration-refactoring, parallel-execution, privacy-first, skill-creator, skill-evaluator, task-decomposition, testing-strategy, triz-analysis, triz-solver, ui-ux-optimize, web-search-researcher
+## Open / deferred
 
-**Recommendation:** Add `version:` field to all SKILL.md frontmatters in a separate PR.
+### validate-links empty / malformed input
 
-## Copied PR Changes
+**Status:** Hardened with empty-file-list guards (no hang on empty discovery).  
+**Remaining:** Edge cases with malformed binary input still low priority.
 
-These are the original PR changes that were pushed to their respective branches.
+### Codacy High findings (assert in tests)
 
-## PR #368 - validate-links.sh Robustness
-
-The Codacy review expressed concern that `scripts/validate-links.sh` may hang on empty input. Investigation deferred.
+**Status:** Deferred to Codacy dashboard (SonarPython S101 not suppressible via CLI).  
+**Action:** Manual suppression of test-file assert findings when Codacy is connected.

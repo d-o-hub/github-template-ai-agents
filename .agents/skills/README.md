@@ -2,19 +2,20 @@
 
 This is the **single canonical location** for all skills in this repository.
 
-Claude Code and Qwen Code use symlinks; Gemini CLI and OpenCode read directly from `.agents/skills/`:
+Claude Code uses per-skill symlinks; Qwen Code, Gemini CLI, OpenCode, and Jules read `.agents/skills/` directly:
 
 ```
 .claude/skills/<name>      -> ../../.agents/skills/<name>
-.qwen/skills/<name>        -> ../../.agents/skills/<name>
 ```
 
 ## Setup
 
-After cloning, run once to create all symlinks:
+After cloning, reconcile Claude skill symlinks:
 
 ```bash
 ./scripts/setup-skills.sh
+# optional domain packs:
+LINK_OPTIONAL=true ./scripts/setup-skills.sh
 ```
 
 Validate symlinks are intact:
@@ -39,6 +40,7 @@ Validate symlinks are intact:
 | [`accessibility-auditor/`](accessibility-auditor/) | Audit web applications for WCAG 2.2 compliance, screen reader compatibility, keyboard navigation, and color contrast. Use this skill when the user asks for an accessibility audit, a11y check, WCAG compliance review, screen reader test, keyboard navigation check, color contrast check, or ARIA validation — even if they don't explicitly mention "accessibility" or "WCAG". Also triggers on Section 508 and ADA compliance requests. Not for css-render-performance. |
 | [`agent-browser/`](agent-browser/) | Browser automation CLI for AI agents. Use when the user needs to interact with websites — navigating pages, filling forms, clicking buttons, taking screenshots, scraping data, testing web apps, or automating any browser task. Even if they just say "open this website", "click that button", "take a screenshot", or "fill out this form". Not for web search (use web-search-researcher), fetching documentation (use do-web-doc-resolver), or reading URLs (use do-web-doc-resolver). |
 | [`agent-coordination/`](agent-coordination/) | Coordinate multiple agents for software development across any language. Use this skill when running parallel execution of independent tasks, sequential chains with dependencies, swarm analysis from multiple perspectives, or iterative refinement loops — even if they just say "run these in parallel" or "coordinate agents". Not for goap-agent. |
+| [`agentic-abstention/`](agentic-abstention/) | Encode CONVOLVE-style stopping rules: decide when to stop acting instead of continuing tool calls on an infeasible task. Use this skill whenever an agent must determine if further execution is warranted. Not for general task planning (use goap-agent). |
 | [`agents-md/`](agents-md/) | Create AGENTS.md files with production-ready best practices. Use this skill when creating new AGENTS.md files, implementing quality gates, or updating agent documentation — even if they just say "add an AGENTS.md" or "set up agent guidance". Not for readme-best-practices, skill-creator. |
 | [`api-design-first/`](api-design-first/) | Design and document RESTful APIs using design-first principles with OpenAPI specifications. Use this skill when the user asks to design an API, create an API spec, plan endpoints, model request/response schemas, or discuss API versioning — even if they just say "design the API" or "create the OpenAPI spec". Not for cloudflare-worker-api. |
 | [`architecture-diagram/`](architecture-diagram/) | Generate or update a project architecture SVG diagram by scanning the live project structure. Use this skill whenever the user asks to regenerate, refresh, or update the architecture diagram, or when skills, agents, or commands have been added/removed and the diagram is stale — even if they just say "update the diagram" or "regenerate the architecture SVG". Triggers on phrases like "update the diagram", "regenerate the architecture SVG", "sync the diagram", or "diagram is out of date". Not for readme-best-practices. |
@@ -89,4 +91,6 @@ Validate symlinks are intact:
 | [`turso-db/`](turso-db/) | Use this skill for Turso (LibSQL/Limbo) database development, including scaffolding, querying, migrations, and maintenance. Supports vector search, full-text search, CDC, MVCC, encryption, and bidirectional remote sync. Use when working with Turso SDKs for JavaScript, Rust, Python, Go, Swift, and React Native — even if they just say "set up Turso", "query my Turso database", or "migrate to LibSQL". Provides current API guidance to avoid stale "libsql" legacy knowledge. Not for PostgreSQL, MySQL, or MongoDB (use database-devops) or general schema design without Turso. |
 | [`ui-ux-optimize/`](ui-ux-optimize/) | Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination, confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, or any screen-based product — even if they just say "improve the UI" or "optimize the UX" or "make it sound human" or "this feels robotic". Not for css-render-performance. |
 | [`verification-template/`](verification-template/) | Template for creating portable domain-specific verification skills. Use this skill when creating a verification checklist as a starting point for defining systematic verification checklists for new features, modules, or domain-specific operations — even if they just say "create a verification checklist" or "add quality checks for this". Not for skill-creator. |
+| [`voice-profiles/`](voice-profiles/) | Adapt writing tone and style using predefined voice and context profiles. Use this skill when asked to adjust persona or platform fit — even if they just say "make this less formal", "rewrite for LinkedIn", "tone down", or "make it sound more professional". Not for auditing project structure or content editing of READMEs (use `readme-best-practices`). |
 | [`web-search-researcher/`](web-search-researcher/) | Research topics using web search to find accurate, current information. Use this skill when you need modern information, official documentation, best practices, or technical solutions beyond training data — even if they just say "look this up" or "search for how to do X". Not for do-web-doc-resolver, agent-browser. |
+
