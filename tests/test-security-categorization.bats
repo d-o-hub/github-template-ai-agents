@@ -64,6 +64,18 @@ setup() {
 
     run categorize_command "strace -p 123"
     [ "$output" = "dangerous" ]
+
+    run categorize_command "chattr +i file"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "setenforce 1"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "iptables-save"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "wall 'maintenance starting'"
+    [ "$output" = "dangerous" ]
 }
 
 @test "harden-command-categorization: detects new network keywords" {
@@ -124,6 +136,15 @@ setup() {
 
     # A standalone script invocation is not a bare dangerous command — it's a script
     run categorize_command "rm.sh"
+    [ "$output" = "unknown" ]
+
+    run categorize_command "python.py"
+    [ "$output" = "unknown" ]
+
+    run categorize_command "node.v14.js"
+    [ "$output" = "unknown" ]
+
+    run categorize_command "python3.11.py"
     [ "$output" = "unknown" ]
 
     # Interpreter with a script argument is still a dangerous command
