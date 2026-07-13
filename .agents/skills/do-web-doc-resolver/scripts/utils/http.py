@@ -122,6 +122,7 @@ def is_safe_url(url: str) -> bool:
             "localhost.localdomain",
             "127.0.0.1",
             "::1",
+            "::",
             "0.0.0.0",
         ):
             return False
