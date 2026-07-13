@@ -43,3 +43,8 @@
 **Vulnerability:** Path validation checks against `FORBIDDEN_PATHS` were case-sensitive, potentially allowing bypasses using alternate casing (e.g., `.GIT`, `.Env`) on case-insensitive filesystems or as a general oversight.
 **Learning:** Security denylists for file and directory names must be enforced case-insensitively to account for cross-platform filesystem behavior and to prevent simple obfuscation bypasses.
 **Prevention:** Always normalize path components (e.g., to lowercase) before comparing them against a denylist of forbidden names. Pre-calculating a lowercase set of forbidden strings improves performance.
+
+## 2026-07-08 - Blocking Unspecified IPv6 Address in SSRF Protection
+**Vulnerability:** The `do-web-doc-resolver` skill's SSRF protection did not explicitly block the unspecified IPv6 address `[::]`, which can be used to access services on the local host on many systems.
+**Learning:** SSRF protection must account for all representations of localhost, including both IPv4 (`0.0.0.0`, `127.0.0.1`) and IPv6 (`::1`, `::`) variants. The unspecified address `::` is often treated as localhost by networking stacks.
+**Prevention:** Explicitly include `::` in hostname blocklists and `::/128` in network blocklists for all SSRF validation logic.
