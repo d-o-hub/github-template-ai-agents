@@ -65,6 +65,12 @@ def test_validate_safe_path_forbidden(tmp_path):
     with pytest.raises(PathValidationError):
         validate_safe_path(".bash_history", base, "test", check_forbidden=True)
     with pytest.raises(PathValidationError):
+        validate_safe_path(".sh_history", base, "test", check_forbidden=True)
+    with pytest.raises(PathValidationError):
+        validate_safe_path("terraform.tfstate", base, "test", check_forbidden=True)
+    with pytest.raises(PathValidationError):
+        validate_safe_path(".terraform", base, "test", check_forbidden=True)
+    with pytest.raises(PathValidationError):
         validate_safe_path("id_rsa", base, "test", check_forbidden=True)
 
 
