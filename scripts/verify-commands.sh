@@ -159,8 +159,12 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
                         ((CACHE_HITS++))
                         CACHED=true
 
-                        # Extract category from cached result using jq to handle formatting variations safely
-                        cached_cat=$(printf "%s\n" "$cached_result" | jq -r --arg unknown "$UNKNOWN_CATEGORY" '.category // $unknown' 2>/dev/null || printf "%s\n" "$UNKNOWN_CATEGORY")
+                        # perf: Replace jq subshell with native bash match to eliminate process fork overhead
+                        if [[ "$cached_result" =~ \"category\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; then
+                            cached_cat="${BASH_REMATCH[1]}"
+                        else
+                            cached_cat="$UNKNOWN_CATEGORY"
+                        fi
 
                         # Security: Validate category against whitelist to prevent injection in arithmetic expansion
                         if [[ ! "$cached_cat" =~ ^(safe|conditional|dangerous|$UNKNOWN_CATEGORY)$ ]]; then
@@ -196,10 +200,13 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
 
         # Save to cache
         if type save_cached_result &> /dev/null; then
-            # Security: Use jq to safely generate JSON and prevent injection
-            # Note: We use -c to produce compact JSON. This is crucial for avoiding multi-line issues later
-            result=$(jq -n -c --arg cat "$category" --arg cmd "$cmd" \
-                '{"valid":true, "category":$cat, "command":$cmd}')
+            # perf: Replace jq with native bash string substitution to generate JSON without fork overhead
+            safe_cmd="${cmd//\\/\\\\}"
+            safe_cmd="${safe_cmd//\"/\\\"}"
+            safe_cmd="${safe_cmd//$'\n'/\\n}"
+            safe_cmd="${safe_cmd//$'\r'/\\r}"
+            safe_cmd="${safe_cmd//$'\t'/\\t}"
+            result="{\"valid\":true,\"category\":\"$category\",\"command\":\"$safe_cmd\"}"
             save_cached_result "$cmd" "$file" "$line" "$result" 2>/dev/null || true
         fi
 
