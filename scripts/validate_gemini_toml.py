@@ -1,12 +1,30 @@
 #!/usr/bin/env python3
 import os
 import sys
-import tomllib
+
+try:
+    import tomllib  # Python 3.11+
+except ModuleNotFoundError:  # pragma: no cover - Python < 3.11
+    try:
+        import tomli as tomllib  # type: ignore
+    except ModuleNotFoundError:
+        print(
+            "Error: need Python 3.11+ (tomllib) or the 'tomli' package to validate Gemini TOML",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+# tomllib / tomli decode errors
+try:
+    TOMLDecodeError = tomllib.TOMLDecodeError  # type: ignore[attr-defined]
+except AttributeError:  # pragma: no cover
+    TOMLDecodeError = ValueError
+
 
 def validate_gemini_toml(filepath, required_fields):
-    """Robust TOML validator for Gemini CLI files using tomllib."""
+    """Robust TOML validator for Gemini CLI files using tomllib/tomli."""
     try:
-        with open(filepath, 'rb') as f:
+        with open(filepath, "rb") as f:
             data = tomllib.load(f)
 
         for field in required_fields:
@@ -18,14 +36,15 @@ def validate_gemini_toml(filepath, required_fields):
                 return False
 
         return True
-    except tomllib.TOMLDecodeError as e:
+    except TOMLDecodeError as e:
         print(f"Error: {filepath} has invalid TOML syntax: {e}")
         return False
     except Exception as e:
         print(f"Error reading {filepath}: {e}")
         return False
 
-def _validate_dir(dirname: str, required_fields: list[str]) -> tuple[bool, int]:
+
+def _validate_dir(dirname, required_fields):
     """Validate all TOML files in a directory. Returns (all_valid, count)."""
     if not os.path.exists(dirname):
         return True, 0
