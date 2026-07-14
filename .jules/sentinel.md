@@ -48,3 +48,8 @@
 **Vulnerability:** The `do-web-doc-resolver` skill's SSRF protection did not explicitly block the unspecified IPv6 address `[::]`, which can be used to access services on the local host on many systems.
 **Learning:** SSRF protection must account for all representations of localhost, including both IPv4 (`0.0.0.0`, `127.0.0.1`) and IPv6 (`::1`, `::`) variants. The unspecified address `::` is often treated as localhost by networking stacks.
 **Prevention:** Explicitly include `::` in hostname blocklists and `::/128` in network blocklists for all SSRF validation logic.
+
+## 2026-07-14 - Harden Command Categorization against Env Var Injection
+**Vulnerability:** Command categorization could be bypassed by prefixing dangerous commands with environment variable assignments (e.g., `LD_PRELOAD=./evil.so ls`). The '=' and '+' characters were not being normalized, causing keywords to be merged and missed by the boundary-based regex.
+**Learning:** Environment variable assignments are often used in shell commands and can contain both dangerous variables themselves and act as a bypass mechanism for keyword detection. Normalization must include assignment operators to ensure proper tokenization of commands.
+**Prevention:** Always include '=' and '+' in the list of normalized characters for command string analysis. Maintain a list of dangerous environment variables to flag even when they are used at the start of a command without `env`.
