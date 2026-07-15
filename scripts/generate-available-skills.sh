@@ -59,12 +59,15 @@ if [[ ${#skill_files[@]} -gt 0 ]]; then
     /^description:/ {
         orig_val = $0
         sub(/^description: */, "", orig_val)
-        if (orig_val ~ /^>[-|]?$/) {
+        # YAML block scalars: |, |-, |+, >, >-, >+ (with optional chomp indicators)
+        if (orig_val ~ /^[>|][+-]?[[:space:]]*$/) {
             desc = ""
             while (getline > 0) {
-                if ($0 ~ /^  /) {
+                # Continuation: indented content under the block scalar
+                if ($0 ~ /^[[:space:]]+/ || $0 == "") {
                     line = $0
-                    sub(/^  /, "", line)
+                    sub(/^[[:space:]]+/, "", line)
+                    if (line == "" && desc == "") continue
                     desc = (desc == "" ? line : desc " " line)
                 } else {
                     if ($0 ~ /^name:/) name = clean($0)

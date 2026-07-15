@@ -1,9 +1,9 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-011"
+    "adr": "adr-031"
   },
-  "active_plan": "plans/GOAP_STATE.md",
+  "active_plan": null,
   "phases": [],
   "handover_ref": null,
   "entries": {
@@ -38,6 +38,10 @@
     "adr-029-add-cli-interface.md": {
       "status": "accepted",
       "date": "2026-06-19"
+    },
+    "adr-030-template-improvement-recommendations.md": {
+      "status": "accepted",
+      "date": "2026-07-15"
     }
   }
 }
