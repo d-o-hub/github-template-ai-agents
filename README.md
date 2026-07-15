@@ -219,6 +219,7 @@ graph LR
 - [Hooks](agents-docs/HOOKS.md) — pre/post tool hooks
 - [Context](agents-docs/CONTEXT.md) — back-pressure mechanisms
 - [Migration](agents-docs/MIGRATION.md) — adopting in existing projects
+- [Adoption profiles](agents-docs/ADOPTION_PROFILES.md) — minimal CI, skill packs, light process
 - [Available Skills](.agents/skills/README.md) — agents skills overview
 - [Monorepo Example](examples/monorepo-bun-turbo/README.md) — Bun + Turbo project structure
 

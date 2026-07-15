@@ -60,10 +60,10 @@ fi
 
 echo "=== Starting Documentation Update Orchestrator ==="
 
-echo "[1/4] Validating configuration..."
+echo "[1/5] Validating configuration..."
 ./scripts/validate-config.sh
 
-echo "[2/4] Verifying commands in documentation..."
+echo "[2/5] Verifying commands in documentation..."
 verify_status=0
 if $DRY_RUN; then
     echo "[DRY-RUN] Would run verify-commands.sh"
@@ -76,7 +76,16 @@ if [[ "$verify_status" -ne 0 ]]; then
     exit "$verify_status"
 fi
 
-echo "[3/4] Syncing AGENTS.md and LLM context files..."
+echo "[3/5] Regenerating skill catalogs..."
+if $DRY_RUN; then
+    echo "[DRY-RUN] Would run generate-available-skills.sh and generate-skill-catalog.sh"
+else
+    ./scripts/generate-available-skills.sh
+    ./scripts/generate-skill-catalog.sh
+    echo "  ✓ Skill catalogs regenerated"
+fi
+
+echo "[4/5] Syncing AGENTS.md and LLM context files..."
 if $DRY_RUN; then
     echo "[DRY-RUN] Checking generated LLM context files without writing committed outputs"
     check_llms_context_files
@@ -85,7 +94,7 @@ else
     echo "  ✓ Documentation and LLM context files synced"
 fi
 
-echo "[4/4] Final validation..."
+echo "[5/5] Final validation..."
 echo "  ✓ Final validation passed"
 
 echo "=== Documentation Update Complete ==="
