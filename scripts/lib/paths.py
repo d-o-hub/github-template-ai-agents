@@ -61,6 +61,14 @@ FORBIDDEN_PATHS = frozenset({
     ".zsh_history",
     ".python_history",
     ".node_repl_history",
+    ".sh_history",
+    ".lesshst",
+    ".viminfo",
+    ".mysql_history",
+    ".psql_history",
+    ".sqlite_history",
+    "terraform.tfstate.backup",
+    ".terraform",
     "id_rsa",
     "id_ed25519",
     "id_ecdsa",
@@ -107,9 +115,20 @@ def validate_safe_path(
 
     if check_forbidden and candidate != base_resolved:
         for part in candidate.relative_to(base_resolved).parts:
-            if part.lower() in FORBIDDEN_PATHS_LOWER:
+            part_lower = part.lower()
+            # Strict matches
+            if part_lower in FORBIDDEN_PATHS_LOWER:
                 raise PathValidationError(
                     f"--{param_name} targets a forbidden path: {part}"
+                )
+
+            # Pattern-based matches
+            if (
+                part_lower.startswith(".env") or
+                part_lower.endswith((".pem", ".key", ".pfx", ".tfstate"))
+            ):
+                raise PathValidationError(
+                    f"--{param_name} targets a sensitive file pattern: {part}"
                 )
 
     return candidate
