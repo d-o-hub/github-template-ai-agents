@@ -67,6 +67,38 @@ def test_validate_safe_path_forbidden(tmp_path):
     with pytest.raises(PathValidationError):
         validate_safe_path("id_rsa", base, "test", check_forbidden=True)
 
+    # Test newly added shell/app history and terraform paths
+    new_forbidden = [
+        ".sh_history", ".lesshst", ".viminfo", ".mysql_history",
+        ".psql_history", ".sqlite_history", "terraform.tfstate",
+        "terraform.tfstate.backup", ".terraform"
+    ]
+    for p in new_forbidden:
+        with pytest.raises(PathValidationError):
+            validate_safe_path(p, base, "test", check_forbidden=True)
+
+
+def test_validate_safe_path_patterns(tmp_path):
+    base = tmp_path / "repo"
+    base.mkdir()
+
+    # .env* patterns
+    with pytest.raises(PathValidationError):
+        validate_safe_path(".env.custom", base, "test", check_forbidden=True)
+    with pytest.raises(PathValidationError):
+        validate_safe_path(".env.local.backup", base, "test", check_forbidden=True)
+
+    # Sensitive extension patterns
+    sensitive_extensions = ["secret.pem", "my.key", "cert.pfx", "prod.tfstate"]
+    for p in sensitive_extensions:
+        with pytest.raises(PathValidationError):
+            validate_safe_path(p, base, "test", check_forbidden=True)
+
+    # Nested pattern matches
+    (base / "subdir").mkdir()
+    with pytest.raises(PathValidationError):
+        validate_safe_path("subdir/id_rsa.pem", base, "test", check_forbidden=True)
+
 
 def test_validate_safe_path_case_insensitivity(tmp_path):
     base = tmp_path / "repo"
