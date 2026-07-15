@@ -53,3 +53,9 @@
 **Vulnerability:** Command categorization could be bypassed by prefixing dangerous commands with environment variable assignments (e.g., `LD_PRELOAD=./evil.so ls`). The '=' and '+' characters were not being normalized, causing keywords to be merged and missed by the boundary-based regex.
 **Learning:** Environment variable assignments are often used in shell commands and can contain both dangerous variables themselves and act as a bypass mechanism for keyword detection. Normalization must include assignment operators to ensure proper tokenization of commands.
 **Prevention:** Always include '=' and '+' in the list of normalized characters for command string analysis. Maintain a list of dangerous environment variables to flag even when they are used at the start of a command without `env`.
+
+## 2026-07-15 - Hardening Forbidden Paths with Pattern Blocking
+
+**Vulnerability:** Static denylists for forbidden paths were insufficient to catch variations of sensitive files like custom environment files (e.g., .env.local) or credential files with various names (e.g., cert.pem, key.pfx).
+**Learning:** Security validation must combine explicit denylists with pattern-based matching to provide broader coverage against known sensitive file types and naming conventions.
+**Prevention:** Implement suffix and prefix matching in path validation logic to block entire classes of sensitive files (e.g., *.pem, *.key, .env*) in addition to maintaining a comprehensive list of specific forbidden filenames.
