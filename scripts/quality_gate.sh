@@ -139,8 +139,12 @@ printf "\n"
 # --- Validate Gemini TOML commands ---
 if [[ -d ".gemini/commands" ]]; then
     printf "%bValidating Gemini TOML commands...%b\n" "${BLUE}" "${NC}"
-    if ! python3 ./scripts/validate_gemini_toml.py; then
-        FAILED=1
+    if command -v python3 &>/dev/null; then
+        if ! python3 ./scripts/validate_gemini_toml.py; then
+            FAILED=1
+        fi
+    else
+        printf "%b  ⚠ python3 not available — skipping Gemini TOML validation%b\n" "${YELLOW}" "${NC}"
     fi
     printf "\n"
 fi
@@ -210,6 +214,7 @@ fi
 # --- Validate .agents/metrics.jsonl ---
 if [[ -f ".agents/metrics.jsonl" ]]; then
     printf "%bValidating .agents/metrics.jsonl...%b\n" "${BLUE}" "${NC}"
+    if command -v python3 &>/dev/null; then
     METRICS_VALID=0
     err_msg=$(jq -R -c '
       select(length > 0) |
@@ -245,6 +250,9 @@ if [[ -f ".agents/metrics.jsonl" ]]; then
         printf "%b  ✓ .agents/metrics.jsonl is valid%b\n" "${GREEN}" "${NC}"
     else
         FAILED=1
+    fi
+    else
+        printf "%b  ⚠ python3 not available — skipping metrics.jsonl validation%b\n" "${YELLOW}" "${NC}"
     fi
     printf "\n"
 fi

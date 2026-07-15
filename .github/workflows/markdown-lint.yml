@@ -19,6 +19,10 @@ permissions:
   checks: write
   pull-requests: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   markdownlint:
     name: Markdown Lint Check

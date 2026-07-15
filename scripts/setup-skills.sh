@@ -20,6 +20,32 @@ CLI_SKILL_DIRS=(
   ".qwen/skills"
 )
 
+# Portable relative path computation (works on macOS/BSD without GNU realpath)
+_portable_relpath() {
+    local target="$1" base="$2"
+    # Normalize: resolve symlinks if possible, fall back to cd+pwd
+    target=$(cd "$target" 2>/dev/null && pwd || echo "$target")
+    base=$(cd "$base" 2>/dev/null && pwd || echo "$base")
+
+    local common_part="$base" result=""
+    while [[ "${target#$common_part}" == "${target}" ]]; do
+        common_part="$(dirname "$common_part")"
+        result="..${result:+/$result}"
+    done
+
+    local forward="${target#$common_part}"
+    forward="${forward#/}"
+    if [[ -n "$result" ]] && [[ -n "$forward" ]]; then
+        printf '%s/%s\n' "$result" "$forward"
+    elif [[ -n "$result" ]]; then
+        printf '%s\n' "$result"
+    elif [[ -n "$forward" ]]; then
+        printf '%s\n' "$forward"
+    else
+        printf '.\n'
+    fi
+}
+
 if [[ ! -d "$SKILLS_SRC" ]]; then
   printf "No skills found at .agents/skills/ - nothing to symlink.\n"
   exit 0
@@ -33,7 +59,7 @@ for cli_dir in "${CLI_SKILL_DIRS[@]}"; do
 
   # Performance optimization: Pre-calculate relative path base once per target dir
   # to avoid O(N) subshell calls in the inner loop.
-  rel_base=$(realpath --relative-to="$target_dir" "$SKILLS_SRC")
+  rel_base=$(_portable_relpath "$SKILLS_SRC" "$target_dir")
 
   for skill_path in "$SKILLS_SRC"/*/; do
     [ -d "$skill_path" ] || continue

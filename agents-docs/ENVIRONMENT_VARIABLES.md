@@ -64,7 +64,6 @@ SKIP_CLIPPY=true ./scripts/quality_gate.sh
 
 ```bash
 SKIP_GLOBAL_HOOKS_CHECK=true git commit -m "feat: add feature"
-./scripts/install-hooks.sh  # During setup
 ```
 
 **When to Use**:

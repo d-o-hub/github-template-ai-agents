@@ -13,8 +13,7 @@
 | `quality_gate.sh` | Multi-language quality gate (lint, test, format) | `./scripts/quality_gate.sh` |
 | `secretlint_gate.sh` | Runs secretlint | `./scripts/secretlint_gate.sh` |
 | `setup-skills.sh` | Create symlinks from `.agents/skills/` to CLI dirs | `./scripts/setup-skills.sh` |
-| `pre-commit-hook.sh` | Pre-commit hook template (copied by install-hooks.sh) | Installed via `install-hooks.sh` |
-| `install-hooks.sh` | Install git hooks (pre-commit + post-commit) | `./scripts/install-hooks.sh` |
+| `pre-commit-hook.sh` | Pre-commit hook template (legacy; `.githooks/` is active) | Via `bootstrap.sh` |
 
 ## Validation Scripts
 
@@ -89,7 +88,6 @@ graph TD
     A --> E[BATS tests]
     B --> F[lib/skill-validation.sh]
     C --> F
-    G[install-hooks.sh] --> H[pre-commit-hook.sh]
     G --> I[validate-git-hooks.sh]
     H --> A
     J[setup-skills.sh] --> K[.claude/skills symlinks]

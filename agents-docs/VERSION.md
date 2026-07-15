@@ -4,7 +4,7 @@
 >
 > **Template note:** in a template repository, `VERSION` is intentionally
 > pinned to `0.0.0`. The template's own release history is tracked in
-> `.templates/CHANGELOG-TEMPLATE.md`, and `README.md` is the only doc that displays a
+> `.template/CHANGELOG-TEMPLATE.md`, and `README.md` is the only doc that displays a
 > template version badge.
 
 ## Overview
@@ -13,7 +13,7 @@ Version propagation is fully automated. You only edit the `VERSION` file — eve
 
 In a **template** repository, `VERSION` is intentionally pinned to
 `0.0.0`. The template's own release history lives in
-`.templates/CHANGELOG-TEMPLATE.md`; the only version badge the template displays
+`.template/CHANGELOG-TEMPLATE.md`; the only version badge the template displays
 is in `README.md`, and `scripts/propagate-version.sh` keeps it in sync
 with the value of `VERSION` at the time it was last run. Downstream
 consumer repositories reset `VERSION` to their own version on first
@@ -46,7 +46,7 @@ The pre-commit hook detects the VERSION change and runs `propagate-version.sh`, 
 - `CHANGELOG.md` - adds `[Unreleased]` section if missing
 
 For the template's own version history (the human-readable record of
-template releases), edit `.templates/CHANGELOG-TEMPLATE.md` directly or run
+template releases), edit `.template/CHANGELOG-TEMPLATE.md` directly or run
 `./scripts/bump_patch_version.sh`. `QUICKSTART.md` and
 `agents-docs/MIGRATION.md` do **not** display a template version
 badge — `README.md` is the only one.
@@ -63,7 +63,7 @@ badge — `README.md` is the only one.
 |------|---------|------------|
 | `VERSION` | `0.0.0` (template) or project version (consumer) | Manual edit |
 | `README.md` | `version-X.Y.Z` badge | propagate-version.sh |
-| `.templates/CHANGELOG-TEMPLATE.md` | template release history | bump_patch_version.sh / manual |
+| `.template/CHANGELOG-TEMPLATE.md` | template release history | bump_patch_version.sh / manual |
 | `CHANGELOG.md` | `[Unreleased]` section | propagate-version.sh (if missing) |
 
 ## CI Workflow

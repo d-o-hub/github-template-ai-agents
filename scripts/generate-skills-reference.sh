@@ -162,10 +162,11 @@ mkdir -p "$(dirname -- "$OUTPUT_FILE")"
     done
 } > "$OUTPUT_FILE"
 
-# perf: Use wc -l instead of grep -c to eliminate regex parsing overhead
+# perf: Use native array length evaluation instead of spawning sub-processes like wc -l
 if [[ -z "$SKILL_DATA" ]]; then
     SKILL_COUNT=0
 else
-    SKILL_COUNT=$(printf '%s\n' "$SKILL_DATA" | wc -l)
+    IFS_BAK="$IFS"; IFS=$'\n'; set -f; _cmd_arr=($SKILL_DATA); set +f; IFS="$IFS_BAK"
+    SKILL_COUNT=${#_cmd_arr[@]}
 fi
 printf 'Generated %s with %s skills\n' "$OUTPUT_FILE" "$SKILL_COUNT"

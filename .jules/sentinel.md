@@ -37,3 +37,19 @@
 **Vulnerability:** Keywords containing literal dots (e.g., \`nc.openbsd\`) were being used directly in regex construction, allowing the dot to be interpreted as a wildcard. This could lead to false positives (e.g., \`ncXopenbsd\`) or potential bypasses if used for exclusion.
 **Learning:** When building regular expressions from a list of keywords that may contain special characters like dots, those characters must be escaped first. Native Bash parameter expansion \`\${VAR//./\\\\.}\` is an efficient way to handle this before regex construction.
 **Prevention:** Always escape literal dots and other shell/regex metacharacters in security keywords before incorporating them into a larger regular expression. Use specific boundaries and hardened suffix patterns to ensure exact matching of command variants.
+
+## 2026-07-07 - Case-Insensitive Forbidden Path Validation
+
+**Vulnerability:** Path validation checks against `FORBIDDEN_PATHS` were case-sensitive, potentially allowing bypasses using alternate casing (e.g., `.GIT`, `.Env`) on case-insensitive filesystems or as a general oversight.
+**Learning:** Security denylists for file and directory names must be enforced case-insensitively to account for cross-platform filesystem behavior and to prevent simple obfuscation bypasses.
+**Prevention:** Always normalize path components (e.g., to lowercase) before comparing them against a denylist of forbidden names. Pre-calculating a lowercase set of forbidden strings improves performance.
+
+## 2026-07-08 - Blocking Unspecified IPv6 Address in SSRF Protection
+**Vulnerability:** The `do-web-doc-resolver` skill's SSRF protection did not explicitly block the unspecified IPv6 address `[::]`, which can be used to access services on the local host on many systems.
+**Learning:** SSRF protection must account for all representations of localhost, including both IPv4 (`0.0.0.0`, `127.0.0.1`) and IPv6 (`::1`, `::`) variants. The unspecified address `::` is often treated as localhost by networking stacks.
+**Prevention:** Explicitly include `::` in hostname blocklists and `::/128` in network blocklists for all SSRF validation logic.
+
+## 2026-07-14 - Harden Command Categorization against Env Var Injection
+**Vulnerability:** Command categorization could be bypassed by prefixing dangerous commands with environment variable assignments (e.g., `LD_PRELOAD=./evil.so ls`). The '=' and '+' characters were not being normalized, causing keywords to be merged and missed by the boundary-based regex.
+**Learning:** Environment variable assignments are often used in shell commands and can contain both dangerous variables themselves and act as a bypass mechanism for keyword detection. Normalization must include assignment operators to ensure proper tokenization of commands.
+**Prevention:** Always include '=' and '+' in the list of normalized characters for command string analysis. Maintain a list of dangerous environment variables to flag even when they are used at the start of a command without `env`.

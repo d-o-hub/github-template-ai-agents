@@ -19,7 +19,12 @@ ARCHIVE_DIR="$PLANS_DIR/archive"
 MOVED_COUNT=0
 NOW_SECONDS=$(date +%s)
 SIXTY_DAYS_SECONDS=$((60 * 24 * 60 * 60))
-CUTOFF_DATE=$(date -d "@$((NOW_SECONDS - SIXTY_DAYS_SECONDS))" +%Y-%m-%d)
+# Portable epoch-to-date: macOS uses date -r, GNU uses date -d
+if date -d "@0" +%Y 2>/dev/null | grep -q '1970'; then
+    CUTOFF_DATE=$(date -d "@$((NOW_SECONDS - SIXTY_DAYS_SECONDS))" +%Y-%m-%d)
+else
+    CUTOFF_DATE=$(date -r "$((NOW_SECONDS - SIXTY_DAYS_SECONDS))" +%Y-%m-%d)
+fi
 
 if [[ ! -d "$ARCHIVE_DIR" ]]; then
   echo "  (Skipping archive: plans/archive/ directory not found)"

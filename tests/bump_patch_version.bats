@@ -12,8 +12,8 @@ setup() {
 
     # Create required files
     echo "1.2.3" > VERSION
-    mkdir -p .templates
-    cat << 'MARKDOWN' > .templates/CHANGELOG-TEMPLATE.md
+    mkdir -p .template
+    cat << 'MARKDOWN' > .template/CHANGELOG-TEMPLATE.md
 # Changelog
 
 ## [Unreleased]
@@ -53,7 +53,7 @@ teardown() {
     [ "$output" = "1.2.4" ]
 
     # Assert changelog contains new entry with correct sections
-    run grep -A 15 "## \[1.2.4\]" .templates/CHANGELOG-TEMPLATE.md
+    run grep -A 15 "## \[1.2.4\]" .template/CHANGELOG-TEMPLATE.md
 
     # Check if we have the headers we expect
     echo "$output" | grep "### Added"

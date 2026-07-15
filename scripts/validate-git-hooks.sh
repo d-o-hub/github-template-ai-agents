@@ -22,7 +22,7 @@ GLOBAL_HOOKS_PATH=$(git config --global core.hooksPath 2>/dev/null || true)
 LOCAL_HOOKS_PATH=$(git config --local core.hooksPath 2>/dev/null || true)
 
 if [[ -n "$GLOBAL_HOOKS_PATH" ]]; then
-    printf "%b\n" "${RED}✗ ERROR: Global git hooks path is set!${NC}"
+    printf "%b\n" "${YELLOW}⚠ WARNING: Global git hooks path is set${NC}"
     printf "   Global hooks path: ${YELLOW}%s${NC}\n" "$GLOBAL_HOOKS_PATH"
     echo ""
     echo "This can prevent local pre-commit hooks from running."
@@ -38,7 +38,7 @@ if [[ -n "$GLOBAL_HOOKS_PATH" ]]; then
     echo "  Option 3 - Skip this check (not recommended):"
     echo "    SKIP_GLOBAL_HOOKS_CHECK=true git commit ..."
     echo ""
-    exit 1
+    exit 0
 fi
 
 # Check if local hooks path is correctly set

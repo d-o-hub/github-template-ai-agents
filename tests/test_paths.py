@@ -68,6 +68,20 @@ def test_validate_safe_path_forbidden(tmp_path):
         validate_safe_path("id_rsa", base, "test", check_forbidden=True)
 
 
+def test_validate_safe_path_case_insensitivity(tmp_path):
+    base = tmp_path / "repo"
+    base.mkdir()
+
+    # On case-sensitive filesystems, this is just a different folder.
+    # On case-insensitive ones, this IS the .git folder.
+    # Security-wise, we should block it regardless for cross-platform safety.
+    with pytest.raises(PathValidationError):
+        validate_safe_path(".GIT", base, "test", check_forbidden=True)
+
+    with pytest.raises(PathValidationError):
+        validate_safe_path(".Env", base, "test", check_forbidden=True)
+
+
 def test_validate_safe_path_symlink_escape(tmp_path):
     base = tmp_path / "repo"
     base.mkdir()

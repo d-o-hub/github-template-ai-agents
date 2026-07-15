@@ -28,7 +28,7 @@ done
 if [[ ${#diff_array[@]} -eq 0 && -z "${diff_array[0]:-}" ]]; then
     count=0
 else
-    # Security: Use printf to pipe variable content safely
-    count=$(printf "%s\n" "$diff_output" | wc -l || true)
+    # perf: Use native array length evaluation instead of spawning sub-processes like wc -l
+    count=${#diff_array[@]}
 fi
 printf "Done. %s files.\n" "$count"

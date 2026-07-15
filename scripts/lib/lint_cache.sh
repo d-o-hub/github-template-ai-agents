@@ -26,7 +26,12 @@ mkdir -p -- "$CACHE_DIR"
 
 # Global associative array for config hash caching (Bash 4+)
 # This avoids re-hashing the same config file hundreds of times
-declare -A _CONFIG_HASH_CACHE
+if ((BASH_VERSINFO[0] >= 4)); then
+    declare -A _CONFIG_HASH_CACHE
+    _LINT_CACHE_HAS_ASSOC=true
+else
+    _LINT_CACHE_HAS_ASSOC=false
+fi
 
 # Helper for portable sha256
 _get_hash_internal() {
@@ -95,7 +100,9 @@ lint_if_changed() {
         # Check if config_file is in memory cache
         # Using associative array lookup directly for robustness with keys containing dots
         local cached_val=""
-        cached_val="${_CONFIG_HASH_CACHE["$config_file"]-}"
+        if [[ "$_LINT_CACHE_HAS_ASSOC" == "true" ]]; then
+            cached_val="${_CONFIG_HASH_CACHE["$config_file"]-}"
+        fi
         if [[ -n "$cached_val" ]]; then
             config_hash="$cached_val"
         else
@@ -109,7 +116,9 @@ lint_if_changed() {
 
             if [[ -n "$real_config" ]]; then
                 config_hash=$(_get_hash_internal "$real_config")
-                _CONFIG_HASH_CACHE["$config_file"]="$config_hash"
+                if [[ "$_LINT_CACHE_HAS_ASSOC" == "true" ]]; then
+                    _CONFIG_HASH_CACHE["$config_file"]="$config_hash"
+                fi
             fi
         fi
     fi
@@ -160,12 +169,17 @@ lint_batch_if_changed() {
         fi
 
         if [[ -n "$real_config" ]]; then
-            local cached_val="${_CONFIG_HASH_CACHE["$config_file"]-}"
+            local cached_val=""
+            if [[ "$_LINT_CACHE_HAS_ASSOC" == "true" ]]; then
+                cached_val="${_CONFIG_HASH_CACHE["$config_file"]-}"
+            fi
             if [[ -n "$cached_val" ]]; then
                 config_hash="$cached_val"
             else
                 config_hash=$(_get_hash_internal "$real_config")
-                _CONFIG_HASH_CACHE["$config_file"]="$config_hash"
+                if [[ "$_LINT_CACHE_HAS_ASSOC" == "true" ]]; then
+                    _CONFIG_HASH_CACHE["$config_file"]="$config_hash"
+                fi
             fi
         fi
     fi
@@ -220,7 +234,7 @@ lint_batch_if_changed() {
         return 0
     fi
 
-    if xargs -0 -r "$@" < "$tmp_misses"; then
+    if xargs -0 "$@" < "$tmp_misses"; then
         # Success, update cache for all processed files
         local i
         for ((i=0; i<${#keys_to_cache[@]}; i++)); do

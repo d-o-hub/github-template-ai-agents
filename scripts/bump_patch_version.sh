@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Automatically bumps the patch version, updates .templates/CHANGELOG-TEMPLATE.md with recent commits,
+# Automatically bumps the patch version, updates .template/CHANGELOG-TEMPLATE.md with recent commits,
 # and propagates the version.
 set -euo pipefail
 
@@ -82,8 +82,8 @@ fi
 # Prepare the new changelog entry
 NEW_ENTRY="## [$NEW_VERSION] - $CURRENT_DATE\n\n$COMMITS\n"
 
-# Insert the new entry into .templates/CHANGELOG-TEMPLATE.md right after ## [Unreleased]
-if grep -q "^## \[Unreleased\]" .templates/CHANGELOG-TEMPLATE.md; then
+# Insert the new entry into .template/CHANGELOG-TEMPLATE.md right after ## [Unreleased]
+if grep -q "^## \[Unreleased\]" .template/CHANGELOG-TEMPLATE.md; then
     TMP_FILE=$(mktemp)
     trap 'rm -f "$TMP_FILE"' EXIT ERR
     # Use awk to insert after Unreleased section
@@ -95,11 +95,11 @@ if grep -q "^## \[Unreleased\]" .templates/CHANGELOG-TEMPLATE.md; then
         next
     }
     {print}
-    ' .templates/CHANGELOG-TEMPLATE.md > "$TMP_FILE"
-    mv "$TMP_FILE" .templates/CHANGELOG-TEMPLATE.md
-    echo "Updated .templates/CHANGELOG-TEMPLATE.md"
+    ' .template/CHANGELOG-TEMPLATE.md > "$TMP_FILE"
+    mv "$TMP_FILE" .template/CHANGELOG-TEMPLATE.md
+    echo "Updated .template/CHANGELOG-TEMPLATE.md"
 else
-    echo "Error: ## [Unreleased] not found in .templates/CHANGELOG-TEMPLATE.md" >&2
+    echo "Error: ## [Unreleased] not found in .template/CHANGELOG-TEMPLATE.md" >&2
     exit 1
 fi
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Post-commit hook for automatic documentation syncing
 # Integrates docs-hook skill with the git post-commit lifecycle
-# Usage: Add to .git/hooks/post-commit or run via install-hooks.sh
+# Usage: Add to .githooks/post-commit or run manually
 
 set -euo pipefail
 
