@@ -20,6 +20,7 @@ readonly DEFAULT_TIMEOUT_SECONDS=1800
 # Git/PR configuration
 readonly MAX_COMMIT_SUBJECT_LENGTH=150
 readonly MAX_PR_TITLE_LENGTH=150
+readonly MAX_PR_BODY_LENGTH=1000
 ```
 
 ## Development Phases
@@ -109,7 +110,7 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 - **Validation**: `echo "title" | npx commitlint --config commitlint.config.cjs` (or `gh pr edit`)
 - PR Title: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
 - Commit Header: `type(scope): subject` (max `${MAX_COMMIT_SUBJECT_LENGTH}` chars total, lowercase)
-- Commit Body: no hard limit (body-max-length disabled in commitlint; enforced at PR level as 1000 chars). Wrap at 100 chars per line. Footer: max 1000 chars.
+- Commit Body: Enforced at PR level as `${MAX_PR_BODY_LENGTH}` chars (GitHub concatenates title + body for squash-merge commits). Wrap at 100 chars per line. Footer: max 1000 chars.
 - Branch per feature; One concern per PR; Never commit to `main`.
 
 ### Commit Type Mapping
