@@ -23,9 +23,18 @@ readonly MAX_PR_TITLE_LENGTH=150
 readonly MAX_PR_BODY_LENGTH=1000
 ```
 
-## Development Phases
+## Process modes
 
-We use a GOAP approach combined with ADRs and TRIZ for structured development.
+| Mode | When | Required steps |
+|------|------|----------------|
+| **Light** (default for adopters) | Small fixes, docs, single-skill work | Quality gate → atomic commit → PR |
+| **Full** (template / large changes) | Architecture, multi-file refactors, new subsystems | GOAP + ADR + TRIZ phases below |
+
+See `agents-docs/ADOPTION_PROFILES.md` for minimal vs full template surface area.
+
+## Development Phases (full mode)
+
+Use GOAP + ADRs + TRIZ for structured development when the change is non-trivial.
 
 **Prerequisites**:
 - Fetch/pull latest default remote branch before beginning.
@@ -36,7 +45,7 @@ We use a GOAP approach combined with ADRs and TRIZ for structured development.
    - **Human Gate**: Review and approve the ADR and analysis before proceeding. *Only human gate.*
 
 2. **DECOMPOSE & PLAN (Phase 2)**
-   - **Action**: Use the `goap-agent` to break down in `plans/GOAP_STATE.md`.
+   - **Action**: Use the `goap-agent` to break down in `plans/GOAP_STATE.md` (create if missing).
 
 3. **EXECUTE & COORDINATE (Phase 3)**
    - **Action**: Execute tasks systematically using atomic commit workflow.
@@ -59,7 +68,7 @@ See `agents-docs/BEHAVIORAL_DEFAULTS.md` for automation-first, parallelism, dire
 
 ## Session Bootstrap
 
-Agents use a `SessionStart` hook to auto-inject project context (docs map + latest changelog) at startup; configured via `docflow.json` and agent-specific settings (e.g., `.claude/settings.json`).
+Agents use a `SessionStart` hook to inject compact project context (top-level docs index + latest changelog) at startup; configured via `docflow.json` and agent-specific settings (e.g., `.claude/settings.json`).
 
 ```bash
 ./hooks/session-start.sh # Manual execution to verify context injection

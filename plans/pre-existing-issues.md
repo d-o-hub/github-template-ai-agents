@@ -1,19 +1,31 @@
 # Pre-existing Issues
 
-These issues existed on the main branch before the PR resolution and were not addressed in this session. They are documented for follow-up.
+Tracked follow-ups that are not currently blocking main. Update this file when
+issues are resolved or new deferred work is accepted.
 
-## Quality Gate Warnings
+## Resolved (2026-07-15)
 
-The quality gate reports 31 skills missing the optional `version:` field in their SKILL.md frontmatter. This is a pre-existing convention issue affecting the following skills:
+- Skill `version:` frontmatter: all current skills include `version:` (was 31
+  missing; fixed earlier). Do not re-open based on historical quality-gate logs.
+- Catalog / symlink drift: addressed by ADR-030 (`setup-skills` prune + catalog
+  generators).
 
-accessibility-auditor, agent-coordination, agents-md, anti-ai-slop, architecture-diagram, atomic-commit, cicd-pipeline, code-quality, code-review-assistant, codeberg-api, database-devops, do-web-doc-resolver, docs-hook, git-github-workflow, github-readme, github-workflow, goap-agent, intent-classifier, iterative-refinement, learn, migration-refactoring, parallel-execution, privacy-first, skill-creator, skill-evaluator, task-decomposition, testing-strategy, triz-analysis, triz-solver, ui-ux-optimize, web-search-researcher
+## Open / deferred
 
-**Recommendation:** Add `version:` field to all SKILL.md frontmatters in a separate PR.
+### validate-links empty / malformed input
 
-## Copied PR Changes
+**Status:** Hardened under ADR-030 (early empty-list guards + lib helpers).
+Re-open only if a concrete hang is reproduced with a minimal reproducer.
 
-These are the original PR changes that were pushed to their respective branches.
+### CI status artifact freshness
 
-## PR #368 - validate-links.sh Robustness
+**Status:** External dependency (ADR-028). When `ci-status.json` is older than
+the freshness window, wait for the update workflow on `main` rather than
+hand-editing the artifact. Adopters who do not want CI-status automation can
+disable those workflows (see `agents-docs/ADOPTION_PROFILES.md`).
 
-The Codacy review expressed concern that `scripts/validate-links.sh` may hang on empty input. Investigation deferred.
+### Mega-script headroom
+
+Scripts near the 500-line limit (`quality_gate.sh`, `self-fix-loop.sh`,
+`swarm-worktree-web-research.sh`) remain candidates for further extraction
+when the next feature would push them over the limit.

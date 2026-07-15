@@ -1,4 +1,4 @@
-.PHONY: all ci fmt lint test quality bootstrap doctor help cli
+.PHONY: all ci fmt lint test quality bootstrap doctor help cli clean-workspaces clean-local-caches
 
 all: ci
 
@@ -32,3 +32,13 @@ doctor: ## Run environment diagnostics
 cli: ## Show CLI help
 	@./bin/agent-toolkit help
 
+
+clean-workspaces: ## Remove local skill eval workspaces and heavy local caches
+	@find .agents/skills -maxdepth 1 -type d -name '*-workspace' -exec rm -rf {} + 2>/dev/null || true
+	@rm -rf .agents/skills/*/node_modules 2>/dev/null || true
+	@echo "Removed local skill workspaces (gitignored)."
+
+clean-local-caches: clean-workspaces ## Also clear common local agent caches
+	@rm -rf .mimocode/node_modules .opencode/node_modules 2>/dev/null || true
+	@find . -type d -name '__pycache__' ! -path './.git/*' -exec rm -rf {} + 2>/dev/null || true
+	@echo "Cleared local node_modules/__pycache__ under tooling dirs where safe."

@@ -16,7 +16,7 @@ Throw away what does not help - more config is not always better.
 
 ## AGENTS.md Guidelines
 
-- Keep under ~150 lines; human-written (never auto-generated - LLM-generated files hurt quality)
+- Keep under **200 lines** (`MAX_LINES_AGENTS_MD` in `AGENTS.md`); human-written (never auto-generated — LLM-generated files hurt quality)
 - Concise and universally applicable - every instruction costs tokens
 - Use progressive disclosure: detailed docs in `agents-docs/`, not the root file
 

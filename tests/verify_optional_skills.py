@@ -85,7 +85,7 @@ def _test_validate_skill_format() -> bool:
     os.rename(SKILL_MD, bak_md)
     with open(SKILL_MD, "w") as f:
         f.write("Invalid content\n")
-    _, _, err = run(VALIDATE_SKILLS_SCRIPT)
+    code, _out, err = run(VALIDATE_SKILLS_SCRIPT)
     os.remove(SKILL_MD)
     os.rename(bak_md, SKILL_MD)
     if code == 2 and "Must start with '---'" in err:

@@ -72,6 +72,24 @@ for link in .claude/skills .qwen/skills; do
     else
       warn "$link exists but contains no symlinks (run setup-skills.sh)"
     fi
+    # Fail soft on dangling / workspace / orphan skill links
+    dangling=0
+    while IFS= read -r -d '' sl; do
+      name="${sl##*/}"
+      if [[ "$name" == *-workspace ]]; then
+        warn "workspace symlink present (run setup-skills.sh to prune): $sl"
+        dangling=$((dangling + 1))
+      elif [[ ! -e "$sl" ]]; then
+        warn "dangling skill symlink (run setup-skills.sh to prune): $sl"
+        dangling=$((dangling + 1))
+      elif [[ ! -f ".agents/skills/$name/SKILL.md" ]]; then
+        warn "orphan skill symlink (run setup-skills.sh to prune): $sl"
+        dangling=$((dangling + 1))
+      fi
+    done < <(find "$link" -maxdepth 1 -type l -print0 2>/dev/null)
+    if [[ "$dangling" -eq 0 ]]; then
+      pass "$link has no dangling/orphan skill links"
+    fi
   elif [[ -e "$link" ]]; then
     bad "$link exists but is NOT a symlink or skills directory"
   else
