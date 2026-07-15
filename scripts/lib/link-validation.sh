@@ -9,10 +9,20 @@ GREEN="${GREEN:-[0;32m}"
 YELLOW="${YELLOW:-[1;33m}"
 NC="${NC:-[0m}"
 
+# Shared patterns (used by this library and by scripts/validate-links.sh after source)
 LINK_REGEX='\[([^]]+)\]\(([^)]+)\)'
 AT_REF_REGEX='@references?/[^[:space:]]+'
 # shellcheck disable=SC2016
 PROPER_REF_REGEX='^\-[[:space:]]+\`(references?/[a-zA-Z0-9_-]+\.md)\`[[:space:]]*-[[:space:]]+.+$'
+export LINK_REGEX AT_REF_REGEX PROPER_REF_REGEX
+
+# Returns 0 if line contains a markdown link; populates BASH_REMATCH.
+# Ensures LINK_REGEX is referenced in this file (Codacy/shellcheck unused-var).
+match_markdown_link() {
+    local line="$1"
+    [[ "$line" =~ $LINK_REGEX ]]
+    return $?
+}
 
 is_references_header() {
     local line="$1"
