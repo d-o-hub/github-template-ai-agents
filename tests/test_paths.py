@@ -68,6 +68,7 @@ def test_validate_safe_path_forbidden(tmp_path):
         validate_safe_path("id_rsa", base, "test", check_forbidden=True)
 
     # Test newly added shell/app history and terraform paths
+    # Note: terraform.tfstate is covered by pattern matching, others by explicit denylist
     new_forbidden = [
         ".sh_history", ".lesshst", ".viminfo", ".mysql_history",
         ".psql_history", ".sqlite_history", "terraform.tfstate",
@@ -89,8 +90,17 @@ def test_validate_safe_path_patterns(tmp_path):
         validate_safe_path(".env.local.backup", base, "test", check_forbidden=True)
 
     # Sensitive extension patterns
-    sensitive_extensions = ["secret.pem", "my.key", "cert.pfx", "prod.tfstate"]
+    sensitive_extensions = [
+        "secret.pem", "my.key", "cert.pfx", "prod.tfstate",
+        "cert.crt", "bundle.cer"
+    ]
     for p in sensitive_extensions:
+        with pytest.raises(PathValidationError):
+            validate_safe_path(p, base, "test", check_forbidden=True)
+
+    # Case-insensitivity for patterns
+    case_patterns = [".ENV.LOCAL", "SECRET.PEM", "MY.KEY"]
+    for p in case_patterns:
         with pytest.raises(PathValidationError):
             validate_safe_path(p, base, "test", check_forbidden=True)
 

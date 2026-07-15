@@ -68,7 +68,7 @@ FORBIDDEN_PATHS = frozenset({
     ".psql_history",
     ".sqlite_history",
     "terraform.tfstate.backup",
-    ".terraform",
+    ".terraform",  # Directory: blocks .terraform/ and its contents
     "id_rsa",
     "id_ed25519",
     "id_ecdsa",
@@ -123,9 +123,12 @@ def validate_safe_path(
                 )
 
             # Pattern-based matches
+            # .env* covers various environment file naming conventions.
+            # Extensions cover common certificate, private key, and state formats.
+            # Note: .key is intentionally broad to catch private keys despite potential false positives.
             if (
                 part_lower.startswith(".env") or
-                part_lower.endswith((".pem", ".key", ".pfx", ".tfstate"))
+                part_lower.endswith((".pem", ".key", ".pfx", ".tfstate", ".crt", ".cer"))
             ):
                 raise PathValidationError(
                     f"--{param_name} targets a sensitive file pattern: {part}"
