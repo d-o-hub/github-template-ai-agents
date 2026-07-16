@@ -8,11 +8,11 @@ set -euo pipefail
 SAFE_KEYWORDS="${SAFE_KEYWORDS:-build:test:lint:check:status:list:help:version:describe:doc:info:show:get:ls:cat:echo:grep:find:pwd:diff:cd:head:tail:sort:uniq:wc:git:log:pgrep:type:which:df:du:free:top:ps:history}"
 CONDITIONAL_KEYWORDS="${CONDITIONAL_KEYWORDS:-install:clean:format:migrate:update:init:add:remove:delete:replace:chmod:chown:chgrp:setfacl:ssh-keygen:openssl:gpg:mv:cp:ln:link:patch:tar:zip:unzip:gzip:gunzip:bzip2:xz:make:touch:gh:xargs:apt:apt-get:yum:dnf:zypper:brew:pipx}"
 # Destructive and administrative commands (strict boundaries)
-DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:killall:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown:pkill:sed:truncate:unlink:tee:parted:fdisk:gdisk:sfdisk:wipe:srm:badblocks:alias:unalias:iptables:nft:ufw:firewall-cmd:crontab:pkexec:mount:umount:chroot:unshare:nsenter:git-remote-ext:poweroff:halt:swapon:swapoff:modprobe:insmod:rmmod:sysctl:strace:gdb:ld_preload:ld_library_path:pythonpath:node_options:bash_env:ps4:-f:-y}"
+DESTRUCTIVE_KEYWORDS="${DESTRUCTIVE_KEYWORDS:-rm:delete:drop:force:destroy:purge:reset:hard:kill:killall:terminate:eval:exec:sudo:doas:docker:kubectl:podman:rmdir:dd:source:env:su:systemctl:shred:mkfs:mke2fs:mkswap:cryptsetup:reboot:shutdown:pkill:sed:truncate:unlink:tee:parted:fdisk:gdisk:sfdisk:wipe:srm:badblocks:alias:unalias:iptables:nft:ufw:firewall-cmd:crontab:pkexec:mount:umount:chroot:unshare:nsenter:git-remote-ext:poweroff:halt:swapon:swapoff:modprobe:insmod:rmmod:sysctl:strace:gdb:ld_preload:ld_library_path:pythonpath:node_options:bash_env:ps4:chattr:setenforce:write:wall:-f:-y}"
 # Language interpreters (broad boundaries to catch versioned ones like python3.11)
 INTERPRETER_KEYWORDS="${INTERPRETER_KEYWORDS:-sh:bash:zsh:python:python3:pip3:node:perl:ruby:php:deno:bun:npx:npm:yarn:pnpm:cargo:go:pip:composer:bundle:pipenv:poetry:conda:mamba:uv:lua:awk}"
 # Networking tools (strict boundaries to avoid false positives like curl.sh)
-NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat:nslookup:dig:host:nc.openbsd:nc.traditional:telnet:ftp:tftp:ssh-add:ssh-agent:ncat:tcpdump:wireshark:tshark:aria2c:lynx:links:elinks:expect:rclone:ssh-copy-id:ssh-keyscan:ngrok:cloudflared:aws:gcloud:az}"
+NETWORK_KEYWORDS="${NETWORK_KEYWORDS:-curl:wget:nc:netcat:nmap:ssh:scp:sftp:rsync:socat:nslookup:dig:host:nc.openbsd:nc.traditional:telnet:ftp:tftp:ssh-add:ssh-agent:ncat:tcpdump:wireshark:tshark:aria2c:lynx:links:elinks:expect:rclone:ssh-copy-id:ssh-keyscan:ngrok:cloudflared:aws:gcloud:az:whois}"
 # Script extensions treated as safe — a keyword followed by one of these is a script, not a bare command
 SAFE_EXTENSIONS=(sh py pl rb js ts mjs bash zsh csh ksh fish)
 _ext_str="${SAFE_EXTENSIONS[*]}"
@@ -22,7 +22,7 @@ unset _ext_str
 # Custom patterns for categories (E3)
 SAFE_PATTERNS=()
 CONDITIONAL_PATTERNS=()
-DANGEROUS_PATTERNS=(ext::)
+DANGEROUS_PATTERNS=(ext:: "gh extension" "gh alias" "gh secret")
 
 # Load project-specific configuration if available
 if [[ -f ".command-verify.conf" ]]; then
