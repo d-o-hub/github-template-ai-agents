@@ -79,6 +79,10 @@ FORBIDDEN_PATHS = frozenset({
     ".env.development",
     ".env.test",
     ".env.production",
+    ".bash_logout",
+    ".inputrc",
+    ".wget-hsts",
+    "rclone.conf",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
