@@ -57,6 +57,17 @@ After setup, you can use the unified `agent-toolkit` CLI instead of calling scri
 If you are starting from scratch, click **"Use this template"** on GitHub before
 cloning. The bootstrap step is the same.
 
+### Start light (recommended)
+
+Day one does **not** require full GOAP/ADR/TRIZ:
+
+1. Bootstrap and edit `AGENTS.md` for your product
+2. Keep core CI workflows; disable maintainer-only ones if you do not need them
+3. Use **light process mode** (quality gate → commit → PR) until changes get large
+
+See [agents-docs/ADOPTION_PROFILES.md](agents-docs/ADOPTION_PROFILES.md) for
+minimal workflows, skill packs, and what to prune.
+
 ## Configure for Your Project
 
 Edit `AGENTS.md` to add your project details:

@@ -65,11 +65,14 @@ done
 
 cd "$REPO_ROOT" || exit 1
 
-log()      { printf '  %s\n' "$*"; }
-section()  { printf '\n%s\n' "== $* =="; }
-ok()       { printf '  \u2713 %s\n' "$*"; }
-warn()     { printf '  ! %s\n' "$*"; WARNINGS=$((WARNINGS + 1)); }
-fail()     { printf '  \u2717 %s\n' "$*" >&2; FAILED=$((FAILED + 1)); }
+REPORT_BODY=""
+_report_append() { REPORT_BODY+="$1"$'\n'; }
+
+log()      { printf '  %s\n' "$*"; _report_append "  $*"; }
+section()  { printf '\n%s\n' "== $* =="; _report_append ""; _report_append "== $* =="; }
+ok()       { printf '  \u2713 %s\n' "$*"; _report_append "  ✓ $*"; }
+warn()     { printf '  ! %s\n' "$*"; WARNINGS=$((WARNINGS + 1)); _report_append "  ! $*"; }
+fail()     { printf '  \u2717 %s\n' "$*" >&2; FAILED=$((FAILED + 1)); _report_append "  ✗ $*"; }
 
 # --- 1. TODO/FIXME density ---
 check_todo_density() {
@@ -194,26 +197,37 @@ check_required_files() {
     fi
 }
 
-# --- 5. Tracking-state freshness ---
+# --- 5. Local tooling state (gitignored; informational only) ---
 check_tracking_state() {
-    section "Tracking state"
+    section "Local tooling state (not git-tracked health)"
     if [[ -d .commandcode ]]; then
         local taste_files
         taste_files=$(find .commandcode -type f 2>/dev/null | wc -l)
-        log "  .commandcode: $taste_files file(s)"
+        log "  .commandcode (local taste): $taste_files file(s)"
     else
-        warn ".commandcode/ missing (taste/learnings state)"
+        log "  .commandcode: not present (optional local tooling)"
     fi
     if [[ -d .mimocode ]]; then
         local mim_files
         mim_files=$(find .mimocode -type f 2>/dev/null | wc -l)
-        log "  .mimocode: $mim_files file(s)"
+        log "  .mimocode (local agent cache): $mim_files file(s) — usually gitignored"
+        if [[ "$mim_files" -gt 1000 ]]; then
+            warn ".mimocode has $mim_files files; run make clean-workspaces if disk is tight"
+        fi
     else
-        warn ".mimocode/ missing"
+        log "  .mimocode: not present (optional local tooling)"
+    fi
+    # Workspace pollution under skills
+    local ws_count
+    ws_count=$(find .agents/skills -maxdepth 1 -type d -name '*-workspace' 2>/dev/null | wc -l)
+    if [[ "$ws_count" -gt 0 ]]; then
+        log "  skill workspaces: $ws_count dir(s) (gitignored; make clean-workspaces to remove)"
+    else
+        ok "no local skill workspace dirs"
     fi
 }
 
-# --- Write report ---
+# --- Write report (full findings, not summary-only) ---
 write_report() {
     mkdir -p "$REPORTS_DIR"
     {
@@ -222,11 +236,14 @@ write_report() {
         printf '## Summary\n\n'
         printf -- '- Errors:   %d\n' "$FAILED"
         printf -- '- Warnings: %d\n' "$WARNINGS"
-        printf '\n## Checks\n\n'
-        printf 'See the human-readable output for full details.\n'
+        printf '\n## Findings\n\n'
+        if [[ -n "$REPORT_BODY" ]]; then
+            printf '%s\n' "$REPORT_BODY"
+        else
+            printf 'No detailed findings captured.\n'
+        fi
     } > "$REPORT_FILE"
-    log ""
-    log "Report written to ${REPORT_FILE#$REPO_ROOT/}"
+    printf '  Report written to %s\n' "${REPORT_FILE#$REPO_ROOT/}"
 }
 
 main() {
@@ -238,7 +255,7 @@ main() {
     check_tracking_state
     write_report
 
-    log ""
+    printf '\n'
     if [[ "$FAILED" -ne 0 ]]; then
         printf '\u2717 Analysis: %d error(s), %d warning(s)\n' "$FAILED" "$WARNINGS" >&2
         exit 1

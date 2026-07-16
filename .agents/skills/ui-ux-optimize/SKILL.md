@@ -39,58 +39,11 @@ Supported: web apps, mobile apps, dashboards, admin tools, e-commerce, SaaS, gam
 
 ## Anti-AI-Slop Guide
 
-Systematic antidote for detecting and avoiding generic AI patterns in UI, UX, and copy. **Audit modes:** (1) Audit — run diagnostic checklists on existing UI; (2) Creation — read "What to do instead" before producing work; (3) Spot-fix — diagnose one element. Always **name the sin** before fixing.
-
-### UI Slop Patterns (Visual Design)
-
-| Pattern | What it looks like | Why it's slop |
-|---|---|---|
-| Purple gradient hero | `#7c3aed → #2563eb` | Default Tailwind AI palette |
-| Glassmorphism cards | Frosted glass, `backdrop-blur` | Overused since iOS 15 |
-| Rounded everything | `border-radius: 24px+` | Removes personality |
-| Inter / DM Sans / Space Grotesk | Default "modern" sans | Signals "AI-generated UI" |
-| Emojis in headers | ✨ 🚀 | Startup theater |
-| Hero headline formula | `[Verb] your [noun] with [product]` | Indistinguishable from 10,000 others |
-| Three-column feature grid | Icon + bold label + 1 sentence | Every SaaS landing page since 2019 |
-| CTA: "Get started for free" | Large primary button | Meaningless |
-
-**What to do instead:** Typography first, commit to one extreme (brutally minimal OR maximally dense), use real color theory, let content shape the layout, reference design movements (Swiss grid, Bauhaus, Brutalist web).
-
-### UX Slop Patterns (Interaction & Flow)
-
-| Pattern | Why it's slop |
-|---|---|
-| Onboarding modal | Interrupts before context |
-| 5-step wizard | Treats users as suspects |
-| Tooltip tours | Teaches wrong interface instead of fixing it |
-| "Are you sure?" | Trust issues. Use undo instead |
-| Toast notifications | Noise. Users ignore them in 2 sessions |
-| Hamburger menu | Discovery failure |
-
-**What to do instead:** Undo over confirm, empty states with one specific next action, progressive disclosure, optimistic UI, inline notifications.
-
-### Copy Slop Patterns
-
-| Slop Type | Examples | Fix |
-|---|---|---|
-| Hollow Affirmations | Absolutely!, Certainly!, Of course! | Delete them. Start with content. |
-| AI Superlatives | Powerful, seamless, intuitive, robust | Use specific claims and data. |
-| Listicle Reflex | Bullet points for everything | Write prose. Use lists only for genuine sets. |
-| Transition Theater | "In conclusion...", "To summarize..." | Just say the thing. |
-| Emoji Inflation | 🚀 💡 ✨ ⚡ 🔥 | Use zero emojis unless genuinely casual/social. |
-| Feature Announcement | "We're excited to announce..." | What does it do, concretely? |
-
-### Audit Workflow
-
-1. Scan all three canons (UI, UX, Copy). List every match by name.
-2. Score severity: 🔴 Structural (redesign), 🟡 Surface (easy fix), 🟢 Cosmetic (polish).
-3. Fix structural first. Provide specific replacements, name the design principle.
-
-### Positive Design Doctrine
-
-- Specificity > universality. Design for this user, this task, this moment.
-- Tension is interest. Contrast, asymmetry, and friction are memorable.
-- Constraints create identity. Respect the user's time. Be opinionated.
+Systematic antidote for generic AI patterns in UI, UX, and copy.
+**Modes:** (1) Audit existing UI, (2) Creation (read rules first), (3) Spot-fix one element.
+Always **name the sin** before fixing. Full pattern tables → `references/anti-slop-guide.md`
+and `references/anti-slop-rules.md`. Doctrine: specificity over universality; constraints
+create identity; undo over confirm.
 
 ## Swarm Architecture
 

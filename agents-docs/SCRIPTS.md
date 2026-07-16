@@ -12,7 +12,9 @@
 | `doctor.sh` | Environment diagnostics for self-service troubleshooting | `./scripts/doctor.sh` |
 | `quality_gate.sh` | Multi-language quality gate (lint, test, format) | `./scripts/quality_gate.sh` |
 | `secretlint_gate.sh` | Runs secretlint | `./scripts/secretlint_gate.sh` |
-| `setup-skills.sh` | Create symlinks from `.agents/skills/` to CLI dirs | `./scripts/setup-skills.sh` |
+| `setup-skills.sh` | Create symlinks from `.agents/skills/` to CLI dirs (prunes dangling/orphan/`*-workspace` links) | `./scripts/setup-skills.sh` |
+| `generate-available-skills.sh` | Regenerate `agents-docs/AVAILABLE_SKILLS.md` from frontmatter | `./scripts/generate-available-skills.sh` |
+| `generate-skill-catalog.sh` | Regenerate intent-classifier skill catalog | `./scripts/generate-skill-catalog.sh` |
 | `pre-commit-hook.sh` | Pre-commit hook template (legacy; `.githooks/` is active) | Via `bootstrap.sh` |
 
 ## Validation Scripts

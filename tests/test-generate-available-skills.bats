@@ -60,3 +60,23 @@ teardown() {
     run grep -q "Hidden Skill" "$OUTPUT_FILE"
     [ "$status" -eq 1 ]
 }
+
+@test "generate-available-skills.sh parses pipe block-scalar descriptions" {
+    mkdir -p "$SKILLS_DIR/block-skill"
+    cat << 'FRONTMATTER' > "$SKILLS_DIR/block-skill/SKILL.md"
+---
+name: "Block Skill"
+description: |
+  First line of description.
+  Second line continues.
+category: "tool"
+---
+FRONTMATTER
+
+    run bash "$BATS_TEST_DIRNAME/../scripts/generate-available-skills.sh"
+    [ "$status" -eq 0 ]
+    run grep -q "Block Skill" "$OUTPUT_FILE"
+    [ "$status" -eq 0 ]
+    run grep -q "First line of description" "$OUTPUT_FILE"
+    [ "$status" -eq 0 ]
+}
