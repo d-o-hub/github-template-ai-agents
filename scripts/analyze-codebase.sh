@@ -115,13 +115,21 @@ check_orphan_cache() {
         return
     fi
 
-    fail "Tracked cache/OS files detected ($(printf '%s\n' "$tracked" | wc -l)):"
+    # perf: safely split tracked string into array to eliminate wc -l and read subshells
+    local old_ifs="$IFS"
+    IFS=$'\n'
+    set -f
+    local tracked_arr=($tracked)
+    set +f
+    IFS="$old_ifs"
+
+    fail "Tracked cache/OS files detected (${#tracked_arr[@]}):"
     printf '%s\n' "$tracked" | sed 's/^/    /'
 
     if [[ "$FIX_MODE" == "true" && -f .gitignore ]]; then
         local additions=()
         local f
-        while IFS= read -r f; do
+        for f in "${tracked_arr[@]}"; do
             [[ -z "$f" ]] && continue
             case "$f" in
                 *.pyc|*.pyo)
@@ -131,7 +139,7 @@ check_orphan_cache() {
                 .DS_Store) additions+=(".DS_Store") ;;
                 Thumbs.db) additions+=("Thumbs.db") ;;
             esac
-        done <<< "$tracked"
+        done
         local pat
         for pat in "${additions[@]:-}"; do
             if ! grep -qxF "$pat" .gitignore 2>/dev/null; then
