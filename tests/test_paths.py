@@ -109,6 +109,31 @@ def test_validate_safe_path_patterns(tmp_path):
     with pytest.raises(PathValidationError):
         validate_safe_path("subdir/id_rsa.pem", base, "test", check_forbidden=True)
 
+    # SSH private key pattern-based matches (custom/backup suffixes)
+    ssh_private_patterns = [
+        "id_rsa_backup", "id_ed25519_sk", "id_ecdsa_old", "id_xmss.backup"
+    ]
+    for p in ssh_private_patterns:
+        with pytest.raises(PathValidationError):
+            validate_safe_path(p, base, "test", check_forbidden=True)
+
+    # Public keys should be allowed
+    ssh_public_patterns = [
+        "id_rsa.pub", "id_ed25519_sk.pub", "id_ecdsa_old.pub"
+    ]
+    for p in ssh_public_patterns:
+        res = validate_safe_path(p, base, "test", check_forbidden=True)
+        assert res == (base / p).resolve()
+
+    # Explicit checks for newly added VCS folders and alternative shell histories
+    vcs_and_histories = [
+        ".hg", ".hgignore", ".hgrc", ".svn",
+        ".fish_history", ".ash_history", ".tcsh_history"
+    ]
+    for p in vcs_and_histories:
+        with pytest.raises(PathValidationError):
+            validate_safe_path(p, base, "test", check_forbidden=True)
+
 
 def test_validate_safe_path_case_insensitivity(tmp_path):
     base = tmp_path / "repo"
