@@ -1,5 +1,5 @@
 ---
-name: Cleanup Automated PRs
+name: Cleanup Automated CI Status PRs
 
 on:  # yamllint disable-line rule:truthy
   schedule:
