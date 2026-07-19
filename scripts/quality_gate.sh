@@ -298,9 +298,10 @@ printf "%bDetecting project languages...%b
 " "" ""
 [[ -f "go.mod" ]] && DETECTED_LANGUAGES+=("go") && printf "  %b✓%b Go
 " "" ""
-find . -name "*.sh" -not -path "" -print -quit | grep -q . && DETECTED_LANGUAGES+=("shell") && printf "  %b✓%b Shell
+# perf: Replace grep -q with native string length check to avoid external fork overhead
+[[ -n "$(find . -name "*.sh" -not -path "" -print -quit)" ]] && DETECTED_LANGUAGES+=("shell") && printf "  %b✓%b Shell
 " "" ""
-find . -name "*.md" -not -path "" -print -quit | grep -q . && DETECTED_LANGUAGES+=("markdown") && printf "  %b✓%b Markdown
+[[ -n "$(find . -name "*.md" -not -path "" -print -quit)" ]] && DETECTED_LANGUAGES+=("markdown") && printf "  %b✓%b Markdown
 " "" ""
 
 # --- Get changed files for scoped linting ---
