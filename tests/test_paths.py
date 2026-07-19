@@ -152,4 +152,6 @@ def test_validate_safe_path_ssh_keys(tmp_path):
     public_keys = ["id_rsa.pub", "id_ed25519_github.pub", "id_dsa_old.pub", "id_ecdsa_corp.pub", "id_xmss_test.pub"]
     for pub in public_keys:
         res = validate_safe_path(pub, base, "test", check_forbidden=True)
-        assert res == (base / pub).resolve()
+        expected = (base / pub).resolve()
+        if res != expected:
+            raise AssertionError(f"Expected {expected}, got {res}")
