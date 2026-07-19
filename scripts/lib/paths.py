@@ -132,7 +132,8 @@ def validate_safe_path(
             # Note: .key is intentionally broad to catch private keys despite potential false positives.
             if (
                 part_lower.startswith(".env") or
-                part_lower.endswith((".pem", ".key", ".pfx", ".tfstate", ".crt", ".cer"))
+                part_lower.endswith((".pem", ".key", ".pfx", ".tfstate", ".crt", ".cer")) or
+                (part_lower.startswith(("id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", "id_xmss")) and not part_lower.endswith(".pub"))
             ):
                 raise PathValidationError(
                     f"--{param_name} targets a sensitive file pattern: {part}"

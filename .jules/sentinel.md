@@ -59,3 +59,9 @@
 **Vulnerability:** Static denylists for forbidden paths were insufficient to catch variations of sensitive files like custom environment files (e.g., .env.local) or credential files with various names (e.g., cert.pem, key.pfx).
 **Learning:** Security validation must combine explicit denylists with pattern-based matching to provide broader coverage against known sensitive file types and naming conventions.
 **Prevention:** Implement suffix and prefix matching in path validation logic to block entire classes of sensitive files (e.g., *.pem, *.key, .env*) in addition to maintaining a comprehensive list of specific forbidden filenames.
+
+## 2026-07-20 - Dynamic Pattern-Based SSH Private Key Prefix Blocking
+
+**Vulnerability:** Static path denylists for specific filenames like `id_rsa` or `id_ed25519` are insufficient to prevent access/exposure of SSH private keys with custom/dynamic names (e.g. `id_rsa_personal`, `id_ed25519_github`).
+**Learning:** Security validation logic must use wildcard or pattern-based prefix matching to capture all variants of SSH private keys, while safely exempting public key counterparts (ending with `.pub`) to avoid breaking valid references.
+**Prevention:** In `validate_safe_path`, block any path component starting with standard SSH key prefixes (`id_rsa`, `id_dsa`, `id_ecdsa`, `id_ed25519`, `id_xmss`) if they do not end with `.pub`.
