@@ -60,6 +60,12 @@
 **Learning:** Security validation must combine explicit denylists with pattern-based matching to provide broader coverage against known sensitive file types and naming conventions.
 **Prevention:** Implement suffix and prefix matching in path validation logic to block entire classes of sensitive files (e.g., *.pem, *.key, .env*) in addition to maintaining a comprehensive list of specific forbidden filenames.
 
+## 2026-07-22 - Pattern-Based SSH Private Key Blocking and Multi-VCS Hardening
+
+**Vulnerability:** Static exact-matching of specific SSH key names (e.g., `id_rsa`, `id_ed25519`) failed to block SSH keys using newer algorithms (e.g., `id_ed25519_sk`, `id_ecdsa_sk`), custom suffixes, or backups (e.g., `id_rsa_backup`, `id_rsa.old`). Additionally, other version control systems like Mercurial (`.hg`) and Subversion (`.svn`) were not explicitly blocked in forbidden path validation.
+**Learning:** Hardcoded lists of exact filenames are prone to omissions. Combining prefix and suffix matching allows blocking an entire class of sensitive keys (such as any file starting with `id_rsa` or similar that does not end with `.pub`) while allowing public keys, ensuring robust coverage for alternative structures and metadata.
+**Prevention:** Apply dynamic prefix-based patterns in combination with exclusion lists (e.g., `not endswith('.pub')`) to block private key variations. Expand static denylists to encompass alternative VCS folders and shell histories to enforce comprehensive coverage.
+
 ## 2026-07-20 - Dynamic Pattern-Based SSH Private Key Prefix Blocking
 
 **Vulnerability:** Static path denylists for specific filenames like `id_rsa` or `id_ed25519` are insufficient to prevent access/exposure of SSH private keys with custom/dynamic names (e.g. `id_rsa_personal`, `id_ed25519_github`).
