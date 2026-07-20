@@ -180,3 +180,34 @@ def test_validate_safe_path_ssh_keys(tmp_path):
         expected = (base / pub).resolve()
         if res != expected:
             raise AssertionError(f"Expected {expected}, got {res}")
+
+
+def test_validate_safe_path_hardened(tmp_path):
+    base = tmp_path / "repo"
+    base.mkdir()
+
+    # New forbidden paths added (directories and files)
+    new_forbidden = [".cargo", ".s3cfg", ".boto", ".gcloud", ".azure"]
+    for p in new_forbidden:
+        with pytest.raises(PathValidationError):
+            validate_safe_path(p, base, "test", check_forbidden=True)
+
+    # New private key identity checks
+    identity_keys = ["identity", "identity_backup", "identity_personal"]
+    for k in identity_keys:
+        with pytest.raises(PathValidationError):
+            validate_safe_path(k, base, "test", check_forbidden=True)
+
+    # identity.pub should be allowed
+    res = validate_safe_path("identity.pub", base, "test", check_forbidden=True)
+    assert res == (base / "identity.pub").resolve()
+
+    # New sensitive extension pattern matches
+    hardened_extensions = [
+        "cert.p12", "key.pkcs8", "key.pk8", "cert.der",
+        "keystore.keystore", "keystore.jks", "docker.dockercfg",
+        "azure.publishsettings"
+    ]
+    for ext in hardened_extensions:
+        with pytest.raises(PathValidationError):
+            validate_safe_path(ext, base, "test", check_forbidden=True)

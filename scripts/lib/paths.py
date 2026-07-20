@@ -90,6 +90,11 @@ FORBIDDEN_PATHS = frozenset({
     ".fish_history",
     ".ash_history",
     ".tcsh_history",
+    ".cargo",
+    ".s3cfg",
+    ".boto",
+    ".gcloud",
+    ".azure",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
@@ -140,9 +145,9 @@ def validate_safe_path(
             # SSH private key prefixes cover custom-named keys and newer types (e.g. id_ed25519_sk, id_rsa_backup).
             if (
                 part_lower.startswith(".env") or
-                part_lower.endswith((".pem", ".key", ".pfx", ".tfstate", ".crt", ".cer")) or
+                part_lower.endswith((".pem", ".key", ".pfx", ".tfstate", ".crt", ".cer", ".p12", ".pkcs8", ".pk8", ".der", ".keystore", ".jks", ".dockercfg", ".publishsettings")) or
                 (
-                    part_lower.startswith(("id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", "id_xmss")) and
+                    part_lower.startswith(("identity", "id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", "id_xmss")) and
                     not part_lower.endswith(".pub")
                 )
             ):
