@@ -243,7 +243,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - chore: resolve merge conflicts with main
 - perf: eliminate grep process forks in codebase analysis (#671)
 - I have improved the scripts' performance by replacing external pattern-matching subshells with native Bash string matching. (#666)
-- ci: bump https://github.com/igorshubovych/markdownlint-cli (#667)
+- ci: bump <https://github.com/igorshubovych/markdownlint-cli> (#667)
 - ci: regenerate llms.txt and llms-full.txt [skip ci]
 - perf: eliminate grep process fork in test-workflow-validation.sh (#655)
 - perf: eliminate awk and grep subshells in validate-skills.sh (#660)
@@ -343,7 +343,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - test: add auto-merge workflow validation tests and fix Dependabot pre-commit label
 - ci: bump the github-actions group across 1 directory with 2 updates (#458)
 - ci: add commitlint config validation to quality gate and fix 14 yamllint truthy warnings
-- ci: bump https://github.com/shellcheck-py/shellcheck-py (#456)
+- ci: bump <https://github.com/shellcheck-py/shellcheck-py> (#456)
 - test: refactor commitlint checks for stricter key-value matching and add dependabot exemption test
 - ci: add dependabot commitlint exemption, LESSON-022, and workflow tests
 - ci: add scheduled cleanup workflow, ci-status label, and duplicate-cleanup tests
