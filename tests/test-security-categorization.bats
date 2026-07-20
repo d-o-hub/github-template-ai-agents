@@ -130,3 +130,31 @@ setup() {
     run categorize_command "bash script.sh"
     [ "$output" = "dangerous" ]
 }
+
+@test "harden-command-categorization: detects newly blocked dangerous environment variables" {
+    run categorize_command "PERL5LIB=/tmp/lib perl script.pl"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "RUSTC_WRAPPER=malicious_bin cargo build"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "GIT_SSH_COMMAND='ssh -i /id_rsa' git clone url"
+    [ "$output" = "dangerous" ]
+}
+
+@test "harden-command-categorization: detects newly blocked networking utilities" {
+    run categorize_command "s3cmd put secret.txt s3://bucket"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "gsutil cp secret.txt gs://bucket"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "mc cp secret.txt play/bucket"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "http POST http://example.com"
+    [ "$output" = "dangerous" ]
+
+    run categorize_command "netstat -pant"
+    [ "$output" = "dangerous" ]
+}
