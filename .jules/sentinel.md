@@ -71,3 +71,9 @@
 **Vulnerability:** Static path denylists for specific filenames like `id_rsa` or `id_ed25519` are insufficient to prevent access/exposure of SSH private keys with custom/dynamic names (e.g. `id_rsa_personal`, `id_ed25519_github`).
 **Learning:** Security validation logic must use wildcard or pattern-based prefix matching to capture all variants of SSH private keys, while safely exempting public key counterparts (ending with `.pub`) to avoid breaking valid references.
 **Prevention:** In `validate_safe_path`, block any path component starting with standard SSH key prefixes (`id_rsa`, `id_dsa`, `id_ecdsa`, `id_ed25519`, `id_xmss`) if they do not end with `.pub`.
+
+## 2026-07-26 - Harden Path Validation with Alternative Formats and Environment Injection Defense
+
+**Vulnerability:** Gaps in forbidden paths allowed potential access to Google Cloud, Azure, and Cargo registry credential directories, while missing private key extensions (like .p12, .pkcs8, and older .identity formats) left credentials unprotected. Additionally, the lack of coverage for highly dangerous environment variables (e.g., PERL5LIB, RUSTC_WRAPPER, GIT_SSH_COMMAND) and extra exfiltration-prone network utilities (e.g., s3cmd, gsutil) left vectors open for environment/command injection and data exfiltration.
+**Learning:** A security boundary must not only block direct and obvious formats but also alternative formats and deployment tools' credential storage. Furthermore, environment variable injection is as powerful as command execution; environment variables controlling binary wrappers, library loaders, and pager scripts must be treated with the same severity as destructive CLI tools.
+**Prevention:** Expand forbidden path lists to cover major cloud and package registry credential directories, and pattern-match all variations of cryptographic files and private keys. Maintain exhaustive keyword definitions for dangerous environment variables and network utilities.
