@@ -18,8 +18,8 @@ SECURITY_SCAN_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "security-scan.ym
 CLEANUP_CI_STATUS_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "cleanup-ci-status-prs.yml"
 
 # SHA hashes that should be present after the PR update
-LABELER_NEW_SHA = "f27b608878404679385c85cfa523b85ccb86e213"
-CODEQL_NEW_SHA = "7211b7c8077ea37d8641b6271f6a365a22a5fbfa"
+LABELER_NEW_SHA = "b8dd2d9be0f68b860e7dae5dae7d772984eacd6d"
+CODEQL_NEW_SHA = "7188fc363630916deb702c7fdcf4e481b751f97a"
 
 # Old SHA hashes that must NOT appear after the update
 LABELER_OLD_SHA = "634933edcd8ababfe52f92936142cc22ac488b1b"
@@ -90,14 +90,14 @@ class TestLabelerWorkflow:
             f"Expected actions/labeler to be pinned to SHA {LABELER_NEW_SHA}"
         )
 
-    def test_labeler_action_version_comment_is_v6_1_0(self):
-        """The inline version comment next to actions/labeler must say v6.1.0."""
+    def test_labeler_action_version_comment_is_v6_2_0(self):
+        """The inline version comment next to actions/labeler must say v6.2.0."""
         raw = _raw_text(LABELER_WORKFLOW)
-        # Expect a line like: uses: actions/labeler@<SHA>  # v6.1.0
+        # Expect a line like: uses: actions/labeler@<SHA>  # v6.2.0
         assert re.search(
-            rf"actions/labeler@{re.escape(LABELER_NEW_SHA)}\s+#\s*v6\.1\.0",
+            rf"actions/labeler@{re.escape(LABELER_NEW_SHA)}\s+#\s*v6\.2\.0",
             raw,
-        ), "actions/labeler pin should be followed by the comment '# v6.1.0'"
+        ), "actions/labeler pin should be followed by the comment '# v6.2.0'"
 
     def test_labeler_action_sha_is_full_40_char_hex(self):
         """The SHA used for actions/labeler must be a full 40-character hex string."""
@@ -287,10 +287,10 @@ class TestSecurityScanWorkflow:
 
     # --- Version comment consistency ---
 
-    def test_security_scan_codeql_version_comments_say_v4_35(self):
-        """Every github/codeql-action/* SHA pin must have a '# v4.35' comment."""
+    def test_security_scan_codeql_version_comments_say_v4_36(self):
+        """Every github/codeql-action/* SHA pin must have a '# v4.36' comment."""
         raw = _raw_text(SECURITY_SCAN_WORKFLOW)
-        # Each pin line should look like: uses: github/codeql-action/...@<SHA>  # v4.35
+        # Each pin line should look like: uses: github/codeql-action/...@<SHA>  # v4.36
         # Use [\w-]+ to match hyphenated names like upload-sarif
         pins = re.findall(
             rf"github/codeql-action/[\w-]+@{re.escape(CODEQL_NEW_SHA)}(\s+#\s*v[\d.]+)?",
@@ -300,14 +300,14 @@ class TestSecurityScanWorkflow:
         assert not missing_comment, (
             "Some codeql-action SHA pins are missing version comments"
         )
-        # Verify they all say v4.35
+        # Verify they all say v4.36
         version_comments = re.findall(
             rf"github/codeql-action/[\w-]+@{re.escape(CODEQL_NEW_SHA)}\s+#\s*(v[\d.]+)",
             raw,
         )
         for comment in version_comments:
             assert comment == "v4.36", (
-                f"Expected version comment 'v4.35', got '{comment}'"
+                f"Expected version comment 'v4.36', got '{comment}'"
             )
 
     # --- Workflow permissions ---
