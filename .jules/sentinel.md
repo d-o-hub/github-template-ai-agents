@@ -71,3 +71,9 @@
 **Vulnerability:** Static path denylists for specific filenames like `id_rsa` or `id_ed25519` are insufficient to prevent access/exposure of SSH private keys with custom/dynamic names (e.g. `id_rsa_personal`, `id_ed25519_github`).
 **Learning:** Security validation logic must use wildcard or pattern-based prefix matching to capture all variants of SSH private keys, while safely exempting public key counterparts (ending with `.pub`) to avoid breaking valid references.
 **Prevention:** In `validate_safe_path`, block any path component starting with standard SSH key prefixes (`id_rsa`, `id_dsa`, `id_ecdsa`, `id_ed25519`, `id_xmss`) if they do not end with `.pub`.
+
+## 2026-07-23 - Hardened Path Validation for Identity Keys and Keystores
+
+**Vulnerability:** Gaps in pattern-based path blocking permitted exposure or manipulation of critical credential formats, keystores, and standard identity key prefixes (such as `.p12`, `.pkcs8`, `.pk8`, `.der`, `.keystore`, `.jks`, `.dockercfg`, `.publishsettings`, and keys starting with `identity`).
+**Learning:** Path protection lists must explicitly cover all standard, cross-platform private key containers and developer identity prefixes, as these files are frequently targeted for credential exfiltration.
+**Prevention:** Always maintain a comprehensive, pattern-based validation filter in `validate_safe_path` that blocks standard identity patterns and Java/web key storage formats while safely permitting public files (e.g., public keys with `.pub`).
