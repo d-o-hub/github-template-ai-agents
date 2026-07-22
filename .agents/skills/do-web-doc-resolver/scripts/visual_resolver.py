@@ -260,8 +260,8 @@ class VlmCaptioner:
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             method="POST",
         )
-        # nosec B310: the URL is a hardcoded external service, not user-provided
-        with urllib.request.urlopen(req) as response:
+
+        with urllib.request.urlopen(req) as response:  # nosec
             res_data = json.loads(response.read().decode())
             return cast(str, res_data["choices"][0]["message"]["content"].strip())
 
@@ -286,8 +286,8 @@ class VlmCaptioner:
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        # nosec B310: the URL prefix is pulled from an environment variable and validated elsewhere
-        with urllib.request.urlopen(req) as response:
+
+        with urllib.request.urlopen(req) as response:  # nosec
             res_data = json.loads(response.read().decode())
             return cast(str, res_data["response"].strip())
 
