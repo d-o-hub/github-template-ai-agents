@@ -53,7 +53,7 @@ async def resolve_with_jina_async(url: str, max_chars: int = MAX_CHARS) -> Resol
         result = ResolvedResult(source="jina", content=content[:max_chars], url=url)
         _save_to_cache(url, "jina", result.to_dict())
         return result
-    except httpx.RequestError as e:
+    except (httpx.RequestError, OSError, TimeoutError) as e:
         logger.warning("Jina resolution failed: %s: %s", type(e).__name__, e)
         return None
 
@@ -96,6 +96,6 @@ def resolve_with_jina(url: str, max_chars: int = MAX_CHARS) -> ResolvedResult | 
         result = ResolvedResult(source="jina", content=content[:max_chars], url=url)
         _save_to_cache(url, "jina", result.to_dict())
         return result
-    except httpx.RequestError as e:
+    except (httpx.RequestError, OSError, TimeoutError) as e:
         logger.warning("Jina resolution failed: %s: %s", type(e).__name__, e)
         return None

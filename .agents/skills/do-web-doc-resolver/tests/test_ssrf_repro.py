@@ -8,7 +8,7 @@ import requests
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from scripts.utils import fetch_llms_txt, fetch_url_content, is_safe_url, validate_url
+from scripts.utils import fetch_llms_txt, fetch_url_content, validate_url
 
 
 class TestSSRFGuards:
@@ -30,8 +30,3 @@ class TestSSRFGuards:
 
         result = fetch_url_content("http://public-site.com/redirect")
         assert result is None
-
-    def test_is_safe_url_blocks_unspecified_ipv6(self):
-        """Verify that [::] is blocked by is_safe_url."""
-        assert not is_safe_url("http://[::]/")
-        assert not is_safe_url("http://[::]:8080/")

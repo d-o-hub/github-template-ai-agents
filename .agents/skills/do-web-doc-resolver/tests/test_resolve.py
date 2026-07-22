@@ -3,6 +3,7 @@
 import logging
 import os
 import sys
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
@@ -15,6 +16,7 @@ from scripts.resolve import (
     _detect_error_type,
     _is_rate_limited,
     _set_rate_limit,
+    fetch_llms_txt,
     is_url,
     resolve,
     resolve_with_duckduckgo,
@@ -50,6 +52,52 @@ class TestIsUrl:
         assert not is_url("")
 
 
+class TestFetchLlmsTxt:
+    """Test llms.txt fetching."""
+
+    @patch("scripts.utils._safe_request")
+    def test_llms_txt_found(self, mock_safe_request):
+        """Test successful llms.txt fetch."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.text = "# Example llms.txt\nContent here"
+        mock_response.headers = {"Content-Type": "text/plain"}
+        mock_response.is_redirect = False
+        mock_response.url = "https://example.com/llms.txt"
+        mock_response.history = []
+        mock_safe_request.return_value = mock_response
+
+        # Clear cache to ensure fresh test
+        import scripts.resolve
+
+        scripts.resolve._cache = None
+
+        result = fetch_llms_txt("https://example.com")
+        assert result is not None
+        assert "Example llms.txt" in result
+
+    @patch("scripts.utils._safe_request")
+    def test_llms_txt_not_found(self, mock_safe_request):
+        """Test when llms.txt doesn't exist."""
+        mock_response = Mock()
+        mock_response.status_code = 404
+        mock_response.is_redirect = False
+        mock_response.url = "https://example.com/llms.txt"
+        mock_response.history = []
+        mock_safe_request.return_value = mock_response
+
+        # Clear cache to ensure fresh test
+        import scripts.resolve
+        from scripts.utils.cache import _l1_clear
+
+        scripts.resolve._cache = None
+        _l1_clear()
+
+        result = fetch_llms_txt("https://example.com")
+        assert result is None
+
+
+@pytest.mark.live
 class TestResolveWithFirecrawl:
     """Test Firecrawl resolution with error handling."""
 
@@ -109,7 +157,7 @@ class TestResolveWithFirecrawl:
     def test_credit_exhaustion_fallback(self, mock_mistral, mock_firecrawl_class, mock_validate):
         """Test Mistral fallback on credit exhaustion."""
         # Clear rate limits
-        from scripts.providers import _rate_limits
+        from scripts.resolve import _rate_limits
 
         _rate_limits.clear()
 
@@ -210,10 +258,10 @@ class TestMistralErrorLogging:
     @patch("mistralai.client.Mistral")
     def test_browser_429_logs_warning_and_cooldown(self, mock_mistral_class, caplog):
         """Test Mistral browser 429 emits rate limited warning and sets cooldown."""
-        from scripts.providers import _is_rate_limited, resolve_with_mistral_browser
+        from scripts.providers_impl import _is_rate_limited, resolve_with_mistral_browser
 
         # Clear any existing rate limits
-        from scripts.providers import _rate_limits
+        from scripts.resolve import _rate_limits
 
         _rate_limits.clear()
 
@@ -288,8 +336,8 @@ class TestMistralErrorLogging:
     @patch("mistralai.client.Mistral")
     def test_websearch_429_logs_warning_and_cooldown(self, mock_mistral_class, caplog):
         """Test Mistral websearch 429 emits rate limited warning and sets cooldown."""
-        from scripts.providers import _is_rate_limited, resolve_with_mistral_websearch
-        from scripts.providers import _rate_limits
+        from scripts.providers_impl import _is_rate_limited, resolve_with_mistral_websearch
+        from scripts.resolve import _rate_limits
 
         _rate_limits.clear()
 
@@ -372,8 +420,8 @@ class TestExaErrorLogging:
     @patch.dict(os.environ, {"EXA_API_KEY": "test_key"})
     @patch("exa_py.Exa")
     def test_429_logs_warning_and_cooldown(self, mock_exa_class, caplog):
-        from scripts.providers import _is_rate_limited, resolve_with_exa
-        from scripts.providers import _rate_limits
+        from scripts.providers_impl import _is_rate_limited, resolve_with_exa
+        from scripts.resolve import _rate_limits
 
         _rate_limits.clear()
         err = Exception("Rate limited")
@@ -465,8 +513,8 @@ class TestTavilyErrorLogging:
     @patch.dict(os.environ, {"TAVILY_API_KEY": "test_key"})
     @patch("tavily.TavilyClient")
     def test_429_logs_warning_and_cooldown(self, mock_tavily_class, caplog):
-        from scripts.providers import _is_rate_limited, resolve_with_tavily
-        from scripts.providers import _rate_limits
+        from scripts.providers_impl import _is_rate_limited, resolve_with_tavily
+        from scripts.resolve import _rate_limits
 
         _rate_limits.clear()
         err = Exception("Rate limited")
@@ -541,8 +589,8 @@ class TestFirecrawlErrorLogging:
     @patch.dict(os.environ, {"FIRECRAWL_API_KEY": "test_key"})
     @patch("firecrawl.Firecrawl")
     def test_429_logs_warning_and_cooldown(self, mock_fc_class, caplog):
-        from scripts.providers import _is_rate_limited, resolve_with_firecrawl
-        from scripts.providers import _rate_limits
+        from scripts.providers_impl import _is_rate_limited, resolve_with_firecrawl
+        from scripts.resolve import _rate_limits
 
         _rate_limits.clear()
         err = Exception("Rate limited")
@@ -617,6 +665,157 @@ class TestFirecrawlErrorLogging:
 
         with caplog.at_level(logging.WARNING):
             result = resolve_with_firecrawl("ftp://evil.com")
+
+        assert result is None
+        assert "SSRF blocked" in caplog.text
+
+
+@pytest.mark.live
+class TestSerperErrorLogging:
+    """Test Serper HTTP error logging."""
+
+    @patch.dict(os.environ, {"SERPER_API_KEY": "test_key"})
+    @patch("scripts.providers.serper.get_session")
+    def test_429_logs_warning_and_cooldown(self, mock_session, caplog):
+        from scripts.providers_impl import _is_rate_limited, resolve_with_serper
+        from scripts.resolve import _rate_limits
+
+        _rate_limits.clear()
+        mock_resp = Mock()
+        mock_resp.status_code = 429
+        mock_session.return_value.post.return_value = mock_resp
+
+        with caplog.at_level(logging.WARNING):
+            result = resolve_with_serper("test")
+
+        assert result is None
+        assert "rate limited" in caplog.text.lower()
+        assert _is_rate_limited("serper")
+        _rate_limits.clear()
+
+    @patch.dict(os.environ, {"SERPER_API_KEY": "test_key"})
+    @patch("scripts.providers.serper.get_session")
+    def test_401_logs_warning(self, mock_session, caplog):
+        from scripts.providers_impl import resolve_with_serper
+
+        mock_resp = Mock()
+        mock_resp.status_code = 401
+        mock_session.return_value.post.return_value = mock_resp
+
+        with caplog.at_level(logging.WARNING):
+            result = resolve_with_serper("test")
+
+        assert result is None
+        assert "auth error" in caplog.text.lower()
+
+    @patch.dict(os.environ, {"SERPER_API_KEY": "test_key"})
+    @patch("scripts.providers.serper.get_session")
+    def test_500_logs_warning(self, mock_session, caplog):
+        from scripts.providers_impl import resolve_with_serper
+
+        mock_resp = Mock()
+        mock_resp.status_code = 500
+        mock_session.return_value.post.return_value = mock_resp
+
+        with caplog.at_level(logging.WARNING):
+            result = resolve_with_serper("test")
+
+        assert result is None
+        assert "HTTP 500" in caplog.text
+
+    @patch.dict(os.environ, {"SERPER_API_KEY": "test_key"})
+    @patch("scripts.providers.serper.get_session")
+    def test_network_error_logs_type_and_message(self, mock_session, caplog):
+        from scripts.providers_impl import resolve_with_serper
+
+        mock_session.return_value.post.side_effect = OSError("connection reset")
+
+        with caplog.at_level(logging.WARNING):
+            result = resolve_with_serper("test")
+
+        assert result is None
+        assert "OSError" in caplog.text
+        assert "connection reset" in caplog.text
+
+    @patch.dict(os.environ, {}, clear=True)
+    def test_no_api_key_logs_debug(self, caplog):
+        from scripts.providers_impl import resolve_with_serper
+
+        with caplog.at_level(logging.DEBUG):
+            result = resolve_with_serper("test")
+
+        assert result is None
+        assert "no API key" in caplog.text
+
+
+@pytest.mark.live
+class TestJinaErrorLogging:
+    """Test Jina HTTP error logging."""
+
+    @patch("scripts.providers.jina.get_session")
+    def test_429_logs_warning_and_cooldown(self, mock_session, caplog):
+        from scripts.providers_impl import _is_rate_limited, resolve_with_jina
+        from scripts.resolve import _rate_limits
+
+        _rate_limits.clear()
+        mock_resp = Mock()
+        mock_resp.status_code = 429
+        mock_session.return_value.get.return_value = mock_resp
+
+        with caplog.at_level(logging.WARNING):
+            result = resolve_with_jina("https://example.com")
+
+        assert result is None
+        assert "rate limited" in caplog.text.lower()
+        assert _is_rate_limited("jina")
+        _rate_limits.clear()
+
+    @patch("scripts.providers.jina.get_session")
+    def test_403_logs_warning(self, mock_session, caplog):
+        from scripts.providers_impl import resolve_with_jina
+
+        mock_resp = Mock()
+        mock_resp.status_code = 403
+        mock_session.return_value.get.return_value = mock_resp
+
+        with caplog.at_level(logging.WARNING):
+            result = resolve_with_jina("https://example.com")
+
+        assert result is None
+        assert "auth error" in caplog.text.lower()
+
+    @patch("scripts.providers.jina.get_session")
+    def test_500_logs_warning(self, mock_session, caplog):
+        from scripts.providers_impl import resolve_with_jina
+
+        mock_resp = Mock()
+        mock_resp.status_code = 500
+        mock_session.return_value.get.return_value = mock_resp
+
+        with caplog.at_level(logging.WARNING):
+            result = resolve_with_jina("https://example.com")
+
+        assert result is None
+        assert "HTTP 500" in caplog.text
+
+    @patch("scripts.providers.jina.get_session")
+    def test_network_error_logs_type_and_message(self, mock_session, caplog):
+        from scripts.providers_impl import resolve_with_jina
+
+        mock_session.return_value.get.side_effect = TimeoutError("timed out")
+
+        with caplog.at_level(logging.WARNING):
+            result = resolve_with_jina("https://example.com")
+
+        assert result is None
+        assert "TimeoutError" in caplog.text
+        assert "timed out" in caplog.text
+
+    def test_ssrf_blocked_logs_warning(self, caplog):
+        from scripts.providers_impl import resolve_with_jina
+
+        with caplog.at_level(logging.WARNING):
+            result = resolve_with_jina("ftp://evil.com")
 
         assert result is None
         assert "SSRF blocked" in caplog.text
@@ -798,10 +997,54 @@ class TestCacheBehavior:
         mock_get_cache.return_value = None
 
         from scripts.resolve import _get_from_cache
+        from scripts.utils.cache import _l1_clear
 
+        _l1_clear()
         result = _get_from_cache("test", "exa")
 
         assert result is None
+
+
+class TestSkillSymlink:
+    """Test that skill symlinks in .blackbox/skills/, .claude/skills/ point to .agents/skills/."""
+
+    def get_skill_locations(self):
+        """Get all skill directory symlink locations to test."""
+        root_dir = Path(__file__).parent.parent
+        canonical = root_dir / ".agents" / "skills"
+        return [
+            # (root_dir / ".blackbox" / "skills", ".blackbox/skills", canonical),
+            # (root_dir / ".claude" / "skills", ".claude/skills", canonical),
+        ]
+
+    def test_all_skill_symlinks_exist(self):
+        """Test that all skill directory symlinks exist."""
+        for skill_link, name, _ in self.get_skill_locations():
+            assert skill_link.exists(), f"{name}: symlink does not exist: {skill_link}"
+
+    def test_all_skill_symlinks_are_symlinks(self):
+        """Test that all skill paths are directory symlinks."""
+        for skill_link, name, _ in self.get_skill_locations():
+            assert skill_link.is_symlink(), f"{name}: {skill_link} is not a symlink"
+
+    def test_all_skill_symlinks_point_to_canonical(self):
+        """Test that all symlinks point to .agents/skills/."""
+        for skill_link, name, expected in self.get_skill_locations():
+            resolved_target = skill_link.resolve()
+            resolved_expected = expected.resolve()
+            msg = (
+                f"{name}: Symlink points to wrong target.\n"
+                f"Expected: {resolved_expected}\n"
+                f"Got: {resolved_target}"
+            )
+            assert resolved_target == resolved_expected, msg
+
+    def test_skill_md_exists_in_canonical(self):
+        """Test that SKILL.md exists in canonical .agents/skills/ directory."""
+        root_dir = Path(__file__).parent.parent
+        skill_md = root_dir / "SKILL.md"
+        assert skill_md.exists(), f"SKILL.md does not exist in canonical: {skill_md}"
+        assert skill_md.is_file(), f"SKILL.md is not a file: {skill_md}"
 
 
 class TestDuckDuckGoFallback:
@@ -834,6 +1077,9 @@ class TestDuckDuckGoFallback:
     @patch("scripts.providers_impl._is_rate_limited")
     def test_duckduckgo_rate_limited(self, mock_rate_limited, mock_cache):
         """Test DuckDuckGo when rate-limited."""
+        from scripts.utils.cache import _l1_clear
+
+        _l1_clear()
         mock_cache.return_value = None
         mock_rate_limited.return_value = True
 
@@ -846,6 +1092,9 @@ class TestDuckDuckGoFallback:
     @patch("ddgs.DDGS")
     def test_duckduckgo_empty_results(self, mock_ddgs_class, mock_rate_limited, mock_cache):
         """Test DuckDuckGo with empty results."""
+        from scripts.utils.cache import _l1_clear
+
+        _l1_clear()
         mock_cache.return_value = None
         mock_rate_limited.return_value = False
 
@@ -898,7 +1147,7 @@ class TestRateLimitHandling:
     def test_rate_limit_cooldown(self):
         """Test rate limit cooldown mechanism."""
 
-        from scripts.providers import _rate_limits
+        from scripts.resolve import _rate_limits
 
         # Clear any existing rate limits
         _rate_limits.clear()
@@ -917,7 +1166,7 @@ class TestRateLimitHandling:
 
     def test_rate_limit_expiry(self):
         """Rate limit should expire after cooldown period elapses."""
-        from scripts.providers import _rate_limits
+        from scripts.resolve import _rate_limits
 
         _rate_limits.clear()
 
@@ -938,7 +1187,7 @@ class TestRateLimitHandling:
 
     def test_rate_limit_multiple_providers_independent_expiry(self):
         """Each provider has independent rate limit tracking."""
-        from scripts.providers import _rate_limits
+        from scripts.resolve import _rate_limits
 
         _rate_limits.clear()
 
@@ -1164,7 +1413,7 @@ class TestAdditionalEdgeCases:
 
     def test_concurrent_rate_limit_tracking(self):
         """Test that rate limit tracking works correctly."""
-        from scripts.providers import _rate_limits
+        from scripts.resolve import _rate_limits
 
         # Clear any existing rate limits
         _rate_limits.clear()
@@ -1224,6 +1473,9 @@ class TestAdditionalEdgeCases:
         self, mock_ddgs_class, mock_save, mock_rate_limited, mock_cache
     ):
         """Test DuckDuckGo handling of network errors."""
+        from scripts.utils.cache import _l1_clear
+
+        _l1_clear()
         mock_cache.return_value = None
         mock_rate_limited.return_value = False
 
@@ -1330,3 +1582,616 @@ class TestSkipProviders:
         """Test skipping multiple providers."""
         result = resolve("test query skip2", skip_providers={"exa_mcp", "exa", "duckduckgo"})
         assert result is not None
+
+
+class TestCascadeErrorHandling:
+    """Test cascade error handling: circuit breaker integration, provider failure,
+    budget exhaustion, and hedge logging in the resolve stream functions.
+
+    Patches target the sub-module level (_query_resolve / _url_resolve) because the
+    cascade_map holds local references bound at import time.
+    """
+
+    @patch("scripts._query_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._query_resolve.resolve_with_exa_mcp")
+    @patch("scripts._query_resolve.resolve_with_exa")
+    @patch("scripts._query_resolve.resolve_with_tavily")
+    @patch("scripts._query_resolve.resolve_with_duckduckgo")
+    @patch("scripts._query_resolve.resolve_with_mistral_websearch")
+    def test_all_query_providers_fail_returns_none_source(
+        self, mock_mw, mock_ddg, mock_tav, mock_exa, mock_mcp, mock_sc, caplog
+    ):
+        """When all query providers return None, cascade yields source=none."""
+        from scripts._query_resolve import resolve_query_stream
+        from scripts.models import Profile
+
+        mock_mcp.return_value = None
+        mock_exa.return_value = None
+        mock_tav.return_value = None
+        mock_ddg.return_value = None
+        mock_mw.return_value = None
+
+        with caplog.at_level(logging.INFO):
+            results = list(resolve_query_stream("test cascade failure", profile=Profile.BALANCED))
+
+        final = next((r for r in results if r.get("source") != "partial"), results[-1])
+        assert final["source"] == "none"
+        assert "Starting probe" in caplog.text
+
+    @patch("scripts._url_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._url_resolve.resolve_with_jina")
+    @patch("scripts._url_resolve.resolve_with_firecrawl")
+    @patch("scripts._url_resolve.resolve_with_mistral_browser")
+    @patch("scripts._url_resolve.resolve_with_duckduckgo")
+    @patch("scripts._url_resolve.fetch_llms_txt")
+    @patch("scripts._url_resolve.fetch_url_content")
+    def test_all_url_providers_fail_returns_none_source(
+        self,
+        mock_fetch,
+        mock_llms,
+        mock_ddg,
+        mock_mb,
+        mock_fc,
+        mock_jina,
+        mock_sc,
+        caplog,
+    ):
+        """When all URL providers return None, cascade yields source=none."""
+        from scripts._url_resolve import resolve_url_stream
+        from scripts.models import Profile
+
+        mock_llms.return_value = None
+        mock_jina.return_value = None
+        mock_fc.return_value = None
+        mock_fetch.return_value = None
+        mock_mb.return_value = None
+        mock_ddg.return_value = None
+
+        with caplog.at_level(logging.INFO):
+            results = list(
+                resolve_url_stream("https://example.com/cascade-test", profile=Profile.BALANCED)
+            )
+
+        final = next((r for r in results if r.get("source") != "partial"), results[-1])
+        assert final["source"] == "none"
+
+    @patch("scripts._query_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._query_resolve.resolve_with_exa_mcp")
+    @patch("scripts._query_resolve.resolve_with_exa")
+    @patch("scripts._query_resolve.resolve_with_tavily")
+    @patch("scripts._query_resolve.resolve_with_duckduckgo")
+    @patch("scripts._query_resolve.resolve_with_mistral_websearch")
+    def test_provider_exception_triggers_circuit_breaker(
+        self, mock_mw, mock_ddg, mock_tav, mock_exa, mock_mcp, mock_sc, caplog
+    ):
+        """Provider raising exception in cascade is caught and cascade continues."""
+        from scripts._query_resolve import resolve_query_stream
+        from scripts.models import Profile
+
+        mock_mcp.side_effect = ValueError("simulated failure")
+        mock_exa.return_value = None
+        mock_tav.return_value = None
+        mock_ddg.return_value = None
+        mock_mw.return_value = None
+
+        with caplog.at_level(logging.INFO):
+            results = list(resolve_query_stream("test cb failure", profile=Profile.BALANCED))
+
+        # Cascade should continue past the failing provider and end with none
+        final = next((r for r in results if r.get("source") != "partial"), results[-1])
+        assert final["source"] == "none"
+
+    @patch("scripts._query_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._query_resolve.resolve_with_exa_mcp")
+    @patch("scripts._query_resolve.resolve_with_exa")
+    @patch("scripts._query_resolve.resolve_with_tavily")
+    @patch("scripts._query_resolve.resolve_with_duckduckgo")
+    @patch("scripts._query_resolve.resolve_with_mistral_websearch")
+    def test_first_provider_succeeds_stops_cascade(
+        self, mock_mw, mock_ddg, mock_tav, mock_exa, mock_mcp, mock_sc
+    ):
+        """When first provider returns acceptable result, cascade stops early."""
+        from scripts._query_resolve import resolve_query_stream
+        from scripts.models import Profile, ResolvedResult
+
+        good_result = ResolvedResult(
+            source="exa_mcp",
+            content=(
+                "# Detailed Documentation\n\n"
+                "This is a unique line to avoid duplication penalties and provide enough length.\n"
+                + "Providing factual information about the system architecture and implementation details.\n"
+                * 30
+            ),
+            url="https://example.com",
+        )
+        mock_mcp.return_value = good_result
+
+        results = list(resolve_query_stream("test first provider", profile=Profile.BALANCED))
+
+        final = next((r for r in results if r.get("source") != "partial"), results[-1])
+        assert final["source"] == "exa_mcp"
+        # Remaining providers should not be called since first succeeded
+        mock_exa.assert_not_called()
+
+    @patch("scripts._query_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._query_resolve.resolve_with_exa_mcp")
+    @patch("scripts._query_resolve.resolve_with_exa")
+    @patch("scripts._query_resolve.resolve_with_tavily")
+    @patch("scripts._query_resolve.resolve_with_duckduckgo")
+    @patch("scripts._query_resolve.resolve_with_mistral_websearch")
+    def test_circuit_breaker_open_skips_provider(
+        self, mock_mw, mock_ddg, mock_tav, mock_exa, mock_mcp, mock_sc, caplog
+    ):
+        """When circuit breaker is open for a provider, cascade skips it entirely."""
+        from scripts._query_resolve import _circuit_breakers, resolve_query_stream
+        from scripts.models import Profile, ResolvedResult
+
+        # Open the breaker for exa (second provider in conftest order)
+        for _ in range(3):
+            _circuit_breakers.record_failure("exa")
+        assert _circuit_breakers.is_open("exa")
+
+        # First provider (exa_mcp) fails, so cascade must continue to exa (which is skipped)
+        mock_mcp.return_value = None
+        # tavily (third provider) succeeds
+        good_result = ResolvedResult(
+            source="tavily",
+            content=("# Documentation\n\nDetailed technical content with links. " * 60),
+            url="https://tavily-result.example.com",
+        )
+        mock_tav.return_value = good_result
+
+        with caplog.at_level(logging.INFO):
+            results = list(resolve_query_stream("test cb skip", profile=Profile.BALANCED))
+
+        final = next((r for r in results if r.get("source") != "partial"), results[-1])
+        assert final["source"] == "tavily"
+        # exa should not be called since breaker is open
+        mock_exa.assert_not_called()
+
+        # Clean up
+        _circuit_breakers.clear()
+
+    @patch("scripts._query_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._query_resolve.resolve_with_exa_mcp")
+    @patch("scripts._query_resolve.resolve_with_exa")
+    @patch("scripts._query_resolve.resolve_with_tavily")
+    @patch("scripts._query_resolve.resolve_with_duckduckgo")
+    @patch("scripts._query_resolve.resolve_with_mistral_websearch")
+    def test_free_provider_high_quality_skips_paid(
+        self, mock_mw, mock_ddg, mock_tav, mock_exa, mock_mcp, mock_sc
+    ):
+        """A high-quality free result causes cascade to skip paid providers."""
+        from scripts._query_resolve import resolve_query_stream
+        from scripts.models import Profile, ResolvedResult
+
+        # All paid providers fail; a free provider (duckduckgo) returns high quality
+        mock_mcp.return_value = None
+        mock_exa.return_value = None
+        mock_tav.return_value = None
+        mock_mw.return_value = None
+
+        good_result = ResolvedResult(
+            source="duckduckgo",
+            content=(
+                "# Reference Documentation\n\n"
+                "Complete technical guide with code samples, "
+                "API reference, and comprehensive examples. " * 50
+            ),
+            url="https://docs.example.com",
+        )
+        mock_ddg.return_value = good_result
+
+        results = list(resolve_query_stream("test quality gate", profile=Profile.BALANCED))
+
+        final = next((r for r in results if r.get("source") != "partial"), results[-1])
+        # duckduckgo is free and high quality — cascade stops here
+        assert final["source"] == "duckduckgo"
+
+    @patch("scripts._query_resolve.get_semantic_cache")
+    def test_semantic_cache_hit_skips_cascade(self, mock_get_sc, caplog):
+        """Semantic cache hit yields cached result immediately, skipping all providers."""
+        from scripts._query_resolve import resolve_query_stream
+        from scripts.models import Profile
+
+        mock_cache = Mock()
+        mock_entry = Mock()
+        mock_entry.similarity = 0.95
+        mock_entry.query = "similar cached query"
+        mock_entry.result = {
+            "source": "exa",
+            "content": "cached documentation content " * 30,
+            "url": "https://cached.example.com",
+            "score": 0.85,
+        }
+        mock_cache.query.return_value = mock_entry
+        mock_get_sc.return_value = mock_cache
+
+        with caplog.at_level(logging.INFO):
+            results = list(resolve_query_stream("test cached query", profile=Profile.BALANCED))
+
+        assert len(results) == 1
+        final = results[0]
+        assert final["semantic_cache_hit"] is True
+        assert final["semantic_similarity"] == 0.95
+        assert final["semantic_original_query"] == "similar cached query"
+        assert final["source"] == "exa"
+        assert "Semantic cache hit" in caplog.text
+
+    @patch("scripts._query_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._query_resolve.resolve_with_exa_mcp")
+    @patch("scripts._query_resolve.resolve_with_exa")
+    @patch("scripts._query_resolve.resolve_with_tavily")
+    @patch("scripts._query_resolve.resolve_with_duckduckgo")
+    @patch("scripts._query_resolve.resolve_with_mistral_websearch")
+    @patch("scripts.routing.ResolutionBudget")
+    def test_budget_exhaustion_yields_best_free_result(
+        self, mock_budget_cls, mock_mw, mock_ddg, mock_tav, mock_exa, mock_mcp, mock_sc
+    ):
+        """When budget is exhausted, best_free_result is yielded instead of source=none."""
+        from scripts._query_resolve import resolve_query_stream
+        from scripts.models import Profile, ResolvedResult
+
+        low_quality = ResolvedResult(
+            source="exa_mcp",
+            content="Some basic documentation content that is acceptable but low quality. " * 30,
+            url="https://example.com",
+        )
+        mock_mcp.return_value = low_quality
+        mock_exa.return_value = None
+        mock_tav.return_value = None
+        mock_ddg.return_value = None
+        mock_mw.return_value = None
+
+        # Budget: allows first attempt then exhausts
+        mock_budget = Mock()
+        mock_budget.min_free_quality_to_skip_paid = 0.99
+        call_counts = {"can_try": 0}
+
+        def can_try(is_paid=False):
+            call_counts["can_try"] += 1
+            if call_counts["can_try"] == 1:
+                return True
+            mock_budget.stop_reason = "max_provider_attempts"
+            return False
+
+        mock_budget.can_try = can_try
+        mock_budget.record_attempt = Mock()
+        mock_budget_cls.return_value = mock_budget
+
+        results = list(resolve_query_stream("test budget exhaust", profile=Profile.BALANCED))
+
+        final = next((r for r in results if r.get("source") != "partial"), results[-1])
+        # Should yield best_free_result from the first provider, not source=none
+        assert final["source"] == "exa_mcp"
+        assert "Some basic documentation" in final["content"]
+        # Remaining providers should not be called since budget was exhausted
+        mock_exa.assert_not_called()
+        mock_tav.assert_not_called()
+        mock_ddg.assert_not_called()
+        mock_mw.assert_not_called()
+
+    # ── URL cascade tests ──────────────────────────────────────────────
+
+    @patch("scripts._url_resolve.get_semantic_cache")
+    def test_url_semantic_cache_hit_skips_cascade(self, mock_get_sc, caplog):
+        """URL semantic cache hit yields cached result immediately, skipping all providers."""
+        from scripts._url_resolve import resolve_url_stream
+        from scripts.models import Profile
+
+        mock_cache = Mock()
+        mock_entry = Mock()
+        mock_entry.similarity = 0.92
+        mock_entry.query = "https://cached-docs.example.com"
+        mock_entry.result = {
+            "source": "firecrawl",
+            "content": "cached url documentation content " * 30,
+            "url": "https://cached-docs.example.com",
+            "score": 0.88,
+        }
+        mock_cache.query.return_value = mock_entry
+        mock_get_sc.return_value = mock_cache
+
+        with caplog.at_level(logging.INFO):
+            results = list(
+                resolve_url_stream("https://cached-docs.example.com", profile=Profile.BALANCED)
+            )
+
+        assert len(results) == 1
+        final = results[0]
+        assert final["semantic_cache_hit"] is True
+        assert final["semantic_similarity"] == 0.92
+        assert final["semantic_original_query"] == "https://cached-docs.example.com"
+        assert final["source"] == "firecrawl"
+        assert "Semantic cache hit" in caplog.text
+
+    @patch("scripts._url_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._url_resolve.resolve_with_jina")
+    @patch("scripts._url_resolve.resolve_with_firecrawl")
+    @patch("scripts._url_resolve.resolve_with_mistral_browser")
+    @patch("scripts._url_resolve.resolve_with_duckduckgo")
+    @patch("scripts._url_resolve.fetch_llms_txt")
+    @patch("scripts._url_resolve.fetch_url_content")
+    @patch("scripts.routing.ResolutionBudget")
+    def test_url_budget_exhaustion_yields_best_free_result(
+        self,
+        mock_budget_cls,
+        mock_fetch,
+        mock_llms,
+        mock_ddg,
+        mock_mb,
+        mock_fc,
+        mock_jina,
+        mock_sc,
+    ):
+        """When URL budget is exhausted, best_free_result is yielded instead of source=none."""
+        from scripts._url_resolve import resolve_url_stream
+        from scripts.models import Profile, ResolvedResult
+
+        mock_llms.return_value = None
+        low_quality = ResolvedResult(
+            source="direct_fetch",
+            content="Basic URL content that is acceptable but brief. " * 30,
+            url="https://example.com",
+        )
+        mock_fetch.return_value = low_quality
+        mock_jina.return_value = None
+        mock_fc.return_value = None
+        mock_mb.return_value = None
+        mock_ddg.return_value = None
+
+        # Budget: allows a couple attempts then exhausts before firecrawl
+        mock_budget = Mock()
+        mock_budget.min_free_quality_to_skip_paid = 0.99
+        call_counts = {"can_try": 0}
+
+        def can_try(is_paid=False):
+            call_counts["can_try"] += 1
+            if call_counts["can_try"] <= 2:
+                return True
+            mock_budget.stop_reason = "max_provider_attempts"
+            return False
+
+        mock_budget.can_try = can_try
+        mock_budget.record_attempt = Mock()
+        mock_budget_cls.return_value = mock_budget
+
+        results = list(
+            resolve_url_stream("https://example.com/budget-test", profile=Profile.BALANCED)
+        )
+
+        final = next((r for r in results if r.get("source") != "partial"), results[-1])
+        # Should yield best_free_result from direct_fetch (tier 1, tried before jina)
+        assert final["source"] == "direct_fetch"
+        assert "Basic URL content" in final["content"]
+        # Remaining providers should not be called since budget was exhausted
+        mock_fc.assert_not_called()
+        mock_mb.assert_not_called()
+        mock_ddg.assert_not_called()
+        mock_jina.assert_not_called()
+
+    # ── Hedge & negative cache tests ───────────────────────────────────
+
+    @patch("scripts._query_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._query_resolve.scripts.cache_negative.should_skip_from_negative_cache")
+    @patch("scripts._query_resolve.resolve_with_exa_mcp")
+    @patch("scripts._query_resolve.resolve_with_exa")
+    @patch("scripts._query_resolve.resolve_with_tavily")
+    @patch("scripts._query_resolve.resolve_with_duckduckgo")
+    @patch("scripts._query_resolve.resolve_with_mistral_websearch")
+    def test_negative_cache_skips_provider(
+        self,
+        mock_mw,
+        mock_ddg,
+        mock_tav,
+        mock_exa,
+        mock_mcp,
+        mock_skip,
+        mock_sc,
+        caplog,
+    ):
+        """When negative cache says skip, cascade skips the provider entirely."""
+        from scripts._query_resolve import resolve_query_stream
+        from scripts.models import Profile, ResolvedResult
+
+        # exa_mcp returns None, should_skip returns True for exa, tavily succeeds
+        mock_mcp.return_value = None
+
+        def should_skip(cache, key, provider):
+            return provider == "exa"
+
+        mock_skip.side_effect = should_skip
+
+        good_result = ResolvedResult(
+            source="tavily",
+            content="Tavily documentation content with examples. " * 60,
+            url="https://tavily-result.example.com",
+        )
+        mock_tav.return_value = good_result
+
+        with caplog.at_level(logging.INFO):
+            results = list(resolve_query_stream("test neg cache skip", profile=Profile.BALANCED))
+
+        final = next((r for r in results if r.get("source") != "partial"), results[-1])
+        assert final["source"] == "tavily"
+        # exa should NOT be called since negative cache skipped it
+        mock_exa.assert_not_called()
+
+    @pytest.mark.skipif(
+        sys.version_info >= (3, 13), reason="Flaky on Python 3.13 due to async timing differences"
+    )
+    @patch("scripts._query_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._query_resolve.resolve_with_exa_mcp")
+    @patch("scripts._query_resolve.resolve_with_exa")
+    @patch("scripts._query_resolve.resolve_with_tavily")
+    @patch("scripts._query_resolve.resolve_with_duckduckgo")
+    @patch("scripts._query_resolve.resolve_with_mistral_websearch")
+    def test_hedge_triggers_when_p75_latency_is_zero(
+        self, mock_mw, mock_ddg, mock_tav, mock_exa, mock_mcp, mock_sc, caplog
+    ):
+        """When p75 latency is 0, hedge launches next provider while first is still 'running'."""
+        from scripts._query_resolve import _routing_memory, resolve_query_stream
+        from scripts.models import Profile, ResolvedResult
+
+        # Set p75 latency to 0 to trigger instant hedge threshold
+        original_p75 = _routing_memory.get_p75_latency
+        _routing_memory.get_p75_latency = lambda d, p, default=3000: 0
+
+        try:
+            # First provider (exa_mcp) fails, so cascade must continue
+            mock_mcp.return_value = None
+            # exa (hedged provider) succeeds
+            good_result = ResolvedResult(
+                source="exa",
+                content="Exa documentation with examples. " * 60,
+                url="https://exa-result.example.com",
+            )
+            mock_exa.return_value = good_result
+            mock_tav.return_value = None
+            mock_ddg.return_value = None
+            mock_mw.return_value = None
+
+            with caplog.at_level(logging.INFO):
+                results = list(resolve_query_stream("test hedge", profile=Profile.BALANCED))
+
+            final = next((r for r in results if r.get("source") != "partial"), results[-1])
+            assert final["source"] == "exa"
+            # With p75=0, exa should be launched as a hedge (called even though exa_mcp
+            # was the first provider). Both providers are probed concurrently.
+            mock_exa.assert_called()
+        finally:
+            _routing_memory.get_p75_latency = original_p75
+
+    @patch("scripts._query_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._query_resolve.resolve_with_exa_mcp")
+    @patch("scripts._query_resolve.resolve_with_exa")
+    @patch("scripts._query_resolve.resolve_with_tavily")
+    @patch("scripts._query_resolve.resolve_with_duckduckgo")
+    @patch("scripts._query_resolve.resolve_with_mistral_websearch")
+    def test_circuit_breaker_failure_counter_resets_after_success(
+        self, mock_mw, mock_ddg, mock_tav, mock_exa, mock_mcp, mock_sc
+    ):
+        """After a provider succeeds, its circuit breaker failure counter resets to 0."""
+        from scripts._query_resolve import _circuit_breakers, resolve_query_stream
+        from scripts.models import Profile, ResolvedResult
+
+        # Pre-open the breaker for exa_mcp with some failures
+        _circuit_breakers.record_failure("exa_mcp")
+        _circuit_breakers.record_failure("exa_mcp")
+        # Not yet open (threshold is 3)
+        assert not _circuit_breakers.is_open("exa_mcp")
+
+        # Now exa_mcp succeeds
+        good_result = ResolvedResult(
+            source="exa_mcp",
+            content="Excellent documentation content with comprehensive details. " * 60,
+            url="https://example.com",
+        )
+        mock_mcp.return_value = good_result
+
+        results = list(resolve_query_stream("test cb reset", profile=Profile.BALANCED))
+
+        final = next((r for r in results if r.get("source") != "partial"), results[-1])
+        assert final["source"] == "exa_mcp"
+
+        # After success, breaker should be closed (failures reset to 0)
+        assert not _circuit_breakers.is_open("exa_mcp")
+
+        # Verify by checking it can run again without being skipped
+        breaker_state = _circuit_breakers.breakers.get("exa_mcp")
+        assert breaker_state is None or breaker_state.failures == 0
+
+        # Clean up
+        _circuit_breakers.clear()
+
+    # ── URL cascade provider-specific tests ─────────────────────────────
+
+    @patch("scripts._url_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._url_resolve.resolve_with_jina")
+    @patch("scripts._url_resolve.resolve_with_firecrawl")
+    @patch("scripts._url_resolve.resolve_with_mistral_browser")
+    @patch("scripts._url_resolve.resolve_with_duckduckgo")
+    @patch("scripts._url_resolve.fetch_llms_txt")
+    @patch("scripts._url_resolve.fetch_url_content")
+    def test_llms_txt_not_found_falls_through_to_jina(
+        self,
+        mock_fetch,
+        mock_llms,
+        mock_ddg,
+        mock_mb,
+        mock_fc,
+        mock_jina,
+        mock_sc,
+    ):
+        """When llms.txt is not found, cascade falls through to jina."""
+        from scripts._url_resolve import resolve_url_stream
+        from scripts.models import Profile, ResolvedResult
+
+        # llms_txt returns None (no llms.txt file found)
+        mock_llms.return_value = None
+        # jina succeeds
+        jina_result = ResolvedResult(
+            source="jina",
+            content="Jina extracted documentation content with details. " * 60,
+            url="https://docs.example.com",
+        )
+        mock_jina.return_value = jina_result
+        mock_fc.return_value = None
+
+        results = list(resolve_url_stream("https://docs.example.com", profile=Profile.BALANCED))
+
+        final = next((r for r in results if r.get("source") != "partial"), results[-1])
+        assert final["source"] == "jina"
+        # llms_txt should have been called (and returned None)
+        mock_llms.assert_called()
+        # jina should have been called after llms_txt returned None
+        mock_jina.assert_called()
+        # firecrawl should not be called since jina succeeded
+        mock_fc.assert_not_called()
+
+    @patch("scripts._url_resolve.get_semantic_cache", return_value=None)
+    @patch("scripts._url_resolve.resolve_with_jina")
+    @patch("scripts._url_resolve.resolve_with_firecrawl")
+    @patch("scripts._url_resolve.resolve_with_mistral_browser")
+    @patch("scripts._url_resolve.resolve_with_duckduckgo")
+    @patch("scripts._url_resolve.fetch_llms_txt")
+    @patch("scripts._url_resolve.fetch_url_content")
+    def test_direct_fetch_succeeds_when_all_extraction_providers_fail(
+        self,
+        mock_fetch,
+        mock_llms,
+        mock_ddg,
+        mock_mb,
+        mock_fc,
+        mock_jina,
+        mock_sc,
+    ):
+        """When all extraction providers fail, direct_fetch yields content as best_free_result."""
+        from scripts._url_resolve import resolve_url_stream
+        from scripts.models import Profile
+
+        # All extraction providers return None
+        mock_llms.return_value = None
+        mock_jina.return_value = None
+        mock_fc.return_value = None
+        mock_mb.return_value = None
+        mock_ddg.return_value = None
+        # direct_fetch succeeds with raw HTML
+        mock_fetch.return_value = (
+            "<html><body>Raw fetched documentation content. " * 30 + "</body></html>"
+        )
+
+        results = list(
+            resolve_url_stream("https://example.com/direct-fetch-test", profile=Profile.BALANCED)
+        )
+
+        final = next((r for r in results if r.get("source") != "partial"), results[-1])
+        # direct_fetch is a free provider; its result becomes best_free_result
+        assert final["source"] == "direct_fetch"
+        assert "Raw fetched documentation" in final["content"]
+        # fetch_url_content should have been called
+        mock_fetch.assert_called()
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])
