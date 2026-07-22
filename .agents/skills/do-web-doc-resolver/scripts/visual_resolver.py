@@ -260,7 +260,7 @@ class VlmCaptioner:
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             method="POST",
         )
-        # nosec B310: URL is hardcoded and safe
+
         with urllib.request.urlopen(req) as response:
             res_data = json.loads(response.read().decode())
             return cast(str, res_data["choices"][0]["message"]["content"].strip())
@@ -286,7 +286,7 @@ class VlmCaptioner:
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        # nosec B310: Internal base_url endpoint config, not direct user input
+
         with urllib.request.urlopen(req) as response:
             res_data = json.loads(response.read().decode())
             return cast(str, res_data["response"].strip())

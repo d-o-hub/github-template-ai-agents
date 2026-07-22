@@ -25,6 +25,7 @@ L1_CACHE_DEFAULT_TTL = 300  # 5 minutes
 
 
 
+
 def _l1_get(key: str) -> Any | None:
     """Get from L1 in-memory cache."""
     with _l1_cache_lock:
