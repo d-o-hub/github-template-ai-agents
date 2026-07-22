@@ -1010,8 +1010,8 @@ class TestSkillSymlink:
 
     def get_skill_locations(self):
         """Get all skill directory symlink locations to test."""
-        root_dir = Path(__file__).parent.parent
-        canonical = root_dir / ".agents" / "skills"
+        # root_dir = Path(__file__).parent.parent
+        # canonical = root_dir / ".agents" / "skills"
         return [
             # (root_dir / ".blackbox" / "skills", ".blackbox/skills", canonical),
             # (root_dir / ".claude" / "skills", ".claude/skills", canonical),
