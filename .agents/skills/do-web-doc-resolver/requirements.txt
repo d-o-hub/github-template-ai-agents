@@ -1,3 +1,11 @@
-# Install all dependencies from pyproject.toml
-# Usage: pip install -r requirements.txt
--e .[dev]
+# Core dependencies for CI testing
+# Full install: pip install -e ".[all,dev]"
+ddgs>=9.0.0
+httpx[http2]>=0.28.1
+trafilatura>=1.10.0
+readability-lxml>=0.8.1
+diskcache>=5.6.0
+pytest>=7.4.0
+requests>=2.31.0
+firecrawl-py>=0.0.5
+sentence-transformers>=5.5.1
