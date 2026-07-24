@@ -6,10 +6,9 @@
 
 | Action | Count | PRs |
 |--------|-------|-----|
-| **Closed (superseded)** | 4 | #718, #722, #720, #711 |
-| **Merged** | 7 | #724, #723, #721, #708, #709, #712, #710 |
-| **Needs human review** | 1 | #719 |
-| **Total resolved** | 11/12 | |
+| **Closed (superseded)** | 5 | #718, #722, #720, #711, #719 |
+| **Merged** | 11 | #724, #723, #721, #708, #709, #712, #710, #725, #726, #727, #728 |
+| **Total resolved** | 15/15 | |
 
 ## Close Decisions
 
@@ -19,6 +18,7 @@
 | #722 | CLOSED | Superseded by #723 |
 | #720 | CLOSED | Superseded by #723 |
 | #711 | CLOSED | Changes already on main via #704/#706/#698/#687 |
+| #719 | CLOSED | Split into 4 focused PRs (#725, #726, #727, #728) |
 
 ## Merge Decisions
 
@@ -31,12 +31,10 @@
 | #709 | MERGED | Squash merge + admin (SSRF fix, conflict resolved) |
 | #712 | MERGED | Squash merge + admin (skill sync) |
 | #710 | MERGED | Squash merge + admin (version bump) |
-
-## Remaining
-
-| PR | Status | Reason |
-|----|--------|--------|
-| #719 | OPEN | Large feature (1652+ lines, 19 files). Needs human review. |
+| #725 | MERGED | Squash merge + admin (error handling) |
+| #726 | MERGED | Squash merge + admin (cascade tests) |
+| #727 | MERGED | Squash merge + admin (semantic cache) |
+| #728 | MERGED | Squash merge + admin (VisualResolver) |
 
 ## CI Note
 
