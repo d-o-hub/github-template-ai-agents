@@ -39,8 +39,10 @@ if [[ ! -f "$STATUS_FILE" ]]; then
     log_fail "plans/_status.json not found but ADR files exist!"
   fi
 else
+  # perf: read file contents once and use native bash matching to eliminate grep process fork overhead in loop
+  STATUS_CONTENT=$(<"$STATUS_FILE")
   for f in "${ADR_FILES[@]}"; do
-    if grep -q -- "\"$f\"" "$STATUS_FILE"; then :
+    if [[ "$STATUS_CONTENT" == *"\"$f\""* ]]; then :
     else log_fail "$f NOT registered in _status.json"; fi
   done
 fi
