@@ -10,6 +10,7 @@ import scripts.routing_memory
 import scripts.state
 import scripts.synthesis
 import scripts.utils
+import scripts.utils.cache
 
 
 class MemoryCache:
@@ -33,6 +34,8 @@ def setup_test_env():
 
     # Apply to all possible locations
     scripts.utils._cache = cache
+    scripts.utils.cache._cache = cache
+    scripts.utils.cache._l1_clear()
     if hasattr(scripts.resolve, "_cache"):
         scripts.resolve._cache = cache
 
