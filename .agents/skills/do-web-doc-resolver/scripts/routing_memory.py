@@ -7,6 +7,7 @@ import math
 import threading
 import time
 from collections import defaultdict
+from typing import Any, cast
 
 from scripts._routing_utils import DEFAULT_PROVIDER_STATS, compute_p75_latency
 
@@ -17,9 +18,11 @@ SCORE_SCALE = 1000.0
 
 
 class RoutingMemory:
-    def __init__(self):
+    def __init__(self) -> None:
         # domain -> provider -> stats
-        self.domain_stats = defaultdict(lambda: defaultdict(lambda: dict(DEFAULT_PROVIDER_STATS)))
+        self.domain_stats: dict[str, dict[str, dict[str, Any]]] = defaultdict(
+            lambda: defaultdict(lambda: dict(DEFAULT_PROVIDER_STATS))
+        )
         self._lock = threading.RLock()
 
     def record(
@@ -27,35 +30,46 @@ class RoutingMemory:
     ) -> None:
         with self._lock:
             stats = self.domain_stats[domain][provider]
-            total = stats["success"] + stats["failure"]
-            stats["avg_latency_ms"] = ((stats["avg_latency_ms"] * total) + latency_ms) / (total + 1)
-            stats["avg_quality"] = ((stats["avg_quality"] * total) + quality_score) / (total + 1)
+            s = cast(int, stats.get("success", 0))
+            f = cast(int, stats.get("failure", 0))
+            total = s + f
+
+            avg_lat = cast(float, stats.get("avg_latency_ms", 0.0))
+            avg_qual = cast(float, stats.get("avg_quality", 0.0))
+
+            stats["avg_latency_ms"] = ((avg_lat * total) + float(latency_ms)) / (total + 1)
+            stats["avg_quality"] = ((avg_qual * total) + float(quality_score)) / (total + 1)
             stats["last_attempted"] = time.time()
             if success:
-                stats["success"] += 1
+                stats["success"] = s + 1
             else:
-                stats["failure"] += 1
+                stats["failure"] = f + 1
 
-    def get_domain_stats(self, provider: str, domain: str) -> dict | None:
+    def get_domain_stats(self, provider: str, domain: str) -> dict[str, Any] | None:
         with self._lock:
-            if domain not in self.domain_stats or provider not in self.domain_stats[domain]:
+            domain_dict = self.domain_stats.get(domain)
+            if not domain_dict:
+                return None
+            stats = domain_dict.get(provider)
+            if not stats:
                 return None
 
-            stats = self.domain_stats[domain][provider]
-            attempts = stats.get("success", 0) + stats.get("failure", 0)
+            s = cast(int, stats.get("success", 0))
+            f = cast(int, stats.get("failure", 0))
+            attempts = s + f
             if attempts == 0:
                 return None
 
-            success_rate = stats.get("success", 0) / max(attempts, 1)
+            success_rate = float(s) / max(attempts, 1)
             days_since_last = 0.0
-            last = stats.get("last_attempted")
+            last = cast(float | None, stats.get("last_attempted"))
             if last:
                 days_since_last = (time.time() - last) / 86400.0
 
             return {
                 "attempts": attempts,
                 "success_rate": success_rate,
-                "avg_latency_ms": stats.get("avg_latency_ms", 0),
+                "avg_latency_ms": stats.get("avg_latency_ms", 0.0),
                 "avg_quality": stats.get("avg_quality", 0.5),
                 "days_since_last": days_since_last,
             }
@@ -97,10 +111,13 @@ class RoutingMemory:
 
     def get_p75_latency(self, domain: str, provider: str, default: int = 3000) -> int:
         with self._lock:
-            stats = self.domain_stats.get(domain, {}).get(provider)
+            domain_dict = self.domain_stats.get(domain)
+            if not domain_dict:
+                return default
+            stats = domain_dict.get(provider)
             if not stats:
                 return default
-            return compute_p75_latency(stats["avg_latency_ms"], default)
+            return compute_p75_latency(cast(float, stats["avg_latency_ms"]), default)
 
     def clear(self) -> None:
         with self._lock:
