@@ -1,10 +1,3 @@
-"""
-Semantic Cache implementation using sqlite-vec + sentence-transformers.
-
-Provides semantic caching for resolved queries and URLs using local embeddings.
-The all-MiniLM-L6-v2 model is used (small, ~80MB, fast) and runs entirely locally.
-"""
-
 import json
 import logging
 import os
@@ -19,25 +12,25 @@ try:
 except ImportError:
     import sqlite3
 
+from scripts.constants import (
+    SEMANTIC_CACHE_MAX_ENTRIES,
+    SEMANTIC_CACHE_THRESHOLD,
+)
+
 logger = logging.getLogger(__name__)
 
 # Default configuration
 DEFAULT_MODEL = "all-MiniLM-L6-v2"
-DEFAULT_THRESHOLD = 0.85
-DEFAULT_MAX_ENTRIES = 10000
 
 
 @dataclass
 class SemanticCacheEntry:
-    """A single semantic cache entry."""
-
     query: str
     result: dict[str, Any]
     timestamp: float = field(default_factory=time.time)
     similarity: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert entry to dictionary."""
         return {
             "query": self.query,
             "result": self.result,
@@ -47,35 +40,64 @@ class SemanticCacheEntry:
 
 
 class SemanticCache:
-    """
-    Semantic cache using sqlite-vec for vector similarity search.
 
-    Uses sentence-transformers for local embeddings (all-MiniLM-L6-v2 model).
-    Falls back gracefully if sqlite-vec or embeddings fail to load.
+    @staticmethod
+    def normalize_text(text: str, filter_stop_words: bool = False) -> str:
+        import re
 
-    Attributes:
-        cache_dir: Directory for cache storage
-        threshold: Minimum similarity score for cache hits (0.0-1.0)
-        max_entries: Maximum number of entries to store
-        enabled: Whether the cache is operational
-    """
+        tokens = [w for w in re.split(r"[^a-zA-Z0-9]", text) if w]
+        is_url = text.startswith("http://") or text.startswith("https://")
+        if is_url:
+            url_stop = {
+                "https",
+                "http",
+                "www",
+                "html",
+                "htm",
+                "php",
+                "asp",
+                "aspx",
+                "jsp",
+                "docs",
+                "api",
+                "index",
+            }
+            tokens = [w for w in tokens if w.lower() not in url_stop]
+        elif filter_stop_words:
+            stop = {
+                "docs",
+                "documentation",
+                "guide",
+                "tutorial",
+                "reference",
+                "ref",
+                "lib",
+                "library",
+                "std",
+                "standard",
+                "for",
+                "of",
+                "the",
+                "a",
+                "an",
+                "and",
+                "programming",
+                "language",
+                "module",
+                "api",
+            }
+            tokens = [w for w in tokens if w.lower() not in stop]
+        if not tokens:
+            return " ".join(text.lower().split())
+        return " ".join(sorted(w.lower() for w in tokens))
 
     def __init__(
         self,
         cache_dir: str | None = None,
-        threshold: float = DEFAULT_THRESHOLD,
-        max_entries: int = DEFAULT_MAX_ENTRIES,
+        threshold: float = SEMANTIC_CACHE_THRESHOLD,
+        max_entries: int = SEMANTIC_CACHE_MAX_ENTRIES,
         model_name: str = DEFAULT_MODEL,
     ) -> None:
-        """
-        Initialize semantic cache.
-
-        Args:
-            cache_dir: Directory for cache storage. Defaults to ~/.cache/do-web-doc-resolver/semantic
-            threshold: Minimum cosine similarity for cache hits (0.0-1.0)
-            max_entries: Maximum number of entries before LRU eviction
-            model_name: Sentence-transformers model to use
-        """
         self.enabled = False
         self._model: Any = None
         self._model_name = model_name
@@ -107,7 +129,6 @@ class SemanticCache:
             self.enabled = False
 
     def _init_db(self) -> None:
-        """Initialize sqlite-vec extension and database schema."""
         self._conn = sqlite3.connect(self.db_path, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
 
@@ -169,13 +190,10 @@ class SemanticCache:
         self._conn.commit()
 
     def _init_model(self) -> None:
-        """Initialize sentence-transformers model (lazy loading)."""
-        # Don't load model yet - do it on first use
         self._model = None
         self._model_loading = False
 
     def _load_model(self) -> Any:
-        """Load the embedding model if not already loaded."""
         if self._model is None and not self._model_loading:
             self._model_loading = True
             try:
@@ -196,7 +214,6 @@ class SemanticCache:
         return self._model
 
     def _create_vector_table(self) -> None:
-        """Create the virtual vector table for similarity search."""
         if self._embedding_dimension is None:
             return
 
@@ -209,20 +226,9 @@ class SemanticCache:
             self._conn.commit()
 
     def _embedding_to_blob(self, embedding: list[float]) -> bytes:
-        """Convert list of floats to binary blob for sqlite-vec."""
-        # Pack as little-endian float32 (4 bytes per float)
         return struct.pack(f"<{len(embedding)}f", *embedding)
 
     def _compute_embedding(self, text: str) -> list[float]:
-        """
-        Compute embedding for text using sentence-transformers.
-
-        Args:
-            text: Input text to embed
-
-        Returns:
-            List of float values representing the embedding vector
-        """
         model = self._load_model()
         if model is None:
             raise RuntimeError("Embedding model not available")
@@ -410,11 +416,9 @@ class SemanticCache:
             return {"enabled": True, "error": str(e)}
 
     def __enter__(self) -> "SemanticCache":
-        """Context manager entry."""
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        """Context manager exit."""
         self.close()
 
 
@@ -424,12 +428,6 @@ _semantic_cache_lock = threading.Lock()
 
 
 def get_semantic_cache() -> SemanticCache | None:
-    """
-    Get or create the global semantic cache instance.
-
-    Returns:
-        SemanticCache instance if enabled and initialized, None otherwise
-    """
     global _semantic_cache_instance
 
     if _semantic_cache_instance is None:
@@ -456,7 +454,6 @@ def get_semantic_cache() -> SemanticCache | None:
 
 
 def reset_semantic_cache() -> None:
-    """Reset the global semantic cache instance (mainly for testing)."""
     global _semantic_cache_instance
     with _semantic_cache_lock:
         if _semantic_cache_instance:
