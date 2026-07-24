@@ -92,14 +92,15 @@ def test_validate_safe_path_patterns(tmp_path):
     # Sensitive extension patterns
     sensitive_extensions = [
         "secret.pem", "my.key", "cert.pfx", "prod.tfstate",
-        "cert.crt", "bundle.cer"
+        "cert.crt", "bundle.cer", "key.p12", "key.pkcs8", "key.pk8",
+        "key.der", "my.keystore", "my.jks", "config.dockercfg", "prod.publishsettings"
     ]
     for p in sensitive_extensions:
         with pytest.raises(PathValidationError):
             validate_safe_path(p, base, "test", check_forbidden=True)
 
     # Case-insensitivity for patterns
-    case_patterns = [".ENV.LOCAL", "SECRET.PEM", "MY.KEY"]
+    case_patterns = [".ENV.LOCAL", "SECRET.PEM", "MY.KEY", "KEY.P12", "MY.JKS"]
     for p in case_patterns:
         with pytest.raises(PathValidationError):
             validate_safe_path(p, base, "test", check_forbidden=True)
@@ -111,7 +112,8 @@ def test_validate_safe_path_patterns(tmp_path):
 
     # SSH private key pattern-based matches (custom/backup suffixes)
     ssh_private_patterns = [
-        "id_rsa_backup", "id_ed25519_sk", "id_ecdsa_old", "id_xmss.backup"
+        "id_rsa_backup", "id_ed25519_sk", "id_ecdsa_old", "id_xmss.backup",
+        "identity", "identity_backup", "identity_ecdsa"
     ]
     for p in ssh_private_patterns:
         with pytest.raises(PathValidationError):
