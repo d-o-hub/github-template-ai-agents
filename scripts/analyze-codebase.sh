@@ -208,26 +208,36 @@ check_required_files() {
 # --- 5. Local tooling state (gitignored; informational only) ---
 check_tracking_state() {
     section "Local tooling state (not git-tracked health)"
+
+    # perf: replace find|wc -l with nullglob+globstar array — eliminates two process
+    # forks per directory check; ${#arr[@]} is O(1) after glob expansion in bash
+    local _old_shopt
+    _old_shopt=$(shopt -p nullglob globstar 2>/dev/null || true)
+    shopt -s nullglob globstar
+
     if [[ -d .commandcode ]]; then
-        local taste_files
-        taste_files=$(find .commandcode -type f 2>/dev/null | wc -l)
-        log "  .commandcode (local taste): $taste_files file(s)"
+        local taste_files=(.commandcode/**)
+        log "  .commandcode (local taste): ${#taste_files[@]} file(s)"
     else
         log "  .commandcode: not present (optional local tooling)"
     fi
+
     if [[ -d .mimocode ]]; then
-        local mim_files
-        mim_files=$(find .mimocode -type f 2>/dev/null | wc -l)
-        log "  .mimocode (local agent cache): $mim_files file(s) — usually gitignored"
-        if [[ "$mim_files" -gt 1000 ]]; then
-            warn ".mimocode has $mim_files files; run make clean-workspaces if disk is tight"
+        local mim_files=(.mimocode/**)
+        log "  .mimocode (local agent cache): ${#mim_files[@]} file(s) — usually gitignored"
+        if [[ "${#mim_files[@]}" -gt 1000 ]]; then
+            warn ".mimocode has ${#mim_files[@]} files; run make clean-workspaces if disk is tight"
         fi
     else
         log "  .mimocode: not present (optional local tooling)"
     fi
-    # Workspace pollution under skills
-    local ws_count
-    ws_count=$(find .agents/skills -maxdepth 1 -type d -name '*-workspace' 2>/dev/null | wc -l)
+
+    # perf: replace find -maxdepth 1 -type d -name '*-workspace'|wc -l with nullglob glob
+    local ws_dirs=(.agents/skills/*-workspace/)
+    local ws_count="${#ws_dirs[@]}"
+
+    eval "$_old_shopt"  # restore previous shopt state
+
     if [[ "$ws_count" -gt 0 ]]; then
         log "  skill workspaces: $ws_count dir(s) (gitignored; make clean-workspaces to remove)"
     else
