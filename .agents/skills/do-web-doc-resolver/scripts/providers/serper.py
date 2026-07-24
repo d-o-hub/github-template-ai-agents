@@ -73,7 +73,7 @@ async def resolve_with_serper_async(
         result = ResolvedResult(source="serper", content=content[:max_chars], query=query)
         _save_to_cache(query, "serper", result.to_dict())
         return result
-    except httpx.RequestError as e:
+    except (httpx.RequestError, OSError, TimeoutError) as e:
         logger.warning("Serper resolution failed: %s: %s", type(e).__name__, e)
         return None
 
@@ -134,6 +134,6 @@ def resolve_with_serper(query: str, max_chars: int = MAX_CHARS) -> ResolvedResul
         result = ResolvedResult(source="serper", content=content[:max_chars], query=query)
         _save_to_cache(query, "serper", result.to_dict())
         return result
-    except httpx.RequestError as e:
+    except (httpx.RequestError, OSError, TimeoutError) as e:
         logger.warning("Serper resolution failed: %s: %s", type(e).__name__, e)
         return None
