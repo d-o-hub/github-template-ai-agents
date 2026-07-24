@@ -34,7 +34,7 @@ fi
 # Security: Store rules as array to prevent word splitting/globbing issues.
 # Ensure INVALIDATION_RULES is defined as an array to avoid unbound variable errors with set -u
 # and prevent "bad array subscript" errors.
-if ! declare -p INVALIDATION_RULES 2>/dev/null | grep -q 'declare -a'; then
+if [[ "$(declare -p INVALIDATION_RULES 2>/dev/null || true)" != *"declare -a"* ]]; then
     declare -a INVALIDATION_RULES=("${DEFAULT_INVALIDATION_RULES[@]}")
 fi
 
