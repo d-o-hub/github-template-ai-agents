@@ -90,6 +90,11 @@ FORBIDDEN_PATHS = frozenset({
     ".fish_history",
     ".ash_history",
     ".tcsh_history",
+    ".cargo",
+    ".s3cfg",
+    ".boto",
+    ".gcloud",
+    ".azure",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.

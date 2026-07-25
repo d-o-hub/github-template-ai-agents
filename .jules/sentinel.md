@@ -77,3 +77,9 @@
 **Vulnerability:** Path validation rules did not cover certificate and keystore formats like `.p12`, `.pkcs8`, `.pk8`, `.der`, `.keystore`, `.jks`, `.dockercfg`, and `.publishsettings`. It also omitted default names for SSH keys like `identity` which could be used to reference private keys.
 **Learning:** Path validation checks based on extensions/prefixes must cover all common cryptographic, credential, and keystore formats used in modern systems. Limiting the blocklist to standard filenames (like `id_rsa`) leaves alternate naming schemes vulnerable.
 **Prevention:** Continuously audit and enrich pattern-based path filters to capture all credential-related suffixes (.p12, .pkcs8, .pk8, .der, .keystore, .jks, .dockercfg, .publishsettings) and default names (identity) while exempting their public counterparts.
+
+## 2026-07-24 - Harden Forbidden Paths with Cloud and Package Configs
+
+**Vulnerability:** Path validation checks omitted directories and configuration files containing cloud platform credentials and private package repository tokens (such as `.cargo`, `.s3cfg`, `.boto`, `.gcloud`, and `.azure`). This omission left sensitive local host files vulnerable to accidental access or exposure.
+**Learning:** A static denylist of sensitive files must encompass local registry and cloud configurations, as exposure of these locations could lead to immediate privilege escalation and credential compromise.
+**Prevention:** Add alternative package registry configs and cloud provider default directories (`.cargo`, `.s3cfg`, `.boto`, `.gcloud`, `.azure`) to the strict denylist within path validation logic.
