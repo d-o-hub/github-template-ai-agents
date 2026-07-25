@@ -117,3 +117,8 @@ def _save_to_cache(input_str: str, source: str, result: dict[str, Any], ttl: int
 
     with _cache_lock:
         cache.set(_cache_key(input_str, source), result, expire=ttl)
+
+
+def _l1_clear():
+    """No-op L1 cache clear function to maintain test compatibility."""
+    pass

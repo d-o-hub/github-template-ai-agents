@@ -130,7 +130,8 @@ def test_validate_safe_path_patterns(tmp_path):
     # Explicit checks for newly added VCS folders and alternative shell histories
     vcs_and_histories = [
         ".hg", ".hgignore", ".hgrc", ".svn",
-        ".fish_history", ".ash_history", ".tcsh_history"
+        ".fish_history", ".ash_history", ".tcsh_history",
+        ".cargo", ".s3cfg", ".boto", ".gcloud", ".azure"
     ]
     for p in vcs_and_histories:
         with pytest.raises(PathValidationError):
