@@ -182,3 +182,29 @@ def test_validate_safe_path_ssh_keys(tmp_path):
         expected = (base / pub).resolve()
         if res != expected:
             raise AssertionError(f"Expected {expected}, got {res}")
+
+
+def test_validate_safe_path_hardened_patterns(tmp_path):
+    base = tmp_path / "repo"
+    base.mkdir()
+
+    # Blocked credentials/keys and history patterns
+    hardened_sensitive = [
+        "key.gpg", "key.pgp", "key.asc", "api.p8", "cert.pkcs12",
+        "etc.passwd", "system.pwd", "apache.htpasswd", "custom_app_history"
+    ]
+    for p in hardened_sensitive:
+        with pytest.raises(PathValidationError):
+            validate_safe_path(p, base, "test", check_forbidden=True)
+
+    # Generalized id_* SSH private keys
+    custom_private_keys = ["id_custom_private", "id_temporary_deploy", "id_backup_key"]
+    for pk in custom_private_keys:
+        with pytest.raises(PathValidationError):
+            validate_safe_path(pk, base, "test", check_forbidden=True)
+
+    # Custom public keys should still be allowed
+    custom_public_keys = ["id_custom_private.pub", "id_temporary_deploy.pub", "id_backup_key.pub"]
+    for pub in custom_public_keys:
+        res = validate_safe_path(pub, base, "test", check_forbidden=True)
+        assert res == (base / pub).resolve()
