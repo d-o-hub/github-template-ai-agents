@@ -143,10 +143,11 @@ def validate_safe_path(
                 part_lower.endswith((
                     ".pem", ".key", ".pfx", ".tfstate", ".crt", ".cer",
                     ".p12", ".pkcs8", ".pk8", ".der", ".keystore", ".jks",
-                    ".dockercfg", ".publishsettings"
+                    ".dockercfg", ".publishsettings", ".gpg", ".pgp", ".asc",
+                    ".p8", ".pkcs12", ".passwd", ".pwd", ".htpasswd", "_history"
                 )) or
                 (
-                    part_lower.startswith(("identity", "id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", "id_xmss")) and
+                    part_lower.startswith(("identity", "id_")) and
                     not part_lower.endswith(".pub")
                 )
             ):
