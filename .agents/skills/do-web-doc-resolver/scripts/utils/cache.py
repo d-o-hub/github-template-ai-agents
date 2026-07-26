@@ -64,8 +64,8 @@ def _l1_clear():
         if _cache is not None:
             try:
                 _cache.clear()
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug("Failed to clear local cache: %s", e)
             _cache = None
 
 
