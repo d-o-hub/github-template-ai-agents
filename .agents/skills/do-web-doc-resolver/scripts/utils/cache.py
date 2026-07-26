@@ -57,6 +57,18 @@ def _get_cache():
     return _cache
 
 
+def _l1_clear():
+    """Clear the local process cache. Useful for tests."""
+    global _cache
+    with _cache_lock:
+        if _cache is not None:
+            try:
+                _cache.clear()
+            except Exception as e:
+                logger.debug("Failed to clear local cache: %s", e)
+            _cache = None
+
+
 def get_ttl(provider: str, config: dict | None = None) -> int:
     """Get the TTL for a given provider from config or defaults."""
     from scripts.utils import get_config_data
