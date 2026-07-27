@@ -72,7 +72,8 @@ def test_validate_safe_path_forbidden(tmp_path):
     new_forbidden = [
         ".sh_history", ".lesshst", ".viminfo", ".mysql_history",
         ".psql_history", ".sqlite_history", "terraform.tfstate",
-        "terraform.tfstate.backup", ".terraform"
+        "terraform.tfstate.backup", ".terraform", ".cargo", ".s3cfg",
+        ".boto", ".gcloud", ".azure"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
@@ -93,7 +94,9 @@ def test_validate_safe_path_patterns(tmp_path):
     sensitive_extensions = [
         "secret.pem", "my.key", "cert.pfx", "prod.tfstate",
         "cert.crt", "bundle.cer", "key.p12", "key.pkcs8", "key.pk8",
-        "key.der", "my.keystore", "my.jks", "config.dockercfg", "prod.publishsettings"
+        "key.der", "my.keystore", "my.jks", "config.dockercfg", "prod.publishsettings",
+        "secret.gpg", "secret.pgp", "secret.asc", "key.p8", "key.pkcs12",
+        "secret.passwd", "secret.pwd", "secret.htpasswd", "app_history"
     ]
     for p in sensitive_extensions:
         with pytest.raises(PathValidationError):

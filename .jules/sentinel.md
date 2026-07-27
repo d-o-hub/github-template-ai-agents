@@ -77,3 +77,9 @@
 **Vulnerability:** Path validation rules did not cover certificate and keystore formats like `.p12`, `.pkcs8`, `.pk8`, `.der`, `.keystore`, `.jks`, `.dockercfg`, and `.publishsettings`. It also omitted default names for SSH keys like `identity` which could be used to reference private keys.
 **Learning:** Path validation checks based on extensions/prefixes must cover all common cryptographic, credential, and keystore formats used in modern systems. Limiting the blocklist to standard filenames (like `id_rsa`) leaves alternate naming schemes vulnerable.
 **Prevention:** Continuously audit and enrich pattern-based path filters to capture all credential-related suffixes (.p12, .pkcs8, .pk8, .der, .keystore, .jks, .dockercfg, .publishsettings) and default names (identity) while exempting their public counterparts.
+
+## 2026-07-24 - Comprehensive Pattern-Based Credential and Cloud Config Blocking in Path Validation
+
+**Vulnerability:** Exact static matching in `FORBIDDEN_PATHS` did not protect cloud configuration folders (like `.cargo`, `.s3cfg`, `.boto`, `.gcloud`, `.azure`) if referenced directly, and `validate_safe_path`'s suffix check lacked coverage for keyrings/gpg, password files, and custom history patterns.
+**Learning:** Hardcoded denylists and static file sets are easily bypassed by alternative tools, configurations, or naming structures. Comprehensive protection must pair expanded explicit lists with robust, pattern-based validation checks covering extensions and keywords for password/keyring/history resources.
+**Prevention:** Continuously enrich path validation filters with standard cloud and package manager directories (`.cargo`, `.azure`, etc.), while ensuring pattern-based suffix matches reject cryptographic keys/keyrings (`.gpg`, `.pgp`, `.asc`, `.p8`, `.pkcs12`), credential stores (`.passwd`, `.pwd`, `.htpasswd`), and history files (`_history`).
