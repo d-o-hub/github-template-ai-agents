@@ -90,6 +90,11 @@ FORBIDDEN_PATHS = frozenset({
     ".fish_history",
     ".ash_history",
     ".tcsh_history",
+    ".cargo",
+    ".s3cfg",
+    ".boto",
+    ".gcloud",
+    ".azure",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
@@ -143,7 +148,8 @@ def validate_safe_path(
                 part_lower.endswith((
                     ".pem", ".key", ".pfx", ".tfstate", ".crt", ".cer",
                     ".p12", ".pkcs8", ".pk8", ".der", ".keystore", ".jks",
-                    ".dockercfg", ".publishsettings"
+                    ".dockercfg", ".publishsettings", ".gpg", ".pgp", ".asc",
+                    ".p8", ".pkcs12", ".passwd", ".pwd", ".htpasswd", "_history"
                 )) or
                 (
                     part_lower.startswith(("identity", "id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", "id_xmss")) and
