@@ -160,7 +160,12 @@ tail -n +"$NEXT_SECTION_LINE" -- "$AGENTS_FILE" >> "$TEMP_FILE"
 mv -- "$TEMP_FILE" "$AGENTS_FILE"
 
 # Count skills
-SKILL_COUNT=$(find "$REPO_ROOT/.agents/skills" -mindepth 1 -maxdepth 1 -type d | wc -l)
+# perf: replace find|wc -l with nullglob array — eliminates two process forks
+_old_shopt=$(shopt -p nullglob 2>/dev/null || true)
+shopt -s nullglob
+_skill_dirs=("$REPO_ROOT/.agents/skills"/*/)
+SKILL_COUNT=${#_skill_dirs[@]}
+eval "$_old_shopt"
 
 echo ""
 echo "✓ AGENTS.md updated successfully"
