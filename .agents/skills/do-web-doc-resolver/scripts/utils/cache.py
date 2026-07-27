@@ -117,3 +117,10 @@ def _save_to_cache(input_str: str, source: str, result: dict[str, Any], ttl: int
 
     with _cache_lock:
         cache.set(_cache_key(input_str, source), result, expire=ttl)
+
+
+def _l1_clear():
+    """Reset the local cache state (clear level 1 cache)."""
+    global _cache
+    with _cache_lock:
+        _cache = None
