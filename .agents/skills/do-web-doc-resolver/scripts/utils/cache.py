@@ -126,8 +126,8 @@ def _l1_clear():
         if _cache is not None:
             try:
                 _cache.clear()
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug("Failed to clear _cache: %s", e)
         _cache = None
 
     try:
@@ -135,8 +135,8 @@ def _l1_clear():
         if hasattr(scripts.resolve, "_cache") and scripts.resolve._cache is not None:
             try:
                 scripts.resolve._cache.clear()
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug("Failed to clear scripts.resolve._cache: %s", e)
             scripts.resolve._cache = None
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug("Failed to clear resolved cache: %s", e)
