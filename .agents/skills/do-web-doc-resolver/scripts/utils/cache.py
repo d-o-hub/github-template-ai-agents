@@ -29,6 +29,13 @@ def _cache_key(input_str: str, source: str) -> str:
     return hashlib.sha256(hash_input.encode()).hexdigest()
 
 
+def _l1_clear():
+    """Clear L1/in-memory cache components to ensure isolated test runs."""
+    global _cache
+    with _cache_lock:
+        _cache = None
+
+
 def _get_cache_proxy():
     import scripts.resolve
 
