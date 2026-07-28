@@ -124,6 +124,16 @@ auto-merge once enabled cannot be auto-disabled by this workflow).
 GraphQL step so a PR that becomes a draft after the label was applied
 still refuses to auto-merge.
 
+**Bot-vs-human review thread handling**: the workflow queries each
+unresolved review thread's first comment author and categorises them as
+`Bot` / `App` / `Organization` (auto-resolvable, e.g. Codacy false
+positives) or anything else (treated as human review feedback). If ANY
+unresolved thread is human-authored, the workflow refuses to auto-merge,
+logs the thread IDs and authors, and exits. Bot threads are
+auto-resolved. This defends against the case where a real reviewer left
+feedback that the maintainer (via the `automerge` label) would
+otherwise silently dismiss.
+
 ### Consequences
 
 **Positive**:
@@ -133,6 +143,8 @@ still refuses to auto-merge.
 - Reuses the proven `enablePullRequestAutoMerge` GraphQL mutation pattern
   from `dependabot-auto-merge.yml` (squash, branch auto-update handled by
   GitHub).
+- Bot-vs-human differentiation prevents silent dismissal of human review
+  feedback when the `automerge` label is applied.
 - Opt-in: no behaviour change unless the label is applied.
 
 **Negative / trade-offs**:
@@ -146,6 +158,9 @@ still refuses to auto-merge.
   addressed here.
 - Does **not** widen `dependabot-auto-merge.yml`'s `if:` guard (rejected
   for supply-chain reasons — see `plans/GOAP_STATE.md` 2026-07-28 lessons).
+- The `dependabot-auto-merge.yml` reference workflow *does* still
+  silently resolve human threads. Out of scope here but tracked for
+  follow-up parity.
 
 ### Alternatives Considered
 
@@ -158,10 +173,15 @@ still refuses to auto-merge.
 - **Tighter trust boundary: only `d-o-hub` user can apply the label.**
   Out of scope; the label-write gate is sufficient today and can be hardened
   via a `CODEOWNERS`-style rule later.
+- **Treat `Organization` as a bot type.** Accepted: GitHub Apps and
+  org-owned bots (e.g. `github-actions[bot]`) are not human reviewers.
+  If a specific org-owned bot is incorrectly classified, the work-around
+  is to resolve the thread manually before applying the `automerge` label.
 
 ### References
 
 - `.github/workflows/auto-merge-non-deps.yml` (this addendum)
-- `.github/workflows/dependabot-auto-merge.yml` (pattern mirrored)
+- `.github/workflows/dependabot-auto-merge.yml` (pattern mirrored; not yet
+  bot-vs-human aware)
 - Issue #741 (the dedup fix this PR was sequenced after)
 - `plans/GOAP_STATE.md` (run 2026-07-28)
