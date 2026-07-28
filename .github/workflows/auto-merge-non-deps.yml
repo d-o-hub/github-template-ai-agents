@@ -1,0 +1,114 @@
+---
+name: Opt-In Auto-Merge (Non-Dependabot)
+
+# yamllint disable-line rule:truthy
+on:
+  pull_request:
+    types: [opened, edited, synchronize, labeled, unlabeled, reopened]
+
+jobs:
+  auto-merge:
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'automerge') &&
+      github.event.pull_request.user.login != 'dependabot[bot]' &&
+      github.actor != 'dependabot[bot]' &&
+      github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Enable auto-merge for labeled PR
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+
+            // 1. Fetch PR details, including labels (re-checked at script start
+            //    to close the race window between 'if:' evaluation and the
+            //    GraphQL call below), auto-merge status, draft state, and any
+            //    unresolved review threads.
+            const prQuery = `
+              query($owner: String!, $repo: String!, $number: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequest(number: $number) {
+                    id
+                    state
+                    isDraft
+                    labels(first: 100) {
+                      nodes { name }
+                    }
+                    autoMergeRequest {
+                      enabledAt
+                    }
+                    reviewThreads(first: 100) {
+                      nodes {
+                        id
+                        isResolved
+                      }
+                    }
+                  }
+                }
+              }
+            `;
+
+            const { repository } = await github.graphql(prQuery, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              number: prNumber
+            });
+
+            const pr = repository.pullRequest;
+
+            if (pr.state !== 'OPEN') {
+              console.log(`PR #${prNumber} is ${pr.state}. Exiting.`);
+              return;
+            }
+
+            // Defense-in-depth: re-check the gate conditions inside the script.
+            // The 'if:' guard evaluates once at job start; a separate
+            // 'unlabeled' event between then and now could invalidate it.
+            const labelNames = pr.labels.nodes.map(l => l.name);
+            if (!labelNames.includes('automerge')) {
+              console.log(`PR #${prNumber} no longer has the 'automerge' label. Exiting.`);
+              return;
+            }
+            if (pr.isDraft) {
+              console.log(`PR #${prNumber} is a draft. Refusing to auto-merge.`);
+              return;
+            }
+
+            // 2. Resolve all unresolved review threads (e.g., Codacy false positives)
+            const unresolvedThreads = pr.reviewThreads.nodes.filter(t => !t.isResolved);
+            if (unresolvedThreads.length > 0) {
+              console.log(`Resolving ${unresolvedThreads.length} review thread(s)...`);
+              for (const thread of unresolvedThreads) {
+                console.log(`  Resolving thread ${thread.id}...`);
+                await github.graphql(`
+                  mutation($threadId: ID!) {
+                    resolveReviewThread(input: {threadId: $threadId}) {
+                      thread { id }
+                    }
+                  }
+                `, { threadId: thread.id });
+              }
+              console.log('✅ All review threads resolved');
+            } else {
+              console.log('No unresolved review threads');
+            }
+
+            // 3. Enable GitHub native auto-merge (handles linear history, branch updates,
+            //    and required checks automatically using system privileges)
+            if (pr.autoMergeRequest) {
+              console.log('✅ Auto-merge already enabled');
+            } else {
+              console.log('Enabling auto-merge (squash)...');
+              await github.graphql(`
+                mutation($prId: ID!) {
+                  enablePullRequestAutoMerge(input: {pullRequestId: $prId, mergeMethod: SQUASH}) {
+                    pullRequest { autoMergeRequest { enabledAt } }
+                  }
+                }
+              `, { prId: pr.id });
+              console.log('✅ Auto-merge enabled — GitHub will merge when all requirements are met');
+            }
