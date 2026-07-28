@@ -19,6 +19,7 @@ from scripts.utils.cache import (
     _get_cache,
     _get_from_cache,
     _save_to_cache,
+    _l1_clear,
     get_cache,
     get_ttl,
 )
@@ -160,6 +161,7 @@ __all__ = [
     "_get_cache",
     "_get_from_cache",
     "_save_to_cache",
+    "_l1_clear",
     "get_cache",
     "get_ttl",
     # URL utilities
