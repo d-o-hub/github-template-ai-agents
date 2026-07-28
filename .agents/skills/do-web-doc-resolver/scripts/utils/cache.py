@@ -117,3 +117,26 @@ def _save_to_cache(input_str: str, source: str, result: dict[str, Any], ttl: int
 
     with _cache_lock:
         cache.set(_cache_key(input_str, source), result, expire=ttl)
+
+
+def _l1_clear():
+    """Clear local cache proxies and clear the underlying cache to isolate test runs."""
+    global _cache
+    with _cache_lock:
+        if _cache is not None:
+            try:
+                _cache.clear()
+            except Exception:
+                pass
+        _cache = None
+
+    try:
+        import scripts.resolve
+        if hasattr(scripts.resolve, "_cache") and scripts.resolve._cache is not None:
+            try:
+                scripts.resolve._cache.clear()
+            except Exception:
+                pass
+            scripts.resolve._cache = None
+    except Exception:
+        pass
