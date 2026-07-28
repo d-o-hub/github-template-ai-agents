@@ -159,8 +159,11 @@ tail -n +"$NEXT_SECTION_LINE" -- "$AGENTS_FILE" >> "$TEMP_FILE"
 # Replace original file
 mv -- "$TEMP_FILE" "$AGENTS_FILE"
 
-# Count skills
-SKILL_COUNT=$(find "$REPO_ROOT/.agents/skills" -mindepth 1 -maxdepth 1 -type d | wc -l)
+# Count skills (perf: Use native array length evaluation instead of spawning sub-processes like wc -l)
+shopt -s nullglob
+skill_dirs=("$REPO_ROOT/.agents/skills"/*/)
+SKILL_COUNT=${#skill_dirs[@]}
+shopt -u nullglob
 
 echo ""
 echo "✓ AGENTS.md updated successfully"
