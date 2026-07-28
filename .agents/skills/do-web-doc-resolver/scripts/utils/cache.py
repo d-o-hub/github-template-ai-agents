@@ -58,15 +58,15 @@ def _get_cache():
 
 
 def _l1_clear():
-    """Clear the local process cache. Useful for tests."""
+    """Reset _cache to None; lazy re-init on next access (test only).
+
+    Set _cache = None rather than calling _cache.clear() so on-disk cached
+    entries are preserved across test runs while still forcing fresh
+    initialization on the next _get_cache() call.
+    """
     global _cache
     with _cache_lock:
-        if _cache is not None:
-            try:
-                _cache.clear()
-            except Exception as e:
-                logger.debug("Failed to clear local cache: %s", e)
-            _cache = None
+        _cache = None
 
 
 def get_ttl(provider: str, config: dict | None = None) -> int:
@@ -129,10 +129,3 @@ def _save_to_cache(input_str: str, source: str, result: dict[str, Any], ttl: int
 
     with _cache_lock:
         cache.set(_cache_key(input_str, source), result, expire=ttl)
-
-
-def _l1_clear():
-    """Reset the local cache state (clear level 1 cache)."""
-    global _cache
-    with _cache_lock:
-        _cache = None
