@@ -80,3 +80,88 @@ Key requirements:
 - `.github/workflows/cleanup-ci-status-prs.yml`
 - `scripts/cleanup-ci-status-prs.sh`
 - LESSON-032 in `AGENTS.md`
+
+## Addendum: Opt-In Auto-Merge for Trusted Authors (2026-07-28)
+
+### Context
+
+The original decision in this ADR applied to *bot-authored* PRs on fixed
+branches (`ci/status-update`, `auto/regenerate-llms-txt`). For human-authored
+PRs by `d-o-hub` and other maintainers, the `dependabot-auto-merge.yml`
+workflow deliberately skips (`if: github.event.pull_request.user.login ==
+'dependabot[bot]'`), so every maintainer PR required a manual
+`gh pr merge --auto` step. With branch protection requiring
+`Require branches to be up to date before merging`, this degraded into the
+"last version always needed" symptom — every `main` advancement forced an
+`Update Branch` click before merge.
+
+### Decision
+
+Add `.github/workflows/auto-merge-non-deps.yml`: an opt-in, label-gated
+auto-merge workflow that mirrors `dependabot-auto-merge.yml` but for any
+non-Dependabot PR carrying the `automerge` label.
+
+**Gate**:
+
+```yaml
+if: |
+  contains(github.event.pull_request.labels.*.name, 'automerge') &&
+  github.event.pull_request.user.login != 'dependabot[bot]' &&
+  github.actor != 'dependabot[bot]' &&
+  github.event.pull_request.draft == false
+```
+
+**Trust boundary**: the `automerge` label can only be applied by a GitHub
+user with `triage` (or higher) write access on the repo (the default
+permission model for outside collaborators). The label is intentionally NOT
+listed in `.github/labeler.yml`, so the auto-labeler cannot apply it
+based on file-path rules. The label write itself acts as the explicit
+opt-in: a maintainer (or designated collaborator) must deliberately add
+the label, and removing the label is a future improvement (currently
+auto-merge once enabled cannot be auto-disabled by this workflow).
+
+**Defense-in-depth**: the workflow re-asserts `isDraft == false` inside the
+GraphQL step so a PR that becomes a draft after the label was applied
+still refuses to auto-merge.
+
+### Consequences
+
+**Positive**:
+
+- Removes the "last version needed" friction for maintainer PRs carrying
+  the `automerge` label.
+- Reuses the proven `enablePullRequestAutoMerge` GraphQL mutation pattern
+  from `dependabot-auto-merge.yml` (squash, branch auto-update handled by
+  GitHub).
+- Opt-in: no behaviour change unless the label is applied.
+
+**Negative / trade-offs**:
+
+- Once `enablePullRequestAutoMerge` fires, removing the `automerge` label
+  does not auto-disable auto-merge. A maintainer must click
+  `Disable auto-merge` in the PR UI. Track as follow-up.
+- Does **not** resolve a different class of bug: if multiple PRs from the
+  same maintainer are open simultaneously, each must be re-merged after
+  every `main` advancement. This is GitHub's default behaviour and not
+  addressed here.
+- Does **not** widen `dependabot-auto-merge.yml`'s `if:` guard (rejected
+  for supply-chain reasons — see `plans/GOAP_STATE.md` 2026-07-28 lessons).
+
+### Alternatives Considered
+
+- **Widen `dependabot-auto-merge.yml`'s `if:` to allow trusted human
+  actors.** Rejected: any owner with push rights could then auto-merge
+  their own unreviewed code. The label gate here is opt-in *and* explicit.
+- **`gh pr merge --auto` from a separate workflow that always runs.**
+  Rejected: same supply-chain concern; also runs the workflow on every PR
+  even when not wanted.
+- **Tighter trust boundary: only `d-o-hub` user can apply the label.**
+  Out of scope; the label-write gate is sufficient today and can be hardened
+  via a `CODEOWNERS`-style rule later.
+
+### References
+
+- `.github/workflows/auto-merge-non-deps.yml` (this addendum)
+- `.github/workflows/dependabot-auto-merge.yml` (pattern mirrored)
+- Issue #741 (the dedup fix this PR was sequenced after)
+- `plans/GOAP_STATE.md` (run 2026-07-28)
