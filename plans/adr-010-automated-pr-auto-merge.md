@@ -120,6 +120,15 @@ opt-in: a maintainer (or designated collaborator) must deliberately add
 the label, and removing the label is a future improvement (currently
 auto-merge once enabled cannot be auto-disabled by this workflow).
 
+**Permissions**: the workflow grants both `pull-requests: write` AND
+`contents: write` on the `GITHUB_TOKEN`, mirroring
+`dependabot-auto-merge.yml`. Empirically (4 consecutive `failure` runs
+on PR #744 with only `pull-requests: write`), the
+`enablePullRequestAutoMerge` GraphQL mutation requires both. The exact
+permission-check behaviour at the API layer is internal to GitHub and
+not formally documented; the safe pattern is to mirror the proven
+dependabot workflow.
+
 **Defense-in-depth**: the workflow re-asserts `isDraft == false` inside the
 GraphQL step so a PR that becomes a draft after the label was applied
 still refuses to auto-merge.
