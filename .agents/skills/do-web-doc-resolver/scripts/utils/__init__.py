@@ -21,6 +21,7 @@ from scripts.utils.cache import (
     _save_to_cache,
     get_cache,
     get_ttl,
+    _l1_clear,
 )
 from scripts.utils.content_clean import clean_content
 from scripts.utils.fetch import (
@@ -162,6 +163,7 @@ __all__ = [
     "_save_to_cache",
     "get_cache",
     "get_ttl",
+    "_l1_clear",
     # URL utilities
     "is_url",
     "normalize_url",
