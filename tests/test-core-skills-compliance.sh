@@ -5,7 +5,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$REPO_ROOT/.agents/skills"
-CORE_SKILLS=("anti-ai-slop" "skill-creator" "skill-evaluator" "dora-report")
+CORE_SKILLS=("avoid-ai-writing" "skill-creator" "skill-evaluator" "dora-report")
 
 echo "=== Verifying Core Skills Compliance ==="
 
