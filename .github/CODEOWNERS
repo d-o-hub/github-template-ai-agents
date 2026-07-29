@@ -1,0 +1,19 @@
+# CODEOWNERS - per-path review gating for CI/ADR-sensitive paths.
+# Background - Jules-task-agent PRs have twice (PRs #747 #748)
+# bundled a legitimate-looking change inside a PR that also
+# reverted these specific file classes. The yaml-validate guard
+# merged via #749 catches structural YAML regressions AFTER merge
+# via yaml.safe_load failure. CODEOWNERS blocks regressions BEFORE
+# merge by routing them to @d-o-hub for review.
+#
+# Patterns use root-relative (leading /) syntax.
+
+# Gate all workflow files (critical for CI infrastructure integrity).
+/.github/workflows/                    @d-o-hub
+/.github/workflows/**                  @d-o-hub
+
+# Gate all architecture decision records.
+/plans/adr-*.md                        @d-o-hub
+
+# Gate the auto-merge workflow documentation (the F4 validation deliverable).
+/docs/automerge-workflow.md            @d-o-hub
