@@ -30,7 +30,7 @@ These are primarily for **maintaining this template** or niche products:
 |----------|--------------|
 | `dora-report.yml`, `dora-fdrt.yml` | Template metrics reporting |
 | `sync-turso-skill.yml` | Turso skill sync |
-| `metrics-conflict-resolver.yml`, `validate-metrics.yml` | `.agents/metrics.jsonl` automation |
+| `metrics-conflict-resolver.yml`, `validate-metrics.yml` | `.agents/metrics/` per-agent automation |
 | `knowledge-cleanup.yml` | Lessons/knowledge maintenance |
 | `track-gitleaks-release.yml` | Upstream release tracking |
 | `auto-resolve-comments.yml`, `dedup-issues.yml` | Heavy issue automation |

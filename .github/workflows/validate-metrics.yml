@@ -1,13 +1,13 @@
 ---
-name: Validate metrics.jsonl schema
+name: Validate metrics schema
 
 on:  # yamllint disable-line rule:truthy
   push:
     paths:
-      - '.agents/metrics.jsonl'
+      - '.agents/metrics/*.jsonl'
   pull_request:
     paths:
-      - '.agents/metrics.jsonl'
+      - '.agents/metrics/*.jsonl'
 
 permissions:
   contents: read
@@ -18,70 +18,80 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
-      - name: Validate metrics.jsonl entries
+      - name: Validate per-agent metrics entries
         run: |
           python3 - <<'EOF'
-          import json, sys
+          import json, sys, glob, os
 
           errors = []
-          with open(".agents/metrics.jsonl") as f:
-              for i, line in enumerate(f, 1):
-                  line = line.strip()
-                  if not line:
-                      continue
-                  try:
-                      entry = json.loads(line)
-                  except json.JSONDecodeError as e:
-                      errors.append(f"Line {i}: invalid JSON: {e}")
-                      continue
+          total_entries = 0
+          metrics_files = glob.glob(".agents/metrics/metrics-*.jsonl")
+          if not metrics_files:
+              print("No per-agent metrics files found (directory empty)")
+              sys.exit(0)
 
-                  # Required fields for all entries
-                  for field in ("timestamp", "agent", "task"):
-                      if field not in entry:
-                          errors.append(f"Line {i}: missing required field '{field}'")
+          for metrics_file in sorted(metrics_files):
+              print(f"Checking {metrics_file}...")
+              with open(metrics_file) as f:
+                  for i, line in enumerate(f, 1):
+                      line = line.strip()
+                      if not line:
+                          continue
+                      total_entries += 1
+                      try:
+                          entry = json.loads(line)
+                      except json.JSONDecodeError as e:
+                          errors.append(f"{metrics_file} line {i}: invalid JSON: {e}")
+                          continue
 
-                  # Abstention-specific validation
-                  if entry.get("abstained") is True:
-                      for field in ("abstention_reason", "stopped_at_step", "infeasibility_signals"):
+                      # Required fields for all entries
+                      for field in ("timestamp", "agent", "task"):
                           if field not in entry:
-                              errors.append(f"Line {i}: abstained=true requires field '{field}'")
-                      if "stopped_at_step" in entry:
-                          if not isinstance(entry["stopped_at_step"], int) or entry["stopped_at_step"] < 0:
-                              errors.append(f"Line {i}: stopped_at_step must be integer >= 0")
-                      if "infeasibility_signals" in entry:
-                          if not isinstance(entry["infeasibility_signals"], list):
-                              errors.append(f"Line {i}: infeasibility_signals must be an array")
+                              errors.append(f"{metrics_file} line {i}: missing required field '{field}'")
+
+                      # Abstention-specific validation
+                      if entry.get("abstained") is True:
+                          for field in ("abstention_reason", "stopped_at_step", "infeasibility_signals"):
+                              if field not in entry:
+                                  errors.append(f"{metrics_file} line {i}: abstained=true requires field '{field}'")
+                          if "stopped_at_step" in entry:
+                              if not isinstance(entry["stopped_at_step"], int) or entry["stopped_at_step"] < 0:
+                                  errors.append(f"{metrics_file} line {i}: stopped_at_step must be integer >= 0")
+                          if "infeasibility_signals" in entry:
+                              if not isinstance(entry["infeasibility_signals"], list):
+                                  errors.append(f"{metrics_file} line {i}: infeasibility_signals must be an array")
 
           if errors:
-              print("metrics.jsonl validation FAILED:")
+              print("metrics validation FAILED:")
               for e in errors:
                   print(f"  {e}")
               sys.exit(1)
           else:
-              print(f"metrics.jsonl validation PASSED ({i} entries checked)")
+              print(f"metrics validation PASSED ({total_entries} entries across {len(metrics_files)} files)")
           EOF
 
       - name: Report abstention summary
         if: always()
         run: |
           python3 - <<'EOF'
-          import json
+          import json, glob
           total = abstained = 0
           reasons = {}
-          with open(".agents/metrics.jsonl") as f:
-              for line in f:
-                  line = line.strip()
-                  if not line:
-                      continue
-                  try:
-                      entry = json.loads(line)
-                  except Exception:
-                      continue
-                  total += 1
-                  if entry.get("abstained"):
-                      abstained += 1
-                      r = entry.get("abstention_reason", "unknown")
-                      reasons[r] = reasons.get(r, 0) + 1
+          for metrics_file in sorted(glob.glob(".agents/metrics/metrics-*.jsonl")):
+              with open(metrics_file) as f:
+                  for line in f:
+                      line = line.strip()
+                      if not line:
+                          continue
+                      try:
+                          entry = json.loads(line)
+                      except Exception:
+                          continue
+                      total += 1
+                      if entry.get("abstained"):
+                          abstained += 1
+                          r = entry.get("abstention_reason", "unknown")
+                          reasons[r] = reasons.get(r, 0) + 1
 
           print(f"Total entries: {total}")
           print(f"Abstention entries: {abstained}")

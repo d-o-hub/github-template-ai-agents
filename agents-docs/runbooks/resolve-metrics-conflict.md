@@ -1,6 +1,10 @@
-# Runbook: Resolving .agents/metrics.jsonl Conflicts
+# Runbook: Resolving .agents/metrics/ Conflicts
 
-If you encounter a merge conflict in `.agents/metrics.jsonl`, follow these steps to resolve it manually. Note that a CI bot typically handles this automatically for PRs.
+If you encounter a merge conflict in `.agents/metrics/`, follow these steps to resolve it manually.
+Note that a CI bot typically handles this automatically for PRs.
+
+Per-agent files (`.agents/metrics/metrics-{agent}.jsonl`) use `merge=union` in
+`.gitattributes`, so Git concatenates both sides on conflict. If that fails:
 
 ## Conflict Pattern
 
@@ -32,10 +36,10 @@ To resolve the conflict while keeping all entries and maintaining chronological 
    If conflict markers appear, run this command to keep all unique lines and remove markers:
 
    ```bash
-   grep -v -E '^(<<<<<<<|=======|>>>>>>>|)' .agents/metrics.jsonl \
+   cat .agents/metrics/metrics-*.jsonl | grep -v -E '^(<<<<<<<|=======|>>>>>>>|)' \
      | sort -u -t'"' -k4 \
-     > .agents/metrics.jsonl.resolved
-   mv .agents/metrics.jsonl.resolved .agents/metrics.jsonl
+     > .agents/metrics-merged.jsonl
+   # Distribute entries back to per-agent files based on "agent" field
    ```
 
 3. **Verify and Commit**:
@@ -43,8 +47,7 @@ To resolve the conflict while keeping all entries and maintaining chronological 
    ```bash
    # Validate JSON and timestamp format
    ./scripts/quality_gate.sh
-
-   git add .agents/metrics.jsonl
+   git add .agents/metrics/metrics-*.jsonl
    git rebase --continue # if rebasing
    # or
    git commit -m "fix(metrics): resolve merge conflict"

@@ -18,7 +18,7 @@ Load `.agents/skills/agent-coordination/SKILL.md` and dispatch a **swarm of agen
 
 ## Handoff Coordination
 
-Each agent writes its handoff summary to `.agents/metrics.jsonl` (Post-Task Protocol) **and** to the orchestration log. The orchestrator consumes the handoffs, resolves cross-agent conflicts (e.g. shared file edits), and triggers the next agent.
+Each agent writes its handoff summary to `.agents/metrics/metrics-{agent}.jsonl` (Post-Task Protocol) **and** to the orchestration log. The orchestrator consumes the handoffs, resolves cross-agent conflicts (e.g. shared file edits), and triggers the next agent.
 
 ## Commit Strategy
 

@@ -150,7 +150,7 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 
 ## Metrics & Post-Task Protocol
 
-See `agents-docs/METRICS.md` for metrics logging (`.agents/metrics.jsonl`), DORA reports, and post-task protocol.
+After every task, append a JSON entry using `./scripts/log-metric.sh '<json>'`. Entries go to per-agent files in `.agents/metrics/metrics-{agent}.jsonl`, eliminating merge conflicts (LESSON-035). See `agents-docs/METRICS.md` for schema, DORA reports, and protocol details.
 
 ## Recovery & Advanced Topics
 

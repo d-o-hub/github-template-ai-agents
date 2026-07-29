@@ -36,5 +36,5 @@ if '$RESUME_HINT':
 print(json.dumps(d))
 ")
 
-echo "$ENTRY" >> .agents/metrics.jsonl
+echo "$ENTRY" >> ".agents/metrics/metrics-$AGENT.jsonl"
 echo "Appended abstention metric for agent=$AGENT reason=$REASON step=$STEP"

@@ -190,7 +190,7 @@ Verify skill has:
 
 ## Metrics Tracking
 
-Append results to `.agents/metrics.jsonl` after each monthly eval cycle:
+Append results to per-agent files using `./scripts/log-metric.sh` after each monthly eval cycle:
 
 ```json
 {

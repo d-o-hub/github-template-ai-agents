@@ -31,7 +31,11 @@ See `agents-docs/SKILLS.md`.
 
 Project slash commands live in `.claude/commands/`. Use them for repeatable workflows.
 
-### Hooks
+### Metrics
+
+After every task, append using: `./scripts/log-metric.sh '<json>'`
+Entries go to `.agents/metrics/metrics-{agent}.jsonl`.
+See `agents-docs/METRICS.md`.
 
 Verification hooks run automatically on agent stop events.
 - Exit `0` = silent success (nothing extra enters context)

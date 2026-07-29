@@ -1,8 +1,18 @@
 # Metrics
 
-## Task metrics (`.agents/metrics.jsonl`)
+## Task metrics (`.agents/metrics/`)
 
-Append one JSON object per completed agent task (post-task protocol).
+Agents append one JSON object per completed task using `./scripts/log-metric.sh '<json>'`.
+Entries go to per-agent files in `.agents/metrics/metrics-{agent}.jsonl`, eliminating
+merge conflicts between concurrent agent sessions (LESSON-035).
+
+### Helper script
+
+```bash
+./scripts/log-metric.sh '{"timestamp":"2026-07-15T12:00:00Z","agent":"buffy","task":"fix CI","skill_used":"shell-script-quality","status":"completed","tokens_used":1200,"duration_seconds":60}'
+```
+
+The script extracts the `agent` field to determine the target file.
 
 Suggested fields:
 
@@ -21,10 +31,20 @@ Suggested fields:
 
 ## Rotation
 
-- Keep the working file small (prefer under a few hundred lines).
+- Keep per-agent files small (prefer under a few hundred lines each).
 - Archive older entries under `agents-docs/metrics-archive/` when rotating.
-- Template clones should not inherit years of maintainer telemetry; ship only an
-  example line (or empty file) and start fresh.
+- Template clones should not inherit years of maintainer telemetry; delete
+  `.agents/metrics/` entries and start fresh.
+
+## Aggregation
+
+To aggregate across all agents for DORA reports:
+
+```bash
+cat .agents/metrics/*.jsonl | sort  # all entries merged
+```
+
+The `dora-report` skill and `quality_gate.sh` scan all `metrics-*.jsonl` files.
 
 ## Related
 

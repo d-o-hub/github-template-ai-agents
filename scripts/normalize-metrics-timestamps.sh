@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# Normalize timestamps in .agents/metrics.jsonl to YYYY-MM-DDTHH:MM:SSZ
+# Normalize timestamps in .agents/metrics/*.jsonl to YYYY-MM-DDTHH:MM:SSZ
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-METRICS_FILE="${REPO_ROOT}/.agents/metrics.jsonl"
-TEMP_FILE="${METRICS_FILE}.tmp"
+METRICS_DIR="${REPO_ROOT}/.agents/metrics"
 
-if [[ ! -f "$METRICS_FILE" ]]; then
-    printf "Metrics file %s not found. Skipping.\n" "$METRICS_FILE"
-else
+for METRICS_FILE in "$METRICS_DIR"/metrics-*.jsonl; do
+    [[ -f "$METRICS_FILE" ]] || continue
+
+    TEMP_FILE="${METRICS_FILE}.tmp"
     printf "Normalizing timestamps in %s...\n" "$METRICS_FILE"
 
     python3 -c '
@@ -42,4 +42,4 @@ for line in sys.stdin:
 
     mv "$TEMP_FILE" "$METRICS_FILE"
     printf "Done. Normalized %s\n" "$METRICS_FILE"
-fi
+done

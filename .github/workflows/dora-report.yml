@@ -35,6 +35,7 @@ jobs:
 
       - name: Generate DORA Report
         run: |
+          cat .agents/metrics/metrics-*.jsonl > .agents/metrics.jsonl 2>/dev/null || true
           touch .agents/metrics.jsonl dora-metrics.jsonl
           if [ -f .agents/skills/dora-report/scripts/compute_dora.py ]; then
             python3 .agents/skills/dora-report/scripts/compute_dora.py \

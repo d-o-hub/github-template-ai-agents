@@ -96,7 +96,7 @@ log shows `header-max-length`, `type-empty`, `subject-empty`, or
 
 - Rename the PR title immediately using a safe fallback: `gh pr edit --title "chore: <original title truncated>"`.
 - Use `feat:` or `fix:` only if the branch name or content provides a high-confidence signal.
-- Record the rename in `.agents/metrics.jsonl` per Post-Task Protocol.
+- Record the rename in `.agents/metrics/metrics-{agent}.jsonl` per Post-Task Protocol.
 - Run `--once` to confirm `lint-pr-title` re-triggers, then resume `--watch`.
 
 **Flaky/unrelated** — transient infra issues (timeouts, runner failures, registry outages, rate limits):

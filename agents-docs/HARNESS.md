@@ -42,10 +42,10 @@ See `agents-docs/SKILLS.md`.
 
 Track agent behavior for debugging and cost control:
 
-- **Task-level**: Append to `.agents/metrics.jsonl` after every task (see `AGENTS.md` Post-Task Protocol)
+- **Task-level**: Use `./scripts/log-metric.sh '<json>'` after every task (see `AGENTS.md` Post-Task Protocol). Entries go to `.agents/metrics/metrics-{agent}.jsonl`.
 - **Session-level**: Use `claude --verbose` for detailed session tracing
 - **Monthly**: Run `dora-report` skill for aggregated metrics
-- **Cost attribution**: Add `session_id` to metrics.jsonl entries to group work by session
+- **Cost attribution**: Add `session_id` to metrics entries to group work by session
 
 ## Supported AI Agents
 

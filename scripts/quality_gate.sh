@@ -211,48 +211,57 @@ if [[ -f "./scripts/check-plan-numbering.sh" ]]; then
     printf "\n"
 fi
 
-# --- Validate .agents/metrics.jsonl ---
-if [[ -f ".agents/metrics.jsonl" ]]; then
-    printf "%bValidating .agents/metrics.jsonl...%b\n" "${BLUE}" "${NC}"
-    if command -v python3 &>/dev/null; then
-    METRICS_VALID=0
-    err_msg=$(jq -R -c '
-      select(length > 0) |
-      . as $raw |
-      try
-        (fromjson |
-          if type != "object" then
-            "INVALID_JSON:\($raw)" | halt_error(1)
-          elif .timestamp == null or (.timestamp | type != "string") or (.timestamp | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$") | not) then
-            "BAD_TS:\(.timestamp // "")" | halt_error(1)
-          else
-            empty
-          end
-        )
-      catch
-        ("INVALID_JSON:\($raw)" | halt_error(1))
-    ' .agents/metrics.jsonl 2>&1 >/dev/null)
+# --- Validate .agents/metrics/ per-agent files ---
+if [[ -d ".agents/metrics" ]]; then
+    printf "%bValidating .agents/metrics/ per-agent files...%b\n" "${BLUE}" "${NC}"
+    METRICS_FILES=$(find .agents/metrics -maxdepth 1 -name 'metrics-*.jsonl' -type f 2>/dev/null || true)
+    if [[ -z "$METRICS_FILES" ]]; then
+        printf "%b  ✓ No per-agent metrics files to validate (directory exists but empty)%b\n" "${GREEN}" "${NC}"
+    else
+        if command -v python3 &>/dev/null; then
+            METRICS_VALID=0
+            while IFS= read -r metrics_file; do
+                [[ -z "$metrics_file" ]] && continue
+                printf "%b  Checking %s...%b\n" "${BLUE}" "$metrics_file" "${NC}"
+                err_msg=$(jq -R -c '
+                  select(length > 0) |
+                  . as $raw |
+                  try
+                    (fromjson |
+                      if type != "object" then
+                        "INVALID_JSON:\($raw)" | halt_error(1)
+                      elif .timestamp == null or (.timestamp | type != "string") or (.timestamp | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$") | not) then
+                        "BAD_TS:\(.timestamp // "")" | halt_error(1)
+                      else
+                        empty
+                      end
+                    )
+                  catch
+                    ("INVALID_JSON:\($raw)" | halt_error(1))
+                ' "$metrics_file" 2>&1 >/dev/null)
 
-    if [[ $? -ne 0 ]]; then
-        if [[ "$err_msg" == INVALID_JSON:* ]]; then
-            line="${err_msg#INVALID_JSON:}"
-            printf "%b  ✗ Invalid JSON in metrics.jsonl: %s%b\n" "${RED}" "$line" "${NC}"
-        elif [[ "$err_msg" == BAD_TS:* ]]; then
-            ts="${err_msg#BAD_TS:}"
-            printf "%b  ✗ Bad timestamp format \"%s\" in metrics.jsonl — must be YYYY-MM-DDTHH:MM:SSZ%b\n" "${RED}" "$ts" "${NC}"
+                if [[ $? -ne 0 ]]; then
+                    if [[ "$err_msg" == INVALID_JSON:* ]]; then
+                        line="${err_msg#INVALID_JSON:}"
+                        printf "%b    ✗ Invalid JSON in %s: %s%b\n" "${RED}" "$metrics_file" "$line" "${NC}"
+                    elif [[ "$err_msg" == BAD_TS:* ]]; then
+                        ts="${err_msg#BAD_TS:}"
+                        printf "%b    ✗ Bad timestamp format \"%s\" in %s — must be YYYY-MM-DDTHH:MM:SSZ%b\n" "${RED}" "$ts" "$metrics_file" "${NC}"
+                    else
+                        printf "%b    ✗ Invalid JSON in %s%b\n" "${RED}" "$metrics_file" "${NC}"
+                    fi
+                    METRICS_VALID=1
+                fi
+            done <<< "$METRICS_FILES"
+
+            if [[ $METRICS_VALID -eq 0 ]]; then
+                printf "%b  ✓ All per-agent metrics files are valid%b\n" "${GREEN}" "${NC}"
+            else
+                FAILED=1
+            fi
         else
-            printf "%b  ✗ Invalid JSON in metrics.jsonl%b\n" "${RED}" "${NC}"
+            printf "%b  ⚠ python3 not available — skipping metrics validation%b\n" "${YELLOW}" "${NC}"
         fi
-        METRICS_VALID=1
-    fi
-
-    if [[ $METRICS_VALID -eq 0 ]]; then
-        printf "%b  ✓ .agents/metrics.jsonl is valid%b\n" "${GREEN}" "${NC}"
-    else
-        FAILED=1
-    fi
-    else
-        printf "%b  ⚠ python3 not available — skipping metrics.jsonl validation%b\n" "${YELLOW}" "${NC}"
     fi
     printf "\n"
 fi
