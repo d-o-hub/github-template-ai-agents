@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-031"
+    "adr": "adr-032"
   },
   "active_plan": null,
   "phases": [],
@@ -42,6 +42,10 @@
     "adr-030-template-improvement-recommendations.md": {
       "status": "accepted",
       "date": "2026-07-15"
+    },
+    "adr-031-per-agent-metrics.md": {
+      "status": "accepted",
+      "date": "2026-07-29"
     }
   }
 }
