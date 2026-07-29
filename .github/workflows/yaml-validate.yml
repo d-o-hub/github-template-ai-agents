@@ -1,0 +1,46 @@
+---
+name: YAML Validate (Scalar-Indent Guard)
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/yaml_validate_workflows.py'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/yaml_validate_workflows.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Workflow YAML Parse Validation (F8-class guard)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: '3.11'
+
+      - name: Install pyyaml
+        # yaml is NOT in Python stdlib; the script imports yaml.safe_load.
+        # Pin pyyaml to a known-good version (latest 6.x for Python 3.11).
+        run: pip install 'pyyaml>=6.0,<7.0'
+
+      - name: Run yaml_validate_workflows.py
+        run: python3 scripts/yaml_validate_workflows.py
