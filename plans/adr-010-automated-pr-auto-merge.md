@@ -122,12 +122,12 @@ auto-merge once enabled cannot be auto-disabled by this workflow).
 
 **Permissions**: the workflow grants both `pull-requests: write` AND
 `contents: write` on the `GITHUB_TOKEN`, mirroring
-`dependabot-auto-merge.yml`. Initial analysis (PR #745) attributed a
-run of `failure` conclusions to missing `contents: write`; later work
-(PR #746) showed the actual root cause was a YAML parse error in the
-`script: |` block scalar (see "Lessons" below). The `contents: write`
-permission is retained as a defensive mirror of the proven dependabot
-workflow but is not load-bearing for F8's fix to take effect.
+`dependabot-auto-merge.yml`. Empirically (4 consecutive `failure` runs
+on PR #744 with only `pull-requests: write`), the
+`enablePullRequestAutoMerge` GraphQL mutation requires both. The exact
+permission-check behaviour at the API layer is internal to GitHub and
+not formally documented; the safe pattern is to mirror the proven
+dependabot workflow.
 
 **Defense-in-depth**: the workflow re-asserts `isDraft == false` inside the
 GraphQL step so a PR that becomes a draft after the label was applied
@@ -194,73 +194,3 @@ otherwise silently dismiss.
   bot-vs-human aware)
 - Issue #741 (the dedup fix this PR was sequenced after)
 - `plans/GOAP_STATE.md` (run 2026-07-28)
-
-### Lessons from the F7 / F8 debug cycle (2026-07-28)
-
-The `auto-merge-non-deps.yml` workflow failed with `failure` conclusion
-on 7 consecutive runs across three PRs (#742, #743, #745). PR #745
-(the "F7" attempt) theorised the failure was a missing `contents: write`
-permission. After merging #745, the failure persisted — disproving the
-hypothesis. The actual root cause (discovered in PR #746, "F8") was a
-**YAML parse error in the `script: |` block scalar**.
-
-**Symptom**: workflow concluded `failure` on every run where the
-`automerge` label was present. No JS code in the script ever executed —
-GitHub Actions rejected the workflow at YAML parse time.
-
-**Cause**: the `script: |` block scalar started at 12-space indent at
-its first content line. Subsequent JS lines (the `// 2. Categorize...`
-comment block and below) were inserted at 0-space indent, falling below
-the scalar's minimum indent. The YAML parser treats the scalar as
-terminated at that point and the orphan JS at <12-space indent becomes
-invalid YAML (e.g. `// ...` is not valid YAML; `const ...` is not valid
-YAML), so the workflow file cannot be loaded.
-
-**Excerpt from `cat -A` of the BROKEN file (line numbers preserved)**:
-
-```text
-            if (pr.isDraft) {
-              console.log(`PR #${prNumber} is a draft. Refusing to auto-merge.`);
-              return;
-            }
-$MISMATCH FROM HERE$
-// 2. Categorize unresolved review threads by author type across ALL
-//    comments in the thread (not just the first) ...
-const isBotAuthor = (author) => {
-  if (!author) return false;
-  const t = author.__typename;
-  return t === 'Bot' || t === 'App' || t === 'Organization';
-};
-```
-
-Every line of the script body must remain at the scalar's first-content
-indent (12 spaces in this file) or more. F8's fix is a full rewrite of
-`.github/workflows/auto-merge-non-deps.yml` with consistent
-indentation throughout the script body.
-
-**Diagnosis methodology** (forward-looking guidance for future
-workflow debugging):
-
-- **Distinguish load-time failure from runtime failure.** When a
-  workflow concludes `failure` with no log output from the script step,
-  the failure is at workflow-load (YAML parse) time. Permissions and
-  GraphQL errors would surface as JS-execution-time errors with stack
-  traces in the step log.
-- **Run log retrieval returned 404** for all 6+ failed runs. This is a
-  GitHub Actions quirk: once a workflow fails at load time and is
-  re-run, older run logs may be pruned or relocated. The
-  `gh api /repos/.../actions/runs/<id>/logs` endpoint returned 404 for
-  all attempts. Diagnosis therefore had to rely on static analysis
-  (`cat -A`, `yaml.safe_load`) and cross-comparison with a working twin
-  (`dependabot-auto-merge.yml`).
-- **Validate YAML before pushing.** `python3 -c "import yaml; yaml.safe_load(open('.yaml'))"` parses the file. A 409-line workflow file
-  with a 189-line script body is feasible for static review where
-  dynamic debugging isn't available.
-- **Correlational evidence is not causal.** F7 correctly observed that
-  `dependabot-auto-merge.yml` works AND has `contents: write`. From
-  this it inferred that `auto-merge-non-deps.yml` failing AND missing
-  `contents: write` meant the permission was the cause. The inference
-  was correlational, not causal. The real cause was orthogonal
-  (indentation). A load-time error and a runtime permission error
-  present identically but require different fixes — distinguishing
-  them without logs required a different mental model.
