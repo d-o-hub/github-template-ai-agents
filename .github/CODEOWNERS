@@ -1,19 +1,26 @@
-# CODEOWNERS - per-path review gating for CI/ADR-sensitive paths.
-# Background - Jules-task-agent PRs have twice (PRs #747 #748)
-# bundled a legitimate-looking change inside a PR that also
-# reverted these specific file classes. The yaml-validate guard
-# merged via #749 catches structural YAML regressions AFTER merge
-# via yaml.safe_load failure. CODEOWNERS blocks regressions BEFORE
-# merge by routing them to @d-o-hub for review.
+# CODEOWNERS for d-o-hub/github-template-ai-agents
+# See plans/GOAP_STATE.md and the F-series debug cycle:
+# Jules-task-agent PRs #747 and #748 bundled legitimate-looking
+# changes inside PRs that also reverted workflow + ADR + docs
+# content. The yaml-validate guard (PR #749) catches structural
+# regressions AFTER merge; this file gates human review for
+# the affected content classes BEFORE merge.
 #
-# Patterns use root-relative (leading /) syntax.
+# Note: branch protection currently returns 404 (no required
+# reviews). Soft enforcement today; promote by adding
+# `Require review from Code Owners` to branch protection when ready.
 
-# Gate all workflow files (critical for CI infrastructure integrity).
-/.github/workflows/                    @d-o-hub
-/.github/workflows/**                  @d-o-hub
+# Workflow files - any change to CI machinery
+/.github/workflows/*.yml          @d-o-hub
+/.github/workflows/*.yaml         @d-o-hub
 
-# Gate all architecture decision records.
-/plans/adr-*.md                        @d-o-hub
+# ADR documents that codify workflow design decisions
+/plans/adr-*.md                  @d-o-hub
 
-# Gate the auto-merge workflow documentation (the F4 validation deliverable).
-/docs/automerge-workflow.md            @d-o-hub
+# User-facing docs about the auto-merge workflow
+/docs/automerge-workflow.md      @d-o-hub
+
+# Jules-task-agent artifacts (sentinel.md, bolt.md). Blocking
+# the entire Jules-PR class since they bundle regressions of
+# the above paths in #747 and #748.
+/.jules/                          @d-o-hub
