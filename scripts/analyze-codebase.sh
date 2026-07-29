@@ -78,22 +78,33 @@ fail()     { printf '  \u2717 %s\n' "$*" >&2; FAILED=$((FAILED + 1)); _report_ap
 check_todo_density() {
     section "TODO/FIXME density"
     local pattern='(TODO|FIXME|XXX|HACK)\b'
-    local file_count
-    file_count=$(grep -RIl --exclude-dir=.git --exclude-dir=node_modules \
+    local file_count=0 marker_count=0
+
+    # perf: replace duplicate grep -RI|wc -l with single grep -Rc and native bash array matching
+    local grep_output
+    grep_output=$(grep -RIc --exclude-dir=.git --exclude-dir=node_modules \
         --exclude-dir=target --exclude-dir=dist --exclude-dir=build \
         --exclude='*.lock' --exclude='*.min.js' \
-        -E "$pattern" . 2>/dev/null | wc -l)
+        -E "$pattern" . 2>/dev/null | grep -v ':0$' || true)
 
-    if [[ "$file_count" -eq 0 ]]; then
+    if [[ -z "$grep_output" ]]; then
         ok "No TODO/FIXME markers found"
         return
     fi
 
-    local marker_count
-    marker_count=$(grep -RI --exclude-dir=.git --exclude-dir=node_modules \
-        --exclude-dir=target --exclude-dir=dist --exclude-dir=build \
-        --exclude='*.lock' --exclude='*.min.js' \
-        -E "$pattern" . 2>/dev/null | wc -l)
+    local old_ifs="$IFS"
+    IFS=$'\n'
+    set -f
+    local files_arr=($grep_output)
+    set +f
+    IFS="$old_ifs"
+    file_count=${#files_arr[@]}
+
+    local line count
+    for line in "${files_arr[@]}"; do
+        count="${line##*:}"
+        marker_count=$((marker_count + count))
+    done
 
     warn "$marker_count TODO/FIXME marker(s) across $file_count file(s)"
 
