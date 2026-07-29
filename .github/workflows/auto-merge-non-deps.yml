@@ -23,25 +23,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            // Failure-mode convention for this script:
-            //   - GraphQL mutations that AFFECT the refusal signal
-            //     (`disablePullRequestAutoMerge` on human-thread refusal)
-            //     are intentionally left WITHOUT a try/catch wrapper so
-            //     that a transient API / permission failure surfaces as a
-            //     failed Actions step rather than as a misleading
-            //     "refusing" comment while auto-merge silently fires.
-            //   - GraphQL mutations that are purely cosmetic
-            //     (`addComment` posting the refusal notice) keep a
-            //     best-effort try/catch so a comment-rate-limit failure
-            //     doesn't fail the workflow — the disable above is the
-            //     real signal.
-
             const prNumber = context.payload.pull_request.number;
 
-            // 1. Fetch PR details (labels, draft state, auto-merge status,
-            //    unresolved review threads) — re-checked at script start
-            //    to close the race window between 'if:' evaluation and
-            //    the GraphQL call below.
+            // 1. Fetch PR details, including labels (re-checked at script start
+            //    to close the race window between 'if:' evaluation and the
+            //    GraphQL call below), auto-merge status, draft state, and any
+            //    unresolved review threads.
             const prQuery = `
               query($owner: String!, $repo: String!, $number: Int!) {
                 repository(owner: $owner, name: $repo) {
@@ -55,20 +42,20 @@ jobs:
                     autoMergeRequest {
                       enabledAt
                     }
-                    reviewThreads(first: 100) {
+                reviewThreads(first: 100) {
+                  nodes {
+                    id
+                    isResolved
+                    comments(first: 100) {
                       nodes {
-                        id
-                        isResolved
-                        comments(first: 100) {
-                          nodes {
-                            author {
-                              __typename
-                              login
-                            }
-                          }
+                        author {
+                          __typename
+                          login
                         }
                       }
                     }
+                  }
+                }
                   }
                 }
               }
@@ -81,21 +68,16 @@ jobs:
             });
 
             const pr = repository.pullRequest;
-            if (!pr) {
-              console.log(`PR #${prNumber} could not be loaded. Exiting.`);
-              return;
-            }
 
             if (pr.state !== 'OPEN') {
               console.log(`PR #${prNumber} is ${pr.state}. Exiting.`);
               return;
             }
 
-            // Defense-in-depth: re-check the gate conditions inside the
-            // script. The 'if:' guard evaluates once at job start; a
-            // separate 'unlabeled' event between then and now could
-            // invalidate it.
-            const labelNames = (pr.labels.nodes || []).map(l => l.name);
+            // Defense-in-depth: re-check the gate conditions inside the script.
+            // The 'if:' guard evaluates once at job start; a separate
+            // 'unlabeled' event between then and now could invalidate it.
+            const labelNames = pr.labels.nodes.map(l => l.name);
             if (!labelNames.includes('automerge')) {
               console.log(`PR #${prNumber} no longer has the 'automerge' label. Exiting.`);
               return;
@@ -105,35 +87,26 @@ jobs:
               return;
             }
 
-            // 2. Categorize unresolved review threads by author type
-            //    across ALL comments in the thread (not just the first)
-            //    so a human reply to a bot thread is correctly recognised
-            //    as human feedback. Only auto-resolve threads whose every
-            //    comment is from a Bot / App / Organization author. If
-            //    any thread has a human author in any comment, refuse
-            //    auto-merge and post a PR comment explaining why (so the
-            //    maintainer sees the reason without digging into Actions
-            //    logs).
+            // 2. Categorize unresolved review threads by author type across ALL
+            //    comments in the thread (not just the first) so a human reply to a
+            //    bot thread is correctly recognised as human feedback. Only
+            //    auto-resolve threads whose every comment is from a bot/app/org
+            //    author. If any thread has a human author in any comment, refuse
+            //    auto-merge and post a PR comment explaining why.
             const isBotAuthor = (author) => {
               if (!author) return false;
               const t = author.__typename;
               return t === 'Bot' || t === 'App' || t === 'Organization';
             };
 
-            const threads = (pr.reviewThreads && pr.reviewThreads.nodes) || [];
-            const unresolvedThreads = threads.filter(t => !t.isResolved);
+            const unresolvedThreads = pr.reviewThreads.nodes.filter(t => !t.isResolved);
             const humanUnresolvedThreads = [];
             const botUnresolvedThreads = [];
 
             for (const thread of unresolvedThreads) {
               const comments = (thread.comments && thread.comments.nodes) || [];
-              // Empty threads (no comments yet) cannot be categorised —
-              // treat as human so they block auto-merge rather than
-              // silently deadlocking the workflow.
-              if (comments.length === 0) {
-                humanUnresolvedThreads.push(thread);
-                continue;
-              }
+              // Skip empty threads (no comments at all) — they aren't actual feedback.
+              if (comments.length === 0) continue;
               const hasHuman = comments.some(c => !isBotAuthor(c.author));
               if (hasHuman) {
                 humanUnresolvedThreads.push(thread);
@@ -143,58 +116,36 @@ jobs:
             }
 
             if (humanUnresolvedThreads.length > 0) {
-              // Collect unique human logins across all unresolved human
-              // threads for the PR comment — reuse isBotAuthor for
-              // consistency with the categorisation above.
+              // Collect unique human logins across all unresolved human threads for
+              // the PR comment.
               const humanLogins = Array.from(new Set(
-                humanUnresolvedThreads.flatMap(t =>
-                  (t.comments.nodes || [])
-                    .map(c => isBotAuthor(c.author) ? null : (c.author && c.author.login) || null)
-                    .filter(l => l)
-                )
+                humanUnresolvedThreads.flatMap(t => (t.comments.nodes || [])
+                  .map(c => {
+                    const isBot = c.author && (
+                      c.author.__typename === 'Bot' ||
+                      c.author.__typename === 'App' ||
+                      c.author.__typename === 'Organization'
+                    );
+                    return (c.author && !isBot) ? c.author.login : null;
+                  })
+                  .filter(l => l))
               ));
-              console.log(`Refusing to auto-merge: ${humanUnresolvedThreads.length} unresolved HUMAN review thread(s).`);
+              console.log(
+                `❌ Refusing to auto-merge: ${humanUnresolvedThreads.length} ` +
+                'unresolved HUMAN review thread(s).'
+              );
               for (const t of humanUnresolvedThreads) {
                 console.log(`  - thread ${t.id}`);
               }
-              for (const login of humanLogins) {
-                console.log(`  - @${login}`);
-              }
 
-              // If a PREVIOUS run of this workflow already enabled
-              // auto-merge (e.g. label was applied earlier, then a human
-              // review thread appeared since), GitHub would still
-              // happily auto-merge the PR once checks pass — defeating
-              // the entire point of this refusal path. Disable the
-              // existing request before exiting.
-              //
-              // Failure here is intentionally FATAL: if disable fails
-              // (transient API error or permission regression), the
-              // workflow must surface that failure rather than post a
-              // misleading "refusing" comment while GitHub silently
-              // merges the PR.
-              if (pr.autoMergeRequest) {
-                await github.graphql(`
-                  mutation($prId: ID!) {
-                    disablePullRequestAutoMerge(input: {pullRequestId: $prId}) {
-                      pullRequest { autoMergeRequest { enabledAt } }
-                    }
-                  }
-                `, { prId: pr.id });
-                console.log('Disabled previously-enabled auto-merge.');
-              } else {
-                console.log('No pre-existing auto-merge to disable.');
-              }
-
-              // Post a PR comment so the maintainer/reviewer sees WHY
-              // auto-merge was blocked without digging into Actions logs.
-              // Best-effort: a comment-rate-limit failure must NOT cause
-              // this workflow to conclude `failure` — the disable above
-              // (or refusal on a first run) is the actual signal.
+              // Post a PR comment so the maintainer/reviewer sees WHY auto-merge was
+              // blocked without having to dig into Actions logs.
               const body = [
                 '## Refusing auto-merge: ' + humanUnresolvedThreads.length + ' unresolved human review thread(s)',
                 '',
-                'This PR carries the `automerge` label, but the workflow refuses to auto-merge because at least one unresolved review thread has a human-authored comment.',
+                'This PR carries the `automerge` label, but the workflow refuses ' +
+                'to auto-merge because at least one unresolved review thread has ' +
+                'a human-authored comment.',
                 '',
                 'Human authors with unresolved comments:',
                 ...humanLogins.map(l => '- @' + l),
@@ -212,9 +163,9 @@ jobs:
                     }
                   }
                 `, { prId: pr.id, body });
-                console.log('Posted PR comment explaining refusal.');
+                console.log('✅ Posted PR comment explaining refusal');
               } catch (e) {
-                console.log(`Failed to post PR comment (best-effort, non-fatal): ${e}`);
+                console.log(`Failed to post PR comment: ${e}`);
               }
               return;
             }
@@ -231,24 +182,25 @@ jobs:
                   }
                 `, { threadId: thread.id });
               }
-              console.log('All bot review threads resolved.');
+              console.log('✅ All bot review threads resolved');
             } else {
-              console.log('No unresolved review threads.');
+              console.log('No unresolved review threads');
             }
 
-            // 3. Enable GitHub native auto-merge (handles linear history,
-            //    branch updates, and required checks automatically using
-            //    system privileges).
+            // 3. Enable GitHub native auto-merge (handles linear history, branch updates,
+            //    and required checks automatically using system privileges)
             if (pr.autoMergeRequest) {
-              console.log('Auto-merge already enabled.');
+              console.log('✅ Auto-merge already enabled');
             } else {
               console.log('Enabling auto-merge (squash)...');
               await github.graphql(`
                 mutation($prId: ID!) {
-                  enablePullRequestAutoMerge(input: {pullRequestId: $prId, mergeMethod: SQUASH}) {
+                  enablePullRequestAutoMerge(
+                    input: {pullRequestId: $prId, mergeMethod: SQUASH}
+                  ) {
                     pullRequest { autoMergeRequest { enabledAt } }
                   }
                 }
               `, { prId: pr.id });
-              console.log('Auto-merge enabled — GitHub will merge when all requirements are met.');
+              console.log('✅ Auto-merge enabled — GitHub will merge when all requirements are met');
             }
