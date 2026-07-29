@@ -1,5 +1,6 @@
 ---
 name: DORA FDRT Recording
+# yamllint disable-line rule:truthy
 on:
   issues:
     types: [closed]

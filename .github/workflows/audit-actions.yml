@@ -1,3 +1,4 @@
+---
 name: Audit GitHub Actions
 
 on:  # yamllint disable-line rule:truthy

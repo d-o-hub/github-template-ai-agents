@@ -1,5 +1,6 @@
 ---
 name: Monthly DORA Report
+# yamllint disable-line rule:truthy
 on:
   schedule:
     - cron: '0 0 1 * *'  # First of every month

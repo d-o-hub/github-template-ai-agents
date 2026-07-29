@@ -120,7 +120,7 @@ jobs:
 
       - name: Install shellcheck and bats
         run: |
-          for i in {1..3}; do sudo apt-get update && break || sleep 5; done
+          for _ in {1..3}; do if sudo apt-get update; then break; else sleep 5; fi; done
           sudo apt-get install -y shellcheck bats
 
       - name: Validate agent config schemas
@@ -264,7 +264,7 @@ jobs:
 
       - name: Setup BATS
         run: |
-          for i in {1..3}; do sudo apt-get update && break || sleep 5; done
+          for _ in {1..3}; do if sudo apt-get update; then break; else sleep 5; fi; done
           sudo apt-get install -y bats
 
       - name: Run BATS tests

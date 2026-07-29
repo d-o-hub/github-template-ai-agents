@@ -1,3 +1,4 @@
+---
 name: Track Gitleaks Node 24 Upgrade
 
 on:  # yamllint disable-line rule:truthy
