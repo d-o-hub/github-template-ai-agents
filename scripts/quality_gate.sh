@@ -214,14 +214,17 @@ fi
 # --- Validate .agents/metrics/ per-agent files ---
 if [[ -d ".agents/metrics" ]]; then
     printf "%bValidating .agents/metrics/ per-agent files...%b\n" "${BLUE}" "${NC}"
-    METRICS_FILES=$(find .agents/metrics -maxdepth 1 -name 'metrics-*.jsonl' -type f 2>/dev/null || true)
-    if [[ -z "$METRICS_FILES" ]]; then
+    # perf: replace find subshell and while read <<< loop with native bash globbing and array iteration
+    shopt -s nullglob
+    METRICS_FILES=(.agents/metrics/metrics-*.jsonl)
+    shopt -u nullglob
+    if [[ ${#METRICS_FILES[@]} -eq 0 ]]; then
         printf "%b  ✓ No per-agent metrics files to validate (directory exists but empty)%b\n" "${GREEN}" "${NC}"
     else
         if command -v python3 &>/dev/null; then
             METRICS_VALID=0
-            while IFS= read -r metrics_file; do
-                [[ -z "$metrics_file" ]] && continue
+            for metrics_file in "${METRICS_FILES[@]}"; do
+                [[ ! -f "$metrics_file" ]] && continue
                 printf "%b  Checking %s...%b\n" "${BLUE}" "$metrics_file" "${NC}"
                 err_msg=$(jq -R -c '
                   select(length > 0) |
@@ -252,7 +255,7 @@ if [[ -d ".agents/metrics" ]]; then
                     fi
                     METRICS_VALID=1
                 fi
-            done <<< "$METRICS_FILES"
+            done
 
             if [[ $METRICS_VALID -eq 0 ]]; then
                 printf "%b  ✓ All per-agent metrics files are valid%b\n" "${GREEN}" "${NC}"
