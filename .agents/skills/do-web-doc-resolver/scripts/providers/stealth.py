@@ -1,7 +1,7 @@
 """Stealth fetch provider — placeholder for anti-bot escalation tier.
 
 TODO: Implement using playwright-stealth or curl-impersonate.
-Currently raises NotImplementedError so cascade skips it gracefully
+Returns an empty result so the cascade skips it gracefully
 via the existing circuit-breaker error path.
 """
 
@@ -15,10 +15,17 @@ logger = logging.getLogger(__name__)
 def resolve_with_stealth(url: str, max_chars: int) -> ResolvedResult:
     """Stealth browser fetch (anti-bot bypass).
 
-    Raises:
-        NotImplementedError: Until a concrete implementation is chosen.
+    Returns an empty result until a concrete implementation is chosen.
+    The cascade will treat this as a failed provider and move on.
     """
-    raise NotImplementedError(
-        "stealth provider not yet implemented — "
-        "candidates: playwright-stealth, curl-impersonate, camoufox"
+    logger.warning(
+        "Stealth provider not yet implemented — skipping %s "
+        "(candidates: playwright-stealth, curl-impersonate, camoufox)",
+        url,
+    )
+    return ResolvedResult(
+        source="stealth",
+        url=url,
+        content="",
+        metadata={"error": "stealth provider not yet implemented"},
     )
