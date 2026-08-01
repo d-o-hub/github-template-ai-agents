@@ -154,7 +154,8 @@ jobs:
                     .filter(l => l)
                 )
               ));
-              console.log(`Refusing to auto-merge: ${humanUnresolvedThreads.length} unresolved HUMAN review thread(s).`);
+              console.log(`Refusing to auto-merge: ` +
+                `${humanUnresolvedThreads.length} unresolved HUMAN review thread(s).`);
               for (const t of humanUnresolvedThreads) {
                 console.log(`  - thread ${t.id}`);
               }
