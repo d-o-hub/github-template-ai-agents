@@ -152,9 +152,13 @@ check_orphan_cache() {
             esac
         done
         local pat
+        # perf: replace grep -q with native bash match on pre-read content to eliminate process forks
+        local gitignore_content
+        gitignore_content=$'\n'$(< .gitignore)$'\n' 2>/dev/null || gitignore_content=$'\n\n'
         for pat in "${additions[@]:-}"; do
-            if ! grep -qxF "$pat" .gitignore 2>/dev/null; then
+            if [[ "$gitignore_content" != *$'\n'"$pat"$'\n'* ]]; then
                 printf '%s\n' "$pat" >> .gitignore
+                gitignore_content+="$pat"$'\n'
                 log "  added '$pat' to .gitignore"
             fi
         done
