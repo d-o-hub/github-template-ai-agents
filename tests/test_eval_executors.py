@@ -159,3 +159,15 @@ def test_run_file_validation_path_traversal(tmp_path):
     assert result.status == eval_executors.EvalStatus.FAIL
     assert result.message == "Missing 1 file(s)"
     assert result.details == ["Missing: ../secret.txt"]
+
+
+def test_run_file_validation_forbidden_path(tmp_path):
+    skill_path = tmp_path / "skill"
+    skill_path.mkdir()
+    (skill_path / ".env").touch()
+
+    eval_case = {"id": 1, "files": [".env"]}
+    result = eval_executors.run_file_validation(eval_case, skill_path, False)
+    assert result.status == eval_executors.EvalStatus.FAIL
+    assert result.message == "Missing 1 file(s)"
+    assert result.details == ["Missing: .env"]

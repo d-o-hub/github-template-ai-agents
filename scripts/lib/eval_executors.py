@@ -92,7 +92,7 @@ def run_file_validation(
     for file_path in files:
         try:
             # Use standardized path validation to prevent traversal and stay within skill_path
-            full_path = validate_safe_path(file_path, skill_path, "files")
+            full_path = validate_safe_path(file_path, skill_path, "files", check_forbidden=True)
             if full_path.exists():
                 found.append(file_path)
             else:
