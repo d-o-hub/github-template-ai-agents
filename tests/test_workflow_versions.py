@@ -1,8 +1,8 @@
 """Tests for GitHub Actions workflow version pin updates.
 
 Covers changes introduced in:
-- .github/workflows/labeler.yml  (actions/labeler updated to v6.1.0)
-- .github/workflows/security-scan.yml  (github/codeql-action/* updated to v4.35 new SHA)
+- .github/workflows/labeler.yml  (actions/labeler updated to v7.0.0)
+- .github/workflows/security-scan.yml  (github/codeql-action/* updated to v4.36 new SHA)
 - .github/workflows/cleanup-ci-status-prs.yml  (weekly scheduled CI status PR cleanup)
 """
 
@@ -18,12 +18,12 @@ SECURITY_SCAN_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "security-scan.ym
 CLEANUP_CI_STATUS_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "cleanup-ci-status-prs.yml"
 
 # SHA hashes that should be present after the PR update
-LABELER_NEW_SHA = "b8dd2d9be0f68b860e7dae5dae7d772984eacd6d"
-CODEQL_NEW_SHA = "7188fc363630916deb702c7fdcf4e481b751f97a"
+LABELER_NEW_SHA = "bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13"
+CODEQL_NEW_SHA = "e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81"
 
 # Old SHA hashes that must NOT appear after the update
-LABELER_OLD_SHA = "f27b608878404679385c85cfa523b85ccb86e213"
-CODEQL_OLD_SHA = "7211b7c8077ea37d8641b6271f6a365a22a5fbfa"
+LABELER_OLD_SHA = "b8dd2d9be0f68b860e7dae5dae7d772984eacd6d"
+CODEQL_OLD_SHA = "7188fc363630916deb702c7fdcf4e481b751f97a"
 
 # Full 40-hex-char SHA pattern
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
@@ -83,21 +83,21 @@ class TestLabelerWorkflow:
             "Workflow must have an 'on' trigger"
 
     def test_labeler_action_uses_updated_sha(self):
-        """actions/labeler must be pinned to the new v6.1.0 SHA."""
+        """actions/labeler must be pinned to the new v7.0.0 SHA."""
         raw = _raw_text(LABELER_WORKFLOW)
         expected_ref = f"actions/labeler@{LABELER_NEW_SHA}"
         assert expected_ref in raw, (
             f"Expected actions/labeler to be pinned to SHA {LABELER_NEW_SHA}"
         )
 
-    def test_labeler_action_version_comment_is_v6_2_0(self):
-        """The inline version comment next to actions/labeler must say v6.2.0."""
+    def test_labeler_action_version_comment_is_v7_0_0(self):
+        """The inline version comment next to actions/labeler must say v7.0.0."""
         raw = _raw_text(LABELER_WORKFLOW)
-        # Expect a line like: uses: actions/labeler@<SHA>  # v6.2.0
+        # Expect a line like: uses: actions/labeler@<SHA>  # v7.0.0
         assert re.search(
-            rf"actions/labeler@{re.escape(LABELER_NEW_SHA)}\s+#\s*v6\.2\.0",
+            rf"actions/labeler@{re.escape(LABELER_NEW_SHA)}\s+#\s*v7\.0\.0",
             raw,
-        ), "actions/labeler pin should be followed by the comment '# v6.2.0'"
+        ), "actions/labeler pin should be followed by the comment '# v7.0.0'"
 
     def test_labeler_action_sha_is_full_40_char_hex(self):
         """The SHA used for actions/labeler must be a full 40-character hex string."""

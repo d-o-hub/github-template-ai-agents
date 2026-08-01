@@ -149,7 +149,8 @@ jobs:
               const humanLogins = Array.from(new Set(
                 humanUnresolvedThreads.flatMap(t =>
                   (t.comments.nodes || [])
-                    .map(c => isBotAuthor(c.author) ? null : (c.author && c.author.login) || null)
+                    .map(c => isBotAuthor(c.author) ? null :
+                      (c.author && c.author.login) || null)
                     .filter(l => l)
                 )
               ));
@@ -194,7 +195,9 @@ jobs:
               const body = [
                 '## Refusing auto-merge: ' + humanUnresolvedThreads.length + ' unresolved human review thread(s)',
                 '',
-                'This PR carries the `automerge` label, but the workflow refuses to auto-merge because at least one unresolved review thread has a human-authored comment.',
+                'This PR carries the `automerge` label, but the workflow refuses to ' +
+                'auto-merge because at least one unresolved review thread has a ' +
+                'human-authored comment.',
                 '',
                 'Human authors with unresolved comments:',
                 ...humanLogins.map(l => '- @' + l),
