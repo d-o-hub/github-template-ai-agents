@@ -111,6 +111,42 @@ class TestIsSafeUrl:
     def test_normal_public_ip_safe(self):
         assert is_safe_url("https://8.8.8.8") is True
 
+    def test_gcp_metadata_hostname_blocked(self):
+        assert is_safe_url("http://metadata.google.internal/computeMetadata/v1/") is False
+
+    def test_azure_metadata_hostname_blocked(self):
+        assert is_safe_url("http://metadata.azure.com/metadata/instance") is False
+
+    def test_k8s_api_hostname_blocked(self):
+        assert is_safe_url("http://kubernetes.default.svc/api/v1") is False
+
+    def test_docker_internal_hostname_blocked(self):
+        assert is_safe_url("http://host.docker.internal:8080/") is False
+
+    def test_decimal_ip_blocked(self):
+        assert is_safe_url("http://2130706433/") is False
+
+    def test_hex_ip_blocked(self):
+        assert is_safe_url("http://0x7f000001/") is False
+
+    def test_carrier_grade_nat_blocked(self):
+        assert is_safe_url("http://100.64.0.1/") is False
+
+    def test_reserved_network_blocked(self):
+        assert is_safe_url("http://198.18.0.1/") is False
+
+    def test_test_net_2_blocked(self):
+        assert is_safe_url("http://198.51.100.1/") is False
+
+    def test_test_net_3_blocked(self):
+        assert is_safe_url("http://203.0.113.1/") is False
+
+    def test_broadcast_address_blocked(self):
+        assert is_safe_url("http://255.255.255.255/") is False
+
+    def test_metadata_suffix_blocked(self):
+        assert is_safe_url("http://sub.metadata.google.internal/v1/") is False
+
 
 # ─── normalize_query ──────────────────────────────────────────────────────
 
