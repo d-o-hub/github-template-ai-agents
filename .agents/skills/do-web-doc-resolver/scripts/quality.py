@@ -161,9 +161,8 @@ def _compute_bonuses(score: float, has_frontmatter: bool, has_anchors: bool) -> 
 
 
 def score_content(markdown: str, links: list[str] | None = None) -> QualityScore:
-    # Handle MagicMocks in tests
     if not isinstance(markdown, str):
-        return QualityScore(1.0, False, False, False, False, True)
+        return QualityScore(0.0, True, True, False, False, False)
 
     text = (markdown or "").strip()
     links = links or []

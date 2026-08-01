@@ -1,5 +1,6 @@
 """Async URL resolution - resolve_url_async and resolve_url_stream_async."""
 
+import asyncio
 import logging
 from collections.abc import AsyncGenerator
 from dataclasses import asdict
@@ -12,12 +13,16 @@ from scripts.models import FetchTier, Profile, ProviderType, ResolvedResult, Res
 from scripts.providers.jina import resolve_with_jina_async
 from scripts.providers.visual_clip import resolve_with_visual_clip_async
 from scripts.providers_impl import (
+    resolve_with_duckduckgo,
+    resolve_with_firecrawl,
+    resolve_with_mistral_browser,
     resolve_with_stealth,
 )
 from scripts.semantic_cache import get_semantic_cache
 from scripts.state import circuit_breakers as _circuit_breakers
 from scripts.state import routing_memory as _routing_memory
 from scripts.utils import compact_content
+from scripts.utils.fetch import fetch_url_content
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +75,7 @@ async def resolve_url_stream_async(
         target=url, is_url=True, routing_memory=_routing_memory, skip_providers=skip_providers
     )
 
-    # Async provider map - only async providers for now
+    # Async provider map — native async + asyncio.to_thread() bridges for sync providers
     cascade_map: dict[str, tuple[ProviderType, Any]] = {
         "jina": (ProviderType.JINA, lambda: resolve_with_jina_async(url, max_chars)),
         "visual_clip": (
@@ -81,11 +86,22 @@ async def resolve_url_stream_async(
             ProviderType.DIRECT_FETCH,
             lambda: resolve_with_stealth(url, max_chars),
         ),
-        # TODO: Add async versions of other providers
-        # "firecrawl": (ProviderType.FIRECRAWL, lambda: resolve_with_firecrawl_async(url, max_chars)),
-        # "direct_fetch": (ProviderType.DIRECT_FETCH, lambda: fetch_url_content_async(url, max_chars)),
-        # "mistral_browser": (ProviderType.MISTRAL_BROWSER, lambda: resolve_with_mistral_browser_async(url, max_chars)),
-        # "duckduckgo": (ProviderType.DUCKDUCKGO, lambda: resolve_with_duckduckgo_async(url, max_chars)),
+        "firecrawl": (
+            ProviderType.FIRECRAWL,
+            lambda: asyncio.to_thread(resolve_with_firecrawl, url, max_chars),
+        ),
+        "direct_fetch": (
+            ProviderType.DIRECT_FETCH,
+            lambda: asyncio.to_thread(fetch_url_content, url, max_chars),
+        ),
+        "mistral_browser": (
+            ProviderType.MISTRAL_BROWSER,
+            lambda: asyncio.to_thread(resolve_with_mistral_browser, url, max_chars),
+        ),
+        "duckduckgo": (
+            ProviderType.DUCKDUCKGO,
+            lambda: asyncio.to_thread(resolve_with_duckduckgo, query or url, max_chars),
+        ),
     }
 
     domain = scripts.routing.extract_domain(url)
