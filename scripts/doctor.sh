@@ -36,7 +36,7 @@ done
 
 # ---- Repository state ----
 sect "Repository"
-if [[ -d .git ]]; then
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   pass "Inside a git repository"
 else
   bad "Not inside a git repository (run from repo root)"
