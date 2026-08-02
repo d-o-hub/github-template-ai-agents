@@ -6,9 +6,12 @@ on: pull_request
 
 jobs:
   auto-merge:
+    # Disabled by default (ADR-032). Enable by setting the repository variable
+    # MAINTAINER_AUTOMATION=true.
     if: |
-      github.event.pull_request.user.login == 'dependabot[bot]' ||
-      github.actor == 'dependabot[bot]'
+      vars.MAINTAINER_AUTOMATION == 'true' &&
+      (github.event.pull_request.user.login == 'dependabot[bot]' ||
+       github.actor == 'dependabot[bot]')
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -55,24 +58,10 @@ jobs:
               return;
             }
 
-            // 2. Resolve all unresolved review threads (e.g., Codacy false positives)
-            const unresolvedThreads = pr.reviewThreads.nodes.filter(t => !t.isResolved);
-            if (unresolvedThreads.length > 0) {
-              console.log(`Resolving ${unresolvedThreads.length} review thread(s)...`);
-              for (const thread of unresolvedThreads) {
-                console.log(`  Resolving thread ${thread.id}...`);
-                await github.graphql(`
-                  mutation($threadId: ID!) {
-                    resolveReviewThread(input: {threadId: $threadId}) {
-                      thread { id }
-                    }
-                  }
-                `, { threadId: thread.id });
-              }
-              console.log('✅ All review threads resolved');
-            } else {
-              console.log('No unresolved review threads');
-            }
+            // 2. NOTE: review threads are intentionally NOT auto-resolved (ADR-032).
+            //    Resolving every thread — including human-authored objections — can
+            //    discard maintainer review signals. Native auto-merge below still
+            //    waits for configured required checks and approvals.
 
             // 3. Enable GitHub native auto-merge (handles linear history, branch updates,
             //    and required checks automatically using system privileges)

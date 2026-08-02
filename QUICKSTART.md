@@ -1,6 +1,9 @@
 # Quick Start Guide
 
-> Get started with AI agent-powered development in 5 minutes.
+> Get started with AI agent-powered development in a few minutes.
+> First setup runs the full quality gate; optional linters (shellcheck,
+> markdownlint, yamllint) are skipped when absent — run `./scripts/doctor.sh`
+> to see what is missing.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -17,8 +20,13 @@
 ## Setup
 
 ```bash
-git clone https://github.com/your-org/your-project.git
-cd your-project
+# Evaluating this template itself:
+git clone https://github.com/d-o-hub/github-template-ai-agents.git
+cd github-template-ai-agents
+
+# After creating YOUR repo from the template ("Use this template"), clone that:
+#   git clone https://github.com/<you>/<your-project>.git && cd <your-project>
+
 ./scripts/bootstrap.sh
 ```
 
@@ -214,7 +222,7 @@ Share its output when filing a bug report.
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | Symlink errors during bootstrap | Windows without Developer Mode | Run inside WSL2 or enable Developer Mode |
-| `pre-commit: command not found` after commit | Hook installed, tool missing | `pip install pre-commit` or `brew install pre-commit` |
+| Commits skip the quality gate | `core.hooksPath` not set | Re-run `./scripts/bootstrap.sh` (sets `core.hooksPath=.githooks`) |
 | Skills validation fails | Symlinks not created | Re-run `./scripts/bootstrap.sh` |
 | Quality gate fails on fresh clone | Missing optional tools | Run `./scripts/doctor.sh` to identify gaps |
 
