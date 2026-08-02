@@ -70,7 +70,7 @@ skill_files=()
 while IFS= read -r -d '' skill_file; do
     skill_files+=("$skill_file")
 done < <(find "$SKILLS_DIR" -mindepth 2 -maxdepth 2 -type f -name SKILL.md \
-    ! -path "$SKILLS_DIR"/_*/* -print0)
+    ! -path "$SKILLS_DIR/_*/*" -print0)
 
 
 if [[ ${#skill_files[@]} -eq 0 ]]; then
