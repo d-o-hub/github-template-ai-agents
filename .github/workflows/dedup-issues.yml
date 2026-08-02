@@ -26,9 +26,13 @@ jobs:
   # ─── Auto-close job (runs on schedule only) ───────────────────────────────
   auto-close:
     name: Auto-Close Stale Duplicates
+    # Disabled by default (ADR-032). Enable by setting the repository variable
+    # MAINTAINER_AUTOMATION=true. Even when enabled, only issues that were
+    # flagged as duplicates 3+ days ago AND were not disputed are closed.
     if: >-
-      github.event_name == 'schedule' ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.issue_number == '')
+      vars.MAINTAINER_AUTOMATION == 'true' &&
+      (github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.issue_number == ''))
     runs-on: ubuntu-latest
     steps:
       - name: Close issues flagged duplicate 3+ days ago
@@ -76,7 +80,8 @@ jobs:
                 issue_number: issue.number,
               });
               const flagComment = comments.find(
-                c => c.user.type === 'Bot' && c.body.includes('auto-closed in 3 days')
+                c => c.user.type === 'Bot' &&
+                  c.body.includes('auto-closed after 3 days')
               );
 
               // If no bot comment found, fallback to updated_at (safety)
@@ -100,48 +105,21 @@ jobs:
                 state_reason: 'not_planned',
               });
 
-              // Also close any cross-referenced PRs (logic from close-confirmed-duplicates.yml)
-              const { data: events } = await github.rest.issues.listEvents({
-                ...context.repo,
-                issue_number: issue.number,
-                per_page: 100
-              });
-
-              for (const event of events) {
-                if (event.event !== 'cross-referenced' || !event.source) continue;
-                const prNumber = event.source.issue?.number;
-                if (!prNumber) continue;
-
-                try {
-                  const { data: prData } = await github.rest.pulls.get({
-                    ...context.repo,
-                    pull_number: prNumber
-                  });
-
-                  if (prData.state === 'open') {
-                    await github.rest.pulls.update({
-                      ...context.repo,
-                      pull_number: prNumber,
-                      state: 'closed'
-                    });
-                    await github.rest.issues.createComment({
-                      ...context.repo,
-                      issue_number: prNumber,
-                      body: `🔒 PR closed — referenced issue  #${issue.number} was auto-closed as a duplicate.`
-                    });
-                    console.log(`Closed PR  #${prNumber} linked to  #${issue.number}`);
-                  }
-                } catch (prError) {
-                  console.warn(`PR close failed for  #${prNumber}: ${prError.message}`);
-                }
-              }
+              // NOTE: cross-referenced PRs are never auto-closed (ADR-032).
+              // A PR referencing a flagged issue may still be a legitimate
+              // implementation in flight; only the duplicate issue is closed.
               console.log(`Closed  #${issue.number}`);
             }
 
   # ─── Detection job (runs on issue open/reopen + manual trigger) ───────────
   dedup:
     name: Detect Duplicate Issues
+    # Disabled by default (ADR-032). Enable by setting the repository variable
+    # MAINTAINER_AUTOMATION=true. The automatic trigger (issue opened/reopened)
+    # runs third-party LLM + rule-based detection and labels duplicates; an
+    # explicit manual workflow_dispatch with an issue_number stays available.
     if: >-
+      vars.MAINTAINER_AUTOMATION == 'true' &&
       (github.event_name == 'issues' && github.event.issue.user.type != 'Bot') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.issue_number != '')
     runs-on: ubuntu-latest
@@ -352,7 +330,8 @@ jobs:
               body: `👋 This looks like a duplicate of  #${canonical}.\n\n` +
                     `The canonical issue has broader scope and/or more tasks — ` +
                     `please subscribe there for updates.\n\n` +
-                    `⏳ This issue will be **auto-closed in 3 days** unless ` +
+                    `⏳ This issue may be **auto-closed after 3 days** (if ` +
+                    `MAINTAINER_AUTOMATION is enabled) unless ` +
                     `you react with 👎 to dispute.\n\n` +
                     `${methodNote}`
             });
