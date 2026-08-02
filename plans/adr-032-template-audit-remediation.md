@@ -143,27 +143,38 @@ Top findings:
   Additionally: dependabot workflow no longer auto-resolves review threads;
   release-drafter no longer uses `gh pr merge --admin`; patch-release guards
   against existing tags; dedup-issues never closes cross-referenced PRs and its
-  comment reflects the opt-in gate. All four files parse as valid YAML.
+  comment reflects the opt-in gate. The dedup **detection** job (third-party
+  LLM + rule-based labeling) is gated on the automatic `issues` trigger too;
+  an explicit manual `workflow_dispatch` with an `issue_number` remains
+  available. All four files parse as valid YAML.
 - **Linked worktrees supported**: `scripts/bootstrap.sh` and `scripts/doctor.sh`
   use `git rev-parse --is-inside-work-tree` instead of `[[ -d .git ]]`.
 - **Claude hook path fixed**: `.claude/settings.json` now points SessionStart at
   `$CLAUDE_PROJECT_DIR/hooks/session-start.sh`.
 
-Remaining (not yet applied): frontmatter-parser fix and single-inventory
-regeneration (decision 5), Python/Go/JS language checks (decision 6), and
-onboarding fixture tests in CI (decision 7).
+- **Frontmatter parser fix applied**: `scripts/generate-skills-reference.sh`
+  accepts `|`, `|-`, `|+`, `>`, `>-`, `>+` block scalars and regenerates
+  `skills-reference.md` byte-identically to the committed file (verified by
+  round-trip).
+
+Remaining (not yet applied): single-inventory convergence across all
+registries plus CI comparison of canonical skill names (decision 5),
+Python/Go/JS language checks (decision 6), and onboarding fixture tests in CI
+(decision 7).
 
 ## Consequences
 
 - **Positive**: adoption no longer installs a broken gate or inherits
   destructive automation; discovery registries are correct; docs match
   implemented behavior.
-- **Drift risk**: `skills-reference.md`/`AGENTS_REGISTRY.md` were hand-repaired
-  here; until the generator fix (decision 5) lands, regenerating in the full
-  repo will revert them — the CI drift check should be used to force the
-  generator fix rather than accepting the corrupted output.
+- **Drift risk (resolved for skills-reference)**: `skills-reference.md` was
+  hand-repaired here, but the generator fix (decision 5) has now landed and
+  regeneration reproduces the committed file exactly. `AGENTS_REGISTRY.md`
+  remains hand-maintained until the single-inventory convergence (decision 5)
+  lands — CI comparison of canonical skill names against every committed
+  registry is still the guardrail.
 - **Maintainer surface**: metrics/DORA/CI-status remain the Full profile's
   responsibility; the `log-metric.sh` protocol and `.agents/metrics/` layout
   are unchanged.
-- **Remaining work**: code-layer items 5-7 above (generator, language checks,
-  onboarding CI tests) remain open.
+- **Remaining work**: decision 5's single-inventory convergence, decision 6
+  language checks, and decision 7 onboarding CI tests remain open.

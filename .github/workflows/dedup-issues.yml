@@ -114,7 +114,12 @@ jobs:
   # ─── Detection job (runs on issue open/reopen + manual trigger) ───────────
   dedup:
     name: Detect Duplicate Issues
+    # Disabled by default (ADR-032). Enable by setting the repository variable
+    # MAINTAINER_AUTOMATION=true. The automatic trigger (issue opened/reopened)
+    # runs third-party LLM + rule-based detection and labels duplicates; an
+    # explicit manual workflow_dispatch with an issue_number stays available.
     if: >-
+      vars.MAINTAINER_AUTOMATION == 'true' &&
       (github.event_name == 'issues' && github.event.issue.user.type != 'Bot') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.issue_number != '')
     runs-on: ubuntu-latest
