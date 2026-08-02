@@ -95,6 +95,12 @@ FORBIDDEN_PATHS = frozenset({
     ".boto",
     ".gcloud",
     ".azure",
+    "_netrc",
+    ".oci",
+    ".sentryclirc",
+    ".vault-token",
+    ".password-store",
+    ".erlang.cookie",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
@@ -144,12 +150,13 @@ def validate_safe_path(
             # Note: .key is intentionally broad to catch private keys despite potential false positives.
             # SSH private key prefixes cover custom-named keys and newer types (e.g. id_ed25519_sk, id_rsa_backup).
             if (
-                part_lower.startswith(".env") or
+                part_lower.startswith((".env", "client_secret", "kubeconfig")) or
                 part_lower.endswith((
                     ".pem", ".key", ".pfx", ".tfstate", ".crt", ".cer",
                     ".p12", ".pkcs8", ".pk8", ".der", ".keystore", ".jks",
                     ".dockercfg", ".publishsettings", ".gpg", ".pgp", ".asc",
-                    ".p8", ".pkcs12", ".passwd", ".pwd", ".htpasswd", "_history"
+                    ".p8", ".pkcs12", ".passwd", ".pwd", ".htpasswd", "_history",
+                    "credentials.json", "client_secret.json", "kubeconfig"
                 )) or
                 (
                     part_lower.startswith(("identity", "id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", "id_xmss")) and
