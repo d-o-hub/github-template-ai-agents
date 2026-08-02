@@ -24,7 +24,7 @@ jobs:
           script: |
             const prNumber = context.payload.pull_request.number;
 
-            // 1. Fetch PR details, auto-merge status, and unresolved review threads
+            // 1. Fetch PR details and auto-merge status
             const prQuery = `
               query($owner: String!, $repo: String!, $number: Int!) {
                 repository(owner: $owner, name: $repo) {
@@ -33,12 +33,6 @@ jobs:
                     state
                     autoMergeRequest {
                       enabledAt
-                    }
-                    reviewThreads(first: 100) {
-                      nodes {
-                        id
-                        isResolved
-                      }
                     }
                   }
                 }
