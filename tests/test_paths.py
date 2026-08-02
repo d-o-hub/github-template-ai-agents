@@ -72,7 +72,8 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".sh_history", ".lesshst", ".viminfo", ".mysql_history",
         ".psql_history", ".sqlite_history", "terraform.tfstate",
         "terraform.tfstate.backup", ".terraform", ".cargo", ".s3cfg",
-        ".boto", ".gcloud", ".azure"
+        ".boto", ".gcloud", ".azure",
+        "_netrc", ".oci", ".sentryclirc", ".vault-token", ".password-store", ".erlang.cookie"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
@@ -102,7 +103,11 @@ def test_validate_safe_path_patterns(tmp_path):
             validate_safe_path(p, base, "test", check_forbidden=True)
 
     # Case-insensitivity for patterns
-    case_patterns = [".ENV.LOCAL", "SECRET.PEM", "MY.KEY", "KEY.P12", "MY.JKS"]
+    case_patterns = [
+        ".ENV.LOCAL", "SECRET.PEM", "MY.KEY", "KEY.P12", "MY.JKS",
+        "MY_CREDENTIALS.JSON", "CLIENT_SECRET.JSON", "CLIENT_SECRET_PROD",
+        "KUBECONFIG.YAML", "PROD_KUBECONFIG"
+    ]
     for p in case_patterns:
         with pytest.raises(PathValidationError):
             validate_safe_path(p, base, "test", check_forbidden=True)

@@ -88,3 +88,9 @@
 **Vulnerability:** The file validation check inside `run_file_validation` failed to enforce `check_forbidden=True` on path-validation logic, leaving a potential vector for verifying, mapping, or exposing the existence of sensitive forbidden files/folders such as `.env`, `.git`, or custom credentials within skill paths.
 **Learning:** Default settings in reused utility helper functions (like `check_forbidden=False` in `validate_safe_path`) must be carefully evaluated at all call sites to avoid accidental omissions of security boundaries. File verification routines must inherit full system-wide forbidden path protections.
 **Prevention:** Always enable explicit validation checks against forbidden directories and credential file patterns when checking file existence in evaluation, testing, or execution harnesses. Include unit tests asserting that the harness correctly rejects sensitive patterns.
+
+## 2026-08-01 - Preventing Secret and Credentials Leakage in Path Validation
+
+**Vulnerability:** Path validation logic lacked protections for high-value targets including modern SaaS/cloud/credential configurations (`_netrc`, `.oci`, `.sentryclirc`, `.vault-token`, `.password-store`, `.erlang.cookie`) and generic API key/credential files matching patterns like `credentials.json`, `client_secret.json`, and `kubeconfig`.
+**Learning:** Hardened static lists must be regularly audited to encompass alternative platform directory names and widely adopted tools. Dynamic pattern matching must extend to common API credential formats (such as key/secret JSON files) to prevent accidental data exfiltration or access by malicious sub-agents.
+**Prevention:** Register standard credentials (`_netrc`, `.oci`, etc.) in static forbidden lists and use `part_lower.startswith()` and `part_lower.endswith()` checks to filter out generic secret patterns case-insensitively, backing them with strong unit assertions.
