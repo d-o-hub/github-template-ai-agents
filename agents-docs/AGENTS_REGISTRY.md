@@ -31,6 +31,7 @@ See [`SKILLS.md`](SKILLS.md) for authoring guide.
 | `accessibility-auditor` | `.agents/skills/accessibility-auditor` | Audit web applications for WCAG 2.2 compliance, screen reade |
 | `agent-browser` | `.agents/skills/agent-browser` | Browser automation CLI for AI agents. Use when the user need |
 | `agent-coordination` | `.agents/skills/agent-coordination` | Coordinate multiple agents for software development across a |
+| `agentic-abstention` | `.agents/skills/agentic-abstention` | Encode CONVOLVE-style stopping rules: decide when to stop acting instead of continuing tool calls on an infeasible task. Use this skill whenever an agent must determine if further execution is warranted. Not for general task planning (use goap-agent). |
 | `agents-md` | `.agents/skills/agents-md` | Create AGENTS.md files with production-ready best practices. |
 | `api-design-first` | `.agents/skills/api-design-first` | Design and document RESTful APIs using design-first principl |
 | `architecture-diagram` | `.agents/skills/architecture-diagram` | Generate or update a project architecture SVG diagram by sca |
@@ -81,6 +82,7 @@ See [`SKILLS.md`](SKILLS.md) for authoring guide.
 | `turso-db` | `.agents/skills/turso-db` | Use this skill for Turso (LibSQL/Limbo) database development |
 | `ui-ux-optimize` | `.agents/skills/ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research agen |
 | `verification-template` | `.agents/skills/verification-template` | Template for creating portable domain-specific verification  |
+| `voice-profiles` | `.agents/skills/voice-profiles` | Adapt writing tone and style based on target audience and content type using predefined voice and context profiles. |
 | `web-search-researcher` | `.agents/skills/web-search-researcher` | Research topics using web search to find accurate, current i |
 
 ---

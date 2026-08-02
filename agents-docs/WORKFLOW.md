@@ -5,15 +5,15 @@
 
 ## Pre-Existing Issue Resolution
 
-**Fix ALL pre-existing issues before completing any task:**
+Scope depends on your process mode (see `AGENTS.md`):
 
-- [ ] Lint warnings (shellcheck, markdownlint)
-- [ ] Test failures
-- [ ] Security vulnerabilities
-- [ ] Documentation gaps (broken links, missing files)
-- [ ] Code style violations
+- **Light mode (default for adopters):** fix pre-existing issues that are
+  **related to your change**. Flag unrelated failures to the user instead of
+  silently expanding scope — change-scoped work keeps PRs reviewable.
+- **Full mode (template maintainers):** fix ALL pre-existing issues before
+  completing the task.
 
-**Process:**
+**Process (Full mode):**
 
 1. Run quality gate: `./scripts/quality_gate.sh`
 2. Note all failures (even unrelated to your changes)
@@ -55,10 +55,10 @@ This ensures the template self-improves over time as projects evolve. See `agent
 # Full quality gate (required before commit)
 ./scripts/quality_gate.sh
 
-# Skip specific checks
-SKIP_TESTS=true ./scripts/quality_gate.sh
-SKIP_LINT=true ./scripts/quality_gate.sh
-SKIP_LINKS=true ./scripts/quality_gate.sh
+# Skip specific checks (only these are implemented in quality_gate.sh)
+SKIP_TESTS=true ./scripts/quality_gate.sh            # skip test runs
+SKIP_CLIPPY=true ./scripts/quality_gate.sh           # skip Rust clippy
+SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/quality_gate.sh
 
 # Minimal quality gate (fast path for CI debugging)
 ./scripts/minimal_quality_gate.sh

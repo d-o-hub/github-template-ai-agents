@@ -66,9 +66,12 @@ if [[ "$SKILLS_DIR" == -* || "$OUTPUT_FILE" == -* ]]; then
     exit 2
 fi
 
-shopt -s nullglob extglob
-skill_files=("$SKILLS_DIR"/!(_*)/SKILL.md)
-shopt -u nullglob extglob
+skill_files=()
+while IFS= read -r -d '' skill_file; do
+    skill_files+=("$skill_file")
+done < <(find "$SKILLS_DIR" -mindepth 2 -maxdepth 2 -type f -name SKILL.md \
+    ! -path "$SKILLS_DIR"/_*/* -print0)
+
 
 if [[ ${#skill_files[@]} -eq 0 ]]; then
     printf 'No skill files found in %s\n' "$SKILLS_DIR" >&2
@@ -118,7 +121,7 @@ FILENAME != prev_file {
 /^description:/ {
     orig_val = $0
     sub(/^description: */, "", orig_val)
-    if (orig_val ~ /^>[-|]?$/) {
+    if (orig_val ~ /^[|>][-+]?$/) {
         desc = ""
         while (getline > 0) {
             if ($0 ~ /^  /) {
