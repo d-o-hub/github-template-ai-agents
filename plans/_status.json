@@ -46,6 +46,10 @@
     "adr-031-per-agent-metrics.md": {
       "status": "accepted",
       "date": "2026-07-29"
+    },
+    "adr-032-template-audit-remediation.md": {
+      "status": "accepted",
+      "date": "2026-08-01"
     }
   }
 }
