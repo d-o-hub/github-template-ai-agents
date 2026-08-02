@@ -16,7 +16,6 @@ on:  # yamllint disable-line rule:truthy
 permissions:
   models: read  # GitHub Models — FREE for public repos
   issues: write
-  pull-requests: write
 
 concurrency:
   group: dedup-${{ github.event.issue.number || github.event.inputs.issue_number || 'scheduled' }}
