@@ -38,7 +38,6 @@ Before starting migration, ensure you have:
 | **Git** | 2.30+ | Version control and hook installation |
 | **Bash** | 4.0+ | Script execution |
 | **One AI CLI tool** | Latest | Primary agent for testing |
-| **realpath** | Any | Symlink creation (usually built-in) |
 
 ### Optional but Recommended
 
@@ -87,10 +86,10 @@ Download the template files to a temporary location:
 
 ```bash
 # Option A: Clone the template repository
-git clone https://github.com/your-org/your-project.git /tmp/ai-agent-template
+git clone https://github.com/d-o-hub/github-template-ai-agents.git /tmp/ai-agent-template
 
 # Option B: Download as zip
-curl -L -o /tmp/ai-agent-template.zip https://github.com/your-org/your-project/archive/main.zip
+curl -L -o /tmp/ai-agent-template.zip https://github.com/d-o-hub/github-template-ai-agents/archive/main.zip
 unzip /tmp/ai-agent-template.zip -d /tmp/ai-agent-template
 ```
 
@@ -100,14 +99,16 @@ Copy the essential files to your project:
 # Create directory structure
 mkdir -p your-project/.agents/skills
 mkdir -p your-project/.claude/skills
-mkdir -p your-project/scripts
 
-# Copy core scripts
-cp /tmp/ai-agent-template/scripts/setup-skills.sh your-project/scripts/
-cp /tmp/ai-agent-template/scripts/validate-skills.sh your-project/scripts/
-cp /tmp/ai-agent-template/scripts/quality_gate.sh your-project/scripts/
-cp /tmp/ai-agent-template/scripts/pre-commit-hook.sh your-project/scripts/
+# Copy the ENTIRE scripts tree (including scripts/lib/) — quality_gate.sh and
+# validate-skills.sh depend on shared libraries and helper validators; copying
+# individual scripts yields a broken gate.
+cp -r /tmp/ai-agent-template/scripts your-project/scripts
 
+# Copy version-controlled hooks and validation configs
+cp -r /tmp/ai-agent-template/.githooks your-project/.githooks
+cp /tmp/ai-agent-template/.shellcheckrc your-project/ 2>/dev/null || true
+cp /tmp/ai-agent-template/markdownlint.toml your-project/ 2>/dev/null || true
 
 # Make scripts executable
 chmod +x your-project/scripts/*.sh
@@ -242,38 +243,30 @@ mkdir -p your-project/.gemini/commands
 
 #### 5.2 Install Pre-Commit Hook
 
+Use the version-controlled `.githooks` directory (matches `bootstrap.sh`);
+do not write into `.git/hooks/` directly:
+
 ```bash
-cp your-project/scripts/pre-commit-hook.sh your-project/.git/hooks/pre-commit
-chmod +x your-project/.git/hooks/pre-commit
+cd your-project
+git config core.hooksPath .githooks
+chmod +x .githooks/* 2>/dev/null || true
 ```
 
 #### 5.3 Customize Quality Gate
 
-Edit `your-project/scripts/quality_gate.sh` to match your tech stack:
+`quality_gate.sh` auto-detects your stack from project files (`Cargo.toml`,
+`package.json`, `requirements.txt`/`pyproject.toml`, `go.mod`) — there are no
+commented language sections to uncomment. Supported skip flags:
 
 ```bash
-# Uncomment the section for your language:
-
-# --- Rust ---
-# cargo fmt --check || { echo "Run: cargo fmt"; exit 1; }
-# cargo clippy -- -D warnings || exit 1
-# cargo test || exit 1
-
-# --- TypeScript/JavaScript ---
-# pnpm lint || exit 1
-# pnpm typecheck || exit 1
-# pnpm test || exit 1
-
-# --- Python ---
-# ruff check . || exit 1
-# black --check . || { echo "Run: black ."; exit 1; }
-# pytest || exit 1
-
-# --- Go ---
-# gofmt -l . | grep . && { echo "Run: gofmt -w ."; exit 1; }
-# go vet ./... || exit 1
-# go test ./... || exit 1
+SKIP_TESTS=true ./scripts/quality_gate.sh             # skip test runs
+SKIP_CLIPPY=true ./scripts/quality_gate.sh            # skip Rust clippy
+SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/quality_gate.sh
 ```
+
+> Note: Python and Go are currently *detected* but do not yet run ecosystem
+> checks, and Rust tests run `cargo test --lib` only. See
+> `plans/adr-032-template-audit-remediation.md` for planned work.
 
 ### Step 6: Update Documentation
 
@@ -322,7 +315,7 @@ cat > your-project/MIGRATION_NOTES.md << 'EOF'
 # Migration Notes
 
 Migration completed on: $(date +%Y-%m-%d)
-Template version: 0.2.10
+Template version: <copy from your-project/VERSION>  # VERSION is the single source of truth
 
 ## Changes Made
 
@@ -366,7 +359,7 @@ opencode "Review the project structure"
 ```bash
 cd your-project
 git add .
-git commit -m "feat: integrate AI agent template
+git commit -m "feat(tooling): integrate AI agent template
 
 - Add AGENTS.md for unified agent instructions
 - Add .agents/skills/ for reusable knowledge
@@ -386,8 +379,8 @@ git commit -m "feat: integrate AI agent template
 git checkout -b backup/pre-ai-agents
 
 # 2. Copy template files
-cp -r /tmp/ai-agent-template/.agents/skills/task-decomposition .agents/skills/
-cp /tmp/ai-agent-template/scripts/*.sh scripts/
+cp -r /tmp/ai-agent-template/.agents/skills/goap-agent .agents/skills/
+cp -r /tmp/ai-agent-template/scripts scripts/
 
 # 3. Customize AGENTS.md
 cat >> AGENTS.md << 'EOF'
@@ -401,9 +394,7 @@ cat >> AGENTS.md << 'EOF'
 - pytest for testing with coverage >= 80%
 EOF
 
-# 4. Update quality_gate.sh (uncomment Python section)
-sed -i 's/^# ruff check/ruff check/' scripts/quality_gate.sh
-sed -i 's/^# black --check/black --check/' scripts/quality_gate.sh
+# 4. Quality gate auto-detects Python — no edits needed
 
 # 5. Setup
 ./scripts/setup-skills.sh
@@ -420,9 +411,9 @@ claude "Run the tests and check coverage"
 git checkout -b backup/pre-ai-agents
 
 # 2. Copy template files
-cp -r /tmp/ai-agent-template/.agents/skills/task-decomposition .agents/skills/
+cp -r /tmp/ai-agent-template/.agents/skills/goap-agent .agents/skills/
 cp -r /tmp/ai-agent-template/.agents/skills/iterative-refinement .agents/skills/
-cp /tmp/ai-agent-template/scripts/*.sh scripts/
+cp -r /tmp/ai-agent-template/scripts scripts/
 
 # 3. Customize AGENTS.md
 cat >> AGENTS.md << 'EOF'
@@ -436,9 +427,7 @@ cat >> AGENTS.md << 'EOF'
 - Vitest for testing
 EOF
 
-# 4. Update quality_gate.sh (uncomment TypeScript section)
-sed -i 's/^# pnpm lint/pnpm lint/' scripts/quality_gate.sh
-sed -i 's/^# pnpm typecheck/pnpm typecheck/' scripts/quality_gate.sh
+# 4. Quality gate auto-detects TypeScript — no edits needed
 
 # 5. Setup
 ./scripts/setup-skills.sh
@@ -455,9 +444,9 @@ claude "Check for TypeScript errors"
 git checkout -b backup/pre-ai-agents
 
 # 2. Copy template files
-cp -r /tmp/ai-agent-template/.agents/skills/task-decomposition .agents/skills/
+cp -r /tmp/ai-agent-template/.agents/skills/goap-agent .agents/skills/
 cp -r /tmp/ai-agent-template/.agents/skills/iterative-refinement .agents/skills/
-cp /tmp/ai-agent-template/scripts/*.sh scripts/
+cp -r /tmp/ai-agent-template/scripts scripts/
 
 # 3. Customize AGENTS.md
 cat >> AGENTS.md << 'EOF'
@@ -470,9 +459,7 @@ cat >> AGENTS.md << 'EOF'
 - Documentation required for public APIs
 EOF
 
-# 4. Update quality_gate.sh (uncomment Rust section)
-sed -i 's/^# cargo fmt --check/cargo fmt --check/' scripts/quality_gate.sh
-sed -i 's/^# cargo clippy/cargo clippy/' scripts/quality_gate.sh
+# 4. Quality gate auto-detects Rust — no edits needed
 
 # 5. Setup
 ./scripts/setup-skills.sh
@@ -489,8 +476,8 @@ claude "Run cargo clippy and fix any warnings"
 git checkout -b backup/pre-ai-agents
 
 # 2. Copy template files to root
-cp -r /tmp/ai-agent-template/.agents/skills/task-decomposition .agents/skills/
-cp /tmp/ai-agent-template/scripts/*.sh scripts/
+cp -r /tmp/ai-agent-template/.agents/skills/goap-agent .agents/skills/
+cp -r /tmp/ai-agent-template/scripts scripts/
 
 # 3. Create root AGENTS.md with monorepo structure
 cat > AGENTS.md << 'EOF'
@@ -617,7 +604,7 @@ Error: No skills in .agents/skills/
 mkdir -p .agents/skills
 
 # Add at least one skill
-cp -r /tmp/ai-agent-template/.agents/skills/task-decomposition .agents/skills/
+cp -r /tmp/ai-agent-template/.agents/skills/goap-agent .agents/skills/
 
 # Re-run setup
 ./scripts/setup-skills.sh
@@ -628,7 +615,7 @@ cp -r /tmp/ai-agent-template/.agents/skills/task-decomposition .agents/skills/
 **Symptom:**
 
 ```
-Error: MISSING symlink: .claude/skills/task-decomposition
+Error: MISSING symlink: .claude/skills/goap-agent
 ```
 
 **Solution:**
@@ -680,14 +667,14 @@ Git commits without running quality gate
 **Solution:**
 
 ```bash
-# Check hook is installed
-ls -la .git/hooks/pre-commit
+# Confirm Git uses the version-controlled hooks dir
+git config core.hooksPath        # expect .githooks
 
-# Ensure it's executable
-chmod +x .git/hooks/pre-commit
+# Ensure hooks are executable
+chmod +x .githooks/* 2>/dev/null || true
 
 # Check hook content
-cat .git/hooks/pre-commit
+cat .githooks/pre-commit
 ```
 
 ### Issue: Permission Denied on Scripts
@@ -704,27 +691,8 @@ bash: ./scripts/setup-skills.sh: Permission denied
 chmod +x scripts/*.sh
 ```
 
-### Issue: realpath Command Not Found
-
-**Symptom:**
-
-```
-realpath: command not found
-```
-
-**Solution:**
-On macOS, install coreutils:
-
-```bash
-brew install coreutils
-```
-
-Or modify `scripts/setup-skills.sh` to use `readlink -f` instead:
-
-```bash
-# Replace realpath --relative-to with:
-rel=$(python3 -c "import os.path; print(os.path.relpath('$skill_path', '$target_dir'))")
-```
+> Note: `setup-skills.sh` no longer requires `realpath` — it implements its own
+> portable relative-path resolution, so no coreutils installation is needed on macOS.
 
 ### Issue: Agent Can't Read Skills
 
@@ -762,7 +730,7 @@ my-project/
 ├── tests/
 ├── package.json
 ├── README.md
-└── .git/hooks/
+└── .githooks/
     └── pre-commit         # New: Quality gate hook
 ```
 
@@ -783,11 +751,11 @@ my-project/
 │   └── pre-commit-hook.sh
 ├── .agents/               # New
 │   └── skills/
-│       ├── task-decomposition/
+│       ├── goap-agent/
 │       └── shell-script-quality/
 ├── .claude/               # New
 │   └── skills/ → ../.agents/skills/
-└── .git/hooks/
+└── .githooks/
     └── pre-commit
 ```
 
@@ -818,4 +786,4 @@ After migration:
 
 ---
 
-**Need Help?** Open an issue on [GitHub](https://github.com/your-org/your-project/issues).
+**Need Help?** Open an issue on [GitHub](https://github.com/d-o-hub/github-template-ai-agents/issues).

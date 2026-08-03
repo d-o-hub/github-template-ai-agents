@@ -63,7 +63,6 @@ Use this template when you want a repository structure that survives:
 | **Qwen Code** | `QWEN.md` | `.qwen/skills/` → individual symlinks to `.agents/skills/` | Override file + per-skill symlinks |
 | **Gemini CLI** | `GEMINI.md` + `.gemini/config.yaml` | `.agents/skills/` (direct read) | Override file + direct canonical path |
 | **OpenCode** | `opencode.json` | `.agents/skills/` (direct read) | JSON config + direct canonical path |
-| **Jules** | `JULES.md` + `.jules/*.md` | `.agents/skills/` (direct read) | Override file + direct canonical path |
 | **Windsurf** | `.windsurf/` | `.windsurf/skills` → directory symlink to `.agents/skills/` | Directory config + directory symlink |
 | **CommandCode** | `.commandcode/` | `.agents/skills/` (direct read) | Directory config + taste learning |
 | **Cursor** | `.cursorrules` | `.cursor/rules.md` | Override file + rules adapter |
@@ -77,7 +76,7 @@ duplicated instructions.
 
 ```mermaid
 flowchart TD
-    A["AGENTS.md<br/>canonical instructions"] --> B["Tool overrides<br/>CLAUDE.md / GEMINI.md<br/>QWEN.md / JULES.md"]
+    A["AGENTS.md<br/>canonical instructions"] --> B["Tool overrides<br/>CLAUDE.md / GEMINI.md<br/>QWEN.md"]
     A --> C[".agents/skills/<br/>canonical skills"]
     C --> D[".claude/skills<br/>per-skill symlinks"]
     C --> E[".qwen/skills<br/>per-skill symlinks"]
@@ -152,8 +151,11 @@ avoiding suggestions that fix one check while breaking another.
 ## Quick Start
 
 ```bash
-git clone https://github.com/your-org/your-project.git
-cd your-project
+# Evaluating this template itself:
+git clone https://github.com/d-o-hub/github-template-ai-agents.git
+cd github-template-ai-agents
+
+# After creating YOUR repo from the template, clone that instead.
 ./scripts/bootstrap.sh
 ```
 
@@ -165,7 +167,7 @@ verification steps. If bootstrap fails, run `./scripts/doctor.sh` for diagnostic
 ### Single Source of Truth
 
 All agents read from `AGENTS.md` — CLI-specific files (`CLAUDE.md`, `GEMINI.md`,
-`QWEN.md`, `JULES.md`, `.cursorrules`) contain only overrides.
+`QWEN.md`, `.cursorrules`) contain only overrides.
 
 ```text
 AGENTS.md → Single source of truth
