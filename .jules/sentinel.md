@@ -1,3 +1,9 @@
+## 2026-07-27 - Hardened Pattern-Based Credential and Cloud Config Blocking in Path Validation
+
+**Vulnerability:** Exact/static matching of forbidden filenames did not block variations of sensitive configurations like custom-named credentials or cloud configuration files (e.g., `credentials.json`, `client_secret.json`, or `kubeconfig`).
+**Learning:** Hardcoded denylists of exact filenames can be easily bypassed using dynamic names or file structure variations. Path validation checks must employ dynamic prefix and suffix pattern-based matches to completely block sensitive cryptographic, credentials, and cloud-provider resources.
+**Prevention:** Combine a comprehensive, case-insensitive explicit denylist with dynamic patterns checking for common sensitive prefixes and extensions. Add tests for wildcard prefixes and suffixes for standard cloud and credential naming schemes.
+
 ## 2026-06-28 - Hardening Command Categorization and Forbidden Paths
 
 **Vulnerability:** Limited coverage of destructive commands, interpreters, and sensitive directories allowed potential bypasses of agent security controls. Specifically, variant commands like `mkfs.ext4` could bypass detection if the regex was too strict.

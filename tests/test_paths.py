@@ -72,7 +72,8 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".sh_history", ".lesshst", ".viminfo", ".mysql_history",
         ".psql_history", ".sqlite_history", "terraform.tfstate",
         "terraform.tfstate.backup", ".terraform", ".cargo", ".s3cfg",
-        ".boto", ".gcloud", ".azure"
+        ".boto", ".gcloud", ".azure", "_netrc", ".oci", ".sentryclirc",
+        ".vault-token", ".password-store", ".erlang.cookie"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
@@ -95,14 +96,27 @@ def test_validate_safe_path_patterns(tmp_path):
         "cert.crt", "bundle.cer", "key.p12", "key.pkcs8", "key.pk8",
         "key.der", "my.keystore", "my.jks", "config.dockercfg", "prod.publishsettings",
         "secret.gpg", "secret.pgp", "secret.asc", "key.p8", "key.pkcs12",
-        "secret.passwd", "secret.pwd", "secret.htpasswd", "app_history"
+        "secret.passwd", "secret.pwd", "secret.htpasswd", "app_history",
+        "client_secret.json", "credentials.json", "kubeconfig", "my_kubeconfig",
+        "client_secret_xyz.json"
     ]
     for p in sensitive_extensions:
         with pytest.raises(PathValidationError):
             validate_safe_path(p, base, "test", check_forbidden=True)
 
+    # Prefix matches
+    prefix_patterns = [
+        "client_secret", "client_secret_local", "kubeconfig", "kubeconfig_prod"
+    ]
+    for p in prefix_patterns:
+        with pytest.raises(PathValidationError):
+            validate_safe_path(p, base, "test", check_forbidden=True)
+
     # Case-insensitivity for patterns
-    case_patterns = [".ENV.LOCAL", "SECRET.PEM", "MY.KEY", "KEY.P12", "MY.JKS"]
+    case_patterns = [
+        ".ENV.LOCAL", "SECRET.PEM", "MY.KEY", "KEY.P12", "MY.JKS",
+        "CLIENT_SECRET_PROD", "KUBECONFIG"
+    ]
     for p in case_patterns:
         with pytest.raises(PathValidationError):
             validate_safe_path(p, base, "test", check_forbidden=True)
