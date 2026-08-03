@@ -14,14 +14,20 @@ readonly AGENTS_MD_FILE='AGENTS.md'
 
 # Try to extract from AGENTS.md if available
 if [[ -f "$AGENTS_MD_FILE" ]]; then
-    MAX_SOURCE_RAW=$(grep -e "MAX_LINES_PER_SOURCE_FILE=" -- "$AGENTS_MD_FILE" | cut -d'=' -f2 || echo 500)
-    MAX_SKILL_RAW=$(grep -e "MAX_LINES_PER_SKILL_MD=" -- "$AGENTS_MD_FILE" | cut -d'=' -f2 || echo 250)
-    MAX_AGENTS_RAW=$(grep -e "MAX_LINES_AGENTS_MD=" -- "$AGENTS_MD_FILE" | cut -d'=' -f2 || echo 150)
+    # Optimization: Use native Bash regex matching to avoid multiple grep and cut process forks
+    content=$(<"$AGENTS_MD_FILE")
 
-    # Validate numeric format or fallback to defaults
-    [[ "$MAX_SOURCE_RAW" =~ ^[0-9]+$ ]] && MAX_SOURCE="$MAX_SOURCE_RAW"
-    [[ "$MAX_SKILL_RAW" =~ ^[0-9]+$ ]] && MAX_SKILL="$MAX_SKILL_RAW"
-    [[ "$MAX_AGENTS_RAW" =~ ^[0-9]+$ ]] && MAX_AGENTS="$MAX_AGENTS_RAW"
+    if [[ "$content" =~ MAX_LINES_PER_SOURCE_FILE=([0-9]+) ]]; then
+        MAX_SOURCE="${BASH_REMATCH[1]}"
+    fi
+
+    if [[ "$content" =~ MAX_LINES_PER_SKILL_MD=([0-9]+) ]]; then
+        MAX_SKILL="${BASH_REMATCH[1]}"
+    fi
+
+    if [[ "$content" =~ MAX_LINES_AGENTS_MD=([0-9]+) ]]; then
+        MAX_AGENTS="${BASH_REMATCH[1]}"
+    fi
 fi
 
 FAILED=0
