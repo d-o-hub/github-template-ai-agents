@@ -134,7 +134,7 @@ scan_find_patterns() {
     run scan_find_patterns "$tmp/bad.sh"
     [ "$status" -eq 1 ]
     [[ "$output" == *"bad.sh:"* ]]
-    [[ "$output" == *'"_$SKILLS_DIR"/_*/*'* ]]
+    [[ "$output" == *'"$SKILLS_DIR"/_*/*'* ]]
 }
 
 @test "detector accepts fully quoted and glob-free patterns" {
