@@ -459,13 +459,17 @@ fi
 # Special handling for drift detection based on context
 if [[ "$DRIFT_DETECTED" == "true" ]]; then
     if [[ "$GITHUB_EVENT" == "$GITHUB_EVENT_PR" ]]; then
-        # During pull_request, print warning but exit 0
+        # During pull_request, drift is a warning only — but real failures
+        # (FAILED=1) must still fail the gate. Fall through to the final status
+        # check below instead of exiting 0 unconditionally.
         printf "%b─────────────────────────────────────────────────────────────────%b\n" "${YELLOW}" "${NC}"
         printf "%b│ ⚠ Quality Gate: Drift detected (warning only during PR)     │%b\n" "${YELLOW}" "${NC}"
         printf "%b─────────────────────────────────────────────────────────────────%b\n" "${YELLOW}" "${NC}"
         printf "\n"
         printf "Languages checked: %s\n" "${DETECTED_LANGUAGES[*]}"
-        exit 0
+        if [[ $FAILED -eq 0 ]]; then
+            exit 0
+        fi
     elif [[ "$ON_MAIN_BRANCH" == "true" ]]; then
         # On main branch, exit with 1
         printf "%b─────────────────────────────────────────────────────────────────%b\n" "${RED}" "${NC}"

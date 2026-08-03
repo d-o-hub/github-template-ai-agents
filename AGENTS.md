@@ -1,6 +1,6 @@
 # AGENTS.md
 
-<!-- Agent-specific guidance: CLAUDE.md, GEMINI.md, QWEN.md, JULES.md -->
+<!-- Agent-specific guidance: CLAUDE.md, GEMINI.md, QWEN.md -->
 
 ## Named Constants
 
@@ -31,6 +31,11 @@ readonly MAX_PR_BODY_LENGTH=1000
 | **Full** (template / large changes) | Architecture, multi-file refactors, new subsystems | GOAP + ADR + TRIZ phases below |
 
 See `agents-docs/ADOPTION_PROFILES.md` for minimal vs full template surface area.
+
+> **Profile scoping:** This file documents the template's **Full (maintainer)**
+> surface. Adopters on **Light** mode should treat Metrics, DORA, CI-status
+> gating, ADR/GOAP/TRIZ, and template-generated-document checks as optional —
+> see `agents-docs/ADOPTION_PROFILES.md` for what to keep vs. prune.
 
 ## Development Phases (full mode)
 
@@ -150,7 +155,14 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 
 ## Metrics & Post-Task Protocol
 
-After every task, append a JSON entry using `./scripts/log-metric.sh '<json>'`. Entries go to per-agent files in `.agents/metrics/metrics-{agent}.jsonl`, eliminating merge conflicts (LESSON-035). See `agents-docs/METRICS.md` for schema, DORA reports, and protocol details.
+**Full profile (template maintainers):** after every task, append a JSON entry
+using `./scripts/log-metric.sh '<json>'`. Entries go to per-agent files in
+`.agents/metrics/metrics-{agent}.jsonl`, eliminating merge conflicts
+(LESSON-035). See `agents-docs/METRICS.md` for schema, DORA reports, and
+protocol details.
+
+**Light mode (adopters):** metrics are optional. Skip `log-metric.sh` unless
+your project adopts the metrics/DORA stack (see `agents-docs/ADOPTION_PROFILES.md`).
 
 ## Recovery & Advanced Topics
 
