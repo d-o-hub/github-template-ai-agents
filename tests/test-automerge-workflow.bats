@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 # BATS tests for dependabot-auto-merge.yml workflow
-# Validates: GraphQL-based auto-merge, review thread resolution, squash
+# Validates: GraphQL-based auto-merge, review-thread preservation, squash
 
 setup() {
     REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
@@ -17,10 +17,9 @@ setup() {
     grep -q "enablePullRequestAutoMerge" "$WORKFLOW_FILE"
 }
 
-@test "auto-merge workflow resolves review threads before merging" {
-    # Resolves bot comments (e.g., Codacy false positives) that would
-    # otherwise block merge due to required_review_thread_resolution
-    grep -q "resolveReviewThread" "$WORKFLOW_FILE"
+@test "auto-merge workflow preserves unresolved review threads" {
+    # Human-authored objections must not be auto-resolved.
+    ! grep -q "resolveReviewThread" "$WORKFLOW_FILE"
 }
 
 @test "auto-merge workflow uses SQUASH merge method" {
@@ -32,8 +31,9 @@ setup() {
     grep -q "autoMergeRequest" "$WORKFLOW_FILE"
 }
 
-@test "auto-merge workflow fetches reviewThreads for resolution" {
-    grep -q "reviewThreads" "$WORKFLOW_FILE"
+@test "auto-merge workflow is gated for maintainers" {
+    grep -q "MAINTAINER_AUTOMATION" "$WORKFLOW_FILE"
+    grep -q "vars.MAINTAINER_AUTOMATION == 'true'" "$WORKFLOW_FILE"
 }
 
 @test "auto-merge workflow uses github.graphql (not REST API)" {

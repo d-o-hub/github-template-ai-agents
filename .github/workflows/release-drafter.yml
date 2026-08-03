@@ -13,6 +13,9 @@ permissions:
 jobs:
   update-changelog:
     name: Update CHANGELOG.md
+    # Disabled by default (ADR-032). Enable by setting the repository variable
+    # MAINTAINER_AUTOMATION=true.
+    if: vars.MAINTAINER_AUTOMATION == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -64,10 +67,10 @@ jobs:
             NEW_PR=$(gh pr view "$PR_URL" --json number --jq '.number')
             echo "Created PR #$NEW_PR"
           fi
+          # Merge without --admin so normal branch protections and reviews apply (ADR-032)
           if gh pr merge "$NEW_PR" \
             --squash \
             --subject "docs: update CHANGELOG.md [skip ci]" \
-            --admin \
             --delete-branch=false; then
             echo "Auto-merged PR #$NEW_PR"
           else
@@ -76,6 +79,8 @@ jobs:
 
   draft-release:
     name: Draft Release
+    # Keep release mutation opt-in for template adopters.
+    if: vars.MAINTAINER_AUTOMATION == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write

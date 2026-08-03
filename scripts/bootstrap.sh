@@ -15,7 +15,7 @@ fail() { printf '\n\u2717 %s\n' "$*" >&2; exit 1; }
 # --- pre-flight ---
 log "Checking environment"
 command -v git >/dev/null 2>&1 || fail "git not found - install git first"
-[[ -d .git ]] || fail "Run bootstrap.sh from the repository root"
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 || fail "Run bootstrap.sh from the repository root (or a linked worktree)"
 ok "git present and inside a repository"
 
 # --- symlink support check ---
