@@ -156,6 +156,12 @@ Top findings:
   accepts `|`, `|-`, `|+`, `>`, `>-`, `>+` block scalars and regenerates
   `skills-reference.md` byte-identically to the committed file (verified by
   round-trip).
+- **Shell glob-quoting regression guard**: `tests/test-find-glob-quoting.bats`
+  fails the build if any repo `.sh`/`.bats` file passes an unquoted glob to
+  `find -path`/`-name` — the Codacy/ShellCheck bug class fixed in
+  `scripts/generate-skills-reference.sh` (0df4cd5). It self-scans the repo
+  (including itself) and unit-tests the detector against quoted, escaped, and
+  glob-free patterns.
 
 Remaining (not yet applied): single-inventory convergence across all
 registries plus CI comparison of canonical skill names (decision 5),
