@@ -100,7 +100,9 @@ def test_validate_safe_path_patterns(tmp_path):
         "secret.gpg", "secret.pgp", "secret.asc", "key.p8", "key.pkcs12",
         "secret.passwd", "secret.pwd", "secret.htpasswd", "app_history",
         "client_secret.json", "credentials.json", "kubeconfig", "my_kubeconfig",
-        "client_secret_xyz.json"
+        "client_secret_xyz.json", "secrets.json", "secrets.yml", "secrets.yaml",
+        "credentials.yml", "credentials.yaml", "production.secrets", "api.credentials",
+        "my.vault"
     ]
     for p in sensitive_extensions:
         with pytest.raises(PathValidationError):
@@ -108,7 +110,8 @@ def test_validate_safe_path_patterns(tmp_path):
 
     # Prefix matches
     prefix_patterns = [
-        "client_secret", "client_secret_local", "kubeconfig", "kubeconfig_prod"
+        "client_secret", "client_secret_local", "kubeconfig", "kubeconfig_prod",
+        "secret_keys.json", "secrets_config", "credential_helper", "credentials_file"
     ]
     for p in prefix_patterns:
         with pytest.raises(PathValidationError):
