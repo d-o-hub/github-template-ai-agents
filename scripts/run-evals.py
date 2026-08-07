@@ -106,9 +106,9 @@ def evaluate_skill(
 def discover_skills(skills_dir: Path, specific_skill: str | None = None) -> list[Path]:
     """Discover all skills with evals/evals.json files."""
     if specific_skill:
-        # Prevent path traversal
+        # Prevent path traversal and sensitive/forbidden path usage
         try:
-            skill_path = validate_safe_path(specific_skill, skills_dir, "skill")
+            skill_path = validate_safe_path(specific_skill, skills_dir, "skill", check_forbidden=True)
         except PathValidationError:
             return []
         evals_path = skill_path / EVALS_SUBDIR / EVALS_FILENAME
@@ -120,6 +120,11 @@ def discover_skills(skills_dir: Path, specific_skill: str | None = None) -> list
         return skills
     for path in sorted(skills_dir.iterdir()):
         if path.is_dir():
+            # Security Hardening: Ensure we do not list/discover forbidden directories
+            try:
+                validate_safe_path(path.name, skills_dir, "skill", check_forbidden=True)
+            except PathValidationError:
+                continue
             evals_path = path / EVALS_SUBDIR / EVALS_FILENAME
             if evals_path.exists():
                 skills.append(path)
