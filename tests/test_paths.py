@@ -73,7 +73,9 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".psql_history", ".sqlite_history", "terraform.tfstate",
         "terraform.tfstate.backup", ".terraform", ".cargo", ".s3cfg",
         ".boto", ".gcloud", ".azure", "_netrc", ".oci", ".sentryclirc",
-        ".vault-token", ".password-store", ".erlang.cookie"
+        ".vault-token", ".password-store", ".erlang.cookie",
+        ".vscode", ".idea", ".env.vault", ".zshenv", ".zprofile",
+        ".zlogin", ".zlogout", ".bash_login"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):

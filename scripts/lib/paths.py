@@ -101,6 +101,14 @@ FORBIDDEN_PATHS = frozenset({
     ".vault-token",
     ".password-store",
     ".erlang.cookie",
+    ".vscode",
+    ".idea",
+    ".env.vault",
+    ".zshenv",
+    ".zprofile",
+    ".zlogin",
+    ".zlogout",
+    ".bash_login",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
