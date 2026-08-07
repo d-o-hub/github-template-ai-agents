@@ -1,3 +1,9 @@
+## 2026-08-04 - Prevent Access to Local Environment Vaults, IDE Workspace Settings, and Shell Configs in Path Validation
+
+**Vulnerability:** Gaps in forbidden path denylists left IDE settings (.vscode, .idea), decrypter credentials vaults (.env.vault), and alternative shell environment profiles (.zshenv, .zprofile, .zlogin, .zlogout, .bash_login) vulnerable to potential reading, manipulation, or extraction.
+**Learning:** Hardening directory and file path validations requires securing the entire configuration surface, including localized IDE configs, decrypter vaults holding development secrets, and alternative user-shell profile startup files that are typically read during shell spawning.
+**Prevention:** Continuously maintain a comprehensive, case-insensitive explicit denylist encompassing IDE workspaces (.vscode, .idea), local decrypted credential vaults (.env.vault), and alternative user shell startup configurations (.zshenv, .zprofile, etc.).
+
 ## 2026-07-27 - Hardened Pattern-Based Credential and Cloud Config Blocking in Path Validation
 
 **Vulnerability:** Exact/static matching of forbidden filenames did not block variations of sensitive configurations like custom-named credentials or cloud configuration files (e.g., `credentials.json`, `client_secret.json`, or `kubeconfig`).
