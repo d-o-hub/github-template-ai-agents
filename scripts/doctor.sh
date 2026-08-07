@@ -67,14 +67,25 @@ for link in .claude/skills .qwen/skills; do
     pass "$link -> $target"
   elif [[ -d "$link" ]]; then
     # Directory of symlinks rather than a single symlink is also fine
-    if [[ -n "$(find "$link" -maxdepth 1 -type l 2>/dev/null | head -n 1)" ]]; then
+    shopt -s nullglob dotglob
+    sl_files=("$link"/*)
+    shopt -u nullglob dotglob
+
+    sl_links=()
+    for f in "${sl_files[@]}"; do
+      if [[ -L "$f" ]]; then
+        sl_links+=("$f")
+      fi
+    done
+
+    if [[ ${#sl_links[@]} -gt 0 ]]; then
       pass "$link populated with skill symlinks"
     else
       warn "$link exists but contains no symlinks (run setup-skills.sh)"
     fi
     # Fail soft on dangling / workspace / orphan skill links
     dangling=0
-    while IFS= read -r -d '' sl; do
+    for sl in "${sl_links[@]}"; do
       name="${sl##*/}"
       if [[ "$name" == *-workspace ]]; then
         warn "workspace symlink present (run setup-skills.sh to prune): $sl"
@@ -86,7 +97,7 @@ for link in .claude/skills .qwen/skills; do
         warn "orphan skill symlink (run setup-skills.sh to prune): $sl"
         dangling=$((dangling + 1))
       fi
-    done < <(find "$link" -maxdepth 1 -type l -print0 2>/dev/null)
+    done
     if [[ "$dangling" -eq 0 ]]; then
       pass "$link has no dangling/orphan skill links"
     fi
