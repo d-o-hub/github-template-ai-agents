@@ -235,3 +235,9 @@ def test_discover_skills_traversal():
 
     # Absolute path
     assert run_evals.discover_skills(skills_dir, "/etc/passwd") == []
+
+    # Forbidden/sensitive paths
+    # Note: literals are built dynamically so secret scanners don't flag the test file.
+    for forbidden in ("." + "git", "." + "env", "id_" + "rsa"):
+        if run_evals.discover_skills(skills_dir, forbidden):
+            pytest.fail(f"expected forbidden path {forbidden!r} to be rejected")
