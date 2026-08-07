@@ -4,6 +4,11 @@
 **Learning:** Hardening directory and file path validations requires securing the entire configuration surface, including localized IDE configs, decrypter vaults holding development secrets, and alternative user-shell profile startup files that are typically read during shell spawning.
 **Prevention:** Continuously maintain a comprehensive, case-insensitive explicit denylist encompassing IDE workspaces (.vscode, .idea), local decrypted credential vaults (.env.vault), and alternative user shell startup configurations (.zshenv, .zprofile, etc.).
 
+## 2026-07-28 - Comprehensive Pattern-Based Security Path Validation for Credentials and Custom Secrets
+**Vulnerability:** Exact static path matches or limited extension checks in path validation did not block custom secret files or alternative naming variations of credentials (such as `secrets.json`, `credentials.yml`, or arbitrary files prefixed with `secret`/`credential`).
+**Learning:** Relying only on specific suffixes (like `credentials.json`) leaves custom-named credential files or alternate configuration extensions (e.g. `.yml`, `.yaml`, `.vault`) vulnerable to unauthorized reading or mapping. Prefix-based startswith checks for "secret" and "credential" paired with broader suffix rules provide a comprehensive security shield.
+**Prevention:** Apply prefix-based validation to block files beginning with generic key-terms ("secret", "credential") alongside explicit extension suffixes (`.secrets`, `.credentials`, `.vault`) in path validation checks, ensuring that all such configurations are systematically rejected.
+
 ## 2026-07-27 - Hardened Pattern-Based Credential and Cloud Config Blocking in Path Validation
 
 **Vulnerability:** Exact/static matching of forbidden filenames did not block variations of sensitive configurations like custom-named credentials or cloud configuration files (e.g., `credentials.json`, `client_secret.json`, or `kubeconfig`).
