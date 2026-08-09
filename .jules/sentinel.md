@@ -1,3 +1,9 @@
+## 2026-08-08 - Block Generalized SSH Private Keys in Path Validation Pattern Matches
+
+**Vulnerability:** Prior to this hardening, path validation logic only checked a static list of explicit algorithm-prefixed SSH private key names (e.g., `id_rsa`, `id_ed25519`). This permitted access to dynamically named, backed-up, or alternatively alg-named private keys (such as `id_custom_key` or `id_temp`) starting with the standard SSH `id_` prefix if they were not explicitly covered.
+**Learning:** Restricting pattern matches to explicit algorithms introduces omissions as SSH key naming schemes and algorithms can be dynamically configured. A generic startswith check for the standard key-prefix `id_` coupled with public key exemptions provides complete and robust security boundary protection for all variations of SSH private keys.
+**Prevention:** Always employ a generalized pattern-based startswith filter for standard key prefixes like `id_` while excluding public keys with `.pub` suffix checks, rather than keeping an exhaustive list of exact key algorithms.
+
 ## 2026-08-04 - Prevent Access to Local Environment Vaults, IDE Workspace Settings, and Shell Configs in Path Validation
 
 **Vulnerability:** Gaps in forbidden path denylists left IDE settings (.vscode, .idea), decrypter credentials vaults (.env.vault), and alternative shell environment profiles (.zshenv, .zprofile, .zlogin, .zlogout, .bash_login) vulnerable to potential reading, manipulation, or extraction.
@@ -99,7 +105,7 @@
 
 **Vulnerability:** Exact static matching in `FORBIDDEN_PATHS` did not protect cloud configuration folders (like `.cargo`, `.s3cfg`, `.boto`, `.gcloud`, `.azure`) if referenced directly, and `validate_safe_path`'s suffix check lacked coverage for keyrings/gpg, password files, and custom history patterns.
 **Learning:** Hardcoded denylists and static file sets are easily bypassed by alternative tools, configurations, or naming structures. Comprehensive protection must pair expanded explicit lists with robust, pattern-based validation checks covering extensions and keywords for password/keyring/history resources.
-**Prevention:** Continuously enrich path validation filters with standard cloud and package manager directories (`.cargo`, `.azure`, etc.), while ensuring pattern-based suffix matches reject cryptographic keys/keyrings (`.gpg`, `.pgp`, `.asc`, `.p8`, `.pkcs12`), credential stores (`.passwd`, `.pwd`, `.htpasswd`), and history files (`_history`).
+**Prevention:** Continuously enrich path validation filters with standard cloud and package manager directories (`.azure`, `.cargo`, etc.), while ensuring pattern-based suffix matches reject cryptographic keys/keyrings (`.gpg`, `.pgp`, `.asc`, `.p8`, `.pkcs12`), credential stores (`.passwd`, `.pwd`, `.htpasswd`), and history files (`_history`).
 
 ## 2026-07-26 - Enforcing Forbidden Path Validation in Skill Evaluation File Validation
 **Vulnerability:** The file validation check inside `run_file_validation` failed to enforce `check_forbidden=True` on path-validation logic, leaving a potential vector for verifying, mapping, or exposing the existence of sensitive forbidden files/folders such as `.env`, `.git`, or custom credentials within skill paths.

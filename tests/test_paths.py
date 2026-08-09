@@ -191,13 +191,19 @@ def test_validate_safe_path_ssh_keys(tmp_path):
     base.mkdir()
 
     # Dynamic private keys (e.g. custom names)
-    private_keys = ["id_rsa_personal", "id_ed25519_github", "id_dsa_old", "id_ecdsa_corp", "id_xmss_test"]
+    private_keys = [
+        "id_rsa_personal", "id_ed25519_github", "id_dsa_old", "id_ecdsa_corp", "id_xmss_test",
+        "id_custom_key", "id_temp", "id_backup", "id_web"
+    ]
     for pk in private_keys:
         with pytest.raises(PathValidationError):
             validate_safe_path(pk, base, "test", check_forbidden=True)
 
     # Public keys should be allowed
-    public_keys = ["id_rsa.pub", "id_ed25519_github.pub", "id_dsa_old.pub", "id_ecdsa_corp.pub", "id_xmss_test.pub"]
+    public_keys = [
+        "id_rsa.pub", "id_ed25519_github.pub", "id_dsa_old.pub", "id_ecdsa_corp.pub", "id_xmss_test.pub",
+        "id_custom_key.pub", "id_temp.pub", "id_backup.pub", "id_web.pub"
+    ]
     for pub in public_keys:
         res = validate_safe_path(pub, base, "test", check_forbidden=True)
         expected = (base / pub).resolve()
