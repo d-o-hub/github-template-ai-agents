@@ -169,7 +169,7 @@ def validate_safe_path(
                     "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml"
                 )) or
                 (
-                    part_lower.startswith(("identity", "id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", "id_xmss")) and
+                    part_lower.startswith(("identity", "id_")) and
                     not part_lower.endswith(".pub")
                 )
             ):
