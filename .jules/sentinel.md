@@ -1,3 +1,9 @@
+## 2026-08-10 - Explicit Path Validation for Local Database and Legacy Shell Configurations
+
+**Vulnerability:** Gaps in forbidden path validations left database credentials/configs (.pgpass, .my.cnf, .pg_service.conf), interactive REPL histories (.irb_history, .pry_history), and legacy shell profiles (.tcshrc, .cshrc, .login, .logout) vulnerable to potential reading, manipulation, or extraction.
+**Learning:** Security boundaries must cover all local configurations and history stores, particularly legacy shell configurations and interactive environment histories that do not fit standard regexes or newer profile matches.
+**Prevention:** Maintain a comprehensive and hardened forbidden paths denylist, explicitly enumerating database credentials and legacy REPL/shell files, backed by test coverage verifying each path.
+
 ## 2026-08-04 - Prevent Access to Local Environment Vaults, IDE Workspace Settings, and Shell Configs in Path Validation
 
 **Vulnerability:** Gaps in forbidden path denylists left IDE settings (.vscode, .idea), decrypter credentials vaults (.env.vault), and alternative shell environment profiles (.zshenv, .zprofile, .zlogin, .zlogout, .bash_login) vulnerable to potential reading, manipulation, or extraction.
