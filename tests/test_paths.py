@@ -75,7 +75,9 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".boto", ".gcloud", ".azure", "_netrc", ".oci", ".sentryclirc",
         ".vault-token", ".password-store", ".erlang.cookie",
         ".vscode", ".idea", ".env.vault", ".zshenv", ".zprofile",
-        ".zlogin", ".zlogout", ".bash_login"
+        ".zlogin", ".zlogout", ".bash_login", ".irb_history", ".pry_history",
+        ".tcshrc", ".cshrc", ".login", ".logout", ".pgpass", ".my.cnf",
+        ".pg_service.conf"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
