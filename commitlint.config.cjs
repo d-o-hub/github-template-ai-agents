@@ -18,7 +18,11 @@ module.exports = {
     // naturally exceed 100 chars. Enforced at PR level (1000 chars) instead.
     'body-max-line-length': [0],
     'footer-max-length': [2, 'always', 1000],
-    'footer-max-line-length': [2, 'always', 100],
+    // footer-max-line-length disabled — GitHub squash merges append the PR body
+    // (free-form markdown with >100-char lines) as the commit footer, which made
+    // the 2026-08-07 Commit Lint run on main fail (8d673e1). Same rationale as
+    // body-max-line-length above: line length is enforced at PR level instead.
+    'footer-max-line-length': [0],
     // subject-case disabled: identifiers like LESSON-017, SKILL.md are valid
     'subject-case': [0],
   },

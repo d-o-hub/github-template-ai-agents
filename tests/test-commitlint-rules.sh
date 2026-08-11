@@ -50,7 +50,11 @@ check_consistency "'body-max-length'" "\\[0\\]" "Body max length (disabled)"
 # The AGENTS.md "Wrap at 100 chars per line" is a recommendation, not enforced.
 check_consistency "'body-max-line-length'" "\\[0\\]" "Body max line length (disabled)"
 check_consistency "'footer-max-length'" "1000" "Footer max length"
-check_consistency "'footer-max-line-length'" "100" "Footer max line length"
+# footer-max-line-length is intentionally disabled ([0]) because GitHub
+# squash merges append the free-form PR body as the commit footer; markdown
+# lines >100 chars are normal (2026-08-07 main Commit Lint failure on 8d673e1).
+# Line length is enforced at PR level instead, same as body-max-line-length.
+check_consistency "'footer-max-line-length'" "\\[0\\]" "Footer max line length (disabled)"
 # subject-case is intentionally disabled ([0]) because identifiers like
 # LESSON-017, SKILL.md, and technical references are valid commit subjects
 check_consistency "'subject-case'" "\\[0\\]" "Subject case (disabled)"
