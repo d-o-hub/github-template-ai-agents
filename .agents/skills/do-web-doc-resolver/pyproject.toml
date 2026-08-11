@@ -154,6 +154,7 @@ python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"
 markers = [
+    "unit: marks unit tests that run fast without external services",
     "live: marks tests as live integration tests requiring real API keys (deselect with '-m not live')",
     "integration: marks integration tests that may require external services or built binaries",
     "benchmark: enables pytest-benchmark style tests without plugin",
