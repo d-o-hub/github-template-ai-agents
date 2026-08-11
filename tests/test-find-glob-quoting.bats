@@ -114,11 +114,6 @@ scan_find_patterns() {
     fi
 }
 
-@test "generate-skills-reference.sh quotes the -path exclusion pattern" {
-    # Direct regression check on the original finding (grep -F: literal match).
-    grep -qF -- '-path "$SKILLS_DIR/_*/*"' "$REPO_ROOT/scripts/generate-skills-reference.sh"
-}
-
 @test "detector flags an unquoted glob suffix (regression case)" {
     local tmp="$BATS_TEST_TMPDIR/unquoted"
     local prefix

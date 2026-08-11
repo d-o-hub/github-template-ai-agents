@@ -66,11 +66,13 @@ if [[ "$SKILLS_DIR" == -* || "$OUTPUT_FILE" == -* ]]; then
     exit 2
 fi
 
-skill_files=()
-while IFS= read -r -d '' skill_file; do
-    skill_files+=("$skill_file")
-done < <(find "$SKILLS_DIR" -mindepth 2 -maxdepth 2 -type f -name SKILL.md \
-    ! -path "$SKILLS_DIR/_*/*" -print0)
+# perf: Eliminate subshells and grep overhead with native globbing
+# Expected Impact: Reduces process forks for skill discovery, improving generation speed.
+# Replaces `find` subshell and `while read` loop with native bash globbing (extglob + nullglob).
+local_shopt=$(shopt -p nullglob extglob || true)
+shopt -s nullglob extglob
+skill_files=("$SKILLS_DIR"/!(_*)/SKILL.md)
+eval "$local_shopt"
 
 
 if [[ ${#skill_files[@]} -eq 0 ]]; then
