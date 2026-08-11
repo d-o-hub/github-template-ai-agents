@@ -109,6 +109,15 @@ FORBIDDEN_PATHS = frozenset({
     ".zlogin",
     ".zlogout",
     ".bash_login",
+    ".tcshrc",
+    ".cshrc",
+    ".login",
+    ".logout",
+    ".pgpass",
+    ".my.cnf",
+    ".pg_service.conf",
+    ".irb_history",
+    ".pry_history",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
