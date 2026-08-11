@@ -1,3 +1,9 @@
+## 2026-08-11 - Block Database Credentials and Alternative Shell/REPL Configurations in Path Validation
+
+**Vulnerability:** Gaps in forbidden path validation permitted potential reading, enumeration, or exfiltration of database credential files (`.pgpass`, `.my.cnf`, `.pg_service.conf`), alternative REPL history files (`.irb_history`, `.pry_history`), and legacy shell startup configurations (`.tcshrc`, `.cshrc`, `.login`, `.logout`).
+**Learning:** Reconstructing robust boundary controls requires safeguarding all credential stores and environment definitions, including database-specific configuration folders, REPL/interactive logs, and legacy shells that agents could leverage or inspect.
+**Prevention:** Continuously maintain a case-insensitive explicit denylist enclosing database client passwords (`.pgpass`), connection credentials (`.my.cnf`, `.pg_service.conf`), interactive console histories (`.irb_history`, `.pry_history`), and legacy user shell profiles (`.tcshrc`, `.cshrc`, `.login`, `.logout`).
+
 ## 2026-08-04 - Prevent Access to Local Environment Vaults, IDE Workspace Settings, and Shell Configs in Path Validation
 
 **Vulnerability:** Gaps in forbidden path denylists left IDE settings (.vscode, .idea), decrypter credentials vaults (.env.vault), and alternative shell environment profiles (.zshenv, .zprofile, .zlogin, .zlogout, .bash_login) vulnerable to potential reading, manipulation, or extraction.
