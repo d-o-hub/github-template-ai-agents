@@ -5,8 +5,10 @@
     grep -q "cancel-in-progress: true" .github/workflows/ci.yml
 }
 
-@test "workflow includes skip ci in status commit" {
-    grep -q 'commit -m "ci: update ci status artifacts \[skip ci\]"' .github/workflows/ci.yml
+@test "workflow delegates CI status persistence to persist script" {
+    grep -q "persist-ci-status.sh" .github/workflows/ci.yml
+    test -x scripts/persist-ci-status.sh
+    grep -q 'ci: update ci status artifacts \[skip ci\]' scripts/persist-ci-status.sh
 }
 
 @test "workflow persists CI data only on main" {
