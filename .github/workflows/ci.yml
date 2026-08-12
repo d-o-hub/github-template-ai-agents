@@ -285,6 +285,7 @@ jobs:
     if: always()
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -314,17 +315,9 @@ jobs:
 
       - name: Persist CI data to main
         if: github.ref == 'refs/heads/main' && always()
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .github/ci-status/
-          if git diff --staged --quiet; then
-            printf "No changes to CI status\n"
-            exit 0
-          fi
-          git commit -m "ci: update ci status artifacts [skip ci]"
-          git push origin main
-        continue-on-error: true
+        run: ./scripts/persist-ci-status.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Check all required jobs passed
         run: |
