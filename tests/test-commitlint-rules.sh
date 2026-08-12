@@ -39,21 +39,30 @@ check_consistency() {
     fi
 }
 
+
+# Literal used for commitlint "disabled" rules ([0]); centralized to keep
+# SonarCloud S1192 (duplicate string literal) below the threshold.
+DISABLED_SET="\\[0\\]"
+
 printf "Checking consistency with AGENTS.md...\n"
 check_consistency "'header-max-length'" "150" "Header max length"
 # body-max-length is intentionally disabled ([0]) because squash merges
 # produce long commit bodies from PR descriptions. Enforced at PR level
 # via lint-pr-title workflow body-length warning step.
-check_consistency "'body-max-length'" "\\[0\\]" "Body max length (disabled)"
+check_consistency "'body-max-length'" "$DISABLED_SET" "Body max length (disabled)"
 # body-max-line-length is intentionally disabled ([0]) because squash merge
 # bodies from gh pr merge --squash naturally exceed 100 characters per line.
 # The AGENTS.md "Wrap at 100 chars per line" is a recommendation, not enforced.
-check_consistency "'body-max-line-length'" "\\[0\\]" "Body max line length (disabled)"
+check_consistency "'body-max-line-length'" "$DISABLED_SET" "Body max line length (disabled)"
 check_consistency "'footer-max-length'" "1000" "Footer max length"
-check_consistency "'footer-max-line-length'" "100" "Footer max line length"
+# footer-max-line-length is intentionally disabled ([0]) because GitHub
+# squash merges append the free-form PR body as the commit footer; markdown
+# lines >100 chars are normal (2026-08-07 main Commit Lint failure on 8d673e1).
+# Line length is enforced at PR level instead, same as body-max-line-length.
+check_consistency "'footer-max-line-length'" "$DISABLED_SET" "Footer max line length (disabled)"
 # subject-case is intentionally disabled ([0]) because identifiers like
 # LESSON-017, SKILL.md, and technical references are valid commit subjects
-check_consistency "'subject-case'" "\\[0\\]" "Subject case (disabled)"
+check_consistency "'subject-case'" "$DISABLED_SET" "Subject case (disabled)"
 
 printf "Checking dependabot commitlint exemption...\n"
 if grep -q "ignores" "$CONFIG_FILE"; then
