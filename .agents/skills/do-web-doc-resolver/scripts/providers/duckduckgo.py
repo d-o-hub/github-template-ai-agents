@@ -25,7 +25,7 @@ async def resolve_with_duckduckgo_async(
         logger.debug("DuckDuckGo skipped: rate limited")
         return None
     try:
-        from duckduckgo_search import DDGS
+        from ddgs import DDGS
 
         def _sync_search():
             with DDGS() as ddgs:
@@ -59,7 +59,7 @@ def resolve_with_duckduckgo(query: str, max_chars: int = MAX_CHARS) -> ResolvedR
         logger.debug("DuckDuckGo skipped: rate limited")
         return None
     try:
-        from duckduckgo_search import DDGS
+        from ddgs import DDGS
 
         with DDGS() as ddgs:
             results = list(ddgs.text(query, max_results=DDG_RESULTS))
