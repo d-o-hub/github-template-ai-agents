@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-import requests
+import httpx
 
 # Add current directory to path
 sys.path.insert(0, os.path.abspath(os.curdir))
@@ -51,12 +51,12 @@ def diagnose_firecrawl():
 
     # Direct API check for headers/schema
     try:
-        response = requests.post(
-            "https://api.firecrawl.dev/v1/scrape",
-            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={"url": TEST_URL, "formats": ["markdown"]},
-            timeout=20,
-        )
+        with httpx.Client(timeout=20) as client:
+            response = client.post(
+                "https://api.firecrawl.dev/v1/scrape",
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json={"url": TEST_URL, "formats": ["markdown"]},
+            )
         print(f"Status Code: {response.status_code}")
         print(f"Headers: {json.dumps(dict(response.headers), indent=2)}")
         data = response.json()
@@ -88,11 +88,11 @@ def diagnose_tavily():
         return
 
     try:
-        response = requests.post(
-            "https://api.tavily.com/search",
-            json={"api_key": api_key, "query": TEST_QUERY, "max_results": 2},
-            timeout=10,
-        )
+        with httpx.Client(timeout=10) as client:
+            response = client.post(
+                "https://api.tavily.com/search",
+                json={"api_key": api_key, "query": TEST_QUERY, "max_results": 2},
+            )
         print(f"Status Code: {response.status_code}")
         print(f"Headers: {json.dumps(dict(response.headers), indent=2)}")
         data = response.json()

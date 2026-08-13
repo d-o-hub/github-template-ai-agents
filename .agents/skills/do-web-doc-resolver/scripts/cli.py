@@ -7,9 +7,17 @@ import argparse
 import asyncio
 import json
 import logging
+import os
 
-from scripts.models import Profile, ProviderType
-from scripts.resolve import (
+# Persist learned per-domain provider preferences across CLI runs (AUDIT #25).
+# Must be set before importing scripts.state (via scripts.resolve), which builds
+# the routing-memory singleton at import time.
+from scripts.constants import CACHE_DIR
+
+os.environ.setdefault("DO_WDR_ROUTING_MEMORY_PATH", os.path.join(CACHE_DIR, "routing_memory.json"))
+
+from scripts.models import Profile, ProviderType  # noqa: E402
+from scripts.resolve import (  # noqa: E402
     MAX_CHARS,
     is_url,
     resolve_direct,
