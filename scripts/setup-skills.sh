@@ -33,8 +33,18 @@ _portable_relpath() {
     base=$(cd "$base" 2>/dev/null && pwd || echo "$base")
 
     local common_part="$base" result=""
-    while [[ "${target#$common_part}" == "${target}" ]]; do
-        common_part="$(dirname "$common_part")"
+    while [[ "${target#$common_part}" == "${target}" && -n "$common_part" && "$common_part" != "/" ]]; do
+        # perf: replace `dirname` subshell with native bash parameter expansion
+        local n="${common_part%/}"
+        if [[ -z "$n" ]]; then
+            if [[ -n "$common_part" ]]; then n="/"; else n="."; fi
+        elif [[ "$n" == */* ]]; then
+            n="${n%/*}"
+            [[ -z "$n" ]] && n="/"
+        else
+            n="."
+        fi
+        common_part="$n"
         result="..${result:+/$result}"
     done
 
