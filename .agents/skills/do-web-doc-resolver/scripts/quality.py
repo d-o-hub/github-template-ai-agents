@@ -86,8 +86,12 @@ def _check_jargon(text_lower: str) -> bool:
         "transform",
         "supercharge",
     ]
-    jargon_count = sum(text_lower.count(signal) for signal in jargon_signals)
-    return jargon_count > THRESHOLD_JARGON
+    jargon_count = 0
+    for signal in jargon_signals:
+        jargon_count += text_lower.count(signal)
+        if jargon_count > THRESHOLD_JARGON:
+            return True
+    return False
 
 
 def _check_frontmatter(text: str) -> bool:
@@ -115,8 +119,12 @@ def _check_anchors(text: str) -> bool:
 def _compute_noise(text_lower: str) -> bool:
     """Detect noisy signals like cookie/subscribe prompts."""
     noisy_signals = ["cookie", "subscribe", "javascript", "log in", "sign up"]
-    noise_count = sum(text_lower.count(signal) for signal in noisy_signals)
-    return noise_count > THRESHOLD_NOISE
+    noise_count = 0
+    for signal in noisy_signals:
+        noise_count += text_lower.count(signal)
+        if noise_count > THRESHOLD_NOISE:
+            return True
+    return False
 
 
 def is_bot_challenge(content: str) -> bool:

@@ -2,10 +2,13 @@
 Cache utilities for the Web Doc Resolver.
 """
 
+import asyncio
 import hashlib
 import logging
 import os
 import threading
+import time
+from collections.abc import Callable
 from typing import Any
 
 from scripts.constants import CACHE_DIR, TIERED_TTL
@@ -14,6 +17,95 @@ logger = logging.getLogger(__name__)
 
 _cache = None
 _cache_lock = threading.RLock()
+
+# L1 in-memory cache: fast TTL cache sitting in front of disk cache
+_l1_cache: dict[str, tuple[Any, float]] = {}
+_l1_cache_lock = threading.RLock()
+L1_CACHE_MAX_SIZE = 1000
+L1_CACHE_DEFAULT_TTL = 300  # 5 minutes
+
+# Request coalescing: track in-flight requests to deduplicate concurrent calls
+_inflight_requests: dict[str, asyncio.Future] = {}
+_inflight_lock = asyncio.Lock()
+
+
+async def coalesce_request(key: str, func: Callable) -> Any:
+    """Coalesce concurrent requests for the same key.
+
+    If a request is already in-flight for this key, wait for its result.
+    Otherwise, execute the function and cache the result for other waiters.
+    """
+    async with _inflight_lock:
+        if key in _inflight_requests:
+            # Another request is in-flight — wait for it
+            future = _inflight_requests[key]
+        else:
+            # First request — create a future and execute
+            future = asyncio.get_event_loop().create_future()
+            _inflight_requests[key] = future
+
+    if future.done():
+        # Already completed (edge case: lock acquired after completion)
+        async with _inflight_lock:
+            _inflight_requests.pop(key, None)
+        return future.result()
+
+    # Check if we're the one who should execute
+    async with _inflight_lock:
+        is_first = _inflight_requests.get(key) is future
+
+    if is_first:
+        try:
+            result = await func()
+            future.set_result(result)
+            return result
+        except Exception as e:
+            future.set_exception(e)
+            raise
+        finally:
+            async with _inflight_lock:
+                _inflight_requests.pop(key, None)
+    else:
+        # Wait for the first request to complete
+        return await future
+
+
+def _l1_get(key: str) -> Any | None:
+    """Get from L1 in-memory cache."""
+    with _l1_cache_lock:
+        entry = _l1_cache.get(key)
+        if entry is None:
+            return None
+        value, expire_time = entry
+        if time.time() > expire_time:
+            del _l1_cache[key]
+            return None
+        return value
+
+
+def _l1_set(key: str, value: Any, ttl: int = L1_CACHE_DEFAULT_TTL) -> None:
+    """Set in L1 in-memory cache with TTL."""
+    with _l1_cache_lock:
+        # Evict oldest entries if at capacity
+        if len(_l1_cache) >= L1_CACHE_MAX_SIZE:
+            # Remove 10% of oldest entries
+            evict_count = max(1, L1_CACHE_MAX_SIZE // 10)
+            to_evict = sorted(_l1_cache.keys(), key=lambda k: _l1_cache[k][1])[:evict_count]
+            for k in to_evict:
+                del _l1_cache[k]
+        _l1_cache[key] = (value, time.time() + ttl)
+
+
+def _l1_clear() -> None:
+    """Clear L1 in-memory cache."""
+    with _l1_cache_lock:
+        _l1_cache.clear()
+
+
+def _clear_inflight() -> None:
+    """Clear inflight request tracking (for testing)."""
+    global _inflight_requests
+    _inflight_requests = {}
 
 
 def _cache_key(input_str: str, source: str) -> str:
@@ -57,18 +149,6 @@ def _get_cache():
     return _cache
 
 
-def _l1_clear():
-    """Reset _cache to None; lazy re-init on next access (test only).
-
-    Set _cache = None rather than calling _cache.clear() so on-disk cached
-    entries are preserved across test runs while still forcing fresh
-    initialization on the next _get_cache() call.
-    """
-    global _cache
-    with _cache_lock:
-        _cache = None
-
-
 def get_ttl(provider: str, config: dict | None = None) -> int:
     """Get the TTL for a given provider from config or defaults."""
     from scripts.utils import get_config_data
@@ -103,6 +183,14 @@ def get_ttl(provider: str, config: dict | None = None) -> int:
 
 
 def _get_from_cache(input_str: str, source: str) -> dict[str, Any] | None:
+    key = _cache_key(input_str, source)
+
+    # Check L1 in-memory cache first (fast path)
+    result = _l1_get(key)
+    if result is not None:
+        return dict(result)
+
+    # Check disk cache (slow path)
     from scripts.utils import _get_cache
 
     with _cache_lock:
@@ -110,22 +198,31 @@ def _get_from_cache(input_str: str, source: str) -> dict[str, Any] | None:
     if not cache:
         return None
     with _cache_lock:
-        result = cache.get(_cache_key(input_str, source))
+        result = cache.get(key)
     if result is None:
         return None
+
+    # Promote to L1 cache for faster subsequent access
+    _l1_set(key, result, ttl=min(get_ttl(source), L1_CACHE_DEFAULT_TTL))
     return dict(result)
 
 
 def _save_to_cache(input_str: str, source: str, result: dict[str, Any], ttl: int | None = None):
     from scripts.utils import _get_cache
 
+    if ttl is None:
+        ttl = get_ttl(source)
+
+    key = _cache_key(input_str, source)
+
+    # Store in L1 in-memory cache
+    _l1_set(key, result, ttl=min(ttl, L1_CACHE_DEFAULT_TTL))
+
+    # Store in disk cache
     with _cache_lock:
         cache = _get_cache()
     if not cache:
         return
 
-    if ttl is None:
-        ttl = get_ttl(source)
-
     with _cache_lock:
-        cache.set(_cache_key(input_str, source), result, expire=ttl)
+        cache.set(key, result, expire=ttl)
