@@ -57,9 +57,9 @@ class TestL1ClearBehavior:
 
         original = cache._cache
         try:
-            cache._cache = object()  # sentinel non-None
+            cache._l1_cache['test'] = object()
             cache._l1_clear()
-            assert cache._cache is None, "_l1_clear must reset _cache to None"
+            assert len(cache._l1_cache) == 0, "_l1_clear must clear _l1_cache"
         finally:
             cache._cache = original
 
@@ -82,16 +82,16 @@ class TestL1ClearBehavior:
             def __exit__(inner, *exc):
                 return False
 
-        original_lock = cache._cache_lock
+        original_lock = cache._l1_cache_lock
         original_cache = cache._cache
         try:
-            cache._cache_lock = _SentinelLock()
-            cache._cache = object()
+            cache._l1_cache_lock = _SentinelLock()
+            cache._l1_cache['test'] = object()
             cache._l1_clear()
             assert entered == [True], (
-                "_l1_clear must enter _cache_lock as a context manager"
+                "_l1_clear must enter _l1_cache_lock as a context manager"
             )
             assert cache._cache is None
         finally:
-            cache._cache_lock = original_lock
+            cache._l1_cache_lock = original_lock
             cache._cache = original_cache
