@@ -76,7 +76,7 @@ import os
 import sys
 from datetime import datetime, timezone
 
-REQUIRED_FIELDS = ("status", "last_run", "failing_jobs", "workflow_url")
+REQUIRED_FIELDS = ("status", "last_run", "failing_jobs", "skipped_jobs", "validated", "workflow_url")
 STALE_STATUS_MESSAGE = "CI status is stale"
 INCONSISTENT_PASSING_MESSAGE = "CI status says passing, but recent GitHub runs disagree"
 BAD_REMOTE_CONCLUSIONS = {"failure", "cancelled", "timed_out", "action_required"}
@@ -128,6 +128,13 @@ failing_jobs = data.get("failing_jobs")
 if failing_jobs is not None and not isinstance(failing_jobs, list):
     errors.append("failing_jobs must be a JSON array")
 
+skipped_jobs = data.get("skipped_jobs")
+if skipped_jobs is not None and not isinstance(skipped_jobs, list):
+    errors.append("skipped_jobs must be a JSON array")
+validated = data.get("validated")
+if validated is not None and not isinstance(validated, bool):
+    errors.append("validated must be a boolean")
+
 workflow_url = data.get("workflow_url")
 if workflow_url is not None and not isinstance(workflow_url, str):
     errors.append("workflow_url must be a string")
@@ -143,6 +150,9 @@ if last_run is not None:
         errors.append(
             f"{STALE_STATUS_MESSAGE}: age={int(age_seconds)}s max={max_age_seconds}s"
         )
+
+if status == "passing" and validated is False:
+    errors.append(INCONSISTENT_PASSING_MESSAGE + ", but validated is false (all jobs skipped/unknown)")
 
 remote_runs = []
 if gh_checked:

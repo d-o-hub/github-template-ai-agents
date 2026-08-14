@@ -62,3 +62,47 @@ verify: zero open PRs, main CI green, ci-status fresh, quality gate pass → PEN
 - Open PRs: **0** (all 9 resolved; 1 canonical merged per group, dups closed)
 - Main CI: **green**; Commit Lint failure class eliminated by Fix A; ci-status persistence
   self-healing via automerge PR (Fix B); pytest warning gone (Fix C).
+
+---
+
+# GOAP STATE: False-Green CI Status Remediation (Round 4 — 2026-08-14)
+
+## Goal
+
+Eliminate false-green CI status artifacts: a run in which every required job is
+skipped must never be persisted as `passing`. Derived from the PR #795 roast
+(auto-generated bot bookkeeping stamped `passing` while quality-gate/test were
+`⏭️ skipped`).
+
+## Swarm (GOAP) — parallel implementers, one file each, fixed interface contract
+
+| Role | File | Outcome |
+|------|------|---------|
+| impl-writer | `scripts/update-ci-status.py` | ✅ status classifier + `skipped_jobs`/`validated` schema + md warning |
+| impl-tests | `tests/test_update_ci_status.py` | ✅ 5 tests (added all-skipped & mixed cases) |
+| impl-validator | `scripts/check_ci_status_freshness.sh` | ✅ required fields + passing&&!validated rule |
+| impl-bats | `tests/test-check-ci-status-freshness.bats` | ✅ fixtures + false-green case |
+| impl-workflow | `.github/workflows/ci.yml` | ✅ gate writer on real success |
+| impl-data | `.github/ci-status/ci-status.json` | ✅ add skipped_jobs/validated (validated:true) |
+
+## Contract (ADR-033)
+
+- `validated` = true iff ≥1 job `success`; `status`∈{passing,failing,skipped}
+  with `skipped` when all skipped (never passing).
+- JSON schema v2: status, last_run, failing_jobs, skipped_jobs, validated, workflow_url.
+- ci.yml writes status only when `needs.quality-gate.result=='success' ||
+  needs.test.result=='success'` (all-skipped runs can't overwrite a green).
+
+## Quality gate
+
+- `python3 -m unittest tests.test_update_ci_status` → 5/5 OK
+- `bats tests/test-check-ci-status-freshness.bats` → false-green case + 4 others OK
+  (test 1 "fresh without gh" fails only when `gh` is auto-detected in the sandbox
+  `/usr/bin`; passes when gh is unavailable — environmental, not a regression)
+- `bats tests/test-ci-status-workflow.bats` → 6/6 OK
+- YAML parse OK (gate on step [2]); shellcheck clean; python compile OK.
+
+## Final State
+
+- False-green eliminated by defense-in-depth (classifier + workflow gate + validator rule).
+- Committed `.github/ci-status/ci-status.json` now carries `skipped_jobs`/`validated`.

@@ -47,6 +47,8 @@ class TestUpdateCIStatus(unittest.TestCase):
         with open(os.path.join(ci_dir, "ci-status.json"), "r") as f:
             data = json.load(f)
             self.assertEqual(data["status"], "passing")
+            self.assertEqual(data["validated"], True)
+            self.assertEqual(data["skipped_jobs"], [])
             self.assertEqual(data["failing_jobs"], [])
 
         with open(os.path.join(ci_dir, "ci-summary.md"), "r") as f:
@@ -66,6 +68,8 @@ class TestUpdateCIStatus(unittest.TestCase):
         with open(os.path.join(ci_dir, "ci-status.json"), "r") as f:
             data = json.load(f)
             self.assertEqual(data["status"], "failing")
+            self.assertEqual(data["validated"], True)
+            self.assertEqual(data["skipped_jobs"], [])
             self.assertEqual(data["failing_jobs"], ["job2"])
 
         with open(os.path.join(ci_dir, "ci-summary.md"), "r") as f:
@@ -84,6 +88,39 @@ class TestUpdateCIStatus(unittest.TestCase):
         with open(os.path.join(ci_dir, "ci-status.json"), "r") as f:
             data = json.load(f)
             self.assertEqual(data["status"], "failing")
+            self.assertEqual(data["validated"], False)
+            self.assertEqual(data["skipped_jobs"], [])
+
+    def test_all_skipped_is_not_passing(self):
+        needs = {
+            "job1": {"result": "skipped"},
+            "job2": {"result": "skipped"}
+        }
+        res = self.run_script(needs)
+        self.assertEqual(res.returncode, 0)
+
+        ci_dir = os.path.join(self.test_dir.name, ".github", "ci-status")
+        with open(os.path.join(ci_dir, "ci-status.json"), "r") as f:
+            data = json.load(f)
+            self.assertNotEqual(data["status"], "passing")
+            self.assertEqual(data["status"], "skipped")
+            self.assertEqual(data["validated"], False)
+            self.assertEqual(set(data["skipped_jobs"]), {"job1", "job2"})
+
+    def test_mixed_skip_and_success_is_passing(self):
+        needs = {
+            "job1": {"result": "success"},
+            "job2": {"result": "skipped"}
+        }
+        res = self.run_script(needs)
+        self.assertEqual(res.returncode, 0)
+
+        ci_dir = os.path.join(self.test_dir.name, ".github", "ci-status")
+        with open(os.path.join(ci_dir, "ci-status.json"), "r") as f:
+            data = json.load(f)
+            self.assertEqual(data["status"], "passing")
+            self.assertEqual(data["validated"], True)
+            self.assertEqual(data["skipped_jobs"], ["job2"])
 
 if __name__ == "__main__":
     unittest.main()
