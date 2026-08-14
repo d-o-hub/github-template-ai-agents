@@ -14,6 +14,8 @@ write_status_file() {
   "status": "passing",
   "last_run": "$timestamp",
   "failing_jobs": [],
+  "skipped_jobs": [],
+  "validated": true,
   "workflow_url": "https://example.test/actions/runs/1"
 }
 JSON
@@ -60,6 +62,8 @@ JSON
     [ "$status" -eq 1 ]
     [[ "$output" == *"missing required field: failing_jobs"* ]]
     [[ "$output" == *"missing required field: workflow_url"* ]]
+    [[ "$output" == *"missing required field: skipped_jobs"* ]]
+    [[ "$output" == *"missing required field: validated"* ]]
 }
 
 @test "passing committed status fails when authenticated gh reports newer run" {
@@ -107,4 +111,24 @@ MOCK
 
     [ "$status" -eq 1 ]
     [[ "$output" == *"conclusion=cancelled"* ]]
+}
+
+@test "passing status with validated false is rejected as false-green" {
+    local last_run
+    last_run="$(utc_timestamp_seconds_ago 60)"
+    cat > "$TEST_REPO/.github/ci-status/ci-status.json" <<JSON
+{
+  "status": "passing",
+  "last_run": "$last_run",
+  "failing_jobs": [],
+  "skipped_jobs": ["quality-gate", "test"],
+  "validated": false,
+  "workflow_url": "https://example.test/actions/runs/1"
+}
+JSON
+
+    run env CI_STATUS_MAX_AGE_SECONDS=3600 "$TEST_REPO/scripts/check_ci_status_freshness.sh"
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"validated is false"* ]]
 }
