@@ -1,3 +1,9 @@
+## 2026-08-12 - Strict GitHub Actions SHA Pinning for Supply Chain Security
+
+**Vulnerability:** Outdated or mismatched GitHub Actions version SHA pins in `.github/workflows/security-scan.yml` failed to match required trusted SHAs for `github/codeql-action` v4.36, exposing workflows to unexpected action runs or potential tag-spoofing supply chain attacks.
+**Learning:** Action steps must be pinned strictly to unique, verified 40-character commit SHAs. Inconsistencies between specified actions and expected SHAs can bypass intent or fail quality assurance test gates.
+**Prevention:** Continuously audit workflow configuration files using static analysis and automated unit test suites to enforce exact matching of cryptographic SHA pins for external GitHub Actions dependencies.
+
 ## 2026-08-11 - Block Database Credentials and Alternative Shell/REPL Configurations in Path Validation
 
 **Vulnerability:** Gaps in forbidden path validation permitted potential reading, enumeration, or exfiltration of database credential files (`.pgpass`, `.my.cnf`, `.pg_service.conf`), alternative REPL history files (`.irb_history`, `.pry_history`), and legacy shell startup configurations (`.tcshrc`, `.cshrc`, `.login`, `.logout`).
