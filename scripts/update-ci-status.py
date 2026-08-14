@@ -19,10 +19,11 @@ def determine_status(results):
     """Determine overall status."""
     if results["failure"] or results["cancelled"]:
         return "failing"
-    elif results["success"]:
+    if results["success"]:
         return "passing"
-    else:
-        return "skipped"  # all jobs skipped/unknown — never "passing"
+    if results.get("unknown", []):
+        return "unknown"
+    return "skipped"  # all required jobs skipped — never "passing"
 
 def get_ci_dir():
     """Return path to .github/ci-status/ directory, creating it if needed."""

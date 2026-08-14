@@ -87,11 +87,22 @@ skipped must never be persisted as `passing`. Derived from the PR #795 roast
 
 ## Contract (ADR-033)
 
-- `validated` = true iff ≥1 job `success`; `status`∈{passing,failing,skipped}
-  with `skipped` when all skipped (never passing).
+- `validated` = true iff ≥1 job `success`;
+  `status`∈{passing,failing,skipped,unknown} with `skipped` only when all
+  required jobs are skipped, and `unknown` when only unexpected results were
+  seen (never passing).
 - JSON schema v2: status, last_run, failing_jobs, skipped_jobs, validated, workflow_url.
-- ci.yml writes status only when `needs.quality-gate.result=='success' ||
-  needs.test.result=='success'` (all-skipped runs can't overwrite a green).
+- ci.yml writes status when at least one required job ran (NOT both skipped):
+  `needs.quality-gate.result != 'skipped' || needs.test.result != 'skipped'`
+  — so failures are recorded and all-skipped runs can't overwrite a green.
+
+## Review (roast-driven) fixes (Round 4b)
+
+- Gate corrected from "any success" to "not both skipped" — the former
+  re-created a false-green on `{failure, skipped}` by never writing `failing`.
+- `determine_status` now distinguishes `unknown` from `skipped`.
+- Validator uses a dedicated `FALSE_GREEN_MESSAGE` instead of reusing the
+  remote-parity message.
 
 ## Quality gate
 

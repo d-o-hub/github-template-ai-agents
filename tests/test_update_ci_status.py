@@ -91,6 +91,21 @@ class TestUpdateCIStatus(unittest.TestCase):
             self.assertEqual(data["validated"], False)
             self.assertEqual(data["skipped_jobs"], [])
 
+    def test_all_unknown_not_skipped(self):
+        needs = {
+            "job1": {"result": "unexpected_value"},
+            "job2": {"result": "weird"}
+        }
+        res = self.run_script(needs)
+        self.assertEqual(res.returncode, 0)
+
+        ci_dir = os.path.join(self.test_dir.name, ".github", "ci-status")
+        with open(os.path.join(ci_dir, "ci-status.json"), "r") as f:
+            data = json.load(f)
+            self.assertEqual(data["status"], "unknown")
+            self.assertEqual(data["validated"], False)
+            self.assertEqual(data["skipped_jobs"], [])
+
     def test_all_skipped_is_not_passing(self):
         needs = {
             "job1": {"result": "skipped"},

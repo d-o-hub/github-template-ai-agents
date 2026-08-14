@@ -21,8 +21,9 @@ The freshness validator has no rule to catch `passing` + skipped.
 
 1. **Classifier** — `determine_status` returns:
    - `failing` if any `failure` or `cancelled`;
-   - `passing` if at least one job `success`; otherwise
-   - `skipped` (all jobs skipped/unknown — never `passing`).
+   - `passing` if at least one job `success`;
+   - `unknown` if only unexpected/unknown job results were seen;
+   - `skipped` if all required jobs were skipped (never `passing`).
 2. **Schema (ci-status.json v2)** — add `skipped_jobs: []` and
    `validated: true|false`. `validated` is `true` iff at least one job had
    result `success` (i.e., a real validation ran).
@@ -31,9 +32,13 @@ The freshness validator has no rule to catch `passing` + skipped.
 4. **Validator** — `check_ci_status_freshness.sh` lists `skipped_jobs` and
    `validated` as required fields, type-checks them, and flags
    `status == "passing" && validated == false` as an inconsistency (false-green).
-5. **Workflow gate** — `ci.yml` writes/persists status artifacts only when
-   `needs.quality-gate.result == 'success' || needs.test.result == 'success'`,
-   so an all-skipped run cannot overwrite a green.
+5. **Workflow gate** — `ci.yml` writes/persists status artifacts only when at
+   least one required job actually ran (i.e., NOT both `skipped`):
+   `needs.quality-gate.result != 'skipped' || needs.test.result != 'skipped'`.
+   This records `failing` on failure/cancelled and `passing` on success, while
+   an all-skipped run (nothing ran) cannot overwrite a green. (Corrected after
+   review: an earlier gate keyed on "any success" failed to record `failing`
+   when one job failed and the other was skipped.)
 6. **Remediate committed artifact** — add `skipped_jobs: []`, `validated: true`
    to the checked-in `.github/ci-status/ci-status.json`.
 

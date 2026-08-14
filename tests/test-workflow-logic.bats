@@ -53,3 +53,15 @@
 @test "ci-success job has write permissions for persisting" {
     sed -n '/ci-success:/,/^  [a-z]/p' .github/workflows/ci.yml | grep -q "contents: write"
 }
+
+@test "status artifacts are NOT written when all required jobs are skipped" {
+    grep -q "needs.quality-gate.result != 'skipped'" .github/workflows/ci.yml
+    grep -q "needs.test.result != 'skipped'" .github/workflows/ci.yml
+}
+
+@test "status artifacts ARE written on failure (not only success)" {
+    # Must run when a required job failed/cancelled (just not when ALL were skipped),
+    # so a failing main is recorded as 'failing' rather than left stale/passing.
+    ! grep -q "result == 'success' || needs.test.result == 'success'" .github/workflows/ci.yml
+    grep -q "github.ref == 'refs/heads/main'" .github/workflows/ci.yml
+}

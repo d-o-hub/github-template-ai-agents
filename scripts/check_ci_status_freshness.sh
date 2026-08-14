@@ -79,6 +79,7 @@ from datetime import datetime, timezone
 REQUIRED_FIELDS = ("status", "last_run", "failing_jobs", "skipped_jobs", "validated", "workflow_url")
 STALE_STATUS_MESSAGE = "CI status is stale"
 INCONSISTENT_PASSING_MESSAGE = "CI status says passing, but recent GitHub runs disagree"
+FALSE_GREEN_MESSAGE = "CI status says passing, but validated is false (all jobs skipped/unknown)"
 BAD_REMOTE_CONCLUSIONS = {"failure", "cancelled", "timed_out", "action_required"}
 INCOMPLETE_REMOTE_STATUSES = {"queued", "in_progress", "waiting", "requested", "pending"}
 
@@ -152,7 +153,7 @@ if last_run is not None:
         )
 
 if status == "passing" and validated is False:
-    errors.append(INCONSISTENT_PASSING_MESSAGE + ", but validated is false (all jobs skipped/unknown)")
+    errors.append(FALSE_GREEN_MESSAGE)
 
 remote_runs = []
 if gh_checked:
