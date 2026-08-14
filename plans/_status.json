@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-032"
+    "adr": "adr-033"
   },
   "active_plan": null,
   "phases": [],
@@ -50,6 +50,10 @@
     "adr-032-template-audit-remediation.md": {
       "status": "accepted",
       "date": "2026-08-01"
+    },
+    "adr-033-ci-status-false-green.md": {
+      "status": "accepted",
+      "date": "2026-08-14"
     }
   }
 }
