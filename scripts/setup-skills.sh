@@ -34,7 +34,15 @@ _portable_relpath() {
 
     local common_part="$base" result=""
     while [[ "${target#$common_part}" == "${target}" ]]; do
-        common_part="$(dirname "$common_part")"
+        # perf: replace external dirname subshell with native bash expansion
+        local next_part="${common_part%/*}"
+        if [[ "$next_part" == "$common_part" ]]; then
+            common_part="."
+        elif [[ -z "$next_part" ]]; then
+            common_part="/"
+        else
+            common_part="$next_part"
+        fi
         result="..${result:+/$result}"
     done
 
