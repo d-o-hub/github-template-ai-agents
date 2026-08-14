@@ -19,7 +19,11 @@ def determine_status(results):
     """Determine overall status."""
     if results["failure"] or results["cancelled"]:
         return "failing"
-    return "passing"
+    if results["success"]:
+        return "passing"
+    if results.get("unknown", []):
+        return "unknown"
+    return "skipped"  # all required jobs skipped — never "passing"
 
 def get_ci_dir():
     """Return path to .github/ci-status/ directory, creating it if needed."""
@@ -27,12 +31,14 @@ def get_ci_dir():
     os.makedirs(ci_dir, exist_ok=True)
     return ci_dir
 
-def update_json(status, last_run, failing_jobs, workflow_url):
+def update_json(status, last_run, failing_jobs, skipped_jobs, validated, workflow_url):
     """Update ci-status.json."""
     ci_status = {
         "status": status,
         "last_run": last_run,
         "failing_jobs": failing_jobs,
+        "skipped_jobs": skipped_jobs,
+        "validated": validated,
         "workflow_url": workflow_url
     }
     path = os.path.join(get_ci_dir(), "ci-status.json")
@@ -54,6 +60,9 @@ def update_markdown(status, last_run, workflow_url, needs):
         f.write(f"Latest CI status: **{status}**\n\n")
         f.write(f"- **Last Run:** {last_run}\n")
         f.write(f"- **Workflow URL:** [{workflow_url}]({workflow_url})\n\n")
+        skipped_jobs = sorted([job for job in needs if needs[job].get("result") == "skipped"])
+        if skipped_jobs:
+            f.write(f"> ⚠️ Skipped jobs: {', '.join(skipped_jobs)}\n")
         f.write("## Job Status\n\n")
         f.write("| Job | Result |\n")
         f.write("| --- | --- |\n")
@@ -75,9 +84,10 @@ def main():
 
     results = get_job_results(needs)
     status = determine_status(results)
+    validated = bool(results["success"])
     last_run = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
-    update_json(status, last_run, results["failure"], workflow_url)
+    update_json(status, last_run, results["failure"], results["skipped"], validated, workflow_url)
     update_markdown(status, last_run, workflow_url, needs)
 
     print(f"CI status updated to: {status}")

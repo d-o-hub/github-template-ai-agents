@@ -298,7 +298,7 @@ jobs:
           python-version: '3.11'
 
       - name: Update CI status artifacts
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && (needs.quality-gate.result != 'skipped' || needs.test.result != 'skipped')
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
           WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
