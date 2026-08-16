@@ -150,7 +150,10 @@ if [[ -z "$SKILL_DATA" ]]; then
     exit 1
 fi
 
-mkdir -p "$(dirname -- "$OUTPUT_FILE")"
+# perf: replace external dirname subshell with native bash expansion
+out_dir="${OUTPUT_FILE%/*}"
+[[ "$out_dir" == "$OUTPUT_FILE" ]] && out_dir="."
+mkdir -p -- "$out_dir"
 
 {
     printf '# Skills Reference\n\n'

@@ -43,7 +43,8 @@ fi
 
 pr_url="$(gh pr create --base main --head "$BRANCH" --title "$TITLE" --body "$BODY" --label "$LABEL" 2>/dev/null || true)"
 if [[ -n "$pr_url" ]]; then
-  pr_number="$(basename "$pr_url")"
+  # perf: replace external basename subshell with native bash expansion
+  pr_number="${pr_url##*/}"
   printf 'Created CI status PR #%s.\n' "$pr_number"
 else
   printf 'WARNING: could not create/update CI status PR for branch %s.\n' "$BRANCH" >&2
