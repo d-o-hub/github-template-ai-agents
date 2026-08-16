@@ -123,6 +123,25 @@ FORBIDDEN_PATHS = frozenset({
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
 FORBIDDEN_PATHS_LOWER = frozenset({p.lower() for p in FORBIDDEN_PATHS})
 
+# Define pattern tuples for sensitive file detection to prevent string literal duplication.
+SENSITIVE_PREFIXES = (
+    ".env", "client_secret", "kubeconfig", "secret", "credential",
+    ".npmrc", ".yarnrc", ".pypirc", "auth.json",
+)
+
+SENSITIVE_SUFFIXES = (
+    ".pem", ".key", ".pfx", ".tfstate", ".crt", ".cer",
+    ".p12", ".pkcs8", ".pk8", ".der", ".keystore", ".jks",
+    ".dockercfg", ".publishsettings", ".gpg", ".pgp", ".asc",
+    ".p8", ".pkcs12", ".passwd", ".pwd", ".htpasswd", "_history",
+    "credentials.json", "client_secret.json", "kubeconfig",
+    ".secrets", ".credentials", ".vault", "secrets.json",
+    "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml",
+    ".npmrc", ".yarnrc", ".yarnrc.yml", ".pypirc", "auth.json",
+)
+
+SSH_KEY_PREFIXES = ("identity", "id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", "id_xmss")
+
 
 class PathValidationError(Exception):
     """Raised when a path fails safe-path validation."""
@@ -167,19 +186,10 @@ def validate_safe_path(
             # Note: .key is intentionally broad to catch private keys despite potential false positives.
             # SSH private key prefixes cover custom-named keys and newer types (e.g. id_ed25519_sk, id_rsa_backup).
             if (
-                part_lower.startswith((".env", "client_secret", "kubeconfig", "secret", "credential", ".npmrc", ".yarnrc", ".pypirc", "auth.json")) or
-                part_lower.endswith((
-                    ".pem", ".key", ".pfx", ".tfstate", ".crt", ".cer",
-                    ".p12", ".pkcs8", ".pk8", ".der", ".keystore", ".jks",
-                    ".dockercfg", ".publishsettings", ".gpg", ".pgp", ".asc",
-                    ".p8", ".pkcs12", ".passwd", ".pwd", ".htpasswd", "_history",
-                    "credentials.json", "client_secret.json", "kubeconfig",
-                    ".secrets", ".credentials", ".vault", "secrets.json",
-                    "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml",
-                    ".npmrc", ".yarnrc", ".yarnrc.yml", ".pypirc", "auth.json"
-                )) or
+                part_lower.startswith(SENSITIVE_PREFIXES) or
+                part_lower.endswith(SENSITIVE_SUFFIXES) or
                 (
-                    part_lower.startswith(("identity", "id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", "id_xmss")) and
+                    part_lower.startswith(SSH_KEY_PREFIXES) and
                     not part_lower.endswith(".pub")
                 )
             ):
