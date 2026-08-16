@@ -104,7 +104,8 @@ def test_validate_safe_path_patterns(tmp_path):
         "client_secret.json", "credentials.json", "kubeconfig", "my_kubeconfig",
         "client_secret_xyz.json", "secrets.json", "secrets.yml", "secrets.yaml",
         "credentials.yml", "credentials.yaml", "production.secrets", "api.credentials",
-        "my.vault"
+        "my.vault", "project.npmrc", "custom.yarnrc", "custom.yarnrc.yml", "pypi.pypirc",
+        "docker.auth.json"
     ]
     for p in sensitive_extensions:
         with pytest.raises(PathValidationError):
@@ -113,7 +114,8 @@ def test_validate_safe_path_patterns(tmp_path):
     # Prefix matches
     prefix_patterns = [
         "client_secret", "client_secret_local", "kubeconfig", "kubeconfig_prod",
-        "secret_keys.json", "secrets_config", "credential_helper", "credentials_file"
+        "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
+        ".npmrc.custom", ".yarnrc.local", ".pypirc.prod", "auth.json.bak"
     ]
     for p in prefix_patterns:
         with pytest.raises(PathValidationError):
