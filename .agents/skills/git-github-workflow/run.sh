@@ -439,27 +439,28 @@ agent_monitor_actions() {
         local has_failure=false
         local has_warning=false
         
+        local checks_output_lower="${checks_output,,}"
         # Check pending
-        if echo "$checks_output" | grep -qiE "(pending|queued|in progress|running)"; then
+        if [[ "$checks_output_lower" =~ (pending|queued|in[[:space:]]progress|running) ]]; then
             has_pending=true
         fi
         
         # Check failures
-        if echo "$checks_output" | grep -qiE "(fail|error|✗|×)"; then
+        if [[ "$checks_output_lower" =~ (fail|error|✗|×) ]]; then
             has_failure=true
         fi
         
         # Check warnings (if strict)
-        if echo "$checks_output" | grep -qiE "(warning|warn:|deprecated)"; then
+        if [[ "$checks_output_lower" =~ (warning|warn:|deprecated) ]]; then
             has_warning=true
         fi
         
         # Check repo Actions
         local workflow_runs=$(gh run list --branch "$BRANCH_NAME" --limit 10 --json status,conclusion 2>/dev/null || echo "[]")
-        if echo "$workflow_runs" | grep -q '"status":"in_progress"'; then
+        if [[ "$workflow_runs" == *'"status":"in_progress"'* ]]; then
             has_pending=true
         fi
-        if echo "$workflow_runs" | grep -q '"conclusion":"failure"'; then
+        if [[ "$workflow_runs" == *'"conclusion":"failure"'* ]]; then
             has_failure=true
         fi
         
