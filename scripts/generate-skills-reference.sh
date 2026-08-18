@@ -150,7 +150,9 @@ if [[ -z "$SKILL_DATA" ]]; then
     exit 1
 fi
 
-mkdir -p "$(dirname -- "$OUTPUT_FILE")"
+output_dir="${OUTPUT_FILE%/*}"
+[[ "$output_dir" == "$OUTPUT_FILE" ]] && output_dir="."
+mkdir -p -- "$output_dir"
 
 {
     printf '# Skills Reference\n\n'
