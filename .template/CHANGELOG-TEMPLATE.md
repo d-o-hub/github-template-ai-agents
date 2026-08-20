@@ -101,7 +101,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ci: bump the github-actions group with 5 updates (#763)
 - perf(scripts): eliminate text-matching process forks in bash loop (#756)
 - perf: eliminate subshells in metrics validation loops (#755)
-- ci: bump https://github.com/igorshubovych/markdownlint-cli (#757)
+- ci: bump <https://github.com/igorshubovych/markdownlint-cli> (#757)
 - chore(metrics): log session wrap-up entry to per-agent metrics file
 - refactor(metrics): replace single metrics file with per-agent files
 - ci(CODEOWNERS): refine patterns + add /jules/ gate (#752)
