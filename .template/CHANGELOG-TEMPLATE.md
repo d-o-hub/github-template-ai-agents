@@ -47,6 +47,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - chore: fix .gitignore malformed pattern and dedupe entries
 - chore: remove duplicate comment block in quality_gate.sh
 
+## [0.2.12] - 2026-08-20
+
+### Added
+
+- docs(plans): record round 3 PR triage and ci status persistence fix (#794)
+- feat(turso-db): sync with latest Turso docs (v0.7.2) (#765)
+- feat: sync features and fixes from upstream repository (#753)
+- docs(adr): add adr-031 for per-agent metrics architecture
+- test(log-metric): add bats tests for per-agent metrics helper
+- docs(dora): correct metrics.jsonl status and triz suggestions
+- docs(dora): add july 2026 dora and agentic metrics report
+- docs(dora): correct F+followup batch merged count to 12 and closed count to 4
+- docs(repo): add automerge workflow quickstart (#744)
+- docs: update GOAP state to reflect all tasks completed (#729)
+- feat(do-wdr): add semantic cache query normalization (#727)
+- test(do-wdr): add cascade error handling tests (#726)
+
+### Fixed
+
+- fix(ci): prevent false-green ci status artifacts (#796)
+- fix(ci): disable footer-max-line-length for squash merge bodies (#784)
+- fix(ci): register unit pytest marker in do-web-doc-resolver (#785)
+- fix(ci): persist ci status via automerge PR when main push is blocked (#786)
+- fix(security): block database credentials and legacy shell profiles in path validation (#775)
+- fix(security): harden skill discovery path validation (#773)
+- fix(security): harden path validation with credential patterns (#770)
+- fix(security): prevent access to development vaults ide settings and shell configs (#768)
+- fix(tests): make turso-db skill version assertion version-agnostic
+- fix(ci): harden reusable template automation (#760)
+- fix(security): harden forbidden paths and credential pattern validation (#762)
+- fix(tests): update stale codeql-action SHA pin in workflow versions test (#766)
+- fix(ci): repair monthly DORA report workflow output path
+- fix(security): harden eval paths and align workflow tests (#758)
+- fix(tests): resolve 3 pre-existing test failures
+- fix(workflows): repair YAML indentation + fatal disable on refusal (#746)
+- fix(workflows): grant contents: write to auto-merge-non-deps workflow (#745)
+- fix(do-wdr): deduplicate _l1_clear helper after squash-merge collision (#741)
+- fix(security): harden path validation with credential patterns and cloud directories (#733)
+- fix: markdownlint issues in GOAP_STATE.md (#728)
+- fix(do-wdr): improve error handling and type safety (#725)
+- fix(security): align async and sync ssrf protection by blocking unspecified ipv6
+
+### Changed
+
+- perf: replace dirname subshell in setup-skills loop (#792)
+- ci: bump dtolnay/rust-toolchain (#780)
+- ci: bump the github-actions group with 6 updates (#779)
+- perf: replace find subshells with bash globbing in doctor.sh (#782)
+- perf: eliminate find subshell in skills reference generation (#777)
+- perf: eliminate grep and cut subshells in loc_gate.sh (#761)
+- ci: bump actions/stale from 10.4.0 to 11.0.0 (#764)
+- ci: bump the github-actions group with 5 updates (#763)
+- perf(scripts): eliminate text-matching process forks in bash loop (#756)
+- perf: eliminate subshells in metrics validation loops (#755)
+- ci: bump https://github.com/igorshubovych/markdownlint-cli (#757)
+- chore(metrics): log session wrap-up entry to per-agent metrics file
+- refactor(metrics): replace single metrics file with per-agent files
+- ci(CODEOWNERS): refine patterns + add /jules/ gate (#752)
+- ci(CODEOWNERS): gate workflows + ADR + auto-merge docs (#751)
+- perf(analyze-codebase): single-pass grep in check_todo_density (#750)
+- ci(workflows): add yaml-validate guard for F8-class regressions (#749)
+- ci(workflows): refine automerge to refuse on human review threads (#743)
+- ci(workflows): opt-in label-gated auto-merge for non-Dependabot PRs (#742)
+- perf: eliminate subshell in update-agents-md.sh (#731)
+- ci: bump actions/labeler from 6.2.0 to 7.0.0 (#736)
+- ci: bump the github-actions group with 6 updates (#735)
+- perf: eliminate grep process forks in adr compliance check
+
 ## [0.2.11] - 2026-07-20
 
 ### Added
