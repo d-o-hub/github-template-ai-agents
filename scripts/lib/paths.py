@@ -118,6 +118,9 @@ FORBIDDEN_PATHS = frozenset({
     ".cshrc",
     ".login",
     ".logout",
+    ".dbshell",
+    ".rediscli_history",
+    ".kshrc",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
