@@ -113,7 +113,8 @@ def test_validate_safe_path_patterns(tmp_path):
     # Prefix matches
     prefix_patterns = [
         "client_secret", "client_secret_local", "kubeconfig", "kubeconfig_prod",
-        "secret_keys.json", "secrets_config", "credential_helper", "credentials_file"
+        "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
+        ".netrc", "netrc", "netrc.txt", ".netrc.old", "netrc_backup"
     ]
     for p in prefix_patterns:
         with pytest.raises(PathValidationError):
