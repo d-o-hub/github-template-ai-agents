@@ -104,7 +104,7 @@ def test_validate_safe_path_patterns(tmp_path):
         "client_secret.json", "credentials.json", "kubeconfig", "my_kubeconfig",
         "client_secret_xyz.json", "secrets.json", "secrets.yml", "secrets.yaml",
         "credentials.yml", "credentials.yaml", "production.secrets", "api.credentials",
-        "my.vault"
+        "my.vault", "client.ovpn", "passwords.kdbx", "login.keychain", "user.keychain-db"
     ]
     for p in sensitive_extensions:
         with pytest.raises(PathValidationError):
@@ -113,7 +113,8 @@ def test_validate_safe_path_patterns(tmp_path):
     # Prefix matches
     prefix_patterns = [
         "client_secret", "client_secret_local", "kubeconfig", "kubeconfig_prod",
-        "secret_keys.json", "secrets_config", "credential_helper", "credentials_file"
+        "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
+        "netrc_backup", ".npmrc", ".yarnrc", ".pypirc", "auth.json"
     ]
     for p in prefix_patterns:
         with pytest.raises(PathValidationError):
@@ -122,7 +123,7 @@ def test_validate_safe_path_patterns(tmp_path):
     # Case-insensitivity for patterns
     case_patterns = [
         ".ENV.LOCAL", "SECRET.PEM", "MY.KEY", "KEY.P12", "MY.JKS",
-        "CLIENT_SECRET_PROD", "KUBECONFIG"
+        "CLIENT_SECRET_PROD", "KUBECONFIG", "CLIENT.OVPN", "PASSWORDS.KDBX"
     ]
     for p in case_patterns:
         with pytest.raises(PathValidationError):
