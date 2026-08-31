@@ -138,7 +138,10 @@ save_cached_result() {
 
     local cache_file
     cache_file=$(get_cache_path "$file" "$line")
-    mkdir -p -- "$(dirname "$cache_file")"
+    local d="${cache_file%/*}"
+    [[ "$d" == "$cache_file" ]] && d="."
+    [[ -z "$d" ]] && d="/"
+    mkdir -p -- "$d"
     printf "%s\n" "$result" > "$cache_file"
 
     # Log to audit trail and rotate
