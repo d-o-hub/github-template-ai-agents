@@ -1,3 +1,9 @@
+## 2026-08-30 - Expand Path Validation Blocklist for DB Shells, Shell Profiles, and Package Manager Credentials
+
+**Vulnerability:** Gaps in `FORBIDDEN_PATHS` left additional sensitive REPL/database shell histories (`.dbshell`, `.rediscli_history`), shell profiles (`.kshrc`), and package manager credential files (`pip.conf`, `.gemrc`) vulnerable to potential inspection or exfiltration.
+**Learning:** Hardening path validation requires securing all package manager index credentials, shell startup configs across shells (Korn shell), and interactive database client history files.
+**Prevention:** Maintain an explicit, case-insensitive denylist encompassing package manager repository credentials (`pip.conf`, `.gemrc`), shell startup profiles (`.kshrc`), and database CLI logs (`.dbshell`, `.rediscli_history`).
+
 ## 2026-08-11 - Block Database Credentials and Alternative Shell/REPL Configurations in Path Validation
 
 **Vulnerability:** Gaps in forbidden path validation permitted potential reading, enumeration, or exfiltration of database credential files (`.pgpass`, `.my.cnf`, `.pg_service.conf`), alternative REPL history files (`.irb_history`, `.pry_history`), and legacy shell startup configurations (`.tcshrc`, `.cshrc`, `.login`, `.logout`).
