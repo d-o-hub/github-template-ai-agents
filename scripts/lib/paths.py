@@ -167,7 +167,7 @@ def validate_safe_path(
             # Note: .key is intentionally broad to catch private keys despite potential false positives.
             # SSH private key prefixes cover custom-named keys and newer types (e.g. id_ed25519_sk, id_rsa_backup).
             if (
-                part_lower.startswith((".env", "client_secret", "kubeconfig", "secret", "credential")) or
+                part_lower.startswith((".env", "client_secret", "kubeconfig", "secret", "credential", "netrc", ".netrc")) or
                 part_lower.endswith((
                     ".pem", ".key", ".pfx", ".tfstate", ".crt", ".cer",
                     ".p12", ".pkcs8", ".pk8", ".der", ".keystore", ".jks",

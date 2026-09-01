@@ -1,3 +1,9 @@
+## 2026-08-28 - Pattern-Based Netrc Credential File Blocking in Path Validation
+
+**Vulnerability:** Path validation only blocked exact matches for `.netrc` and `_netrc`, leaving dynamic variations such as `netrc`, `netrc.txt`, `netrc_backup`, or `.netrc.old` accessible.
+**Learning:** Static filename denylists for sensitive authentication configuration files can be bypassed using alternate file extensions or prefix variations. Pattern-based prefix matching provides robust defense against dynamic credential file names.
+**Prevention:** Incorporate `netrc` into pattern-based `startswith` validation checks alongside `.env`, `secret`, and `credential` prefixes to systematically reject all netrc variations.
+
 ## 2026-08-11 - Block Database Credentials and Alternative Shell/REPL Configurations in Path Validation
 
 **Vulnerability:** Gaps in forbidden path validation permitted potential reading, enumeration, or exfiltration of database credential files (`.pgpass`, `.my.cnf`, `.pg_service.conf`), alternative REPL history files (`.irb_history`, `.pry_history`), and legacy shell startup configurations (`.tcshrc`, `.cshrc`, `.login`, `.logout`).
