@@ -118,6 +118,11 @@ FORBIDDEN_PATHS = frozenset({
     ".cshrc",
     ".login",
     ".logout",
+    ".dbshell",
+    ".rediscli_history",
+    ".kshrc",
+    "pip.conf",
+    ".gemrc",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
