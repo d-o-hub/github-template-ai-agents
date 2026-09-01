@@ -1,3 +1,9 @@
+## 2026-08-18 - Block VPN Configurations, KeePass Databases, and Keychains in Path Validation
+
+**Vulnerability:** Pattern-based path validation checks lacked explicit suffix blocking for VPN configurations (`.ovpn`), KeePass password manager databases (`.kdbx`), and system/user keychain stores (`.keychain`, `.keychain-db`).
+**Learning:** Security controls on file paths must proactively protect credentials across all local secret stores, network access profiles, and password managers to prevent unintentional exposure or access by agents.
+**Prevention:** Extend `SENSITIVE_SUFFIXES` in path validation routines to encompass VPN profile configurations (`.ovpn`), encrypted password manager stores (`.kdbx`), and OS-level keychains (`.keychain`, `.keychain-db`).
+
 ## 2026-08-11 - Block Database Credentials and Alternative Shell/REPL Configurations in Path Validation
 
 **Vulnerability:** Gaps in forbidden path validation permitted potential reading, enumeration, or exfiltration of database credential files (`.pgpass`, `.my.cnf`, `.pg_service.conf`), alternative REPL history files (`.irb_history`, `.pry_history`), and legacy shell startup configurations (`.tcshrc`, `.cshrc`, `.login`, `.logout`).
