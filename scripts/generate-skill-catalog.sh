@@ -9,7 +9,9 @@ REPO_ROOT="${REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 SKILLS_DIR="${SKILLS_DIR:-$REPO_ROOT/.agents/skills}"
 OUTPUT_FILE="${OUTPUT_FILE:-$SKILLS_DIR/intent-classifier/references/skill-catalog.md}"
 
-mkdir -p "$(dirname "$OUTPUT_FILE")"
+output_dir="${OUTPUT_FILE%/*}"
+[[ "$output_dir" == "$OUTPUT_FILE" ]] && output_dir="."
+mkdir -p "$output_dir"
 
 python3 - "$SKILLS_DIR" "$OUTPUT_FILE" <<'PY'
 """Generate intent-classifier skill-catalog.md from live SKILL.md frontmatter."""
