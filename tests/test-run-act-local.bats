@@ -25,10 +25,11 @@ fake_path_without() {
         [ -d "$dir" ] || continue
         for tool in "$dir"/*; do
             [ -x "$tool" ] || continue
-            case "$(basename "$tool")" in
+            local tool_name="${tool##*/}"
+            case "$tool_name" in
                 $skip_pattern) continue ;;
             esac
-            ln -sf "$tool" "$stripped/$(basename "$tool")" 2>/dev/null || true
+            ln -sf "$tool" "$stripped/$tool_name" 2>/dev/null || true
         done
     done
     echo "$stripped"
