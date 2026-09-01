@@ -77,7 +77,8 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".vscode", ".idea", ".env.vault", ".zshenv", ".zprofile",
         ".zlogin", ".zlogout", ".bash_login", ".pgpass", ".my.cnf",
         ".irb_history", ".pry_history", ".pg_service.conf",
-        ".tcshrc", ".cshrc", ".login", ".logout"
+        ".tcshrc", ".cshrc", ".login", ".logout",
+        ".dbshell", ".rediscli_history", ".kshrc"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
