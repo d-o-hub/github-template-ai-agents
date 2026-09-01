@@ -87,14 +87,15 @@ for file in "${changed_array[@]}"; do
     
     if [[ "$file" == "$REPO_ROOT/.agents/skills"* ]] || [[ "$file" == .agents/skills/* ]]; then
         # Skill documentation
-        skill_name=$(basename "$(dirname "$file")")
+        d="${file%/*}"
+        skill_name="${d##*/}"
         target_dir="${AGENTS_DIR}/skills/${skill_name}"
         log_info "Syncing skill doc: ${skill_name}"
         
     elif [[ "$file" == */SKILL.md ]]; then
         # Generic skill file
         target_dir="${AGENTS_DIR}/skills"
-        log_info "Syncing generic skill doc: $(basename "$file")"
+        log_info "Syncing generic skill doc: ${file##*/}"
         
     if [[ "$file" == "$REPO_ROOT/agents-docs"* ]] || [[ "$file" == agents-docs/* ]]; then
         # Already in docs, skip
@@ -112,7 +113,7 @@ for file in "${changed_array[@]}"; do
     else
         # Other documentation
         target_dir="${AGENTS_DIR}/reference"
-        log_info "Syncing reference doc: $(basename "$file")"
+        log_info "Syncing reference doc: ${file##*/}"
     fi
     
     # Create target directory
@@ -126,7 +127,7 @@ for file in "${changed_array[@]}"; do
 done
 
 # Update README index if skills changed
-if echo "$CHANGED_FILES" | grep -q '.agents/skills/'; then
+if [[ "$CHANGED_FILES" == *".agents/skills/"* ]]; then
     log_info "Skills changed, updating skill index..."
     
     # Generate simple index
@@ -140,7 +141,8 @@ if echo "$CHANGED_FILES" | grep -q '.agents/skills/'; then
     
     for skill_dir in "$REPO_ROOT/.agents/skills"/*/; do
         if [ -f "${skill_dir}/SKILL.md" ]; then
-            skill_name=$(basename "$skill_dir")
+            skill_name="${skill_dir%/}"
+            skill_name="${skill_name##*/}"
             echo "- [${skill_name}](skills/${skill_name}/)" >> "$INDEX_FILE"
         fi
     done
