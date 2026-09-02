@@ -116,3 +116,9 @@
 **Vulnerability:** The skill discovery logic in `run-evals.py` failed to enforce `check_forbidden=True` on both the `--skill` user parameter and the general directory iterator loop. This left a potential vector where sensitive or forbidden system paths (such as `.git`, `.env`, or nested secret folders) could be referenced, mapped, or queried as a valid skill.
 **Learning:** Base parameters or iterating loops that process directory lists must explicitly validate names using standardized safe path checks. Bypassing check_forbidden on inputs can expose sensitive directories that contain private configurations or repository structures.
 **Prevention:** Always set `check_forbidden=True` in path-validation routines when discovering, resolving, or loading specific dynamic directories. Include unit tests ensuring traversal and forbidden paths are blocked.
+
+## 2026-09-02 - Enforcing Forbidden Path Validation in Skill README Generator
+
+**Vulnerability:** `scripts/generate-skills-readme.py` iterated through `.agents/skills` subdirectories without enforcing `check_forbidden=True` via `validate_safe_path`. A forbidden or sensitive directory inside `.agents/skills` could be parsed or processed.
+**Learning:** All script routines that iterate through directories or file trees must explicitly validate path safety with `check_forbidden=True` to enforce uniform forbidden path boundaries across the codebase.
+**Prevention:** Always invoke `validate_safe_path(..., check_forbidden=True)` inside directory iteration loops before inspecting or reading file contents.
