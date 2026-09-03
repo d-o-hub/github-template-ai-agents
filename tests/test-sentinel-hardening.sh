@@ -71,7 +71,8 @@ source scripts/lib/worktree-manager.sh
 # Scenario A: Exact match for a path that is a prefix of another
 CREATED_WORKTREES=("$TEST_ROOT/app")
 OUTPUT=$(cleanup_worktrees 2>&1)
-if echo "$OUTPUT" | grep -x -F -q "Removing $TEST_ROOT/app" && ! echo "$OUTPUT" | grep -F -q "app-2"; then
+# Use bash parameter expansion to check for exact line match (or standalone string)
+if [[ "$OUTPUT" =~ (^|$'\n')"Removing $TEST_ROOT/app"($|$'\n') ]] && [[ "$OUTPUT" != *"app-2"* ]]; then
     echo "  ✓ Passed: Exact match confirmed (no overlap false positive)"
 else
     echo "  ✗ Failed: Overlap issue or incorrect matching"
@@ -82,7 +83,7 @@ fi
 # Scenario B: Literal matching of regex characters
 CREATED_WORKTREES=("$TEST_ROOT/wt*regex")
 OUTPUT=$(cleanup_worktrees 2>&1)
-if echo "$OUTPUT" | grep -x -F -q "Removing $TEST_ROOT/wt*regex"; then
+if [[ "$OUTPUT" =~ (^|$'\n')"Removing $TEST_ROOT/wt*regex"($|$'\n') ]]; then
     echo "  ✓ Passed: Literal matching confirmed (regex characters ignored)"
 else
     echo "  ✗ Failed: Literal matching failed for regex characters"
