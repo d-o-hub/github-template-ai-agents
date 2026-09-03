@@ -175,7 +175,8 @@ def validate_safe_path(
                     ".p8", ".pkcs12", ".passwd", ".pwd", ".htpasswd", "_history",
                     "credentials.json", "client_secret.json", "kubeconfig",
                     ".secrets", ".credentials", ".vault", "secrets.json",
-                    "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml"
+                    "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml",
+                    ".keyring", ".kdb"
                 )) or
                 (
                     part_lower.startswith(("identity", "id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", "id_xmss")) and

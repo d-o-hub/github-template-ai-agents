@@ -104,7 +104,7 @@ def test_validate_safe_path_patterns(tmp_path):
         "client_secret.json", "credentials.json", "kubeconfig", "my_kubeconfig",
         "client_secret_xyz.json", "secrets.json", "secrets.yml", "secrets.yaml",
         "credentials.yml", "credentials.yaml", "production.secrets", "api.credentials",
-        "my.vault"
+        "my.vault", "user.keyring", "keepass.kdb"
     ]
     for p in sensitive_extensions:
         with pytest.raises(PathValidationError):
