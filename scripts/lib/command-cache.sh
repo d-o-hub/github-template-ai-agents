@@ -138,7 +138,14 @@ save_cached_result() {
 
     local cache_file
     cache_file=$(get_cache_path "$file" "$line")
-    mkdir -p -- "$(dirname "$cache_file")"
+
+    # Optimization: Use native bash parameter expansion instead of $(dirname "$cache_file")
+    # This eliminates subshell and external process fork overhead, which improves performance
+    # when processing high-volume caches.
+    local cache_dir="${cache_file%/*}"
+    [[ "$cache_dir" == "$cache_file" ]] && cache_dir="."
+    [[ -z "$cache_dir" ]] && cache_dir="/"
+    mkdir -p -- "$cache_dir"
     printf "%s\n" "$result" > "$cache_file"
 
     # Log to audit trail and rotate
