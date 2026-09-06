@@ -1,7 +1,7 @@
 # Skill Catalog
 
 > Auto-generated from `.agents/skills/` directory.
-> Last updated: 2026-07-15
+> Last updated: 2026-08-16
 > Do not edit manually. Run `./scripts/generate-skill-catalog.sh`.
 
 ## Available Skills

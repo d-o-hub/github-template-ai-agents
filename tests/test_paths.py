@@ -77,8 +77,8 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".vscode", ".idea", ".env.vault", ".zshenv", ".zprofile",
         ".zlogin", ".zlogout", ".bash_login", ".pgpass", ".my.cnf",
         ".irb_history", ".pry_history", ".pg_service.conf",
-        ".tcshrc", ".cshrc", ".login", ".logout",
-        ".dbshell", ".rediscli_history", ".kshrc", "pip.conf", ".gemrc"
+        ".tcshrc", ".cshrc", ".login", ".logout", ".rediscli_history",
+        ".dbshell", ".kshrc", "pip.conf", ".gemrc"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
@@ -105,7 +105,8 @@ def test_validate_safe_path_patterns(tmp_path):
         "client_secret.json", "credentials.json", "kubeconfig", "my_kubeconfig",
         "client_secret_xyz.json", "secrets.json", "secrets.yml", "secrets.yaml",
         "credentials.yml", "credentials.yaml", "production.secrets", "api.credentials",
-        "my.vault"
+        "my.vault", "client.ovpn", "passwords.kdbx", "login.keychain",
+        "login.keychain-db", "system.keyring", "db.kdb"
     ]
     for p in sensitive_extensions:
         with pytest.raises(PathValidationError):
@@ -114,16 +115,26 @@ def test_validate_safe_path_patterns(tmp_path):
     # Prefix matches
     prefix_patterns = [
         "client_secret", "client_secret_local", "kubeconfig", "kubeconfig_prod",
-        "secret_keys.json", "secrets_config", "credential_helper", "credentials_file"
+        "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
+        "netrc_backup", ".netrc_old", ".npmrc_custom", ".yarnrc_custom", ".pypirc_prod",
+        "auth.json_copy"
     ]
     for p in prefix_patterns:
+        with pytest.raises(PathValidationError):
+            validate_safe_path(p, base, "test", check_forbidden=True)
+
+    # Additional sensitive extension suffix patterns
+    additional_suffixes = [
+        "vpn_config.ovpn", "passwords.kdbx", "login.keychain", "user.keychain-db"
+    ]
+    for p in additional_suffixes:
         with pytest.raises(PathValidationError):
             validate_safe_path(p, base, "test", check_forbidden=True)
 
     # Case-insensitivity for patterns
     case_patterns = [
         ".ENV.LOCAL", "SECRET.PEM", "MY.KEY", "KEY.P12", "MY.JKS",
-        "CLIENT_SECRET_PROD", "KUBECONFIG"
+        "CLIENT_SECRET_PROD", "KUBECONFIG", "VPN.OVPN", "STORE.KDBX"
     ]
     for p in case_patterns:
         with pytest.raises(PathValidationError):
