@@ -77,7 +77,8 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".vscode", ".idea", ".env.vault", ".zshenv", ".zprofile",
         ".zlogin", ".zlogout", ".bash_login", ".pgpass", ".my.cnf",
         ".irb_history", ".pry_history", ".pg_service.conf",
-        ".tcshrc", ".cshrc", ".login", ".logout"
+        ".tcshrc", ".cshrc", ".login", ".logout", ".rediscli_history",
+        ".dbshell"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
@@ -104,7 +105,8 @@ def test_validate_safe_path_patterns(tmp_path):
         "client_secret.json", "credentials.json", "kubeconfig", "my_kubeconfig",
         "client_secret_xyz.json", "secrets.json", "secrets.yml", "secrets.yaml",
         "credentials.yml", "credentials.yaml", "production.secrets", "api.credentials",
-        "my.vault"
+        "my.vault", "client.ovpn", "passwords.kdbx", "login.keychain",
+        "login.keychain-db", "system.keyring", "db.kdb"
     ]
     for p in sensitive_extensions:
         with pytest.raises(PathValidationError):
@@ -122,7 +124,7 @@ def test_validate_safe_path_patterns(tmp_path):
     # Case-insensitivity for patterns
     case_patterns = [
         ".ENV.LOCAL", "SECRET.PEM", "MY.KEY", "KEY.P12", "MY.JKS",
-        "CLIENT_SECRET_PROD", "KUBECONFIG"
+        "CLIENT_SECRET_PROD", "KUBECONFIG", "VPN.OVPN", "STORE.KDBX"
     ]
     for p in case_patterns:
         with pytest.raises(PathValidationError):
