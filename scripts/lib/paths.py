@@ -126,12 +126,19 @@ FORBIDDEN_PATHS = frozenset({
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
 FORBIDDEN_PATHS_LOWER = frozenset({p.lower() for p in FORBIDDEN_PATHS})
 
+# Module-level constants for pattern-based sensitive file validation to avoid string duplication.
 SENSITIVE_PREFIXES = (
     ".env",
     "client_secret",
     "kubeconfig",
     "secret",
     "credential",
+    "netrc",
+    ".netrc",
+    ".npmrc",
+    ".yarnrc",
+    ".pypirc",
+    "auth.json",
 )
 
 SENSITIVE_SUFFIXES = (
