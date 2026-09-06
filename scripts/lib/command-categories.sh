@@ -44,7 +44,8 @@ categorize_command() {
     # Optimization: Use native Bash parameter expansion instead of tr pipeline to eliminate subshells.
     cmd_lower="$cmd"
     # Security: Remove backslash-newline combinations first to defeat multi-line obfuscation.
-    cmd_lower="${cmd_lower//\\$'\n'/}"
+    local nl=$'\n'
+    cmd_lower="${cmd_lower//\\$nl/}"
     cmd_lower="${cmd_lower//\'/}"
     cmd_lower="${cmd_lower//\"/}"
     cmd_lower="${cmd_lower//\\/}"
