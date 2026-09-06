@@ -47,15 +47,12 @@ def extract_frontmatter(skill_file: Path) -> dict:
     return result
 
 
-def main() -> int:
-    repo_root = Path(__file__).resolve().parent.parent
-    skills_dir = repo_root / ".agents" / "skills"
-    output_file = skills_dir / "README.md"
+def discover_skills(skills_dir: Path) -> list:
+    """Collect (name, description) tuples from valid skill directories.
 
-    if not skills_dir.is_dir():
-        print("Error: Skills directory not found", file=sys.stderr)
-        return 1
-
+    Directories that fail forbidden-path validation, skip-convention
+    (underscore prefix), or that lack a SKILL.md are ignored.
+    """
     skills = []
     for skill_path in sorted(skills_dir.iterdir()):
         if not skill_path.is_dir() or skill_path.name.startswith("_"):
@@ -73,6 +70,19 @@ def main() -> int:
         name = fm.get("name", skill_path.name)
         description = fm.get("description", "No description available")
         skills.append((name, description))
+    return skills
+
+
+def main() -> int:
+    repo_root = Path(__file__).resolve().parent.parent
+    skills_dir = repo_root / ".agents" / "skills"
+    output_file = skills_dir / "README.md"
+
+    if not skills_dir.is_dir():
+        print("Error: Skills directory not found", file=sys.stderr)
+        return 1
+
+    skills = discover_skills(skills_dir)
 
     lines = [
         "# .agents/skills/ - Canonical Skill Source",
@@ -118,8 +128,9 @@ def main() -> int:
     for name, description in skills:
         lines.append(f"| [`{name}/`]({name}/) | {description} |")
 
-    lines.append("")
-
+    # Single trailing newline: the join already terminates the last row and
+    # write_text adds the final newline (a trailing "" element here would
+    # produce a blank line and trip markdownlint MD012).
     output_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"Generated {output_file} with {len(skills)} skills")
     return 0

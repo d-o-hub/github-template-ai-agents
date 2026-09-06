@@ -6,6 +6,7 @@ Latest CI status: **passing**
 - **Workflow URL:** [https://github.com/d-o-hub/github-template-ai-agents/actions/runs/34054936248](https://github.com/d-o-hub/github-template-ai-agents/actions/runs/34054936248)
 
 > ⚠️ Skipped jobs: test
+
 ## Job Status
 
 | Job | Result |
