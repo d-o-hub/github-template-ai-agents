@@ -117,3 +117,14 @@ skipped must never be persisted as `passing`. Derived from the PR #795 roast
 
 - False-green eliminated by defense-in-depth (classifier + workflow gate + validator rule).
 - Committed `.github/ci-status/ci-status.json` now carries `skipped_jobs`/`validated`.
+
+## Round 4 (2026-09-06): CI status persistence loop + template 0.2.13
+
+- Diagnosed why the artifact stayed stale despite ADR-033: GITHUB_TOKEN event
+  suppression (automerge workflow never fired), janitor closing fresh artifact
+  PRs, dead required Codacy check, freshness validator false-reds.
+- Fixed in #839/#841; ruleset Codacy requirement removed (ADR-034); artifact
+  PRs #840/#842 converged autonomously — verified twice.
+- Template version bumped to 0.2.13 (#843) with sonar.projectVersion anchor.
+- Anti-churn guard (duplicate PR detection) added — see ADR-034 successor work
+  and .github/workflows/duplicate-pr-guard.yml.
