@@ -37,11 +37,11 @@ jobs:
         if: steps.check_skill.outputs.exists == 'true'
         run: |
           set -euo pipefail
-          LATEST_RELEASE="$(curl -fsSL \
+          LATEST_RELEASE="$(curl -fsSL --proto '=https' --tlsv1.2 \
             https://api.github.com/repos/tursodatabase/turso/releases/latest \
             | jq -r '.tag_name')"
           test -n "$LATEST_RELEASE" && test "$LATEST_RELEASE" != "null"
-          curl -fsSL https://docs.turso.tech/llms.txt -o /tmp/llms.txt
+          curl -fsSL --proto '=https' --tlsv1.2 https://docs.turso.tech/llms.txt -o /tmp/llms.txt
           echo "LATEST_RELEASE=$LATEST_RELEASE" >> "$GITHUB_ENV"
 
       - name: Compare llms.txt with cached version

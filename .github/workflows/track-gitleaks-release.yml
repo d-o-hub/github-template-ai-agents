@@ -21,7 +21,7 @@ jobs:
         id: check
         run: |
           set -euo pipefail
-          LATEST=$(curl -sL --fail --max-time 10 --retry 3 \
+          LATEST=$(curl -sL --fail --proto '=https' --tlsv1.2 --max-time 10 --retry 3 \
             "https://api.github.com/repos/gitleaks/gitleaks-action/releases/latest" \
             | jq -r '.tag_name')
           if [[ -z "$LATEST" ]] || ! echo "$LATEST" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then
@@ -33,7 +33,7 @@ jobs:
 
           MAJOR=$(echo "$LATEST" | sed -E 's/^v?([0-9]+).*/\1/')
           if [[ "$MAJOR" -ge 3 ]]; then
-            RUNTIME=$(curl -sL --fail --max-time 10 --retry 3 \
+            RUNTIME=$(curl -sL --fail --proto '=https' --tlsv1.2 --max-time 10 --retry 3 \
               "https://raw.githubusercontent.com/gitleaks/gitleaks-action/$LATEST/action.yml" \
               2>/dev/null | grep -oP 'using:\s*\K\S+' || echo "unknown")
             echo "Runtime for $LATEST: $RUNTIME"

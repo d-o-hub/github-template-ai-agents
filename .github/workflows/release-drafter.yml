@@ -32,7 +32,7 @@ jobs:
           node-version: '22'
 
       - name: Install conventional-changelog-cli
-        run: npm install -g conventional-changelog-cli
+        run: npm install -g --ignore-scripts conventional-changelog-cli@5.0.0
 
       - name: Generate changelog
         run: |

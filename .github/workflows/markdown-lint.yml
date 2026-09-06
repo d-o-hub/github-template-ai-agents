@@ -37,7 +37,7 @@ jobs:
           node-version: '20'
 
       - name: Install markdownlint-cli2
-        run: npm install -g markdownlint-cli2
+        run: npm install -g --ignore-scripts markdownlint-cli2@0.23.2
 
       - name: Run markdownlint
         run: |

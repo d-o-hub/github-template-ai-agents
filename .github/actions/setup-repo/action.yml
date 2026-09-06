@@ -37,7 +37,9 @@ runs:
       if: hashFiles('go.mod') != ''
 
     - name: Install Node dependencies
-      run: npm ci
+      # Lifecycle scripts kept enabled on purpose: consumer repos may need
+      # native-module postinstalls. Reviewed; accepted by design.
+      run: npm ci # NOSONAR
       shell: bash
       if: hashFiles('package.json') != ''
 
