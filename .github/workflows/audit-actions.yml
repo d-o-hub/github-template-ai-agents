@@ -40,7 +40,7 @@ jobs:
               continue
             fi
 
-            RUNTIME=$(curl -sL --fail \
+            RUNTIME=$(curl -sL --fail --proto '=https' --tlsv1.2 \
               "https://raw.githubusercontent.com/${ACTION}/${VERSION}/action.yml" \
               2>/dev/null | grep -oP 'using:\s*\K\S+' || echo "unknown")
 

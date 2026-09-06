@@ -12,7 +12,7 @@ STATUS=0
 if [[ -f ".secretlintrc.json" ]]; then
     printf "%bRunning Secretlint checks...%b\n" "$BLUE" "$NC"
     if command -v npx &> /dev/null; then
-        if ! npx -p secretlint -p @secretlint/secretlint-rule-preset-recommend secretlint "**/*"; then
+        if ! npx --ignore-scripts -p secretlint -p @secretlint/secretlint-rule-preset-recommend secretlint "**/*"; then # NOSONAR: developer gate bootstrap, scripts disabled
             printf "%b  ✗ secretlint failed%b\n" "$RED" "$NC"
             STATUS=1
         else
