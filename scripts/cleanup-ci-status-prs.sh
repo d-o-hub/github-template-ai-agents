@@ -19,6 +19,12 @@ gh auth status >/dev/null 2>&1 || { printf "ERROR: gh not authenticated\n" >&2; 
 # Pattern 2: LLM context regeneration PRs from github-actions[bot]
 # Pattern 3: Any bot-authored PR on auto/* or ci/* branches older than 1 day
 #   (stale threshold: 86400s = 24h; cleanup runs every 6h, so worst case ~30h)
+#
+# Title-matched patterns (1 and 2) use a 21600s = 6h threshold: a healthy
+# automerge PR converges within minutes of persist-ci-status.sh enabling
+# native auto-merge, so anything older than one cleanup cycle is genuinely
+# stuck. Without this threshold the janitor races (and historically lost
+# against) the auto-merge, closing fresh artifact PRs before they merged.
 
 close_prs() {
   local description="$1"
@@ -51,18 +57,36 @@ close_prs() {
   done
 }
 
+# filter_stale: reads "number<TAB>branch<TAB>createdAt" lines and prints only
+# those older than 6h. Age filtering lives in bash (not --jq) so malformed or
+# mocked input is skipped rather than closing bogus PR numbers.
+filter_stale() {
+  local threshold=21600
+  local now num branch ts ts_epoch
+  now=$(date -u +%s)
+  while IFS=$'\t' read -r num branch ts; do
+    [[ "$num" =~ ^[0-9]+$ ]] || continue
+    ts_epoch=$(date -u -d "$ts" +%s 2>/dev/null || echo 0)
+    if (( ts_epoch > 0 && now - ts_epoch > threshold )); then
+      printf '%s %s\n' "$num" "$branch"
+    fi
+  done
+}
+
 printf "%s\n" "Searching for stale automated PRs..."
 
-# CI status update PRs
+# CI status update PRs (only if older than 6h — see header comment)
 CI_PRS=$(gh pr list --repo "$REPO" --author "github-actions[bot]" --state open \
   --search "ci: update ci status artifacts" \
-  --json number,headRefName --jq '.[] | "\(.number) \(.headRefName)"' 2>/dev/null || true)
+  --json number,headRefName,createdAt \
+  --jq '.[] | "\(.number)\t\(.headRefName)\t\(.createdAt)"' 2>/dev/null | filter_stale || true)
 close_prs "stale CI status update PRs" "$CI_PRS"
 
-# LLM context regeneration PRs
+# LLM context regeneration PRs (only if older than 6h — see header comment)
 LLM_PRS=$(gh pr list --repo "$REPO" --author "github-actions[bot]" --state open \
   --search "ci: regenerate llms.txt" \
-  --json number,headRefName --jq '.[] | "\(.number) \(.headRefName)"' 2>/dev/null || true)
+  --json number,headRefName,createdAt \
+  --jq '.[] | "\(.number)\t\(.headRefName)\t\(.createdAt)"' 2>/dev/null | filter_stale || true)
 close_prs "stale LLM context regeneration PRs" "$LLM_PRS"
 
 # Any remaining bot PRs on auto/* or ci/* branches older than 24 hours
