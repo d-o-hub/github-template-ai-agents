@@ -32,8 +32,13 @@ PY
 }
 
 @test "fresh committed CI status passes without gh" {
+    # Hermetic: local environments may have an authenticated gh in /usr/bin,
+    # so shadow it with a stub whose auth check fails.
+    mkdir -p "$BATS_TMPDIR/nogh"
+    printf '#!/usr/bin/env bash\nexit 1\n' > "$BATS_TMPDIR/nogh/gh"
+    chmod +x "$BATS_TMPDIR/nogh/gh"
     write_status_file "$(utc_timestamp_seconds_ago 60)"
-    run env PATH="/usr/bin:/bin" "$TEST_REPO/scripts/check_ci_status_freshness.sh"
+    run env PATH="$BATS_TMPDIR/nogh:/usr/bin:/bin" "$TEST_REPO/scripts/check_ci_status_freshness.sh"
 
     [ "$status" -eq 0 ]
     [[ "$output" == *"OK: CI status JSON is fresh and valid"* ]]
@@ -92,15 +97,19 @@ MOCK
 }
 
 @test "passing committed status fails when authenticated gh reports cancelled run" {
+    # The cancelled run must be NEWER than the committed status: an older
+    # cancellation is already summarized by last_run and is not a disagreement.
+    local cancelled_run
+    cancelled_run="$(utc_timestamp_seconds_ago 30)"
     write_status_file "$(utc_timestamp_seconds_ago 60)"
-    cat > "$BATS_TMPDIR/gh" <<'MOCK'
+    cat > "$BATS_TMPDIR/gh" <<MOCK
 #!/usr/bin/env bash
-if [[ "$1" == "auth" && "$2" == "status" ]]; then
+if [[ "\$1" == "auth" && "\$2" == "status" ]]; then
   exit 0
 fi
-if [[ "$1" == "run" && "$2" == "list" ]]; then
-  cat <<'JSON'
-[{"status":"completed","conclusion":"cancelled","createdAt":"2026-06-09T00:00:00Z","url":"https://example.test/actions/runs/3"}]
+if [[ "\$1" == "run" && "\$2" == "list" ]]; then
+  cat <<JSON
+[{"status":"completed","conclusion":"cancelled","createdAt":"$cancelled_run","url":"https://example.test/actions/runs/3"}]
 JSON
   exit 0
 fi
