@@ -8,10 +8,16 @@ readonly CI_STATUS_FILE="${REPO_ROOT}/.github/ci-status/ci-status.json"
 readonly DEFAULT_CI_STATUS_MAX_AGE_SECONDS=86400
 readonly DEFAULT_CI_STATUS_BRANCH="main"
 readonly DEFAULT_CI_STATUS_RUN_LIMIT=5
+readonly DEFAULT_CI_STATUS_WORKFLOW="ci.yml"
 
 ci_status_max_age_seconds="${CI_STATUS_MAX_AGE_SECONDS:-$DEFAULT_CI_STATUS_MAX_AGE_SECONDS}"
 ci_status_branch="${CI_STATUS_BRANCH:-$DEFAULT_CI_STATUS_BRANCH}"
 ci_status_run_limit="${CI_STATUS_RUN_LIMIT:-$DEFAULT_CI_STATUS_RUN_LIMIT}"
+# ci-status.json describes the CI gate (ci.yml) only. Comparing against runs of
+# other workflows (e.g. CodeQL's default-setup "dynamic" runs, which fire on
+# every push to main regardless of [skip ci]) would flag the committed status
+# as stale right after every artifact merge.
+ci_status_workflow="${CI_STATUS_WORKFLOW:-$DEFAULT_CI_STATUS_WORKFLOW}"
 gh_runs_json=""
 gh_checked="false"
 
@@ -20,8 +26,9 @@ usage() {
 Usage: CI_STATUS_MAX_AGE_SECONDS=<seconds> $0
 
 Validates .github/ci-status/ci-status.json for required fields and freshness.
-If gh is installed and authenticated, compares the file to recent CI runs on
-"${DEFAULT_CI_STATUS_BRANCH}" (override with CI_STATUS_BRANCH).
+If gh is installed and authenticated, compares the file to recent runs of the
+"${DEFAULT_CI_STATUS_WORKFLOW}" gate workflow on "${DEFAULT_CI_STATUS_BRANCH}"
+(override with CI_STATUS_BRANCH / CI_STATUS_WORKFLOW).
 USAGE
 }
 
@@ -56,6 +63,7 @@ if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
   gh_checked="true"
   if ! gh_runs_json="$(gh run list \
     --branch "$ci_status_branch" \
+    --workflow "$ci_status_workflow" \
     --limit "$ci_status_run_limit" \
     --json status,conclusion,createdAt,url)"; then
     printf 'WARNING: gh is authenticated but recent CI runs could not be fetched; skipping remote comparison.\n' >&2
@@ -174,7 +182,11 @@ if gh_checked and last_run is not None and status == "passing":
         run_status = run.get("status")
         run_conclusion = run.get("conclusion")
         run_url = run.get("url", "<unknown-url>")
-        if run_created is not None and run_created > last_run:
+        if run_created is not None and run_created <= last_run:
+            # Older than the committed status: already summarized by last_run
+            # (e.g. runs cancelled because a newer push superseded them).
+            continue
+        if run_created is not None:
             errors.append(
                 f"{INCONSISTENT_PASSING_MESSAGE}: run newer than last_run ({run_created.isoformat()} {run_url})"
             )
