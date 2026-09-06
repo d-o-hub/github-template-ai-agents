@@ -101,5 +101,5 @@ setup() {
 @test "doctor.sh prints structured pass/fail messages" {
     run ./scripts/doctor.sh
     # Either pass or fail, output should include section headers
-    echo "$output" | grep -q '==>'
+    [[ "$output" == *"==>"* ]]
 }
