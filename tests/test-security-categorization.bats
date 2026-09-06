@@ -22,6 +22,10 @@ setup() {
     
     run categorize_command "r\\m -rf /"
     [ "$output" = "dangerous" ]
+
+    local cmd_multiline=$'rm \\\n-rf /'
+    run categorize_command "$cmd_multiline"
+    [ "$output" = "dangerous" ]
 }
 
 @test "harden-command-categorization: detects commands near metacharacters" {

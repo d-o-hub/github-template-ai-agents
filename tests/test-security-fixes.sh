@@ -61,7 +61,7 @@ EOF
 
 # Run script and check output
 OUTPUT=$("$TEST_ROOT/scripts/validate-skills.sh" 2>&1)
-if echo "$OUTPUT" | grep -q "skill-rules.json: 2 rules defined"; then
+if [[ "$OUTPUT" == *"skill-rules.json: 2 rules defined"* ]]; then
     echo "  ✓ Test 2 passed"
 else
     echo "  ✗ Test 2 failed: Output was: $OUTPUT"

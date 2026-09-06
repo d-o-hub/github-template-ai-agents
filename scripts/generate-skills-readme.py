@@ -5,6 +5,12 @@ from pathlib import Path
 import re
 import sys
 
+# Ensure scripts directory is in sys.path for lib imports
+repo_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(repo_root / "scripts"))
+
+from lib.paths import PathValidationError, validate_safe_path
+
 
 def extract_frontmatter(skill_file: Path) -> dict:
     """Extract YAML frontmatter from a SKILL.md file."""
@@ -53,6 +59,12 @@ def main() -> int:
     skills = []
     for skill_path in sorted(skills_dir.iterdir()):
         if not skill_path.is_dir() or skill_path.name.startswith("_"):
+            continue
+        try:
+            validate_safe_path(
+                skill_path.name, skills_dir, "skill", check_forbidden=True
+            )
+        except PathValidationError:
             continue
         skill_file = skill_path / "SKILL.md"
         if not skill_file.is_file():
