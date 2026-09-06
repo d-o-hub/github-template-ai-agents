@@ -56,10 +56,10 @@ teardown() {
     run grep -A 15 "## \[1.2.4\]" .template/CHANGELOG-TEMPLATE.md
 
     # Check if we have the headers we expect
-    echo "$output" | grep "### Added"
-    echo "$output" | grep "\- feat: add amazing new feature"
-    echo "$output" | grep "### Fixed"
-    echo "$output" | grep "\- fix: resolve critical bug"
-    echo "$output" | grep "### Changed"
-    echo "$output" | grep "\- chore: some internal update"
+    [[ "$output" == *"### Added"* ]]
+    [[ "$output" == *"- feat: add amazing new feature"* ]]
+    [[ "$output" == *"### Fixed"* ]]
+    [[ "$output" == *"- fix: resolve critical bug"* ]]
+    [[ "$output" == *"### Changed"* ]]
+    [[ "$output" == *"- chore: some internal update"* ]]
 }
