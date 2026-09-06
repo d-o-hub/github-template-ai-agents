@@ -1,59 +1,63 @@
 {
-  "nextAvailable": {
-    "plan": "001",
-    "adr": "adr-033"
+ "nextAvailable": {
+  "plan": "001",
+  "adr": "adr-035"
+ },
+ "active_plan": null,
+ "phases": [],
+ "handover_ref": null,
+ "entries": {
+  "adr-007-dependabot-auto-merge-ruleset.md": {
+   "status": "accepted",
+   "date": "2026-06-02"
   },
-  "active_plan": null,
-  "phases": [],
-  "handover_ref": null,
-  "entries": {
-    "adr-007-dependabot-auto-merge-ruleset.md": {
-      "status": "accepted",
-      "date": "2026-06-02"
-    },
-    "adr-008-enforce-conventional-commits.md": {
-      "status": "accepted",
-      "date": "2026-06-07"
-    },
-    "adr-009-session-start-hook.md": {
-      "status": "accepted",
-      "date": "2026-06-07"
-    },
-    "adr-010-automated-pr-auto-merge.md": {
-      "status": "accepted",
-      "date": "2026-06-08"
-    },
-    "adr-011-adopt-p0-primitives-from-do-gist-hub.md": {
-      "status": "accepted",
-      "date": "2026-06-16"
-    },
-    "adr-027-ci-node24-migration.md": {
-      "status": "accepted",
-      "date": "2026-06-16"
-    },
-    "adr-028-ci-status-staleness-external-dep.md": {
-      "status": "accepted",
-      "date": "2026-06-19"
-    },
-    "adr-029-add-cli-interface.md": {
-      "status": "accepted",
-      "date": "2026-06-19"
-    },
-    "adr-030-template-improvement-recommendations.md": {
-      "status": "accepted",
-      "date": "2026-07-15"
-    },
-    "adr-031-per-agent-metrics.md": {
-      "status": "accepted",
-      "date": "2026-07-29"
-    },
-    "adr-032-template-audit-remediation.md": {
-      "status": "accepted",
-      "date": "2026-08-01"
-    },
-    "adr-033-ci-status-false-green.md": {
-      "status": "accepted",
-      "date": "2026-08-14"
-    }
+  "adr-008-enforce-conventional-commits.md": {
+   "status": "accepted",
+   "date": "2026-06-07"
+  },
+  "adr-009-session-start-hook.md": {
+   "status": "accepted",
+   "date": "2026-06-07"
+  },
+  "adr-010-automated-pr-auto-merge.md": {
+   "status": "accepted",
+   "date": "2026-06-08"
+  },
+  "adr-011-adopt-p0-primitives-from-do-gist-hub.md": {
+   "status": "accepted",
+   "date": "2026-06-16"
+  },
+  "adr-027-ci-node24-migration.md": {
+   "status": "accepted",
+   "date": "2026-06-16"
+  },
+  "adr-028-ci-status-staleness-external-dep.md": {
+   "status": "accepted",
+   "date": "2026-06-19"
+  },
+  "adr-029-add-cli-interface.md": {
+   "status": "accepted",
+   "date": "2026-06-19"
+  },
+  "adr-030-template-improvement-recommendations.md": {
+   "status": "accepted",
+   "date": "2026-07-15"
+  },
+  "adr-031-per-agent-metrics.md": {
+   "status": "accepted",
+   "date": "2026-07-29"
+  },
+  "adr-032-template-audit-remediation.md": {
+   "status": "accepted",
+   "date": "2026-08-01"
+  },
+  "adr-033-ci-status-false-green.md": {
+   "status": "accepted",
+   "date": "2026-08-14"
+  },
+  "adr-034-ci-status-persistence-redesign.md": {
+   "status": "accepted",
+   "date": "2026-09-06"
   }
+ }
 }
