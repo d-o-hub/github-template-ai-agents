@@ -14,6 +14,19 @@ LABEL="${CI_STATUS_SYNC_LABEL:-automerge}"
 TITLE="${CI_STATUS_TITLE:-ci: update ci status artifacts [skip ci]}"
 BODY="${CI_STATUS_BODY:-Automated CI status artifacts update. Merged by the template automerge workflow.}"
 
+# GitHub suppresses workflow triggers for events caused by GITHUB_TOKEN, so
+# auto-merge-non-deps.yml never fires for PRs this script creates and native
+# auto-merge is never enabled. Enable it here directly; GitHub merges once
+# branch rules (e.g. up-to-date) are met.
+enable_automerge() {
+  local pr="$1"
+  if gh pr merge "$pr" --squash --auto >/dev/null 2>&1; then
+    printf 'Auto-merge enabled for PR #%s.\n' "$pr"
+  else
+    printf 'WARNING: could not enable auto-merge for PR #%s; it will be re-pointed on the next CI run.\n' "$pr" >&2
+  fi
+}
+
 git config user.name "github-actions[bot]"
 git config user.email "github-actions[bot]@users.noreply.github.com"
 
@@ -38,6 +51,7 @@ pr_number="$(gh pr list --base main --head "$BRANCH" --state open --json number 
 if [[ -n "$pr_number" ]]; then
   gh pr edit "$pr_number" --title "$TITLE" --body "$BODY" --add-label "$LABEL" >/dev/null 2>&1 || true
   printf 'Updated existing CI status PR #%s.\n' "$pr_number"
+  enable_automerge "$pr_number"
   exit 0
 fi
 
@@ -46,6 +60,7 @@ if [[ -n "$pr_url" ]]; then
   # perf: replace external basename subshell with native bash expansion
   pr_number="${pr_url##*/}"
   printf 'Created CI status PR #%s.\n' "$pr_number"
+  enable_automerge "$pr_number"
 else
   printf 'WARNING: could not create/update CI status PR for branch %s.\n' "$BRANCH" >&2
   exit 1

@@ -10,12 +10,12 @@ elif [ "$1" = "repo" ]; then
     echo "owner/repo"
 elif [ "$1" = "pr" ]; then
     if [ "$2" = "list" ]; then
-        # Match CI status update PRs
+        # Match CI status update PRs (old enough to pass the 6h threshold)
         if [[ "$*" == *"--search"* ]] && [[ "$*" == *"ci: update ci status artifacts"* ]]; then
-            echo "123 branch-123"
-        # Match LLM regeneration PRs
+            printf '123\tbranch-123\t2020-01-01T00:00:00Z\n'
+        # Match LLM regeneration PRs (old enough to pass the 6h threshold)
         elif [[ "$*" == *"--search"* ]] && [[ "$*" == *"ci: regenerate llms.txt"* ]]; then
-            echo "456 auto/regenerate-llms-txt"
+            printf '456\tauto/regenerate-llms-txt\t2020-01-01T00:00:00Z\n'
         # Match stale bot PRs on auto/ci branches (>24h)
         elif [[ "$*" == *"--json"* ]] && [[ "$*" == *"createdAt"* ]]; then
             echo ""
@@ -69,6 +69,31 @@ MOCK
     [ "$status" -eq 0 ]
     [[ "$output" == *"Retrying close without branch delete for PR #123"* ]]
     [[ "$output" == *"API call: api -X DELETE repos/owner/repo/git/refs/heads/branch-123"* ]]
+}
+
+@test "cleanup script skips fresh CI status PRs (under 6h)" {
+    # Override the mock: a just-reopened artifact PR must NOT be closed
+    cat << "MOCK" > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "auth" ] && [ "$2" = "status" ]; then
+    exit 0
+elif [ "$1" = "repo" ]; then
+    echo "owner/repo"
+elif [ "$1" = "pr" ]; then
+    if [ "$2" = "list" ]; then
+        if [[ "$*" == *"--search"* ]] && [[ "$*" == *"ci: update ci status artifacts"* ]]; then
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            printf '789\tci/ci-status-update\t%s\n' "$NOW"
+        else
+            echo ""
+        fi
+    fi
+fi
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/cleanup-ci-status-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"Closing PR #789"* ]]
 }
 
 @test "cleanup script fails fast when gh is not authenticated" {
