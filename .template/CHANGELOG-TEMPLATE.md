@@ -47,6 +47,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - chore: fix .gitignore malformed pattern and dedupe entries
 - chore: remove duplicate comment block in quality_gate.sh
 
+## [0.2.13] - 2026-09-06
+
+### Security
+
+- fix(security): harden path validation for VPN configs, keychains, and DB histories (#834)
+- fix(security): expand path validation sensitive pattern matching (netrc/npmrc variants) (#823)
+- fix(security): expand path validation forbidden list for sensitive configs (#826)
+- fix(security): harden path validation in skill readme generator (#832)
+- fix(security): sanitize backslash-newline line continuations in command categorization (#798)
+- fix(security): update codeql-action sha pin in security-scan workflow (#820)
+- fix(security): remediate sonar new-code security findings (curl proto, npm/pip pinning) (#837)
+- fix(security): pin python tool deps in setup-repo action (#838)
+
+### Fixed
+
+- fix(ci): unblock ci status artifact persistence loop (#839)
+- fix(ci): scope ci status freshness check to the ci gate workflow (#841)
+- fix(tests): rotate codeql sha pins in workflow versions test (#836)
+
+### Changed
+
+- perf: eliminate subshells and grep forks in scripts and tests (#800, #803, #811, #816, #830)
+- ci: bump the github-actions group and markdownlint-cli (#804, #827)
+
+### Added
+
+- feat(turso-db): sync with latest Turso docs (v0.7.2) (#801)
+- docs(dora): update monthly DORA performance report (#825)
+
 ## [0.2.12] - 2026-08-20
 
 ### Added
