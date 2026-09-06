@@ -44,7 +44,7 @@ runs:
       if: hashFiles('package.json') != ''
 
     - name: Install Python dependencies
-      run: pip install ruff black pytest
+      run: "pip install --only-binary=:all: 'ruff==0.16.6' 'black==26.5.1' 'pytest==9.1.1'"
       shell: bash
       if: >-
         hashFiles('requirements.txt') != '' ||
