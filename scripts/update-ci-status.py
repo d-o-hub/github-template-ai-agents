@@ -54,23 +54,29 @@ def update_markdown(status, last_run, workflow_url, needs):
         "skipped": "⏭️"
     }
 
+    skipped_jobs = sorted([job for job in needs if needs[job].get("result") == "skipped"])
+
+    # Built as sections so blank-line rules (markdownlint MD022/MD012) always hold:
+    # exactly one blank line between blocks and a single trailing newline.
+    sections = [
+        "# CI Summary",
+        "",
+        f"Latest CI status: **{status}**",
+        "",
+        f"- **Last Run:** {last_run}",
+        f"- **Workflow URL:** [{workflow_url}]({workflow_url})",
+    ]
+    if skipped_jobs:
+        sections += ["", f"> ⚠️ Skipped jobs: {', '.join(skipped_jobs)}"]
+    sections += ["", "## Job Status", "", "| Job | Result |", "| --- | --- |"]
+    for job in sorted(needs.keys()):
+        res = needs[job].get("result", "unknown")
+        emoji = emojis.get(res, "⚠️")
+        sections.append(f"| {job} | {emoji} {res} |")
+
     path = os.path.join(get_ci_dir(), "ci-summary.md")
     with open(path, "w", encoding="utf-8") as f:
-        f.write("# CI Summary\n\n")
-        f.write(f"Latest CI status: **{status}**\n\n")
-        f.write(f"- **Last Run:** {last_run}\n")
-        f.write(f"- **Workflow URL:** [{workflow_url}]({workflow_url})\n\n")
-        skipped_jobs = sorted([job for job in needs if needs[job].get("result") == "skipped"])
-        if skipped_jobs:
-            f.write(f"> ⚠️ Skipped jobs: {', '.join(skipped_jobs)}\n")
-        f.write("## Job Status\n\n")
-        f.write("| Job | Result |\n")
-        f.write("| --- | --- |\n")
-
-        for job in sorted(needs.keys()):
-            res = needs[job].get("result", "unknown")
-            emoji = emojis.get(res, "⚠️")
-            f.write(f"| {job} | {emoji} {res} |\n")
+        f.write("\n".join(sections) + "\n")
 
 def main():
     needs_json = os.environ.get("NEEDS_JSON", "{}")
