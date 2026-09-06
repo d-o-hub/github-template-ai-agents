@@ -1,0 +1,36 @@
+---
+name: Duplicate PR Guard
+
+on:  # yamllint disable-line rule:truthy
+  schedule:
+    - cron: '45 */6 * * *'  # Offset from the ci-status janitor (30 past)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Report only (do not comment/close/label)'
+        required: false
+        default: 'true'
+        type: boolean
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  guard:
+    name: Detect duplicate PRs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Detect and defuse duplicate PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Scheduled runs act live; manual dispatch defaults to dry-run.
+          DRY_RUN: ${{ github.event_name == 'schedule' && 'false' || 'true' }}
+        run: |
+          set -e
+          chmod +x scripts/detect-duplicate-prs.sh
+          ./scripts/detect-duplicate-prs.sh
