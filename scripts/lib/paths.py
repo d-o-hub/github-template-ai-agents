@@ -1,6 +1,7 @@
 # scripts/lib/paths.py
 # Security Hardening: 2026-07-06 - Expanded forbidden paths.
 # Security Hardening: 2026-07-07 - Case-insensitive forbidden path validation.
+# Security Hardening: 2026-08-18 - Added VPN, keychain, and DB history file pattern protections.
 """Path validation utilities for CLI scripts."""
 
 from __future__ import annotations
@@ -67,6 +68,8 @@ FORBIDDEN_PATHS = frozenset({
     ".mysql_history",
     ".psql_history",
     ".sqlite_history",
+    ".rediscli_history",
+    ".dbshell",
     "terraform.tfstate.backup",
     ".terraform",  # Directory: blocks .terraform/ and its contents
     "id_rsa",
@@ -125,8 +128,17 @@ FORBIDDEN_PATHS_LOWER = frozenset({p.lower() for p in FORBIDDEN_PATHS})
 
 # Module-level constants for pattern-based sensitive file validation to avoid string duplication.
 SENSITIVE_PREFIXES = (
-    ".env", "client_secret", "kubeconfig", "secret", "credential", "netrc", ".netrc",
-    ".npmrc", ".yarnrc", ".pypirc", "auth.json"
+    ".env",
+    "client_secret",
+    "kubeconfig",
+    "secret",
+    "credential",
+    "netrc",
+    ".netrc",
+    ".npmrc",
+    ".yarnrc",
+    ".pypirc",
+    "auth.json",
 )
 
 SENSITIVE_SUFFIXES = (
@@ -137,7 +149,16 @@ SENSITIVE_SUFFIXES = (
     "credentials.json", "client_secret.json", "kubeconfig",
     ".secrets", ".credentials", ".vault", "secrets.json",
     "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml",
-    ".ovpn", ".kdbx", ".keychain", ".keychain-db"
+    ".ovpn", ".kdbx", ".keychain", ".keychain-db", ".keyring", ".kdb",
+)
+
+SSH_KEY_PREFIXES = (
+    "identity",
+    "id_rsa",
+    "id_dsa",
+    "id_ecdsa",
+    "id_ed25519",
+    "id_xmss",
 )
 
 
@@ -187,7 +208,7 @@ def validate_safe_path(
                 part_lower.startswith(SENSITIVE_PREFIXES) or
                 part_lower.endswith(SENSITIVE_SUFFIXES) or
                 (
-                    part_lower.startswith(("identity", "id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", "id_xmss")) and
+                    part_lower.startswith(SSH_KEY_PREFIXES) and
                     not part_lower.endswith(".pub")
                 )
             ):
