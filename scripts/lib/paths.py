@@ -135,6 +135,8 @@ FORBIDDEN_PATHS_LOWER = frozenset({p.lower() for p in FORBIDDEN_PATHS})
 SENSITIVE_PREFIXES = (
     ".env",
     "client_secret",
+    "service_account",
+    "service-account",
     "kubeconfig",
     "secret",
     "credential",
