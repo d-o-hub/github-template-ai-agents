@@ -52,7 +52,11 @@
     run bash -c 'for skill_file in .agents/skills/*/SKILL.md; do
         line_count=$(wc -l < "$skill_file")
         if [ "$line_count" -gt 250 ]; then
-            echo "WARNING: $(basename $(dirname $skill_file)) has $line_count lines"
+            # perf: replace external basename and dirname subshells with native bash parameter expansion
+            # Expected Impact: Eliminates process fork overhead per skill file, improving test execution speed.
+            dir="${skill_file%/*}"
+            skill_name="${dir##*/}"
+            echo "WARNING: $skill_name has $line_count lines"
         fi
     done'
     # This test always passes - it just logs warnings
