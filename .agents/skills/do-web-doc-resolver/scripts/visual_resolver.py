@@ -271,6 +271,7 @@ class VlmCaptioner:
             method="POST",
         )
 
+        # nosec B310 -- fixed https endpoint, no user-controlled scheme, request now timeout-bounded
         with urllib.request.urlopen(req, timeout=self.timeout_s) as response:
             res_data = json.loads(response.read().decode())
             return cast(str, res_data["choices"][0]["message"]["content"].strip())
@@ -297,6 +298,7 @@ class VlmCaptioner:
             method="POST",
         )
 
+        # nosec B310 -- fixed endpoint (local Ollama), no user-controlled scheme, request now timeout-bounded
         with urllib.request.urlopen(req, timeout=self.timeout_s) as response:
             res_data = json.loads(response.read().decode())
             return cast(str, res_data["response"].strip())

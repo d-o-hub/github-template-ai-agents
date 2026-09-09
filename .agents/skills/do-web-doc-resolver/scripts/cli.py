@@ -107,4 +107,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         pass
     finally:
-        from scripts.state import routing_memory
+        # Flush records that landed inside the throttled auto-save window.
+        from scripts.state import routing_memory  # noqa: E402
+
+        routing_memory.save()
