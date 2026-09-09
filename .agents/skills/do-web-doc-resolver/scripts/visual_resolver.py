@@ -60,6 +60,7 @@ class VisualConfig:
     scroll_frames: int = 3
     caption_model: str = "qwen/qwen2.5-vl-7b-instruct:free"
     caption_max_tokens: int = 512
+    caption_timeout_s: float = 30.0
     enabled: bool = True
     clip_model_name: str = "clip-ViT-B-32"
 
@@ -87,6 +88,13 @@ class VisualConfig:
                 config_dict["clip_threshold"] = float(env_threshold)
             except ValueError:
                 logger.warning("Invalid DO_WDR_VISUAL_THRESHOLD: %s", env_threshold)
+
+        env_timeout = os.getenv("DO_WDR_VISUAL_TIMEOUT")
+        if env_timeout:
+            try:
+                config_dict["caption_timeout_s"] = float(env_timeout)
+            except ValueError:
+                logger.warning("Invalid DO_WDR_VISUAL_TIMEOUT: %s", env_timeout)
 
         res = cls()
         for k, v in config_dict.items():
@@ -201,9 +209,10 @@ class ClipEncoder:
 
 
 class VlmCaptioner:
-    def __init__(self, model: str, max_tokens: int):
+    def __init__(self, model: str, max_tokens: int, timeout_s: float = 30.0):
         self.model = model
         self.max_tokens = max_tokens
+        self.timeout_s = timeout_s
         self.system_prompt = (
             "You are a document analysis assistant. Describe the page content, "
             "focusing on the query context. Output compact GitHub Flavored Markdown."
@@ -262,7 +271,7 @@ class VlmCaptioner:
             method="POST",
         )
 
-        with urllib.request.urlopen(req) as response:  # nosec B310 -- fixed https endpoint, no user-controlled scheme
+        with urllib.request.urlopen(req, timeout=self.timeout_s) as response:
             res_data = json.loads(response.read().decode())
             return cast(str, res_data["choices"][0]["message"]["content"].strip())
 
@@ -288,7 +297,7 @@ class VlmCaptioner:
             method="POST",
         )
 
-        with urllib.request.urlopen(req) as response:  # nosec B310 -- fixed endpoint, no user-controlled scheme
+        with urllib.request.urlopen(req, timeout=self.timeout_s) as response:
             res_data = json.loads(response.read().decode())
             return cast(str, res_data["response"].strip())
 
@@ -323,7 +332,9 @@ class VisualResolver:
         self.cfg = cfg or VisualConfig.from_toml()
         self.engine = ScreenshotEngine(self.cfg)
         self.encoder: ClipEncoder | None = None
-        self.captioner = VlmCaptioner(self.cfg.caption_model, self.cfg.caption_max_tokens)
+        self.captioner = VlmCaptioner(
+            self.cfg.caption_model, self.cfg.caption_max_tokens, self.cfg.caption_timeout_s
+        )
 
     def is_available(self) -> bool:
         """Returns False if cfg.enabled=False or any required import fails."""
