@@ -118,7 +118,7 @@ def test_validate_safe_path_patterns(tmp_path):
         "kubeconfig", "kubeconfig_prod",
         "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
         "netrc_backup", ".netrc_old", ".npmrc_custom", ".yarnrc_custom", ".pypirc_prod",
-        "auth.json_copy"
+        "auth.json_copy", "token_credentials.json", "token.json", "api_key.txt", "api_key_prod"
     ]
     for p in prefix_patterns:
         with pytest.raises(PathValidationError):
