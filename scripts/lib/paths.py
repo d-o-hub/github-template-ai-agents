@@ -146,6 +146,8 @@ SENSITIVE_PREFIXES = (
     ".yarnrc",
     ".pypirc",
     "auth.json",
+    "token",
+    "api_key",
 )
 
 SENSITIVE_SUFFIXES = (
