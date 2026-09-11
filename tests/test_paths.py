@@ -126,7 +126,8 @@ def test_validate_safe_path_patterns(tmp_path):
 
     # Additional sensitive extension suffix patterns
     additional_suffixes = [
-        "vpn_config.ovpn", "passwords.kdbx", "login.keychain", "user.keychain-db"
+        "vpn_config.ovpn", "passwords.kdbx", "login.keychain", "user.keychain-db",
+        "config.env", "app.env"
     ]
     for p in additional_suffixes:
         with pytest.raises(PathValidationError):
