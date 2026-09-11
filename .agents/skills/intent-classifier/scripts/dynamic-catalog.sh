@@ -34,18 +34,38 @@ HEADER
 # Process each skill
 for skill_path in "$SKILLS_DIR"/*/; do
     if [[ -f "$skill_path/SKILL.md" ]]; then
-        skill_name=$(basename "$skill_path")
+        # perf: replace external basename subshell with native bash expansion
+        skill_name="${skill_path%/}"
+        skill_name="${skill_name##*/}"
         
         # Extract description from frontmatter
         description=$(awk '/^---$/{p=!p;next} p && /^description:/{gsub(/^description: /,""); print; exit}' "$skill_path/SKILL.md" 2>/dev/null || echo "No description available")
         
         # Extract keywords (first 5 words from description, excluding common words)
-        triggers=$(echo "$description" | tr '[:upper:]' '[:lower:]' | \
-            grep -oE '\b[a-z]+\b' | \
-            grep -vE '^(use|when|the|and|or|for|to|with|a|an|this|that|these|those|is|are|was|were|be|been|have|has|had|do|does|did|will|would|could|should|may|might|can|shall|must|need|want|ask)$' | \
-            head -5 | \
-            tr '\n' ',' | \
-            sed 's/,$//')
+        # perf: replace external subshells and process forks with native bash manipulation
+        desc_lower="${description,,}"
+        # Split on non-alphabetic characters like the original grep -oE '\b[a-z]+\b'
+        IFS=$' \t\n\r\f\v!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~' read -ra words <<< "$desc_lower"
+
+        triggers=""
+        trigger_count=0
+        for word in "${words[@]}"; do
+            # Ignore numbers
+            word="${word//[0-9]/}"
+
+            if [[ -z "$word" ]] || [[ "$word" =~ ^(use|when|the|and|or|for|to|with|a|an|this|that|these|those|is|are|was|were|be|been|have|has|had|do|does|did|will|would|could|should|may|might|can|shall|must|need|want|ask)$ ]]; then
+                continue
+            fi
+            if [[ -z "$triggers" ]]; then
+                triggers="$word"
+            else
+                triggers="$triggers,$word"
+            fi
+            ((trigger_count++))
+            if [[ $trigger_count -ge 5 ]]; then
+                break
+            fi
+        done
         
         # Truncate description for table
         short_desc="${description:0:100}"
