@@ -146,6 +146,8 @@ SENSITIVE_PREFIXES = (
     ".yarnrc",
     ".pypirc",
     "auth.json",
+    "token",
+    "api_key",
 )
 
 SENSITIVE_SUFFIXES = (
@@ -157,6 +159,7 @@ SENSITIVE_SUFFIXES = (
     ".secrets", ".credentials", ".vault", "secrets.json",
     "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml",
     ".ovpn", ".kdbx", ".keychain", ".keychain-db", ".keyring", ".kdb",
+    ".env",
 )
 
 SSH_KEY_PREFIXES = (
