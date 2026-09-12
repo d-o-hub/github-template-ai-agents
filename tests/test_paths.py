@@ -118,7 +118,7 @@ def test_validate_safe_path_patterns(tmp_path):
         "kubeconfig", "kubeconfig_prod",
         "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
         "netrc_backup", ".netrc_old", ".npmrc_custom", ".yarnrc_custom", ".pypirc_prod",
-        "auth.json_copy"
+        "auth.json_copy", "token_secret.json", "token.txt", "api_key_prod", "api_key.json"
     ]
     for p in prefix_patterns:
         with pytest.raises(PathValidationError):
@@ -126,7 +126,8 @@ def test_validate_safe_path_patterns(tmp_path):
 
     # Additional sensitive extension suffix patterns
     additional_suffixes = [
-        "vpn_config.ovpn", "passwords.kdbx", "login.keychain", "user.keychain-db"
+        "vpn_config.ovpn", "passwords.kdbx", "login.keychain", "user.keychain-db",
+        "config.env", "prod.env", "secrets.env"
     ]
     for p in additional_suffixes:
         with pytest.raises(PathValidationError):
