@@ -44,16 +44,14 @@ for skill_path in "$SKILLS_DIR"/*/; do
         # Extract keywords (first 5 words from description, excluding common words)
         # perf: replace external subshells and process forks with native bash manipulation
         desc_lower="${description,,}"
-        # Split on non-alphabetic characters like the original grep -oE '\b[a-z]+\b'
-        IFS=$' \t\n\r\f\v!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~' read -ra words <<< "$desc_lower"
-
+        # Extract [a-z]+ word runs like the original grep -oE '\b[a-z]+\b'
         triggers=""
         trigger_count=0
-        for word in "${words[@]}"; do
-            # Ignore numbers
-            word="${word//[0-9]/}"
-
-            if [[ -z "$word" ]] || [[ "$word" =~ ^(use|when|the|and|or|for|to|with|a|an|this|that|these|those|is|are|was|were|be|been|have|has|had|do|does|did|will|would|could|should|may|might|can|shall|must|need|want|ask)$ ]]; then
+        remainder="$desc_lower"
+        while [[ "$remainder" =~ ([a-z]+)(.*)$ ]] && [[ $trigger_count -lt 5 ]]; do
+            word="${BASH_REMATCH[1]}"
+            remainder="${BASH_REMATCH[2]}"
+            if [[ "$word" =~ ^(use|when|the|and|or|for|to|with|a|an|this|that|these|those|is|are|was|were|be|been|have|has|had|do|does|did|will|would|could|should|may|might|can|shall|must|need|want|ask)$ ]]; then
                 continue
             fi
             if [[ -z "$triggers" ]]; then
@@ -61,10 +59,7 @@ for skill_path in "$SKILLS_DIR"/*/; do
             else
                 triggers="$triggers,$word"
             fi
-            ((trigger_count++))
-            if [[ $trigger_count -ge 5 ]]; then
-                break
-            fi
+            trigger_count=$((trigger_count + 1))
         done
         
         # Truncate description for table
