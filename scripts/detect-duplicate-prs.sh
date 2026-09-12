@@ -56,7 +56,15 @@ flag_superseded() {
   gh pr comment "$pr" \
     --body "$MARKER
 Possible duplicate: this PR shares most of its meaningful files with newer PR #$newer. If #$newer covers the same change, close this one; otherwise close #$newer. Labeled \`$LABEL\` for triage. See ADR-034."
-  gh pr edit "$pr" --add-label "$LABEL" >/dev/null 2>&1 || true
+  if ! gh pr edit "$pr" --add-label "$LABEL" >/dev/null 2>&1; then
+    # A missing repo label makes --add-label fail; flags would stay comment-only
+    # and invisible to label-based triage. Create the label once and retry.
+    gh label create "$LABEL" \
+      --description "Open PR sharing most meaningful files with a newer PR; close the stale one (ADR-034)" \
+      --color d4c5f9 >/dev/null 2>&1 || true
+    gh pr edit "$pr" --add-label "$LABEL" >/dev/null 2>&1 ||
+      printf 'Warning: PR #%s flagged but not labeled (%s missing/unavailable)\n' "$pr" "$LABEL" >&2
+  fi
   FLAGGED_COUNT=$((FLAGGED_COUNT + 1))
   printf 'Flagged PR #%s as superseded-candidate (overlaps #%s)\n' "$pr" "$newer"
 }

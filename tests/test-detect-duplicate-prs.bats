@@ -170,3 +170,50 @@ MOCK
     [[ "$output" == *"Skipping PR #401 (already flagged by a previous run)"* ]]
     [[ "$(actions)" == "" ]]
 }
+
+@test "self-heals: creates missing label and retries when labeling fails" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '501\t2026-09-01T00:00:00Z\n'
+    printf '502\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    if [[ "$*" == *"--name-only"* ]]; then
+        case "$3" in
+            501) printf 'src/feat.sh\nsrc/other.sh\n';;
+            502) printf 'src/feat.sh\nsrc/other.sh\nsrc/new.sh\n';;
+        esac
+    else
+        case "$3" in
+            501) printf 'diff --git a/src/feat.sh b/src/feat.sh\n@@\n-a\n+b\n';;
+            502) printf 'diff --git a/src/feat.sh b/src/feat.sh\n@@\n-a\n+c\n';;
+        esac
+    fi
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    # Simulate a repo missing the label: --add-label fails until it is created.
+    if [ -f "$BATS_TMPDIR/label-exists" ]; then
+        echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+    else
+        exit 1
+    fi
+elif [ "$1" = "label" ] && [ "$2" = "create" ]; then
+    touch "$BATS_TMPDIR/label-exists"
+    echo "CREATED-LABEL" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Flagged PR #501 as superseded-candidate (overlaps #502)"* ]]
+    [[ "$(actions)" == *"COMMENTED 501"* ]]
+    [[ "$(actions)" == *"CREATED-LABEL"* ]]
+    [[ "$(actions)" == *"LABELED 501"* ]]
+    [[ "$(actions)" != *"CLOSED 501"* ]]
+}
