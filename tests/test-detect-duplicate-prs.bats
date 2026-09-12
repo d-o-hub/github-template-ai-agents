@@ -278,3 +278,40 @@ MOCK
     [[ "$output" == *"Flagged PR #701 as superseded-candidate (overlaps #702)"* ]]
     [[ "$(actions)" != *"CLOSED 701"* ]]
 }
+
+@test "task siblings: flags the older PR re-run of the same Jules task" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '801\t2026-09-01T00:00:00Z\n'
+    printf '802\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    # Disjoint files: no file-overlap signal, only the task id ties them.
+    case "$3" in
+        801) printf 'diff --git a/src/one.sh b/src/one.sh\n@@\n-1\n+2\n';;
+        802) printf 'diff --git a/docs/two.md b/docs/two.md\n@@\n-3\n+4\n';;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    if [ "$5" = "body" ]; then
+        printf 'PR created automatically by Jules for task [777777777777777777](https://jules.google.com/task/777777777777777777) started by @d-o-hub'
+    else
+        printf '{"comments":[]}'
+    fi
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Flagged PR #801 as superseded-candidate (same Jules task as #802)"* ]]
+    [[ "$(actions)" == *"COMMENTED 801"* ]]
+    [[ "$(actions)" == *"LABELED 801"* ]]
+    [[ "$(actions)" != *"CLOSED 801"* ]]
+    [[ "$(actions)" != *"COMMENTED 802"* ]]
+}
