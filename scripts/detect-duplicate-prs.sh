@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# detect-duplicate-prs.sh - Detect and defuse duplicate open PRs (ADR-034 guard).
+# detect-duplicate-prs.sh - Detect and defuse duplicate open PRs (ADR-035 guard).
 #
 # Motivation: automation spawned ~20 redundant PRs in one month (5 byte-identical
 # codeql pin PRs, 10 overlapping paths.py PRs, 9 subshell-perf PRs). Behavior:
 #   - EXACT duplicates (byte-identical diffs): comment + close all but the
 #     newest PR in the group.
+#   - SUBSET duplicates (older PR's meaningful files strictly contained in a
+#     newer PR's file set with byte-identical per-file patches): comment +
+#     close the older PR.
 #   - NEAR duplicates (>=70% of the smaller PR's meaningful files shared with a
 #     newer PR; diary/generated files excluded): comment + label
 #     'superseded-candidate', never close automatically.
@@ -37,10 +40,24 @@ close_duplicate() {
   fi
   gh pr close "$pr" \
     --comment "$MARKER
-Closing as an exact duplicate: byte-identical diff to PR #$survivor (kept as the newest). See ADR-034 and .github/workflows/duplicate-pr-guard.yml."
+Closing as an exact duplicate: byte-identical diff to PR #$survivor (kept as the newest). See ADR-035 and .github/workflows/duplicate-pr-guard.yml."
   CLOSED_SET["$pr"]=1
   CLOSED_COUNT=$((CLOSED_COUNT + 1))
   printf 'Closed duplicate PR #%s (exact match, survivor #%s)\n' "$pr" "$survivor"
+}
+
+close_subset_duplicate() {
+  local pr="$1" survivor="$2"
+  if is_dry; then
+    printf '[DRY RUN] would close subset duplicate PR #%s (every changed file patch is byte-identical in survivor #%s)\n' "$pr" "$survivor"
+    return 0
+  fi
+  gh pr close "$pr" \
+    --comment "$MARKER
+Closing as a subset duplicate: every changed file in this PR has a byte-identical patch in PR #$survivor (kept as the newest), so nothing is lost. See ADR-035 and .github/workflows/duplicate-pr-guard.yml."
+  CLOSED_SET["$pr"]=1
+  CLOSED_COUNT=$((CLOSED_COUNT + 1))
+  printf 'Closed subset duplicate PR #%s (contained in survivor #%s)\n' "$pr" "$survivor"
 }
 
 flag_superseded() {
@@ -55,12 +72,12 @@ flag_superseded() {
   fi
   gh pr comment "$pr" \
     --body "$MARKER
-Possible duplicate: this PR shares most of its meaningful files with newer PR #$newer. If #$newer covers the same change, close this one; otherwise close #$newer. Labeled \`$LABEL\` for triage. See ADR-034."
+Possible duplicate: this PR shares most of its meaningful files with newer PR #$newer. If #$newer covers the same change, close this one; otherwise close #$newer. Labeled \`$LABEL\` for triage. See ADR-035."
   if ! gh pr edit "$pr" --add-label "$LABEL" >/dev/null 2>&1; then
     # A missing repo label makes --add-label fail; flags would stay comment-only
     # and invisible to label-based triage. Create the label once and retry.
     gh label create "$LABEL" \
-      --description "Open PR sharing most meaningful files with a newer PR; close the stale one (ADR-034)" \
+      --description "Open PR sharing most meaningful files with a newer PR; close the stale one (ADR-035)" \
       --color d4c5f9 >/dev/null 2>&1 || true
     gh pr edit "$pr" --add-label "$LABEL" >/dev/null 2>&1 ||
       printf 'Warning: PR #%s flagged but not labeled (%s missing/unavailable)\n' "$pr" "$LABEL" >&2
@@ -69,10 +86,25 @@ Possible duplicate: this PR shares most of its meaningful files with newer PR #$
   printf 'Flagged PR #%s as superseded-candidate (overlaps #%s)\n' "$pr" "$newer"
 }
 
-meaningful_files() {
-  # Prints the PR's changed files, noise-filtered and sorted.
-  local pr="$1"
-  gh pr diff "$pr" --name-only 2>/dev/null | grep -vE "$NOISE_REGEX" | sort -u || true
+file_sections() {
+  # Reads a unified diff; emits "<patch-sha256>\t<file>" per diff section.
+  # A section spans from its `diff --git` header to the next (or EOF).
+  local path="" section=""
+  while IFS= read -r line; do
+    if [[ "$line" == 'diff --git '* ]]; then
+      if [[ -n "$path" ]]; then
+        printf '%s\t%s\n' "$(printf '%s' "$section" | sha256sum | cut -d' ' -f1)" "$path"
+      fi
+      path="${line#diff --git a/}"
+      path="${path%% b/*}"
+      section=""
+    elif [[ -n "$path" ]]; then
+      section+="$line"$'\n'
+    fi
+  done
+  if [[ -n "$path" ]]; then
+    printf '%s\t%s\n' "$(printf '%s' "$section" | sha256sum | cut -d' ' -f1)" "$path"
+  fi
 }
 
 main() {
@@ -90,14 +122,21 @@ main() {
   local -A pr_created=()
   local -A pr_hash=()
   local -A pr_files=()
+  local -A pr_patch_hash=()
   local -A CLOSED_SET=()
-  local num created hash
+  local num created diff_text sections ph fpath
   while IFS=$'\t' read -r num created; do
     [[ "$num" =~ ^[0-9]+$ ]] || continue
     pr_created["$num"]="$created"
-    hash="$(gh pr diff "$num" 2>/dev/null | sha256sum | cut -d' ' -f1 || true)"
-    pr_hash["$num"]="$hash"
-    pr_files["$num"]="$(meaningful_files "$num")"
+    # Single fetch per PR: whole-diff hash, per-file patch hashes, and the
+    # meaningful-file list all derive from the same payload (ADR-035).
+    diff_text="$(gh pr diff "$num" 2>/dev/null || true)"
+    pr_hash["$num"]="$(printf '%s' "$diff_text" | sha256sum | cut -d' ' -f1)"
+    sections="$(file_sections <<< "$diff_text")"
+    pr_files["$num"]="$(cut -f2 <<< "$sections" | grep -vE "$NOISE_REGEX" | sort -u || true)"
+    while IFS=$'\t' read -r ph fpath; do
+      [[ -n "$fpath" ]] && pr_patch_hash["$num:$fpath"]="$ph"
+    done <<< "$sections"
   done < <(printf '%s\n' "$pr_rows")
 
   # --- EXACT duplicates: identical diff hashes, keep the newest. ---
@@ -122,15 +161,42 @@ main() {
     done
   done
 
-  # --- NEAR duplicates: pairwise meaningful-file overlap, flag the older. ---
+  # --- Order PRs oldest -> newest (shared by the subset and near tiers). ---
   local -a ordered=()
   for num in "${!pr_created[@]}"; do
     ordered+=("$num")
   done
   mapfile -t ordered < <(for n in "${ordered[@]}"; do printf '%s\t%s\n' "${pr_created[$n]}" "$n"; done | sort | cut -f2)
 
+  # --- SUBSET duplicates: older PR's files strictly contained in a newer PR's
+  # file set with byte-identical patches on every shared file; close the older.
+  local i j a b fname a_hash b_hash contained total=${#ordered[@]}
+  for ((i = 0; i < total; i++)); do
+    for ((j = i + 1; j < total; j++)); do
+      a="${ordered[$i]}"
+      b="${ordered[$j]}"
+      [[ -z "${CLOSED_SET[$a]:-}" && -z "${CLOSED_SET[$b]:-}" ]] || continue
+      # a's file set must be a proper subset of b's file set.
+      [[ $(grep -c . <<< "${pr_files[$a]}") -lt $(grep -c . <<< "${pr_files[$b]}") ]] || continue
+      [[ -z "$(comm -13 <(printf '%s\n' "${pr_files[$b]}") <(printf '%s\n' "${pr_files[$a]}"))" ]] || continue
+      contained=1
+      while IFS= read -r fname; do
+        [[ -n "$fname" ]] || continue
+        a_hash="${pr_patch_hash["$a:$fname"]:-}"
+        b_hash="${pr_patch_hash["$b:$fname"]:-}"
+        if [[ -z "$a_hash" || -z "$b_hash" || "$a_hash" != "$b_hash" ]]; then
+          contained=0
+          break
+        fi
+      done <<< "${pr_files[$a]}"
+      (( contained )) || continue
+      close_subset_duplicate "$a" "$b"
+    done
+  done
+
+  # --- NEAR duplicates: pairwise meaningful-file overlap, flag the older. ---
   local -a files_a=() files_b=()
-  local i j a b overlap smaller total=${#ordered[@]}
+  local overlap smaller
   for ((i = 0; i < total; i++)); do
     for ((j = i + 1; j < total; j++)); do
       a="${ordered[$i]}"
