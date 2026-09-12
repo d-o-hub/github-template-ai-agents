@@ -61,7 +61,7 @@ Closing as a subset duplicate: every changed file in this PR has a byte-identica
 }
 
 flag_superseded() {
-  local pr="$1" newer="$2"
+  local pr="$1" newer="$2" comment_reason="$3" log_reason="$4"
   if has_marker "$pr"; then
     printf 'Skipping PR #%s (already flagged by a previous run)\n' "$pr"
     return 0
@@ -72,7 +72,7 @@ flag_superseded() {
   fi
   gh pr comment "$pr" \
     --body "$MARKER
-Possible duplicate: this PR shares most of its meaningful files with newer PR #$newer. If #$newer covers the same change, close this one; otherwise close #$newer. Labeled \`$LABEL\` for triage. See ADR-035."
+Possible duplicate: $comment_reason. If #$newer covers the same change, close this one; otherwise close #$newer. Labeled \`$LABEL\` for triage. See ADR-035."
   if ! gh pr edit "$pr" --add-label "$LABEL" >/dev/null 2>&1; then
     # A missing repo label makes --add-label fail; flags would stay comment-only
     # and invisible to label-based triage. Create the label once and retry.
@@ -83,7 +83,7 @@ Possible duplicate: this PR shares most of its meaningful files with newer PR #$
       printf 'Warning: PR #%s flagged but not labeled (%s missing/unavailable)\n' "$pr" "$LABEL" >&2
   fi
   FLAGGED_COUNT=$((FLAGGED_COUNT + 1))
-  printf 'Flagged PR #%s as superseded-candidate (overlaps #%s)\n' "$pr" "$newer"
+  printf 'Flagged PR #%s as superseded-candidate (%s)\n' "$pr" "$log_reason"
 }
 
 file_sections() {
@@ -123,8 +123,9 @@ main() {
   local -A pr_hash=()
   local -A pr_files=()
   local -A pr_patch_hash=()
+  local -A pr_task=()
   local -A CLOSED_SET=()
-  local num created diff_text sections ph fpath
+  local num created diff_text sections ph fpath body head_ref task_id
   while IFS=$'\t' read -r num created; do
     [[ "$num" =~ ^[0-9]+$ ]] || continue
     pr_created["$num"]="$created"
@@ -137,6 +138,14 @@ main() {
     while IFS=$'\t' read -r ph fpath; do
       [[ -n "$fpath" ]] && pr_patch_hash["$num:$fpath"]="$ph"
     done <<< "$sections"
+    # Jules task id: task URL in the body first, branch-name id as fallback.
+    body="$(gh pr view "$num" --json body --jq '.body' 2>/dev/null || true)"
+    task_id="$(printf '%s' "$body" | grep -oE 'jules\.google\.com/task/[0-9]+' | head -1 | grep -oE '[0-9]+$' || true)"
+    if [[ -z "$task_id" ]]; then
+      head_ref="$(gh pr view "$num" --json headRefName --jq '.headRefName' 2>/dev/null || true)"
+      task_id="$(printf '%s' "$head_ref" | grep -oE '(^|-)[0-9]{15,}(-|$)' | head -1 | tr -d '-' || true)"
+    fi
+    pr_task["$num"]="$task_id"
   done < <(printf '%s\n' "$pr_rows")
 
   # --- EXACT duplicates: identical diff hashes, keep the newest. ---
@@ -209,9 +218,32 @@ main() {
       (( overlap > 0 )) || continue
       smaller=$(( ${#files_a[@]} < ${#files_b[@]} ? ${#files_a[@]} : ${#files_b[@]} ))
       if awk -v o="$overlap" -v s="$smaller" -v t="$OVERLAP_THRESHOLD" 'BEGIN { exit !(o / s >= t) }'; then
-        flag_superseded "$a" "$b"
+        flag_superseded "$a" "$b" \
+          "this PR shares most of its meaningful files with newer PR #$b" \
+          "overlaps #$b"
       fi
     done
+  done
+
+  # --- TASK SIBLINGS: several open PRs created by the same Jules task ---
+  # (matched via the task URL in the PR body, else the numeric task id embedded
+  # in the branch name). One task yields one PR; re-runs supersede earlier
+  # attempts even when file overlap is below the near-duplicate threshold.
+  # Flag-only: a semantic signal, never proof of change containment.
+  local -A task_survivor=()
+  local task_id
+  for ((i = total - 1; i >= 0; i--)); do
+    a="${ordered[$i]}"
+    [[ -z "${CLOSED_SET[$a]:-}" ]] || continue
+    task_id="${pr_task[$a]:-}"
+    [[ -n "$task_id" ]] || continue
+    if [[ -n "${task_survivor[$task_id]:-}" ]]; then
+      flag_superseded "$a" "${task_survivor[$task_id]}" \
+        "this PR was created by the same Jules task as newer PR #${task_survivor[$task_id]}" \
+        "same Jules task as #${task_survivor[$task_id]}"
+    else
+      task_survivor["$task_id"]="$a"
+    fi
   done
 
   printf 'Done. closed=%d flagged=%d (DRY_RUN=%s)\n' "$CLOSED_COUNT" "$FLAGGED_COUNT" "$DRY_RUN"
