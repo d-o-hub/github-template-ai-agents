@@ -39,6 +39,12 @@ The 2026-09-12 triage exposed two gaps in the guard's two-tier design:
      any shared file fall through to the near tier.
    - **NEAR** — >=70% meaningful-file overlap: comment + label
      `superseded-candidate`, never auto-close (unchanged).
+   - **TASK SIBLINGS** — several open PRs created by the same Jules task
+     (task URL in the PR body, else the 15+ digit task id embedded in the
+     branch name): flag the older PRs against the newest survivor. Flag-only:
+     one task yields one PR, so a second open PR for the same task means a
+     re-run superseded the earlier attempt, but a semantic signal is never
+     proof of change containment.
 2. **Single diff fetch per PR.** Per-file patch hashes and the meaningful-file
    list are derived from the same `gh pr diff` payload (sections split on
    `diff --git` headers), replacing the separate `--name-only` call.
@@ -52,12 +58,15 @@ The 2026-09-12 triage exposed two gaps in the guard's two-tier design:
 - False-close risk is bounded: auto-close requires byte-identical per-file
   patches; base drift, rebase churn, or any divergence degrades to the
   flag-only near tier. Equal-file-set PRs with different patches (conflicting
-  edits) are never auto-closed.
-- Fewer GitHub API calls (one `gh pr diff` per PR instead of two).
+  edits) are never auto-closed. Task siblings are flagged, never closed.
+- Fewer GitHub API calls for the diff pipeline (one `gh pr diff` per PR
+  instead of two), offset by one `gh pr view` per PR for task-id extraction.
 - DRY_RUN and the idempotent HTML marker behavior are preserved on all tiers.
 
 ## Verification
 
-- `bats tests/test-detect-duplicate-prs.bats`: subset duplicate auto-closes;
-  divergent-patch subset stays flag-only; all pre-existing tiers unchanged.
+- `bats tests/test-detect-duplicate-prs.bats`: 9/9 — subset duplicate
+  auto-closes; divergent-patch subset stays flag-only; same-task re-run with
+  disjoint files is flagged via the task-sibling tier; all pre-existing tiers
+  unchanged.
 - `shellcheck` clean; `./scripts/quality_gate.sh` passed.
