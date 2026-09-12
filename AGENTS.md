@@ -137,7 +137,7 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 
 If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject>"` or use `git rebase -i`.
 
-### Automation Pre-Flight (ADR-034)
+### Automation Pre-Flight (ADR-035)
 
 Before creating a PR, check for open PRs already touching the same files
 (`gh pr list` + `gh pr diff --name-only`) and extend the existing one instead of

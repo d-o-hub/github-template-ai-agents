@@ -209,6 +209,7 @@ fi
 exit 0
 MOCK
     chmod +x "$BATS_TMPDIR/gh"
+    rm -f "$BATS_TMPDIR/label-exists"
     run ./scripts/detect-duplicate-prs.sh
     [ "$status" -eq 0 ]
     [[ "$output" == *"Flagged PR #501 as superseded-candidate (overlaps #502)"* ]]
@@ -216,4 +217,64 @@ MOCK
     [[ "$(actions)" == *"CREATED-LABEL"* ]]
     [[ "$(actions)" == *"LABELED 501"* ]]
     [[ "$(actions)" != *"CLOSED 501"* ]]
+}
+
+@test "subset duplicates: closes the older PR when every shared file patch is identical" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '601\t2026-09-01T00:00:00Z\n'
+    printf '602\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    case "$3" in
+        601) printf 'diff --git a/src/a.sh b/src/a.sh\n@@\n-a\n+b\ndiff --git a/src/b.sh b/src/b.sh\n@@\n-b\n+c\n';;
+        602) printf 'diff --git a/src/a.sh b/src/a.sh\n@@\n-a\n+b\ndiff --git a/src/b.sh b/src/b.sh\n@@\n-b\n+c\ndiff --git a/src/new.sh b/src/new.sh\n@@\n-n\n+m\n';;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Closed subset duplicate PR #601 (contained in survivor #602)"* ]]
+    [[ "$(actions)" == *"CLOSED 601"* ]]
+    [[ "$(actions)" != *"CLOSED 602"* ]]
+    [[ "$(actions)" != *"COMMENTED 601"* ]]
+}
+
+@test "divergent patch on a shared file: subset does not close, falls back to flag" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '701\t2026-09-01T00:00:00Z\n'
+    printf '702\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    case "$3" in
+        701) printf 'diff --git a/src/a.sh b/src/a.sh\n@@\n-a\n+b\ndiff --git a/src/b.sh b/src/b.sh\n@@\n-b\n+c\n';;
+        702) printf 'diff --git a/src/a.sh b/src/a.sh\n@@\n-a\n+DIFFERENT\ndiff --git a/src/b.sh b/src/b.sh\n@@\n-b\n+c\ndiff --git a/src/new.sh b/src/new.sh\n@@\n-n\n+m\n';;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Flagged PR #701 as superseded-candidate (overlaps #702)"* ]]
+    [[ "$(actions)" != *"CLOSED 701"* ]]
 }

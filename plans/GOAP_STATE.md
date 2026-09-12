@@ -126,5 +126,5 @@ skipped must never be persisted as `passing`. Derived from the PR #795 roast
 - Fixed in #839/#841; ruleset Codacy requirement removed (ADR-034); artifact
   PRs #840/#842 converged autonomously — verified twice.
 - Template version bumped to 0.2.13 (#843) with sonar.projectVersion anchor.
-- Anti-churn guard (duplicate PR detection) added — see ADR-034 successor work
+- Anti-churn guard (duplicate PR detection) added — see ADR-035
   and .github/workflows/duplicate-pr-guard.yml.
