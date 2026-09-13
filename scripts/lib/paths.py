@@ -151,6 +151,7 @@ SENSITIVE_PREFIXES = (
     "private_key",
     "private-key",
     "privkey",
+    "secret_key",
 )
 
 SENSITIVE_SUFFIXES = (
