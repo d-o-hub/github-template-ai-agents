@@ -101,8 +101,9 @@ fi
 
     for category in $CATEGORIES; do
         # Capitalize category for display
-        # Use printf to prevent option injection for categories starting with -
-        category_display=$(printf "%s\n" "$category" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
+        # perf: replace expensive string manipulation subshells with native bash features
+        read -ra _cat_words <<< "${category//-/ }"
+        category_display="${_cat_words[*]^}"
 
         printf "## %s\n" "$category_display"
         printf "\n"
