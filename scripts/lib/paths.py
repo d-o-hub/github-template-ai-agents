@@ -148,6 +148,9 @@ SENSITIVE_PREFIXES = (
     "auth.json",
     "token",
     "api_key",
+    "private_key",
+    "private-key",
+    "privkey",
 )
 
 SENSITIVE_SUFFIXES = (
