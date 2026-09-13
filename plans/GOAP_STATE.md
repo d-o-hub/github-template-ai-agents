@@ -128,3 +128,32 @@ skipped must never be persisted as `passing`. Derived from the PR #795 roast
 - Template version bumped to 0.2.13 (#843) with sonar.projectVersion anchor.
 - Anti-churn guard (duplicate PR detection) added — see ADR-035
   and .github/workflows/duplicate-pr-guard.yml.
+
+## Round 5 (2026-09-13): swarm PR triage — #878/#879 roasted, fixed, merged
+
+- Goal: analyze/review/roast all open PRs (incl. drafts); close no-impact,
+  ready+fix impactful, merge in order once CI green. goap-agent as
+  orchestrator with a 2-agent review swarm (one per PR).
+- CI gate: `.github/ci-status/ci-status.json` = passing at start.
+- #879 `fix(security): block private/secret key prefixes` — impact yes.
+  Fixes: dropped `secret_key` prefix (redundant under existing `secret`
+  startswith, zero behavior change), replaced 3 tautological test cases
+  (`private-key.pem`/`privkey.pem` blocked by `.pem` suffix on main,
+  `secret_key.txt` by `secret` prefix) with `private-key.txt`/`privkey`,
+  verified fail-on-revert; retitled (secret half already shipped).
+  Merged `1a9a545`.
+- #878 `perf: eliminate sed subshells` — impact yes (~115x/call, ~0.1s/run).
+  Fixes: retitled `Bolt: perf:` -> `perf(scripts):` (ADR-008 lint was
+  failing), corrected future-dated (2026-10-27) bolt entry to 2026-09-13
+  with blank-line separator + "hyphen" typo. Merged `3499eb9`.
+- Lessons:
+  1. Jules re-synced its branch 14min after my fix push and clobbered both
+     edits with its original workspace state (re-commit under same subject);
+     re-applied on top of the new tip. Merge bot PRs promptly after fixes.
+  2. GitHub PR-API major outage 2026-09-13: CodeQL/Trivy SARIF uploads died
+     mid-request, `commit_refs` fatal on push, and one reported-failed push
+     actually landed (zombie merge commit). Triage via step-level
+     conclusions: scan steps succeeded -> failure was platform, not code.
+  3. Draft PRs run a reduced check set; the full suite (incl. lint-pr-title
+     and Run Tests) only fires on ready_for_review — stale failing checks
+     from pre-retitle events need a rerun/retrigger to clear.
