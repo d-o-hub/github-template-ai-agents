@@ -165,7 +165,8 @@ mkdir -p -- "$out_dir"
     printf '|-------|-------------|----------|\n'
 
     printf '%s\n' "$SKILL_DATA" | LC_ALL=C sort -t'|' -k1,1 | while IFS='|' read -r name description category; do
-        category_display=$(printf '%s' "$category" | sed 's/-/ /g')
+        # perf: replace expensive string manipulation subshells with native bash features
+        category_display="${category//-/ }"
         printf '| `%s` | %s | %s |\n' "$name" "$description" "$category_display"
     done
 } > "$OUTPUT_FILE"
