@@ -126,6 +126,8 @@ FORBIDDEN_PATHS = frozenset({
     ".kshrc",
     "pip.conf",
     ".gemrc",
+    ".sops.yaml",
+    ".sops",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
@@ -162,7 +164,7 @@ SENSITIVE_SUFFIXES = (
     ".secrets", ".credentials", ".vault", "secrets.json",
     "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml",
     ".ovpn", ".kdbx", ".keychain", ".keychain-db", ".keyring", ".kdb",
-    ".env",
+    ".env", ".tfvars", ".tfvars.json",
 )
 
 SSH_KEY_PREFIXES = (
