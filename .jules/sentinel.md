@@ -1,3 +1,9 @@
+## 2026-09-12 - Block Terraform Variables and SOPS Configuration Files in Path Validation
+
+**Vulnerability:** Terraform variable files (`.tfvars`, `.tfvars.json`) and SOPS configuration/key files (`.sops.yaml`, `.sops`) were not explicitly blocked in forbidden path validation, creating potential exposure of unencrypted infrastructure credentials, API keys, and secret values.
+**Learning:** IaC configuration variable files and secret management config stores must be protected alongside state files (`.tfstate`), as they frequently hold raw secrets and credentials in plain text.
+**Prevention:** Maintain `.tfvars` and `.tfvars.json` in `SENSITIVE_SUFFIXES` and `.sops.yaml` / `.sops` in `FORBIDDEN_PATHS` for pattern-based and exact match security enforcement.
+
 ## 2026-08-30 - Expand Path Validation Blocklist for DB Shells, Shell Profiles, and Package Manager Credentials
 
 **Vulnerability:** Gaps in `FORBIDDEN_PATHS` left additional sensitive REPL/database shell histories (`.dbshell`, `.rediscli_history`), shell profiles (`.kshrc`), and package manager credential files (`pip.conf`, `.gemrc`) vulnerable to potential inspection or exfiltration.
