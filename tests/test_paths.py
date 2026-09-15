@@ -78,7 +78,8 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".zlogin", ".zlogout", ".bash_login", ".pgpass", ".my.cnf",
         ".irb_history", ".pry_history", ".pg_service.conf",
         ".tcshrc", ".cshrc", ".login", ".logout", ".rediscli_history",
-        ".dbshell", ".kshrc", "pip.conf", ".gemrc"
+        ".dbshell", ".kshrc", "pip.conf", ".gemrc", ".pnpmrc",
+        ".sops.yaml", ".sops"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
@@ -106,7 +107,8 @@ def test_validate_safe_path_patterns(tmp_path):
         "client_secret_xyz.json", "secrets.json", "secrets.yml", "secrets.yaml",
         "credentials.yml", "credentials.yaml", "production.secrets", "api.credentials",
         "my.vault", "client.ovpn", "passwords.kdbx", "login.keychain",
-        "login.keychain-db", "system.keyring", "db.kdb"
+        "login.keychain-db", "system.keyring", "db.kdb", "terraform.tfvars",
+        "secrets.tfvars.json"
     ]
     for p in sensitive_extensions:
         with pytest.raises(PathValidationError):
