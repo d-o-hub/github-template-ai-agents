@@ -180,14 +180,38 @@ main() {
   # --- SUBSET duplicates: older PR's files strictly contained in a newer PR's
   # file set with byte-identical patches on every shared file; close the older.
   local i j a b fname a_hash b_hash contained total=${#ordered[@]}
+  local stripped_a count_a stripped_b count_b
   for ((i = 0; i < total; i++)); do
     for ((j = i + 1; j < total; j++)); do
       a="${ordered[$i]}"
       b="${ordered[$j]}"
       [[ -z "${CLOSED_SET[$a]:-}" && -z "${CLOSED_SET[$b]:-}" ]] || continue
+
       # a's file set must be a proper subset of b's file set.
-      [[ $(grep -c . <<< "${pr_files[$a]}") -lt $(grep -c . <<< "${pr_files[$b]}") ]] || continue
-      [[ -z "$(comm -13 <(printf '%s\n' "${pr_files[$b]}") <(printf '%s\n' "${pr_files[$a]}"))" ]] || continue
+      # perf: eliminate grep -c . subshells with native string replacements for speed
+      stripped_a="${pr_files[$a]//[^$'\n']/}"
+      count_a=${#stripped_a}
+      stripped_b="${pr_files[$b]//[^$'\n']/}"
+      count_b=${#stripped_b}
+      [[ $count_a -lt $count_b ]] || continue
+
+      # perf: eliminate comm -13 subshells with a native associative array loop
+      local -A set_b=()
+      while IFS= read -r fname; do
+        [[ -n "$fname" ]] && set_b["$fname"]=1
+      done <<< "${pr_files[$b]}"
+
+      local not_subset=0
+      while IFS= read -r fname; do
+        [[ -n "$fname" ]] || continue
+        if [[ -z "${set_b["$fname"]:-}" ]]; then
+            not_subset=1
+            break
+        fi
+      done <<< "${pr_files[$a]}"
+
+      [[ $not_subset -eq 0 ]] || continue
+
       contained=1
       while IFS= read -r fname; do
         [[ -n "$fname" ]] || continue
@@ -211,12 +235,28 @@ main() {
       a="${ordered[$i]}"
       b="${ordered[$j]}"
       [[ -z "${CLOSED_SET[$a]:-}" && -z "${CLOSED_SET[$b]:-}" ]] || continue
-      mapfile -t files_a < <(printf '%s\n' "${pr_files[$a]}" | grep -v '^$' || true)
-      mapfile -t files_b < <(printf '%s\n' "${pr_files[$b]}" | grep -v '^$' || true)
-      (( ${#files_a[@]} > 0 && ${#files_b[@]} > 0 )) || continue
-      overlap="$(comm -12 <(printf '%s\n' "${files_a[@]}") <(printf '%s\n' "${files_b[@]}") | grep -c . || true)"
+
+      # perf: eliminate mapfile subshells and use native mapfile from string
+      mapfile -t files_a <<< "${pr_files[$a]}"
+      mapfile -t files_b <<< "${pr_files[$b]}"
+
+      # Remove empty strings from arrays
+      local -a valid_a=() valid_b=()
+      for f in "${files_a[@]}"; do [[ -n "$f" ]] && valid_a+=("$f"); done
+      for f in "${files_b[@]}"; do [[ -n "$f" ]] && valid_b+=("$f"); done
+
+      (( ${#valid_a[@]} > 0 && ${#valid_b[@]} > 0 )) || continue
+
+      # perf: eliminate comm -12 and grep -c . subshells using associative array
+      overlap=0
+      local -A overlap_set_b=()
+      for f in "${valid_b[@]}"; do overlap_set_b["$f"]=1; done
+      for f in "${valid_a[@]}"; do
+        [[ -n "${overlap_set_b["$f"]:-}" ]] && overlap=$((overlap + 1))
+      done
+
       (( overlap > 0 )) || continue
-      smaller=$(( ${#files_a[@]} < ${#files_b[@]} ? ${#files_a[@]} : ${#files_b[@]} ))
+      smaller=$(( ${#valid_a[@]} < ${#valid_b[@]} ? ${#valid_a[@]} : ${#valid_b[@]} ))
       if awk -v o="$overlap" -v s="$smaller" -v t="$OVERLAP_THRESHOLD" 'BEGIN { exit !(o / s >= t) }'; then
         flag_superseded "$a" "$b" \
           "this PR shares most of its meaningful files with newer PR #$b" \
