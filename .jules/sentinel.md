@@ -1,3 +1,9 @@
+## 2026-09-02 - Expand Path Validation Blocklist for SOPS Secrets, PNPM Configs, and Terraform Variables
+
+**Vulnerability:** Gaps in `FORBIDDEN_PATHS` and `SENSITIVE_SUFFIXES` left SOPS encrypted credentials files (`.sops.yaml`, `.sops`), pnpm package manager configs (`.pnpmrc`), and Terraform variable files containing secrets (`.tfvars`, `.tfvars.json`) vulnerable to path inspection or exfiltration.
+**Learning:** Hardening path validation requires securing all package manager index credentials, encrypted secrets management configs (SOPS), and infrastructure-as-code variable files that frequently hold sensitive runtime parameters.
+**Prevention:** Maintain an explicit denylist and suffix pattern check encompassing package manager credentials (`.pnpmrc`), encrypted secret vault configs (`.sops.yaml`, `.sops`), and Terraform variable files (`.tfvars`, `.tfvars.json`).
+
 ## 2026-08-30 - Expand Path Validation Blocklist for DB Shells, Shell Profiles, and Package Manager Credentials
 
 **Vulnerability:** Gaps in `FORBIDDEN_PATHS` left additional sensitive REPL/database shell histories (`.dbshell`, `.rediscli_history`), shell profiles (`.kshrc`), and package manager credential files (`pip.conf`, `.gemrc`) vulnerable to potential inspection or exfiltration.
