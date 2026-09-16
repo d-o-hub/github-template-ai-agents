@@ -78,7 +78,8 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".zlogin", ".zlogout", ".bash_login", ".pgpass", ".my.cnf",
         ".irb_history", ".pry_history", ".pg_service.conf",
         ".tcshrc", ".cshrc", ".login", ".logout", ".rediscli_history",
-        ".dbshell", ".kshrc", "pip.conf", ".gemrc"
+        ".dbshell", ".kshrc", "pip.conf", ".gemrc", ".condarc",
+        "nuget.config", ".zsh_sessions"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
@@ -118,7 +119,8 @@ def test_validate_safe_path_patterns(tmp_path):
         "kubeconfig", "kubeconfig_prod",
         "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
         "netrc_backup", ".netrc_old", ".npmrc_custom", ".yarnrc_custom", ".pypirc_prod",
-        "auth.json_copy", "token_secret.json", "token.txt", "api_key_prod", "api_key.json",
+        "auth.json_copy", "token_secret.json", "token.txt", "access_token_v1.json",
+        "refresh_token.txt", "auth_token_file", "session_token.key", "api_key_prod", "api_key.json",
         "private_key.txt", "private-key.txt", "privkey"
     ]
     for p in prefix_patterns:
@@ -137,7 +139,8 @@ def test_validate_safe_path_patterns(tmp_path):
     # Case-insensitivity for patterns
     case_patterns = [
         ".ENV.LOCAL", "SECRET.PEM", "MY.KEY", "KEY.P12", "MY.JKS",
-        "CLIENT_SECRET_PROD", "KUBECONFIG", "VPN.OVPN", "STORE.KDBX"
+        "CLIENT_SECRET_PROD", "KUBECONFIG", "VPN.OVPN", "STORE.KDBX",
+        "ACCESS_TOKEN.TXT", "REFRESH_TOKEN.JSON", "NUGET.CONFIG"
     ]
     for p in case_patterns:
         with pytest.raises(PathValidationError):
