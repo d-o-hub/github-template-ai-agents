@@ -187,8 +187,23 @@ main() {
       [[ -z "${CLOSED_SET[$a]:-}" && -z "${CLOSED_SET[$b]:-}" ]] || continue
       # a's file set must be a proper subset of b's file set.
       [[ $(grep -c . <<< "${pr_files[$a]}") -lt $(grep -c . <<< "${pr_files[$b]}") ]] || continue
-      [[ -z "$(comm -13 <(printf '%s\n' "${pr_files[$b]}") <(printf '%s\n' "${pr_files[$a]}"))" ]] || continue
+
+      # perf: replace comm -13 subshells with native associative arrays
+      local -A set_b=()
+      while IFS= read -r fname; do
+        [[ -n "$fname" ]] && set_b["$fname"]=1
+      done <<< "${pr_files[$b]}"
+
       contained=1
+      while IFS= read -r fname; do
+        [[ -n "$fname" ]] || continue
+        if [[ -z "${set_b["$fname"]:-}" ]]; then
+          contained=0
+          break
+        fi
+      done <<< "${pr_files[$a]}"
+      (( contained )) || continue
+
       while IFS= read -r fname; do
         [[ -n "$fname" ]] || continue
         a_hash="${pr_patch_hash["$a:$fname"]:-}"
@@ -214,7 +229,20 @@ main() {
       mapfile -t files_a < <(printf '%s\n' "${pr_files[$a]}" | grep -v '^$' || true)
       mapfile -t files_b < <(printf '%s\n' "${pr_files[$b]}" | grep -v '^$' || true)
       (( ${#files_a[@]} > 0 && ${#files_b[@]} > 0 )) || continue
-      overlap="$(comm -12 <(printf '%s\n' "${files_a[@]}") <(printf '%s\n' "${files_b[@]}") | grep -c . || true)"
+
+      # perf: replace comm -12 subshells with native associative arrays
+      local -A set_b_overlap=()
+      for fname in "${files_b[@]}"; do
+        set_b_overlap["$fname"]=1
+      done
+
+      overlap=0
+      for fname in "${files_a[@]}"; do
+        if [[ -n "${set_b_overlap["$fname"]:-}" ]]; then
+          ((overlap++))
+        fi
+      done
+
       (( overlap > 0 )) || continue
       smaller=$(( ${#files_a[@]} < ${#files_b[@]} ? ${#files_a[@]} : ${#files_b[@]} ))
       if awk -v o="$overlap" -v s="$smaller" -v t="$OVERLAP_THRESHOLD" 'BEGIN { exit !(o / s >= t) }'; then
