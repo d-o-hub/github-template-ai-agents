@@ -185,11 +185,35 @@ main() {
       a="${ordered[$i]}"
       b="${ordered[$j]}"
       [[ -z "${CLOSED_SET[$a]:-}" && -z "${CLOSED_SET[$b]:-}" ]] || continue
+
+      local old_opts="$-"
+      set -f
+      local old_ifs="$IFS"
+      IFS=$'\n'
+      local arr_a=(${pr_files[$a]})
+      local arr_b=(${pr_files[$b]})
+      IFS="$old_ifs"
+      [[ "$old_opts" != *f* ]] && set +f
+
       # a's file set must be a proper subset of b's file set.
-      [[ $(grep -c . <<< "${pr_files[$a]}") -lt $(grep -c . <<< "${pr_files[$b]}") ]] || continue
-      [[ -z "$(comm -13 <(printf '%s\n' "${pr_files[$b]}") <(printf '%s\n' "${pr_files[$a]}"))" ]] || continue
+      [[ ${#arr_a[@]} -lt ${#arr_b[@]} ]] || continue
+
+      local -A b_set=()
+      for fname in "${arr_b[@]}"; do
+        b_set["$fname"]=1
+      done
+
+      local is_subset=1
+      for fname in "${arr_a[@]}"; do
+        if [[ -z "${b_set["$fname"]:-}" ]]; then
+          is_subset=0
+          break
+        fi
+      done
+      [[ "$is_subset" -eq 1 ]] || continue
+
       contained=1
-      while IFS= read -r fname; do
+      for fname in "${arr_a[@]}"; do
         [[ -n "$fname" ]] || continue
         a_hash="${pr_patch_hash["$a:$fname"]:-}"
         b_hash="${pr_patch_hash["$b:$fname"]:-}"
@@ -197,24 +221,43 @@ main() {
           contained=0
           break
         fi
-      done <<< "${pr_files[$a]}"
+      done
       (( contained )) || continue
       close_subset_duplicate "$a" "$b"
     done
   done
 
   # --- NEAR duplicates: pairwise meaningful-file overlap, flag the older. ---
-  local -a files_a=() files_b=()
   local overlap smaller
   for ((i = 0; i < total; i++)); do
     for ((j = i + 1; j < total; j++)); do
       a="${ordered[$i]}"
       b="${ordered[$j]}"
       [[ -z "${CLOSED_SET[$a]:-}" && -z "${CLOSED_SET[$b]:-}" ]] || continue
-      mapfile -t files_a < <(printf '%s\n' "${pr_files[$a]}" | grep -v '^$' || true)
-      mapfile -t files_b < <(printf '%s\n' "${pr_files[$b]}" | grep -v '^$' || true)
+
+      local old_opts="$-"
+      set -f
+      local old_ifs="$IFS"
+      IFS=$'\n'
+      local files_a=(${pr_files[$a]})
+      local files_b=(${pr_files[$b]})
+      IFS="$old_ifs"
+      [[ "$old_opts" != *f* ]] && set +f
+
       (( ${#files_a[@]} > 0 && ${#files_b[@]} > 0 )) || continue
-      overlap="$(comm -12 <(printf '%s\n' "${files_a[@]}") <(printf '%s\n' "${files_b[@]}") | grep -c . || true)"
+
+      local -A b_set=()
+      for fname in "${files_b[@]}"; do
+        b_set["$fname"]=1
+      done
+
+      overlap=0
+      for fname in "${files_a[@]}"; do
+        if [[ -n "${b_set["$fname"]:-}" ]]; then
+          overlap=$((overlap + 1))
+        fi
+      done
+
       (( overlap > 0 )) || continue
       smaller=$(( ${#files_a[@]} < ${#files_b[@]} ? ${#files_a[@]} : ${#files_b[@]} ))
       if awk -v o="$overlap" -v s="$smaller" -v t="$OVERLAP_THRESHOLD" 'BEGIN { exit !(o / s >= t) }'; then
