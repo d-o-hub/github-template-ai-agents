@@ -188,12 +188,17 @@ main() {
       [[ -z "${CLOSED_SET[$a]:-}" && -z "${CLOSED_SET[$b]:-}" ]] || continue
       # a's file set must be a proper subset of b's file set.
       # perf: Replace grep -c subshell with native bash string length calculation
-      stripped_a="${pr_files[$a]//[^$'\n']/}"
-      count_a=$((${#stripped_a} + 1))
-      [[ -z "${pr_files[$a]}" ]] && count_a=0
-      stripped_b="${pr_files[$b]//[^$'\n']/}"
-      count_b=$((${#stripped_b} + 1))
-      [[ -z "${pr_files[$b]}" ]] && count_b=0
+      # Only count newlines if the string is not empty.
+      count_a=0
+      if [[ -n "${pr_files[$a]}" ]]; then
+        stripped_a="${pr_files[$a]//[^$'\n']/}"
+        count_a=$((${#stripped_a} + 1))
+      fi
+      count_b=0
+      if [[ -n "${pr_files[$b]}" ]]; then
+        stripped_b="${pr_files[$b]//[^$'\n']/}"
+        count_b=$((${#stripped_b} + 1))
+      fi
       [[ $count_a -lt $count_b ]] || continue
 
       # perf: Replaced expensive comm -13 subshells with native associative array checks
