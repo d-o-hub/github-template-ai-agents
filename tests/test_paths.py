@@ -97,7 +97,7 @@ def test_validate_safe_path_patterns(tmp_path):
 
     # Sensitive extension patterns
     sensitive_extensions = [
-        "secret.pem", "my.key", "cert.pfx", "prod.tfstate",
+        "secret.pem", "my.key", "cert.pfx", "prod.tfstate", "terraform.tfvars", "terraform.tfvars.json",
         "cert.crt", "bundle.cer", "key.p12", "key.pkcs8", "key.pk8",
         "key.der", "my.keystore", "my.jks", "config.dockercfg", "prod.publishsettings",
         "secret.gpg", "secret.pgp", "secret.asc", "key.p8", "key.pkcs12",
@@ -118,8 +118,9 @@ def test_validate_safe_path_patterns(tmp_path):
         "kubeconfig", "kubeconfig_prod",
         "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
         "netrc_backup", ".netrc_old", ".npmrc_custom", ".yarnrc_custom", ".pypirc_prod",
-        "auth.json_copy", "token_secret.json", "token.txt", "api_key_prod", "api_key.json",
-        "private_key.txt", "private-key.txt", "privkey"
+        "auth.json_copy", "token_secret.json", "token.txt", "access_token.json", "refresh_token.txt",
+        "auth_token.txt", "session_token.key", "api_key_prod", "api_key.json",
+        "private_key.txt", "private-key.txt", "privkey", "secret_key.pem"
     ]
     for p in prefix_patterns:
         with pytest.raises(PathValidationError):
