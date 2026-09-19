@@ -78,7 +78,8 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".zlogin", ".zlogout", ".bash_login", ".pgpass", ".my.cnf",
         ".irb_history", ".pry_history", ".pg_service.conf",
         ".tcshrc", ".cshrc", ".login", ".logout", ".rediscli_history",
-        ".dbshell", ".kshrc", "pip.conf", ".gemrc"
+        ".dbshell", ".kshrc", "pip.conf", ".gemrc",
+        ".zsh_sessions", ".condarc", "nuget.config", ".sops.yaml", ".sops"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
@@ -106,7 +107,7 @@ def test_validate_safe_path_patterns(tmp_path):
         "client_secret_xyz.json", "secrets.json", "secrets.yml", "secrets.yaml",
         "credentials.yml", "credentials.yaml", "production.secrets", "api.credentials",
         "my.vault", "client.ovpn", "passwords.kdbx", "login.keychain",
-        "login.keychain-db", "system.keyring", "db.kdb"
+        "login.keychain-db", "system.keyring", "db.kdb", "terraform.tfvars", "prod.tfvars.json"
     ]
     for p in sensitive_extensions:
         with pytest.raises(PathValidationError):
@@ -119,7 +120,8 @@ def test_validate_safe_path_patterns(tmp_path):
         "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
         "netrc_backup", ".netrc_old", ".npmrc_custom", ".yarnrc_custom", ".pypirc_prod",
         "auth.json_copy", "token_secret.json", "token.txt", "api_key_prod", "api_key.json",
-        "private_key.txt", "private-key.txt", "privkey"
+        "access_token.json", "refresh_token_prod", "auth_token_key", "session_token_xyz",
+        "private_key.txt", "private-key.txt", "privkey", "secret_key.pem"
     ]
     for p in prefix_patterns:
         with pytest.raises(PathValidationError):
