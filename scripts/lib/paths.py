@@ -126,6 +126,11 @@ FORBIDDEN_PATHS = frozenset({
     ".kshrc",
     "pip.conf",
     ".gemrc",
+    ".zsh_sessions",
+    ".condarc",
+    "nuget.config",
+    ".sops.yaml",
+    ".sops",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
@@ -147,14 +152,19 @@ SENSITIVE_PREFIXES = (
     ".pypirc",
     "auth.json",
     "token",
+    "access_token",
+    "refresh_token",
+    "auth_token",
+    "session_token",
     "api_key",
     "private_key",
     "private-key",
     "privkey",
+    "secret_key",
 )
 
 SENSITIVE_SUFFIXES = (
-    ".pem", ".key", ".pfx", ".tfstate", ".crt", ".cer",
+    ".pem", ".key", ".pfx", ".tfstate", ".tfvars", ".tfvars.json", ".crt", ".cer",
     ".p12", ".pkcs8", ".pk8", ".der", ".keystore", ".jks",
     ".dockercfg", ".publishsettings", ".gpg", ".pgp", ".asc",
     ".p8", ".pkcs12", ".passwd", ".pwd", ".htpasswd", "_history",
