@@ -52,7 +52,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - chore(metrics): log 2026-09-06 pr triage and ci status session (#847)
 - ci: update ci status artifacts [skip ci] (#846)
 
-
 ### Added
 
 - feat(harness): add Agent Teams, Dynamic Workflows, and Worktrees guide (`AGENT_TEAMS_GUIDE.md`)
