@@ -2,6 +2,7 @@
 # Security Hardening: 2026-07-06 - Expanded forbidden paths.
 # Security Hardening: 2026-07-07 - Case-insensitive forbidden path validation.
 # Security Hardening: 2026-08-18 - Added VPN, keychain, and DB history file pattern protections.
+# Security Hardening: 2026-09-20 - Added SOPS config, Terraform variable files, and token prefixes.
 """Path validation utilities for CLI scripts."""
 
 from __future__ import annotations
@@ -126,6 +127,10 @@ FORBIDDEN_PATHS = frozenset({
     ".kshrc",
     "pip.conf",
     ".gemrc",
+    ".sops.yaml",
+    ".sops",
+    ".tfvars",
+    ".tfvars.json",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
@@ -147,10 +152,15 @@ SENSITIVE_PREFIXES = (
     ".pypirc",
     "auth.json",
     "token",
+    "access_token",
+    "refresh_token",
+    "auth_token",
+    "session_token",
     "api_key",
     "private_key",
     "private-key",
     "privkey",
+    "secret_key",
 )
 
 SENSITIVE_SUFFIXES = (
@@ -162,7 +172,7 @@ SENSITIVE_SUFFIXES = (
     ".secrets", ".credentials", ".vault", "secrets.json",
     "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml",
     ".ovpn", ".kdbx", ".keychain", ".keychain-db", ".keyring", ".kdb",
-    ".env",
+    ".env", ".tfvars", ".tfvars.json", ".sops.yaml", ".sops",
 )
 
 SSH_KEY_PREFIXES = (
