@@ -1,3 +1,9 @@
+## 2026-09-20 - Block SOPS Configs, Terraform Variable Files, and Token/Secret Key Prefixes in Path Validation
+
+**Vulnerability:** Gaps in `FORBIDDEN_PATHS`, `SENSITIVE_PREFIXES`, and `SENSITIVE_SUFFIXES` allowed potential reading or enumeration of SOPS encryption configs/files (`.sops.yaml`, `.sops`), Terraform variable files (`.tfvars`, `.tfvars.json`), and custom token/secret key files (`access_token`, `refresh_token`, `auth_token`, `session_token`, `secret_key`).
+**Learning:** Hardening path validation requires protecting all secrets orchestration metadata (SOPS), infrastructure-as-code variable files (Terraform), and token/secret key naming variations across repository paths.
+**Prevention:** Maintain an explicit, case-insensitive denylist and pattern-matching rules in `validate_safe_path` encompassing SOPS configuration files (`.sops.yaml`), Terraform variable files (`.tfvars`), and token/secret key prefixes.
+
 ## 2026-08-30 - Expand Path Validation Blocklist for DB Shells, Shell Profiles, and Package Manager Credentials
 
 **Vulnerability:** Gaps in `FORBIDDEN_PATHS` left additional sensitive REPL/database shell histories (`.dbshell`, `.rediscli_history`), shell profiles (`.kshrc`), and package manager credential files (`pip.conf`, `.gemrc`) vulnerable to potential inspection or exfiltration.

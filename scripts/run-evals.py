@@ -259,6 +259,7 @@ Examples:
                         help="Write report to file instead of stdout")
     args = parser.parse_args()
     try:
+        # Resolve skills_dir base path; discover_skills enforces check_forbidden=True on all skills inside
         skills_dir = validate_safe_path(args.path, Path.cwd(), "path")
     except PathValidationError as e:
         print(f"Error: {e}", file=sys.stderr)
