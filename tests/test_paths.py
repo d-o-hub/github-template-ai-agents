@@ -78,7 +78,8 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".zlogin", ".zlogout", ".bash_login", ".pgpass", ".my.cnf",
         ".irb_history", ".pry_history", ".pg_service.conf",
         ".tcshrc", ".cshrc", ".login", ".logout", ".rediscli_history",
-        ".dbshell", ".kshrc", "pip.conf", ".gemrc"
+        ".dbshell", ".kshrc", "pip.conf", ".gemrc", ".condarc",
+        "nuget.config", ".sops.yaml", ".sops", ".zsh_sessions"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
@@ -128,7 +129,8 @@ def test_validate_safe_path_patterns(tmp_path):
     # Additional sensitive extension suffix patterns
     additional_suffixes = [
         "vpn_config.ovpn", "passwords.kdbx", "login.keychain", "user.keychain-db",
-        "config.env", "prod.env", "secrets.env"
+        "config.env", "prod.env", "secrets.env", "terraform.tfvars",
+        "terraform.tfvars.json", "override.tfvars", "secrets.tfvars.json"
     ]
     for p in additional_suffixes:
         with pytest.raises(PathValidationError):
