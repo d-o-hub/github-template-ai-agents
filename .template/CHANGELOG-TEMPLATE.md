@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.14] - 2026-09-20
+
+### Added
+
+- feat(ci): flag same-jules-task sibling prs in guard (#874)
+- docs(jules): restore true dates on bolt entries (#873)
+- feat(ci): auto-close subset duplicate prs in guard (#871)
+- feat: apply external optimizations to do-web-doc-resolver (#855)
+- feat(ci): add duplicate pr guard workflow and detector (#845)
+- docs(plans): record adr-034 ci status persistence redesign (#844)
+
+### Fixed
+
+- fix(security): block private key prefixes in path validation (#879)
+- fix(ci): self-heal missing superseded-candidate label in duplicate guard (#869)
+- fix(security): harden path validation for token, api_key, and env suffixes (#864)
+- fix(security): harden path validation for service accounts and custom SSH keys (#854)
+- fix(tests): reduce test complexity and fix markdown generator lint (#849)
+
+### Changed
+
+- ci: update ci status artifacts [skip ci] (#882)
+- ci: update ci status artifacts [skip ci] (#881)
+- chore(metrics): log 2026-09-13 pr triage session (#880)
+- perf(scripts): eliminate sed subshells for string capitalization (#878)
+- ci: update ci status artifacts [skip ci] (#876)
+- chore(metrics): log 2026-09-12 guard hardening session (#875)
+- ci: update ci status artifacts [skip ci] (#872)
+- ci: update ci status artifacts [skip ci] (#870)
+- ci: update ci status artifacts [skip ci] (#868)
+- chore(metrics): log 2026-09-12 pr triage session (#867)
+- ci: update ci status artifacts [skip ci] (#866)
+- perf(skills): eliminate subshells in dynamic-catalog loop (#862)
+- ci: update ci status artifacts [skip ci] (#865)
+- ci: update ci status artifacts [skip ci] (#860)
+- chore(metrics): log 2026-09-09 pr triage session (#859)
+- ci: update ci status artifacts [skip ci] (#858)
+- perf(tests): eliminate subshells in validate-skills test (#852)
+- ci: update ci status artifacts [skip ci] (#857)
+- ci: bump reviewdog/action-actionlint in the github-actions group (#853)
+- ci: update ci status artifacts [skip ci] (#850)
+- ci: update ci status artifacts [skip ci] (#848)
+- chore(metrics): log 2026-09-06 pr triage and ci status session (#847)
+- ci: update ci status artifacts [skip ci] (#846)
+
 ### Added
 
 - feat(harness): add Agent Teams, Dynamic Workflows, and Worktrees guide (`AGENT_TEAMS_GUIDE.md`)
