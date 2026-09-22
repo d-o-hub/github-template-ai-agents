@@ -79,7 +79,8 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".irb_history", ".pry_history", ".pg_service.conf",
         ".tcshrc", ".cshrc", ".login", ".logout", ".rediscli_history",
         ".dbshell", ".kshrc", "pip.conf", ".gemrc", ".condarc",
-        "nuget.config", ".sops.yaml", ".sops", ".zsh_sessions"
+        "nuget.config", ".sops.yaml", ".sops", ".zsh_sessions",
+        ".curlrc", ".wgetrc"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
