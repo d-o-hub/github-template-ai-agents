@@ -1,1 +1,0 @@
-perf(scripts): optimize subset and near duplicate checks in PR scanner
