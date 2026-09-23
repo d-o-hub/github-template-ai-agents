@@ -180,16 +180,45 @@ main() {
   # --- SUBSET duplicates: older PR's files strictly contained in a newer PR's
   # file set with byte-identical patches on every shared file; close the older.
   local i j a b fname a_hash b_hash contained total=${#ordered[@]}
+  local nl=$'\n' stripped_a len_a stripped_b len_b
+  local -a arr_a arr_b files_a files_b
+  local -A map_b
+  local is_subset f
+
   for ((i = 0; i < total; i++)); do
     for ((j = i + 1; j < total; j++)); do
       a="${ordered[$i]}"
       b="${ordered[$j]}"
       [[ -z "${CLOSED_SET[$a]:-}" && -z "${CLOSED_SET[$b]:-}" ]] || continue
+
+      # perf: count lines natively via parameter expansion instead of $(grep -c)
+      stripped_a="${pr_files[$a]//[^$nl]/}"
+      len_a=$(( ${#pr_files[$a]} == 0 ? 0 : ${#stripped_a} + 1 ))
+      stripped_b="${pr_files[$b]//[^$nl]/}"
+      len_b=$(( ${#pr_files[$b]} == 0 ? 0 : ${#stripped_b} + 1 ))
+
       # a's file set must be a proper subset of b's file set.
-      [[ $(grep -c . <<< "${pr_files[$a]}") -lt $(grep -c . <<< "${pr_files[$b]}") ]] || continue
-      [[ -z "$(comm -13 <(printf '%s\n' "${pr_files[$b]}") <(printf '%s\n' "${pr_files[$a]}"))" ]] || continue
+      [[ $len_a -lt $len_b ]] || continue
+
+      # perf: replace `comm -13` with native associative array lookups
+      mapfile -t arr_a <<< "${pr_files[$a]}"
+      mapfile -t arr_b <<< "${pr_files[$b]}"
+      map_b=()
+      for f in "${arr_b[@]}"; do
+        [[ -n "$f" ]] && map_b["$f"]=1
+      done
+
+      is_subset=1
+      for f in "${arr_a[@]}"; do
+        if [[ -n "$f" && -z "${map_b[$f]:-}" ]]; then
+          is_subset=0
+          break
+        fi
+      done
+      [[ $is_subset -eq 1 ]] || continue
+
       contained=1
-      while IFS= read -r fname; do
+      for fname in "${arr_a[@]}"; do
         [[ -n "$fname" ]] || continue
         a_hash="${pr_patch_hash["$a:$fname"]:-}"
         b_hash="${pr_patch_hash["$b:$fname"]:-}"
@@ -197,25 +226,39 @@ main() {
           contained=0
           break
         fi
-      done <<< "${pr_files[$a]}"
+      done
       (( contained )) || continue
       close_subset_duplicate "$a" "$b"
     done
   done
 
   # --- NEAR duplicates: pairwise meaningful-file overlap, flag the older. ---
-  local -a files_a=() files_b=()
   local overlap smaller
   for ((i = 0; i < total; i++)); do
     for ((j = i + 1; j < total; j++)); do
       a="${ordered[$i]}"
       b="${ordered[$j]}"
       [[ -z "${CLOSED_SET[$a]:-}" && -z "${CLOSED_SET[$b]:-}" ]] || continue
-      mapfile -t files_a < <(printf '%s\n' "${pr_files[$a]}" | grep -v '^$' || true)
-      mapfile -t files_b < <(printf '%s\n' "${pr_files[$b]}" | grep -v '^$' || true)
+
+      # perf: eliminate process substitutions and `grep -v '^$'` via native here-strings
+      mapfile -t files_a <<< "${pr_files[$a]}"
+      mapfile -t files_b <<< "${pr_files[$b]}"
+
       (( ${#files_a[@]} > 0 && ${#files_b[@]} > 0 )) || continue
-      overlap="$(comm -12 <(printf '%s\n' "${files_a[@]}") <(printf '%s\n' "${files_b[@]}") | grep -c . || true)"
+
+      # perf: eliminate `comm -12 ... | grep -c .` pipeline with native associative array overlap counting
+      map_b=()
+      for f in "${files_b[@]}"; do
+        [[ -n "$f" ]] && map_b["$f"]=1
+      done
+
+      overlap=0
+      for f in "${files_a[@]}"; do
+        [[ -n "$f" && -n "${map_b[$f]:-}" ]] && ((overlap++)) || true
+      done
+
       (( overlap > 0 )) || continue
+
       smaller=$(( ${#files_a[@]} < ${#files_b[@]} ? ${#files_a[@]} : ${#files_b[@]} ))
       if awk -v o="$overlap" -v s="$smaller" -v t="$OVERLAP_THRESHOLD" 'BEGIN { exit !(o / s >= t) }'; then
         flag_superseded "$a" "$b" \
