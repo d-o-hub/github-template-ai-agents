@@ -152,10 +152,15 @@ SENSITIVE_PREFIXES = (
     ".pypirc",
     "auth.json",
     "token",
+    "access_token",
+    "refresh_token",
+    "auth_token",
+    "session_token",
     "api_key",
     "private_key",
     "private-key",
     "privkey",
+    "secret_key",
 )
 
 SENSITIVE_SUFFIXES = (
