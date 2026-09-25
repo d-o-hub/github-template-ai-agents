@@ -137,18 +137,6 @@ FORBIDDEN_PATHS = frozenset({
 FORBIDDEN_PATHS_LOWER = frozenset({p.lower() for p in FORBIDDEN_PATHS})
 
 # Module-level constants for pattern-based sensitive file validation to avoid string duplication.
-# Low-severity filename-policy layer: validate_safe_path() first resolves and
-# confines every candidate inside base via resolve()/relative_to before this
-# denylist is consulted, and current callers only probe existence (eval file
-# validation) or write reports inside base. This list therefore blocks
-# repo-local overwrite/probe of sensitive names, not arbitrary reads.
-# Fail-closed prefix policy: startswith() matching intentionally over-blocks
-# (e.g. "tokenizer", "token_secret_backup"); false positives are accepted
-# for denylist safety.
-# Deliberately narrow coverage: only the listed snake_case/hyphenated
-# lowercase prefixes are blocked. camelCase (e.g. "myAccessToken") and infix
-# forms (e.g. "mytokenfile", "tokenized_backup") are NOT covered unless
-# matched by another rule.
 SENSITIVE_PREFIXES = (
     ".env",
     "client_secret",
