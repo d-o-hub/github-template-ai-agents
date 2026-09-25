@@ -180,12 +180,14 @@ main() {
   # --- SUBSET duplicates: older PR's files strictly contained in a newer PR's
   # file set with byte-identical patches on every shared file; close the older.
   local i j a b fname a_hash b_hash contained total=${#ordered[@]}
-  local nl=$'\n'
   local -a files_a_arr=() files_b_arr=()
   local a_count b_count
 
-  # Performance optimization: pre-calculate file arrays and counts to avoid repetitive work
-  local -A pr_files_arrays=()
+  # Cache per-PR meaningful-file blobs (newline-separated strings) and valid
+  # counts so the pair loops below re-split cached strings instead of forking
+  # subshell pipelines per pair. Note: the near-duplicate threshold check still
+  # forks awk once per overlapping pair.
+  local -A pr_files_blob=()
   local -A pr_files_counts=()
   for a in "${ordered[@]}"; do
     local -a current_files=()
@@ -197,8 +199,8 @@ main() {
       fi
     done
     pr_files_counts["$a"]=$valid_count
-    # Store newline-separated valid files back for array reconstruction
-    pr_files_arrays["$a"]="${pr_files[$a]}"
+    # Keep the newline-separated blob; callers re-split it with mapfile per pair.
+    pr_files_blob["$a"]="${pr_files[$a]}"
   done
 
   for ((i = 0; i < total; i++)); do
@@ -213,14 +215,15 @@ main() {
       # a's file set must be a proper subset of b's file set.
       [[ $a_count -lt $b_count ]] || continue
 
-      # Performance optimization: Replace `comm -13` with native bash associative arrays
+      # Subset check with native bash associative-array lookup (avoids comm
+      # + process-substitution forks per pair).
       local -A b_files_set=()
-      mapfile -t files_b_arr <<< "${pr_files_arrays[$b]}"
+      mapfile -t files_b_arr <<< "${pr_files_blob[$b]}"
       for fname in "${files_b_arr[@]}"; do
         [[ -n "$fname" ]] && b_files_set["$fname"]=1
       done
 
-      mapfile -t files_a_arr <<< "${pr_files_arrays[$a]}"
+      mapfile -t files_a_arr <<< "${pr_files_blob[$a]}"
       local subset_fail=0
       for fname in "${files_a_arr[@]}"; do
         if [[ -n "$fname" ]] && [[ -z "${b_files_set[$fname]:-}" ]]; then
@@ -258,10 +261,11 @@ main() {
 
       (( a_count > 0 && b_count > 0 )) || continue
 
-      mapfile -t files_a_arr <<< "${pr_files_arrays[$a]}"
-      mapfile -t files_b_arr <<< "${pr_files_arrays[$b]}"
+      mapfile -t files_a_arr <<< "${pr_files_blob[$a]}"
+      mapfile -t files_b_arr <<< "${pr_files_blob[$b]}"
 
-      # Performance optimization: Replace `comm -12` with native bash associative array intersection
+      # Overlap count with native bash associative-array intersection (avoids
+      # comm + process-substitution forks per pair).
       local -A a_files_set=()
       for fname in "${files_a_arr[@]}"; do
         [[ -n "$fname" ]] && a_files_set["$fname"]=1

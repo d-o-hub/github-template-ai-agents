@@ -315,3 +315,372 @@ MOCK
     [[ "$(actions)" != *"CLOSED 801"* ]]
     [[ "$(actions)" != *"COMMENTED 802"* ]]
 }
+
+@test "empty: no open PRs does nothing" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    exit 0
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"No open PRs; nothing to do."* ]]
+    [[ "$(actions)" == "" ]]
+}
+
+@test "blank: single PR with empty diff takes no action" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '910\t2026-09-01T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    case "$3" in
+        910) printf '';;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Done. closed=0 flagged=0"* ]]
+    [[ "$(actions)" == "" ]]
+}
+
+@test "spaces in filenames: subset closes the older PR" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '931\t2026-09-01T00:00:00Z\n'
+    printf '932\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    case "$3" in
+        931) printf 'diff --git a/src/my file.sh b/src/my file.sh\n@@\n-a\n+b\n';;
+        932) printf 'diff --git a/src/my file.sh b/src/my file.sh\n@@\n-a\n+b\ndiff --git a/src/other.sh b/src/other.sh\n@@\n-c\n+d\n';;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Closed subset duplicate PR #931 (contained in survivor #932)"* ]]
+    [[ "$(actions)" == *"CLOSED 931"* ]]
+    [[ "$(actions)" != *"CLOSED 932"* ]]
+}
+
+@test "quotes in filenames: subset closes without word-splitting" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '935\t2026-09-01T00:00:00Z\n'
+    printf '936\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    case "$3" in
+        935)
+            qfile="src/a'b\"c.sh"
+            printf 'diff --git a/%s b/%s\n@@\n-a\n+b\n' "$qfile" "$qfile"
+            ;;
+        936)
+            qfile="src/a'b\"c.sh"
+            printf 'diff --git a/%s b/%s\n@@\n-a\n+b\n' "$qfile" "$qfile"
+            printf 'diff --git a/src/other.sh b/src/other.sh\n@@\n-c\n+d\n'
+            ;;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Closed subset duplicate PR #935 (contained in survivor #936)"* ]]
+    [[ "$(actions)" == *"CLOSED 935"* ]]
+    [[ "$(actions)" != *"CLOSED 936"* ]]
+}
+
+@test "glob chars in filenames: no pathname expansion, subset closes" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '941\t2026-09-01T00:00:00Z\n'
+    printf '942\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    case "$3" in
+        941)
+            g1='src/star*.sh'
+            g2='src/qmark?.sh'
+            g3='src/bracket[ab].sh'
+            printf 'diff --git a/%s b/%s\n@@\n-a\n+b1\n' "$g1" "$g1"
+            printf 'diff --git a/%s b/%s\n@@\n-a\n+b2\n' "$g2" "$g2"
+            printf 'diff --git a/%s b/%s\n@@\n-a\n+b3\n' "$g3" "$g3"
+            ;;
+        942)
+            g1='src/star*.sh'
+            g2='src/qmark?.sh'
+            g3='src/bracket[ab].sh'
+            printf 'diff --git a/%s b/%s\n@@\n-a\n+b1\n' "$g1" "$g1"
+            printf 'diff --git a/%s b/%s\n@@\n-a\n+b2\n' "$g2" "$g2"
+            printf 'diff --git a/%s b/%s\n@@\n-a\n+b3\n' "$g3" "$g3"
+            printf 'diff --git a/src/extra.sh b/src/extra.sh\n@@\n-c\n+d\n'
+            ;;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Closed subset duplicate PR #941 (contained in survivor #942)"* ]]
+    [[ "$(actions)" == *"CLOSED 941"* ]]
+    [[ "$(actions)" != *"CLOSED 942"* ]]
+}
+
+@test "b-slash path component: no crash, consistent handling closes subset" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '943\t2026-09-01T00:00:00Z\n'
+    printf '944\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    case "$3" in
+        943)
+            spfile='src/a b/c.sh'
+            printf 'diff --git a/%s b/%s\n@@\n-a\n+b\n' "$spfile" "$spfile"
+            ;;
+        944)
+            spfile='src/a b/c.sh'
+            printf 'diff --git a/%s b/%s\n@@\n-a\n+b\n' "$spfile" "$spfile"
+            printf 'diff --git a/src/other.sh b/src/other.sh\n@@\n-c\n+d\n'
+            ;;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Closed subset duplicate PR #943 (contained in survivor #944)"* ]]
+    [[ "$(actions)" == *"CLOSED 943"* ]]
+    [[ "$(actions)" != *"CLOSED 944"* ]]
+}
+
+@test "tabs in filenames: exact duplicates still close without crash" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '945\t2026-09-01T00:00:00Z\n'
+    printf '946\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    case "$3" in
+        945)
+            tabfile=$'src/a\tb.sh'
+            printf 'diff --git a/%s b/%s\n@@\n-a\n+b\n' "$tabfile" "$tabfile"
+            ;;
+        946)
+            tabfile=$'src/a\tb.sh'
+            printf 'diff --git a/%s b/%s\n@@\n-a\n+b\n' "$tabfile" "$tabfile"
+            ;;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Closed duplicate PR #945 (exact match, survivor #946)"* ]]
+    [[ "$(actions)" == *"CLOSED 945"* ]]
+    [[ "$(actions)" != *"CLOSED 946"* ]]
+}
+
+@test "threshold boundary: 7 of 10 shared files flags at 0.7" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '951\t2026-09-01T00:00:00Z\n'
+    printf '952\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    case "$3" in
+        951)
+            for f in s1 s2 s3 s4 s5 s6 s7 a1 a2 a3; do
+                printf 'diff --git a/src/%s.sh b/src/%s.sh\n@@\n-%s\n+951-%s\n' "$f" "$f" "$f" "$f"
+            done
+            ;;
+        952)
+            for f in s1 s2 s3 s4 s5 s6 s7 b1 b2 b3; do
+                printf 'diff --git a/src/%s.sh b/src/%s.sh\n@@\n-%s\n+952-%s\n' "$f" "$f" "$f" "$f"
+            done
+            ;;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Flagged PR #951 as superseded-candidate (overlaps #952)"* ]]
+    [[ "$(actions)" == *"COMMENTED 951"* ]]
+    [[ "$(actions)" == *"LABELED 951"* ]]
+    [[ "$(actions)" != *"CLOSED 951"* ]]
+}
+
+@test "threshold boundary: 6 of 10 shared files does not flag below 0.7" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '953\t2026-09-01T00:00:00Z\n'
+    printf '954\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    case "$3" in
+        953)
+            for f in s1 s2 s3 s4 s5 s6 a1 a2 a3 a4; do
+                printf 'diff --git a/src/%s.sh b/src/%s.sh\n@@\n-%s\n+953-%s\n' "$f" "$f" "$f" "$f"
+            done
+            ;;
+        954)
+            for f in s1 s2 s3 s4 s5 s6 b1 b2 b3 b4; do
+                printf 'diff --git a/src/%s.sh b/src/%s.sh\n@@\n-%s\n+954-%s\n' "$f" "$f" "$f" "$f"
+            done
+            ;;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Done. closed=0 flagged=0"* ]]
+    [[ "$(actions)" == "" ]]
+}
+
+@test "dry run subset: reports without mutating" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '961\t2026-09-01T00:00:00Z\n'
+    printf '962\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    case "$3" in
+        961) printf 'diff --git a/src/a.sh b/src/a.sh\n@@\n-a\n+b\ndiff --git a/src/b.sh b/src/b.sh\n@@\n-b\n+c\n';;
+        962) printf 'diff --git a/src/a.sh b/src/a.sh\n@@\n-a\n+b\ndiff --git a/src/b.sh b/src/b.sh\n@@\n-b\n+c\ndiff --git a/src/new.sh b/src/new.sh\n@@\n-n\n+m\n';;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run env DRY_RUN=true ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"[DRY RUN] would close subset duplicate PR #961"* ]]
+    [[ "$(actions)" == "" ]]
+}
+
+@test "dry run near: reports without mutating" {
+    cat <<'MOCK' > "$BATS_TMPDIR/gh"
+#!/usr/bin/env bash
+if [ "$1" = "pr" ] && [ "$2" = "list" ]; then
+    printf '971\t2026-09-01T00:00:00Z\n'
+    printf '972\t2026-09-05T00:00:00Z\n'
+elif [ "$1" = "pr" ] && [ "$2" = "diff" ]; then
+    case "$3" in
+        971) printf 'diff --git a/src/feat.sh b/src/feat.sh\n@@\n-a\n+b\n';;
+        972) printf 'diff --git a/src/feat.sh b/src/feat.sh\n@@\n-a\n+c\n';;
+    esac
+elif [ "$1" = "pr" ] && [ "$2" = "view" ]; then
+    printf '{"comments":[]}'
+elif [ "$1" = "pr" ] && [ "$2" = "comment" ]; then
+    echo "COMMENTED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "edit" ]; then
+    echo "LABELED $3" >> "$BATS_TMPDIR/actions.log"
+elif [ "$1" = "pr" ] && [ "$2" = "close" ]; then
+    echo "CLOSED $3" >> "$BATS_TMPDIR/actions.log"
+fi
+exit 0
+MOCK
+    chmod +x "$BATS_TMPDIR/gh"
+    run env DRY_RUN=true ./scripts/detect-duplicate-prs.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"[DRY RUN] would flag PR #971 as superseded by #972"* ]]
+    [[ "$(actions)" == "" ]]
+}
