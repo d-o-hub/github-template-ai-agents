@@ -120,7 +120,10 @@ def test_validate_safe_path_patterns(tmp_path):
         "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
         "netrc_backup", ".netrc_old", ".npmrc_custom", ".yarnrc_custom", ".pypirc_prod",
         "auth.json_copy", "token_secret.json", "token.txt", "api_key_prod", "api_key.json",
-        "private_key.txt", "private-key.txt", "privkey"
+        "private_key.txt", "private-key.txt", "privkey",
+        "access_token.json", "access-token.json", "refresh_token.txt", "refresh-token.txt",
+        "auth_token.json", "auth-token.json", "session_token.json", "session-token.json",
+        "bearer_token.json", "bearer-token.json", "app_secret.json", "app-secret.json"
     ]
     for p in prefix_patterns:
         with pytest.raises(PathValidationError):
@@ -222,3 +225,41 @@ def test_validate_safe_path_ssh_keys(tmp_path):
         expected = (base / pub).resolve()
         if res != expected:
             raise AssertionError(f"Expected {expected}, got {res}")
+
+
+def test_token_app_secret_blocked_via_eval_consumer_path(tmp_path):
+    """Consumer regression: the eval file-validation caller
+    (scripts/lib/eval_executors.py::run_file_validation, "files" param) and
+    the report-writer caller (scripts/run-evals.py --output, "output" param)
+    must reject access_token.json / app_secret.json even when repo-local."""
+    import os
+    import sys
+
+    scripts_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "scripts"))
+    if scripts_dir not in sys.path:
+        sys.path.insert(0, scripts_dir)
+    from lib.eval_executors import run_file_validation
+    from lib.eval_types import EvalStatus
+
+    skill_path = tmp_path / "skill"
+    skill_path.mkdir()
+    # Files exist inside base: rejection must still hold (fail closed).
+    (skill_path / "access_token.json").write_text("{}")
+    (skill_path / "app_secret.json").write_text("{}")
+
+    result = run_file_validation(
+        {"id": 1, "files": ["access_token.json", "app_secret.json"]},
+        skill_path,
+        False,
+    )
+    if result.status != EvalStatus.FAIL:
+        raise AssertionError(f"Expected FAIL, got {result.status}")
+    for name in ("access_token.json", "app_secret.json"):
+        if not any(name in d for d in result.details):
+            raise AssertionError(f"{name} not reported missing: {result.details}")
+
+    # Report-writer caller path: same repo-local rejection.
+    with pytest.raises(PathValidationError):
+        validate_safe_path("access_token.json", skill_path, "output", check_forbidden=True)
+    with pytest.raises(PathValidationError):
+        validate_safe_path("app_secret.json", skill_path, "output", check_forbidden=True)
