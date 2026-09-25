@@ -173,12 +173,11 @@ def test_run_file_validation_forbidden_path(tmp_path):
     assert result.details == ["Missing: .env"]  # nosec B101 -- test assertion
 
 
-def test_run_file_validation_curlrc_wgetrc_rejected(tmp_path):
-    """Consumer regression: eval file-validation must reject repo-local download-tool rc files."""
+def test_run_file_validation_curlrc_wgetrc_forbidden(tmp_path):
     skill_path = tmp_path / "skill"
     skill_path.mkdir()
-    (skill_path / ".curlrc").write_text("test-content", encoding="utf-8")
-    (skill_path / ".wgetrc").write_text("test-content", encoding="utf-8")
+    (skill_path / ".curlrc").touch()
+    (skill_path / ".wgetrc").touch()
 
     eval_case = {"id": 1, "files": [".curlrc", ".wgetrc"]}
     result = eval_executors.run_file_validation(eval_case, skill_path, False)

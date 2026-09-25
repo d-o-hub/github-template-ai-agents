@@ -131,9 +131,6 @@ FORBIDDEN_PATHS = frozenset({
     ".sops.yaml",
     ".sops",
     ".zsh_sessions",
-    # Low-severity filename-policy gap within the allowed base:
-    # validate_safe_path already confines via resolve()+relative_to,
-    # so this denylist only blocks these in-base names.
     ".curlrc",
     ".wgetrc",
 })
