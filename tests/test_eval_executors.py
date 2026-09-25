@@ -171,3 +171,16 @@ def test_run_file_validation_forbidden_path(tmp_path):
     assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
     assert result.message == "Missing 1 file(s)"  # nosec B101 -- test assertion
     assert result.details == ["Missing: .env"]  # nosec B101 -- test assertion
+
+
+def test_run_file_validation_curlrc_wgetrc_forbidden(tmp_path):
+    skill_path = tmp_path / "skill"
+    skill_path.mkdir()
+    (skill_path / ".curlrc").touch()
+    (skill_path / ".wgetrc").touch()
+
+    eval_case = {"id": 1, "files": [".curlrc", ".wgetrc"]}
+    result = eval_executors.run_file_validation(eval_case, skill_path, False)
+    assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
+    assert result.message == "Missing 2 file(s)"  # nosec B101 -- test assertion
+    assert result.details == ["Missing: .curlrc", "Missing: .wgetrc"]  # nosec B101 -- test assertion
