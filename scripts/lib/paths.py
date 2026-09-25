@@ -156,6 +156,18 @@ SENSITIVE_PREFIXES = (
     "private_key",
     "private-key",
     "privkey",
+    "access_token",
+    "access-token",
+    "refresh_token",
+    "refresh-token",
+    "auth_token",
+    "auth-token",
+    "session_token",
+    "session-token",
+    "bearer_token",
+    "bearer-token",
+    "app_secret",
+    "app-secret",
 )
 
 SENSITIVE_SUFFIXES = (
