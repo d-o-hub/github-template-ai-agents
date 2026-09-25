@@ -252,7 +252,8 @@ def test_token_app_secret_blocked_via_eval_consumer_path(tmp_path):
         skill_path,
         False,
     )
-    assert result.status == EvalStatus.FAIL
+    if result.status != EvalStatus.FAIL:
+        raise AssertionError(f"Expected FAIL, got {result.status}")
     for name in ("access_token.json", "app_secret.json"):
         if not any(name in d for d in result.details):
             raise AssertionError(f"{name} not reported missing: {result.details}")
