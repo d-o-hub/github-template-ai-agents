@@ -120,7 +120,10 @@ def test_validate_safe_path_patterns(tmp_path):
         "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
         "netrc_backup", ".netrc_old", ".npmrc_custom", ".yarnrc_custom", ".pypirc_prod",
         "auth.json_copy", "token_secret.json", "token.txt", "api_key_prod", "api_key.json",
-        "private_key.txt", "private-key.txt", "privkey"
+        "private_key.txt", "private-key.txt", "privkey",
+        "access_token.json", "access-token.json", "refresh_token.txt", "refresh-token.txt",
+        "auth_token.json", "auth-token.json", "session_token.json", "session-token.json",
+        "bearer_token.json", "bearer-token.json", "app_secret.json", "app-secret.json"
     ]
     for p in prefix_patterns:
         with pytest.raises(PathValidationError):
