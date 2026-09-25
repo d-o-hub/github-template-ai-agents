@@ -180,16 +180,58 @@ main() {
   # --- SUBSET duplicates: older PR's files strictly contained in a newer PR's
   # file set with byte-identical patches on every shared file; close the older.
   local i j a b fname a_hash b_hash contained total=${#ordered[@]}
+  local nl=$'\n'
+  local -a files_a_arr=() files_b_arr=()
+  local a_count b_count
+
+  # Performance optimization: pre-calculate file arrays and counts to avoid repetitive work
+  local -A pr_files_arrays=()
+  local -A pr_files_counts=()
+  for a in "${ordered[@]}"; do
+    local -a current_files=()
+    mapfile -t current_files <<< "${pr_files[$a]}"
+    local valid_count=0
+    for fname in "${current_files[@]}"; do
+      if [[ -n "$fname" ]]; then
+        valid_count=$((valid_count + 1))
+      fi
+    done
+    pr_files_counts["$a"]=$valid_count
+    # Store newline-separated valid files back for array reconstruction
+    pr_files_arrays["$a"]="${pr_files[$a]}"
+  done
+
   for ((i = 0; i < total; i++)); do
     for ((j = i + 1; j < total; j++)); do
       a="${ordered[$i]}"
       b="${ordered[$j]}"
       [[ -z "${CLOSED_SET[$a]:-}" && -z "${CLOSED_SET[$b]:-}" ]] || continue
+
+      a_count=${pr_files_counts["$a"]}
+      b_count=${pr_files_counts["$b"]}
+
       # a's file set must be a proper subset of b's file set.
-      [[ $(grep -c . <<< "${pr_files[$a]}") -lt $(grep -c . <<< "${pr_files[$b]}") ]] || continue
-      [[ -z "$(comm -13 <(printf '%s\n' "${pr_files[$b]}") <(printf '%s\n' "${pr_files[$a]}"))" ]] || continue
+      [[ $a_count -lt $b_count ]] || continue
+
+      # Performance optimization: Replace `comm -13` with native bash associative arrays
+      local -A b_files_set=()
+      mapfile -t files_b_arr <<< "${pr_files_arrays[$b]}"
+      for fname in "${files_b_arr[@]}"; do
+        [[ -n "$fname" ]] && b_files_set["$fname"]=1
+      done
+
+      mapfile -t files_a_arr <<< "${pr_files_arrays[$a]}"
+      local subset_fail=0
+      for fname in "${files_a_arr[@]}"; do
+        if [[ -n "$fname" ]] && [[ -z "${b_files_set[$fname]:-}" ]]; then
+          subset_fail=1
+          break
+        fi
+      done
+      (( subset_fail == 0 )) || continue
+
       contained=1
-      while IFS= read -r fname; do
+      for fname in "${files_a_arr[@]}"; do
         [[ -n "$fname" ]] || continue
         a_hash="${pr_patch_hash["$a:$fname"]:-}"
         b_hash="${pr_patch_hash["$b:$fname"]:-}"
@@ -197,26 +239,43 @@ main() {
           contained=0
           break
         fi
-      done <<< "${pr_files[$a]}"
+      done
       (( contained )) || continue
       close_subset_duplicate "$a" "$b"
     done
   done
 
   # --- NEAR duplicates: pairwise meaningful-file overlap, flag the older. ---
-  local -a files_a=() files_b=()
   local overlap smaller
   for ((i = 0; i < total; i++)); do
     for ((j = i + 1; j < total; j++)); do
       a="${ordered[$i]}"
       b="${ordered[$j]}"
       [[ -z "${CLOSED_SET[$a]:-}" && -z "${CLOSED_SET[$b]:-}" ]] || continue
-      mapfile -t files_a < <(printf '%s\n' "${pr_files[$a]}" | grep -v '^$' || true)
-      mapfile -t files_b < <(printf '%s\n' "${pr_files[$b]}" | grep -v '^$' || true)
-      (( ${#files_a[@]} > 0 && ${#files_b[@]} > 0 )) || continue
-      overlap="$(comm -12 <(printf '%s\n' "${files_a[@]}") <(printf '%s\n' "${files_b[@]}") | grep -c . || true)"
+
+      a_count=${pr_files_counts["$a"]}
+      b_count=${pr_files_counts["$b"]}
+
+      (( a_count > 0 && b_count > 0 )) || continue
+
+      mapfile -t files_a_arr <<< "${pr_files_arrays[$a]}"
+      mapfile -t files_b_arr <<< "${pr_files_arrays[$b]}"
+
+      # Performance optimization: Replace `comm -12` with native bash associative array intersection
+      local -A a_files_set=()
+      for fname in "${files_a_arr[@]}"; do
+        [[ -n "$fname" ]] && a_files_set["$fname"]=1
+      done
+
+      overlap=0
+      for fname in "${files_b_arr[@]}"; do
+        if [[ -n "$fname" ]] && [[ -n "${a_files_set[$fname]:-}" ]]; then
+          overlap=$((overlap + 1))
+        fi
+      done
+
       (( overlap > 0 )) || continue
-      smaller=$(( ${#files_a[@]} < ${#files_b[@]} ? ${#files_a[@]} : ${#files_b[@]} ))
+      smaller=$(( a_count < b_count ? a_count : b_count ))
       if awk -v o="$overlap" -v s="$smaller" -v t="$OVERLAP_THRESHOLD" 'BEGIN { exit !(o / s >= t) }'; then
         flag_superseded "$a" "$b" \
           "this PR shares most of its meaningful files with newer PR #$b" \
