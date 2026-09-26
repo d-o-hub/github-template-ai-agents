@@ -131,6 +131,8 @@ FORBIDDEN_PATHS = frozenset({
     ".sops.yaml",
     ".sops",
     ".zsh_sessions",
+    ".curlrc",
+    ".wgetrc",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
