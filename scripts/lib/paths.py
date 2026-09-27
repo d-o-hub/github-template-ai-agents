@@ -183,6 +183,9 @@ SENSITIVE_SUFFIXES = (
     ".dockercfg", ".publishsettings", ".gpg", ".pgp", ".asc",
     ".p8", ".pkcs12", ".passwd", ".pwd", ".htpasswd", "_history",
     "credentials.json", "client_secret.json", "kubeconfig",
+    # Low-severity filename-policy gap within the allowed base:
+    # validate_safe_path already confines via resolve()+relative_to,
+    # so these suffixes only block matching in-base names (not arbitrary reads).
     "kubeconfig.yaml", "kubeconfig.yml",
     ".secrets", ".credentials", ".vault", "secrets.json",
     "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml",
