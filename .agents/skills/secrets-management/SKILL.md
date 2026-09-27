@@ -1,8 +1,8 @@
 ---
 name: secrets-management
-version: "0.1.0"
+version: "0.2.10"
 category: security
-description: Own the secret lifecycle: detect leaked secrets, rotate them, and store them correctly. Use when handling API keys, tokens, or credentials — even if they just say "rotate this key" or "where do I put this secret". Not for privacy-first (email/PII lint), security-code-auditor (vuln audits).
+description: Own the secret lifecycle: detect leaked secrets, rotate them, and store them correctly. Use when handling API keys, tokens, or credentials — even if they just say "rotate this key", "where do I put this secret", or "this key is hardcoded". Not for privacy-first (email/PII lint), general vulnerability audits (use security-code-auditor), or commit/PR lifecycle mechanics (use git-github-workflow).
 license: MIT
 ---
 
@@ -33,6 +33,9 @@ first, clean history second, prevent third.
 ## Rules
 
 - Never print a secret, even redacted-partially, into logs or PR comments.
+- Never echo a secret value back, even if the user pasted it into the
+  conversation or asks for a copy "for debugging". Offer the reference
+  name (`STRIPE_SECRET_KEY`) or the command to fetch it instead.
 - Never commit a "test" secret that resembles a real one.
 - Separate secret *values* from secret *references* in every example.
 

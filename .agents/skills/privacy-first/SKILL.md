@@ -9,7 +9,7 @@ description: >
   source code or documentation — even if they just say "no email" or "check
   for personal data". Not for security audits (use security-code-auditor),
   EU AI Act compliance (use eu-ai-act-compliance), or hardcoded secrets
-  (use security-code-auditor).
+  (use secrets-management).
 license: MIT
 compatibility: Works with Claude Code, OpenCode, and similar agents. No external dependencies.
 metadata:

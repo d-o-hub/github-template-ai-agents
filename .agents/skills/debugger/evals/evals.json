@@ -29,9 +29,20 @@
    "expected_output": "Refusal to fix out of order; traces to the first causal error",
    "files": [],
    "assertions": [
-    "identifies the first error as causal",
-    "does not patch a downstream symptom",
-    "requires regression coverage"
+    "cites the specific first log line as causal, with file:line or exit code from the log",
+    "refuses to close the issue and names the second error as a downstream symptom of the first",
+    "adds a regression test that reproduces the first error, not the last"
+   ]
+  },
+  {
+   "id": 4,
+   "prompt": "Why is this failing? Three tests in tests/auth/session.test.ts errored with ECONNREFUSED after the last merge, and the build is red too.",
+   "expected_output": "Routes the test-suite half to test-runner, the build half to debugger; does not claim sole ownership",
+   "files": [],
+   "assertions": [
+    "does not claim the whole request for debugger when a test suite is implicated",
+    "names test-runner for the failing tests and debugger for the build/runtime failure",
+    "still applies root-cause discipline (first causal error, not the last)"
    ]
   }
  ]

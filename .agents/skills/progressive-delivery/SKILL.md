@@ -1,9 +1,9 @@
 ---
 name: progressive-delivery
-description: Ship production fixes through a gated loop: reproduce the failure, generate a candidate fix, evaluate it, red-team it adversarially, then shadow, canary, and promote or roll back on SLO verdicts. Use when remediating production incidents, rolling out risky changes, or setting up shadow/canary/rollback stages — even if they just say "roll this out safely" or "canary this fix".
+description: Remediate a live production failure through a gated loop: reproduce the failure, generate a candidate fix, evaluate it, red-team it adversarially, then shadow, canary, and promote or roll back on SLO verdicts. Use when production is degraded and the fix must itself be proven safe, or when the user is already mid-rollout and needs shadow/canary/rollback decisions — even if they just say "roll this out safely", "canary this fix", or "prove the fix". Not for shipping changes through git/GitHub (use git-github-workflow), for running tests or diagnosing failures (use test-runner), for iterate-until-green validation loops (use iterative-refinement), or for authoring CI/CD pipeline config (use cicd-pipeline).
 category: workflow
 license: MIT
-version: "0.1.0"
+version: "0.2.10"
 ---
 
 # Progressive Delivery
@@ -16,7 +16,7 @@ an explicit verdict (proceed / abort-and-roll-back) recorded before moving on.
 - Production failure needs a fix that must itself be proven safe
 - Rolling out a risky change (migration, perf patch, security hardening)
 - Setting up shadow/canary/promote/rollback stages in any stack
-- Even if they just say "ship it carefully", "canary this", or "prove the fix"
+- Even if they just say "roll this out safely", "canary this", or "prove the fix"
 
 ## The Loop
 
@@ -38,8 +38,9 @@ NOT change. Keep migrations and behavior changes in separate commits.
 
 ### 4. Evaluate — static + functional gates
 
-Run the repo gates (`quality_gate.sh`, targeted tests, `validate-skills.sh`
-for skill changes). All must pass with zero warnings before rollout stages.
+Run the repo gates (`./scripts/quality_gate.sh`, targeted tests,
+`./scripts/validate-skills.sh` for skill changes). All must pass with zero
+warnings before rollout stages.
 
 ### 5. Adversarial evaluation — red-team the fix
 
@@ -107,5 +108,5 @@ mitigation rather than a cure.
 
 - `test-runner` — Execute tests and diagnose failures (stages 2–4)
 - `security-code-auditor` — Audit the fix for vulns (stage 5 input)
-- `git-github-workflow` — Ship the change end-to-end (stage 8 mechanics)
+- `git-github-workflow` — commit/PR/merge mechanics (runs alongside the loop)
 - `iterative-refinement` — Validation loops until quality criteria are met

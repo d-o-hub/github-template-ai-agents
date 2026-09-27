@@ -1,8 +1,8 @@
 ---
 name: dependency-upgrades
-version: "0.1.0"
+version: "0.2.10"
 category: devops
-description: Perform routine dependency version bumps and vulnerability-driven upgrades. Use when updating packages, lockfiles, or base images — even if they just say "bump lodash" or "fix this CVE". Not for migration-refactoring (framework migrations).
+description: Perform routine, low-risk dependency version bumps and vulnerability-driven upgrades (patch/minor, or major with no source changes). Use when updating packages, action pins, pre-commit hooks, lockfiles, or base images — even if they just say "bump lodash" or "fix this CVE". Not for migration-refactoring (major bumps that force source changes, framework or language migrations).
 license: MIT
 ---
 
@@ -36,6 +36,9 @@ by CI, with a rollback path.
 - Never ignore a lockfile diff — read it; unexpected transitive churn is
   a signal, not noise.
 - Never merge a security upgrade red (failing checks void the point).
+- This repo's Dependabot groups all action minor/patch bumps into one PR
+  (`.github/dependabot.yml`) and auto-merges via ADR-032 when
+  `MAINTAINER_AUTOMATION=true`; never let that bypass the verify step.
 
 ## Rationalizations
 

@@ -1,7 +1,7 @@
 ---
 name: git-github-workflow
 version: "0.3.0"
-description: Orchestrates the full git-to-merge lifecycle: validate → commit → check issues → create PR → monitor ALL GitHub Actions (including pre-existing failures) → fix via swarm/web research → merge with strategy selection → post-merge validate. Use this skill when the user asks to ship changes end-to-end, manage a PR through CI, or handle the complete commit-to-merge workflow — even if they just say "push it" or "ship it". Not for simple one-off git operations (revert, squash, cherry-pick) or isolated tasks (just review, just test, just lint).
+description: Orchestrates the full git-to-merge lifecycle: validate → commit → check issues → create PR → monitor ALL GitHub Actions (including pre-existing failures) → fix via swarm/web research → merge with strategy selection → post-merge validate. Use this skill when the user asks to ship changes end-to-end, manage a PR through CI, or handle the complete commit-to-merge workflow — even if they just say "push it" or "ship it". Not for simple one-off git operations (revert, squash, cherry-pick), isolated tasks (just review, just test, just lint), or secret lifecycle work such as rotation and revocation (use secrets-management).
 category: workflow
 license: MIT
 ---

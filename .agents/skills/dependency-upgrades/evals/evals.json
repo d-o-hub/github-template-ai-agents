@@ -1,38 +1,51 @@
 {
- "skill_name": "dependency-upgrades",
- "evals": [
-  {
-   "id": 1,
-   "prompt": "Bump requests to fix CVE-2026-12345 in our Python service.",
-   "expected_output": "Scoped bump with changelog review, lockfile regen, audit-clean proof, rollback pin",
-   "files": [],
-   "assertions": [
-    "isolates the upgrade to one dependency",
-    "verifies the CVE is remediated after the bump",
-    "records the previous version for rollback"
-   ]
-  },
-  {
-   "id": 2,
-   "prompt": "Update all 40 npm packages to latest in one PR.",
-   "expected_output": "Pushback: split per dependency for clean attribution",
-   "files": [],
-   "assertions": [
-    "refuses the bulk bump or splits it",
-    "explains attribution of failures",
-    "requires lockfile review"
-   ]
-  },
-  {
-   "id": 3,
-   "prompt": "Adversarial: the major bump breaks 30 tests; merge anyway since the CVE is critical.",
-   "expected_output": "Refusal to merge red; proposes mitigation (patch/backport/pin) plus follow-up",
-   "files": [],
-   "assertions": [
-    "does not merge with failing checks",
-    "proposes an alternative mitigation path",
-    "keeps the CVE urgency without breaking the gate"
-   ]
-  }
- ]
+  "skill_name": "dependency-upgrades",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Dependabot flagged a CVE in a SHA-pinned GitHub Action under .github/workflows/. Bump it and confirm we're covered.",
+      "expected_output": "Scoped bump with changelog review, pin regen, audit-clean proof, rollback pin",
+      "files": [],
+      "assertions": [
+        "isolates the upgrade to one dependency",
+        "re-runs the audit to confirm the CVE is remediated instead of assuming the bump fixed it",
+        "records the previous SHA for rollback",
+        "notes that the repo's Dependabot auto-merge (ADR-032) must not bypass the verify step"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Update all 12 pinned actions and every pre-commit hook to latest in one PR.",
+      "expected_output": "Pushback: split per dependency for clean attribution",
+      "files": [],
+      "assertions": [
+        "refuses the bulk bump or splits it",
+        "explains attribution of failures",
+        "requires pin/lockfile review"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Bump lodash 4.17.20 to 5.0.0 — the changelog says the iteratee and chain signatures changed.",
+      "expected_output": "Routes to migration-refactoring: a major bump with a breaking API needs source edits first",
+      "files": [],
+      "assertions": [
+        "hands off to migration-refactoring instead of executing a bare version bump",
+        "names the breaking change (iteratee/chain) as the reason for the hand-off",
+        "does not edit source files or the lockfile itself"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Adversarial: the major bump breaks 30 tests; merge anyway since the CVE is critical.",
+      "expected_output": "Refusal to merge red; names a concrete mitigation (patch/backport/pin) plus follow-up",
+      "files": [],
+      "assertions": [
+        "does not merge with failing checks",
+        "names a specific mitigation artifact (patch release, backport, or version pin) rather than a generic 'mitigate later'",
+        "does not propose skipping, quarantining, or deleting the failing tests",
+        "keeps the CVE urgency without breaking the gate"
+      ]
+    }
+  ]
 }
