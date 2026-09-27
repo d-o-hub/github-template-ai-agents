@@ -188,6 +188,18 @@ skipped must never be persisted as `passing`. Derived from the PR #795 roast
   validated tip before the next sync. Direct merge kept racing (`Base branch
   was modified` from ci-status artifact PRs landing every few minutes).
 
+## Round 7 (2026-09-27): NVIDIA SkillEvaluator reuse + production pipeline
+
+- Goal: adopt SkillEvaluator tier semantics without vendoring (ADR-037);
+  ship `progressive-delivery` skill for the production loop
+  (failure → reproduce → fix → evaluate → adversarial → shadow → canary →
+  promote/rollback); add keyless Tier-2 `check-skill-overlap.sh` (advisory).
+- Swarm: single primary + research (web-search-researcher); no subagents
+  needed (small, cohesive change).
+- Gates: `validate-skills.sh`, BATS for new script, `quality_gate.sh`,
+  full CI on PR, squash-merge via `--auto`.
+- Status: IN FLIGHT (ADR-037 accepted).
+
 ## Round 6 deviations (2026-09-27, primary log)
 
 1. **#906 closed via #907**: Jules/user merged token-prefix content as #907

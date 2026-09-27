@@ -1,7 +1,7 @@
 # Skill Catalog
 
 > Auto-generated from `.agents/skills/` directory.
-> Last updated: 2026-08-16
+> Last updated: 2026-09-27
 > Do not edit manually. Run `./scripts/generate-skill-catalog.sh`.
 
 ## Available Skills
@@ -11,23 +11,23 @@
 | accessibility-auditor | Audit web applications for WCAG 2.2 compliance, screen reader compatibility, keyboard navigation, and color contrast. Use this skill when the user asks for an accessibility audit, a11y check, WCAG compliance review, s... | ui-ux |
 | agent-browser | Browser automation CLI for AI agents. Use when the user needs to interact with websites — navigating pages, filling forms, clicking buttons, taking screenshots, scraping data, testing web apps, or automating any brows... | tool |
 | agent-coordination | Coordinate multiple agents for software development across any language. Use this skill when running parallel execution of independent tasks, sequential chains with dependencies, swarm analysis from multiple perspecti... | agent |
-| agentic-abstention | No description available | agent |
+| agentic-abstention | Encode CONVOLVE-style stopping rules: decide when to stop acting instead of continuing tool calls on an infeasible task. Use this skill whenever an agent must determine if further execution is warranted. Not for gener... | agent |
 | agents-md | Create AGENTS.md files with production-ready best practices. Use this skill when creating new AGENTS.md files, implementing quality gates, or updating agent documentation — even if they just say "add an AGENTS.md" or ... | documentation |
 | api-design-first | Design and document RESTful APIs using design-first principles with OpenAPI specifications. Use this skill when the user asks to design an API, create an API spec, plan endpoints, model request/response schemas, or di... | platform |
 | architecture-diagram | Generate or update a project architecture SVG diagram by scanning the live project structure. Use this skill whenever the user asks to regenerate, refresh, or update the architecture diagram, or when skills, agents, o... | documentation |
 | avoid-ai-writing | Audit and rewrite content to remove AI writing patterns ("AI-isms"). Use this skill when asked to "remove AI-isms," "clean up AI writing," "edit writing for AI patterns," "audit writing for AI tells," or "make this so... | quality |
 | cicd-pipeline | Design and configure CI/CD pipelines with GitHub Actions, GitLab CI, and Forgejo Actions. Use this skill when the user asks to create a new workflow, set up pipeline triggers, configure caching or matrix builds, manag... | workflow |
-| cloudflare-worker-api | No description available | workflow |
+| cloudflare-worker-api | Structure Worker API routes and handlers. Use this skill when defining Cloudflare Worker routes, building response helpers, or implementing typed handler patterns — even if they just say "set up the worker routes" or ... | workflow |
 | codacy | Use the Codacy CLI for local static analysis and cloud data queries. Use the Analysis CLI (`codacy-analysis`) to run local analysis without pushing to Codacy Cloud, or the Cloud CLI (`codacy`) to query remote reposito... | code-quality |
 | code-review-assistant | Automated code review with PR analysis, change summaries, quality checks, and code smell detection. Use this skill when reviewing pull requests, generating review comments, checking against best practices, identifying... | code-quality |
-| codeberg-api | No description available | platform |
+| codeberg-api | Interact with Forgejo/Codeberg repositories via the REST API — read or write files, manage issues, create pull requests, list branches/tags, search repos, and automate CI/CD workflows. Use this skill when the user wan... | platform |
 | css-render-performance | Guide CSS render performance analysis and optimization. Use this skill when reviewing or writing CSS animations, transitions, scroll-heavy UIs, or long lists — even if they just say "this animation is janky" or "optim... | code-quality |
 | database-devops | Database design, migration, and DevOps automation with safety patterns. Use this skill when designing schemas, planning migrations, optimizing queries, or managing multi-database orchestration — even if they just say ... | database |
 | delegate | Lightweight retrieval and context agent skill for rapid information gathering and environment assessment. Use this skill when you need quick context lookups, finding code patterns, or assessing current state without f... | agent |
 | dist-channel-selection | Guide for selecting the correct distribution channel (npm, Cargo, etc.) based on artifact type and target audience. Use this skill when preparing to publish or release a new version of a package — even if they just sa... | tool |
 | do-web-doc-resolver | Python resolver for URLs and queries into compact, LLM-ready markdown. Use this skill when fetching documentation, resolving web URLs, or building context from web sources — even if they just say "read this doc page" ... | tool |
 | docs-hook | Lightweight git hook integration for updating agents-docs with minimal tokens. Use this skill when updating agents-docs on commit or merge events to sync documentation — even if they just say "update the docs" or "syn... | workflow |
-| document-rendering-and-locators | No description available | workflow |
+| document-rendering-and-locators | Implement resilient document rendering and annotation anchoring. Use this skill when working with reader-core rendering, TOC generation, locator systems, or highlight anchoring changes — even if they just say "fix the... | workflow |
 | dogfood | Systematically explore and test a web application to find bugs, UX issues, and other problems. Use when asked to "dogfood", "QA", "exploratory test", "find issues", "bug hunt", "test this app/site/platform", or review... | quality |
 | dora-report | Generate monthly DORA and agentic metrics reports. Use this skill when the user asks for a DORA report, monthly metrics, or a monthly audit. Not for readme-best-practices. | devops |
 | durable-objects | Create and review Cloudflare Durable Objects. Use when building stateful coordination (chat rooms, multiplayer games, booking systems), implementing RPC methods, SQLite storage, alarms, WebSockets, or reviewing DO cod... | platform |
@@ -43,11 +43,12 @@
 | lifecycle-management | Manage application lifecycle, error handling, and resource cleanup to prevent memory leaks and ensure stability. Use this skill when handling startup/shutdown sequences, managing resource pools, implementing error bou... | quality |
 | memory-context | Retrieve semantically relevant past learnings, analysis outputs, and project context using the csm CLI (HDC encoder with hybrid BM25 retrieval). Use this skill when the user needs context retrieval, past session memor... | knowledge |
 | migration-refactoring | Automate complex code migrations and refactorings with safety patterns. Use this skill when upgrading dependencies, migrating frameworks (React class→hooks, Flask→FastAPI), modernizing languages (Python 2→3), or perfo... | code-quality |
-| privacy-first | No description available | security |
-| pwa-offline-sync | No description available | workflow |
-| reader-ui-ux | No description available | workflow |
-| readme-best-practices | No description available | documentation |
-| secure-invite-and-access | No description available | workflow |
+| privacy-first | Prevent email addresses and personal data from entering the codebase. Use this skill when the user asks to prevent emails, remove personal data, run a privacy check, scan for PII, or ensure no email addresses leak int... | security |
+| progressive-delivery | Ship production fixes through a gated loop: reproduce the failure, generate a candidate fix, evaluate it, red-team it adversarially, then shadow, canary, and promote or roll back on SLO verdicts. Use when remediating ... | workflow |
+| pwa-offline-sync | Design Cache Storage + IndexedDB strategy and sync queue. Use this skill when building service workers, implementing caching strategies, or investigating offline bugs — even if they just say "make it work offline" or ... | workflow |
+| reader-ui-ux | Build localized, accessible reader/admin UI with responsive layouts, telemetry, and state management. Use this skill when building React screens, polishing UX, or implementing responsive layouts for reader or admin in... | workflow |
+| readme-best-practices | Create, audit, and improve GitHub README.md files following 2026 best practices. Use this skill when a user asks to write, rewrite, or review a README.md for a GitHub repository, add shields.io badges, create a projec... | documentation |
+| secure-invite-and-access | Implement access control, authentication, and authorization patterns. Use this skill when building auth endpoints, managing permissions, implementing session/token logic, or generating signed URLs — even if they just ... | workflow |
 | security-code-auditor | Perform security audits on code to identify vulnerabilities, misconfigurations, and security anti-patterns. Use when users ask to 'audit', 'review', or 'check security' of code, configurations, or repositories — even ... | security |
 | shell-script-quality | Lint and test shell scripts using ShellCheck and BATS. Use this skill when checking bash/sh scripts for errors, writing shell script tests, fixing ShellCheck warnings, setting up CI/CD for shell scripts, or improving ... | code-quality |
 | skill-creator | Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill... | quality |
@@ -55,14 +56,14 @@
 | static-analysis | Triage and fix static analysis findings across any programming language. Use this skill when running linters (ruff, eslint, clippy, shellcheck), analyzing lint output, fixing warnings or errors, or managing cross-lang... | code-quality |
 | template-version-management | Manage versioning in a template repository. Use when working with template repos where `VERSION` is intentionally pinned to 0.0.0, when bumping the template's own release version, when fixing stale version badges, or ... | tool |
 | test-runner | Execute tests, analyze results, and diagnose failures across any testing framework. Use this skill when running test suites, debugging failing tests, or configuring CI/CD testing pipelines — even if they just say "run... | testing |
-| testdata-builders | No description available | quality |
+| testdata-builders | Maintain deterministic builders/factories for test entities. Use this skill when authoring tests, extending test utilities, or adding schema fields that affect fixtures — even if they just say "create test data" or "b... | quality |
 | testing-strategy | Design and implement comprehensive testing strategies for software projects. Use this skill when planning test suites, choosing testing approaches like property-based testing, visual regression, load testing, mutation... | testing |
 | triz-analysis | Run a systematic TRIZ contradiction audit against a codebase, architecture, or workflow to identify hidden trade-offs and innovation opportunities. Use this skill when facing design trade-offs, contradictory requireme... | analysis |
 | triz-solver | Systematic problem-solving using TRIZ (Theory of Inventive Problem Solving) principles adapted for software engineering. Use when stuck on complex problems, facing technical contradictions, optimizing system design, o... | innovation-problem-solving |
 | turso-db | Use this skill for Turso (LibSQL/Limbo) database development, including scaffolding, querying, migrations, and maintenance. Supports vector search, full-text search, CDC, MVCC, encryption, and bidirectional remote syn... | database |
-| ui-ux-optimize | No description available | ui-ux |
+| ui-ux-optimize | Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination, confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile app... | ui-ux |
 | verification-template | Template for creating portable domain-specific verification skills. Use this skill when creating a verification checklist as a starting point for defining systematic verification checklists for new features, modules, ... | quality |
-| voice-profiles | No description available | quality |
+| voice-profiles | Adapt writing tone and style based on target audience and content type using predefined voice and context profiles. | quality |
 | web-search-researcher | Research topics using web search to find accurate, current information. Use this skill when you need modern information, official documentation, best practices, or technical solutions beyond training data — even if th... | tool |
 
 ## Skill Categories
@@ -170,6 +171,7 @@
 - git-github-workflow
 - github-pr-sentinel
 - goap-agent
+- progressive-delivery
 - pwa-offline-sync
 - reader-ui-ux
 - secure-invite-and-access

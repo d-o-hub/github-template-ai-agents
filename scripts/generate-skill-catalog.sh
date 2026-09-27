@@ -41,7 +41,10 @@ def parse_frontmatter(text: str) -> dict[str, str]:
         if key_match:
             data[key] = key_match.group(1).strip().strip("\"'")
 
-    desc_match = re.search(r"(?m)^description:\s*([>|][+-]?)?\s*\n?", fm)
+    # NOTE: only horizontal whitespace may precede the newline — a greedy
+    # \s* here would swallow the next line's indentation and break block
+    # scalars (|, >) by starting mid-content (empty description as result).
+    desc_match = re.search(r"(?m)^description:[ \t]*([>|][+-]?)?[ \t]*\r?\n?", fm)
     if not desc_match:
         data["description"] = ""
         return data

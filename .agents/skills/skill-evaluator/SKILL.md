@@ -217,6 +217,8 @@ PASS | NEEDS_WORK | FAIL — <one sentence>
 
 - `skill-creator` — Create and improve skills
 - `intent-classifier` — Route requests to appropriate skills
+- `progressive-delivery` — Gated production rollout loop (evaluate → adversarial → shadow → canary)
+- `agents-docs/SKILL_EVAL_TIERS.md` — NVIDIA SkillEvaluator tier mapping (ADR-037)
 
 ## Rationalizations
 

@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-037"
+    "adr": "adr-038"
   },
   "active_plan": null,
   "phases": [],
@@ -64,6 +64,10 @@
       "date": "2026-09-12"
     },
     "adr-036-roast-review-merge-900-905-906.md": {
+      "status": "accepted",
+      "date": "2026-09-27"
+    },
+    "adr-037-nvidia-skillevaluator-reuse.md": {
       "status": "accepted",
       "date": "2026-09-27"
     }
