@@ -32,6 +32,7 @@
 - **LESSON-040 — Bot Sync-Merge SHAs Report action_required**: `pull_request`-event runs on bot-authored sync-merge commits conclude `action_required` (not failure); identical content on a clean linear tip runs green. Strip sync merges (`rebase --onto`, force-push with lease), validate, merge promptly.
 - **LESSON-041 — Merge-At-Once Beats Main-Churn Races**: ci-status artifact PRs land every few minutes, so `gh pr merge` on a just-rebased branch fails with `Base branch was modified`. Push a clean linear tip then `gh pr merge --auto --squash` in one move; auto-merge fires on the validated tip before the next sync.
 - **LESSON-042 — gh Label Ops Need REST Fallback**: `gh pr edit --add/remove-label` fails repo-wide when GraphQL `projectCards` errors (Projects-classic sunset). Use REST: `gh api repos/{o}/{r}/issues/{n}/labels/{name} -X DELETE` (or POST `{"labels":[...]}`).
+- **LESSON-043 — Ghost Dirs Trip Validators**: `git rm -r` leaves ignored artifacts (`__pycache__/`) behind, so empty skill dirs persist and directory-iterating validators (`validate-skills.sh`) fail with Missing SKILL.md. Follow every skill deletion with `rm -rf` on the path.
 
 ---
 
