@@ -155,5 +155,41 @@ skipped must never be persisted as `passing`. Derived from the PR #795 roast
      actually landed (zombie merge commit). Triage via step-level
      conclusions: scan steps succeeded -> failure was platform, not code.
   3. Draft PRs run a reduced check set; the full suite (incl. lint-pr-title
-     and Run Tests) only fires on ready_for_review — stale failing checks
-     from pre-retitle events need a rerun/retrigger to clear.
+      and Run Tests) only fires on ready_for_review — stale failing checks
+      from pre-retitle events need a rerun/retrigger to clear.
+
+## Round 6 (2026-09-25): roast-review-merge #900 → #906 → #905 (ADR-036)
+
+- Goal: fix-then-merge all 3 open PRs (0 open issues; none qualifies for
+  no-impact close). User decisions: keep `.jules/bolt.md`, narrow security
+  narrative to low-severity filename-policy scope, include pre-existing debt.
+- Order (file-overlap dependency): #900 (CLEAN, +4/-1) → #906 (same 2 files,
+  needs rebase + full CI retrigger) → #905 (disjoint file, Codacy FAIL).
+- Swarm (GOAP orchestrator): swarm-900 (security-merger), swarm-906
+  (security-merger), swarm-905 (perf-merger + BATS), swarm-debt (skill
+  versions + validate-links). Merges sequential; fix-prep parallelizable.
+- Gates per PR: all bot + owner comments addressed, `bash -n`,
+  `shellcheck --severity=error` clean, BATS + pytest green,
+  `quality_gate.sh` pass, `gh pr checks` all-green, rebase onto main,
+  squash-merge + delete branch. Jules-clobber watch (Round-5 lesson 1).
+- Status: IN FLIGHT (ADR-036 accepted).
+
+## Round 6 deviations (2026-09-27, primary log)
+
+1. **#906 closed via #907**: Jules/user merged token-prefix content as #907
+   (`d3d89fbd`, +`secret_key`/`secret-key` extra) WITHOUT swarm-906 fixes
+   (consumer test, fail-closed policy comment, narrowed claim). Follow-up PR
+   required to port those gaps; also review `secret_key` redundancy (Round-5
+   #879 deliberately dropped it as covered by `secret` startswith).
+2. **Jules clobbered swarm-900 fix**: auto-sync merge commits (`d6bc456f`)
+   broke `pull_request`-event runs (`action_required` on 8 workflows) and
+   later force-pushed a re-cut branch (`9421045c`) dropping `03f68a53`.
+   Fixed by cherry-picking (`b3857358`+`49bebdc4`) onto `8068e220`,
+   force-push with lease, linear history → fresh runs `queued`, anomaly gone.
+3. **NEW PR #909** (kubeconfig.yaml/yml suffixes): same 2 files as #900.
+   Order now #900 → #909 → #905. Roast: gap real (bare `kubeconfig`
+   suffix never matched `*.yaml`), tests meaningful, still needs consumer
+   test + narrowed wording + full CI.
+4. **`gh pr edit` label op broken repo-wide**: GraphQL `projectCards`
+   deprecation error. Workaround: REST
+   `DELETE /issues/{n}/labels/{name}` (used for #900 `superseded-candidate`).
