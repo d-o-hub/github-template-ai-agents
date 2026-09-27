@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-036"
+    "adr": "adr-037"
   },
   "active_plan": null,
   "phases": [],
@@ -62,6 +62,10 @@
     "adr-035-duplicate-pr-auto-triage-tiers.md": {
       "status": "accepted",
       "date": "2026-09-12"
+    },
+    "adr-036-roast-review-merge-900-905-906.md": {
+      "status": "accepted",
+      "date": "2026-09-27"
     }
   }
 }
