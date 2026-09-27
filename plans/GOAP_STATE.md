@@ -166,13 +166,27 @@ skipped must never be persisted as `passing`. Derived from the PR #795 roast
 - Order (file-overlap dependency): #900 (CLEAN, +4/-1) → #906 (same 2 files,
   needs rebase + full CI retrigger) → #905 (disjoint file, Codacy FAIL).
 - Swarm (GOAP orchestrator): swarm-900 (security-merger), swarm-906
-  (security-merger), swarm-905 (perf-merger + BATS), swarm-debt (skill
-  versions + validate-links). Merges sequential; fix-prep parallelizable.
+  (security-merger), swarm-905 (perf-merger + BATS), swarm-909 (security),
+  swarm-debt (investigation only). Merges sequential; fix-prep parallel.
 - Gates per PR: all bot + owner comments addressed, `bash -n`,
   `shellcheck --severity=error` clean, BATS + pytest green,
   `quality_gate.sh` pass, `gh pr checks` all-green, rebase onto main,
   squash-merge + delete branch. Jules-clobber watch (Round-5 lesson 1).
 - Status: IN FLIGHT (ADR-036 accepted).
+
+## Round 6 final (2026-09-27)
+
+- Merged: #900 `a3ab345a` (curlrc/wgetrc + consumer test, label delabeled),
+  #909 `85582b69` (kubeconfig.yaml/yml + consumer test), #905 `2a1f5f44`
+  (assoc-array perf + 11 BATS cases, Codacy fail cleared), #912 `69147c72`
+  (token-prefix follow-up: policy comment, secret_key dropped, consumer test).
+- #906 closed unmerged; content shipped via #907 (lost review fixes → #912).
+- Open PRs: 0. Open issues: 0. Debt: skill `version:` already 0-missing;
+  validate-links re-verified clean (no read loops, exit 0).
+- Merge tactic that beat the sync-bot + main-churn loop: clean linear branch
+  → push → `gh pr merge --auto --squash` immediately; auto-merge fires on the
+  validated tip before the next sync. Direct merge kept racing (`Base branch
+  was modified` from ci-status artifact PRs landing every few minutes).
 
 ## Round 6 deviations (2026-09-27, primary log)
 

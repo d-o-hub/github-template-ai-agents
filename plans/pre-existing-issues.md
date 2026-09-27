@@ -31,6 +31,8 @@ no longer applies and should be revisited in a follow-up.
 
 **Status:** Hardened under ADR-030 (early empty-list guards + lib helpers).
 Re-open only if a concrete hang is reproduced with a minimal reproducer.
+**Re-verified 2026-09-27:** no `read` loops exist in the script (mapfile/array
+iteration only); full run exits 0 (88 files, 313 links, 0 broken). Closed.
 
 ### Mega-script headroom
 

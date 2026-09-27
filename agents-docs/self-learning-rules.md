@@ -29,6 +29,9 @@
 - **LESSON-036b — markdownlint-cli2 "default: true" Means All Non-Disabled Rules Are Active**: `.markdownlint-cli2.jsonc` sets `"default": true` and disables 15 rules. Any rule NOT in the disabled list (including MD047, MD022, MD031, MD009, MD012) is active and will fail CI. To find active rules: diff default ruleset against the disabled set in the config.
 - **LESSON-036c — 250-Line SKILL.md Limit Is a WARNING, Not a CI Block**: `scripts/lib/skill-validation.sh` checks `MAX_SKILL_LINES=250` but emits a yellow ⚠ warning — it does NOT increment FAILED counter. Skills can exceed 250 lines without blocking CI. The limit is aspirational, not enforced. Override via `MAX_SKILL_LINES=999` env var if needed.
 - **LESSON-036d — Skill Description Is Dual-Purpose: Docs + Intent Classifier Training**: Updated descriptions include explicit trigger phrases ("Use this skill when...") AND negative disambiguation ("This is the LOCAL skill — NOT for cloud"). The frontmatter `description:` field is the primary signal for agent intent routing — well-crafted descriptions prevent misrouting.
+- **LESSON-040 — Bot Sync-Merge SHAs Report action_required**: `pull_request`-event runs on bot-authored sync-merge commits conclude `action_required` (not failure); identical content on a clean linear tip runs green. Strip sync merges (`rebase --onto`, force-push with lease), validate, merge promptly.
+- **LESSON-041 — Merge-At-Once Beats Main-Churn Races**: ci-status artifact PRs land every few minutes, so `gh pr merge` on a just-rebased branch fails with `Base branch was modified`. Push a clean linear tip then `gh pr merge --auto --squash` in one move; auto-merge fires on the validated tip before the next sync.
+- **LESSON-042 — gh Label Ops Need REST Fallback**: `gh pr edit --add/remove-label` fails repo-wide when GraphQL `projectCards` errors (Projects-classic sunset). Use REST: `gh api repos/{o}/{r}/issues/{n}/labels/{name} -X DELETE` (or POST `{"labels":[...]}`).
 
 ---
 
