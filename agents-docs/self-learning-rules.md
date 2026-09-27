@@ -33,6 +33,8 @@
 - **LESSON-041 — Merge-At-Once Beats Main-Churn Races**: ci-status artifact PRs land every few minutes, so `gh pr merge` on a just-rebased branch fails with `Base branch was modified`. Push a clean linear tip then `gh pr merge --auto --squash` in one move; auto-merge fires on the validated tip before the next sync.
 - **LESSON-042 — gh Label Ops Need REST Fallback**: `gh pr edit --add/remove-label` fails repo-wide when GraphQL `projectCards` errors (Projects-classic sunset). Use REST: `gh api repos/{o}/{r}/issues/{n}/labels/{name} -X DELETE` (or POST `{"labels":[...]}`).
 - **LESSON-043 — Ghost Dirs Trip Validators**: `git rm -r` leaves ignored artifacts (`__pycache__/`) behind, so empty skill dirs persist and directory-iterating validators (`validate-skills.sh`) fail with Missing SKILL.md. Follow every skill deletion with `rm -rf` on the path.
+- **LESSON-044 — New Skills Need a Post-Creation Audit**: Freshly created skills ship with one-way `Not for` guards and positive-scope-only evals, so routing defects are invisible until they misfire. Audit axes: sibling trigger overlap, bidirectional guards, routing near-miss evals, fail-closed evidence, registry mirrors (ADR-039).
+- **LESSON-045 — Description Edits Are 6-Site Edits**: A skill `description:` change propagates to 5-6 generated files (AVAILABLE_SKILLS.md, skills-reference.md, skill-catalog.md, .agents/skills/README.md, llms-full.txt, AGENTS_REGISTRY.md). Always regenerate; never hand-edit.
 
 ---
 

@@ -251,3 +251,15 @@ skipped must never be persisted as `passing`. Derived from the PR #795 roast
   consolidates verdicts (KEEP / DISTILL / FIX).
 - Gates: validate-skills.sh, quality_gate.sh, full CI, --auto merge.
 - Status: IN FLIGHT (ADR-039 accepted).
+
+## Round 9 final (2026-09-27)
+
+- Merged: #936 (bidirectional Not-for guards across 8 skills, evals 13->19,
+  versions aligned, registries regenerated).
+- Audit verdicts: all 4 skills FIX (no DISTILL). Real defects found:
+  privacy-first mis-routed "hardcoded secrets"; migration-refactoring stole
+  the bump lane; progressive-delivery's "Ship production fixes" collided
+  with git-github-workflow's "ship it"; debugger's bare "why is this
+  failing" stole test-runner traffic.
+- Swarm: 4 parallel read-only audit agents; primary consolidated.
+- Open PRs: 0. Open issues: 0. Overlap gate: 0 pairs. Skills: 54.
