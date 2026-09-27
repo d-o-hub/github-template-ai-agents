@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-09-27 12:45 UTC
+> Last updated: 2026-09-27 12:49 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -24,7 +24,7 @@ Agents are organized by CLI tool and purpose.
 ## Available Skills
 
 Skills are reusable knowledge modules with progressive disclosure.
-See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
+See [Creating or Updating Skills](../CONTRIBUTING.md#creating-or-updating-skills) for the authoring guide.
 
 | Skill | Location | Description |
 |-------|----------|-------------|

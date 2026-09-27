@@ -107,7 +107,7 @@ cat >> "$TEMP_FILE" << 'SKILLS_HEADER'
 ## Available Skills
 
 Skills are reusable knowledge modules with progressive disclosure.
-See [`agents-docs/SKILLS.md`](agents-docs/SKILLS.md) for authoring guide.
+See [Creating or Updating Skills](../CONTRIBUTING.md#creating-or-updating-skills) for the authoring guide.
 
 | Skill | Location | Description |
 |-------|----------|-------------|
