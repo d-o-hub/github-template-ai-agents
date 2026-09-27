@@ -164,7 +164,7 @@ See **[execution-strategies.md](execution-strategies.md)** for details.
 
 ## Integration
 
-- **agent-coordination**: Strategy implementation (parallel, sequential, swarm)
+- **execution-strategies.md**: Strategy implementation (parallel, sequential, swarm)
 
 ## Summary
 
@@ -172,7 +172,6 @@ GOAP enables systematic planning through: Analysis, Decomposition, Strategy, Qua
 
 ## See Also
 
-- `agent-coordination` — Coordinate multiple agents
 - `triz-solver` — Solve problems and audit systems for contradictions using TRIZ
 
 ## Rationalizations

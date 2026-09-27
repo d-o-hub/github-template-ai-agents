@@ -1,6 +1,6 @@
 # Agent Teams, Dynamic Workflows & Worktrees
 
-> Reference doc — not loaded by default. Link from `agent-coordination` skill or AGENTS.md as needed.
+> Reference doc — not loaded by default. Link from `goap-agent` skill or AGENTS.md as needed.
 
 Claude Code (v2.1+) ships three native capabilities for parallel agent execution.
 This guide covers when to use each, how they compare to custom coordination patterns,
@@ -81,8 +81,8 @@ runs many sub-agents and verifies their findings against each other.
 - Want a reusable workflow (bundled or custom)
 
 **vs. custom swarm:** Dynamic Workflows are the production-grade version of the
-patterns in `agent-coordination`. Use them when available; fall back to custom
-coordination for tool-agnostic or non-Claude runtimes.
+patterns in `goap-agent` (`execution-strategies.md`). Use them when available;
+fall back to custom coordination for tool-agnostic or non-Claude runtimes.
 
 ## Worktrees
 
@@ -116,6 +116,6 @@ All costs draw from the same plan quota. There is no separate agent billing.
 
 ## See Also
 
-- `agent-coordination` skill — Custom coordination patterns (tool-agnostic)
+- `goap-agent` skill — Custom coordination patterns (tool-agnostic)
 - `HARNESS.md` — Harness architecture overview
 - `SUB-AGENTS.md` — Sub-agent format and cost control

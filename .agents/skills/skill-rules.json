@@ -73,27 +73,6 @@
       "autoActivate": true
     },
     {
-      "skill": "agent-coordination",
-      "triggers": {
-        "keywords": [
-          "parallel",
-          "concurrent",
-          "simultaneous",
-          "batch",
-          "coordinate",
-          "swarm"
-        ],
-        "patterns": [
-          "parallel.*",
-          "concurrent.*",
-          "coordinate.*"
-        ],
-        "files": []
-      },
-      "priority": "medium",
-      "autoActivate": false
-    },
-    {
       "skill": "iterative-refinement",
       "triggers": {
         "keywords": [

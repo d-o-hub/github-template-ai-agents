@@ -1,6 +1,6 @@
 # TRIZ Swarm Example: Solving a Database Migration Contradiction
 
-Demonstrates using the `triz-solver` skill with `agent-coordination` swarm pattern
+Demonstrates using the `triz-solver` skill with `goap-agent` swarm pattern
 and handoff between agents.
 
 ## Scenario
@@ -14,7 +14,7 @@ risk and rollback complexity.
 ```bash
 # Skills used:
 # - triz-solver: Identify and resolve the contradiction
-# - agent-coordination (swarm): Multi-perspective investigation
+# - goap-agent (swarm): Multi-perspective investigation
 # - goap-agent: Break into atomic migration tasks
 ```
 

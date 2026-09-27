@@ -146,8 +146,7 @@ bash <(curl -Ls https://coverage.codacy.com/get.sh) final
 
 ## See Also
 
-- `git-github-workflow` — Full commit-to-merge lifecycle including CI monitoring
-- `github-pr-sentinel` — Specialized PR monitoring with CI failure diagnosis
+- `git-github-workflow` — Full commit-to-merge lifecycle including CI monitoring (watch mode + failure diagnosis)
 
 ## Voice & Context
 
