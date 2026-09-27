@@ -1,14 +1,4 @@
----
-name: template-version-management
-version: "0.2.10"
-category: tool
-description: Manage versioning in a template repository. Use when working with template repos where `VERSION` is intentionally pinned to 0.0.0, when bumping the template's own release version, when fixing stale version badges, or when answering questions about how versioning flows from `VERSION`/`.template/CHANGELOG-TEMPLATE.md` to `README.md` — even if they just say "bump the template version", "fix the stale badge", or "how does versioning work here". Not for bumping versions in npm packages, Cargo.toml, or non-template projects (use your package manager's versioning).
-license: MIT
----
-
-# Template Version Management
-
-Versioning in a **template** repository follows a different mental model than a regular project. `VERSION` is the consumer-side default (always `0.0.0`); the template's own release history is canonical in `.template/CHANGELOG-TEMPLATE.md`; only `README.md` displays a template version badge; and the existing scripts (`propagate-version.sh`, `bump_patch_version.sh`) are general-purpose utilities that downstream consumers reuse unchanged.
+# Template Versioning (contributor doc, absorbed from template-version-management skill)
 
 ## When to Use
 
@@ -98,42 +88,11 @@ This catches stale badges, broken version references, and any propagation drift.
 - **Manually editing the README badge instead of running `propagate-version.sh`.** The script is the source of truth; manual edits get overwritten on the next propagation.
 - **Forgetting to reset `VERSION` to `0.0.0` after a template release.** Downstream consumers clone the template and expect a clean starting point.
 
-## See Also
-
-- `skill-creator` — Create and improve skills
-- `readme-best-practices` — README best practices
-
-## Rationalizations
-
-| Rationalization | Reality |
-|-----------------|---------|
-| "I'll just hardcode the template version in `QUICKSTART.md` so the badge looks right." | The badge will go stale again on the next release. Remove it entirely; `README.md` is the only place that shows the version. |
-| "Let me change `propagate-version.sh` to read from `.template/CHANGELOG-TEMPLATE.md` so the badges stay accurate." | The script is a general-purpose utility for consumer repos. Changing it breaks downstream usage. The right fix is in the documentation, not the script. |
-| "`VERSION=0.0.0` looks like a bug — I'll set it to the current template version." | The template's version lives in `.template/CHANGELOG-TEMPLATE.md`. `VERSION` is intentionally `0.0.0` for downstream consumers to reset on first use. |
-| "I can just edit the README badge manually." | `propagate-version.sh` will overwrite it on the next run. Always go through the script or `bump_patch_version.sh`. |
-| "This new doc needs a template version badge too." | Unless it's a top-level user-facing doc, link to `README.md` or `.template/CHANGELOG-TEMPLATE.md`. Avoid badge proliferation. |
-
-## Red Flags
-
-- [ ] A new `Template Version` badge appears in any file other than `README.md`
-- [ ] `VERSION` is changed to a non-zero value in a template repository
-- [ ] `scripts/propagate-version.sh` or `scripts/bump_patch_version.sh` is modified to read from `.template/CHANGELOG-TEMPLATE.md` instead of `VERSION`
-- [ ] A version string in any doc does not match the latest `## [X.Y.Z]` heading in `.template/CHANGELOG-TEMPLATE.md`
-- [ ] `bump_patch_version.sh` is run without resetting `VERSION` to `0.0.0` afterward
-- [ ] Stale `version-0.X.Y` badge persists in `QUICKSTART.md` or `agents-docs/MIGRATION.md`
-- [ ] A PR adds a new file with a hardcoded template version instead of going through the propagation script
-
 ## References
 
-- `references/version-flow.md` — Detailed flow diagram of how version updates propagate from `.template/CHANGELOG-TEMPLATE.md` to `README.md`
-- `references/scripts-inventory.md` — Inventory of version-related scripts and what each one does
+- `template-versioning/version-flow.md` — Detailed flow diagram of version propagation
+- `template-versioning/scripts-inventory.md` — Inventory of version-related scripts
 - `.template/CHANGELOG-TEMPLATE.md` — Canonical template release history
 - `agents-docs/VERSION.md` — Version management documentation (template + consumer)
-- `scripts/propagate-version.sh` — Reads `VERSION`, propagates to consumer files
-- `scripts/bump_patch_version.sh` — Bumps patch version, updates `.template/CHANGELOG-TEMPLATE.md`
-- `.github/workflows/version-propagation.yml` — CI workflow that runs propagation on `VERSION` changes
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.
+- `scripts/propagate-version.sh`, `scripts/bump_patch_version.sh` — General-purpose consumer utilities
+- `.github/workflows/version-propagation.yml` — CI workflow on `VERSION` changes

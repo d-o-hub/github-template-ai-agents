@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-09-27 12:49 UTC
+> Last updated: 2026-09-27 13:00 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -72,14 +72,11 @@ See [Creating or Updating Skills](../CONTRIBUTING.md#creating-or-updating-skills
 | `skill-creator` | `.agents/skills/skill-creator` | Create new skills, modify and improve existing skills, and m |
 | `skill-evaluator` | `.agents/skills/skill-evaluator` | Reusable skill for evaluating other skills with structure ch |
 | `static-analysis` | `.agents/skills/static-analysis` | Triage and fix static analysis findings across any programmi |
-| `template-version-management` | `.agents/skills/template-version-management` | Manage versioning in a template repository. Use when working |
-| `testdata-builders` | `.agents/skills/testdata-builders` | Maintain deterministic builders/factories for test entities. |
 | `testing-strategy` | `.agents/skills/testing-strategy` | Design and implement comprehensive testing strategies for so |
 | `test-runner` | `.agents/skills/test-runner` | Execute tests, analyze results, and diagnose failures across |
 | `triz-solver` | `.agents/skills/triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive P |
 | `turso-db` | `.agents/skills/turso-db` | Use this skill for Turso (LibSQL/Limbo) database development |
 | `ui-ux-optimize` | `.agents/skills/ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research agen |
-| `verification-template` | `.agents/skills/verification-template` | Template for creating portable domain-specific verification  |
 | `voice-profiles` | `.agents/skills/voice-profiles` | Adapt writing tone and style based on target audience and co |
 | `web-search-researcher` | `.agents/skills/web-search-researcher` | Research topics using web search to find accurate, current i |
 

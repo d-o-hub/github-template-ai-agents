@@ -52,14 +52,11 @@
 | skill-creator | Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill... | quality |
 | skill-evaluator | Reusable skill for evaluating other skills with structure checks, eval coverage review, and real usage spot checks. Use when you need to check a skill, add evals, benchmark a skill, validate outputs against assertions... | quality |
 | static-analysis | Triage and fix static analysis findings across any programming language. Use this skill when running linters (ruff, eslint, clippy, shellcheck), analyzing lint output, fixing warnings or errors, or managing cross-lang... | code-quality |
-| template-version-management | Manage versioning in a template repository. Use when working with template repos where `VERSION` is intentionally pinned to 0.0.0, when bumping the template's own release version, when fixing stale version badges, or ... | tool |
 | test-runner | Execute tests, analyze results, and diagnose failures across any testing framework. Use this skill when running test suites, debugging failing tests, or configuring CI/CD testing pipelines — even if they just say "run... | testing |
-| testdata-builders | Maintain deterministic builders/factories for test entities. Use this skill when authoring tests, extending test utilities, or adding schema fields that affect fixtures — even if they just say "create test data" or "b... | quality |
 | testing-strategy | Design and implement comprehensive testing strategies for software projects. Use this skill when planning test suites, choosing testing approaches like property-based testing, visual regression, load testing, mutation... | testing |
 | triz-solver | Systematic problem-solving using TRIZ (Theory of Inventive Problem Solving) principles adapted for software engineering. Use when facing technical contradictions, optimizing system design, running a TRIZ audit, findin... | innovation-problem-solving |
 | turso-db | Use this skill for Turso (LibSQL/Limbo) database development, including scaffolding, querying, migrations, and maintenance. Supports vector search, full-text search, CDC, MVCC, encryption, and bidirectional remote syn... | database |
 | ui-ux-optimize | Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination, confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile app... | ui-ux |
-| verification-template | Template for creating portable domain-specific verification skills. Use this skill when creating a verification checklist as a starting point for defining systematic verification checklists for new features, modules, ... | quality |
 | voice-profiles | Adapt writing tone and style based on target audience and content type using predefined voice and context profiles. | quality |
 | web-search-researcher | Research topics using web search to find accurate, current information. Use this skill when you need modern information, official documentation, best practices, or technical solutions beyond training data — even if th... | tool |
 
@@ -127,8 +124,6 @@
 - lifecycle-management
 - skill-creator
 - skill-evaluator
-- testdata-builders
-- verification-template
 - voice-profiles
 
 ### security
@@ -146,7 +141,6 @@
 - agent-browser
 - dist-channel-selection
 - do-web-doc-resolver
-- template-version-management
 - web-search-researcher
 
 ### ui-ux
