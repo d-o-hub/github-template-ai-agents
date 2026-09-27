@@ -183,6 +183,7 @@ SENSITIVE_SUFFIXES = (
     ".dockercfg", ".publishsettings", ".gpg", ".pgp", ".asc",
     ".p8", ".pkcs12", ".passwd", ".pwd", ".htpasswd", "_history",
     "credentials.json", "client_secret.json", "kubeconfig",
+    "kubeconfig.yaml", "kubeconfig.yml",
     ".secrets", ".credentials", ".vault", "secrets.json",
     "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml",
     ".ovpn", ".kdbx", ".keychain", ".keychain-db", ".keyring", ".kdb",

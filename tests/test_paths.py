@@ -133,7 +133,8 @@ def test_validate_safe_path_patterns(tmp_path):
     additional_suffixes = [
         "vpn_config.ovpn", "passwords.kdbx", "login.keychain", "user.keychain-db",
         "config.env", "prod.env", "secrets.env", "terraform.tfvars",
-        "terraform.tfvars.json", "override.tfvars", "secrets.tfvars.json"
+        "terraform.tfvars.json", "override.tfvars", "secrets.tfvars.json",
+        "cluster.kubeconfig.yaml", "cluster.kubeconfig.yml"
     ]
     for p in additional_suffixes:
         with pytest.raises(PathValidationError):
