@@ -192,9 +192,9 @@ your project adopts the metrics/DORA stack (see `agents-docs/ADOPTION_PROFILES.m
 | **Knowledge** | `memory-context` |
 | **Knowledge Management** | `learn` |
 | **Platform** | `api-design-first`, `codeberg-api`, `durable-objects` |
-| **Quality** | `avoid-ai-writing`, `dogfood`, `lifecycle-management`, `skill-creator`, `skill-evaluator`, `testdata-builders`, `verification-template`, `voice-profiles` |
+| **Quality** | `avoid-ai-writing`, `dogfood`, `lifecycle-management`, `skill-creator`, `skill-evaluator`, `voice-profiles` |
 | **Security** | `privacy-first`, `security-code-auditor` |
 | **Testing** | `test-runner`, `testing-strategy` |
-| **Tool** | `agent-browser`, `dist-channel-selection`, `do-web-doc-resolver`, `template-version-management`, `web-search-researcher` |
+| **Tool** | `agent-browser`, `dist-channel-selection`, `do-web-doc-resolver`, `web-search-researcher` |
 | **UI/UX** | `accessibility-auditor`, `ui-ux-optimize` |
 | **Workflow** | `cicd-pipeline`, `cloudflare-worker-api`, `docs-hook`, `document-rendering-and-locators`, `git-github-workflow`, `goap-agent`, `progressive-delivery`, `pwa-offline-sync`, `reader-ui-ux`, `secure-invite-and-access` |

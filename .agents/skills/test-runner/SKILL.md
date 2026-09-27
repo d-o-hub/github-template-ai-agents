@@ -1,6 +1,6 @@
 ---
 name: test-runner
-description: Execute tests, analyze results, and diagnose failures across any testing framework. Use this skill when running test suites, debugging failing tests, or configuring CI/CD testing pipelines — even if they just say "run the tests" or "why is this test failing". Not for testing-strategy, testdata-builders.
+description: Execute tests, analyze results, and diagnose failures across any testing framework. Use this skill when running test suites, debugging failing tests, or configuring CI/CD testing pipelines — even if they just say "run the tests" or "why is this test failing". Not for testing-strategy.
 version: "0.2.10"
 category: testing
 template_version: "0.2"
@@ -169,8 +169,7 @@ for i in {1..10}; do pytest || echo "Failed run $i"; done
 
 ## See Also
 
-- `testing-strategy` — Choose testing approaches and plan test suites
-- `testdata-builders` — Create test fixtures and factories
+- `testing-strategy` — Choose testing approaches and plan test suites (incl. testdata-builders appendix)
 - `dogfood` — Exploratory testing of web applications
 
 ## Rationalizations

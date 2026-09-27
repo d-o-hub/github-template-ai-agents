@@ -19,6 +19,12 @@ SKILLS_SRC="$REPO_ROOT/.agents/skills"
 SKILLS_OPTIONAL=(
   "eu-ai-act-compliance"
   "durable-objects"
+  "reader-ui-ux"
+  "document-rendering-and-locators"
+  "pwa-offline-sync"
+  "cloudflare-worker-api"
+  "codacy"
+  "lifecycle-management"
 )
 
 CLI_SKILL_DIRS=(

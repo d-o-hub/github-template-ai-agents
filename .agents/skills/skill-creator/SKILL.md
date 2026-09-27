@@ -128,7 +128,7 @@ Store in `evals/evals.json`:
 ## Domain-Specific Verification Skills
 
 When creating a new domain-specific skill, always include a verification checklist.
-Use `.agents/skills/verification-template/SKILL.md` as a starting point.
+Use `skill-evaluator/references/verification-checklist.md` as a starting point.
 
 ### Benefits
 

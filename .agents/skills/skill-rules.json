@@ -216,30 +216,6 @@
       "autoActivate": true
     },
     {
-      "skill": "codacy",
-      "triggers": {
-        "keywords": [
-          "codacy",
-          "code quality",
-          "static analysis",
-          "lint analysis",
-          "code coverage",
-          "quality gate"
-        ],
-        "patterns": [
-          "codacy.*",
-          "quality.*gate",
-          "code.*quality"
-        ],
-        "files": [
-          ".codacy.yaml",
-          ".codacy.yml"
-        ]
-      },
-      "priority": "high",
-      "autoActivate": true
-    },
-    {
       "skill": "code-review-assistant",
       "triggers": {
         "keywords": [
