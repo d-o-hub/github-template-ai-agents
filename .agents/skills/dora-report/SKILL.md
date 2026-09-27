@@ -42,8 +42,10 @@ Activate when:
 
 ## Instructions
 
-1. Run the automation script: `python3 scripts/generate_report.py`
-2. Verify the output in `agents-docs/dora-reports/YYYY-MM.md`.
+1. Run the automation script: `python3 .agents/skills/dora-report/scripts/generate_report.py`
+2. Verify the output in `agents-docs/dora-reports/YYYY-MM.md`: every value
+   must trace to git history, `gh`, or metrics logs — never placeholders.
+   Hand-written Analyst Notes are preserved across regenerations.
 3. Add any qualitative analysis or TRIZ-based innovation opportunities to the generated file.
 
 ## See Also
