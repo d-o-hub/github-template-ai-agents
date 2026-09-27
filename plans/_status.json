@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-038"
+    "adr": "adr-039"
   },
   "active_plan": null,
   "phases": [],
@@ -68,6 +68,10 @@
       "date": "2026-09-27"
     },
     "adr-037-nvidia-skillevaluator-reuse.md": {
+      "status": "accepted",
+      "date": "2026-09-27"
+    },
+    "adr-038-skill-consolidation.md": {
       "status": "accepted",
       "date": "2026-09-27"
     }

@@ -200,6 +200,16 @@ skipped must never be persisted as `passing`. Derived from the PR #795 roast
   full CI on PR, squash-merge via `--auto`.
 - Status: IN FLIGHT (ADR-037 accepted).
 
+## Round 8 (2026-09-27): skill consolidation execution (ADR-038)
+
+- Goal: execute dogfood verdicts in revertable PRs — safe edits, triz +
+  sentinel + coordination folds, testdata/verification/tvm/docs-hook folds,
+  6 demotions to SKILLS_OPTIONAL. KEEP deviations: jules-delegator,
+  turso-db, do-web-doc-resolver (workflow-coupled, documented in ADR-038).
+- Gates per PR: generators re-run, `git grep` cross-ref check,
+  `validate-skills.sh`, `quality_gate.sh`, full CI, `--auto` merge.
+- Status: IN FLIGHT (ADR-038 accepted).
+
 ## Round 6 deviations (2026-09-27, primary log)
 
 1. **#906 closed via #907**: Jules/user merged token-prefix content as #907
