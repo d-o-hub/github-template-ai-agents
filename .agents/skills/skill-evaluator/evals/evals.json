@@ -26,7 +26,7 @@
     },
     {
       "id": 3,
-      "prompt": "Compare the triz-analysis skill with and without the skill loaded (baseline comparison)",
+      "prompt": "Compare the triz-solver skill in audit mode with and without the skill loaded (baseline comparison)",
       "expected_output": "The agent runs the same prompt twice: once with the skill loaded, once without. Compares pass rate, missing details, format compliance.",
       "files": [],
       "assertions": [

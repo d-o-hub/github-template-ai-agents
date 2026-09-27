@@ -1,7 +1,7 @@
 ---
 name: triz-solver
 version: "0.2.10"
-description: Systematic problem-solving using TRIZ (Theory of Inventive Problem Solving) principles adapted for software engineering. Use when facing technical contradictions, optimizing system design, or seeking innovative solutions beyond trial-and-error — even if they just say "help me solve this contradiction". Prevents solving the wrong problem correctly. Not for triz-analysis, goap-agent, delegate.
+description: Systematic problem-solving using TRIZ (Theory of Inventive Problem Solving) principles adapted for software engineering. Use when facing technical contradictions, optimizing system design, running a TRIZ audit, finding contradictions in a design, or seeking innovative solutions beyond trial-and-error — even if they just say "help me solve this contradiction" or "run a TRIZ audit". Prevents solving the wrong problem correctly. Not for goap-agent, delegate.
 category: innovation-problem-solving
 license: MIT
 ---
@@ -139,6 +139,20 @@ Apply: #4 Asymmetry → Heavy knowledge in references/, load lazily
 Result: Reliability maintained, context efficiency improved
 ```
 
+## Audit Mode (absorbed from triz-analysis)
+
+Same protocol, wider scope: audit a codebase, architecture, or workflow for
+hidden trade-offs instead of solving one problem.
+
+1. **SCOPE SCAN**: examine the target for pain points and trade-offs.
+2. **CONTRADICTION DISCOVERY**: state each as "Improving [X] worsens [Y]".
+3. **PRINCIPLE MAPPING**: map to inventive principles via the matrix above.
+4. **INNOVATION ROADMAP**: propose architectural or process changes.
+5. **REPORT**: write findings to `analysis/triz-<scope>-YYYY-MM-DD.md`
+   (e.g. `analysis/triz-scripts-2025-05-20.md`); use the audit IFR
+   ("the ideal system performs its function with zero overhead") to separate
+   real constraints from assumed ones.
+
 ## Integration with Other Skills
 
 - **goap-agent**: Use TRIZ to identify contradictions before decomposing (Phase 2)
@@ -155,7 +169,6 @@ Result: Reliability maintained, context efficiency improved
 
 ## See Also
 
-- `triz-analysis` — Audit mode (vs problem-solving mode)
 - `goap-agent` — Orchestrator that uses TRIZ problem-solving
 - `iterative-refinement` — Use contradiction analysis to guide refinement cycles
 

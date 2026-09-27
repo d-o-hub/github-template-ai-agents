@@ -46,7 +46,7 @@ Use GOAP + ADRs + TRIZ for structured development when the change is non-trivial
 - **Check CI Status**: Agents MUST check `.github/ci-status/ci-status.json`. If NOT "passing", pause until fixed.
 
 1. **ANALYZE & STRATEGIZE (Phase 1)**
-   - **Action**: Use `triz-analysis` or `triz-solver`. Write an **ADR** in `plans/`.
+   - **Action**: Use `triz-solver` (solve or audit mode). Write an **ADR** in `plans/`.
    - **Human Gate**: Review and approve the ADR and analysis before proceeding. *Only human gate.*
 
 2. **DECOMPOSE & PLAN (Phase 2)**
@@ -182,7 +182,7 @@ your project adopts the metrics/DORA stack (see `agents-docs/ADOPTION_PROFILES.m
 | Category | Skills |
 |----------|--------|
 | **Agent** | `agentic-abstention`, `agent-coordination`, `delegate`, `implementer`, `intent-classifier`, `jules-delegator` |
-| **Analysis** | `triz-analysis` |
+| **Analysis** | `triz-solver` (solve + audit modes) |
 | **Code Quality** | `codacy`, `code-review-assistant`, `css-render-performance`, `iterative-refinement`, `migration-refactoring`, `shell-script-quality`, `static-analysis` |
 | **Compliance** | `eu-ai-act-compliance` |
 | **Database** | `database-devops`, `turso-db` |
