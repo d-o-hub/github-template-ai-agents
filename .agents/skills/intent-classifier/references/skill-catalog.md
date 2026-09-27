@@ -22,7 +22,9 @@
 | codeberg-api | Interact with Forgejo/Codeberg repositories via the REST API — read or write files, manage issues, create pull requests, list branches/tags, search repos, and automate CI/CD workflows. Use this skill when the user wan... | platform |
 | css-render-performance | Guide CSS render performance analysis and optimization. Use this skill when reviewing or writing CSS animations, transitions, scroll-heavy UIs, or long lists — even if they just say "this animation is janky" or "optim... | code-quality |
 | database-devops | Database design, migration, and DevOps automation with safety patterns. Use this skill when designing schemas, planning migrations, optimizing queries, or managing multi-database orchestration — even if they just say ... | database |
+| debugger | Diagnose failing builds and runtime errors with root-cause discipline. Use when a build breaks, a service crashes, or an error appears at runtime — even if they just say "why is this failing" or "debug this crash". No... | code-quality |
 | delegate | Lightweight retrieval and context agent skill for rapid information gathering and environment assessment. Use this skill when you need quick context lookups, finding code patterns, or assessing current state without f... | agent |
+| dependency-upgrades | Perform routine dependency version bumps and vulnerability-driven upgrades. Use when updating packages, lockfiles, or base images — even if they just say "bump lodash" or "fix this CVE". Not for migration-refactoring ... | devops |
 | dist-channel-selection | Guide for selecting the correct distribution channel (npm, Cargo, etc.) based on artifact type and target audience. Use this skill when preparing to publish or release a new version of a package — even if they just sa... | tool |
 | do-web-doc-resolver | Python resolver for URLs and queries into compact, LLM-ready markdown. Use this skill when fetching documentation, resolving web URLs, or building context from web sources — even if they just say "read this doc page" ... | tool |
 | docs-hook | Lightweight git hook integration for updating agents-docs with minimal tokens. Use this skill when updating agents-docs on commit or merge events to sync documentation — even if they just say "update the docs" or "syn... | workflow |
@@ -46,6 +48,7 @@
 | pwa-offline-sync | Design Cache Storage + IndexedDB strategy and sync queue. Use this skill when building service workers, implementing caching strategies, or investigating offline bugs — even if they just say "make it work offline" or ... | workflow |
 | reader-ui-ux | Build localized, accessible reader/admin UI with responsive layouts, telemetry, and state management. Use this skill when building React screens, polishing UX, or implementing responsive layouts for reader or admin in... | workflow |
 | readme-best-practices | Create, audit, and improve GitHub README.md files following 2026 best practices. Use this skill when a user asks to write, rewrite, or review a README.md for a GitHub repository, add shields.io badges, create a projec... | documentation |
+| secrets-management | Own the secret lifecycle: detect leaked secrets, rotate them, and store them correctly. Use when handling API keys, tokens, or credentials — even if they just say "rotate this key" or "where do I put this secret". Not... | security |
 | secure-invite-and-access | Implement access control, authentication, and authorization patterns. Use this skill when building auth endpoints, managing permissions, implementing session/token logic, or generating signed URLs — even if they just ... | workflow |
 | security-code-auditor | Perform security audits on code to identify vulnerabilities, misconfigurations, and security anti-patterns. Use when users ask to 'audit', 'review', or 'check security' of code, configurations, or repositories — even ... | security |
 | shell-script-quality | Lint and test shell scripts using ShellCheck and BATS. Use this skill when checking bash/sh scripts for errors, writing shell script tests, fixing ShellCheck warnings, setting up CI/CD for shell scripts, or improving ... | code-quality |
@@ -75,6 +78,7 @@
 - codacy
 - code-review-assistant
 - css-render-performance
+- debugger
 - iterative-refinement
 - migration-refactoring
 - shell-script-quality
@@ -91,6 +95,7 @@
 
 ### devops
 
+- dependency-upgrades
 - dora-report
 
 ### documentation
@@ -129,6 +134,7 @@
 ### security
 
 - privacy-first
+- secrets-management
 - security-code-auditor
 
 ### testing
