@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-09-27 13:09 UTC
+> Last updated: 2026-09-27 15:51 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -44,7 +44,7 @@ See [Creating or Updating Skills](../CONTRIBUTING.md#creating-or-updating-skills
 | `database-devops` | `.agents/skills/database-devops` | Database design, migration, and DevOps automation with safet |
 | `debugger` | `.agents/skills/debugger` | Diagnose failing builds and runtime errors with root-cause d |
 | `delegate` | `.agents/skills/delegate` | Lightweight retrieval and context agent skill for rapid info |
-| `dependency-upgrades` | `.agents/skills/dependency-upgrades` | Perform routine dependency version bumps and vulnerability-d |
+| `dependency-upgrades` | `.agents/skills/dependency-upgrades` | Perform routine, low-risk dependency version bumps and vulne |
 | `dist-channel-selection` | `.agents/skills/dist-channel-selection` | Guide for selecting the correct distribution channel (npm, C |
 | `docs-hook` | `.agents/skills/docs-hook` | Lightweight git hook integration for updating agents-docs wi |
 | `document-rendering-and-locators` | `.agents/skills/document-rendering-and-locators` | Implement resilient document rendering and annotation anchor |
@@ -64,7 +64,7 @@ See [Creating or Updating Skills](../CONTRIBUTING.md#creating-or-updating-skills
 | `memory-context` | `.agents/skills/memory-context` | Retrieve semantically relevant past learnings, analysis outp |
 | `migration-refactoring` | `.agents/skills/migration-refactoring` | Automate complex code migrations and refactorings with safet |
 | `privacy-first` | `.agents/skills/privacy-first` | Prevent email addresses and personal data from entering the  |
-| `progressive-delivery` | `.agents/skills/progressive-delivery` | Ship production fixes through a gated loop: reproduce the fa |
+| `progressive-delivery` | `.agents/skills/progressive-delivery` | Remediate a live production failure through a gated loop: re |
 | `pwa-offline-sync` | `.agents/skills/pwa-offline-sync` | Design Cache Storage + IndexedDB strategy and sync queue. Us |
 | `reader-ui-ux` | `.agents/skills/reader-ui-ux` | Build localized, accessible reader/admin UI with responsive  |
 | `readme-best-practices` | `.agents/skills/readme-best-practices` | Create, audit, and improve GitHub README.md files following  |

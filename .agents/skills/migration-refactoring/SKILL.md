@@ -2,7 +2,7 @@
 name: migration-refactoring
 version: "0.2.10"
 category: code-quality
-description: Automate complex code migrations and refactorings with safety patterns. Use this skill when upgrading dependencies, migrating frameworks (React class→hooks, Flask→FastAPI), modernizing languages (Python 2→3), or performing large-scale refactories — even if they just say "migrate this" or "refactor the whole thing". Includes breaking change analysis, automated fix application, rollback strategies, and cross-file dependency tracking. Not for static-analysis, code-review-assistant.
+description: Automate complex code migrations and refactorings with safety patterns. Use this skill when a dependency upgrade forces source changes, when migrating frameworks (React class→hooks, Flask→FastAPI), modernizing languages (Python 2→3), or performing large-scale refactories — even if they just say "migrate this" or "refactor the whole thing". Includes breaking change analysis, automated fix application, rollback strategies, and cross-file dependency tracking. Not for static-analysis, code-review-assistant, or routine patch/minor/CVE bumps (use dependency-upgrades).
 license: MIT
 ---
 
@@ -12,7 +12,7 @@ Systematic approach to complex code migrations with safety guardrails and rollba
 
 ## When to Use
 
-- **Dependency upgrades** - Major version bumps with breaking changes
+- **Dependency upgrades that force source changes** - major bumps with breaking APIs; routine patch/minor/CVE bumps go to `dependency-upgrades`
 - **Framework migrations** - React class→hooks, Flask→FastAPI, Django→DRF, etc.
 - **Language modernizations** - Python 2→3, JavaScript→TypeScript
 - **Large-scale refactoring** - Cross-file changes requiring consistency
@@ -194,6 +194,7 @@ See `references/rollback-strategies.md` for platform-specific guides.
 
 - `static-analysis` — Linter triage and fix workflows
 - `code-review-assistant` — PR review workflow
+- `dependency-upgrades` — Routine patch/minor/CVE version bumps
 
 ## Rationalizations
 

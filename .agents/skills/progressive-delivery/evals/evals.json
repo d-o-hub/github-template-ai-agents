@@ -31,9 +31,9 @@
    "expected_output": "Negative cases rejecting traversal input and failing when the fix is reverted",
    "files": [],
    "assertions": [
-    "authors at least one negative/adversarial case",
-    "traversal input is rejected, not sanitized-then-allowed",
-    "test fails when the fix is reverted (fail-on-revert)"
+    "names the specific test/module under test and the expected rejection (non-zero exit or thrown error, not a log line)",
+    "asserts an exact fail-on-revert check: revert the fix commit, the same case must fail, then re-apply and confirm green",
+    "traversal input is rejected, not sanitized-then-allowed"
    ]
   },
   {
@@ -45,6 +45,28 @@
     "refuses to skip shadow and canary stages",
     "flags non-idempotent writes as unsafe to mirror to live sinks",
     "requires a rollback plan before rollout"
+   ]
+  },
+  {
+   "id": 5,
+   "prompt": "Add a 10% canary stage with an SLO AnalysisTemplate to my existing Argo Rollouts manifest.",
+   "expected_output": "Configuration authoring for an existing rollout \u2014 YAML edits, no incident remediation, no new gated loop",
+   "files": [],
+   "assertions": [
+    "treats as rollout-config authoring, not as a production-incident remediation loop",
+    "does not require reproducing a failure or authoring an adversarial test case",
+    "defers to CI/CD pipeline configuration guidance for the manifest changes"
+   ]
+  },
+  {
+   "id": 6,
+   "prompt": "The fix is written and CI is green. Commit it, open a PR, and merge once checks pass.",
+   "expected_output": "Handled as a git/GitHub ship task: commit, PR, CI monitoring, merge \u2014 no shadow/canary stages",
+   "files": [],
+   "assertions": [
+    "does not invoke shadow or canary stages for a change with no production traffic exposure",
+    "routes the PR and merge mechanics to the git/GitHub workflow skill",
+    "only adds rollout gating if the change is identified as production-facing"
    ]
   }
  ]

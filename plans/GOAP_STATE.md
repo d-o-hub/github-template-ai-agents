@@ -242,3 +242,12 @@ skipped must never be persisted as `passing`. Derived from the PR #795 roast
 4. **`gh pr edit` label op broken repo-wide**: GraphQL `projectCards`
    deprecation error. Workaround: REST
    `DELETE /issues/{n}/labels/{name}` (used for #900 `superseded-candidate`).
+
+## Round 9 (2026-09-27): post-creation audit of gap skills (ADR-039)
+
+- Goal: independent quality pass on debugger, secrets-management,
+  dependency-upgrades, progressive-delivery (5 axes each).
+- Swarm: 4 parallel read-only audit agents, one per skill; primary
+  consolidates verdicts (KEEP / DISTILL / FIX).
+- Gates: validate-skills.sh, quality_gate.sh, full CI, --auto merge.
+- Status: IN FLIGHT (ADR-039 accepted).

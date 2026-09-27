@@ -1,8 +1,8 @@
 ---
 name: debugger
-version: "0.1.0"
+version: "0.2.10"
 category: code-quality
-description: Diagnose failing builds and runtime errors with root-cause discipline. Use when a build breaks, a service crashes, or an error appears at runtime — even if they just say "why is this failing" or "debug this crash". Not for test-runner (failing tests), security-code-auditor (vulns).
+description: Diagnose failing builds and runtime errors with root-cause discipline. Use when a build, deploy, or service crashes, or an error appears at runtime — even if they just say "debug this crash" or "why does the server 502". Not for test-runner (failing or flaky tests in a suite), iterative-refinement (repeat-until-pass loops), security-code-auditor (vulnerabilities).
 license: MIT
 ---
 
@@ -16,7 +16,7 @@ theories second, fixes last.
 - Build, deploy, or CI pipeline fails
 - Runtime crash, panic, exception, or hang
 - Error output that is cryptic or misleading
-- Even if they just say "why is this failing" or "debug this"
+- Even if they just say "debug this crash" or "the build is red"
 
 ## Steps
 
@@ -52,8 +52,9 @@ theories second, fixes last.
 
 ## See Also
 
-- `test-runner` — Execute tests and diagnose test failures
-- `iterative-refinement` — Validation loops until criteria are met
+- `test-runner` — Execute tests and diagnose failures *inside* a test suite
+- `iterative-refinement` — Repeat-until-pass validation loops once the cause is known
+- `security-code-auditor` — Vulnerability analysis, not failure diagnosis
 
 ## References
 
