@@ -60,6 +60,10 @@ Orchestrates complete code submission as a state machine with **swarm agent coor
 - Detect warnings (configurable fail-on-warning)
 - Wait for ALL checks green or timeout
 - Branch protection awareness
+- **Watch mode** (absorbed from `github-pr-sentinel`): for long-running PRs,
+  poll with `scripts/gh_pr_watch.py --pr <n> --watch` until merged, green,
+  or blocked; loop back to Phase 5 on actionable review feedback before
+  retrying flaky checks. Details: `references/PR_WATCH_*.md`.
 
 ### Phase 5: ISSUE RESOLUTION (Agent: fix-agent) [Conditional]
 

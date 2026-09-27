@@ -49,7 +49,7 @@ set and add packs when the product needs them.
 ### Core (recommended for Standard)
 
 - `static-analysis`, `shell-script-quality`, `security-code-auditor`
-- `git-github-workflow`, `github-pr-sentinel`, `code-review-assistant`
+- `git-github-workflow`, `code-review-assistant`
 - `goap-agent`, `implementer`, `delegate`, `learn`
 - `skill-creator`, `skill-evaluator`, `agents-md`, `readme-best-practices`
 - `testing-strategy`, `test-runner`, `privacy-first`

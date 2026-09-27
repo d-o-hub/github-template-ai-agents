@@ -176,7 +176,7 @@ output_contract:
 |---|---|
 | `web-search-researcher` | Deep research for Research Scout |
 | Anti-Slop Sentinel | Built-in (see Anti-AI-Slop Guide in SKILL.md) |
-| `agent-coordination` | Orchestration patterns |
+| `goap-agent` | Orchestration patterns |
 | `iterative-refinement` | Autoresearch loop patterns |
-| `agent-coordination` | Parallel variant generation |
+| `goap-agent` | Parallel variant generation |
 | `goap-agent` | Multi-screen decomposition |

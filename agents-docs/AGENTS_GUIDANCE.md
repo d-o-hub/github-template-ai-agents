@@ -8,7 +8,7 @@ Load `.agents/skills/goap-agent/SKILL.md` — the default orchestrator for any m
 
 ## Swarm Dispatch
 
-Load `.agents/skills/agent-coordination/SKILL.md` and dispatch a **swarm of agents** in parallel:
+Load `.agents/skills/goap-agent/SKILL.md` and dispatch a **swarm of agents** in parallel:
 
 | Role | Skill | Responsibility |
 |------|-------|----------------|

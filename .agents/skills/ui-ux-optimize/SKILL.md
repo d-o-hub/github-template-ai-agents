@@ -152,7 +152,7 @@ Run every step. Swarm coordinates handoffs.
 | Skill | Integration |
 |---|---|
 | `web-search-researcher` | Research Scout — deep research |
-| `agent-coordination` | Swarm orchestration, parallel variant generation |
+| `goap-agent` | Swarm orchestration, parallel variant generation |
 | `iterative-refinement` | Autoresearch loop |
 
 ## References
