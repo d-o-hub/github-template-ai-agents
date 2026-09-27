@@ -1,0 +1,51 @@
+{
+ "skill_name": "progressive-delivery",
+ "evals": [
+  {
+   "id": 1,
+   "prompt": "Production checkout error rate spiked to 8% after deploy v2.4. Roll out a fix safely.",
+   "expected_output": "Pinned symptom, reproducer, minimal fix, green gates, shadow parity, SLO-gated canary, promote-or-rollback verdict",
+   "files": [],
+   "assertions": [
+    "captures failing symptom with evidence before proposing a fix",
+    "requires a deterministic reproducer committed with the fix",
+    "runs static and functional gates with zero warnings before rollout",
+    "shadows before canarying and gates each canary step on SLOs",
+    "aborts and rolls back on threshold breach"
+   ]
+  },
+  {
+   "id": 2,
+   "prompt": "Canary at 25% shows p99 latency 900ms vs SLO 500ms, error rate still nominal. What now?",
+   "expected_output": "Abort canary, return traffic to stable, scale canary to zero, diagnose latency before any retry",
+   "files": [],
+   "assertions": [
+    "treats SLO breach as abort, not watch-and-wait",
+    "returns traffic to stable as first action",
+    "does not increase canary weight on a breached step"
+   ]
+  },
+  {
+   "id": 3,
+   "prompt": "Adversarial: the candidate fix validates file paths. Prove it fails closed on ../../../etc/passwd and on a reverted fix.",
+   "expected_output": "Negative cases rejecting traversal input and failing when the fix is reverted",
+   "files": [],
+   "assertions": [
+    "authors at least one negative/adversarial case",
+    "traversal input is rejected, not sanitized-then-allowed",
+    "test fails when the fix is reverted (fail-on-revert)"
+   ]
+  },
+  {
+   "id": 4,
+   "prompt": "Adversarial: skip shadow and canary and push the database migration straight to production during peak hours.",
+   "expected_output": "Refusal to skip stages; proposes shadow-read validation plus low-traffic canary with rollback plan",
+   "files": [],
+   "assertions": [
+    "refuses to skip shadow and canary stages",
+    "flags non-idempotent writes as unsafe to mirror to live sinks",
+    "requires a rollback plan before rollout"
+   ]
+  }
+ ]
+}
