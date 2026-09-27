@@ -14,7 +14,7 @@
 
 ## Pre-Existing Issue Workflow
 
-Load `.agents/skills/goap-agent/SKILL.md` (orchestrator) and `.agents/skills/agent-coordination/SKILL.md` (swarm dispatch). Retriever / Implementer / Verifier in parallel, atomic commits per issue, verify green before moving on. Full playbook: `agents-docs/AGENTS_GUIDANCE.md`.
+Load `.agents/skills/goap-agent/SKILL.md` (orchestrator + swarm dispatch). Retriever / Implementer / Verifier in parallel, atomic commits per issue, verify green before moving on. Full playbook: `agents-docs/AGENTS_GUIDANCE.md`.
 
 ## Triage Protocol for Unfixable Issues
 

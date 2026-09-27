@@ -10,7 +10,6 @@
 |-------|-------------|----------|
 | accessibility-auditor | Audit web applications for WCAG 2.2 compliance, screen reader compatibility, keyboard navigation, and color contrast. Use this skill when the user asks for an accessibility audit, a11y check, WCAG compliance review, s... | ui-ux |
 | agent-browser | Browser automation CLI for AI agents. Use when the user needs to interact with websites — navigating pages, filling forms, clicking buttons, taking screenshots, scraping data, testing web apps, or automating any brows... | tool |
-| agent-coordination | Coordinate multiple agents for software development across any language. Use this skill when running parallel execution of independent tasks, sequential chains with dependencies, swarm analysis from multiple perspecti... | agent |
 | agentic-abstention | Encode CONVOLVE-style stopping rules: decide when to stop acting instead of continuing tool calls on an infeasible task. Use this skill whenever an agent must determine if further execution is warranted. Not for gener... | agent |
 | agents-md | Create AGENTS.md files with production-ready best practices. Use this skill when creating new AGENTS.md files, implementing quality gates, or updating agent documentation — even if they just say "add an AGENTS.md" or ... | documentation |
 | api-design-first | Design and document RESTful APIs using design-first principles with OpenAPI specifications. Use this skill when the user asks to design an API, create an API spec, plan endpoints, model request/response schemas, or di... | platform |
@@ -33,7 +32,6 @@
 | durable-objects | Create and review Cloudflare Durable Objects. Use when building stateful coordination (chat rooms, multiplayer games, booking systems), implementing RPC methods, SQLite storage, alarms, WebSockets, or reviewing DO cod... | platform |
 | eu-ai-act-compliance | EU AI Act compliance logging and requirements. Use this skill when ensuring transparency, human oversight, and record-keeping per Regulation (EU) 2024/1689 — even if they just say "add compliance logging" or "make sur... | compliance |
 | git-github-workflow | Orchestrates the full git-to-merge lifecycle: validate → commit → check issues → create PR → monitor ALL GitHub Actions (including pre-existing failures) → fix via swarm/web research → merge with strategy selection → ... | workflow |
-| github-pr-sentinel | Monitor a GitHub pull request until it's merged, green, or blocked. Polls CI checks, review comments, and mergeability state continuously. Use this skill when the user asks to monitor a PR, watch CI, handle review com... | workflow |
 | goap-agent | Orchestrates complex multi-step tasks with intelligent planning: analyze the problem, decompose into sub-goals, select execution strategy, assign agents, and coordinate with quality gates. Use this skill when the user... | workflow |
 | implementer | Execution agent skill focused on implementing changes based on an approved Blueprint. Use this skill when implementing targeted, atomic code changes once the plan is solid — even if they just say "implement this" or "... | agent |
 | intent-classifier | Classify user intents and route to appropriate skills, commands, or workflows. Use when determining which skill to invoke, routing requests to specialized agents, or building skill selection logic. Trigger on 'which s... | agent |
@@ -69,7 +67,6 @@
 
 ### agent
 
-- agent-coordination
 - agentic-abstention
 - delegate
 - implementer
@@ -164,7 +161,6 @@
 - docs-hook
 - document-rendering-and-locators
 - git-github-workflow
-- github-pr-sentinel
 - goap-agent
 - progressive-delivery
 - pwa-offline-sync

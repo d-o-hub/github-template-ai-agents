@@ -264,7 +264,7 @@ Skills can reference other skills:
 Link between skills:
 
 ```markdown
-See also: **[agent-coordination](../agent-coordination/SKILL.md)** for concurrent task patterns.
+See also: **goap-agent** (`execution-strategies.md`) for concurrent task patterns.
 ```
 
 ## Output Patterns

@@ -157,7 +157,7 @@ Merging vs bot sync-churn: push a clean linear tip then `gh pr merge --auto --sq
 
 ## Delegation Routing
 
-- **Route to**: `delegate` (retrieval/context) → `implementer` (execution) → `agent-coordination` (swarm dispatch).
+- **Route to**: `delegate` (retrieval/context) → `implementer` (execution) → `goap-agent` (swarm dispatch).
 - **Parallel agents**: See `agents-docs/AGENT_TEAMS_GUIDE.md` for Agent Teams, Dynamic Workflows, and Worktrees.
 
 ## Metrics & Post-Task Protocol
@@ -181,7 +181,7 @@ your project adopts the metrics/DORA stack (see `agents-docs/ADOPTION_PROFILES.m
 
 | Category | Skills |
 |----------|--------|
-| **Agent** | `agentic-abstention`, `agent-coordination`, `delegate`, `implementer`, `intent-classifier`, `jules-delegator` |
+| **Agent** | `agentic-abstention`, `delegate`, `implementer`, `intent-classifier`, `jules-delegator` |
 | **Analysis** | `triz-solver` (solve + audit modes) |
 | **Code Quality** | `codacy`, `code-review-assistant`, `css-render-performance`, `iterative-refinement`, `migration-refactoring`, `shell-script-quality`, `static-analysis` |
 | **Compliance** | `eu-ai-act-compliance` |
@@ -197,4 +197,4 @@ your project adopts the metrics/DORA stack (see `agents-docs/ADOPTION_PROFILES.m
 | **Testing** | `test-runner`, `testing-strategy` |
 | **Tool** | `agent-browser`, `dist-channel-selection`, `do-web-doc-resolver`, `template-version-management`, `web-search-researcher` |
 | **UI/UX** | `accessibility-auditor`, `ui-ux-optimize` |
-| **Workflow** | `cicd-pipeline`, `cloudflare-worker-api`, `docs-hook`, `document-rendering-and-locators`, `git-github-workflow`, `github-pr-sentinel`, `goap-agent`, `progressive-delivery`, `pwa-offline-sync`, `reader-ui-ux`, `secure-invite-and-access` |
+| **Workflow** | `cicd-pipeline`, `cloudflare-worker-api`, `docs-hook`, `document-rendering-and-locators`, `git-github-workflow`, `goap-agent`, `progressive-delivery`, `pwa-offline-sync`, `reader-ui-ux`, `secure-invite-and-access` |

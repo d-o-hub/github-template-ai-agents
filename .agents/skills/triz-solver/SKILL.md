@@ -155,8 +155,7 @@ hidden trade-offs instead of solving one problem.
 
 ## Integration with Other Skills
 
-- **goap-agent**: Use TRIZ to identify contradictions before decomposing (Phase 2)
-- **agent-coordination**: Apply IFR to coordination strategy selection
+- **goap-agent**: Use TRIZ to identify contradictions before decomposing (Phase 2); apply IFR to coordination strategy selection
 - **iterative-refinement**: Use contradiction analysis to guide refinement cycles
 
 ## Quality Checklist

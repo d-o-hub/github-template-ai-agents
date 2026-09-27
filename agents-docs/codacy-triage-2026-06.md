@@ -163,7 +163,7 @@ blocking all merges. Use the App only, and let GitHub native auto-merge handle t
 
 - `tests/verify_optional_skills.py` — `shell=True` → `shlex.split()`
 - `scripts/lib/eval_executors.py` — NOSONAR comments for subprocess false positives
-- `.agents/skills/github-pr-sentinel/scripts/gh_pr_watch.py` — NOSONAR comment
+- `.agents/skills/git-github-workflow/scripts/gh_pr_watch.py` — NOSONAR comment (moved from `github-pr-sentinel` fold)
 - `.agents/skills/ui-ux-optimize/scripts/verify.py` — Fixed bare `except: pass` → `except Exception: pass` with nosec
 - `.agents/skills/architecture-diagram/scripts/generate_diagram.py` — nosec B110 annotation
 - `.agents/skills/codeberg-api/scripts/forgejo_api.py` — nosec B110 annotation
