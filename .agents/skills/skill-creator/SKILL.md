@@ -21,10 +21,13 @@ Create and improve skills following the Agent Skills specification. A skill exte
 1. **Capture intent** - What should the skill do? When should it trigger?
 2. **Write draft** - Create SKILL.md with frontmatter and instructions
 3. **Create test cases** - Realistic prompts users would actually say
-4. **Run evals** - Test with-skill vs baseline (or old version)
+4. **Run evals via `skill-evaluator`** - Delegate execution; do not re-specify
+   eval mechanics here (test with-skill vs baseline or old version)
 5. **Review results** - Use eval-viewer for human review + benchmarks
 6. **Iterate** - Improve based on feedback until satisfied
 7. **Optimize description** - Fine-tune frontmatter for better triggering
+8. **Check trigger uniqueness** - Grep sibling descriptions for shared trigger
+   phrases; add `Not for <sibling>` until no collisions remain
 
 ---
 
@@ -49,6 +52,8 @@ skill-name/
 |-------|----------|-------------|
 | `name` | Yes | Max 64 chars. Lowercase letters, numbers, hyphens only. |
 | `description` | Yes | Max 1024 chars. Describes what the skill does AND when to use it. |
+| `category` | Yes | Existing category slug; required by `validate-skills.sh`. |
+| `version` | Yes | SemVer; required by `validate-skills.sh`. See Versioning Conventions. |
 | `license` | No | License name or reference to bundled license file. |
 | `compatibility` | No | Max 500 chars. Environment requirements. |
 | `metadata` | No | Arbitrary key-value mapping. |

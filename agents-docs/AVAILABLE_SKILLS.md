@@ -49,7 +49,7 @@
 
 | Skill | Description |
 |-------|-------------|
-| `dora-report` | Generate monthly DORA and agentic metrics reports. Use this skill when the user asks for a DORA report, monthly metrics, or a monthly audit. Not for readme-best-practices. |
+| `dora-report` | Generate monthly DORA and agentic metrics reports. Use this skill when the user asks for a DORA report, monthly metrics, or a monthly audit. Not for security-code-auditor, readme-best-practices. |
 
 ## Documentation
 
@@ -63,7 +63,7 @@
 
 | Skill | Description |
 |-------|-------------|
-| `triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive Problem Solving) principles adapted for software engineering. Use when stuck on complex problems, facing technical contradictions, optimizing system design, or seeking innovative solutions beyond trial-and-error — even if they just say "I'm stuck on this" or "help me solve this contradiction". Prevents solving the wrong problem correctly. Not for triz-analysis. |
+| `triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive Problem Solving) principles adapted for software engineering. Use when facing technical contradictions, optimizing system design, or seeking innovative solutions beyond trial-and-error — even if they just say "help me solve this contradiction". Prevents solving the wrong problem correctly. Not for triz-analysis, goap-agent, delegate. |
 
 ## Knowledge
 
@@ -127,7 +127,7 @@
 | Skill | Description |
 |-------|-------------|
 | `accessibility-auditor` | Audit web applications for WCAG 2.2 compliance, screen reader compatibility, keyboard navigation, and color contrast. Use this skill when the user asks for an accessibility audit, a11y check, WCAG compliance review, screen reader test, keyboard navigation check, color contrast check, or ARIA validation — even if they don't explicitly mention "accessibility" or "WCAG". Also triggers on Section 508 and ADA compliance requests. Not for css-render-performance. |
-| `ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination, confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, or any screen-based product — even if they just say "improve the UI" or "optimize the UX" or "make it sound human" or "this feels robotic". Not for css-render-performance. |
+| `ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination, confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, or any screen-based product — even if they just say "improve the UI" or "optimize the UX" or "this feels robotic". Writing-voice requests ("make it sound human") belong to avoid-ai-writing. Not for css-render-performance, avoid-ai-writing. |
 
 ## Workflow
 

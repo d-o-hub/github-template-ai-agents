@@ -84,8 +84,8 @@ Preview what would be updated without making changes.
 🔍 Dry Run Mode - No changes will be made
 
 Files that would be updated:
-- docs/skills/README.md
-- docs/api/endpoints.md
+- agents-docs/skills-reference.md
+- agents-docs/AVAILABLE_SKILLS.md
 - AGENTS.md
 
 Commands needing validation: 49
@@ -349,7 +349,7 @@ FAIL_ON_DANGEROUS=true ./scripts/update-all-docs.sh
 - `/verify` - Verify documentation commands only
 - `/verify-stats` - Show verification statistics
 - `/validate-links` - Validate links only
-- `/generate-skills` - Generate skills documentation
+- `./scripts/generate-available-skills.sh` - Generate skills documentation
 
 ## Best Practices
 

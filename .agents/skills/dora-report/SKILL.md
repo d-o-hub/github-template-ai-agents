@@ -1,6 +1,6 @@
 ---
 name: dora-report
-description: Generate monthly DORA and agentic metrics reports. Use this skill when the user asks for a DORA report, monthly metrics, or a monthly audit. Not for readme-best-practices.
+description: Generate monthly DORA and agentic metrics reports. Use this skill when the user asks for a DORA report, monthly metrics, or a monthly audit. Not for security-code-auditor, readme-best-practices.
 category: devops
 version: "0.2.10"
 template_version: "0.3"
