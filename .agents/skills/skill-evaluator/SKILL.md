@@ -212,6 +212,7 @@ PASS | NEEDS_WORK | FAIL — <one sentence>
 ## Bundled Tools
 
 - `scripts/check_structure.py` — checks local skill folder structure and eval presence
+- `references/verification-checklist.md` — starter checklist for domain-specific verification
 
 ## See Also
 

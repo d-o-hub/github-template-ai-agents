@@ -86,11 +86,17 @@ Integrate testing into CI/CD:
 
 - [Testing Strategy Patterns](../../../agents-docs/references/testing-patterns.md) - Comprehensive collection of testing patterns and strategies
 
+## Appendix: Deterministic Testdata Builders (absorbed from testdata-builders)
+
+Keep tests concise with pure-function factories (`makeEntity(overrides)`),
+realistic defaults, seeded randomness, and builders updated on every schema
+change (CI fails otherwise). Patterns: `references/builder-patterns.md`;
+strategy: `references/test-data-strategy.md`.
+
 ## See Also
 
 - `test-runner` — Execute tests and diagnose failures
 - `dogfood` — Exploratory testing of web applications
-- `testdata-builders` — Create test fixtures and factories
 
 ## Voice & Context
 
