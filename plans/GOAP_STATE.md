@@ -210,6 +210,19 @@ skipped must never be persisted as `passing`. Derived from the PR #795 roast
   `validate-skills.sh`, `quality_gate.sh`, full CI, `--auto` merge.
 - Status: IN FLIGHT (ADR-038 accepted).
 
+## Round 8 final (2026-09-27)
+
+- Merged: #918 (trigger hygiene + registry fixes), #920 (triz merge),
+  #922 (sentinel + coordination folds + registry link fix), #923-era folds
+  (testdata/verification/tvm + 6 demotions), #926 (debugger,
+  secrets-management, dependency-upgrades).
+- Deviations: KEEP docs-hook (load-bearing 169-line sync script),
+  jules-delegator, turso-db, do-web-doc-resolver (workflow-coupled).
+- Ghost-dir lesson: `git rm` leaves ignored `__pycache__` behind, tripping
+  directory-iterating validators — `rm -rf` ghost dirs (LESSON-043).
+- Registry generator bug fixed (block-scalar descriptions 12→0 missing).
+- Open PRs: 0. Open issues: 0. Overlap gate: 0 pairs.
+
 ## Round 6 deviations (2026-09-27, primary log)
 
 1. **#906 closed via #907**: Jules/user merged token-prefix content as #907
