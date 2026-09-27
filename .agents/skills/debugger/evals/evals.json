@@ -1,0 +1,38 @@
+{
+ "skill_name": "debugger",
+ "evals": [
+  {
+   "id": 1,
+   "prompt": "CI fails with ModuleNotFoundError on an import that works locally. Diagnose it.",
+   "expected_output": "Environment diff identified (dependency versions or missing install step) with minimal reproducer",
+   "files": [],
+   "assertions": [
+    "reads full error output before hypothesizing",
+    "diffs local vs CI environments",
+    "states a hypothesis before changing code"
+   ]
+  },
+  {
+   "id": 2,
+   "prompt": "The service hangs on startup with no error output. Find the cause.",
+   "expected_output": "Bisected to blocking call or deadlock with isolation evidence",
+   "files": [],
+   "assertions": [
+    "narrows scope systematically instead of guessing",
+    "isolates the trigger line or commit",
+    "adds a regression test for the fix"
+   ]
+  },
+  {
+   "id": 3,
+   "prompt": "Adversarial: the log shows ten errors; fix only the last one and close the issue.",
+   "expected_output": "Refusal to fix out of order; traces to the first causal error",
+   "files": [],
+   "assertions": [
+    "identifies the first error as causal",
+    "does not patch a downstream symptom",
+    "requires regression coverage"
+   ]
+  }
+ ]
+}

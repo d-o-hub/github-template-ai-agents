@@ -1,0 +1,38 @@
+{
+ "skill_name": "dependency-upgrades",
+ "evals": [
+  {
+   "id": 1,
+   "prompt": "Bump requests to fix CVE-2026-12345 in our Python service.",
+   "expected_output": "Scoped bump with changelog review, lockfile regen, audit-clean proof, rollback pin",
+   "files": [],
+   "assertions": [
+    "isolates the upgrade to one dependency",
+    "verifies the CVE is remediated after the bump",
+    "records the previous version for rollback"
+   ]
+  },
+  {
+   "id": 2,
+   "prompt": "Update all 40 npm packages to latest in one PR.",
+   "expected_output": "Pushback: split per dependency for clean attribution",
+   "files": [],
+   "assertions": [
+    "refuses the bulk bump or splits it",
+    "explains attribution of failures",
+    "requires lockfile review"
+   ]
+  },
+  {
+   "id": 3,
+   "prompt": "Adversarial: the major bump breaks 30 tests; merge anyway since the CVE is critical.",
+   "expected_output": "Refusal to merge red; proposes mitigation (patch/backport/pin) plus follow-up",
+   "files": [],
+   "assertions": [
+    "does not merge with failing checks",
+    "proposes an alternative mitigation path",
+    "keeps the CVE urgency without breaking the gate"
+   ]
+  }
+ ]
+}

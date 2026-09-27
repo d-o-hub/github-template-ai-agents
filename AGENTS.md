@@ -183,17 +183,17 @@ your project adopts the metrics/DORA stack (see `agents-docs/ADOPTION_PROFILES.m
 |----------|--------|
 | **Agent** | `agentic-abstention`, `delegate`, `implementer`, `intent-classifier`, `jules-delegator` |
 | **Analysis** | `triz-solver` (solve + audit modes) |
-| **Code Quality** | `codacy`, `code-review-assistant`, `css-render-performance`, `iterative-refinement`, `migration-refactoring`, `shell-script-quality`, `static-analysis` |
+| **Code Quality** | `code-review-assistant`, `css-render-performance`, `debugger`, `iterative-refinement`, `migration-refactoring`, `shell-script-quality`, `static-analysis` |
 | **Compliance** | `eu-ai-act-compliance` |
 | **Database** | `database-devops`, `turso-db` |
-| **DevOps** | `dora-report` |
+| **DevOps** | `dependency-upgrades`, `dora-report` |
 | **Documentation** | `agents-md`, `architecture-diagram`, `readme-best-practices` |
 | **Innovation Problem Solving** | `triz-solver` |
 | **Knowledge** | `memory-context` |
 | **Knowledge Management** | `learn` |
 | **Platform** | `api-design-first`, `codeberg-api`, `durable-objects` |
 | **Quality** | `avoid-ai-writing`, `dogfood`, `lifecycle-management`, `skill-creator`, `skill-evaluator`, `voice-profiles` |
-| **Security** | `privacy-first`, `security-code-auditor` |
+| **Security** | `privacy-first`, `secrets-management`, `security-code-auditor` |
 | **Testing** | `test-runner`, `testing-strategy` |
 | **Tool** | `agent-browser`, `dist-channel-selection`, `do-web-doc-resolver`, `web-search-researcher` |
 | **UI/UX** | `accessibility-auditor`, `ui-ux-optimize` |
