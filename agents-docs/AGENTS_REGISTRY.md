@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-09-27 13:00 UTC
+> Last updated: 2026-09-27 13:09 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -42,7 +42,9 @@ See [Creating or Updating Skills](../CONTRIBUTING.md#creating-or-updating-skills
 | `code-review-assistant` | `.agents/skills/code-review-assistant` | Automated code review with PR analysis, change summaries, qu |
 | `css-render-performance` | `.agents/skills/css-render-performance` | Guide CSS render performance analysis and optimization. Use  |
 | `database-devops` | `.agents/skills/database-devops` | Database design, migration, and DevOps automation with safet |
+| `debugger` | `.agents/skills/debugger` | Diagnose failing builds and runtime errors with root-cause d |
 | `delegate` | `.agents/skills/delegate` | Lightweight retrieval and context agent skill for rapid info |
+| `dependency-upgrades` | `.agents/skills/dependency-upgrades` | Perform routine dependency version bumps and vulnerability-d |
 | `dist-channel-selection` | `.agents/skills/dist-channel-selection` | Guide for selecting the correct distribution channel (npm, C |
 | `docs-hook` | `.agents/skills/docs-hook` | Lightweight git hook integration for updating agents-docs wi |
 | `document-rendering-and-locators` | `.agents/skills/document-rendering-and-locators` | Implement resilient document rendering and annotation anchor |
@@ -66,6 +68,7 @@ See [Creating or Updating Skills](../CONTRIBUTING.md#creating-or-updating-skills
 | `pwa-offline-sync` | `.agents/skills/pwa-offline-sync` | Design Cache Storage + IndexedDB strategy and sync queue. Us |
 | `reader-ui-ux` | `.agents/skills/reader-ui-ux` | Build localized, accessible reader/admin UI with responsive  |
 | `readme-best-practices` | `.agents/skills/readme-best-practices` | Create, audit, and improve GitHub README.md files following  |
+| `secrets-management` | `.agents/skills/secrets-management` | Own the secret lifecycle: detect leaked secrets, rotate them |
 | `secure-invite-and-access` | `.agents/skills/secure-invite-and-access` | Implement access control, authentication, and authorization  |
 | `security-code-auditor` | `.agents/skills/security-code-auditor` | Perform security audits on code to identify vulnerabilities, |
 | `shell-script-quality` | `.agents/skills/shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use t |
