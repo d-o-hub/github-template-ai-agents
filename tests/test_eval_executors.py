@@ -185,3 +185,17 @@ def test_run_file_validation_curlrc_wgetrc_rejected(tmp_path):
     assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
     assert result.message == "Missing 2 file(s)"  # nosec B101 -- test assertion
     assert result.details == ["Missing: .curlrc", "Missing: .wgetrc"]  # nosec B101 -- test assertion
+
+
+def test_run_file_validation_kubeconfig_yaml_rejected(tmp_path):
+    """Consumer regression: eval file-validation must reject repo-local kubeconfig.yaml/yml."""
+    skill_path = tmp_path / "skill"
+    skill_path.mkdir()
+    (skill_path / "cluster.kubeconfig.yaml").write_text("test-content", encoding="utf-8")
+    (skill_path / "cluster.kubeconfig.yml").write_text("test-content", encoding="utf-8")
+
+    eval_case = {"id": 1, "files": ["cluster.kubeconfig.yaml", "cluster.kubeconfig.yml"]}
+    result = eval_executors.run_file_validation(eval_case, skill_path, False)
+    assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
+    assert result.message == "Missing 2 file(s)"  # nosec B101 -- test assertion
+    assert result.details == ["Missing: cluster.kubeconfig.yaml", "Missing: cluster.kubeconfig.yml"]  # nosec B101 -- test assertion
