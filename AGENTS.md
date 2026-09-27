@@ -142,6 +142,7 @@ If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject
 Before creating a PR, check for open PRs already touching the same files
 (`gh pr list` + `gh pr diff --name-only`) and extend the existing one instead of
 spawning a duplicate. Scheduled detection: `.github/workflows/duplicate-pr-guard.yml`.
+Merging vs bot sync-churn: push a clean linear tip then `gh pr merge --auto --squash` at once (LESSON-040).
 
 ## Skill Guidance
 

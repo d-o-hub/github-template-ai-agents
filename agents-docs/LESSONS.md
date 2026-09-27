@@ -1515,3 +1515,67 @@ Also applied consistently across the frontmatter parsing block by replacing all 
 **Files Modified**:
 - `scripts/validate-skills.sh` — Fixed `[^\r\n]` → `[^$nl$cr]` in name regex; normalized all ANSI-C quoted newline/CR references to variables
 - `.agents/skills/agentic-abstention/evals/evals.json` — Created with 6 eval cases covering all 5 stopping rules + 1 negative case
+
+### LESSON-040 — Bot Sync-Merge SHAs Report `action_required`, Not Failure
+
+**Date**: 2026-09-27
+**Component**: GitHub Actions / PR workflow
+**Severity**: Medium
+
+**Issue**: After every force-push of a clean linear branch tip, an automation (Jules, acting under the user identity `d.o.`) pushed a no-op `Merge <tip> into <base>` commit within minutes. On those merge SHAs, ALL `pull_request`-event workflow runs (CI, Commit Lint, Security Scan, gitleaks) concluded `action_required` with empty job lists, while the identical content on the linear tip ran fully green.
+
+**Symptoms**:
+- `gh api .../actions/runs?head_sha=<merge-sha>` shows 8 workflows `completed | action_required`, zero jobs via jobs API (`log not found`)
+- Same tree on linear SHA: CI success (Quality Gate + Run Tests), Commit Lint success, Security Scan success
+- `gh pr checks` on merge SHAs shows only external checks (Codacy/Sonar/CodeQL)
+
+**Root Cause**: Bot-authored merge commits trigger workflow runs that stall at an approval/protection gate (actor-gated), producing `action_required` instead of executing. Content-identical; reporting-only artifact.
+
+**Solution**: Strip sync merges (`git rebase --onto origin/main <old-base>` or `reset --hard <clean-tip>`, `push --force-with-lease`), re-validate on the linear tip, and merge promptly (see LESSON-041). Verify content identity with `git diff <clean> <merge> --stat` (empty = safe).
+
+**Prevention**:
+- Never `git pull`/merge main into a PR branch; always rebase to keep linear history
+- After pushing fixes to bot-owned branches, poll `git ls-remote` for clobber/sync commits before merging
+- Jules re-syncs can also silently drop fix commits (Round-5/6): cherry-pick by hash onto fresh main if the branch was re-cut
+
+**Tags**: #github-actions #ci #bot #jules #merge-queue
+
+**Files Modified**: (workflow only, no source changes)
+
+### LESSON-041 — Merge-At-Once Beats Main-Churn Races
+
+**Date**: 2026-09-27
+**Component**: GitHub PR merge workflow
+**Severity**: Medium
+
+**Issue**: `gh pr merge --squash` on a freshly rebased branch failed with `Base branch was modified`: automated `ci: update ci status artifacts [skip ci]` PRs land every few minutes, invalidating the base between rebase and merge.
+
+**Root Cause**: Sequential rebase → wait-for-CI → merge cannot win against continuous artifact automation; each merge triggers the next artifact PR.
+
+**Solution**: Validate content on the clean tip (full CI green at least once), then push + `gh pr merge --auto --squash --delete-branch` in one move. GitHub auto-merge fires on the validated tip before the next churn event. Used successfully for #909 and #905 after direct merges kept racing.
+
+**Prevention**:
+- Prefer `--auto` over direct merge whenever artifact automation is active
+- Keep the validated window short: re-verify locally (`pytest`, `quality_gate.sh`) right before the push so branch CI is a formality
+
+**Tags**: #github #merge #ci-churn #auto-merge
+
+**Files Modified**: (workflow only, no source changes)
+
+### LESSON-042 — `gh pr edit` Label Ops Need REST Fallback
+
+**Date**: 2026-09-27
+**Component**: GitHub CLI / API
+**Severity**: Low
+
+**Issue**: `gh pr edit 900 --remove-label "superseded-candidate"` failed repo-wide with `GraphQL: Projects (classic) is being deprecated ... (repository.pullRequest.projectCards)`. The label was never removed despite the error surfacing as a deprecation notice.
+
+**Root Cause**: `gh pr edit` fetches `projectCards` via GraphQL; the Projects-classic sunset turns that field into a hard error, failing the whole mutation.
+
+**Solution**: Bypass GraphQL with REST:
+`gh api repos/{owner}/{repo}/issues/{number}/labels/{name} -X DELETE`
+(add: `gh api .../issues/{number}/labels -X POST -f labels='["x"]'`).
+
+**Tags**: #github-cli #graphql #labels #workaround
+
+**Files Modified**: (workflow only, no source changes)
