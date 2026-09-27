@@ -2,7 +2,7 @@
 name: ui-ux-optimize
 description: >
   Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination,
-  confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, or any screen-based product — even if they just say "improve the UI" or "optimize the UX" or "make it sound human" or "this feels robotic". Not for css-render-performance.
+  confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile apps, games, dashboards, SaaS, e-commerce, kiosks, or any screen-based product — even if they just say "improve the UI" or "optimize the UX" or "this feels robotic". Writing-voice requests ("make it sound human") belong to avoid-ai-writing. Not for css-render-performance, avoid-ai-writing.
 version: "0.3.0"
 category: ui-ux
 license: MIT

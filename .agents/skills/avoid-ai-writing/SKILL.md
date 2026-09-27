@@ -24,13 +24,9 @@ You are editing content to remove AI writing patterns ("AI-isms") that make text
 
 ## Voice Profiles (Optional)
 
-Independent of audience context; sets the persona.
-
-- **`casual`**: Contractions, short sentences (≤14 words), low jargon.
-- **`professional`**: Active voice, concrete claims, low hedging.
-- **`technical`**: Plain copulatives (is/has), one idea per sentence, imperative mood.
-- **`warm`**: Direct address ("you"), strong verbs, medium cadence (15-20 words).
-- **`blunt`**: Short declaratives, no padding, no hedges.
+Personas are canonical in `voice-profiles` — see that skill for definitions.
+Pass the chosen profile name (`casual`, `professional`, `technical`, `warm`,
+`blunt`) with the rewrite request instead of redefining personas here.
 
 ## Context Profiles
 

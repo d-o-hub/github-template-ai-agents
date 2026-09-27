@@ -15,7 +15,13 @@ One-sentence purpose statement.
 
 ## When to Use
 
-- Bullet trigger conditions
+- Bullet trigger conditions (quote exact user phrases)
+- Add `Not for <sibling>` guards for every near-miss sibling skill
+
+## Evals Scaffold (required by validate-skills.sh: ≥3 cases in evals/evals.json)
+
+- Author realistic prompts plus at least one should-not-trigger near-miss
+- See `skill-creator/references/schemas.md` for the eval JSON schema
 
 ## Required Inputs
 
@@ -42,4 +48,5 @@ Numbered workflow the agent follows.
 
 ## See Also
 
-- Related skill — brief description of when to use it instead
+- Related skill — brief description of when to use it instead (mirrors the
+  `Not for` guards above so routing stays consistent both directions)
