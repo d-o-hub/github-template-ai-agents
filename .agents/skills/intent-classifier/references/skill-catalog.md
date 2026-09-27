@@ -58,8 +58,7 @@
 | test-runner | Execute tests, analyze results, and diagnose failures across any testing framework. Use this skill when running test suites, debugging failing tests, or configuring CI/CD testing pipelines — even if they just say "run... | testing |
 | testdata-builders | Maintain deterministic builders/factories for test entities. Use this skill when authoring tests, extending test utilities, or adding schema fields that affect fixtures — even if they just say "create test data" or "b... | quality |
 | testing-strategy | Design and implement comprehensive testing strategies for software projects. Use this skill when planning test suites, choosing testing approaches like property-based testing, visual regression, load testing, mutation... | testing |
-| triz-analysis | Run a systematic TRIZ contradiction audit against a codebase, architecture, or workflow to identify hidden trade-offs and innovation opportunities. Use this skill when facing design trade-offs, contradictory requireme... | analysis |
-| triz-solver | Systematic problem-solving using TRIZ (Theory of Inventive Problem Solving) principles adapted for software engineering. Use when facing technical contradictions, optimizing system design, or seeking innovative soluti... | innovation-problem-solving |
+| triz-solver | Systematic problem-solving using TRIZ (Theory of Inventive Problem Solving) principles adapted for software engineering. Use when facing technical contradictions, optimizing system design, running a TRIZ audit, findin... | innovation-problem-solving |
 | turso-db | Use this skill for Turso (LibSQL/Limbo) database development, including scaffolding, querying, migrations, and maintenance. Supports vector search, full-text search, CDC, MVCC, encryption, and bidirectional remote syn... | database |
 | ui-ux-optimize | Swarm-powered UI/UX prompt optimizer with auto-research agents, handoff coordination, confidence-scored autoresearch loops, and backpressure quality gates. Use this skill when optimizing UI/UX for web apps, mobile app... | ui-ux |
 | verification-template | Template for creating portable domain-specific verification skills. Use this skill when creating a verification checklist as a starting point for defining systematic verification checklists for new features, modules, ... | quality |
@@ -76,10 +75,6 @@
 - implementer
 - intent-classifier
 - jules-delegator
-
-### analysis
-
-- triz-analysis
 
 ### code-quality
 
