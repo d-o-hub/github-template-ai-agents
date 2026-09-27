@@ -14,12 +14,6 @@
 | `intent-classifier` | Classify user intents and route to appropriate skills, commands, or workflows. Use when determining which skill to invoke, routing requests to specialized agents, or building skill selection logic. Trigger on 'which skill should I use', 'route this to', 'classify this request', 'skill selection', or when multiple skills could handle a task. Not for skill-creator, skill-evaluator. |
 | `jules-delegator` | Use this skill to delegate complex coding tasks by creating Jules sessions via the Jules CLI. Use this skill when the user asks to delegate a coding task to Jules, create a Jules session, or hand off implementation work — even if they just say "send this to Jules" or "let Jules handle it". Jules is an AI coding agent that can autonomously implement features, fix bugs, and make code changes across repositories. Not for git-github-workflow. |
 
-## Analysis
-
-| Skill | Description |
-|-------|-------------|
-| `triz-analysis` | Run a systematic TRIZ contradiction audit against a codebase, architecture, or workflow to identify hidden trade-offs and innovation opportunities. Use this skill when facing design trade-offs, contradictory requirements, or when needing to identify innovation opportunities through systematic contradiction analysis — even if they just say "run a TRIZ audit" or "find contradictions in this design". Not for triz-solver. |
-
 ## Code Quality
 
 | Skill | Description |
@@ -63,7 +57,7 @@
 
 | Skill | Description |
 |-------|-------------|
-| `triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive Problem Solving) principles adapted for software engineering. Use when facing technical contradictions, optimizing system design, or seeking innovative solutions beyond trial-and-error — even if they just say "help me solve this contradiction". Prevents solving the wrong problem correctly. Not for triz-analysis, goap-agent, delegate. |
+| `triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive Problem Solving) principles adapted for software engineering. Use when facing technical contradictions, optimizing system design, running a TRIZ audit, finding contradictions in a design, or seeking innovative solutions beyond trial-and-error — even if they just say "help me solve this contradiction" or "run a TRIZ audit". Prevents solving the wrong problem correctly. Not for goap-agent, delegate. |
 
 ## Knowledge
 

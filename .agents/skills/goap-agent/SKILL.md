@@ -36,7 +36,7 @@ Use this skill when facing:
 ## Phase 1: Task Analysis (Analyze & Strategize)
 
 Before decomposing tasks, ensure architectural decisions are sound:
-1. **Analyze**: Use `triz-analysis` or `triz-solver` to evaluate the problem and resolve contradictions.
+1. **Analyze**: Use `triz-solver` (solve or audit mode) to evaluate the problem and resolve contradictions.
 2. **Decide**: Formulate an **ADR** (Architecture Decision Record) detailing Context, Decision, and Consequences.
 3. **Gate**: Wait for human approval of the ADR before proceeding to decomposition.
 
@@ -173,8 +173,7 @@ GOAP enables systematic planning through: Analysis, Decomposition, Strategy, Qua
 ## See Also
 
 - `agent-coordination` — Coordinate multiple agents
-- `triz-analysis` — Audit systems for contradictions
-- `triz-solver` — Solve specific problems using TRIZ
+- `triz-solver` — Solve problems and audit systems for contradictions using TRIZ
 
 ## Rationalizations
 
