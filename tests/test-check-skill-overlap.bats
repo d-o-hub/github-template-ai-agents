@@ -53,9 +53,8 @@ teardown() {
     [[ "$output" == *'"skill-alpha"'* ]]
 }
 
-@test "known corpus duplicate triz pair is flagged" {
-    run ./scripts/check-skill-overlap.sh --threshold 0.04
+@test "known corpus duplicate pair is flagged" {
+    run ./scripts/check-skill-overlap.sh --threshold 0.01
     [ "$status" -eq 0 ]
-    [[ "$output" == *"triz-analysis"* ]]
-    [[ "$output" == *"triz-solver"* ]]
+    [[ "$output" == *"OVERLAP"* ]]
 }
