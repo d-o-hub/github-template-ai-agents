@@ -1,86 +1,47 @@
-#!/bin/bash
-# Dynamic Skill Catalog Updater
-# Scans .agents/skills/ and regenerates the skill catalog
+#!/usr/bin/env bash
+# dynamic-catalog.sh - DEPRECATED shim; delegates to the canonical generator.
+#
+# This script used to write the intent-classifier catalog itself, in a private
+# format with a 100-character description budget. That was a landmine: the
+# catalog is a ROUTING table, and the discriminators intent-classifier needs --
+# the "Not for <sibling>" guard and the secondary trigger phrases -- live at the
+# TAIL of each description, exactly where a blind character slice lands.
+# Measured against the live tree, 52 of 54 descriptions were cut mid-sentence
+# and the guards went from 50/50 present to 2/50, silently re-breaking routing
+# for any agent that followed this script instead of the canonical one.
+#
+# The canonical generator is scripts/generate-skill-catalog.sh. It owns the
+# output file, carries the 1024-char budget with word-boundary elision and
+# guard retention, and is covered by tests/test-generate-skill-catalog.bats.
+#
+# This shim is kept only so the previously documented command keeps working.
+# It can no longer produce a worse catalog: it has no catalog logic of its own.
+#
+# Usage: .agents/skills/intent-classifier/scripts/dynamic-catalog.sh [SKILLS_DIR]
+
+set -euo pipefail
 
 # Get repository root for portable paths
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../" && pwd)"
-
-SKILLS_DIR="${1:-$REPO_ROOT/.agents/skills}"
+CANONICAL_GENERATOR="$REPO_ROOT/scripts/generate-skill-catalog.sh"
 CATALOG_FILE="$REPO_ROOT/.agents/skills/intent-classifier/references/skill-catalog.md"
 
-# Check if skills directory exists
-if [[ ! -d "$SKILLS_DIR" ]]; then
-    echo "Error: Skills directory not found: $SKILLS_DIR"
+if [[ ! -x "$CANONICAL_GENERATOR" ]]; then
+    printf 'Error: canonical catalog generator not found or not executable: %s\n' \
+        "$CANONICAL_GENERATOR" >&2
     exit 1
 fi
 
-# Generate header
-cat > "$CATALOG_FILE" << 'HEADER'
-# Skill Catalog
+# Pin the output to the canonical catalog path, matching the target this shim
+# always wrote to, and forward a legacy positional skills-dir argument through
+# the environment variable the canonical generator already reads.
+export OUTPUT_FILE="$CATALOG_FILE"
+if [[ $# -ge 1 ]]; then
+    export SKILLS_DIR="$1"
+fi
 
-> Auto-generated from `.agents/skills/` directory.
-HEADER
+# Deprecation notice on stderr so the canonical generator's stdout stays
+# machine-parseable for anything that consumes it.
+printf 'dynamic-catalog.sh is deprecated; delegating to %s\n' "$CANONICAL_GENERATOR" >&2
 
-# Add timestamp
-{
-    echo ">> Last updated: $(date +%Y-%m-%d)"
-    echo ""
-    echo "## Available Skills"
-    echo ""
-    echo "| Skill | Description | Key Triggers |"
-    echo "|-------|-------------|--------------|"
-} >> "$CATALOG_FILE"
-
-# Process each skill
-for skill_path in "$SKILLS_DIR"/*/; do
-    if [[ -f "$skill_path/SKILL.md" ]]; then
-        # perf: replace external basename subshell with native bash expansion
-        skill_name="${skill_path%/}"
-        skill_name="${skill_name##*/}"
-        
-        # Extract description from frontmatter
-        description=$(awk '/^---$/{p=!p;next} p && /^description:/{gsub(/^description: /,""); print; exit}' "$skill_path/SKILL.md" 2>/dev/null || echo "No description available")
-        
-        # Extract keywords (first 5 words from description, excluding common words)
-        # perf: replace external subshells and process forks with native bash manipulation
-        desc_lower="${description,,}"
-        # Extract [a-z]+ word runs like the original grep -oE '\b[a-z]+\b'
-        triggers=""
-        trigger_count=0
-        remainder="$desc_lower"
-        while [[ "$remainder" =~ ([a-z]+)(.*)$ ]] && [[ $trigger_count -lt 5 ]]; do
-            word="${BASH_REMATCH[1]}"
-            remainder="${BASH_REMATCH[2]}"
-            if [[ "$word" =~ ^(use|when|the|and|or|for|to|with|a|an|this|that|these|those|is|are|was|were|be|been|have|has|had|do|does|did|will|would|could|should|may|might|can|shall|must|need|want|ask)$ ]]; then
-                continue
-            fi
-            if [[ -z "$triggers" ]]; then
-                triggers="$word"
-            else
-                triggers="$triggers,$word"
-            fi
-            trigger_count=$((trigger_count + 1))
-        done
-        
-        # Truncate description for table
-        short_desc="${description:0:100}"
-        if [[ ${#description} -gt 100 ]]; then
-            short_desc="${short_desc}..."
-        fi
-        
-        echo "| $skill_name | $short_desc | $triggers |" >> "$CATALOG_FILE"
-    fi
-done
-
-{
-    echo ""
-    echo "## Update Catalog"
-    echo ""
-    echo "To regenerate this catalog:"
-    echo '```bash'
-    echo "./scripts/dynamic-catalog.sh"
-    echo '```'
-} >> "$CATALOG_FILE"
-
-echo "Skill catalog updated: $CATALOG_FILE"
-echo "Total skills indexed: $(grep -c '^| [a-z-]* |' "$CATALOG_FILE" || echo 0)"
+exec "$CANONICAL_GENERATOR"

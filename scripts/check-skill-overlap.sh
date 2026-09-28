@@ -2,14 +2,29 @@
 # scripts/check-skill-overlap.sh — keyless Tier-2 skill overlap check.
 # Reuse of NVIDIA SkillEvaluator Tier 2 (inter-skill similarity) without
 # embeddings: word-5-gram Jaccard over normalized SKILL.md bodies flags
-# verbatim duplication. Advisory by default (exit 0); --strict gates.
+# verbatim duplication only, never semantic overlap. Advisory by default
+# (exit 0); --strict gates.
 # See agents-docs/SKILL_EVAL_TIERS.md and ADR-037.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 SKILLS_DIR="$REPO_ROOT/.agents/skills"
-THRESHOLD="0.04"
+# Calibrated against the live catalog, 54 skills / 1431 pairs:
+#   noise floor 0.0267  - highest real-corpus score (pwa-offline-sync <->
+#                         reader-ui-ux). Everything in the 0.02-0.027 band is
+#                         shared template boilerplate ("Use this skill when...",
+#                         "## Rationalizations", "## Red Flags", "Not for X"),
+#                         not semantic overlap, so a threshold down there
+#                         reports false positives and invites bogus merges.
+#   verbatim dup 0.9556 - a fixture pair sharing a large identical paragraph.
+#   0.50 sits in the gap: ~19x above the noise floor and aligned with NVIDIA's
+#                         own DISTINCT boundary, so both systems agree on what
+#                         "distinct" means.
+# DETECTION SCOPE: this catches VERBATIM duplication only. Semantic overlap
+# needs embeddings (NVIDIA Tier 2 similarity-check) and is deliberately out of
+# scope for this keyless template. See agents-docs/SKILL_EVAL_TIERS.md.
+THRESHOLD="0.50"
 STRICT=0
 FORMAT="text"
 
@@ -34,6 +49,7 @@ import glob
 import json
 import os
 import re
+import sys
 from itertools import combinations
 
 skills_dir = os.environ["SKILLS_DIR"]

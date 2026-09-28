@@ -1,6 +1,33 @@
 #!/usr/bin/env bash
-# Evaluates skill quality by running check_structure.py against .agents/skills.
-# Validates eval coverage, frontmatter fields, and directory structure.
+# Static structural audit of the skills in .agents/skills.
+#
+# What this script actually checks:
+#   1. Per-skill directory layout, via .agents/skills/skill-evaluator/scripts/
+#      check_structure.py: no nested <skill>/<skill>/ duplicate, SKILL.md
+#      present, and the presence of references/, scripts/ and evals/.
+#   2. evals/evals.json, via the same script: the file exists and parses, a
+#      top-level "evals" array is present, every case carries id + prompt +
+#      expected_output, at least 2 cases are recommended, and the optional
+#      4-bucket taxonomy is coherent (no unknown bucket; if any bucket is
+#      declared, a "negative" case must exist).
+#   3. Required eval fields, via an awk pass over every evals.json (both the
+#      skills/<name>/evals.json and skills/<name>/evals/evals.json layouts):
+#      expected_output + id + prompt + assertions must all appear. The legacy
+#      "should_trigger" key is rejected, and "files" must be a plain array of
+#      path strings rather than objects carrying path/content.
+#   4. Zero-byte evals.json files, which satisfy no awk pattern and would
+#      otherwise pass unnoticed; reported as missing all four required fields.
+#   5. SKILL.md content, via an awk pass: the only content rule is that the
+#      doc must not reference a non-existent "should_trigger" key.
+#
+# What this script does NOT check:
+#   - SKILL.md YAML frontmatter. It is never parsed; no frontmatter key (name,
+#     description, version, allowed-tools, ...) is validated here. Frontmatter
+#     validation lives in scripts/lib/skill-validation.sh.
+#   - Behaviour. No eval is executed and no assertion is scored against model
+#     output. This is a static schema and layout audit, not an eval run; use
+#     scripts/run-evals.py for that.
+#
 # Exit 0 = all pass, Exit 1 = needs work.
 set -euo pipefail
 
