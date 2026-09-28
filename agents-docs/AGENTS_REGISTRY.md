@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-09-27 15:51 UTC
+> Last updated: 2026-09-28 15:30 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -12,11 +12,11 @@ Agents are organized by CLI tool and purpose.
 
 | Agent | CLI | Purpose | Tools |
 |-------|-----|---------|-------|
-| `agent-creator` | Claude Code | Create new Claude Code agents with proper format, YAML front | Write, Read, Glob, Grep, Edit |
-| `analysis-swarm` | Claude Code | Multi-persona code analysis orchestrator using RYAN (methodi | Read, Glob, Grep, Bash |
-| `goap-agent` | Claude Code | Invoke for complex multi-step tasks requiring intelligent pl | Task, Read, Glob, Grep, TodoWrite |
-| `loop-agent` | Claude Code | Execute workflow agents iteratively for refinement and progr | Task, Read, TodoWrite, Glob, Grep |
-| `github-action-editor` | OpenCode | Edit and create GitHub Actions workflows and composite actio |  |
+| `agent-creator` | Claude Code | Create new Claude Code agents with proper format, YAML | Write, Read, Glob, Grep, Edit |
+| `analysis-swarm` | Claude Code | Multi-persona code analysis orchestrator using RYAN | Read, Glob, Grep, Bash |
+| `goap-agent` | Claude Code | Invoke for complex multi-step tasks requiring intelligent | Task, Read, Glob, Grep, TodoWrite |
+| `loop-agent` | Claude Code | Execute workflow agents iteratively for refinement and | Task, Read, TodoWrite, Glob, Grep |
+| `github-action-editor` | OpenCode | Edit and create GitHub Actions workflows and composite |  |
 | `git-worktree-manager` | OpenCode | Manage git worktrees for efficient multi-branch development |  |
 
 ---
@@ -28,60 +28,60 @@ See [Creating or Updating Skills](../CONTRIBUTING.md#creating-or-updating-skills
 
 | Skill | Location | Description |
 |-------|----------|-------------|
-| `accessibility-auditor` | `.agents/skills/accessibility-auditor` | Audit web applications for WCAG 2.2 compliance, screen reade |
-| `agent-browser` | `.agents/skills/agent-browser` | Browser automation CLI for AI agents. Use when the user need |
-| `agentic-abstention` | `.agents/skills/agentic-abstention` | Encode CONVOLVE-style stopping rules: decide when to stop ac |
-| `agents-md` | `.agents/skills/agents-md` | Create AGENTS.md files with production-ready best practices. |
-| `api-design-first` | `.agents/skills/api-design-first` | Design and document RESTful APIs using design-first principl |
-| `architecture-diagram` | `.agents/skills/architecture-diagram` | Generate or update a project architecture SVG diagram by sca |
-| `avoid-ai-writing` | `.agents/skills/avoid-ai-writing` | Audit and rewrite content to remove AI writing patterns (AI- |
-| `cicd-pipeline` | `.agents/skills/cicd-pipeline` | Design and configure CI/CD pipelines with GitHub Actions, Gi |
-| `cloudflare-worker-api` | `.agents/skills/cloudflare-worker-api` | Structure Worker API routes and handlers. Use this skill whe |
-| `codacy` | `.agents/skills/codacy` | Use the Codacy CLI for local static analysis and cloud data  |
-| `codeberg-api` | `.agents/skills/codeberg-api` | Interact with Forgejo/Codeberg repositories via the REST API |
-| `code-review-assistant` | `.agents/skills/code-review-assistant` | Automated code review with PR analysis, change summaries, qu |
-| `css-render-performance` | `.agents/skills/css-render-performance` | Guide CSS render performance analysis and optimization. Use  |
-| `database-devops` | `.agents/skills/database-devops` | Database design, migration, and DevOps automation with safet |
-| `debugger` | `.agents/skills/debugger` | Diagnose failing builds and runtime errors with root-cause d |
-| `delegate` | `.agents/skills/delegate` | Lightweight retrieval and context agent skill for rapid info |
-| `dependency-upgrades` | `.agents/skills/dependency-upgrades` | Perform routine, low-risk dependency version bumps and vulne |
-| `dist-channel-selection` | `.agents/skills/dist-channel-selection` | Guide for selecting the correct distribution channel (npm, C |
-| `docs-hook` | `.agents/skills/docs-hook` | Lightweight git hook integration for updating agents-docs wi |
-| `document-rendering-and-locators` | `.agents/skills/document-rendering-and-locators` | Implement resilient document rendering and annotation anchor |
-| `dogfood` | `.agents/skills/dogfood` | Systematically explore and test a web application to find bu |
-| `dora-report` | `.agents/skills/dora-report` | Generate monthly DORA and agentic metrics reports. Use this  |
-| `do-web-doc-resolver` | `.agents/skills/do-web-doc-resolver` | Python resolver for URLs and queries into compact, LLM-ready |
-| `durable-objects` | `.agents/skills/durable-objects` | Create and review Cloudflare Durable Objects. Use when build |
-| `eu-ai-act-compliance` | `.agents/skills/eu-ai-act-compliance` | EU AI Act compliance logging and requirements. Use this skil |
-| `git-github-workflow` | `.agents/skills/git-github-workflow` | Orchestrates the full git-to-merge lifecycle: validate → c |
-| `goap-agent` | `.agents/skills/goap-agent` | Orchestrates complex multi-step tasks with intelligent plann |
-| `implementer` | `.agents/skills/implementer` | Execution agent skill focused on implementing changes based  |
-| `intent-classifier` | `.agents/skills/intent-classifier` | Classify user intents and route to appropriate skills, comma |
-| `iterative-refinement` | `.agents/skills/iterative-refinement` | Execute iterative refinement workflows with validation loops |
-| `jules-delegator` | `.agents/skills/jules-delegator` | Use this skill to delegate complex coding tasks by creating  |
-| `learn` | `.agents/skills/learn` | Extract non-obvious session learnings, patterns, and discove |
-| `lifecycle-management` | `.agents/skills/lifecycle-management` | Manage application lifecycle, error handling, and resource c |
-| `memory-context` | `.agents/skills/memory-context` | Retrieve semantically relevant past learnings, analysis outp |
-| `migration-refactoring` | `.agents/skills/migration-refactoring` | Automate complex code migrations and refactorings with safet |
-| `privacy-first` | `.agents/skills/privacy-first` | Prevent email addresses and personal data from entering the  |
-| `progressive-delivery` | `.agents/skills/progressive-delivery` | Remediate a live production failure through a gated loop: re |
-| `pwa-offline-sync` | `.agents/skills/pwa-offline-sync` | Design Cache Storage + IndexedDB strategy and sync queue. Us |
-| `reader-ui-ux` | `.agents/skills/reader-ui-ux` | Build localized, accessible reader/admin UI with responsive  |
-| `readme-best-practices` | `.agents/skills/readme-best-practices` | Create, audit, and improve GitHub README.md files following  |
-| `secrets-management` | `.agents/skills/secrets-management` | Own the secret lifecycle: detect leaked secrets, rotate them |
-| `secure-invite-and-access` | `.agents/skills/secure-invite-and-access` | Implement access control, authentication, and authorization  |
-| `security-code-auditor` | `.agents/skills/security-code-auditor` | Perform security audits on code to identify vulnerabilities, |
-| `shell-script-quality` | `.agents/skills/shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use t |
-| `skill-creator` | `.agents/skills/skill-creator` | Create new skills, modify and improve existing skills, and m |
-| `skill-evaluator` | `.agents/skills/skill-evaluator` | Reusable skill for evaluating other skills with structure ch |
-| `static-analysis` | `.agents/skills/static-analysis` | Triage and fix static analysis findings across any programmi |
-| `testing-strategy` | `.agents/skills/testing-strategy` | Design and implement comprehensive testing strategies for so |
-| `test-runner` | `.agents/skills/test-runner` | Execute tests, analyze results, and diagnose failures across |
-| `triz-solver` | `.agents/skills/triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive P |
-| `turso-db` | `.agents/skills/turso-db` | Use this skill for Turso (LibSQL/Limbo) database development |
-| `ui-ux-optimize` | `.agents/skills/ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research agen |
-| `voice-profiles` | `.agents/skills/voice-profiles` | Adapt writing tone and style based on target audience and co |
-| `web-search-researcher` | `.agents/skills/web-search-researcher` | Research topics using web search to find accurate, current i |
+| `accessibility-auditor` | `.agents/skills/accessibility-auditor` | Audit web applications for WCAG 2.2 compliance, screen |
+| `agent-browser` | `.agents/skills/agent-browser` | Browser automation CLI for AI agents. Use when the user |
+| `agentic-abstention` | `.agents/skills/agentic-abstention` | Encode CONVOLVE-style stopping rules: decide when to stop |
+| `agents-md` | `.agents/skills/agents-md` | Create AGENTS.md files with production-ready best |
+| `api-design-first` | `.agents/skills/api-design-first` | Design and document RESTful APIs using design-first |
+| `architecture-diagram` | `.agents/skills/architecture-diagram` | Generate or update a project architecture SVG diagram by |
+| `avoid-ai-writing` | `.agents/skills/avoid-ai-writing` | Audit and rewrite content to remove AI writing patterns |
+| `cicd-pipeline` | `.agents/skills/cicd-pipeline` | Design and configure CI/CD pipelines with GitHub Actions, |
+| `cloudflare-worker-api` | `.agents/skills/cloudflare-worker-api` | Structure Worker API routes and handlers. Use this skill |
+| `codacy` | `.agents/skills/codacy` | Use the Codacy CLI for local static analysis and cloud data |
+| `codeberg-api` | `.agents/skills/codeberg-api` | Interact with Forgejo/Codeberg repositories via the REST |
+| `code-review-assistant` | `.agents/skills/code-review-assistant` | Automated code review with PR analysis, change summaries, |
+| `css-render-performance` | `.agents/skills/css-render-performance` | Guide CSS render performance analysis and optimization. Use |
+| `database-devops` | `.agents/skills/database-devops` | Database design, migration, and DevOps automation with |
+| `debugger` | `.agents/skills/debugger` | Diagnose failing builds and runtime errors with root-cause |
+| `delegate` | `.agents/skills/delegate` | Lightweight retrieval and context agent skill for rapid |
+| `dependency-upgrades` | `.agents/skills/dependency-upgrades` | Perform routine, low-risk dependency version bumps and |
+| `dist-channel-selection` | `.agents/skills/dist-channel-selection` | Guide for selecting the correct distribution channel (npm, |
+| `docs-hook` | `.agents/skills/docs-hook` | Lightweight git hook integration for updating agents-docs |
+| `document-rendering-and-locators` | `.agents/skills/document-rendering-and-locators` | Implement resilient document rendering and annotation |
+| `dogfood` | `.agents/skills/dogfood` | Systematically explore and test a web application to find |
+| `dora-report` | `.agents/skills/dora-report` | Generate monthly DORA and agentic metrics reports. Use this |
+| `do-web-doc-resolver` | `.agents/skills/do-web-doc-resolver` | Python resolver for URLs and queries into compact, |
+| `durable-objects` | `.agents/skills/durable-objects` | Create and review Cloudflare Durable Objects. Use when |
+| `eu-ai-act-compliance` | `.agents/skills/eu-ai-act-compliance` | EU AI Act compliance logging and requirements. Use this |
+| `git-github-workflow` | `.agents/skills/git-github-workflow` | Orchestrates the full git-to-merge lifecycle: validate → |
+| `goap-agent` | `.agents/skills/goap-agent` | Orchestrates complex multi-step tasks with intelligent |
+| `implementer` | `.agents/skills/implementer` | Execution agent skill focused on implementing changes based |
+| `intent-classifier` | `.agents/skills/intent-classifier` | Classify user intents and route to appropriate skills, |
+| `iterative-refinement` | `.agents/skills/iterative-refinement` | Execute iterative refinement workflows with validation |
+| `jules-delegator` | `.agents/skills/jules-delegator` | Use this skill to delegate complex coding tasks by creating |
+| `learn` | `.agents/skills/learn` | Extract non-obvious session learnings, patterns, and |
+| `lifecycle-management` | `.agents/skills/lifecycle-management` | Manage application lifecycle, error handling, and resource |
+| `memory-context` | `.agents/skills/memory-context` | Retrieve semantically relevant past learnings, analysis |
+| `migration-refactoring` | `.agents/skills/migration-refactoring` | Automate complex code migrations and refactorings with |
+| `privacy-first` | `.agents/skills/privacy-first` | Prevent email addresses and personal data from entering the |
+| `progressive-delivery` | `.agents/skills/progressive-delivery` | Remediate a live production failure through a gated loop: |
+| `pwa-offline-sync` | `.agents/skills/pwa-offline-sync` | Design Cache Storage + IndexedDB strategy and sync queue. |
+| `reader-ui-ux` | `.agents/skills/reader-ui-ux` | Build localized, accessible reader/admin UI with responsive |
+| `readme-best-practices` | `.agents/skills/readme-best-practices` | Create, audit, and improve GitHub README.md files following |
+| `secrets-management` | `.agents/skills/secrets-management` | Own the secret lifecycle: detect leaked secrets, rotate |
+| `secure-invite-and-access` | `.agents/skills/secure-invite-and-access` | Implement access control, authentication, and authorization |
+| `security-code-auditor` | `.agents/skills/security-code-auditor` | Perform security audits on code to identify |
+| `shell-script-quality` | `.agents/skills/shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use |
+| `skill-creator` | `.agents/skills/skill-creator` | Create new skills, modify and improve existing skills, and |
+| `skill-evaluator` | `.agents/skills/skill-evaluator` | Reusable skill for evaluating other skills with structure |
+| `static-analysis` | `.agents/skills/static-analysis` | Triage and fix static analysis findings across any |
+| `testing-strategy` | `.agents/skills/testing-strategy` | Design and implement comprehensive testing strategies for |
+| `test-runner` | `.agents/skills/test-runner` | Execute tests, analyze results, and diagnose failures |
+| `triz-solver` | `.agents/skills/triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive |
+| `turso-db` | `.agents/skills/turso-db` | Use this skill for Turso (LibSQL/Limbo) database |
+| `ui-ux-optimize` | `.agents/skills/ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research |
+| `voice-profiles` | `.agents/skills/voice-profiles` | Adapt writing tone and style based on target audience and |
+| `web-search-researcher` | `.agents/skills/web-search-researcher` | Research topics using web search to find accurate, current |
 
 ---
 

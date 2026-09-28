@@ -138,15 +138,33 @@ Agents load individual skills on demand rather than injecting everything at once
 
 ```json
 {
-  "status": "passing",
-  "last_run": "2026-06-05T16:47:55Z",
+  "schema_version": 3,
+  "status": "unknown",
+  "last_run": "2026-09-27T16:03:22Z",
+  "validated": false,
   "failing_jobs": [],
-  "workflow_url": "https://github.com/.../actions/runs/27027831423"
+  "skipped_jobs": ["test"],
+  "allowed_skips": [],
+  "unallowed_skips": ["test"],
+  "cancelled_jobs": [],
+  "timed_out_jobs": [],
+  "unknown_jobs": [],
+  "succeeded_jobs": ["quality-gate"],
+  "advisory_only": true,
+  "workflow_url": "https://github.com/.../actions/runs/36331732554"
 }
 ```
 
-Agents read this artifact to understand the current CI state before proposing changes,
-avoiding suggestions that fix one check while breaking another.
+`status` is tri-state — `passing`, `failing`, or `unknown` — and only `passing`
+clears the gate. A job skipped by an `if:` condition reports `Success` on
+GitHub and does not block a merge even as a required check, so a skipped
+required job never yields `passing` unless it is explicitly allowlisted; that
+is why the example above reads `unknown` rather than green.
+
+The artifact is **advisory**: a committed file is not a merge gate, so anyone
+with write permission can set any status. Agents read it as a fast signal and
+should confirm with `gh run list` before pausing. Full contract:
+[`agents-docs/CI_STATUS.md`](agents-docs/CI_STATUS.md).
 
 ## Quick Start
 

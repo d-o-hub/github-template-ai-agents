@@ -76,13 +76,15 @@ When a request contains multiple intents:
 Update the skill catalog using:
 
 ```bash
-./scripts/dynamic-catalog.sh
+./scripts/generate-skill-catalog.sh
 ```
 
 This scans `.agents/skills/` and regenerates the skill registry with:
-- Skill names and descriptions
-- Keywords extracted from descriptions
-- Compatibility requirements
+- Skill names and full descriptions (1024-char budget, `Not for` guards retained)
+- Categories, with a per-category index
+
+Regenerate after adding, renaming, or removing a skill. The previous
+`dynamic-catalog.sh` entry point is a deprecated shim that delegates here.
 
 ## Skill Selection Examples
 

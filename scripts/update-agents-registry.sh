@@ -12,6 +12,12 @@ cd "$REPO_ROOT"
 REGISTRY_FILE="$REPO_ROOT/agents-docs/AGENTS_REGISTRY.md"
 TEMP_FILE=$(mktemp /tmp/agents-registry-XXXXXX)
 
+# Max chars for the registry "Purpose" column. A human-facing index, not the
+# routing catalog (scripts/generate-skill-catalog.sh owns that and allows 1024),
+# so a tight budget is correct here -- but it must still land on a word boundary
+# so no cell is cut mid-word.
+readonly MAX_REGISTRY_DESC_CHARS=60
+
 # Trap to clean up temp files on exit or error
 trap 'rm -f "$TEMP_FILE"' EXIT ERR
 
@@ -46,7 +52,7 @@ extract_agent_info() {
     local cli_type="$2"
     
     # Optimized extraction using a single awk pass to avoid multiple process spawns
-    awk -v cli_type="$cli_type" -- '
+    awk -v cli_type="$cli_type" -v max_desc="$MAX_REGISTRY_DESC_CHARS" -- '
     BEGIN { name=""; desc="No description"; tools="Inherited"; in_fm=0 }
     /^---$/ {
         in_fm++;
@@ -55,8 +61,14 @@ extract_agent_info() {
                 # Clean up description
                 sub(/\. Invoke when.*/, "", desc);
                 sub(/Invoke when.*/, "", desc);
-                # Trim to 60 chars
-                if (length(desc) > 60) desc = substr(desc, 1, 60);
+                # Trim to MAX_REGISTRY_DESC_CHARS on a word boundary
+                if (length(desc) > max_desc) {
+                    desc = substr(desc, 1, max_desc)
+                    if (substr(desc, length(desc), 1) != " ") {
+                        sub(/[[:space:]]+[^[:space:]]*$/, "", desc)
+                    }
+                    gsub(/[[:space:]]+$/, "", desc)
+                }
                 printf("| `%s` | %s | %s | %s |\n", name, cli_type, desc, tools);
             }
             exit;
@@ -129,13 +141,19 @@ if [[ -d "$REPO_ROOT/.agents/skills" ]]; then
         ((++SKILL_COUNT))
         
         # Optimized extraction using a single awk pass
-        awk -v name="$skill_name" -- '
+        awk -v name="$skill_name" -v max_desc="$MAX_REGISTRY_DESC_CHARS" -- '
         BEGIN { display_name=name; desc="No description"; in_fm=0 }
         /^---$/ {
             in_fm++;
             if (in_fm == 2) {
-                # Trim description to 60 chars
-                if (length(desc) > 60) desc = substr(desc, 1, 60);
+                # Trim to MAX_REGISTRY_DESC_CHARS on a word boundary
+                if (length(desc) > max_desc) {
+                    desc = substr(desc, 1, max_desc)
+                    if (substr(desc, length(desc), 1) != " ") {
+                        sub(/[[:space:]]+[^[:space:]]*$/, "", desc)
+                    }
+                    gsub(/[[:space:]]+$/, "", desc)
+                }
                 printf("| `%s` | `.agents/skills/%s` | %s |\n", display_name, name, desc);
                 exit;
             }
@@ -156,8 +174,14 @@ if [[ -d "$REPO_ROOT/.agents/skills" ]]; then
                     }
                     if (/^---$/) {
                         # End of frontmatter
-                        # Trim description to 60 chars
-                        if (length(desc) > 60) desc = substr(desc, 1, 60);
+                        # Trim to MAX_REGISTRY_DESC_CHARS on a word boundary
+                        if (length(desc) > max_desc) {
+                            desc = substr(desc, 1, max_desc)
+                            if (substr(desc, length(desc), 1) != " ") {
+                                sub(/[[:space:]]+[^[:space:]]*$/, "", desc)
+                            }
+                            gsub(/[[:space:]]+$/, "", desc)
+                        }
                         printf("| `%s` | `.agents/skills/%s` | %s |\n", display_name, name, desc);
                         exit;
                     }

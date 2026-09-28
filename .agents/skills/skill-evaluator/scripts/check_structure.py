@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
-"""Check local skill directory structure and eval coverage."""
+"""Check local skill directory layout and eval schema.
+
+Validates directory structure (SKILL.md present, no nested skill-name/skill-name
+directory, references/ and scripts/ presence) and the *shape* of
+evals/evals.json -- required case fields and optional bucket taxonomy. It does
+not measure how many eval cases a skill has relative to its scope, and it never
+parses SKILL.md frontmatter: that lives in scripts/lib/skill-validation.sh.
+Behavioural eval execution lives in scripts/run-evals.py.
+"""
 from __future__ import annotations
 
 import json
 import sys
 from pathlib import Path
+
+# Kept local: skill scripts ship standalone and must not import repo libraries.
+EVAL_BUCKETS = frozenset({"explicit", "implicit", "contextual", "negative"})
 
 
 def load_evals(evals_path: Path) -> tuple[dict | None, str | None]:
@@ -31,6 +42,36 @@ def check_eval_fields(data: dict) -> list[str]:
         ]
         if missing:
             issues.append(f"eval #{idx} missing fields: {', '.join(missing)}")
+    issues.extend(check_eval_buckets(evals))
+    return issues
+
+
+def check_eval_buckets(evals: list) -> list[str]:
+    """Advisory check for the optional 4-bucket eval taxonomy.
+
+    Absent buckets are never an error - the taxonomy is progressive. Only an
+    unknown bucket value, or a set that declares buckets while missing the
+    negative bucket, is surfaced.
+    """
+    issues: list[str] = []
+    declared = []
+    for idx, case in enumerate(evals, start=1):
+        if not isinstance(case, dict):
+            continue
+        bucket = case.get("bucket")
+        if bucket is None:
+            continue
+        declared.append(bucket)
+        if bucket not in EVAL_BUCKETS:
+            issues.append(
+                f"eval #{idx}: unknown bucket '{bucket}' "
+                f"(expected one of {sorted(EVAL_BUCKETS)})"
+            )
+    if declared and "negative" not in declared:
+        issues.append(
+            "buckets declared but none tagged 'negative'; add an "
+            "out-of-scope case that must leave the skill unloaded"
+        )
     return issues
 
 

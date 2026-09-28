@@ -2,7 +2,13 @@
 name: goap-agent
 version: "0.2.10"
 category: workflow
-description: Orchestrates complex multi-step tasks with intelligent planning: analyze the problem, decompose into sub-goals, select execution strategy, assign agents, and coordinate with quality gates. Use this skill when the user asks to plan a large change, break down a complex problem, coordinate multiple agents, or systematically tackle a multi-file refactoring — even if they just say "plan this out" or "how should we approach this". Not for simple single-step tasks (use delegate) or implementing from an approved plan (use implementer).
+description: >-
+  Orchestrates complex multi-step tasks with intelligent planning: analyze the problem, decompose into
+  sub-goals, select execution strategy, assign agents, and coordinate with quality gates. Use this
+  skill when the user asks to plan a large change, break down a complex problem, coordinate multiple
+  agents, or systematically tackle a multi-file refactoring — even if they just say "plan this out" or
+  "how should we approach this". Not for simple single-step tasks (use delegate) or implementing from
+  an approved plan (use implementer).
 license: MIT
 ---
 

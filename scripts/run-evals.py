@@ -213,7 +213,8 @@ def generate_json_report(report: EvalReport) -> str:
                         "status": er.status.value,
                         "message": er.message,
                         "details": er.details,
-                        "duration_ms": er.duration_ms
+                        "duration_ms": er.duration_ms,
+                        "total_tokens": er.total_tokens
                     }
                     for er in sr.eval_results
                 ]

@@ -31,6 +31,11 @@ setup() {
     if [ -f scripts/lib/lint_cache.sh ]; then
         cp scripts/lib/lint_cache.sh "$TEMP_DIR/scripts/lib/"
     fi
+    # quality_gate.sh hard-requires lang-checks.sh (fails loudly if absent), so the
+    # fixture must provide it -- same as lint_cache.sh above.
+    if [ -f scripts/lib/lang-checks.sh ]; then
+        cp scripts/lib/lang-checks.sh "$TEMP_DIR/scripts/lib/"
+    fi
     chmod +x "$TEMP_DIR/scripts/"*.sh
 
     # Stub all other validators so the ONLY issue is the stale llms.txt drift
@@ -81,6 +86,11 @@ setup() {
     if [ -f scripts/lib/lint_cache.sh ]; then
         cp scripts/lib/lint_cache.sh "$TEMP_DIR/scripts/lib/"
     fi
+    # quality_gate.sh hard-requires lang-checks.sh (fails loudly if absent), so the
+    # fixture must provide it -- same as lint_cache.sh above.
+    if [ -f scripts/lib/lang-checks.sh ]; then
+        cp scripts/lib/lang-checks.sh "$TEMP_DIR/scripts/lib/"
+    fi
     chmod +x "$TEMP_DIR/scripts/"*.sh
     
     # Create minimal required files
@@ -119,6 +129,11 @@ setup() {
     mkdir -p "$TEMP_DIR/scripts/lib"
     if [ -f scripts/lib/lint_cache.sh ]; then
         cp scripts/lib/lint_cache.sh "$TEMP_DIR/scripts/lib/"
+    fi
+    # quality_gate.sh hard-requires lang-checks.sh (fails loudly if absent), so the
+    # fixture must provide it -- same as lint_cache.sh above.
+    if [ -f scripts/lib/lang-checks.sh ]; then
+        cp scripts/lib/lang-checks.sh "$TEMP_DIR/scripts/lib/"
     fi
     chmod +x "$TEMP_DIR/scripts/"*.sh
     
@@ -164,6 +179,11 @@ setup() {
     mkdir -p "$TEMP_DIR/scripts/lib"
     if [ -f scripts/lib/lint_cache.sh ]; then
         cp scripts/lib/lint_cache.sh "$TEMP_DIR/scripts/lib/"
+    fi
+    # quality_gate.sh hard-requires lang-checks.sh (fails loudly if absent), so the
+    # fixture must provide it -- same as lint_cache.sh above.
+    if [ -f scripts/lib/lang-checks.sh ]; then
+        cp scripts/lib/lang-checks.sh "$TEMP_DIR/scripts/lib/"
     fi
     chmod +x "$TEMP_DIR/scripts/"*.sh
 
@@ -219,6 +239,11 @@ setup() {
     if [ -f scripts/lib/lint_cache.sh ]; then
         cp scripts/lib/lint_cache.sh "$TEMP_DIR/scripts/lib/"
     fi
+    # quality_gate.sh hard-requires lang-checks.sh (fails loudly if absent), so the
+    # fixture must provide it -- same as lint_cache.sh above.
+    if [ -f scripts/lib/lang-checks.sh ]; then
+        cp scripts/lib/lang-checks.sh "$TEMP_DIR/scripts/lib/"
+    fi
     chmod +x "$TEMP_DIR/scripts/"*.sh
 
     # Copy real check-adr-compliance.sh
@@ -270,6 +295,11 @@ setup() {
     if [ -f scripts/lib/lint_cache.sh ]; then
         cp scripts/lib/lint_cache.sh "$TEMP_DIR/scripts/lib/"
     fi
+    # quality_gate.sh hard-requires lang-checks.sh (fails loudly if absent), so the
+    # fixture must provide it -- same as lint_cache.sh above.
+    if [ -f scripts/lib/lang-checks.sh ]; then
+        cp scripts/lib/lang-checks.sh "$TEMP_DIR/scripts/lib/"
+    fi
     chmod +x "$TEMP_DIR/scripts/"*.sh
 
     # Create stub scripts for all checks quality_gate.sh runs
@@ -314,6 +344,11 @@ setup() {
     mkdir -p "$TEMP_DIR/scripts/lib"
     if [ -f scripts/lib/lint_cache.sh ]; then
         cp scripts/lib/lint_cache.sh "$TEMP_DIR/scripts/lib/"
+    fi
+    # quality_gate.sh hard-requires lang-checks.sh (fails loudly if absent), so the
+    # fixture must provide it -- same as lint_cache.sh above.
+    if [ -f scripts/lib/lang-checks.sh ]; then
+        cp scripts/lib/lang-checks.sh "$TEMP_DIR/scripts/lib/"
     fi
 
     # Stub validators; make validate-workflows.sh FAIL to simulate a real gate failure
