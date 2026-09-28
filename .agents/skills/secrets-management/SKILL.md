@@ -2,7 +2,12 @@
 name: secrets-management
 version: "0.2.10"
 category: security
-description: Own the secret lifecycle: detect leaked secrets, rotate them, and store them correctly. Use when handling API keys, tokens, or credentials — even if they just say "rotate this key", "where do I put this secret", or "this key is hardcoded". Not for privacy-first (email/PII lint), general vulnerability audits (use security-code-auditor), or commit/PR lifecycle mechanics (use git-github-workflow).
+description: >-
+  Own the secret lifecycle: detect leaked secrets, rotate them, and store them correctly. Use when
+  handling API keys, tokens, or credentials — even if they just say "rotate this key", "where do I put
+  this secret", or "this key is hardcoded". Not for privacy-first (email/PII lint), general
+  vulnerability audits (use security-code-auditor), or commit/PR lifecycle mechanics (use
+  git-github-workflow).
 license: MIT
 ---
 

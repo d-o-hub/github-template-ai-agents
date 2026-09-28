@@ -3,6 +3,17 @@
 Status: Accepted (build mode, 2026-09-27)
 Date: 2026-09-27
 
+> **Correction (2026-09-27).** Decision 1's Tier 3 mapping was wrong on
+> verification. `skill-creator/scripts/run_loop.py` is a *description optimization
+> loop for skill frontmatter* (trigger precision/recall), not a live-run harness,
+> and `aggregate_benchmark.py` consumes `timing.json`/`grading.json` that nothing
+> in the repo writes. Tier 3 is **not implemented**. Two smaller defects in the
+> Tier 2 deliverable are also fixed: a missing `import sys` made `--strict` raise
+> `NameError`, and the `0.04` threshold exceeded every score in the 54-skill
+> catalog (observed max `0.0267`), so the check could never fire. Threshold is
+> now `0.02`; `agents-docs/SKILL_EVAL_TIERS.md` is the accurate description.
+> The rest of this ADR stands.
+
 ## Context
 
 [NVIDIA SkillEvaluator](https://github.com/NVIDIA/SkillEvaluator) (Apache-2.0,
@@ -61,3 +72,18 @@ not just ASR); MITRE ATLAS.
 - Negative: heuristic Tier 2 has false positives/negatives vs embeddings —
   hence advisory default; LLM-backed verification remains future work.
 - Risks: none to existing CI (new script is advisory-only in the gate).
+
+## Addendum (2026-09-27)
+
+5. **Adopt the 4-bucket eval taxonomy** as an optional `bucket` field
+   (`explicit` / `implicit` / `contextual` / `negative`), generalising decision
+   2. Advisory: absent is valid, so no existing `evals.json` is retrofitted.
+6. **Adopt an advisory cost budget** over the token/time deltas that the eval
+   harness already produces, targeting the blog's finding that token savings are
+   not automatic (`cuopt-install` +120.3%). Named-constant limits
+   (`MAX_TOKEN_REGRESSION_PCT`, `MAX_TIME_REGRESSION_PCT`) that report rather
+   than fail, consistent with the progressive-adoption posture above.
+
+Both additions stop short of Tier 3: they measure eval-harness cost, not agent
+trajectory cost. Closing the Tier 3 gap — paired with/without-skill trials,
+Harbor-style isolation, real Skill Lift — is tracked separately.

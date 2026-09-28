@@ -1,6 +1,14 @@
 ---
 name: progressive-delivery
-description: Remediate a live production failure through a gated loop: reproduce the failure, generate a candidate fix, evaluate it, red-team it adversarially, then shadow, canary, and promote or roll back on SLO verdicts. Use when production is degraded and the fix must itself be proven safe, or when the user is already mid-rollout and needs shadow/canary/rollback decisions — even if they just say "roll this out safely", "canary this fix", or "prove the fix". Not for shipping changes through git/GitHub (use git-github-workflow), for running tests or diagnosing failures (use test-runner), for iterate-until-green validation loops (use iterative-refinement), or for authoring CI/CD pipeline config (use cicd-pipeline).
+description: >-
+  Remediate a live production failure through a gated loop: reproduce the failure, generate a
+  candidate fix, evaluate it, red-team it adversarially, then shadow, canary, and promote or roll back
+  on SLO verdicts. Use when production is degraded and the fix must itself be proven safe, or when the
+  user is already mid-rollout and needs shadow/canary/rollback decisions — even if they just say "roll
+  this out safely", "canary this fix", or "prove the fix". Not for shipping changes through git/GitHub
+  (use git-github-workflow), for running tests or diagnosing failures (use test-runner), for
+  iterate-until-green validation loops (use iterative-refinement), or for authoring CI/CD pipeline
+  config (use cicd-pipeline).
 category: workflow
 license: MIT
 version: "0.2.10"
