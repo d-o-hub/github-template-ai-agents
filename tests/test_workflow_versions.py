@@ -35,6 +35,7 @@ LABELER_OLD_SHA = "b8dd2d9be0f68b860e7dae5dae7d772984eacd6d"
 # test_codeql_version_label_matches_pinned_sha names the exact fix on failure.
 CODEQL_SHA_TO_VERSION = {
     "1c5b675653bb5c22dbe9b12b556ec555138e09fd": "v4.38.1",  # tag v4.38.1
+    "2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2": "v4.38.2",  # peeled tag v4.38.2
 }
 
 # Same invariant for reviewdog/action-actionlint in yaml-lint.yml. Its label on
@@ -43,6 +44,7 @@ CODEQL_SHA_TO_VERSION = {
 # comment as-is rather than correcting it.
 ACTIONLINT_SHA_TO_VERSION = {
     "320fcdd9c860767cf17fab3b20e22e739d5d02b8": "v1.76.0",  # tag v1.76.0
+    "2085657ab2c7f48c58edcc767fba576f63bea76b": "v1.77.0",  # tag v1.77.0
 }
 
 YAML_LINT_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "yaml-lint.yml"
