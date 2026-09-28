@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from lib.eval_types import EvalResult, EvalStatus
+from lib.eval_types import EVAL_BUCKETS, EvalResult, EvalStatus
 
 
 def load_evals_file(evals_path: Path) -> tuple[dict | None, str | None]:
@@ -31,6 +31,7 @@ def _validate_eval_case(eval_case: dict, idx: int, required_fields: set[str]) ->
     if missing:
         issues.append(f"Eval #{idx} missing fields: {', '.join(sorted(missing))}")
     _validate_assertions(eval_case, idx, issues)
+    _validate_bucket(eval_case, idx, issues)
     _validate_files(eval_case, idx, issues)
     return issues
 
@@ -44,6 +45,22 @@ def _validate_assertions(eval_case: dict, idx: int, issues: list[str]) -> None:
         issues.append(f"Eval #{idx}: 'assertions' must be an array")
     elif len(assertions) == 0:
         issues.append(f"Eval #{idx}: 'assertions' array is empty")
+
+
+def _validate_bucket(eval_case: dict, idx: int, issues: list[str]) -> None:
+    """Validate the optional bucket field.
+
+    Absent is always valid: the 4-bucket taxonomy is advisory, so existing
+    evals.json files are not retrofitted. Only a present-but-invalid value is
+    reported.
+    """
+    if "bucket" not in eval_case:
+        return
+    bucket = eval_case["bucket"]
+    if not isinstance(bucket, str) or bucket not in EVAL_BUCKETS:
+        issues.append(
+            f"Eval #{idx}: 'bucket' must be one of {sorted(EVAL_BUCKETS)}"
+        )
 
 
 def _validate_files(eval_case: dict, idx: int, issues: list[str]) -> None:

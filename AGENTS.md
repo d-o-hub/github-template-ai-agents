@@ -43,7 +43,7 @@ Use GOAP + ADRs + TRIZ for structured development when the change is non-trivial
 
 **Prerequisites**:
 - Fetch/pull latest default remote branch before beginning.
-- **Check CI Status**: Agents MUST check `.github/ci-status/ci-status.json`. If NOT "passing", pause until fixed.
+- **Check CI Status**: `.github/ci-status/ci-status.json` is tri-state (`passing` | `failing` | `unknown`); only `passing` clears the gate — `unknown` means a required job did not run, and a skipped required job is never `passing`. Advisory only, never a merge gate. Contract: `agents-docs/CI_STATUS.md`.
 
 1. **ANALYZE & STRATEGIZE (Phase 1)**
    - **Action**: Use `triz-solver` (solve or audit mode). Write an **ADR** in `plans/`.

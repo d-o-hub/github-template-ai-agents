@@ -21,8 +21,12 @@
 }
 
 @test "workflow checks required job results" {
-    grep -q 'needs.quality-gate.result' .github/workflows/ci.yml
-    grep -q 'needs.test.result' .github/workflows/ci.yml
+    # The gate is delegated to the producer, which asserts the expected value of
+    # every needs.<job>.result. A denylist of bad results is fail-open: GitHub
+    # reports an `if:`-skipped job as "Success" (ADR-040).
+    grep -q 'toJSON(needs)' .github/workflows/ci.yml
+    grep -q 'update-ci-status.py --check' .github/workflows/ci.yml
+    ! grep -q "== \"failure\" || " .github/workflows/ci.yml
 }
 
 @test "workflow uses SHA-pinned actions" {
@@ -54,14 +58,23 @@
     sed -n '/ci-success:/,/^  [a-z]/p' .github/workflows/ci.yml | grep -q "contents: write"
 }
 
-@test "status artifacts are NOT written when all required jobs are skipped" {
-    grep -q "needs.quality-gate.result != 'skipped'" .github/workflows/ci.yml
-    grep -q "needs.test.result != 'skipped'" .github/workflows/ci.yml
+@test "status artifacts are always written on main (all-skipped records unknown)" {
+    # ADR-033 deferred the write when every job was skipped to protect a green.
+    # The fail-closed producer now records `unknown` instead, so the guard is
+    # gone and only the main-ref condition remains.
+    ! grep -q "needs.quality-gate.result != 'skipped'" .github/workflows/ci.yml
+    ! grep -q "needs.test.result != 'skipped'" .github/workflows/ci.yml
+    grep -q "github.ref == 'refs/heads/main'" .github/workflows/ci.yml
 }
 
 @test "status artifacts ARE written on failure (not only success)" {
-    # Must run when a required job failed/cancelled (just not when ALL were skipped),
-    # so a failing main is recorded as 'failing' rather than left stale/passing.
+    # Must run when a required job failed/cancelled, so a failing main is
+    # recorded as 'failing' rather than left stale/passing.
     ! grep -q "result == 'success' || needs.test.result == 'success'" .github/workflows/ci.yml
     grep -q "github.ref == 'refs/heads/main'" .github/workflows/ci.yml
+}
+
+@test "ci-success declares the skip allowlist from a repository variable" {
+    sed -n '/ci-success:/,/^  [a-z]/p' .github/workflows/ci.yml \
+        | grep -q 'CI_STATUS_ALLOWED_SKIPS: ${{ vars.CI_STATUS_ALLOWED_SKIPS }}'
 }

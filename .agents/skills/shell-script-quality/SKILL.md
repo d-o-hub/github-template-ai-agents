@@ -46,6 +46,41 @@ find scripts -name "*.sh" -exec shellcheck {} +
 shellcheck -x script.sh
 ```
 
+### Step 1b: Verify new code at FULL severity (required before push)
+
+This repo's `quality_gate.sh` runs `shellcheck --severity=error`, but Codacy's
+**required** check has `issueThreshold: 0` and counts issues at *any* severity.
+Code that passes the local gate can therefore still block a merge. Verify the
+files you touched at full severity, where **all** levels are findings:
+
+```bash
+# Full severity on the files you changed
+shellcheck path/to/changed.sh
+
+# Delta check: compare full severity between HEAD and your branch, so you only
+# see NEW issues. A blanket repo-wide full-severity run is NOT viable here --
+# ~127 pre-existing findings would drown the signal.
+git stash -q
+shellcheck $(git ls-files '*.sh') 2>&1 | grep -cE '^In |SC[0-9]+' > /tmp/opencode/sc-base
+git stash pop -q
+shellcheck $(git ls-files '*.sh') 2>&1 | grep -cE '^In |SC[0-9]+' > /tmp/opencode/sc-new
+diff /tmp/opencode/sc-base /tmp/opencode/sc-new && echo "no new findings"
+```
+
+Query the real verdict rather than guessing:
+
+```bash
+codacy pull-request <PR> -o json   # newIssues, quality.gate, per-issue resultDataId
+```
+
+Two codes that found real defects here, and are worth reading as bugs rather
+than style:
+
+| Code | Why it matters |
+|------|----------------|
+| `SC2235` | `(...)` is a **subshell**. `VAR+=(x)` inside it never reaches the parent, so a later `[[ " ${VAR[*]} " =~ " x " ]]` test silently never matches — a latent false green. |
+| `SC2034` | "Appears unused" across a `source` boundary is usually a **real contract**: the variable is read by the sourcing script. Fix with a file-scope `disable` plus a stated reason, or fix the contract. |
+
 **Common fixes**: See [SHELLCHECK.md](SHELLCHECK.md) for fix patterns
 
 ### Step 2: Fix Reported Issues
@@ -188,6 +223,8 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 | Rationalization | Reality |
 |-----------------|---------|
 | "ShellCheck warnings are false positives" | Most SC warnings catch real bugs; suppress with documented reason, not dismissal. |
+| "The local gate passed, so the code is clean" | The gate runs `--severity=error`; Codacy's required check counts issues at **any** severity. Warning-level findings pass locally and still block the merge. |
+| "Just run full-severity ShellCheck on the whole repo" | ~127 findings already exist at full severity. Use a base-vs-branch **delta** so new issues are visible without the noise. |
 | "BATS tests take too long to write" | Untested scripts break silently in production; test time is investment, not waste. |
 | "set -e is too strict for my script" | Scripts without -e silently swallow errors and leave systems in inconsistent states. |
 
@@ -195,4 +232,6 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 - [ ] Running shell scripts without set -euo pipefail
 - [ ] Skipping ShellCheck linting before committing shell scripts
+- [ ] Trusting `--severity=error` as proof of Codacy-clean shell code
+- [ ] Checking `codacy pull-request` only after discovering the PR is blocked
 - [ ] Suppressing SC warnings without documenting the reason and date

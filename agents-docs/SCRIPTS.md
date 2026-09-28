@@ -25,7 +25,9 @@
 
 | `validate-git-hooks.sh` | Check git hooks configuration | `./scripts/validate-git-hooks.sh` |
 | `validate-links.sh` | Validate markdown links are not broken | `./scripts/validate-links.sh` |
-| `check_ci_status_freshness.sh` | Validate `.github/ci-status/ci-status.json` required fields, freshness, and optional `gh run list` parity | `./scripts/check_ci_status_freshness.sh` |
+| `check_ci_status_freshness.sh` | Validate `.github/ci-status/ci-status.json` schema v3, self-consistency, freshness, and optional `gh run list` parity | `./scripts/check_ci_status_freshness.sh` |
+| `update-ci-status.py` | Derive the tri-state CI status artifact; `--check` is the fail-closed gate | `python3 scripts/update-ci-status.py [--check]` |
+| `persist-ci-status.sh` | Commit the CI status artifacts and converge them onto the default branch | `./scripts/persist-ci-status.sh` |
 
 ## Update Scripts
 
@@ -71,6 +73,8 @@
 | `CI_STATUS_MAX_AGE_SECONDS` | `86400` | Max accepted age for `.github/ci-status/ci-status.json` `last_run` before freshness check fails |
 | `CI_STATUS_BRANCH` | `main` | Branch used by `check_ci_status_freshness.sh` for optional `gh run list` comparison |
 | `CI_STATUS_RUN_LIMIT` | `5` | Number of recent workflow runs fetched by `check_ci_status_freshness.sh` when `gh` is authenticated |
+| `CI_STATUS_ALLOWED_SKIPS` | *(empty)* | Allowlist of job ids whose skip `update-ci-status.py` tolerates; empty means a skipped required job yields `unknown`. Set via the repository variable of the same name |
+| `CI_STATUS_TIMESTAMP` | *(run time)* | ISO-8601 run completion time written as `last_run`; used when backfilling artifact provenance |
 
 ## Exit Codes
 

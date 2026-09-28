@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 # check_ci_status_freshness.sh - Validate committed CI status freshness and optional GitHub run parity.
+#
+# Validates the fail-closed tri-state contract (schema v3) of
+# .github/ci-status/ci-status.json:
+#   * status is one of passing | failing | unknown;
+#   * `passing` is never claimed alongside a failing job, an unrecognized job
+#     result, or a skip that is outside the `allowed_skips` allowlist;
+#   * the job lists are mutually consistent with the declared status.
+# The artifact is ADVISORY: a committed file is not a merge gate (anybody with
+# write permission can set any status). Only a required status check can block
+# a merge. See https://docs.github.com/en/pull-requests/reference/status-checks
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -84,11 +94,51 @@ import os
 import sys
 from datetime import datetime, timezone
 
-REQUIRED_FIELDS = ("status", "last_run", "failing_jobs", "skipped_jobs", "validated", "workflow_url")
+REQUIRED_FIELDS = (
+    "schema_version",
+    "status",
+    "last_run",
+    "validated",
+    "failing_jobs",
+    "skipped_jobs",
+    "allowed_skips",
+    "unallowed_skips",
+    "cancelled_jobs",
+    "timed_out_jobs",
+    "unknown_jobs",
+    "succeeded_jobs",
+    "advisory_only",
+    "workflow_url",
+)
+LIST_FIELDS = (
+    "failing_jobs",
+    "skipped_jobs",
+    "allowed_skips",
+    "unallowed_skips",
+    "cancelled_jobs",
+    "timed_out_jobs",
+    "unknown_jobs",
+    "succeeded_jobs",
+)
+MIN_SCHEMA_VERSION = 3
+TRISTATE_STATUSES = ("passing", "failing", "unknown")
 STALE_STATUS_MESSAGE = "CI status is stale"
 INCONSISTENT_PASSING_MESSAGE = "CI status says passing, but recent GitHub runs disagree"
+CONTRADICTION_MESSAGE = "self-contradictory CI status"
 FALSE_GREEN_MESSAGE = "CI status says passing, but validated is false (all jobs skipped/unknown)"
-BAD_REMOTE_CONCLUSIONS = {"failure", "cancelled", "timed_out", "action_required"}
+NOT_PASSING_MESSAGE = "CI status is not passing"
+ADVISORY_MESSAGE = "artifact is not marked advisory_only; a committed file is not a merge gate"
+# `stale`/`neutral`/`skipped` are not green; only `success` certifies a run.
+GOOD_REMOTE_CONCLUSION = "success"
+BAD_REMOTE_CONCLUSIONS = {
+    "failure",
+    "cancelled",
+    "timed_out",
+    "action_required",
+    "stale",
+    "neutral",
+    "skipped",
+}
 INCOMPLETE_REMOTE_STATUSES = {"queued", "in_progress", "waiting", "requested", "pending"}
 
 status_file = os.environ["CI_STATUS_PATH"]
@@ -129,24 +179,121 @@ for field in REQUIRED_FIELDS:
     if field not in data:
         errors.append(f"missing required field: {field}")
 
+schema_version = data.get("schema_version")
+if schema_version is not None and (
+    not isinstance(schema_version, int) or schema_version < MIN_SCHEMA_VERSION
+):
+    errors.append(
+        f"schema_version must be an integer >= {MIN_SCHEMA_VERSION}, got: {schema_version!r}"
+    )
+
 status = data.get("status")
 if status is not None and not isinstance(status, str):
     errors.append("status must be a string")
+elif status is not None and status not in TRISTATE_STATUSES:
+    errors.append(
+        f"status must be one of {', '.join(TRISTATE_STATUSES)}, got: {status!r}"
+    )
 
-failing_jobs = data.get("failing_jobs")
-if failing_jobs is not None and not isinstance(failing_jobs, list):
-    errors.append("failing_jobs must be a JSON array")
+lists = {}
+for field in LIST_FIELDS:
+    value = data.get(field)
+    if value is None:
+        continue
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        errors.append(f"{field} must be a JSON array of strings")
+        continue
+    lists[field] = sorted(value)
 
-skipped_jobs = data.get("skipped_jobs")
-if skipped_jobs is not None and not isinstance(skipped_jobs, list):
-    errors.append("skipped_jobs must be a JSON array")
 validated = data.get("validated")
 if validated is not None and not isinstance(validated, bool):
     errors.append("validated must be a boolean")
 
+advisory_only = data.get("advisory_only")
+if advisory_only is not None and not isinstance(advisory_only, bool):
+    errors.append("advisory_only must be a boolean")
+elif advisory_only is not True:
+    warnings.append(ADVISORY_MESSAGE)
+
 workflow_url = data.get("workflow_url")
 if workflow_url is not None and not isinstance(workflow_url, str):
     errors.append("workflow_url must be a string")
+
+# --- Coherence: the artifact must never contradict itself -------------------
+# GitHub reports an `if:`-skipped job as "Success" and does not block merging
+# even as a required check, so `passing` alongside a skip is the exact
+# false-green this repo has shipped before. Allowlisted skips are the only
+# tolerated kind.
+skipped = lists.get("skipped_jobs", [])
+allowed = lists.get("allowed_skips", [])
+unallowed = lists.get("unallowed_skips", [])
+failing = lists.get("failing_jobs", [])
+unrecognized = lists.get("unknown_jobs", [])
+cancelled = lists.get("cancelled_jobs", [])
+timed_out = lists.get("timed_out_jobs", [])
+succeeded = lists.get("succeeded_jobs", [])
+
+# This contradiction needs only two scalar fields, so it is checked even when
+# other fields are missing or malformed.
+if status == "passing" and validated is False:
+    errors.append(FALSE_GREEN_MESSAGE)
+
+# Cross-field checks are meaningless until every list field is present and
+# well-typed, so they run only once the structure itself is sound.
+structure_ok = all(field in lists for field in LIST_FIELDS)
+
+if structure_ok:
+    if sorted(set(unallowed) | set(allowed)) != skipped:
+        errors.append(
+            f"{CONTRADICTION_MESSAGE}: allowed_skips + unallowed_skips "
+            f"({sorted(set(allowed) | set(unallowed))}) must partition "
+            f"skipped_jobs ({skipped})"
+        )
+    stale_allowlist = sorted(set(allowed) - set(skipped))
+    if stale_allowlist:
+        warnings.append(
+            f"allowed_skips lists {stale_allowlist} but those jobs did not skip"
+        )
+    blocking_for_passing = []
+    if failing:
+        blocking_for_passing.append(f"failing_jobs={failing}")
+    if unallowed:
+        blocking_for_passing.append(f"unallowed_skips={unallowed}")
+    if unrecognized:
+        blocking_for_passing.append(f"unknown_jobs={unrecognized}")
+    if cancelled:
+        blocking_for_passing.append(f"cancelled_jobs={cancelled}")
+    if timed_out:
+        blocking_for_passing.append(f"timed_out_jobs={timed_out}")
+
+    if status == "passing" and blocking_for_passing:
+        errors.append(
+            f"{CONTRADICTION_MESSAGE}: status=passing with " + ", ".join(blocking_for_passing)
+        )
+    if status == "passing" and not succeeded:
+        errors.append(
+            f"{CONTRADICTION_MESSAGE}: status=passing with no succeeded_jobs; "
+            "nothing validated"
+        )
+    if status == "failing" and not failing:
+        errors.append(
+            f"{CONTRADICTION_MESSAGE}: status=failing with an empty failing_jobs"
+        )
+    if (
+        status == "unknown"
+        and not failing
+        and not unallowed
+        and not unrecognized
+        and succeeded
+    ):
+        errors.append(
+            f"{CONTRADICTION_MESSAGE}: status=unknown although every job succeeded"
+        )
+
+if status is not None and status != "passing":
+    warnings.append(
+        f"{NOT_PASSING_MESSAGE} ({status}); consumers must not treat it as green"
+    )
 
 last_run = parse_time(data.get("last_run"), "last_run") if "last_run" in data else None
 now = datetime.now(timezone.utc)
@@ -159,9 +306,6 @@ if last_run is not None:
         errors.append(
             f"{STALE_STATUS_MESSAGE}: age={int(age_seconds)}s max={max_age_seconds}s"
         )
-
-if status == "passing" and validated is False:
-    errors.append(FALSE_GREEN_MESSAGE)
 
 remote_runs = []
 if gh_checked:
@@ -194,6 +338,10 @@ if gh_checked and last_run is not None and status == "passing":
             errors.append(
                 f"{INCONSISTENT_PASSING_MESSAGE}: conclusion={run_conclusion} ({run_url})"
             )
+        elif run_conclusion is not None and run_conclusion != GOOD_REMOTE_CONCLUSION:
+            warnings.append(
+                f"newer run has unrecognized conclusion {run_conclusion!r} ({run_url})"
+            )
         if run_status in INCOMPLETE_REMOTE_STATUSES:
             errors.append(
                 f"{INCONSISTENT_PASSING_MESSAGE}: status={run_status} ({run_url})"
@@ -208,5 +356,8 @@ if errors:
     sys.exit(1)
 
 remote_summary = "with gh comparison" if gh_checked else "without gh comparison"
-print(f"OK: CI status JSON is fresh and valid ({remote_summary}).")
+if status != "passing":
+    print(f"OK: CI status JSON is fresh and valid ({remote_summary}); status={status} is not green.")
+else:
+    print(f"OK: CI status JSON is fresh and valid ({remote_summary}).")
 PY

@@ -28,6 +28,18 @@ REPO_VERSION=""
 # Shared variable to return line count without extra subshell
 SKILL_LINE_COUNT=0
 
+# Template pin: a template repository intentionally holds VERSION at the
+# placeholder below (see agents-docs/VERSION.md), so any skill's
+# template_version is trivially "current" and the minor-version staleness
+# comparison can never fire. The comparison is therefore skipped explicitly
+# and announced once per run, instead of sitting here as unreachable code that
+# reads like a bug. A consumer repository that sets a real VERSION takes the
+# comparison path as normal. Policy: agents-docs/SKILLS.md.
+readonly TEMPLATE_VERSION_PIN="0.0.0"
+# Emitted once per run so the deliberate skip stays visible without repeating
+# itself for every skill that declares a template_version.
+TEMPLATE_VERSION_PIN_NOTICE_SHOWN="$FALSE"
+
 # Validate a single SKILL.md file for format correctness
 # Returns 0 if valid, 1 if invalid (prints errors to stderr)
 validate_skill_file() {
@@ -106,7 +118,18 @@ validate_skill_file() {
             fi
         fi
         local current_version="$REPO_VERSION"
-        if [[ -n "$current_version" ]]; then
+        if [[ -z "$current_version" ]]; then
+            printf "  %b⚠%b %s: template_version %s set but VERSION is unreadable; staleness check skipped\n" "${YELLOW}" "${NC}" "$skill_name" "$template_version" >&2
+        elif [[ "$current_version" == "$TEMPLATE_VERSION_PIN" ]]; then
+            # Deliberate skip, not dead code. VERSION is the template placeholder
+            # (TEMPLATE_VERSION_PIN), so the minor-version comparison below is
+            # meaningless: it would report every skill as current forever. Announce
+            # the skip once so a reader does not mistake it for a broken check.
+            if [[ "$TEMPLATE_VERSION_PIN_NOTICE_SHOWN" -eq $FALSE ]]; then
+                printf "  %b⚠%b template_version staleness check skipped: VERSION is the template pin %s (see agents-docs/SKILLS.md)\n" "${YELLOW}" "${NC}" "$TEMPLATE_VERSION_PIN" >&2
+                TEMPLATE_VERSION_PIN_NOTICE_SHOWN=$TRUE
+            fi
+        else
             # Use internal parameter expansion instead of cut
             local c_major="${current_version%%.*}"
             local rest="${current_version#*.}"

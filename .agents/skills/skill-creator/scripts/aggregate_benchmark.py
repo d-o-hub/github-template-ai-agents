@@ -8,6 +8,14 @@ import math
 import sys
 from pathlib import Path
 
+# Advisory cost budget. A skill may legitimately cost more than its no-skill
+# baseline, so this never fails a build; it flags skills that add context
+# without reducing wasted work. NVIDIA's published catalog spans -76.9%
+# (jetson-optimize-memory) to +120.3% (cuopt-install), so 50% is the point
+# past which a skill warrants optimization rather than acceptance.
+MAX_TOKEN_REGRESSION_PCT = 50.0
+MAX_TIME_REGRESSION_PCT = 50.0
+
 
 def load_json_files(root: Path, pattern: str) -> list[dict]:
     """Recursively load all JSON files matching a pattern."""
@@ -106,6 +114,7 @@ def aggregate_results(workspace_path: Path) -> dict:
     return {
         "workspace": str(workspace_path),
         "total_cases": len(eval_ids),
+        "budget": evaluate_budget(run_summary),
         "runs_per_case": max(
             (len(configs[c].get("pass_rates", [])) // max(len(eval_ids), 1))
             if configs.get(c, {}).get("pass_rates") else 0
@@ -113,6 +122,47 @@ def aggregate_results(workspace_path: Path) -> dict:
         ) if eval_ids else 0,
         "run_summary": run_summary,
     }
+
+
+def evaluate_budget(run_summary: dict) -> dict:
+    """Compare with-skill cost against the without-skill baseline.
+
+    Returns a per-metric verdict. ``REVIEW`` means the skill costs materially
+    more than doing nothing, which is a signal to optimize the skill - not
+    proof that it is harmful, since a skill may buy correctness with tokens.
+    """
+    without = run_summary.get("without_skill", {})
+    with_skill = run_summary.get("with_skill", {})
+    if not without or not with_skill:
+        return {"verdict": "NO_DATA", "metrics": {}}
+
+    limits = {
+        "tokens": MAX_TOKEN_REGRESSION_PCT,
+        "time_seconds": MAX_TIME_REGRESSION_PCT,
+    }
+    metrics = {}
+    breaches = []
+    for metric, limit in limits.items():
+        base = without.get(metric, {}).get("mean", 0.0)
+        cost = with_skill.get(metric, {}).get("mean", 0.0)
+        if base <= 0:
+            continue
+        pct = (cost - base) / base * 100.0
+        verdict = "REVIEW" if pct > limit else "PASS"
+        if verdict == "REVIEW":
+            breaches.append(f"{metric} +{pct:.1f}%")
+        metrics[metric] = {
+            "baseline_mean": round(base, 2),
+            "with_skill_mean": round(cost, 2),
+            "delta_pct": round(pct, 1),
+            "limit_pct": limit,
+            "verdict": verdict,
+        }
+
+    overall = "REVIEW" if breaches else "PASS"
+    if breaches:
+        overall = "REVIEW: " + ", ".join(breaches)
+    return {"verdict": overall, "metrics": metrics}
 
 
 def generate_markdown(benchmark: dict) -> str:
@@ -161,6 +211,20 @@ def generate_markdown(benchmark: dict) -> str:
         f"- Time: {fmt_val(rs.get('delta', {}).get('time_seconds', {}))}",
         f"- Tokens: {fmt_val(rs.get('delta', {}).get('tokens', {}))}",
     ])
+
+    budget = benchmark.get("budget", {})
+    lines.extend([
+        "",
+        "## Cost Budget",
+        "",
+        f"- Verdict: {budget.get('verdict', 'NO_DATA')}",
+    ])
+    for metric, data in budget.get("metrics", {}).items():
+        lines.append(
+            f"- {metric}: {data['delta_pct']:+.1f}% vs baseline "
+            f"({data['with_skill_mean']} vs {data['baseline_mean']}, "
+            f"limit {data['limit_pct']}%) - {data['verdict']}"
+        )
 
     return "\n".join(lines)
 
