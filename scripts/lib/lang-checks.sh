@@ -19,6 +19,11 @@
 # format strings span a literal newline, so re-indenting the continuation line
 # would change the emitted text.
 
+# FAILED is only ever assigned in this file; the sourcing script reads it as the
+# error accumulator. ShellCheck cannot follow `source`, so it reports SC2034
+# ("appears unused") for a variable that is genuinely consumed downstream.
+# shellcheck disable=SC2034
+
 # ---------------------------------------------------------------------------
 # _changed_files_z - emits the lintable file set, NUL-delimited, one path per record.
 # Private helper: not part of the caller contract.
@@ -47,10 +52,13 @@ _changed_files_z() {
         return
     fi
 
-    # Convert newline-delimited to null-delimited
-    local IFS=$'\n'
-    # shellcheck disable=SC2046
-    printf '%s\0' $source_files
+    # Convert newline-delimited to null-delimited, one record per line. Iterate
+    # rather than word-splitting $source_files: splitting would also break on
+    # paths containing spaces and leaves SC2086 (and globbing) unguarded.
+    local line
+    while IFS= read -r line; do
+        printf '%s\0' "$line"
+    done <<< "$source_files"
 }
 
 # ---------------------------------------------------------------------------
@@ -65,7 +73,7 @@ printf "%bDetecting project languages...%b
 " "" ""
 [[ -f "package.json" ]] && DETECTED_LANGUAGES+=("typescript") && printf "  %b✓%b TypeScript
 " "" ""
-([[ -f "requirements.txt" ]] || [[ -f "pyproject.toml" ]] || [[ -f "setup.py" ]]) && DETECTED_LANGUAGES+=("python") && printf "  %b✓%b Python
+{ [[ -f "requirements.txt" ]] || [[ -f "pyproject.toml" ]] || [[ -f "setup.py" ]]; } && DETECTED_LANGUAGES+=("python") && printf "  %b✓%b Python
 " "" ""
 [[ -f "go.mod" ]] && DETECTED_LANGUAGES+=("go") && printf "  %b✓%b Go
 " "" ""
