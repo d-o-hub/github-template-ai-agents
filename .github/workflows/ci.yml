@@ -286,6 +286,14 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      # Allowlist (never denylist) of job ids whose skip is tolerated. Empty by
+      # default: a required job must actually run to be certified green. GitHub
+      # reports an `if:`-skipped job as "Success" and it does not block a merge
+      # even as a required check, so tolerating every skip is fail-open.
+      # Set the repository variable CI_STATUS_ALLOWED_SKIPS (e.g. "test") only
+      # when a skip is deliberate for this repository.
+      CI_STATUS_ALLOWED_SKIPS: ${{ vars.CI_STATUS_ALLOWED_SKIPS }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -298,9 +306,10 @@ jobs:
           python-version: '3.11'
 
       - name: Update CI status artifacts
-        if: >-
-          github.ref == 'refs/heads/main' &&
-          (needs.quality-gate.result != 'skipped' || needs.test.result != 'skipped')
+        # Runs on every main push, including all-skipped ones: the artifact must
+        # record that nothing validated ("unknown") rather than keep a stale green.
+        # The fail-closed tri-state lives in scripts/update-ci-status.py.
+        if: github.ref == 'refs/heads/main'
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
           WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -321,12 +330,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      # Deliberately last: the artifact is written and persisted even when this
+      # gate fails, so a red run is always recorded. Explicit expected-value
+      # assertion per dependency (success, or an allowlisted skip) instead of a
+      # denylist of bad results — `!failure()` and `failure|cancelled` are both
+      # false-green when a dependency was skipped.
       - name: Check all required jobs passed
-        run: |
-          for res in "${{ needs.quality-gate.result }}" "${{ needs.test.result }}"; do
-            if [[ "$res" == "failure" || "$res" == "cancelled" ]]; then
-              echo "Required job failed or was cancelled: $res"
-              exit 1
-            fi
-          done
-          echo "All required jobs passed (or were correctly skipped)"
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: python3 scripts/update-ci-status.py --check

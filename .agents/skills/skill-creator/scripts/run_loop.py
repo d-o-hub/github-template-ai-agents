@@ -31,6 +31,32 @@ def split_train_validation(queries: list[dict], train_ratio: float = 0.6) -> tup
     return shuffled[:split], shuffled[split:]
 
 
+def parse_token_usage(stdout: str) -> int:
+    """Sum token usage from `claude --json` stream output.
+
+    The CLI emits newline-delimited JSON; usage-bearing messages carry an
+    ``input_tokens``/``output_tokens`` pair. Malformed lines are skipped so a
+    non-JSON diagnostic never breaks the eval loop.
+    """
+    total = 0
+    for line in stdout.splitlines():
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            payload = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        usage = payload.get("usage")
+        if not isinstance(usage, dict):
+            message = payload.get("message")
+            usage = message.get("usage") if isinstance(message, dict) else None
+        if isinstance(usage, dict):
+            total += int(usage.get("input_tokens", 0) or 0)
+            total += int(usage.get("output_tokens", 0) or 0)
+    return total
+
+
 def evaluate_description(
     description: str,
     queries: list[dict],
@@ -42,7 +68,13 @@ def evaluate_description(
     Runs each query 3x (configurable via future arg) and returns pass rates.
     Uses the `claude` CLI via subprocess.
     """
-    results = {"true_positives": 0, "true_negatives": 0, "total": len(queries), "details": []}
+    results = {
+        "true_positives": 0,
+        "true_negatives": 0,
+        "total": len(queries),
+        "details": [],
+        "total_tokens": 0,
+    }
 
     for q in queries:
         prompt = q["query"]
@@ -68,6 +100,9 @@ def evaluate_description(
             except (subprocess.TimeoutExpired, FileNotFoundError) as exc:
                 output = f"<error: {exc}>"
 
+            run_tokens = parse_token_usage(output)
+            results["total_tokens"] += run_tokens
+
             triggered = "invoked" in output.lower() or skill_path.split("/")[-1] in output
 
             is_correct = triggered == should_trigger
@@ -83,6 +118,7 @@ def evaluate_description(
                 "triggered": triggered,
                 "run": run_num,
                 "correct": is_correct,
+                "total_tokens": run_tokens,
             })
 
     total_checks = len(queries) * 3

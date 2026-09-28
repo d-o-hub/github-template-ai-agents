@@ -24,6 +24,10 @@ exclude_paths:
   # Test files: subprocess list-form calls and tempfile usage are safe patterns.
   - ".agents/skills/do-web-doc-resolver/tests/integration/**"
   - "tests/test_update_ci_status.py"
+  # Repo-level test tree. Same rationale as the entry above: assertions,
+  # subprocess list-form calls, and tempdir fixtures are safe patterns, and
+  # excluding the whole tree avoids re-adding a path each time a test is added.
+  - "tests/**"
   # Shell templates: ${var:?} is standard bash parameter validation.
   - ".agents/skills/agent-browser/templates/**"
 

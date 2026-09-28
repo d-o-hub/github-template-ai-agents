@@ -9,13 +9,28 @@ setup() {
 
 write_status_file() {
     local timestamp="$1"
+    write_raw_status_file "$timestamp" passing '[]' '[]' '[]' '["quality-gate", "test"]' true
+}
+
+# write_raw_status_file <timestamp> <status> <failing> <skipped> <unallowed> <succeeded> <validated>
+write_raw_status_file() {
+    local timestamp="$1" status="$2" failing="$3" skipped="$4"
+    local unallowed="$5" succeeded="$6" validated="$7"
     cat > "$TEST_REPO/.github/ci-status/ci-status.json" <<JSON
 {
-  "status": "passing",
+  "schema_version": 3,
+  "status": "$status",
   "last_run": "$timestamp",
-  "failing_jobs": [],
-  "skipped_jobs": [],
-  "validated": true,
+  "validated": $validated,
+  "failing_jobs": $failing,
+  "skipped_jobs": $skipped,
+  "allowed_skips": [],
+  "unallowed_skips": $unallowed,
+  "cancelled_jobs": [],
+  "timed_out_jobs": [],
+  "unknown_jobs": [],
+  "succeeded_jobs": $succeeded,
+  "advisory_only": true,
   "workflow_url": "https://example.test/actions/runs/1"
 }
 JSON
@@ -69,6 +84,9 @@ JSON
     [[ "$output" == *"missing required field: workflow_url"* ]]
     [[ "$output" == *"missing required field: skipped_jobs"* ]]
     [[ "$output" == *"missing required field: validated"* ]]
+    [[ "$output" == *"missing required field: schema_version"* ]]
+    [[ "$output" == *"missing required field: allowed_skips"* ]]
+    [[ "$output" == *"missing required field: advisory_only"* ]]
 }
 
 @test "passing committed status fails when authenticated gh reports newer run" {
@@ -125,19 +143,102 @@ MOCK
 @test "passing status with validated false is rejected as false-green" {
     local last_run
     last_run="$(utc_timestamp_seconds_ago 60)"
-    cat > "$TEST_REPO/.github/ci-status/ci-status.json" <<JSON
-{
-  "status": "passing",
-  "last_run": "$last_run",
-  "failing_jobs": [],
-  "skipped_jobs": ["quality-gate", "test"],
-  "validated": false,
-  "workflow_url": "https://example.test/actions/runs/1"
-}
-JSON
+    write_raw_status_file "$last_run" passing '[]' '["quality-gate", "test"]' \
+        '["quality-gate", "test"]' '[]' false
 
     run env CI_STATUS_MAX_AGE_SECONDS=3600 "$TEST_REPO/scripts/check_ci_status_freshness.sh"
 
     [ "$status" -eq 1 ]
     [[ "$output" == *"validated is false"* ]]
+}
+
+@test "passing status with an unallowlisted skip is rejected as self-contradictory" {
+    # The exact false green this repo shipped: status=passing while a required
+    # job was skipped. GitHub reports such a job as "Success" and does not
+    # block merging even as a required check.
+    write_raw_status_file "$(utc_timestamp_seconds_ago 60)" passing '[]' '["test"]' \
+        '["test"]' '["quality-gate"]' true
+
+    run env CI_STATUS_MAX_AGE_SECONDS=3600 "$TEST_REPO/scripts/check_ci_status_freshness.sh"
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"self-contradictory CI status"* ]]
+    [[ "$output" == *"unallowed_skips=['test']"* ]]
+}
+
+@test "passing status alongside a failing job is rejected as self-contradictory" {
+    write_raw_status_file "$(utc_timestamp_seconds_ago 60)" passing '["test"]' '[]' '[]' \
+        '["quality-gate"]' true
+
+    run env CI_STATUS_MAX_AGE_SECONDS=3600 "$TEST_REPO/scripts/check_ci_status_freshness.sh"
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"self-contradictory CI status"* ]]
+    [[ "$output" == *"failing_jobs=['test']"* ]]
+}
+
+@test "unknown status with a skip is accepted and warned, not failed" {
+    write_raw_status_file "$(utc_timestamp_seconds_ago 60)" unknown '[]' '["test"]' \
+        '["test"]' '["quality-gate"]' false
+
+    run env CI_STATUS_MAX_AGE_SECONDS=3600 \
+        PATH="$BATS_TMPDIR/nogh:/usr/bin:/bin" \
+        "$TEST_REPO/scripts/check_ci_status_freshness.sh"
+
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"CI status is not passing (unknown)"* ]]
+    [[ "$output" == *"status=unknown is not green"* ]]
+}
+
+@test "non-tri-state status value is rejected" {
+    # `skipped` was the pre-ADR-035 fourth value; the contract is tri-state.
+    write_status_file "$(utc_timestamp_seconds_ago 60)"
+    sed -i 's/"status": "passing"/"status": "skipped"/' \
+        "$TEST_REPO/.github/ci-status/ci-status.json"
+
+    run env CI_STATUS_MAX_AGE_SECONDS=3600 "$TEST_REPO/scripts/check_ci_status_freshness.sh"
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"status must be one of passing, failing, unknown"* ]]
+}
+
+@test "stale schema version is rejected" {
+    write_status_file "$(utc_timestamp_seconds_ago 60)"
+    sed -i 's/"schema_version": 3/"schema_version": 2/' \
+        "$TEST_REPO/.github/ci-status/ci-status.json"
+
+    run env CI_STATUS_MAX_AGE_SECONDS=3600 "$TEST_REPO/scripts/check_ci_status_freshness.sh"
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"schema_version must be an integer >= 3"* ]]
+}
+
+@test "unpartitioned skip lists are rejected as self-contradictory" {
+    write_status_file "$(utc_timestamp_seconds_ago 60)"
+    sed -i 's/"unallowed_skips": \[\]/"unallowed_skips": ["ghost"]/' \
+        "$TEST_REPO/.github/ci-status/ci-status.json"
+
+    run env CI_STATUS_MAX_AGE_SECONDS=3600 "$TEST_REPO/scripts/check_ci_status_freshness.sh"
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"must partition skipped_jobs"* ]]
+}
+
+@test "unknown status with every job succeeded is rejected as self-contradictory" {
+    write_raw_status_file "$(utc_timestamp_seconds_ago 60)" unknown '[]' '[]' '[]' \
+        '["quality-gate", "test"]' false
+
+    run env CI_STATUS_MAX_AGE_SECONDS=3600 "$TEST_REPO/scripts/check_ci_status_freshness.sh"
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"status=unknown although every job succeeded"* ]]
+}
+
+@test "passing status with no succeeded job is rejected as self-contradictory" {
+    write_raw_status_file "$(utc_timestamp_seconds_ago 60)" passing '[]' '[]' '[]' '[]' true
+
+    run env CI_STATUS_MAX_AGE_SECONDS=3600 "$TEST_REPO/scripts/check_ci_status_freshness.sh"
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"no succeeded_jobs"* ]]
 }

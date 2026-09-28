@@ -22,6 +22,24 @@ class EvalStatus(Enum):
     ERROR = "ERROR"
 
 
+class EvalBucket(Enum):
+    """Optional eval taxonomy (NVIDIA SkillEvaluator 4-bucket datasets).
+
+    explicit   - the request directly names the skill's job.
+    implicit   - the request needs the skill without naming the job.
+    contextual - the request is adjacent; tests non-triggering boundaries.
+    negative   - out-of-scope; the skill must stay unloaded.
+    """
+
+    EXPLICIT = "explicit"
+    IMPLICIT = "implicit"
+    CONTEXTUAL = "contextual"
+    NEGATIVE = "negative"
+
+
+EVAL_BUCKETS = frozenset(b.value for b in EvalBucket)
+
+
 @dataclass
 class EvalResult:
     """Result of a single eval scenario."""
@@ -30,6 +48,7 @@ class EvalResult:
     message: str = ""
     details: list[str] = field(default_factory=list)
     duration_ms: float = 0.0
+    total_tokens: int = 0
 
 
 @dataclass
