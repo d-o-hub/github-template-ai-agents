@@ -182,6 +182,14 @@ SENSITIVE_PREFIXES = (
     "private_key",
     "private-key",
     "privkey",
+    "id_token",
+    "id-token",
+    "identity_token",
+    "identity-token",
+    "oauth_token",
+    "oauth-token",
+    "jwt_token",
+    "jwt-token",
     # NOTE: `secret_key`/`secret-key` intentionally omitted: already covered by
     # the `secret` prefix above (see #879 precedent); listing them would be dead config.
 )
