@@ -1,3 +1,9 @@
+## 2026-09-15 - Block ID, OAuth, and JWT Token File Prefixes in Path Validation
+
+**Vulnerability:** SENSITIVE_PREFIXES in path validation blocked general tokens (`token`, `access_token`, `bearer_token`), but lacked explicit prefixes for identity (`id_token`, `id-token`, `identity_token`, `identity-token`), OAuth (`oauth_token`, `oauth-token`), and JWT tokens (`jwt_token`, `jwt-token`).
+**Learning:** Hardening credential path validation requires covering specific token variants used in OpenID Connect, OAuth 2.0 workflows, and JWT authentication.
+**Prevention:** Maintain explicit token prefix patterns in SENSITIVE_PREFIXES to block all standard identity and OAuth token credential file variations.
+
 ## 2026-08-30 - Expand Path Validation Blocklist for DB Shells, Shell Profiles, and Package Manager Credentials
 
 **Vulnerability:** Gaps in `FORBIDDEN_PATHS` left additional sensitive REPL/database shell histories (`.dbshell`, `.rediscli_history`), shell profiles (`.kshrc`), and package manager credential files (`pip.conf`, `.gemrc`) vulnerable to potential inspection or exfiltration.
