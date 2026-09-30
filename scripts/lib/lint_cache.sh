@@ -190,7 +190,12 @@ lint_batch_if_changed() {
     local -a keys_to_cache=()
     local -a vals_to_cache=()
 
-    while IFS= read -r -d '' file; do
+    local -a files_array=()
+    if [[ -s "$tmp_file_list" ]]; then
+        mapfile -d '' files_array < "$tmp_file_list"
+    fi
+
+    for file in "${files_array[@]}"; do
         [[ -n "$file" ]] || continue
 
         local safe_file="${file//[\/\. ]/_}"
@@ -227,7 +232,7 @@ lint_batch_if_changed() {
         # We need to save the cache_value mapped to the file securely
         keys_to_cache+=("$cache_key")
         vals_to_cache+=("$cache_value")
-    done < "$tmp_file_list"
+    done
 
     if [[ ! -s "$tmp_misses" ]]; then
         rm -f -- "$tmp_misses"

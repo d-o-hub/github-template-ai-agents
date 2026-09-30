@@ -143,9 +143,15 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
     trap 'rm -f "$TMP_PARSED_COMMANDS"' EXIT ERR
     printf "%s\n" "$DISCOVERED_COMMANDS" | jq -j 'select(.command != null and .command != "null") | "\(.file // "unknown")\u0000\(.line // 0)\u0000\(.command)\u0000"' 2>/dev/null > "$TMP_PARSED_COMMANDS"
 
-    while IFS= read -r -d '' file && \
-          IFS= read -r -d '' line && \
-          IFS= read -r -d '' cmd; do
+    declare -a parsed_items=()
+    if [[ -s "$TMP_PARSED_COMMANDS" ]]; then
+        mapfile -d '' parsed_items < "$TMP_PARSED_COMMANDS"
+    fi
+
+    for ((_i=0; _i<${#parsed_items[@]}; _i+=3)); do
+        file="${parsed_items[_i]}"
+        line="${parsed_items[_i+1]}"
+        cmd="${parsed_items[_i+2]}"
         [[ -z "$cmd" ]] && continue
 
         # Check cache first
@@ -216,7 +222,7 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
         if [[ "$category" == "dangerous" ]]; then
             FAILED_COMMANDS+=("$cmd")
         fi
-    done < "$TMP_PARSED_COMMANDS"
+    done
     rm -f "$TMP_PARSED_COMMANDS"
 fi
 
