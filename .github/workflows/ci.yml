@@ -12,6 +12,10 @@ on:
     branches:
       - main
       - develop
+  # Bot-authored PRs (GITHUB_TOKEN) do not trigger `pull_request` runs, so their
+  # branches are otherwise unvalidated. `gh workflow run ci.yml --ref <branch>`
+  # gives them a real test job before merge.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -202,15 +206,16 @@ jobs:
         uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772  # stable
         if: hashFiles('Cargo.toml') != ''
 
-      - name: Setup Python (if requirements.txt or pyproject.toml exists)
+      # Unconditional in the test job: the root suite contains pure-Python
+      # checks (tests/test_workflow_versions.py, ci-status tristate, path
+      # validation) and corpus BATS tests whose heredocs `import yaml`. Both
+      # were silently skipped whenever no root requirements.txt existed, so a
+      # green run meant "never ran". The suite's own assumptions must not be
+      # gated on an optional manifest. See plans/adr-041-ci-test-job-self-contained.md.
+      - name: Setup Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
           python-version: '3.11'
-        if: >-
-          hashFiles('requirements.txt') != '' ||
-          hashFiles('pyproject.toml') != '' ||
-          hashFiles('.agents/skills/*/requirements.txt') != '' ||
-          hashFiles('.agents/skills/*/pyproject.toml') != ''
 
       - name: Setup Go (if go.mod exists)
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e  # v7.0.0
@@ -244,9 +249,15 @@ jobs:
         run: cargo test --lib
         if: hashFiles('Cargo.toml') != ''
 
+      # Installed last on purpose: the root suite and the corpus BATS tests both
+      # need pytest + PyYAML, and no manifest in this repo guarantees them. A
+      # missing PyYAML made every `import yaml` BATS test fail while the run
+      # still looked like a code failure. See plans/adr-041-ci-test-job-self-contained.md.
+      - name: Install test dependencies (Python root)
+        run: pip install pytest pyyaml
+
       - name: Run tests (Python root)
         run: pytest tests/ -v
-        if: hashFiles('requirements.txt') != ''
 
       - name: Run tests (Python skills)
         run: |

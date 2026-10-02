@@ -2,7 +2,7 @@
 
 Covers changes introduced in:
 - .github/workflows/labeler.yml  (actions/labeler updated to v7.0.0)
-- .github/workflows/security-scan.yml  (github/codeql-action/* updated to v4.36 new SHA)
+- .github/workflows/security-scan.yml  (github/codeql-action/* pin + version label)
 - .github/workflows/cleanup-ci-status-prs.yml  (weekly scheduled CI status PR cleanup)
 """
 
@@ -19,14 +19,58 @@ CLEANUP_CI_STATUS_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "cleanup-ci-s
 
 # SHA hashes that should be present after the PR update
 LABELER_NEW_SHA = "bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13"
-CODEQL_NEW_SHA = "cdf488f595d80d6e07e03d4674febd5ab45fa938"
 
 # Old SHA hashes that must NOT appear after the update
 LABELER_OLD_SHA = "b8dd2d9be0f68b860e7dae5dae7d772984eacd6d"
-CODEQL_OLD_SHA = "f205ea1c3313d32999d8d6a48b4f6530d4437b38"
+
+# Single source of truth for the codeql-action pin: SHA -> real upstream version.
+#
+# These tests deliberately do NOT hardcode one SHA as "the correct one". A
+# previous revision did, which turned this into a one-shot migration test: any
+# later Dependabot bump desynchronised it and main carried 7 permanently red
+# tests. The invariant worth protecting is not a particular SHA -- that is
+# Dependabot's job and needs network access to verify -- it is that the pin and
+# its version label agree. When Dependabot bumps the pin, add the new entry here
+# and update the `# vX.Y.Z` comments in security-scan.yml in the same commit.
+# test_codeql_version_label_matches_pinned_sha names the exact fix on failure.
+CODEQL_SHA_TO_VERSION = {
+    "1c5b675653bb5c22dbe9b12b556ec555138e09fd": "v4.38.1",  # tag v4.38.1
+}
+
+# Same invariant for reviewdog/action-actionlint in yaml-lint.yml. Its label on
+# main was `# v1` (major-only) while the pin was actually v1.76.0, which is the
+# same class of drift as the codeql labels: Dependabot leaves an incorrect
+# comment as-is rather than correcting it.
+ACTIONLINT_SHA_TO_VERSION = {
+    "320fcdd9c860767cf17fab3b20e22e739d5d02b8": "v1.76.0",  # tag v1.76.0
+}
+
+YAML_LINT_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "yaml-lint.yml"
 
 # Full 40-hex-char SHA pattern
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+
+# A codeql-action pin plus its trailing `# vX.Y.Z` label, e.g.
+# "github/codeql-action/init@<sha>   # v4.38.1"
+_CODEQL_PIN_RE = re.compile(
+    r"github/codeql-action/[\w-]+@([0-9a-f]{40})(\s+#\s*(v[\d.]+))?"
+)
+
+# Generic `uses: <owner>/<action>@<sha>  # vX.Y.Z` matcher.
+_USES_PIN_RE = re.compile(
+    r"uses:\s+(\S+)@([0-9a-f]{40})(\s+#\s*(v[\d.]+))?"
+)
+
+
+def _codeql_pins():
+    """Return every codeql-action pin in security-scan.yml as (sha, label) pairs.
+
+    Group 1 is the SHA, group 2 the whole '  # vX.Y.Z' label block, group 3 the
+    bare version inside it.
+    """
+    raw = _raw_text(SECURITY_SCAN_WORKFLOW)
+    return [(sha, version or None)
+            for sha, _label_block, version in _CODEQL_PIN_RE.findall(raw)]
 
 
 # ---------------------------------------------------------------------------
@@ -178,137 +222,94 @@ class TestSecurityScanWorkflow:
         missing = expected_jobs - set(jobs.keys())
         assert not missing, f"Missing expected jobs: {missing}"
 
-    # --- upload-sarif: shellcheck job ---
+    # --- codeql-action pin invariants ---
+    #
+    # These assert coherence (one SHA, a label that matches it, full-SHA pins)
+    # rather than one blessed SHA, so a Dependabot bump cannot desynchronise
+    # them. The SHA that is currently correct lives in CODEQL_SHA_TO_VERSION.
 
-    def test_shellcheck_upload_sarif_uses_new_codeql_sha(self):
-        """shellcheck-security job: upload-sarif step must use the updated SHA."""
+    def test_codeql_upload_sarif_pins_present(self):
+        """The upload-sarif step must be pinned in both scan jobs."""
+        pins = _codeql_pins()
+        upload = [p for p in pins if "upload-sarif@" in _raw_text(SECURITY_SCAN_WORKFLOW)]
+        # 4 upload-sarif steps share the same SHA as the 3 codeql steps.
         raw = _raw_text(SECURITY_SCAN_WORKFLOW)
-        expected = f"github/codeql-action/upload-sarif@{CODEQL_NEW_SHA}"
-        assert raw.count(expected) >= 1, (
-            f"Expected at least one reference to upload-sarif@{CODEQL_NEW_SHA}"
+        count = len(re.findall(r"github/codeql-action/upload-sarif@", raw))
+        assert count >= 4, f"Expected >=4 upload-sarif pins, found {count}"
+        assert upload == pins or len(pins) >= 7, (
+            f"Expected 7 codeql-action pins, found {len(pins)}"
         )
 
-    def test_trivy_fs_upload_sarif_uses_new_codeql_sha(self):
-        """trivy-fs job: upload-sarif step must use the updated SHA."""
-        # Verified indirectly: all 4 upload-sarif occurrences are checked together
-        raw = _raw_text(SECURITY_SCAN_WORKFLOW)
-        expected = f"github/codeql-action/upload-sarif@{CODEQL_NEW_SHA}"
-        # There must be at least 4 upload-sarif references (shellcheck, trivy-fs,
-        # codeql-empty, iac-scan)
-        count = raw.count(expected)
-        assert count >= 4, (
-            f"Expected >=4 upload-sarif references with new SHA, found {count}"
-        )
-
-    # --- codeql job: init, autobuild, analyze ---
-
-    def test_codeql_init_uses_new_sha(self):
-        """codeql job: Initialize CodeQL step must use the updated SHA."""
-        raw = _raw_text(SECURITY_SCAN_WORKFLOW)
-        assert f"github/codeql-action/init@{CODEQL_NEW_SHA}" in raw, (
-            f"codeql-action/init must be pinned to {CODEQL_NEW_SHA}"
-        )
-
-    def test_codeql_autobuild_uses_new_sha(self):
-        """codeql job: Autobuild step must use the updated SHA."""
-        raw = _raw_text(SECURITY_SCAN_WORKFLOW)
-        assert f"github/codeql-action/autobuild@{CODEQL_NEW_SHA}" in raw, (
-            f"codeql-action/autobuild must be pinned to {CODEQL_NEW_SHA}"
-        )
-
-    def test_codeql_analyze_uses_new_sha(self):
-        """codeql job: Perform CodeQL Analysis step must use the updated SHA."""
-        raw = _raw_text(SECURITY_SCAN_WORKFLOW)
-        assert f"github/codeql-action/analyze@{CODEQL_NEW_SHA}" in raw, (
-            f"codeql-action/analyze must be pinned to {CODEQL_NEW_SHA}"
-        )
-
-    # --- Total count of codeql-action usages ---
-
-    def test_security_scan_total_codeql_action_count(self):
-        """All 7 codeql-action references must use the new SHA (no leftovers)."""
-        raw = _raw_text(SECURITY_SCAN_WORKFLOW)
-        # Count every occurrence of the new SHA tied to codeql-action
-        # Use [\w-]+ to match hyphenated action names like upload-sarif
-        count = len(re.findall(
-            rf"github/codeql-action/[\w-]+@{re.escape(CODEQL_NEW_SHA)}",
-            raw,
-        ))
-        assert count == 7, (
-            f"Expected exactly 7 github/codeql-action/* references with new SHA, "
-            f"found {count}"
-        )
-
-    # --- Regression: old SHA must be gone ---
-
-    def test_security_scan_does_not_contain_old_codeql_sha(self):
-        """Regression: old codeql-action SHA must not appear anywhere in the file."""
-        raw = _raw_text(SECURITY_SCAN_WORKFLOW)
-        assert CODEQL_OLD_SHA not in raw, (
-            f"Old SHA {CODEQL_OLD_SHA} still present in security-scan.yml"
-        )
-
-    # --- Consistency: all codeql-action pins use the same SHA ---
-
-    def test_security_scan_all_codeql_action_shas_are_consistent(self):
+    def test_codeql_all_pins_use_one_sha(self):
         """Every github/codeql-action/* reference must use the same SHA."""
-        raw = _raw_text(SECURITY_SCAN_WORKFLOW)
-        # Extract all SHAs following github/codeql-action/<subaction>@
-        # Use [\w-]+ to match hyphenated names like upload-sarif
-        shas = re.findall(r"github/codeql-action/[\w-]+@([0-9a-f]{40})", raw)
-        assert len(shas) > 0, "No github/codeql-action/* references found"
-        unique_shas = set(shas)
-        assert len(unique_shas) == 1, (
-            f"All codeql-action steps must use the same SHA, "
-            f"but found multiple: {unique_shas}"
-        )
-        assert unique_shas.pop() == CODEQL_NEW_SHA
-
-    # --- SHA format validation ---
-
-    def test_codeql_sha_is_full_40_char_hex(self):
-        """The updated codeql-action SHA must be a valid 40-character hex string."""
-        assert SHA_PATTERN.match(CODEQL_NEW_SHA), (
-            "CODEQL_NEW_SHA must be a valid 40-char hex SHA"
+        pins = _codeql_pins()
+        assert pins, "No github/codeql-action/* references found"
+        shas = {sha for sha, _ in pins}
+        assert len(shas) == 1, (
+            f"All codeql-action steps must use the same SHA, found {shas}"
         )
 
-    def test_security_scan_codeql_actions_not_pinned_by_tag_only(self):
+    def test_codeql_pinned_sha_is_40_char_hex(self):
+        """The pinned codeql-action SHA must be a full 40-character hex string."""
+        pins = _codeql_pins()
+        assert pins, "No github/codeql-action/* references found"
+        for sha, _ in pins:
+            assert SHA_PATTERN.match(sha), (
+                f"codeql-action SHA must be 40-char hex, got {sha!r}"
+            )
+
+    def test_codeql_actions_not_pinned_by_tag_only(self):
         """All github/codeql-action/* references must use full SHA pins, not tags."""
         raw = _raw_text(SECURITY_SCAN_WORKFLOW)
-        # A tag-only reference would look like codeql-action/<name>@v4 without a SHA
-        # Use [\w-]+ to match hyphenated names like upload-sarif
-        tag_only = re.findall(
-            r"github/codeql-action/[\w-]+@(v\d+[\w.]*)\b",
-            raw,
-        )
-        assert not tag_only, (
-            f"Found mutable tag references for codeql-action: {tag_only}"
-        )
+        tag_only = re.findall(r"github/codeql-action/[\w-]+@(v\d+[\w.]*)\b", raw)
+        assert not tag_only, f"Found mutable tag references: {tag_only}"
 
-    # --- Version comment consistency ---
-
-    def test_security_scan_codeql_version_comments_say_v4_36(self):
-        """Every github/codeql-action/* SHA pin must have a '# v4.36' comment."""
+    def test_codeql_pins_are_not_orphaned_sha_comments(self):
+        """The codeql SHA must not appear on a non-codeql action line."""
         raw = _raw_text(SECURITY_SCAN_WORKFLOW)
-        # Each pin line should look like: uses: github/codeql-action/...@<SHA>  # v4.36
-        # Use [\w-]+ to match hyphenated names like upload-sarif
-        pins = re.findall(
-            rf"github/codeql-action/[\w-]+@{re.escape(CODEQL_NEW_SHA)}(\s+#\s*v[\d.]+)?",
-            raw,
+        pins = _codeql_pins()
+        assert pins
+        sha = pins[0][0]
+        strays = re.findall(
+            rf"uses:\s+(?!github/codeql-action/)[^\n]+{re.escape(sha)}", raw
         )
-        missing_comment = [p for p in pins if not p.strip()]
-        assert not missing_comment, (
-            "Some codeql-action SHA pins are missing version comments"
+        assert not strays, f"codeql SHA appears on unrelated action lines: {strays}"
+
+    def test_codeql_pins_all_carry_a_version_comment(self):
+        """Every github/codeql-action/* pin must have a '# vX.Y.Z' label."""
+        missing = [sha for sha, label in _codeql_pins() if not label]
+        assert not missing, f"codeql-action pins missing version comments: {missing}"
+
+    def test_codeql_version_comments_all_agree(self):
+        """All codeql-action version labels must state the same version."""
+        labels = {label for _, label in _codeql_pins() if label}
+        assert len(labels) == 1, f"Version labels disagree: {labels}"
+
+    def test_codeql_version_label_matches_pinned_sha(self):
+        """The version label must name the real version of the pinned SHA.
+
+        When Dependabot bumps the pin, add the new SHA to
+        CODEQL_SHA_TO_VERSION and update the '# vX.Y.Z' comments in
+        security-scan.yml in the same commit. Verify the version with:
+            gh api repos/github/codeql-action/git/matching-refs/tags/<version>
+        """
+        pins = _codeql_pins()
+        assert pins
+        shas = {sha for sha, _ in pins}
+        assert len(shas) == 1
+        sha = shas.pop()
+        assert sha in CODEQL_SHA_TO_VERSION, (
+            f"Pinned codeql-action SHA {sha} is not in CODEQL_SHA_TO_VERSION. "
+            f"Known: {sorted(CODEQL_SHA_TO_VERSION)}. Add the new SHA->version "
+            f"entry here and update the '# vX.Y.Z' comments in "
+            f"security-scan.yml in the same commit."
         )
-        # Verify they all say v4.36
-        version_comments = re.findall(
-            rf"github/codeql-action/[\w-]+@{re.escape(CODEQL_NEW_SHA)}\s+#\s*(v[\d.]+)",
-            raw,
+        expected = CODEQL_SHA_TO_VERSION[sha]
+        wrong = sorted({label for _, label in _codeql_pins() if label != expected})
+        assert not wrong, (
+            f"Pinned SHA {sha} is {expected}, but the comments say {wrong}. "
+            f"Update the '# vX.Y.Z' comments in security-scan.yml."
         )
-        for comment in version_comments:
-            assert comment == "v4.36", (
-                f"Expected version comment 'v4.36', got '{comment}'"
-            )
 
     # --- Workflow permissions ---
 
@@ -326,17 +327,58 @@ class TestSecurityScanWorkflow:
     # --- Boundary / negative: no unrelated SHA replacements ---
 
     def test_security_scan_non_codeql_action_shas_unchanged(self):
-        """Non-codeql action SHAs in security-scan.yml must not include the new codeql SHA."""
+        """The codeql-action SHA must not leak onto a non-codeql action line."""
+        pins = _codeql_pins()
+        assert pins
+        sha = pins[0][0]
         raw = _raw_text(SECURITY_SCAN_WORKFLOW)
-        # Confirm that the new codeql SHA only appears in codeql-action references
-        # Find all 'uses:' lines that contain the new SHA but are NOT codeql-action
-        non_codeql_with_new_sha = re.findall(
-            rf"uses:\s+(?!github/codeql-action/)[^\n]+{re.escape(CODEQL_NEW_SHA)}",
+        # Find all 'uses:' lines that contain the codeql SHA but are NOT codeql-action
+        non_codeql_with_codeql_sha = re.findall(
+            rf"uses:\s+(?!github/codeql-action/)[^\n]+{re.escape(sha)}",
             raw,
         )
-        assert not non_codeql_with_new_sha, (
-            f"New codeql SHA found in non-codeql actions: {non_codeql_with_new_sha}"
+        assert not non_codeql_with_codeql_sha, (
+            f"codeql SHA found in non-codeql actions: {non_codeql_with_codeql_sha}"
         )
+
+
+# ===========================================================================
+# yaml-lint.yml tests
+# ===========================================================================
+
+
+class TestYamlLintWorkflow:
+    """Tests for .github/workflows/yaml-lint.yml actionlint pin."""
+
+    def test_workflow_exists(self):
+        assert YAML_LINT_WORKFLOW.exists(), "yaml-lint.yml must exist"
+
+    def test_actionlint_pin_is_full_sha(self):
+        """reviewdog/action-actionlint must be pinned to a full 40-char SHA."""
+        raw = _raw_text(YAML_LINT_WORKFLOW)
+        pins = _USES_PIN_RE.findall(raw)
+        actionlint = [p for p in pins if p[0] == "reviewdog/action-actionlint"]
+        assert actionlint, "No SHA-pinned reviewdog/action-actionlint reference"
+        for _, sha, _label_block, _ in actionlint:
+            assert SHA_PATTERN.match(sha), f"actionlint SHA must be 40-char hex: {sha!r}"
+
+    def test_actionlint_version_label_matches_pinned_sha(self):
+        """The actionlint label must name the real version of the pinned SHA."""
+        raw = _raw_text(YAML_LINT_WORKFLOW)
+        pins = [p for p in _USES_PIN_RE.findall(raw)
+                if p[0] == "reviewdog/action-actionlint"]
+        assert pins
+        for _, sha, _label_block, label in pins:
+            assert sha in ACTIONLINT_SHA_TO_VERSION, (
+                f"Pinned actionlint SHA {sha} is not in ACTIONLINT_SHA_TO_VERSION. "
+                f"Known: {sorted(ACTIONLINT_SHA_TO_VERSION)}. Verify with: "
+                f"gh api repos/reviewdog/action-actionlint/commits/{sha}"
+            )
+            expected = ACTIONLINT_SHA_TO_VERSION[sha]
+            assert label == expected, (
+                f"actionlint pin is {expected} but the comment says {label!r}. "
+                f"Update the '# vX.Y.Z' comment in yaml-lint.yml."
+            )
 
 
 # ===========================================================================
