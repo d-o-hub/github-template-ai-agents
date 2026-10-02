@@ -97,10 +97,15 @@ ids), consumed by `.github/workflows/ci.yml`:
 CI_STATUS_ALLOWED_SKIPS=test
 ```
 
-**Do not allowlist `test` reflexively.** In this repository `test` is gated by
-`if: needs.changes.outputs.code == 'true'`, so it is skipped for docs-only
-changes. That skip is path-driven, not deliberate, which is exactly why it must
-stay outside the allowlist: a docs-only change cannot certify that tests passed.
+**Do not allowlist `test` reflexively.** `test` used to be gated by
+`if: needs.changes.outputs.code == 'true'`, so docs-only changes skipped it.
+That skip was path-driven, not deliberate: a docs-only change cannot certify
+that tests passed, while this repository's suite reads `SKILL.md`, generated
+catalogs, `.github/workflows`, and `scripts/lib`. The gate was removed rather
+than allowlisted — the fix for a job that never ran is to run it (ADR-041's
+lesson, applied to the job condition instead of an inner step). Any remaining
+skip is therefore unexpected: confirm it with `gh run view` before thinking
+about the allowlist.
 
 ## Scripts
 
@@ -130,7 +135,7 @@ greenness.
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `status: unknown` with `unallowed_skips` non-empty | A required job was path-filtered out | Confirm the real state with `gh run view`; decide whether the skip is deliberate, then set `CI_STATUS_ALLOWED_SKIPS` |
+| `status: unknown` with `unallowed_skips` non-empty | A required job was skipped by its `if:` — `test` no longer is, so this now means `quality-gate` path-filtered both jobs out, or a job was skipped some other way | Confirm the real state with `gh run view`; decide whether the skip is deliberate, then set `CI_STATUS_ALLOWED_SKIPS` |
 | `self-contradictory CI status` from the validator | Artifact hand-edited or produced by a stale producer | Re-run the producer; do not hand-edit the JSON |
 | `CI status is stale` | The persist loop has not converged | See ADR-034; check the automerge PR and the janitor |
 
