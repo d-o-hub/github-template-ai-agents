@@ -227,3 +227,21 @@ def test_run_file_validation_m2_netrc_bak_rejected(tmp_path):
     assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
     assert result.message == "Missing 2 file(s)"  # nosec B101 -- test assertion
     assert result.details == ["Missing: .m2", "Missing: .netrc.bak"]  # nosec B101 -- test assertion
+
+
+def test_run_file_validation_key_token_prefixes_rejected(tmp_path):
+    """Consumer regression: eval file-validation must reject repo-local api-key, id-token, oauth and jwt files."""
+    skill_path = tmp_path / "skill"
+    skill_path.mkdir()
+    names = [
+        "api-key.json", "id-token.txt", "oauth_token.json",
+        "oauth-token.txt", "jwt_token.json", "jwt-token.txt",
+    ]
+    for name in names:
+        (skill_path / name).write_text("test-content", encoding="utf-8")
+
+    eval_case = {"id": 1, "files": names}
+    result = eval_executors.run_file_validation(eval_case, skill_path, False)
+    assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
+    assert result.message == "Missing 6 file(s)"  # nosec B101 -- test assertion
+    assert result.details == [f"Missing: {name}" for name in names]  # nosec B101 -- test assertion
