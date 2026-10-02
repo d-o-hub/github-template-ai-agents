@@ -20,7 +20,7 @@ from pathlib import Path
 from lib.eval_executors import run_command_check, run_file_validation
 from lib.eval_types import EvalReport, EvalResult, EvalStatus, EvalType, SkillEvalResult
 from lib.eval_validators import load_evals_file, run_structure_check, validate_evals_format
-from lib.paths import PathValidationError, validate_safe_path
+from lib.paths import PathValidationError, validate_canonical_name, validate_safe_path
 
 EVALS_FILENAME = "evals.json"
 EVALS_SUBDIR = "evals"
@@ -106,9 +106,9 @@ def evaluate_skill(
 def discover_skills(skills_dir: Path, specific_skill: str | None = None) -> list[Path]:
     """Discover all skills with evals/evals.json files."""
     if specific_skill:
-        # Prevent path traversal and sensitive/forbidden path usage
+        # Prevent path traversal; the denylist does not apply to skill names
         try:
-            skill_path = validate_safe_path(specific_skill, skills_dir, "skill", check_forbidden=True)
+            skill_path = validate_canonical_name(specific_skill, skills_dir, "skill")
         except PathValidationError:
             return []
         evals_path = skill_path / EVALS_SUBDIR / EVALS_FILENAME
@@ -120,9 +120,10 @@ def discover_skills(skills_dir: Path, specific_skill: str | None = None) -> list
         return skills
     for path in sorted(skills_dir.iterdir()):
         if path.is_dir():
-            # Security Hardening: Ensure we do not list/discover forbidden directories
+            # A skill directory is content, not a credential path: validate the
+            # name, not the denylist, or legitimately-named skills go missing.
             try:
-                validate_safe_path(path.name, skills_dir, "skill", check_forbidden=True)
+                validate_canonical_name(path.name, skills_dir, "skill")
             except PathValidationError:
                 continue
             evals_path = path / EVALS_SUBDIR / EVALS_FILENAME

@@ -276,3 +276,53 @@ def validate_safe_path(
                 )
 
     return candidate
+
+
+def validate_canonical_name(
+    raw: str,
+    base: Path,
+    param_name: str,
+) -> Path:
+    """
+    Resolve a single-segment child *name* under `base`, exempt from substring matching.
+
+    `SENSITIVE_PREFIXES` exists to keep credential-bearing files from being read
+    or overwritten, and it deliberately over-blocks (`tokenizer`,
+    `token_secret_backup`): for a file path, a false positive costs nothing.
+    Applied to a curated skills tree it hides real skills -- `.agents/skills/secrets-management`
+    trips the `secret` prefix, so `run-evals.py --skill secrets-management`
+    reported "not found" and the generated README published 53 of 54 skills.
+
+    So the exemption is narrow by design. What still blocks:
+
+    * exact credential names (`.git`, `.env`, `Makefile`, `requirements.txt`)
+    * hidden names (leading `.`)
+    * key and certificate formats (`.pem`, `.key`, `.id_rsa`, …)
+
+    What no longer blocks is a name that merely *contains* a sensitive word.
+
+    Traversal and confinement are unaffected: the name must be a single segment
+    and `validate_safe_path` still requires containment under `base`.
+    """
+    if not raw or Path(raw).name != raw:
+        raise PathValidationError(
+            f"--{param_name} must be a single path segment, not a path: {raw}"
+        )
+
+    name_lower = raw.lower()
+    if name_lower.startswith("."):
+        raise PathValidationError(
+            f"--{param_name} must not be a hidden name: {raw}"
+        )
+    if name_lower in FORBIDDEN_PATHS_LOWER:
+        raise PathValidationError(
+            f"--{param_name} targets a forbidden path: {raw}"
+        )
+    if name_lower.endswith(SENSITIVE_SUFFIXES) or (
+        name_lower.startswith(SSH_KEY_PREFIXES) and not name_lower.endswith(".pub")
+    ):
+        raise PathValidationError(
+            f"--{param_name} targets a sensitive file pattern: {raw}"
+        )
+
+    return validate_safe_path(raw, base, param_name, check_forbidden=False)
