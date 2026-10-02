@@ -66,12 +66,15 @@ that no gate can see:
 
 ## Decision
 
-1. **Canonical names under `.agents/skills/` are exempt from forbidden-path
-   matching**, not the forbidden patterns themselves. `SENSITIVE_PREFIXES`
-   still protects dotfiles, credentials and key material everywhere else;
-   only the skills directory stops treating a directory *name* as a
-   sensitive path. Every `SKILL.md` directory must then be discoverable, and
-   a regression test asserts it.
+1. **Canonical names under `.agents/skills/` stop being matched against
+   substring prefixes** — not against the denylist. `SENSITIVE_PREFIXES`
+   over-blocks on purpose (`tokenizer`, `token_secret_backup`), which is free
+   for a file path and fatal for a skill name; exact credential names
+   (`.git`, `.env`), hidden names, and key/certificate formats (`.pem`,
+   `id_rsa`) stay refused, as does any name that is not a single path
+   segment. `validate_safe_path` is untouched, so file-level callers keep full
+   coverage. Every `SKILL.md` directory must then be discoverable, and a
+   regression test asserts it.
 
 2. **`update-agents-md.sh` gets its fallback back** by making the section-end
    probe tolerate a grep miss. The generator does **not** take ownership of
@@ -114,3 +117,12 @@ that no gate can see:
 - Lessons become an auditable triple-write rather than three files that
   happen to share a topic.
 - Round 12 inherits four named items rather than an unstated backlog.
+
+## Observed while implementing, not decided here
+
+`lib/eval_executors.py:95` applies the same denylist to *files inside* a skill
+directory, so `privacy-first` eval #2 (`pyproject.toml`) and
+`security-code-auditor` eval #2 (`.env.example`) are refused as paths: both
+evals report their fixture "missing" even when it exists. Those entries were
+added deliberately as overwrite protection, so relaxing them is a security
+trade-off rather than a rename fix, and it needs its own decision.
