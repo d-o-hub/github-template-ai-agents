@@ -186,9 +186,16 @@ jobs:
     name: Run Tests
     runs-on: ubuntu-latest
     needs: [changes, quality-gate]
-    if: |
-      always() &&
-      needs.changes.outputs.code == 'true'
+    # Unconditional, like ADR-041 made the root suite's install steps. The
+    # suite here validates agent and skill *content* — root pytest reads
+    # .github/workflows and scripts/lib, the skill tests and BATS corpus read
+    # SKILL.md frontmatter and the generated catalogs — so a path filter over
+    # source extensions skipped it for exactly the markdown-heavy changes this
+    # repository is made of. agents-docs/CI_STATUS.md already records that such
+    # a skip is "path-driven, not deliberate" and must not be allowlisted; the
+    # honest fix is to stop producing the skip. Cost is ~1 min on a job that
+    # previously reported a green run that meant "never ran".
+    if: always()
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
