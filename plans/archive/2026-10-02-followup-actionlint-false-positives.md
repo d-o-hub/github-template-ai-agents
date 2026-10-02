@@ -1,6 +1,21 @@
 # Follow-up: Actionlint False Positives
 
-## Status: Pending (actionlint upstream issue)
+## Status: Resolved (verified 2026-10-02, ADR-042)
+
+Both findings are non-blocking in CI, which settles this without an upstream
+change. Archived rather than deleted per ADR-042 decision 5.
+
+Evidence, re-checked 2026-10-02:
+
+- `.github/workflows/dedup-issues.yml:17` still declares `models: read`.
+- `.github/workflows/yaml-lint.yml:50-60` runs `reviewdog/action-actionlint`
+  pinned at `2085657ab2c7f48c58edcc767fba576f63bea76b` (`# v1.77.0`) with
+  `fail_level: error`, `filter_mode: nofilter`.
+- Every `YAML Lint` run on `main` is green (runs 37006924167, 37000623655,
+  36996361732), so the pinned action accepts the `models` scope.
+- Local `actionlint` 1.6.26 still reports `unknown permission scope "models"`,
+  which is why this plan looked open: the local binary is older than the one
+  CI runs. The upstream issue is therefore moot for this repository.
 
 ## Problem
 

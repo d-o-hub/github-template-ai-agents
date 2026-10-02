@@ -25,8 +25,6 @@ fails the gate if the two ever disagree, or if either counter is missing.
 | `PR-resolution-summary.md` | Roll-up of resolved PR review threads. |
 | `monthly-eval-schedule.md` | Cadence for the mandatory skill-evaluation report. |
 | `pre-existing-issues.md` | Issues observed in CI that predate the current change. |
-| `unresolved-comments.md` | Review threads still awaiting resolution. |
-| `followup-actionlint-false-positives.md` | Known actionlint false positives to suppress. |
 | `handovers/` | Cross-session context snapshots referenced by `handover_ref`. |
 | `archive/` | Superseded plans and ADRs, kept for history. |
 
