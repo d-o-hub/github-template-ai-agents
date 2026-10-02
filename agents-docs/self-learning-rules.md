@@ -35,6 +35,7 @@
 - **LESSON-043 — Ghost Dirs Trip Validators**: `git rm -r` leaves ignored artifacts (`__pycache__/`) behind, so empty skill dirs persist and directory-iterating validators (`validate-skills.sh`) fail with Missing SKILL.md. Follow every skill deletion with `rm -rf` on the path.
 - **LESSON-044 — New Skills Need a Post-Creation Audit**: Freshly created skills ship with one-way `Not for` guards and positive-scope-only evals, so routing defects are invisible until they misfire. Audit axes: sibling trigger overlap, bidirectional guards, routing near-miss evals, fail-closed evidence, registry mirrors (ADR-039).
 - **LESSON-045 — Description Edits Are 6-Site Edits**: A skill `description:` change propagates to 5-6 generated files (AVAILABLE_SKILLS.md, skills-reference.md, skill-catalog.md, .agents/skills/README.md, llms-full.txt, AGENTS_REGISTRY.md). Always regenerate; never hand-edit.
+- **LESSON-046 — `[skip ci]` Suppresses Required External Checks**: The skip directive also silences apps that honour `GITHUB_TOKEN` (Codacy), so a required check is never *reported* — indistinguishable from pending, and a strict ruleset blocks the merge. Reserve `[skip ci]` for commits landing directly on the default branch; when a PR is `BLOCKED` with every visible check green, diff the displayed list against the required list — a missing row is the failure.
 
 ---
 
