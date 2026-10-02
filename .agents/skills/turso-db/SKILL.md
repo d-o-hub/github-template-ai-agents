@@ -36,6 +36,7 @@ Before writing any Turso code, you MUST know these constraints:
 - **MVCC is experimental and not production ready** — `PRAGMA journal_mode = experimental_mvcc`.
 - **Vector distance: lower = closer** — ORDER BY distance ASC for nearest neighbors.
 - **Deprecated Features**: Avoid using ATTACH DATABASE, Data Edge, or Multi-DB Schemas for new projects as they are deprecated.
+- **Deleted databases and groups stay restorable for 5 days** — recover with `List Deleted Databases` → `Restore Database` and `List Deleted Groups` → `Restore Group`. Restore requires a paid plan, an admin/owner token, and recovery enabled for the organization; listing works even while recovery is disabled. See `references/llms.txt` → "Recover Deleted Databases".
 
 ## Feature Decision Tree
 
