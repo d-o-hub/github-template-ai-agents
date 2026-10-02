@@ -136,6 +136,8 @@ FORBIDDEN_PATHS = frozenset({
     # so this denylist only blocks these in-base names.
     ".curlrc",
     ".wgetrc",
+    ".m2",
+    ".netrc.bak",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
