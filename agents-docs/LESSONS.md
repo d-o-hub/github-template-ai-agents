@@ -1579,3 +1579,39 @@ Also applied consistently across the frontmatter parsing block by replacing all 
 **Tags**: #github-cli #graphql #labels #workaround
 
 **Files Modified**: (workflow only, no source changes)
+
+### LESSON-046 — `[skip ci]` on a PR Head Silently Suppresses the Required Codacy Check
+
+**Date**: 2026-10-02
+**Component**: GitHub Actions / branch protection / Codacy
+**Severity**: Medium
+
+**Issue**: PRs #952 and #956 stayed `BLOCKED` while every check GitHub actually displayed was green (`CodeQL`, `SonarCloud Code Analysis`, `Analyze (python|actions|javascript-typescript)`). The ruleset's one required check, `Codacy Static Code Analysis`, was simply absent from `gh pr checks`.
+
+**Symptoms**:
+- `gh pr checks <n>` lists every external check **except** `Codacy Static Code Analysis`
+- `gh pr view --json mergeStateStatus` returns `BLOCKED` (sometimes `UNSTABLE`) with nothing visibly red
+- `gh pr merge --squash` refuses: "Pull request #N is not mergeable"
+- Re-running workflows does nothing, because Codacy is not an Actions job — there is nothing to re-run
+- Reads like "Codacy is slow", which is the wrong conclusion: it will never arrive
+
+**Root Cause**: both head commits carried `[skip ci]` in the message. GitHub's skip directive applies to `push` and `pull_request`-triggered workflows **and** to external apps that honour the same token, so Codacy never posts a check at all. A required check that is never *reported* is indistinguishable from one that is pending: the branch ruleset (`strict_required_status_checks_policy: true`) blocks the merge either way. The missing row in `gh pr checks` **is** the error signal — absence, not a visible failure.
+
+**Solution**:
+
+```bash
+git checkout <pr-branch>
+git commit --amend -m "<same message, without [skip ci]>"
+git push --force-with-lease origin <pr-branch>
+```
+
+Codacy posts within about a minute. Do this only after the branch is up to date with base — strict required checks also report `BEHIND`, which independently makes `gh pr merge` refuse.
+
+**Prevention**:
+- Reserve `[skip ci]` for commits that land directly on the default branch (that is the point for `persist-ci-status.sh`'s artifact PR, whose own title carries it so the artifact loop cannot re-trigger itself). Never put it on a PR head that must satisfy a required external check.
+- When a PR is `BLOCKED` with all *visible* checks green, diff the displayed check list against the ruleset's required checks before suspecting flakiness: a missing entry is a failed gate.
+- Read `agents-docs/CI_STATUS.md` first — it already distinguishes `unknown` from `failing`, which is the same absence-vs-failure distinction applied to our own artifact.
+
+**Tags**: #github-actions #ci #codacy #branch-protection #skip-ci #required-checks
+
+**Files Modified**: (workflow/PR message only, no source changes)
