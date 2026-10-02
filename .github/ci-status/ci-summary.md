@@ -2,9 +2,9 @@
 
 Latest CI status: **unknown**
 
-- **Last Run:** 2026-10-02T17:30:08.484271Z
+- **Last Run:** 2026-10-02T18:01:34.730640Z
 - **Schema Version:** 3
-- **Workflow URL:** [https://github.com/d-o-hub/github-template-ai-agents/actions/runs/37040434293](https://github.com/d-o-hub/github-template-ai-agents/actions/runs/37040434293)
+- **Workflow URL:** [https://github.com/d-o-hub/github-template-ai-agents/actions/runs/37044252851](https://github.com/d-o-hub/github-template-ai-agents/actions/runs/37044252851)
 
 > ⚠️ Required jobs skipped outside the allowlist: quality-gate
 >
