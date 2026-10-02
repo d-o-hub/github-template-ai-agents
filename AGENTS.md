@@ -182,13 +182,12 @@ your project adopts the metrics/DORA stack (see `agents-docs/ADOPTION_PROFILES.m
 | Category | Skills |
 |----------|--------|
 | **Agent** | `agentic-abstention`, `delegate`, `implementer`, `intent-classifier`, `jules-delegator` |
-| **Analysis** | `triz-solver` (solve + audit modes) |
-| **Code Quality** | `code-review-assistant`, `css-render-performance`, `debugger`, `iterative-refinement`, `migration-refactoring`, `shell-script-quality`, `static-analysis` |
+| **Analysis** | `triz-solver` (solve + audit modes, TRIZ contradiction analysis) |
+| **Code Quality** | `codacy`, `code-review-assistant`, `css-render-performance`, `debugger`, `iterative-refinement`, `migration-refactoring`, `shell-script-quality`, `static-analysis` |
 | **Compliance** | `eu-ai-act-compliance` |
 | **Database** | `database-devops`, `turso-db` |
 | **DevOps** | `dependency-upgrades`, `dora-report` |
 | **Documentation** | `agents-md`, `architecture-diagram`, `readme-best-practices` |
-| **Innovation Problem Solving** | `triz-solver` |
 | **Knowledge** | `memory-context` |
 | **Knowledge Management** | `learn` |
 | **Platform** | `api-design-first`, `codeberg-api`, `durable-objects` |

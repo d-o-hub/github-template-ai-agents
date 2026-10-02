@@ -223,6 +223,15 @@ if [[ -f "./scripts/check-plan-numbering.sh" ]]; then
     printf "\n"
 fi
 
+# --- AGENTS.md skill table drift check ---
+if [[ -f "./scripts/check-agents-md-skills.sh" ]]; then
+    printf "%bChecking AGENTS.md skill table...%b\n" "${BLUE}" "${NC}"
+    if ! ./scripts/check-agents-md-skills.sh; then
+        FAILED=1
+    fi
+    printf "\n"
+fi
+
 # --- Validate .agents/metrics/ per-agent files ---
 if [[ -d ".agents/metrics" ]]; then
     printf "%bValidating .agents/metrics/ per-agent files...%b\n" "${BLUE}" "${NC}"
