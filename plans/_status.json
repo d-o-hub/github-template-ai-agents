@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-042"
+    "adr": "adr-043"
   },
   "active_plan": null,
   "phases": [],
@@ -84,6 +84,10 @@
       "date": "2026-09-27"
     },
     "adr-041-ci-test-job-self-contained.md": {
+      "status": "accepted",
+      "date": "2026-10-02"
+    },
+    "adr-042-round11-audit-layer-debt.md": {
       "status": "accepted",
       "date": "2026-10-02"
     }
