@@ -25,13 +25,14 @@ def make_skill(skills_dir: Path, name: str, description: str = "A skill") -> Non
     )
 
 
-# Forbidden names are formed dynamically to avoid triggering secret linting tools
+# Credential-shaped directory names are formed dynamically to avoid
+# triggering secret linting tools. These must still be skipped.
 @pytest.mark.parametrize(
     "forbidden_name",
-    ["." + "git", "." + "env", "id_" + "rsa", "secret" + "s"],
+    ["." + "git", "." + "env", "id_" + "rsa", "private." + "pem"],
 )
 def test_forbidden_skill_directory_is_skipped(tmp_path, forbidden_name):
-    """Forbidden directory names in the skills directory must be skipped."""
+    """Credential-shaped directory names in the skills directory must be skipped."""
     skills_dir = tmp_path / ".agents" / "skills"
     skills_dir.mkdir(parents=True)
     make_skill(skills_dir, "valid-skill", "A valid skill")
@@ -40,6 +41,23 @@ def test_forbidden_skill_directory_is_skipped(tmp_path, forbidden_name):
     skills = gen_readme.discover_skills(skills_dir)
 
     assert [name for name, _ in skills] == ["valid-skill"]
+
+
+# A skill name that merely *contains* a sensitive word is legitimate content.
+# The old substring-prefix rule hid `secrets-management` from this generator,
+# publishing 53 of 54 skills.
+@pytest.mark.parametrize(
+    "sensitive_substring_name",
+    ["secret" + "s", "secret" + "s-management", "credential" + "-hygiene", "token" + "izer"],
+)
+def test_sensitive_substring_skill_name_is_published(tmp_path, sensitive_substring_name):
+    skills_dir = tmp_path / ".agents" / "skills"
+    skills_dir.mkdir(parents=True)
+    make_skill(skills_dir, sensitive_substring_name, "A legitimate skill")
+
+    skills = gen_readme.discover_skills(skills_dir)
+
+    assert [name for name, _ in skills] == [sensitive_substring_name]
 
 
 def test_valid_skill_name_and_description_are_collected(tmp_path):

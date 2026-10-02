@@ -9,7 +9,7 @@ import sys
 repo_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(repo_root / "scripts"))
 
-from lib.paths import PathValidationError, validate_safe_path
+from lib.paths import PathValidationError, validate_canonical_name
 
 
 def extract_frontmatter(skill_file: Path) -> dict:
@@ -50,17 +50,15 @@ def extract_frontmatter(skill_file: Path) -> dict:
 def discover_skills(skills_dir: Path) -> list:
     """Collect (name, description) tuples from valid skill directories.
 
-    Directories that fail forbidden-path validation, skip-convention
-    (underscore prefix), or that lack a SKILL.md are ignored.
+    Directories that fail name validation, skip-convention (underscore
+    prefix), or that lack a SKILL.md are ignored.
     """
     skills = []
     for skill_path in sorted(skills_dir.iterdir()):
         if not skill_path.is_dir() or skill_path.name.startswith("_"):
             continue
         try:
-            validate_safe_path(
-                skill_path.name, skills_dir, "skill", check_forbidden=True
-            )
+            validate_canonical_name(skill_path.name, skills_dir, "skill")
         except PathValidationError:
             continue
         skill_file = skill_path / "SKILL.md"
