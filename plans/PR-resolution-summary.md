@@ -67,6 +67,17 @@ Three open PRs were analyzed and fixed. No merge conflicts were found (all PRs w
 
 ## Unresolved / Deferred
 
-- **PR #368 Codacy review**: `scripts/validate-links.sh` empty input handling is pre-existing, not introduced by this PR. Recommended for follow-up.
-- **PR #363**: Original Dependabot changes (SHA updates for codeql-action v4.35 and stale v10.3.0) were stale. Main already uses different versions. The PR now contains only the SARIF/category fix.
-- **Pre-existing warnings**: Quality gate shows 31 skills missing `version:` field. These are pre-existing across all skills and not addressed.
+- **PR #368 Codacy review**: `scripts/validate-links.sh` empty input handling
+  is pre-existing, not introduced by this PR. **Closed** — see
+  [`pre-existing-issues.md`](pre-existing-issues.md); hardened under ADR-030 and
+  re-verified 2026-09-27. Archived thread:
+  [`archive/2026-10-02-unresolved-comments.md`](archive/2026-10-02-unresolved-comments.md).
+- **PR #363**: Original Dependabot changes (SHA updates for codeql-action v4.35
+  and stale v10.3.0) were stale. Main already uses different versions. The PR now
+  contains only the SARIF/category fix.
+- ~~**Pre-existing warnings**: Quality gate shows 31 skills missing `version:`
+  field. These are pre-existing across all skills and not addressed.~~
+  **Corrected 2026-10-02 (ADR-042):** this line was already false when written
+  and is contradicted by [`pre-existing-issues.md`](pre-existing-issues.md)
+  (*Resolved 2026-07-15*): all current skills carry `version:`. The 31-skill
+  figure belongs to a historical quality-gate log, not to the present catalog.

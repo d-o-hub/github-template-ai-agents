@@ -36,6 +36,11 @@ fresh `.github/ci-status/ci-status.json`.
 
 ## Dependency graph
 
+> Superseded (ADR-042, 2026-10-02). This graph describes Round 3; its
+> `IN FLIGHT` and `PENDING` entries were completed long ago. The authoritative
+> state is *Round 9 final* below — 0 open PRs, 0 open issues — and Round 11.
+> Retained verbatim so the round reads in order rather than being rewritten.
+
 ```
 close dup/no-impact PRs (parallel, safe)          → DONE
 merge #775 → #777 → #782 → #779 → #780 (sequential, gated on Codacy) → DONE

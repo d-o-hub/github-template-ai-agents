@@ -1,5 +1,13 @@
 # Unresolved Review Comments
 
+> **Archived 2026-10-02 (ADR-042).** Review threads from PRs #362/#363/#368
+> (May 2026). Nothing here is outstanding: the one item marked DEFERRED —
+> `scripts/validate-links.sh` on empty input — is closed in
+> [`../pre-existing-issues.md`](../pre-existing-issues.md) under *Open /
+> deferred → validate-links empty / malformed input*, re-verified 2026-09-27
+> (no `read` loops remain; the run exits 0 over 88 files and 313 links). Kept
+> for history per ADR-042 decision 5.
+
 ## PR #368 - Sentinel Hardening
 
 ### tests/test-security-fixes.sh Missing from Diff
