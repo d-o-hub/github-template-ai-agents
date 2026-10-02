@@ -1,3 +1,9 @@
+## 2026-10-01 - Expand Path Validation Blocklist for Maven Repositories and Netrc Credential Backups
+
+**Vulnerability:** Omission of Maven configuration/repository directories (`.m2`) and netrc backup files (`.netrc.bak`) in forbidden path validation left local Maven credentials (`settings.xml`) and netrc backups exposed to potential inspection or exfiltration.
+**Learning:** Security path denylists must cover build tool repository directories that store server credentials and authorization tokens alongside backup variations of standard credential files.
+**Prevention:** Maintain explicit denylist entries for build tool config folders (`.m2`) and credential file backup extensions (`.netrc.bak`).
+
 ## 2026-08-30 - Expand Path Validation Blocklist for DB Shells, Shell Profiles, and Package Manager Credentials
 
 **Vulnerability:** Gaps in `FORBIDDEN_PATHS` left additional sensitive REPL/database shell histories (`.dbshell`, `.rediscli_history`), shell profiles (`.kshrc`), and package manager credential files (`pip.conf`, `.gemrc`) vulnerable to potential inspection or exfiltration.
