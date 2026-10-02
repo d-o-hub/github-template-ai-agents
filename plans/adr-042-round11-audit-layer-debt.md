@@ -44,9 +44,10 @@ that no gate can see:
    six generated catalogs.
 
 4. **The lessons triple-write has drifted and nothing checks it.**
-   `agents-docs/LESSONS.md` is missing LESSON-030…034 and
-   `agents-docs/lessons.jsonl` is missing LESSON-020…029 and 035, while
-   `self-learning-rules.md` already references the missing range.
+   Measured across `LESSON-001…046`, `agents-docs/LESSONS.md` is missing
+   LESSON-029…035, 037 and 043…045, and `agents-docs/lessons.jsonl` is
+   missing LESSON-020…035 and 043…045, while `self-learning-rules.md`
+   carries titles and bodies for all of them.
    `rg -l 'lessons.jsonl' scripts/ tests/ .github/` returns nothing: the
    three-file invariant has no validator.
 
@@ -89,7 +90,11 @@ that no gate can see:
    `check-plan-numbering.sh`, wired into `quality_gate.sh`.
 
 5. **Resolved plan items are archived with evidence, never deleted**, and
-   Round-10's records are landed on `main` through the normal PR path.
+   Round-10's records are landed on `main` through the normal PR path. A new
+   lesson takes the next free id rather than the one its working tree
+   happened to carry: the stranded lesson was numbered 043, which
+   `self-learning-rules.md` had already given to *Ghost Dirs Trip
+   Validators*, so it lands as 046.
 
 6. **Deferred, deliberately:** regenerating `plans/monthly-eval-schedule.md`
    from disk and running the overdue month; de-path-filtering `quality-gate`
