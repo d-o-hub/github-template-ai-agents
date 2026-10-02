@@ -1,6 +1,14 @@
+import sys
+from pathlib import Path
+
 import pytest
 
-from paths import validate_safe_path, FORBIDDEN_PATHS, PathValidationError
+from paths import (
+    validate_safe_path,
+    validate_canonical_name,
+    FORBIDDEN_PATHS,
+    PathValidationError,
+)
 
 
 def test_validate_safe_path_normal(tmp_path):
@@ -229,3 +237,74 @@ def test_validate_safe_path_ssh_keys(tmp_path):
         expected = (base / pub).resolve()
         if res != expected:
             raise AssertionError(f"Expected {expected}, got {res}")
+
+
+def test_validate_canonical_name_allows_sensitive_substring(tmp_path):
+    """A skill dir name is content, not a credential path.
+
+    Regression: `secrets-management` tripped the `secret` prefix, so
+    run-evals.py reported "not found" and the generated README published
+    53 of 54 skills.
+    """
+    base = tmp_path / "skills"
+    base.mkdir()
+    (base / "secrets-management").mkdir()
+
+    res = validate_canonical_name("secrets-management", base, "skill")
+    assert res == (base / "secrets-management").resolve()
+
+
+def test_validate_canonical_name_requires_single_segment(tmp_path):
+    base = tmp_path / "skills"
+    base.mkdir()
+    (base / "nested").mkdir()
+    outside = tmp_path / "outside"
+    outside.mkdir()
+
+    for bad in ("", ".", "..", "nested/child", "./secrets-management", str(base / "secrets-management")):
+        with pytest.raises(PathValidationError):
+            validate_canonical_name(bad, base, "skill")
+
+    # Hidden names and credential-shaped names stay refused.
+    for hidden_or_credential in (".git", ".env", "id_rsa", "private.pem", "credentials.json"):
+        with pytest.raises(PathValidationError):
+            validate_canonical_name(hidden_or_credential, base, "skill")
+
+    # Traversal out of the base is still refused.
+    with pytest.raises(PathValidationError):
+        validate_canonical_name("../outside", base, "skill")
+
+
+def test_validate_canonical_name_does_not_relax_validate_safe_path(tmp_path):
+    """The exemption is scoped to the name helper; the denylist still bites."""
+    base = tmp_path / "skills"
+    base.mkdir()
+
+    for denied in (".env", "id_rsa", "credentials.json"):
+        with pytest.raises(PathValidationError):
+            validate_safe_path(denied, base, "files", check_forbidden=True)
+
+
+def test_every_skill_directory_is_discoverable():
+    """No skill may be invisible to the generators that publish the catalog.
+
+    Guards the whole class, not just the name that broke: any future skill
+    whose directory name trips the denylist would silently vanish from
+    run-evals.py and .agents/skills/README.md.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    from lib.paths import validate_canonical_name
+
+    skills_dir = Path(__file__).resolve().parents[1] / ".agents" / "skills"
+    assert skills_dir.is_dir()
+
+    hidden = []
+    for entry in sorted(skills_dir.iterdir()):
+        if not entry.is_dir() or entry.name.startswith("_"):
+            continue
+        try:
+            validate_canonical_name(entry.name, skills_dir, "skill")
+        except PathValidationError:
+            hidden.append(entry.name)
+
+    assert hidden == [], f"skills hidden from discovery by path validation: {hidden}"
