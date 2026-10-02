@@ -254,7 +254,9 @@ jobs:
       # missing PyYAML made every `import yaml` BATS test fail while the run
       # still looked like a code failure. See plans/adr-041-ci-test-job-self-contained.md.
       - name: Install test dependencies (Python root)
-        run: pip install pytest pyyaml
+        # Wheel-only + pinned, same convention as yaml-validate.yml: unpinned or
+        # sdist-capable installs trip the SonarCloud security rules on new code.
+        run: "pip install --only-binary=:all: 'pytest==9.1.1' 'pyyaml==6.0.3'"
 
       - name: Run tests (Python root)
         run: pytest tests/ -v
