@@ -97,8 +97,14 @@ remains unbuilt. Do not treat the `run_summary.delta` numbers in
 | Signal | Producer | Consumer |
 |--------|----------|----------|
 | `duration_ms` per eval | `scripts/lib/eval_executors.py` (command checks) | `run-evals.py --format json` |
-| `total_tokens` per eval | `run_loop.py` `parse_token_usage()` from `claude --json` | `run-evals.py --format json` |
+| `total_tokens` per eval | `skill-creator/scripts/run_loop.py` `parse_token_usage()` from `claude --json` | `run_loop.py` output |
 | token/time budget verdict | `aggregate_benchmark.py` `evaluate_budget()` | `benchmark.md` |
+
+`run-evals.py` reports `total_tokens` as a hardcoded `0`
+(`scripts/lib/eval_types.py`). It is not a token measurement and never will be:
+that field belongs to `run_loop.py`, which is the only component in this template
+that invokes an agent CLI. Do not read a `run-evals.py` report as evidence that
+an eval consumed tokens.
 
 This covers **eval-harness cost, not agent trajectory cost**. It is a partial
 Tier 3, sufficient to catch a skill that inflates spend without reducing wasted

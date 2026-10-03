@@ -6,7 +6,15 @@ directory, references/ and scripts/ presence) and the *shape* of
 evals/evals.json -- required case fields and optional bucket taxonomy. It does
 not measure how many eval cases a skill has relative to its scope, and it never
 parses SKILL.md frontmatter: that lives in scripts/lib/skill-validation.sh.
-Behavioural eval execution lives in scripts/run-evals.py.
+
+No behavioural eval is executed anywhere in this template. scripts/run-evals.py
+is a static smoke runner: it re-checks structure, confirms that evals[].files
+resolve, and runs check_structure.py for skills that ship scripts/. It invokes
+no model and scores no assertion -- a case with an empty assertion list still
+reports PASS, because the default branch reports prompt *length*, not content.
+Paired with/without-skill trials (Tier 3) are not implemented; see
+agents-docs/SKILL_EVAL_TIERS.md. The only component here that calls an agent CLI
+and reads real token usage is skill-creator's scripts/run_loop.py.
 """
 from __future__ import annotations
 

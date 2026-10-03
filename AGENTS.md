@@ -97,7 +97,8 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 ```bash
 ./scripts/analyze-codebase.sh   # Autonomous analysis and self-learning
 ./scripts/check-adr-compliance.sh # Verify ADR registration and patterns
-./scripts/run-evals.py --skill dora-report # Mandatory monthly report
+./scripts/eval-skills.sh        # Eval schema + input-fixture check (runs in quality_gate.sh)
+./scripts/run-evals.py          # Optional local smoke run; no model is invoked
 ```
 
 **Guard Rails:** Temporary files in `/tmp` only. Never create debug, scripts, reports, or similar temporary files in the repository root. Gitleaks enforced via CI. Pre-commit validates git config (`SKIP_GLOBAL_HOOKS_CHECK=true` to bypass).
