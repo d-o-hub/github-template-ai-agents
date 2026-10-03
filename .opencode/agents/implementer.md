@@ -31,7 +31,7 @@ You have access to:
 
 ## 1. Blueprint Approval
 
-**GATED STEP**: A clear ADR with TRIZ contradiction analysis must exist. If no TRIZ analysis was performed upstream, invoke `triz-analysis` skill before proceeding.
+**GATED STEP**: A clear ADR with TRIZ contradiction analysis must exist. If no TRIZ analysis was performed upstream, invoke the `triz-solver` skill before proceeding.
 
 ## 2. Implementation
 

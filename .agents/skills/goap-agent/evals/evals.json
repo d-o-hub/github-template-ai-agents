@@ -16,7 +16,7 @@
     {
       "id": 2,
       "prompt": "Fix all 15 failing tests in our test suite",
-      "expected_output": "The agent decomposes into: run tests to identify failures → group by module → fix in parallel or sequentially → verify. Uses task-decomposition and selects appropriate agents.",
+      "expected_output": "The agent decomposes into: run tests to identify failures → group by module → fix in parallel or sequentially → verify. Decomposes into sub-goals and selects appropriate agents.",
       "files": [],
       "assertions": [
         "The agent first runs tests to identify specific failures",

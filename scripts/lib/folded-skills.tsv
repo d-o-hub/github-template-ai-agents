@@ -1,0 +1,27 @@
+# Folded skill names and their successors.
+#
+# ADR-038 consolidated the catalog; a name whose directory no longer exists is
+# dead routing. An agent told to "invoke `triz-analysis`" gets nothing, because
+# that skill is not there any more.
+#
+# Each row is: <folded-name> <TAB> <successor> <TAB> <origin>
+#
+# scripts/check-skill-references.sh scans the live agent surfaces for the first
+# column and fails, which is what LESSON-036 asked for and never got: it listed
+# the doc locations a merge must touch, but nothing verified them.
+#
+# Lines that document the fold ("absorbed from", "superseded", ...) are history,
+# not routing, and are exempt.
+#
+# Add a row whenever a skill directory is deleted or renamed.
+
+triz-analysis	triz-solver	ADR-038
+agent-coordination	goap-agent	ADR-038
+task-decomposition	goap-agent	b8970509
+parallel-execution	goap-agent	b8970509
+github-pr-sentinel	git-github-workflow	ADR-038
+testdata-builders	testing-strategy	ADR-038
+verification-template	skill-evaluator	ADR-038
+template-version-management	agents-docs/	ADR-038
+anti-ai-slop	avoid-ai-writing	b8970509
+codacy-cloud-cli	codacy	b8970509

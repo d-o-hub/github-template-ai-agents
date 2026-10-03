@@ -33,7 +33,8 @@
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
-| `update-agents-md.sh` | Regenerate skill table in AGENTS.md | `./scripts/update-agents-md.sh` |
+| `check-skill-references.sh` | Fail when a live agent/skill surface references a folded skill name (`scripts/lib/folded-skills.tsv`) | `./scripts/check-skill-references.sh` |
+| `check-agents-md-skills.sh` | Verify the AGENTS.md skill table matches `.agents/skills/` (the table is hand-curated, so it is checked, not generated) | `./scripts/check-agents-md-skills.sh` |
 | `update-agents-registry.sh` | Update AGENTS_REGISTRY.md | `./scripts/update-agents-registry.sh` |
 
 | `generate-skills-readme.py` | Auto-generate .agents/skills/README.md | `./scripts/generate-skills-readme.py` |
