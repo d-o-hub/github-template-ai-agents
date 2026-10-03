@@ -47,7 +47,8 @@
 |--------|---------|-------|
 | `swarm-worktree-web-research.sh` | Swarm analysis with web research | `./scripts/swarm-worktree-web-research.sh "topic"` |
 | `self-fix-loop.sh` | Auto-fix CI failures in a loop | `./scripts/self-fix-loop.sh` |
-| `run-evals.py` | Skill evaluation framework | `python3 scripts/run-evals.py` |
+| `run-evals.py` | Static smoke runner over `evals/evals.json` — structure, `files[]` resolution. Invokes no model | `python3 scripts/run-evals.py` |
+| `eval-skills.sh` | Static schema + fixture audit; gates in `quality_gate.sh` | `./scripts/eval-skills.sh` |
 | `gh-labels-creator.sh` | Create GitHub labels | `./scripts/gh-labels-creator.sh --ci` |
 
 | `minimal_quality_gate.sh` | Fast-path quality gate (CI debug) | `./scripts/minimal_quality_gate.sh` |
