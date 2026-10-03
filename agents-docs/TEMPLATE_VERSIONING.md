@@ -51,18 +51,22 @@ grep -rn "Template Version" --include="*.md" .
 
 ### 2. Bump the template version
 
-For a patch bump, use the existing script. It will:
+Edit `.template/CHANGELOG-TEMPLATE.md` directly and add the release heading:
 
-1. Read the current `VERSION` (0.0.0 in a template repo)
-2. Append a new `## [X.Y.Z] - YYYY-MM-DD` entry to `.template/CHANGELOG-TEMPLATE.md`
-3. Reset `VERSION` back to `0.0.0` for templates
-4. Run `propagate-version.sh` to update the README badge
+1. Add `## [X.Y.Z] - YYYY-MM-DD` at the top of the released sections, below
+   `## [Unreleased]`.
+2. Update the `README.md` version badge to match — it is the only doc that shows
+   one.
+3. Update `sonar.projectVersion` in `sonar-project.properties`. SonarCloud uses it
+   to anchor the new-code period, so a stale value silently keeps the window
+   open and stops resetting.
+4. Leave `VERSION` at `0.0.0`.
 
-```bash
-./scripts/bump_patch_version.sh
-```
-
-For minor/major template versions, edit `.template/CHANGELOG-TEMPLATE.md` directly, then run `propagate-version.sh`.
+Do **not** use `scripts/bump_patch_version.sh` here. It is a downstream-consumer
+utility: it derives the new version from `VERSION` (pinned to `0.0.0` in a
+template repo), so running it here rewrites the advertised `0.2.14` down to
+`0.0.1` instead of bumping anything. It also does not reset `VERSION` afterwards,
+which earlier revisions of this document claimed it did. See Common Pitfalls.
 
 ### 3. Fix a stale badge
 
@@ -83,8 +87,22 @@ This catches stale badges, broken version references, and any propagation drift.
 ## Common Pitfalls
 
 - **Editing `VERSION` to "fix" the template version.** `VERSION=0.0.0` is intentional; the template's version is in `.template/CHANGELOG-TEMPLATE.md`.
+- **Running `scripts/bump_patch_version.sh` in this repository.** It is a
+  downstream-consumer utility and it derives everything from `VERSION`, which is
+  pinned to `0.0.0` here. Measured in a sandbox, running it writes `0.0.1` into
+  `VERSION`, rewrites the `0.2.14` badge in `README.md` down to `0.0.1`, rewrites
+  `Template version:` text in `QUICKSTART.md` and `agents-docs/MIGRATION.md`, and
+  prepends a bogus `## [0.0.1]` entry to `.template/CHANGELOG-TEMPLATE.md`. It
+  does not bump the template version; it corrupts the advertised one. Cut a
+  template release by editing `.template/CHANGELOG-TEMPLATE.md`, the `README.md`
+  badge and `sonar.projectVersion` by hand, and leave `VERSION` at `0.0.0`.
+  Fixing this *inside* the script is the wrong move — see the next pitfall.
 - **Adding a "Template Version" badge to a new doc file.** `README.md` is the only one. Link to `README.md` or `.template/CHANGELOG-TEMPLATE.md` instead.
 - **Modifying `scripts/propagate-version.sh` or `bump_patch_version.sh` to read from `.template/CHANGELOG-TEMPLATE.md`.** They are general-purpose utilities for downstream consumers. Keep their `VERSION`-based design.
+- **Guarding a template-only hazard inside a consumer script.** A template
+  concern does not belong in a script that ships to every adopting repository,
+  even when the hazard is real and the fix is a three-line guard. Put the
+  template-side answer in this file instead.
 - **Manually editing the README badge instead of running `propagate-version.sh`.** The script is the source of truth; manual edits get overwritten on the next propagation.
 - **Forgetting to reset `VERSION` to `0.0.0` after a template release.** Downstream consumers clone the template and expect a clean starting point.
 
