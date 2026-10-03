@@ -104,7 +104,7 @@
 | Skill | Description |
 |-------|-------------|
 | `test-runner` | Execute tests, analyze results, and diagnose failures across any testing framework. Use this skill when running test suites, debugging failing tests, or configuring CI/CD testing pipelines — even if they just say "run the tests" or "why is this test failing". Not for debugger (build/deploy/runtime failures outside a suite), testing-strategy. |
-| `testing-strategy` | Design and implement comprehensive testing strategies for software projects. Use this skill when planning test suites, choosing testing approaches like property-based testing, visual regression, load testing, mutation testing, or E2E test generation — even if they just say "how should we test this" or "what testing approach should we use". Not for test-runner, testdata-builders. |
+| `testing-strategy` | Design and implement comprehensive testing strategies for software projects. Use this skill when planning test suites, choosing testing approaches like property-based testing, visual regression, load testing, mutation testing, or E2E test generation — even if they just say "how should we test this" or "what testing approach should we use". Not for test-runner. |
 
 ## Tool
 
