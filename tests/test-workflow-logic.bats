@@ -35,9 +35,15 @@
     grep -q "uses: actions/setup-python@" .github/workflows/ci.yml
 }
 
-@test "workflow has change detection job" {
-    grep -q "name: Detect Changes" .github/workflows/ci.yml
-    grep -q "dorny/paths-filter" .github/workflows/ci.yml
+@test "workflow has no path-filtered job gating validation" {
+    # Reversed 2026-10-02. The change-detection job existed only to feed
+    # needs.changes.outputs.* into quality-gate's `if:`, and ADR-040's fail-closed
+    # artifact turns a skipped required job into `unknown` -- so a docs-only or
+    # plans-only PR could not be certified and merging one turned main red.
+    # The filter now gates nothing, so the job is gone instead of left as
+    # decoration that invites the same regression.
+    ! grep -q "name: Detect Changes" .github/workflows/ci.yml
+    ! grep -q "dorny/paths-filter" .github/workflows/ci.yml
 }
 
 @test "workflow runs quality gate" {
@@ -77,4 +83,22 @@
 @test "ci-success declares the skip allowlist from a repository variable" {
     sed -n '/ci-success:/,/^  [a-z]/p' .github/workflows/ci.yml \
         | grep -q 'CI_STATUS_ALLOWED_SKIPS: ${{ vars.CI_STATUS_ALLOWED_SKIPS }}'
+}
+
+@test "quality-gate is unconditional so a docs-only PR can be certified" {
+    # ADR-040: a skipped required job records `unknown`, never `passing`. With a
+    # path filter over source extensions, a plans-only or docs-only PR left
+    # quality-gate skipped, so `CI Success` failed with
+    # "CI gate NOT satisfied (status=unknown)" and main went red on merge.
+    # ADR-041 fixed the test job; this pins the gate job.
+    job=$(sed -n '/^  quality-gate:/,/^  [a-z]/p' .github/workflows/ci.yml)
+    ! grep -q "needs.changes" <<< "$job"
+    ! grep -q "outputs.code" <<< "$job"
+}
+
+@test "the dead path-filter job is gone rather than left as decoration" {
+    # Nothing consumed needs.changes.outputs.* once the gate became
+    # unconditional, so keeping the filter would invite the same regression.
+    ! grep -q "Detect Changes" .github/workflows/ci.yml
+    ! grep -q "dorny/paths-filter" .github/workflows/ci.yml
 }
