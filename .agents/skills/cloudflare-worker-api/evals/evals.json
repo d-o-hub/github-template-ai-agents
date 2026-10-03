@@ -5,21 +5,21 @@
       "id": 1,
       "prompt": "Create a new API route for user profile updates with input validation",
       "expected_output": "Implements a typed route handler with Zod schema validation and consistent error responses",
-      "files": ["src/routes/profile.ts"],
+      "files": ["evals/files/routes/profile.ts"],
       "assertions": ["Uses Zod for validation", "Returns consistent error format", "Has typed request/response"]
     },
     {
       "id": 2,
       "prompt": "Add rate limiting and CORS headers to all public endpoints",
       "expected_output": "Configures CORS middleware and rate limiting on unprotected routes without affecting authenticated endpoints",
-      "files": ["src/middleware.ts"],
+      "files": ["evals/files/middleware.ts"],
       "assertions": ["CORS headers present", "Rate limiting applied to public routes", "Authenticated routes unaffected"]
     },
     {
       "id": 3,
       "prompt": "Review this Worker API for security issues: hardcoded secrets, missing auth, and injection risks",
       "expected_output": "Flags hardcoded credentials, unprotected routes, and unsanitized input as security findings",
-      "files": ["src/routes/admin.ts"],
+      "files": ["evals/files/routes/admin.ts"],
       "assertions": ["Detects hardcoded secrets", "Identifies missing auth middleware", "Flags input injection risks"]
     }
   ]

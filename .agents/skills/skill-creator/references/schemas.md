@@ -14,7 +14,7 @@ Test case definitions for evaluating skill behavior.
       "id": 1,
       "prompt": "User's task prompt text",
       "expected_output": "Description of what correct output looks like",
-      "files": ["path/to/input/file.md"],
+      "files": [],
       "assertions": [
         "The output includes X",
         "The output is valid JSON"
@@ -31,8 +31,38 @@ Test case definitions for evaluating skill behavior.
 | `evals[].id` | integer | yes | Unique test case identifier |
 | `evals[].prompt` | string | yes | User prompt to test |
 | `evals[].expected_output` | string | yes | Description of expected result |
-| `evals[].files` | array | no | File paths relative to skill root |
+| `evals[].files` | array | no | Input fixture paths, relative to the skill root. Omit or use `[]` when the case needs no input file |
 | `evals[].assertions` | array | yes | Verifiable claims about output |
+
+### Input fixtures (`files[]`)
+
+`files` is **optional**. Most cases are behavioural — a prompt and what a good
+answer looks like — and correctly declare `"files": []`. Populate it only when
+the scenario needs an input document.
+
+When you do populate it, the path is **relative to the skill root** and the
+file **must exist**:
+
+```json
+"files": ["evals/files/sample1.pdf"]
+```
+
+Two rules that are easy to get wrong:
+
+1. **Fixtures live under `evals/files/`.** This is a convention, not something
+   the tooling enforces: a path is resolved against the skill root, so
+   `src/routes/admin.ts` would resolve *if that file existed*. It does not,
+   because these skills ship prose in `references/` rather than runnable
+   source — and a case naming it fails for missing a fixture, which reads like
+   a regression in the skill rather than a mistake in the eval.
+2. **The file has to be committed.** `scripts/eval-skills.sh` verifies that
+   every non-empty `files[]` path exists, so a dangling fixture fails the gate
+   instead of being reported as a missing input at report time.
+
+A path naming a credential-shaped file (`pyproject.toml`, `.env.example`,
+anything under `.git/`) is refused by `scripts/lib/paths.py`, which blocks
+overwrites of sensitive paths before the eval runs. Model that case with
+`"files": []` and describe the artefact in `prompt` instead.
 
 ## grading.json
 

@@ -28,6 +28,13 @@ exclude_paths:
   # subprocess list-form calls, and tempdir fixtures are safe patterns, and
   # excluding the whole tree avoids re-adding a path each time a test is added.
   - "tests/**"
+  # Skill eval fixtures. These are input *data* for an eval case, not code the
+  # template ships or executes: run-evals.py only checks that files[] resolves.
+  # The database-devops migration also drew a T-SQL-only rule (TSLint wants
+  # SET QUOTED_IDENTIFIER ON) that no portable SQL can satisfy, and per-rule
+  # suppression in sonar-project.properties was measured not to reach Codacy's
+  # own engines. Excluding the tree is the same treatment tests/** already gets.
+  - "**/evals/files/**"
   # Shell templates: ${var:?} is standard bash parameter validation.
   - ".agents/skills/agent-browser/templates/**"
 

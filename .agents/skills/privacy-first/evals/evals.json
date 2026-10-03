@@ -5,21 +5,21 @@
       "id": 1,
       "prompt": "Scan this README.md for any email addresses that should be removed",
       "expected_output": "Identifies email addresses and replaces them with GitHub Issues links or generic placeholders",
-      "files": ["README.md"],
+      "files": ["evals/files/README.md"],
       "assertions": ["Detects email addresses", "Replaces with GitHub Issues URL", "Does not flag example.com addresses"]
     },
     {
       "id": 2,
       "prompt": "Check pyproject.toml for personal data leaks before we publish",
       "expected_output": "Removes email fields from package metadata and authors list",
-      "files": ["pyproject.toml"],
+      "files": [],
       "assertions": ["Removes email from authors", "Preserves non-personal metadata", "Does not break package structure"]
     },
     {
       "id": 3,
       "prompt": "Add a contact section to our CONTRIBUTING.md but make sure no personal emails end up in it",
       "expected_output": "Adds a contact section that references GitHub Issues instead of an email address",
-      "files": ["CONTRIBUTING.md"],
+      "files": ["evals/files/CONTRIBUTING.md"],
       "assertions": ["Uses GitHub Issues link", "Contains no email addresses", "Section is present and functional"]
     }
   ]

@@ -19,6 +19,9 @@
 #      otherwise pass unnoticed; reported as missing all four required fields.
 #   5. SKILL.md content, via an awk pass: the only content rule is that the
 #      doc must not reference a non-existent "should_trigger" key.
+#   6. Input fixtures, via a Python pass: every path in a non-empty
+#      evals[].files must exist under the skill root, so a case cannot name a
+#      fixture that was never committed.
 #
 # What this script does NOT check:
 #   - SKILL.md YAML frontmatter. It is never parsed; no frontmatter key (name,
@@ -124,6 +127,49 @@ for eval_file in "$SKILLS_DIR"/*/evals.json "$SKILLS_DIR"/*/evals/evals.json; do
   fi
 done
 shopt -u nullglob
+
+
+# Check 6: every path in a non-empty evals[].files must exist.
+#
+# The agentskills.io / NVIDIA SkillEvaluator convention is that files[] names
+# input fixtures relative to the skill root, staged into the eval workspace.
+# Nothing in the repo verified they were real, so a case could name a path that
+# was never committed and scripts/run-evals.py would then report it as a
+# missing input -- indistinguishable from a genuinely absent fixture.
+if ! python3 - "$SKILLS_DIR" <<'PYTHON_FIXTURE_CHECK'; then
+import json
+import sys
+from pathlib import Path
+
+skills_dir = Path(sys.argv[1])
+failed = False
+
+for evals_path in sorted(skills_dir.glob("*/evals/evals.json")) + sorted(
+    skills_dir.glob("*/evals.json")
+):
+    skill_root = evals_path.parent.parent
+    skill_name = skill_root.name
+    try:
+        evals = json.loads(evals_path.read_text()).get("evals", [])
+    except (OSError, json.JSONDecodeError):
+        continue  # reported by the field checks above
+
+    for case in evals:
+        for rel in case.get("files") or []:
+            if not isinstance(rel, str):
+                continue  # object form is rejected by the awk pass above
+            if not (skill_root / rel).is_file():
+                print(
+                    f" [FAIL] {skill_name}: eval #{case.get('id', '?')} names "
+                    f"files[] entry '{rel}', which does not exist under the "
+                    f"skill root"
+                )
+                failed = True
+
+sys.exit(1 if failed else 0)
+PYTHON_FIXTURE_CHECK
+  FAILED=1
+fi
 
 
 # Optimization: Use batched awk pass via xargs for SKILL.md validation instead of loop with grep

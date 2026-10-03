@@ -5,21 +5,21 @@
       "id": 1,
       "prompt": "Audit this Python codebase for SQL injection vulnerabilities",
       "expected_output": "Identifies string concatenation in SQL queries and recommends parameterized queries",
-      "files": ["src/db.py"],
+      "files": ["evals/files/src/db.py"],
       "assertions": ["Reports SQL injection risk", "Recommends parameterized queries", "Classifies severity"]
     },
     {
       "id": 2,
       "prompt": "Check this repository for hardcoded secrets and credentials",
       "expected_output": "Detects hardcoded API keys, tokens, or passwords and flags them as high severity",
-      "files": ["src/config.py", ".env.example"],
+      "files": ["evals/files/src/config.py"],
       "assertions": ["Detects hardcoded secrets", "Suggests environment variables or vault usage", "Does not flag example/placeholder values"]
     },
     {
       "id": 3,
       "prompt": "Review the security headers and CORS configuration in this Express app",
       "expected_output": "Identifies missing CSP, HSTS, and overly permissive CORS settings with remediation steps",
-      "files": ["src/server.ts"],
+      "files": ["evals/files/src/server.ts"],
       "assertions": ["Checks for CSP header", "Validates CORS policy", "Provides specific header recommendations"]
     }
   ]
