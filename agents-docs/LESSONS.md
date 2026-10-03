@@ -1615,3 +1615,80 @@ Codacy posts within about a minute. Do this only after the branch is up to date 
 **Tags**: #github-actions #ci #codacy #branch-protection #skip-ci #required-checks
 
 **Files Modified**: (workflow/PR message only, no source changes)
+
+---
+
+## Condensed records (reconciled 2026-10-02, ADR-042)
+
+The entries below were recorded first in `self-learning-rules.md` as runtime
+notes and never given a verbose entry here, so `LESSONS.md` skipped the ids
+while still being cited as the catalog. They are reproduced from that index
+verbatim rather than expanded: the detail those lessons recorded is the detail
+recorded here, and inventing a symptoms/root-cause structure they never had
+would make the catalog look more trustworthy than it is.
+
+### LESSON-029 — Bots Bypass Commit Conventions
+
+**Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
+
+`google-labs-jules[bot]`, `dependabot[bot]`, and `github-copilot[bot]` produce prose-style commit subjects that fail commitlint. Layered defense: (1) `scripts/commit-msg-hook.sh` for local contributors, (2) `lint-pr-title` job in `commitlint.yml` to fail the PR title, (3) `normalize-commits.sh` rewriter for bot branches, (4) sentinel auto-fix with `chore(commit): normalize bot commits to conventional format`. See ADR-008.
+
+### LESSON-030 — wagoid/commitlint-github-action v6 Inputs
+
+**Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
+
+v6 dropped `from`/`to` inputs and now infers the range from the PR/push event. Passing them produces `Unexpected input(s)` warnings. Use `commitDepth: 0` (push) or omit (PR) — see ADR-008.
+
+### LESSON-031 — Squash Merge Body-Length Failures
+
+**Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
+
+Disable `body-max-length` in commitlint config (`[0]`) for repos using squash merges; GitHub concatenates PR title+body as the commit message, causing recurring failures on main. Enforce body length at PR level instead via a step in the commitlint workflow that fails if body >1000 chars.
+
+### LESSON-032 — Automated PR Auto-Merge
+
+**Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
+
+All workflows that create PRs (ci.yml, update-llms-txt.yml) MUST auto-merge with `gh pr merge --squash --admin --delete-branch=false` immediately after creation/reuse. Without auto-merge, automated PRs linger as open and require manual cleanup. Use `--admin` to bypass required status checks that would deadlock.
+
+### LESSON-033 — BATS Subshell Variable Loss
+
+**Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
+
+Piped `while read` loops run in subshells; variables modified inside are lost. Use heredoc `<<< "$var"` instead of `printf ... | while read` to keep the loop in the current shell.
+
+### LESSON-034 — gh pr create Does Not Support --json
+
+**Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
+
+`gh pr create` does not accept `--json`/`--jq` flags. To get the PR number after creation, capture the URL from stdout: `PR_URL=$(gh pr create ...) && PR_NUM=$(gh pr view "$PR_URL" --json number --jq '.number')`.
+
+### LESSON-035 — Metrics JSONL Merge Conflicts
+
+**Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
+
+Concurrent PRs often conflict on the tail of per-agent metrics files. Resolved via per-agent file isolation (`.agents/metrics/metrics-{agent}.jsonl`) and `merge=union` in `.gitattributes` for same-agent collisions. See `scripts/log-metric.sh`.
+
+### LESSON-037 — SKILL.md Line Limit Management
+
+**Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
+
+Adhere to `MAX_LINES_PER_SKILL_MD=250` by moving exhaustive pattern tables and vocabulary lists to `references/patterns.md`.
+
+### LESSON-043 — Ghost Dirs Trip Validators
+
+**Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
+
+`git rm -r` leaves ignored artifacts (`__pycache__/`) behind, so empty skill dirs persist and directory-iterating validators (`validate-skills.sh`) fail with Missing SKILL.md. Follow every skill deletion with `rm -rf` on the path.
+
+### LESSON-044 — New Skills Need a Post-Creation Audit
+
+**Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
+
+Freshly created skills ship with one-way `Not for` guards and positive-scope-only evals, so routing defects are invisible until they misfire. Audit axes: sibling trigger overlap, bidirectional guards, routing near-miss evals, fail-closed evidence, registry mirrors (ADR-039).
+
+### LESSON-045 — Description Edits Are 6-Site Edits
+
+**Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
+
+A skill `description:` change propagates to 5-6 generated files (AVAILABLE_SKILLS.md, skills-reference.md, skill-catalog.md, .agents/skills/README.md, llms-full.txt, AGENTS_REGISTRY.md). Always regenerate; never hand-edit.

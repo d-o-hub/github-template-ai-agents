@@ -17,6 +17,22 @@
 {"id": "LESSON-017", "date": "2026-05-31", "component": "CI/CD", "title": "CI Workflow Symlink Dependency - validate-skills Requires setup-skills First", "severity": "High", "tags": ["ci", "symlinks", "skills", "validate-skills", "setup-skills", "quality-gate"]}
 {"id": "LESSON-018", "date": "2026-05-31", "component": "Scripts", "title": "Locale-Dependent Sort Causes CI Drift Detection", "severity": "High", "tags": ["scripts", "sort", "locale", "lc_all", "drift", "ci", "portability"]}
 {"id": "LESSON-019", "date": "2026-05-31", "component": "Scripts", "title": "Nested node_modules Not Excluded from Quality Gate Find", "severity": "Medium", "tags": ["scripts", "find", "node_modules", "quality-gate", "markdownlint", "glob"]}
+{"id": "LESSON-020", "title": "Dependabot Auto-Merge Skipped - github.actor vs PR Author on Synchronize", "date": "2026-06-02", "component": "CI/CD / GitHub Actions / Dependabot", "severity": "High"}
+{"id": "LESSON-021", "title": "CI Status File Staleness After Direct Pushes", "date": "2026-06-02", "component": "CI/CD / Artifacts / Agent Guardrails", "severity": "Medium"}
+{"id": "LESSON-022", "title": "CI Status PR Recreation - Duplicate Auto-Generated PRs", "date": "2026-06-02", "component": "CI/CD / Pull Requests / GitHub Actions / Stale Bot", "severity": "High"}
+{"id": "LESSON-023", "title": "Dependabot Auto-Merge — GraphQL Native Merge vs REST Direct Merge", "date": "2026-06-02", "component": "CI/CD / GitHub Actions / Dependabot / Auto-Merge", "severity": "Critical"}
+{"id": "LESSON-024", "title": "ADR Compliance Gate Already Exists — Registration Required, Not Gate Creation", "date": "2026-06-02", "component": "Quality Gate / ADR Compliance / CI/CD", "severity": "Low"}
+{"id": "LESSON-025", "title": "BATS Markdown Fixtures — Trailing Newline for MD047", "date": "2026-06-02", "component": "Testing / Quality Gate / Markdown Lint", "severity": "Low"}
+{"id": "LESSON-026", "title": "act CI Simulation — Requires Docker + act Binary", "date": "2026-06-02", "component": "CI/CD / Dev Tools", "severity": "Low"}
+{"id": "LESSON-027", "title": "CI Status PR Auto-Detection — System Working as Designed", "date": "2026-06-02", "component": "CI/CD / Monitoring", "severity": "Low"}
+{"id": "LESSON-028", "title": "Codacy SonarPython Inline Suppressions Don't Work — Use File Exclusion or Constant Extraction", "date": "2026-06-03", "component": "CI/CD / Codacy / Static Analysis", "severity": "High"}
+{"id": "LESSON-029", "title": "Bots Bypass Commit Conventions"}
+{"id": "LESSON-030", "title": "wagoid/commitlint-github-action v6 Inputs"}
+{"id": "LESSON-031", "title": "Squash Merge Body-Length Failures"}
+{"id": "LESSON-032", "title": "Automated PR Auto-Merge"}
+{"id": "LESSON-033", "title": "BATS Subshell Variable Loss"}
+{"id": "LESSON-034", "title": "gh pr create Does Not Support --json"}
+{"id": "LESSON-035", "title": "Metrics JSONL Merge Conflicts"}
 {"id": "LESSON-036", "date": "2026-06-18", "component": "Skills", "title": "Skill Merge Requires 5 Coordinated Doc Locations; markdownlint-cli2 default:true Is Not Obvious", "severity": "High", "tags": ["skills", "merge", "markdownlint", "250-line-limit", "triple-write", "documentation-coordination"]}
 {"id": "LESSON-037", "date": "2026-06-28", "component": "Skills", "title": "SKILL.md Line Limit Management via External Reference Files", "severity": "Medium", "tags": ["skills", "documentation", "linting", "context-optimization", "MD022"]}
 {"id": "LESSON-038", "date": "2026-07-03", "component": "Documentation / AGENTS.md / Knowledge Architecture", "title": "AGENTS.md Restructure: agents-docs/ Split Requires 4 Coordinated Updates", "severity": "Medium", "tags": ["documentation", "restructure", "quality-gate", "markdownlint", "agents-docs"]}
@@ -24,4 +40,7 @@
 {"id": "LESSON-040", "date": "2026-09-27", "component": "GitHub Actions / PR workflow", "title": "Bot Sync-Merge SHAs Report action_required, Not Failure", "severity": "Medium", "tags": ["github-actions", "ci", "bot", "jules", "merge-queue"]}
 {"id": "LESSON-041", "date": "2026-09-27", "component": "GitHub PR merge workflow", "title": "Merge-At-Once Beats Main-Churn Races", "severity": "Medium", "tags": ["github", "merge", "ci-churn", "auto-merge"]}
 {"id": "LESSON-042", "date": "2026-09-27", "component": "GitHub CLI / API", "title": "gh pr edit Label Ops Need REST Fallback", "severity": "Low", "tags": ["github-cli", "graphql", "labels", "workaround"]}
+{"id": "LESSON-043", "title": "Ghost Dirs Trip Validators"}
+{"id": "LESSON-044", "title": "New Skills Need a Post-Creation Audit"}
+{"id": "LESSON-045", "title": "Description Edits Are 6-Site Edits"}
 {"id": "LESSON-046", "date": "2026-10-02", "component": "GitHub Actions / branch protection / Codacy", "title": "[skip ci] on a PR Head Silently Suppresses the Required Codacy Check", "severity": "Medium", "tags": ["github-actions", "ci", "codacy", "branch-protection", "skip-ci", "required-checks"]}
