@@ -1,7 +1,7 @@
 # Skill Catalog
 
 > Auto-generated from `.agents/skills/` directory.
-> Last updated: 2026-10-02
+> Last updated: 2026-10-03
 > Do not edit manually. Run `./scripts/generate-skill-catalog.sh`.
 > Description budget: 1024 chars (Agent Skills spec cap).
 > Elided text ends on a word boundary and always keeps the `Not for <sibling>` guard.
