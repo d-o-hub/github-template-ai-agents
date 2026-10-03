@@ -138,6 +138,7 @@ FORBIDDEN_PATHS = frozenset({
     ".wgetrc",
     ".m2",
     ".netrc.bak",
+    ".gradle",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
