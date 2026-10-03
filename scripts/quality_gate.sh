@@ -232,6 +232,15 @@ if [[ -f "./scripts/check-agents-md-skills.sh" ]]; then
     printf "\n"
 fi
 
+# --- Lesson record consistency check ---
+if [[ -f "./scripts/check-lessons-consistency.sh" ]]; then
+    printf "%bChecking lesson record consistency...%b\n" "${BLUE}" "${NC}"
+    if ! ./scripts/check-lessons-consistency.sh; then
+        FAILED=1
+    fi
+    printf "\n"
+fi
+
 # --- Folded skill reference check ---
 if [[ -f "./scripts/check-skill-references.sh" ]]; then
     printf "%bChecking for references to folded skills...%b\n" "${BLUE}" "${NC}"
