@@ -43,11 +43,13 @@ if [[ "$CHANGED_FILES" == *".agents/skills/"* ]]; then
         echo "Skills changed - updating documentation..."
     fi
     
-    # Update AGENTS.md skill table
-    if [[ -f "$REPO_ROOT/scripts/update-agents-md.sh" ]]; then
-        "$REPO_ROOT/scripts/update-agents-md.sh" 2>/dev/null || true
-        git add AGENTS.md 2>/dev/null || true
-        DOCS_UPDATED=true
+    # The AGENTS.md skill table is hand-curated by category, so it is verified
+    # rather than generated. Report drift; scripts/check-agents-md-skills.sh
+    # is the gate that fails on it.
+    if [[ -f "$REPO_ROOT/scripts/check-agents-md-skills.sh" ]]; then
+        if ! "$REPO_ROOT/scripts/check-agents-md-skills.sh" >/dev/null 2>&1; then
+            echo "Warning: AGENTS.md skill table has drifted from .agents/skills/ -- run scripts/check-agents-md-skills.sh" >&2
+        fi
     fi
     
     # Update agents registry if agent configs changed

@@ -36,7 +36,7 @@ Purpose: deliver intentional, localized, accessible reader/admin UX.
 
 ## See Also
 
-- `anti-ai-slop` — Avoid AI slop in UI/UX
+- `avoid-ai-writing` — Avoid AI slop in UI/UX
 - `css-render-performance` — CSS render performance optimization
 
 ## Rationalizations

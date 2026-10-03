@@ -144,7 +144,7 @@ Multiple specialized agents analyze from different perspectives.
 ### Example: UI/UX Optimization
 
 ```
-1. anti-ai-slop agent    → Authenticity review
+1. avoid-ai-writing      → Authenticity review
 2. ui-ux-optimize agent  → Usability analysis
 3. Accessibility agent    → a11y compliance
 4. Synthesizer           → Combined recommendations
