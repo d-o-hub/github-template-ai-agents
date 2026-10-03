@@ -1,6 +1,6 @@
 description = "Create a structured plan for a complex task"
 prompt = """
-Invoke the task-decomposition skill.
+Invoke the goap-agent skill.
 Analyze the user request and break it down into atomic, actionable steps.
 For each step, specify:
 1. The goal and success criteria
