@@ -55,6 +55,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Documentation no longer claims this template runs behavioural evals.
+  `AGENTS.md` listed `run-evals.py --skill <name>` as a "Mandatory monthly
+  report"; `reports/` has never held a report, the script is in neither CI nor
+  `quality_gate.sh`, and it invokes no model. Across 218 cases, none declares a
+  `type`; the default branch reports prompt *length* rather than content, so a
+  case with an empty `assertions` list still reports PASS, and roughly 200 skip
+  with "No scripts directory found". `AGENTS.md` now points at
+  `scripts/eval-skills.sh`, which is a real gate. The same correction applies to
+  `skill-evaluator`'s `check_structure.py` docstring — which told every adopting
+  repository that "behavioural eval execution lives in scripts/run-evals.py" —
+  and to the `run-evals.py` row in `agents-docs/SCRIPTS.md`.
+  `agents-docs/SKILL_EVAL_TIERS.md` already recorded Tier 3 paired trials as *Not
+  implemented*; the surrounding claims now match it.
+- `SKILL_EVAL_TIERS.md` no longer attributes `total_tokens` to
+  `run-evals.py`. That field is a hardcoded `0` in `scripts/lib/eval_types.py`;
+  real token accounting lives in `skill-creator/scripts/run_loop.py`.
 - `scripts/update-agents-md.sh` is replaced by
   `scripts/check-agents-md-skills.sh`. The old script exited 1 on every
   invocation — its section-end probe was a `grep | cut | awk` pipeline under
