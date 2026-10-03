@@ -245,3 +245,16 @@ def test_run_file_validation_key_token_prefixes_rejected(tmp_path):
     assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
     assert result.message == "Missing 6 file(s)"  # nosec B101 -- test assertion
     assert result.details == [f"Missing: {name}" for name in names]  # nosec B101 -- test assertion
+
+
+def test_run_file_validation_gradle_rejected(tmp_path):
+    """Consumer regression: eval file-validation must reject repo-local .gradle files."""
+    skill_path = tmp_path / "skill"
+    skill_path.mkdir()
+    (skill_path / ".gradle").mkdir()
+
+    eval_case = {"id": 1, "files": [".gradle"]}
+    result = eval_executors.run_file_validation(eval_case, skill_path, False)
+    assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
+    assert result.message == "Missing 1 file(s)"  # nosec B101 -- test assertion
+    assert result.details == ["Missing: .gradle"]  # nosec B101 -- test assertion
