@@ -1,19 +1,14 @@
 # CI Summary
 
-Latest CI status: **unknown**
+Latest CI status: **passing**
 
-- **Last Run:** 2026-10-02T17:30:08.484271Z
+- **Last Run:** 2026-10-03T11:40:06.672888Z
 - **Schema Version:** 3
-- **Workflow URL:** [https://github.com/d-o-hub/github-template-ai-agents/actions/runs/37040434293](https://github.com/d-o-hub/github-template-ai-agents/actions/runs/37040434293)
-
-> ⚠️ Required jobs skipped outside the allowlist: quality-gate
->
-> This artifact is **advisory**. Only a required status check can block a
-> merge; see [GitHub docs on status checks](https://docs.github.com/en/pull-requests/reference/status-checks)
+- **Workflow URL:** [https://github.com/d-o-hub/github-template-ai-agents/actions/runs/37120162038](https://github.com/d-o-hub/github-template-ai-agents/actions/runs/37120162038)
 
 ## Job Status
 
 | Job | Result |
 | --- | --- |
-| quality-gate | ⏭️ skipped |
+| quality-gate | ✅ success |
 | test | ✅ success |
