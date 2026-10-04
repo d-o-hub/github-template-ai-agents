@@ -139,11 +139,19 @@ main() {
       [[ -n "$fpath" ]] && pr_patch_hash["$num:$fpath"]="$ph"
     done <<< "$sections"
     # Jules task id: task URL in the body first, branch-name id as fallback.
+    # perf: Replace multiple external command subshells (grep, head, tr) with native bash regex matching
+    # to significantly reduce process fork overhead per loop iteration
     body="$(gh pr view "$num" --json body --jq '.body' 2>/dev/null || true)"
-    task_id="$(printf '%s' "$body" | grep -oE 'jules\.google\.com/task/[0-9]+' | head -1 | grep -oE '[0-9]+$' || true)"
+    if [[ "$body" =~ jules\.google\.com/task/([0-9]+) ]]; then
+      task_id="${BASH_REMATCH[1]}"
+    else
+      task_id=""
+    fi
     if [[ -z "$task_id" ]]; then
       head_ref="$(gh pr view "$num" --json headRefName --jq '.headRefName' 2>/dev/null || true)"
-      task_id="$(printf '%s' "$head_ref" | grep -oE '(^|-)[0-9]{15,}(-|$)' | head -1 | tr -d '-' || true)"
+      if [[ "$head_ref" =~ (^|-)([0-9]{15,})(-|$) ]]; then
+        task_id="${BASH_REMATCH[2]}"
+      fi
     fi
     pr_task["$num"]="$task_id"
   done < <(printf '%s\n' "$pr_rows")
