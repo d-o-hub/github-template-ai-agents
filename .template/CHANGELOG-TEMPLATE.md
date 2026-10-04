@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- LESSON-046's root cause was wrong and has been corrected. It attributed a
+  missing `Codacy Static Code Analysis` check to `[skip ci]` on the PR head and
+  prescribed `git commit --amend` plus a force-push. Its own evidence refutes it:
+  #952 carries no skip directive and never received a check, while #973 has a
+  byte-identical title to #956 and received one 26 minutes after creation.
+  `[skip ci]` is neither necessary nor sufficient. Codacy was not posting status
+  checks at all on 2026-10-01/02 and has posted consistently since 2026-10-03,
+  which matches Codacy's documented "Status checks" setting in the GitHub
+  integration. The amend-and-force-push remedy is retracted; `codacy pull-request
+  <n> --reanalyze` re-reports without rewriting history.
+- `agents-docs/WORKFLOW.md` gains a *Waiting for CI* section recording the
+  measured 8–26 minute latency of the required Codacy check and the procedure to
+  follow while it is absent. Nothing in the repository previously said how long to
+  wait, which is what led to a correct integration being misread as a broken one.
+
+## [0.2.15] - 2026-10-04
+
+### Fixed
+
 - Eval fixtures now resolve. Eleven eval cases across four skills named a
   `files[]` path that was never committed — `src/routes/profile.ts`,
   `migrations/20260101_add_settings.sql`, `src/db.py`, `pyproject.toml` — so

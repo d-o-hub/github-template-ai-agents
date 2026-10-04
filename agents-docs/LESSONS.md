@@ -1580,13 +1580,14 @@ Also applied consistently across the frontmatter parsing block by replacing all 
 
 **Files Modified**: (workflow only, no source changes)
 
-### LESSON-046 — `[skip ci]` on a PR Head Silently Suppresses the Required Codacy Check
+### LESSON-046 — A Missing Required Codacy Check Was a Disabled Setting, Not `[skip ci]`
 
 **Date**: 2026-10-02
+**Revised**: 2026-10-04 (root cause corrected — see below)
 **Component**: GitHub Actions / branch protection / Codacy
 **Severity**: Medium
 
-**Issue**: PRs #952 and #956 stayed `BLOCKED` while every check GitHub actually displayed was green (`CodeQL`, `SonarCloud Code Analysis`, `Analyze (python|actions|javascript-typescript)`). The ruleset's one required check, `Codacy Static Code Analysis`, was simply absent from `gh pr checks`.
+**Issue**: PRs #952 and #956 stayed `BLOCKED` while every check GitHub displayed was green (`CodeQL`, `SonarCloud Code Analysis`, `Analyze (python|actions|javascript-typescript)`). The ruleset's one required check, `Codacy Static Code Analysis`, was absent from `gh pr checks`.
 
 **Symptoms**:
 - `gh pr checks <n>` lists every external check **except** `Codacy Static Code Analysis`
@@ -1595,26 +1596,47 @@ Also applied consistently across the frontmatter parsing block by replacing all 
 - Re-running workflows does nothing, because Codacy is not an Actions job — there is nothing to re-run
 - Reads like "Codacy is slow", which is the wrong conclusion: it will never arrive
 
-**Root Cause**: both head commits carried `[skip ci]` in the message. GitHub's skip directive applies to `push` and `pull_request`-triggered workflows **and** to external apps that honour the same token, so Codacy never posts a check at all. A required check that is never *reported* is indistinguishable from one that is pending: the branch ruleset (`strict_required_status_checks_policy: true`) blocks the merge either way. The missing row in `gh pr checks` **is** the error signal — absence, not a visible failure.
+**Correction (2026-10-04).** The original entry attributed this to `[skip ci]` on the PR head, and prescribed `git commit --amend` to strip it plus a force-push. Both are wrong, and the evidence was in the same PR list:
 
-**Solution**:
+| PR | Title | Codacy check |
+|----|-------|--------------|
+| #952 | `docs(dora): monthly DORA performance report update` | never arrived |
+| #956 | `ci: update ci status artifacts [skip ci]` | never arrived |
+| #973 | `ci: update ci status artifacts [skip ci]` | arrived, 26.3 min after PR creation |
+| #975 | `ci: update ci status artifacts [skip ci]` | arrived, 11.6 min |
+| #977 | `ci: update ci status artifacts [skip ci]` | arrived, 9.4 min |
+| #982 | `ci: update ci status artifacts [skip ci]` | arrived, 8.4 min |
+
+PR #952 carries **no** skip directive, so `[skip ci]` is not necessary. PRs #973 and #956 have **byte-identical titles**, so it is not sufficient either. Both hold, so the stated root cause is falsified by its own evidence.
+
+**Actual root cause**: Codacy was not posting PR status checks at all on 2026-10-01/02, and was posting them consistently from 2026-10-03 onward. That matches Codacy's own documentation on the [GitHub integration](https://docs.codacy.com/repositories-configure/integrations/github-integration/): *"For open source repositories on GitHub, Codacy will not run analysis if Status checks is disabled. Make sure this setting is enabled to keep analysis running."* The setting is repo configuration in the Codacy dashboard, not a property of the commit message.
+
+**Solution**: confirm the check will arrive before touching the branch.
 
 ```bash
-git checkout <pr-branch>
-git commit --amend -m "<same message, without [skip ci]>"
-git push --force-with-lease origin <pr-branch>
+# Has Codacy reported for this head yet?
+gh api repos/:owner/:repo/commits/<sha>/check-runs \
+  --jq '[.check_runs[]|select(.name=="Codacy Static Code Analysis")]|length'
+
+# If 0, ask Codacy directly whether it has analysed the head, and how long ago
+codacy pull-request <n>
 ```
 
-Codacy posts within about a minute. Do this only after the branch is up to date with base — strict required checks also report `BEHIND`, which independently makes `gh pr merge` refuse.
+If Codacy reports the head as analysed with 0 new issues but no check-run exists, request re-report rather than rewriting history:
+
+```bash
+codacy pull-request <n> --reanalyze
+```
 
 **Prevention**:
-- Reserve `[skip ci]` for commits that land directly on the default branch (that is the point for `persist-ci-status.sh`'s artifact PR, whose own title carries it so the artifact loop cannot re-trigger itself). Never put it on a PR head that must satisfy a required external check.
-- When a PR is `BLOCKED` with all *visible* checks green, diff the displayed check list against the ruleset's required checks before suspecting flakiness: a missing entry is a failed gate.
-- Read `agents-docs/CI_STATUS.md` first — it already distinguishes `unknown` from `failing`, which is the same absence-vs-failure distinction applied to our own artifact.
+- **Wait.** Measured latency is 8–26 minutes from PR creation. Codacy PR analysis scans only changed files, and the check is posted when the cloud analysis finishes. This is normal async behaviour, not a stuck gate.
+- Do **not** `git commit --amend` to strip `[skip ci]` and force-push. It was the original prescribed fix here and it is unnecessary: it rewrites history on a false premise, and `[skip ci]` on a bot artifact PR head is deliberate — it stops the `persist-ci-status.sh` loop re-triggering itself.
+- When a PR is `BLOCKED` with all *visible* checks green, diff the displayed check list against the ruleset's required list, then **measure before concluding**. Absence has two very different causes — a disabled setting and ordinary latency — and they need opposite responses.
+- `strict_required_status_checks_policy: true` also reports `BEHIND`, which independently refuses a merge. Update the branch before diagnosing anything else.
 
-**Tags**: #github-actions #ci #codacy #branch-protection #skip-ci #required-checks
+**Tags**: #github-actions #ci #codacy #branch-protection #required-checks #latency
 
-**Files Modified**: (workflow/PR message only, no source changes)
+**Files Modified**: (documentation only, no source changes)
 
 ---
 

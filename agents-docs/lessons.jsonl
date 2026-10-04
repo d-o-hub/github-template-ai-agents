@@ -43,4 +43,4 @@
 {"id": "LESSON-043", "title": "Ghost Dirs Trip Validators"}
 {"id": "LESSON-044", "title": "New Skills Need a Post-Creation Audit"}
 {"id": "LESSON-045", "title": "Description Edits Are 6-Site Edits"}
-{"id": "LESSON-046", "date": "2026-10-02", "component": "GitHub Actions / branch protection / Codacy", "title": "[skip ci] on a PR Head Silently Suppresses the Required Codacy Check", "severity": "Medium", "tags": ["github-actions", "ci", "codacy", "branch-protection", "skip-ci", "required-checks"]}
+{"id": "LESSON-046", "date": "2026-10-04", "component": "GitHub Actions / branch protection / Codacy", "title": "A Missing Required Codacy Check Was a Disabled Setting, Not [skip ci]", "severity": "Medium", "tags": ["github-actions", "ci", "codacy", "branch-protection", "required-checks", "latency"]}
