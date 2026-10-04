@@ -131,7 +131,8 @@ def test_validate_safe_path_patterns(tmp_path):
         "auth.json_copy", "token_secret.json", "token.txt", "access_token.json", "access-token.txt",
         "refresh_token.json", "refresh-token.txt", "auth_token.json", "auth-token.txt",
         "session_token.json", "session-token.txt", "bearer_token.txt", "bearer-token.txt",
-        "app_secret.json", "app-secret.json", "api_key_prod", "api_key.json",
+        "app_secret.json", "app-secret.json", "api_secret.txt", "api-secret.txt",
+        "app_key.txt", "app-key.txt", "api_key_prod", "api_key.json",
         "api-key.txt", "id-token.txt", "oauth_token.json", "oauth-token.txt",
         "jwt_token.json", "jwt-token.txt",
         "private_key.txt", "private-key.txt", "privkey", "secret_key.json", "secret-key.txt"
