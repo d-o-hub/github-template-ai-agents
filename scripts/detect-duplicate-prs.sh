@@ -140,7 +140,7 @@ main() {
     done <<< "$sections"
     # Jules task id: task URL in the body first, branch-name id as fallback.
     # perf: Replace multiple external command subshells (grep, head, tr) with native bash regex matching
-    # to significantly reduce process fork overhead per loop iteration.
+    # to significantly reduce process fork overhead per loop iteration
     body="$(gh pr view "$num" --json body --jq '.body' 2>/dev/null || true)"
     if [[ "$body" =~ jules\.google\.com/task/([0-9]+) ]]; then
       task_id="${BASH_REMATCH[1]}"
