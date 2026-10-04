@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.15] - 2026-10-04
+
 ### Fixed
 
 - Eval fixtures now resolve. Eleven eval cases across four skills named a
