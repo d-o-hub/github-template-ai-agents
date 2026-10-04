@@ -64,6 +64,45 @@ SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/quality_gate.sh
 ./scripts/minimal_quality_gate.sh
 ```
 
+## Waiting for CI
+
+`Codacy Static Code Analysis` is the branch ruleset's one required status check
+(plus `Codacy Static Code Analysis`'s app integration). It is posted by the Codacy
+GitHub App from a cloud analysis, **not** by a GitHub Actions job, so it cannot be
+re-run from the Actions tab and does not appear until the analysis finishes.
+
+Measured latency from PR creation to check posted: **8–26 minutes**. Codacy scans
+only changed files, and the check lands when the cloud analysis concludes. A PR
+sitting `BLOCKED` with every *visible* check green is usually this, not a failure.
+
+```bash
+# Is the required check present yet?
+gh pr checks <n>
+
+# Has Codacy reported for this head?
+gh api repos/:owner/:repo/commits/<sha>/check-runs \
+  --jq '[.check_runs[]|select(.name=="Codacy Static Code Analysis")]|length'
+
+# What does Codacy itself think? Reports the analysed head SHA.
+codacy pull-request <n>
+```
+
+Procedure:
+
+1. Arm auto-merge (`gh pr merge <n> --squash --auto`) and let it wait. It merges
+   when the required check passes.
+2. Poll for **at least 25 minutes** before treating the absence as abnormal.
+3. If Codacy reports the head as already analysed but no check-run exists, ask it
+   to re-report — do not rewrite the branch:
+   `codacy pull-request <n> --reanalyze`
+4. `strict_required_status_checks_policy: true` also reports `BEHIND`, which
+   refuses a merge on its own. Update the branch before diagnosing anything else.
+
+Never `git commit --amend` to strip `[skip ci]` in order to coax the check out.
+That was the original prescribed workaround in LESSON-046 and it is wrong — see
+that entry, which also records why `[skip ci]` on a bot artifact PR head is
+deliberate.
+
 ## Dependabot PRs
 
 Dependabot PRs are auto-merged via CI when all checks pass. Do not manually merge or close Dependabot PRs.
