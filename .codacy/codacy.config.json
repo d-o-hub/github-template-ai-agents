@@ -38,6 +38,7 @@
     ".agents/skills/do-web-doc-resolver/scripts/providers/docling.py",
     ".agents/skills/skill-creator/scripts/run_loop.py",
     ".agents/skills/do-web-doc-resolver/tests/integration/**",
+    ".agents/skills/do-web-doc-resolver/tests/test_optional_visual_dependencies.py",
     "tests/test_update_ci_status.py",
     ".agents/skills/agent-browser/templates/**"
   ]
