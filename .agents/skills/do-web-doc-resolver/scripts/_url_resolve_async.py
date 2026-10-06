@@ -92,7 +92,7 @@ async def resolve_url_stream_async(
         ),
         "direct_fetch": (
             ProviderType.DIRECT_FETCH,
-            lambda: asyncio.to_thread(fetch_url_content, url, max_chars),
+            lambda: asyncio.to_thread(fetch_url_content, url, max_chars=max_chars),
         ),
         "mistral_browser": (
             ProviderType.MISTRAL_BROWSER,

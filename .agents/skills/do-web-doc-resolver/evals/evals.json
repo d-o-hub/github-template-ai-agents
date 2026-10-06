@@ -28,10 +28,10 @@
     {
       "id": 3,
       "prompt": "Resolve https://github.com/rust-lang/rust with max 2000 chars",
-      "expected_output": "Truncated markdown from GitHub page, under 2000 chars.",
+      "expected_output": "Extracted markdown content capped at 2000 characters; source/metadata fields are outside the content-length budget.",
       "assertions": [
         "Output contains markdown content",
-        "Content is under 3000 characters (truncation working)",
+        "Extracted content contains at most 2000 characters, matching the requested max_chars limit",
         "Output includes source provider name"
       ],
       "files": []

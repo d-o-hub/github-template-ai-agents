@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
   "status": "passing",
-  "last_run": "2026-10-04T16:02:08.724722Z",
+  "last_run": "2026-10-05T12:51:02Z",
   "validated": true,
   "failing_jobs": [],
   "skipped_jobs": [],
@@ -15,5 +15,5 @@
     "test"
   ],
   "advisory_only": true,
-  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/37214828279"
+  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/37311098820"
 }

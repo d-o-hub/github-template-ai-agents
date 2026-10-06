@@ -66,10 +66,22 @@ SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/quality_gate.sh
 
 ## Waiting for CI
 
-`Codacy Static Code Analysis` is the branch ruleset's one required status check
-(plus `Codacy Static Code Analysis`'s app integration). It is posted by the Codacy
-GitHub App from a cloud analysis, **not** by a GitHub Actions job, so it cannot be
-re-run from the Actions tab and does not appear until the analysis finishes.
+The **2026-09-28** inspection of this template's branch ruleset recorded
+`Codacy Static Code Analysis` as a required status check, bound to its app
+integration. This contradicts the older no-required-status-check snapshot in
+ADR-034/ADR-040-era guidance. It is not a permanent inventory: query live
+rulesets (including inherited rules) and classic branch protection before
+acting. Do not change or delete `.github/main-branch-protection.json` to resolve
+a discrepancy; it is a snapshot and changing it does not change live protection.
+
+Adopters must configure their own product-relevant required checks. Confirm
+that a copied CI-status artifact's `workflow_url` names the intended repository,
+then inspect the actual run and current head. A template artifact is advisory,
+not proof of an adopter's CI or merge eligibility. See [CI Status Contract](CI_STATUS.md).
+
+Codacy is posted by the Codacy GitHub App from a cloud analysis, **not** by a
+GitHub Actions job, so it cannot be re-run from the Actions tab and does not
+appear until the analysis finishes. Actions-only inspection is insufficient.
 
 Measured latency from PR creation to check posted: **8–26 minutes**. Codacy scans
 only changed files, and the check lands when the cloud analysis concludes. A PR
@@ -77,11 +89,14 @@ sitting `BLOCKED` with every *visible* check green is usually this, not a failur
 
 ```bash
 # Is the required check present yet?
-gh pr checks <n>
+REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
+DEFAULT_BRANCH=$(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name')
+gh api --paginate "repos/$REPO/rules/branches/$DEFAULT_BRANCH"
+gh pr checks <n> --repo "$REPO" --required
 
-# Has Codacy reported for this head?
-gh api repos/:owner/:repo/commits/<sha>/check-runs \
-  --jq '[.check_runs[]|select(.name=="Codacy Static Code Analysis")]|length'
+# Inspect check-runs on the current PR head, including names and app identities.
+gh api --paginate "repos/$REPO/commits/<sha>/check-runs" \
+  --jq '.check_runs[] | {name, status, conclusion, head_sha, app: .app.slug}'
 
 # What does Codacy itself think? Reports the analysed head SHA.
 codacy pull-request <n>
@@ -89,14 +104,21 @@ codacy pull-request <n>
 
 Procedure:
 
-1. Arm auto-merge (`gh pr merge <n> --squash --auto`) and let it wait. It merges
-   when the required check passes.
-2. Poll for **at least 25 minutes** before treating the absence as abnormal.
+1. Verify source repository, current head, and live required checks. Missing or
+   pending checks are not success, even if every visible Actions job is green.
+2. If shipping is authorized, arm auto-merge (`gh pr merge <n> --squash --auto`)
+   and let it wait for all live requirements. Poll through the observed
+   **26-minute** latency window before treating absence alone as abnormal.
 3. If Codacy reports the head as already analysed but no check-run exists, ask it
    to re-report — do not rewrite the branch:
    `codacy pull-request <n> --reanalyze`
-4. `strict_required_status_checks_policy: true` also reports `BEHIND`, which
-   refuses a merge on its own. Update the branch before diagnosing anything else.
+4. If the live rules require an up-to-date branch,
+   `strict_required_status_checks_policy: true` also reports `BEHIND`. With
+   authorization, update the branch and recheck the new head's requirements.
+
+Do not bypass Codacy or remove a valid required check just because it is slow
+or conflicts with an old ADR. Investigate the live policy first; removing a
+protection requires an explicit user decision, not an inference from a blocked PR.
 
 Never `git commit --amend` to strip `[skip ci]` in order to coax the check out.
 That was the original prescribed workaround in LESSON-046 and it is wrong — see

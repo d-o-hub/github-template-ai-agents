@@ -1,15 +1,17 @@
 # Quick Start Guide
 
-> Get started with AI agent-powered development in a few minutes.
-> First setup runs the full quality gate; optional linters (shellcheck,
+> Set up shared agent instructions, then tailor checks to your product.
+> This repository uses Full template maintainer policy; downstream adopters
+> normally choose Minimal/Standard Light. Bootstrap runs the template quality
+> gate and configures local git hooks. Optional linters (shellcheck,
 > markdownlint, yamllint) are skipped when absent — run `./scripts/doctor.sh`
-> to see what is missing.
+> to see what is missing. Skipped checks are not proof of success.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Prerequisites
 
-- Git installed
+- Git and Bash installed
 - One or more CLI coding agents:
   - [Claude Code](https://claude.ai/code) (recommended)
   - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
@@ -20,15 +22,20 @@
 ## Setup
 
 ```bash
-# Evaluating this template itself:
+# Evaluating this template itself (Full suite):
 git clone https://github.com/d-o-hub/github-template-ai-agents.git
 cd github-template-ai-agents
 
 # After creating YOUR repo from the template ("Use this template"), clone that:
 #   git clone https://github.com/<you>/<your-project>.git && cd <your-project>
 
+# Deliberate setup: creates skill links and sets local core.hooksPath.
 ./scripts/bootstrap.sh
 ```
+
+For a product, choose a profile and customize docs/local checks/CI before
+treating bootstrap as verification of your application. It sets up template
+tooling, not product dependencies; do not run it just to inspect a repository.
 
 **Expected output:**
 
@@ -47,7 +54,8 @@ cd github-template-ai-agents
 Bootstrap complete. Repository is ready for AI agent workflows.
 ```
 
-`bootstrap.sh` is idempotent — re-run it any time to repair the environment.
+`bootstrap.sh` is idempotent, but may change local hook configuration again.
+Rerun deliberately when repairing template tooling.
 
 ### CLI (optional)
 
@@ -63,18 +71,26 @@ After setup, you can use the unified `agent-toolkit` CLI instead of calling scri
 ### Use this template on GitHub
 
 If you are starting from scratch, click **"Use this template"** on GitHub before
-cloning. The bootstrap step is the same.
+cloning your own repository. Follow the adopter cleanup path below; do not
+carry the template's historical state into product operations.
 
 ### Start light (recommended)
 
-Day one does **not** require full GOAP/ADR/TRIZ:
+Minimal and Standard profiles default to **Light** process; Full is the current
+template maintainer profile. Day one does not require the Full maintenance stack:
 
-1. Bootstrap and edit `AGENTS.md` for your product
-2. Keep core CI workflows; disable maintainer-only ones if you do not need them
-3. Use **light process mode** (quality gate → commit → PR) until changes get large
+1. Rewrite `AGENTS.md`, README, version policy, and retained tool overrides for
+   the product. Use understand → change → verify → report; ship only on request.
+2. Remove or reinitialize copied CI-status artifacts, per-agent and legacy
+   metrics/DORA, and old plans. Keep only relevant tools, skills, and workflows;
+   update required checks, rulesets, and triggers with any workflow removal.
+3. Scale planning to risk: small fixes/docs need a short plan and relevant
+   checks; architectural changes need a proportionate approved decision record.
+   GOAP/TRIZ does not require opting into telemetry or always-fix maintenance.
 
 See [agents-docs/ADOPTION_PROFILES.md](agents-docs/ADOPTION_PROFILES.md) for
-minimal workflows, skill packs, and what to prune.
+the complete cleanup checklist and CI adaptation guidance. These are downstream
+choices, not instructions to delete current maintainer artifacts here.
 
 ## Configure for Your Project
 
@@ -92,24 +108,39 @@ Primary stack: [frameworks, libraries, tools]
 
 ### 2. Update Setup Commands
 
-```markdown
+````markdown
 ## Setup
 
 ```bash
-# Install dependencies
-# TODO: Replace with your commands
-pnpm install | cargo build | pip install -r requirements.txt
-
-# Start dev server
-# TODO: Replace with your commands
-pnpm dev | cargo run | python main.py
+# Example only: a pnpm product with these scripts defined
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm lint
+pnpm typecheck
+pnpm test
 ```
+````
 
-```
+Replace the example with commands verified for your product. Do not pipe
+alternative package-manager or language commands together.
+
+The supplied `ci.yml` is an example multi-language/template suite: it also runs
+template schema/content checks, root Python tests, skill tests, and BATS. Node
+CI assumes `npm ci` / `npm test`, whereas the local checker uses `pnpm` when
+available. pnpm, Yarn, and Bun adopters must align setup, lockfile/cache paths,
+frozen installs, and test commands in both CI and local gates. Replace unrelated
+language/template checks rather than assuming manifest detection is enough.
+
+Remove optional maintainer workflows carefully; do not use generic `if: false`
+guards as a substitute for changing required checks and triggers. CI-status
+update/upload/persist steps live inside `ci.yml`'s `ci-success` job, so removing
+only its cleanup workflow does not disable production. Preserve/replace the
+required-job aggregation check when dropping those steps. See
+[Adoption Profiles](agents-docs/ADOPTION_PROFILES.md#optional-maintainer-automation).
 
 ### 3. Add Language-Specific Style
 
-Uncomment and customize the relevant section:
+Choose and customize rules for the product's actual toolchain:
 
 ```markdown
 <!--
@@ -150,6 +181,13 @@ gemini "What are the main components of this project?"
 opencode "Review the project structure"
 ```
 
+These prompts check tool discovery and context, not application correctness or
+skill effectiveness. Optional packs are adoption suggestions, distinct from
+the eight default-unlinked Claude/Qwen skills; see
+[link policy and pruning](agents-docs/ADOPTION_PROFILES.md#default-unlinked-skills-are-a-separate-mechanism).
+Pruning also requires the curated `AGENTS.md` inventory and all affected
+generators, not just recreating skill links.
+
 ## Start Coding
 
 ### Example: Implement a Feature
@@ -158,12 +196,16 @@ opencode "Review the project structure"
 claude "Implement a function that validates user input"
 ```
 
-The agent will:
+Expected workflow (verify the agent actually follows it):
 
 1. Read relevant files
-2. Implement the feature
-3. Run quality gates automatically
-4. Commit with proper message format
+2. Plan proportionately, then implement the feature
+3. Run relevant product checks and report skipped checks or blockers
+4. Summarize the diff; commit/push/PR/merge only if requested
+
+Delegate retrieval → planning → implementation → verification. Independent
+tasks may run in parallel; dependent stages must remain ordered. Light mode
+does not impose Full metrics/DORA or unrequested inherited-failure remediation.
 
 ### Example: Fix a Bug
 
@@ -180,14 +222,28 @@ claude "Refactor the authentication module to improve readability"
 ## Verify Everything Works
 
 ```bash
+# Full template check; downstream repositories use their product gate instead.
 ./scripts/quality_gate.sh
 ```
 
-Expected: all checks pass.
+Check that the intended checks actually ran, not merely that the command exited
+successfully. **Static validation ≠ behavioral proof:** skill structure, eval
+schema/fixture validation, and `run-evals.py` smoke checks invoke no model and
+do not prove skill effectiveness. Low-impact documentation needs relevant
+inventory/link/Markdown checks, not new behavioral tests by default.
 
-### 4. Set Usage Policies & Eval Tracking
+### Version policy
 
-For production-grade repositories, copy and customize the policy templates:
+The template's root `VERSION=0.0.0` is a consumer placeholder; template releases
+are recorded in `.template/CHANGELOG-TEMPLATE.md`. Set downstream `VERSION` to
+the product version and customize its README/changelog/release tools. The
+existing patch-bump script increments `VERSION` and never resets it; it still
+requires the template changelog unless adapted. See
+[Version Flow](agents-docs/template-versioning/version-flow.md).
+
+### Optional: Usage Policies & Eval Tracking
+
+If useful for your product, copy and customize the policy templates:
 
 ```bash
 cp .template/USE_RESTRICTIONS.md ./USE_RESTRICTIONS.md

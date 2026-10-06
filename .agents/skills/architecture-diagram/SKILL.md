@@ -8,10 +8,7 @@ metadata:
   author: d.o.
   version: "1.0"
   platform: agentskills.io
-compatibility:
-  tools:
-    - bash
-    - create_file
+compatibility: Requires Python 3 and permission to write the output SVG in the project.
 ---
 
 # Architecture Diagram

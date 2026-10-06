@@ -24,11 +24,19 @@ Resolve URLs and queries into compact, LLM-ready markdown using a progressive, f
 - Validate content against agent-docs-spec v0.3.0
 - Trace resolution trajectories for debugging
 
+## Prerequisites
+
+- Python 3.10+ in an isolated virtual environment.
+- From the skill directory, run `python -m pip install .` to install the base
+  package and dependencies declared in `pyproject.toml` before the quick start.
+- Install provider, ML, or database extras only for the features that need them;
+  text resolution does not require the optional visual/ML stack.
+
 ## Quick Start
 
 ```bash
-python -m scripts.resolve "https://docs.rust-lang.org/book/"
-python -m scripts.resolve "Rust async programming" --profile quality --trace --json
+python -m scripts.cli "https://docs.rust-lang.org/book/"
+python -m scripts.cli "Rust async programming" --profile quality --json
 ```
 
 ## Cascade Strategy
@@ -65,7 +73,7 @@ python -m scripts.resolve "Rust async programming" --profile quality --trace --j
 
 **Layered Routing Memory**: TTL-based decay (30 days), metadata filtering, recency weighting. See `scripts/routing_memory.py`.
 
-**Trace-Based Evaluation**: Emit `ResolutionTrace` with `TraceStep` per provider. CLI: `--trace --json`.
+**Structured Resolution Evidence**: CLI `--json` reports available source, quality, and provider metrics. Trace model types live in `scripts/models.py`; the CLI has no `--trace` flag.
 
 **Agent-Friendly Docs Validation**: Validates against [agent-docs-spec v0.3.0](https://github.com/agent-ecosystem/agent-docs-spec) — 10 checks across 7 categories.
 

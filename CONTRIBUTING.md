@@ -35,7 +35,7 @@ Do not open a skill PR without completing both steps.
    - Add entry to `AGENTS.md` Skills section (alphabetical within category)
    - Add entry to `agents-docs/skills-reference.md`
    - Run `./scripts/update-agents-registry.sh`
-   - Run `./scripts/generate-skills-readme.py`
+   - Run `python3 scripts/generate-skills-readme.py`
 5. Paste the full Eval Report into the PR description
 
 ### Updating an existing skill

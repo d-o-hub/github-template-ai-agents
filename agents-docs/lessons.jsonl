@@ -44,3 +44,5 @@
 {"id": "LESSON-044", "title": "New Skills Need a Post-Creation Audit"}
 {"id": "LESSON-045", "title": "Description Edits Are 6-Site Edits"}
 {"id": "LESSON-046", "date": "2026-10-04", "component": "GitHub Actions / branch protection / Codacy", "title": "A Missing Required Codacy Check Was a Disabled Setting, Not [skip ci]", "severity": "Medium", "tags": ["github-actions", "ci", "codacy", "branch-protection", "required-checks", "latency"]}
+{"id":"LESSON-047","date":"2026-10-05","component":"Skill validation","title":"Independently Shipped Validators Need Acceptance Parity","severity":"Medium","tags":["skills","schema","portability","standalone","contract-tests"]}
+{"id":"LESSON-048","date":"2026-10-05","component":"Skill dogfooding","title":"Skill Dogfooding Needs Real Runtime Contracts","severity":"Medium","tags":["skills","behavioral-evidence","optional-dependencies","httpx","cli-contracts"]}

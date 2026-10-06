@@ -25,43 +25,38 @@ readonly MAX_PR_BODY_LENGTH=1000
 
 ## Process modes
 
-| Mode | When | Required steps |
-|------|------|----------------|
-| **Light** (default for adopters) | Small fixes, docs, single-skill work | Quality gate → atomic commit → PR |
-| **Full** (template / large changes) | Architecture, multi-file refactors, new subsystems | GOAP + ADR + TRIZ phases below |
+**This repository uses Full (template maintainer) policy.** Downstream product
+repositories should choose Minimal or Standard and rewrite this file for their stack.
 
-See `agents-docs/ADOPTION_PROFILES.md` for minimal vs full template surface area.
+| Profile | Default mode | Scope |
+|---------|--------------|-------|
+| **Minimal** (adopter) | **Light** | Product instructions, relevant checks, basic CI |
+| **Standard** (adopter) | **Light** | Minimal + selected skills and agent workflows |
+| **Full** (current repository) | **Full** | Template orchestration, generators, metrics/DORA, CI-status maintenance |
 
-> **Profile scoping:** This file documents the template's **Full (maintainer)**
-> surface. Adopters on **Light** mode should treat Metrics, DORA, CI-status
-> gating, ADR/GOAP/TRIZ, and template-generated-document checks as optional —
-> see `agents-docs/ADOPTION_PROFILES.md` for what to keep vs. prune.
+Light: understand → change → verify → report. Commit/PR steps apply only when
+requested. Architectural changes still need a proportionate plan and decision
+record; they do not require adopting the entire Full telemetry/automation stack.
+See `agents-docs/ADOPTION_PROFILES.md` for downstream cleanup and optional packs.
 
-## Development Phases (full mode)
+## Planning & Delegation
 
-Use GOAP + ADRs + TRIZ for structured development when the change is non-trivial.
-
-**Prerequisites**:
-- Fetch/pull latest default remote branch before beginning.
-- **Check CI Status**: `.github/ci-status/ci-status.json` is tri-state (`passing` | `failing` | `unknown`); only `passing` clears the gate — `unknown` means a required job did not run, and a skipped required job is never `passing`. Advisory only, never a merge gate. Contract: `agents-docs/CI_STATUS.md`.
-
-1. **ANALYZE & STRATEGIZE (Phase 1)**
-   - **Action**: Use `triz-solver` (solve or audit mode). Write an **ADR** in `plans/`.
-   - **Human Gate**: Review and approve the ADR and analysis before proceeding. *Only human gate.*
-
-2. **DECOMPOSE & PLAN (Phase 2)**
-   - **Action**: Use the `goap-agent` to break down in `plans/GOAP_STATE.md` (create if missing).
-
-3. **EXECUTE & COORDINATE (Phase 3)**
-   - **Action**: Execute tasks systematically using atomic commit workflow.
-   - **Action**: Use `git-github-workflow` or run `./scripts/self-fix-loop.sh` until all CI checks pass.
-
-4. **SYNTHESIZE (Phase 4)**
-   - **Action**: Run `learn` skill to extract discoveries and update `AGENTS.md`.
+- **Route:** retrieval (`delegate`) → planning (`goap-agent` when complex) → implementation (`implementer`) → verification (`test-runner` / `code-review-assistant`). Parallelize independent work, not dependent stages.
+- Small fixes/docs: use a short plan and relevant checks; no new ADR or tests just for ceremony.
+- Architecture, new subsystems, or broad refactors: use `triz-solver`, record the decision in a `plans/` ADR, obtain approval, then decompose with GOAP before implementation.
+- Full: keep `plans/GOAP_STATE.md` current and capture reusable discoveries with `learn`.
+- Check branch/upstream state before work; do not pull over local changes. Full CI-status is an advisory signal, not a merge gate: `passing` / `failing` / `unknown`; a required job that did not run is not proof of success. Confirm the actual run. Contract: `agents-docs/CI_STATUS.md`.
+- Team/worktree patterns: `agents-docs/AGENT_TEAMS_GUIDE.md`.
 
 ## Behavioral Defaults
 
-See `agents-docs/BEHAVIORAL_DEFAULTS.md` for automation-first, parallelism, direct action, diff-oriented, voice, and pre-existing issue handling rules.
+Act autonomously within the requested scope, but **do not commit, push, open/close
+PRs or issues, or merge without user intent**. Fix introduced regressions; Full's
+pre-existing-issue remediation policy is not a downstream Light default.
+For requested GitHub triage, judge impact by adopter value, including consumed
+metadata, catalogs, safety, and automation—not just product source changes.
+Do not close consumed metadata updates as “no impact.” Details:
+`agents-docs/BEHAVIORAL_DEFAULTS.md`.
 
 ## Setup
 
@@ -71,37 +66,37 @@ See `agents-docs/BEHAVIORAL_DEFAULTS.md` for automation-first, parallelism, dire
 ./bin/agent-toolkit    # Unified CLI: setup, doctor, quality, validate, analyze, fix, eval, docs
 ```
 
-## Session Bootstrap
-
-Agents use a `SessionStart` hook to inject compact project context (top-level docs index + latest changelog) at startup; configured via `docflow.json` and agent-specific settings (e.g., `.claude/settings.json`).
-
-```bash
-./hooks/session-start.sh # Manual execution to verify context injection
-```
+These are template commands, not inferred product install/test commands.
+Bootstrap configures local git hooks; run it deliberately. Adopters replace CI
+and local checks for their language and package manager. Session context uses
+`./hooks/session-start.sh`, configured by `docflow.json` and tool settings.
 
 ## Version Management
 
-**Single source of truth**: `VERSION` file at root. Never edit version strings elsewhere.
+Here `VERSION=0.0.0` is the consumer placeholder; template releases are recorded
+in `.template/CHANGELOG-TEMPLATE.md`. Downstream `VERSION` is the product's
+source of truth. The bump script does not reset it. See
+`agents-docs/template-versioning/version-flow.md` before using release tooling.
 
 ## Quality Gate (Required Before Commit)
 
-Use the `static-analysis` skill to triage and fix any findings before committing.
+Use `static-analysis` to triage findings. Full maintainers run:
 
 ```bash
-./scripts/quality_gate.sh # Always run before committing. Fix all errors.
-./scripts/update-all-docs.sh # Verify and update documentation
+./scripts/quality_gate.sh # Required before an authorized commit
+./scripts/update-all-docs.sh # Full-only generated documentation maintenance
 ```
 
-## Maintenance & Verification
+Light adopters retain a product-relevant quality gate, not mandatory template
+generators, metrics, or ADR-registration checks. Match verification to risk:
+low-impact docs need inventory/link/Markdown checks, not new behavioral tests.
+**Static validation ≠ behavioral proof.** Skill structure/schema/fixture checks
+and `./scripts/run-evals.py` smoke runs do not invoke a model or prove skill
+behavior. Report skipped checks and use representative behavioral evals when
+claiming effectiveness. Full maintenance references: `agents-docs/SCRIPTS.md`.
 
-```bash
-./scripts/analyze-codebase.sh   # Autonomous analysis and self-learning
-./scripts/check-adr-compliance.sh # Verify ADR registration and patterns
-./scripts/eval-skills.sh        # Eval schema + input-fixture check (runs in quality_gate.sh)
-./scripts/run-evals.py          # Optional local smoke run; no model is invoked
-```
-
-**Guard Rails:** Temporary files in `/tmp` only. Never create debug, scripts, reports, or similar temporary files in the repository root. Gitleaks enforced via CI. Pre-commit validates git config (`SKIP_GLOBAL_HOOKS_CHECK=true` to bypass).
+**Guard rails:** Temporary files in `/tmp` only; no debug/report files in the
+repository root. Gitleaks runs in CI. Respect task ownership and write boundaries.
 
 ## Code Style
 
@@ -109,7 +104,7 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 - `SKILL.md` must start with frontmatter and include **Rationalizations** and **Red Flags** sections.
 - **No hardcoded values**: Use relative paths, runtime derivation, env vars, or named constants.
 - Shell: `shellcheck` (severity=error); Markdown: `markdownlint`; Diagrams: `mermaid`
-- **YAML Workflow Files**: All new `.github/workflows/*.yml` files must include `# yamllint disable-line rule:truthy` on the `on:` line (line 4). CI yamllint uses strict rules (line-length: 120, indentation: 2 spaces).
+- **YAML workflows**: Put `# yamllint disable-line rule:truthy` on the `on:` line. CI yamllint: line-length 120, indentation 2 spaces.
 
 ## Repository Structure
 
@@ -121,12 +116,13 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 
 ## PR & Commit Instructions
 
-- **MANDATORY (ADR-008)**: PR titles MUST follow `type(scope): subject`.
-- **Validation**: `echo "title" | npx commitlint --config commitlint.config.cjs` (or `gh pr edit`)
+- Apply only to requested shipping work; never treat implementation as permission to publish.
+- **MANDATORY (ADR-008)**: PR titles and commit headers follow `type(scope): subject`.
 - PR Title: `type(scope): description` (max `${MAX_PR_TITLE_LENGTH}` chars)
 - Commit Header: `type(scope): subject` (max `${MAX_COMMIT_SUBJECT_LENGTH}` chars total, lowercase)
-- Commit Body: Enforced at PR level as `${MAX_PR_BODY_LENGTH}` chars (GitHub concatenates title + body for squash-merge commits). Wrap at 100 chars per line. Footer: max 1000 chars.
+- PR body: max `${MAX_PR_BODY_LENGTH}` chars; squash merges concatenate title/body. Wrap at 100 chars per line.
 - Branch per feature; One concern per PR; Never commit to `main`.
+- Inspect status/diff/history; stage only owned changes. Do not change git config, bypass hooks, rewrite history, or force-push without explicit authorization.
 
 ### Commit Type Mapping
 
@@ -136,14 +132,10 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 | New security feature/control  | `feat`   | `security`       |
 | Security-related CI/tooling   | `ci`     | `security`       |
 
-If `commitlint` fails, reword: `git commit --amend -m "<type>(<scope>): <subject>"` or use `git rebase -i`.
-
-### Automation Pre-Flight (ADR-035)
-
-Before creating a PR, check for open PRs already touching the same files
-(`gh pr list` + `gh pr diff --name-only`) and extend the existing one instead of
-spawning a duplicate. Scheduled detection: `.github/workflows/duplicate-pr-guard.yml`.
-Merging vs bot sync-churn: push a clean linear tip then `gh pr merge --auto --squash` at once (LESSON-040).
+Before an authorized PR, check for existing overlapping work (`gh pr list` +
+`gh pr diff --name-only`); prefer extending it over duplicates (ADR-035).
+Use `git-github-workflow` for a requested end-to-end shipping task, not an
+automatic commit/push/merge loop. Details: `agents-docs/WORKFLOW.md`.
 
 ## Skill Guidance
 
@@ -152,25 +144,17 @@ Merging vs bot sync-churn: push a clean linear tip then `gh pr merge --auto --sq
 > See `CONTRIBUTING.md → Creating or Updating Skills`. Use `.agents/skills/SKILL_TEMPLATE.md`.
 
 - **Rules**: Review `## Rationalizations` and `## Red Flags` in skills before use.
-- **Plan**: Produce written plan, wait for confirmation for non-trivial tasks.
-- **Policies**: See `agents-docs/WORKFLOW.md` for Atomic Commit & Issue resolution.
-- **Learning**: After work, run `learn` or append discoveries to nearest `AGENTS.md`.
-
-## Delegation Routing
-
-- **Route to**: `delegate` (retrieval/context) → `implementer` (execution) → `goap-agent` (swarm dispatch).
-- **Parallel agents**: See `agents-docs/AGENT_TEAMS_GUIDE.md` for Agent Teams, Dynamic Workflows, and Worktrees.
+- **Selection**: Load relevant skills progressively; optional packs are product choices, not all default-unlinked skills. See `agents-docs/ADOPTION_PROFILES.md`.
+- **Inventory**: Keep the curated table below aligned with canonical skills when pruning; run all affected generators, not just symlink setup.
 
 ## Metrics & Post-Task Protocol
 
-**Full profile (template maintainers):** after every task, append a JSON entry
-using `./scripts/log-metric.sh '<json>'`. Entries go to per-agent files in
-`.agents/metrics/metrics-{agent}.jsonl`, eliminating merge conflicts
-(LESSON-035). See `agents-docs/METRICS.md` for schema, DORA reports, and
-protocol details.
-
-**Light mode (adopters):** metrics are optional. Skip `log-metric.sh` unless
-your project adopts the metrics/DORA stack (see `agents-docs/ADOPTION_PROFILES.md`).
+**Full only:** log tasks with `./scripts/log-metric.sh '<json>'` to
+`.agents/metrics/metrics-{agent}.jsonl` (not legacy `.agents/metrics.jsonl`).
+Respect scoped ownership; the coordinating agent handles shared post-task
+bookkeeping. Schema/DORA: `agents-docs/METRICS.md`.
+**Minimal/Standard Light:** metrics, DORA, and always-fix maintenance are optional;
+do not inherit them or copied telemetry as product policy.
 
 ## Recovery & Advanced Topics
 

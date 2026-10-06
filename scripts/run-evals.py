@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Automated evaluation runner framework for skills.
+"""Static smoke runner for skill definitions and local input fixtures.
 
-This script discovers all skills with evals/evals.json files, runs the defined
-test scenarios, and generates comprehensive reports with pass/fail statistics.
+Discovers evals/evals.json files and checks structure, fixture paths, and selected
+local checker commands. It invokes no model and scores no behavioral assertions.
 
 Usage:
     python3 scripts/run-evals.py
@@ -138,6 +138,7 @@ def generate_text_report(report: EvalReport) -> str:
     lines.append(SEPARATOR_DOUBLE)
     lines.append("SKILL EVALUATION REPORT")
     lines.append(SEPARATOR_DOUBLE)
+    lines.append("Scope: static smoke checks; behavioral evaluation: NOT_RUN")
     lines.append("")
     lines.append("SUMMARY")
     lines.append(SEPARATOR_SINGLE)
@@ -189,6 +190,8 @@ def generate_json_report(report: EvalReport) -> str:
     """Generate a JSON report."""
     data = {
         "summary": {
+            "scope": "static_smoke",
+            "behavioral_evaluation": "not_run",
             "total_skills": report.total_skills,
             "skills_passed": report.skills_passed,
             "skills_failed": report.skills_failed,
@@ -229,7 +232,7 @@ def generate_json_report(report: EvalReport) -> str:
 def main() -> int:
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Automated evaluation runner framework for skills",
+        description="Static skill smoke checks (no model or assertion scoring)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

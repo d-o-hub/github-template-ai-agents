@@ -1,240 +1,204 @@
 ---
 name: skill-evaluator
-description: >-
-  Reusable skill for evaluating other skills with structure checks, eval coverage review, and real
-  usage spot checks. Use when you need to check a skill, add evals, benchmark a skill, validate
-  outputs against assertions, or compare current skill behavior against a baseline — even if they just
-  say "evaluate this skill" or "check if this skill works".". Not for skill-creator.
-license: MIT
 version: "0.2.10"
+description: Reusable skill for evaluating other skills with static structure checks, eval coverage review, and manual paired behavioral trials. Use this skill when checking a skill, reviewing eval assertions, grading actual outputs, or comparing a skill against a baseline — even if they just say "evaluate this skill" or "check if this skill works". Not for authoring skills (use skill-creator) or routing requests (use intent-classifier).
 category: quality
-metadata:
-  author: d.o.
-  version: "1.1"
-  spec: "agentskills.io"
+license: MIT
 ---
 
 # Skill Evaluator
 
-Evaluate local skills with a repeatable loop: inspect structure, read eval definitions, run one or more realistic prompts, then score the output with explicit assertions and evidence.
+Evaluate local skills with evidence and an explicit scope. Choose **static
+audit** or **manual paired behavioral evaluation**; never confuse their verdicts.
 
 ## When to Use
 
-- Test whether a skill is wired correctly
-- Check whether `evals/evals.json` exists and is usable
-- Run a real prompt through a skill and grade the result
-- Compare a skill against a no-skill baseline or older snapshot
-- Identify missing folders, weak evals, and flaky assertions
+- Check whether a skill is wired correctly and has usable eval definitions
+- Review assertion quality and coverage without executing user prompts
+- Grade actual outputs or compare a skill against a no-skill/older baseline
+- Identify missing fixtures, weak evals, and unclear routing boundaries
 
 ## Required Inputs
 
-At minimum, identify:
-
 ```text
 SKILL_PATH: absolute or workspace-relative path to the skill directory
-GOAL: structure check / eval review / live run / baseline comparison
+MODE: static (default) / manual-paired
+GOAL: structure / coverage review / behavioral comparison
 ```
 
-## Evaluation Workflow
+If the user requests behavioral evaluation but execution is unavailable, report
+**behavioral: NOT_RUN** or **BLOCKED**, not a static result relabeled as behavior.
 
-### 1. Structure Check
+## Mode 1: Static Audit
 
-Confirm the skill directory is sane before judging outputs.
+This mode reads definitions only. It invokes no model, executes no eval prompt,
+and scores no assertion against an answer. No secrets or authentication are
+needed for static evaluation, including evals describing authenticated tools.
 
-Expected layout:
-
-```text
-skill-name/
-  SKILL.md
-  evals/evals.json                   # required
-  references/evaluating-skills.md    # required for evaluator
-  scripts/                           # optional but useful
-```
-
-Flag these issues explicitly:
-
-- missing `SKILL.md`
-- nested duplicate directory like `skill-name/skill-name/`
-- `evals/` exists but `evals/evals.json` is missing or invalid JSON
-- eval cases missing `id`, `prompt`, or `expected_output`
-
-### 2. Eval Review
-
-Read `evals/evals.json` if present and assess whether each case is realistic.
-
-Good evals include:
-
-- a real user prompt
-- a short success definition
-- optional input files
-- assertions that are concrete and checkable
-
-Weak evals include:
-
-- vague prompts
-- purely subjective assertions
-- no evidence path for pass/fail
-
-### 3. Live Run
-
-Run at least one representative prompt from the eval set or create a focused ad hoc prompt.
-
-For each live run:
-
-- load the target skill
-- read only the files the skill itself points to
-- produce the answer or output
-- grade against assertions with evidence
-
-### 4. Baseline Comparison
-
-Always rerun the same prompt without the skill (or against a snapshot of the older skill) to establish a baseline.
-
-For each run, capture:
-- `with_skill`: Standard run using the current skill version.
-- `without_skill`: Run using the same prompt but without any skill loaded.
-- `old_skill`: (Optional) Run using a prior snapshot of the skill for regression testing.
-
-Compare:
-- pass rate
-- missing details
-- format compliance
-- time (`duration_ms`) and token cost (`total_tokens`)
-
-### 5. Verdict
-
-End with one of:
-
-- `PASS` — structure is sound and live output meets assertions
-- `NEEDS_WORK` — usable, but structure gaps or output gaps remain
-- `FAIL` — skill is broken, misleading, or missing core pieces
-
-## Workspace Layout
-
-Organize eval results in `.agents/skills/<skill-name>-workspace/iteration-N/`. Each iteration produces structured artifacts.
-
-```text
-.agents/skills/<skill-name>-workspace/
-└── iteration-N/
-    ├── eval-<id>/
-    │   ├── with_skill/ (outputs/, timing.json, grading.json)
-    │   └── without_skill/ (outputs/, timing.json, grading.json)
-    ├── benchmark.json
-    └── grading.json
-```
-
-## Workspace Iteration Automation
+### 1. Structure and Schema
 
 ```bash
-# Create iteration directory
-ITER="iteration-$(printf '%02d' $((++N)))"
-mkdir -p ".agents/skills/<skill-name>-workspace/$ITER"
-
-# Set up subdirectories
-for ID in $(jq -r '.evals[].id' evals/evals.json); do
-  mkdir -p ".agents/skills/<skill-name>-workspace/$ITER/eval-$ID"/{with_skill,without_skill}
-done
-
-# Generate eval_metadata.json
-jq '.evals[] | {id, prompt, expected_output, assertions}' evals/evals.json \
-  > "<skill-name>-workspace/$ITER/eval_metadata.json"
+python3 .agents/skills/skill-evaluator/scripts/check_structure.py --path "$SKILL_PATH"
 ```
 
-Capture timing in `timing.json` with `total_tokens` and `duration_ms`. Run grader, aggregate into `benchmark.json`, record feedback to `feedback.json`.
+The standalone checker accepts one skill directory or an inventory directory.
+It ignores support folders without `SKILL.md`, `_`-prefixed directories, and
+`*-workspace` directories. An empty inventory fails rather than passing vacuously.
 
-## Scoring Rubric
+Template-local requirements (not Agent Skills specification requirements):
 
-Evaluate skills across these four dimensions (Score 1-5):
+- `SKILL.md` exists; no nested `skill-name/skill-name/` duplicate
+- `evals/evals.json` exists, even if `evals/` itself was never created
+- Root JSON object with matching non-empty `skill_name` and `evals` array
+- At least **3** cases; each is an object with unique integer `id`, non-empty
+  `prompt` and `expected_output` strings, and a non-empty `assertions` string array
+- Optional `files` is an array of non-empty paths to existing input files under
+  the skill root; absolute paths, escapes, and missing fixtures fail
+- Optional `bucket` uses `explicit`, `implicit`, `contextual`, or `negative`;
+  a tagged set needs a real out-of-scope negative case
 
-| Dimension | Description |
-|---|---|
-| **Clarity** | Are the instructions unambiguous and easy for an agent to follow? |
-| **Completeness** | Does it cover common edge cases and include required sections (Rationalizations/Red Flags)? |
-| **Testability** | Does it include realistic and varied eval cases in `evals/evals.json`? |
-| **Reusability** | Can the skill be applied to multiple projects/contexts without hardcoded values? |
+`references/` and `scripts/` are optional. The checker reports their presence,
+not their quality. It does not parse frontmatter or enforce prose/line limits;
+repository frontmatter policy is in `agents-docs/SKILLS.md`.
 
-Detailed JSON Schema definitions for all evaluation artifacts are available in `references/schemas.md`.
+### 2. Eval Definition Review
 
-### Filing a Skill Improvement Issue
+Read every case and check:
 
-When a skill fails evaluation:
-1. Open a GitHub Issue with the title `skill-improvement: <skill-name>`.
-2. Include the **Eval Report** in the description.
-3. Label the issue with `quality` and `skill`.
+- Prompt is realistic, success is defined, and inputs can be found locally
+- Assertions are concrete and checkable, not just command-word presence
+- Expected output and assertions agree with the skill's instructions
+- Contextual cases actually supply context; negative cases leave the target
+  skill unloaded and route appropriately instead of merely carrying a label
 
-### Deprecation Process
+Schema checks cannot establish these semantic properties. Record this review
+separately from the automated structure result, with case IDs as evidence.
 
-1. Add `[DEPRECATED]` to the `description` in `SKILL.md` and link to the replacement.
-2. File an issue to remove the skill in the next major version.
-3. Delete the skill directory and update all registries after the notice period.
+### 3. Static Verdict
+
+- **PASS (static)**: structure/schema/fixtures pass and reviewed definitions are usable
+- **NEEDS_WORK (static)**: definitions have gaps or weak coverage
+- **FAIL (static)**: missing/invalid core files or malformed schema
+
+Always add **Behavioral evaluation: NOT_RUN**. A static PASS is never a
+behavioral PASS, trigger-accuracy measurement, or evidence of skill uplift.
+
+## Mode 2: Manual Paired Behavioral Evaluation
+
+This is a manual operator/agent protocol, **not a bundled model runner**.
+Repository `eval-skills.sh` and `run-evals.py` are static checks; they cannot
+produce behavioral pass rates. Tier 3 automation is not shipped.
+
+### 1. Prepare
+
+Run the static audit first. Choose representative case IDs and define the
+grading criteria before seeing answers. Use only authorized, safe inputs.
+For external services, prefer a user-approved dry-run or mock; do not request
+credentials just to audit definitions. If needed execution is unavailable,
+mark that case BLOCKED and preserve the reason.
+
+### 2. Capture Paired Outputs
+
+Use fresh isolated sessions for each configuration:
+
+- `with_skill`: same prompt and fixtures, target skill loaded
+- `without_skill`: same prompt and fixtures, target skill not loaded
+- `old_skill` (optional): a pinned prior snapshot for regression comparison
+
+Keep tool access, model/configuration, and input context equal except for the
+skill. Record deviations. Never reuse a with-skill transcript as the baseline.
+For negative cases, test routing from the description without preloading the
+target skill; record whether it stayed unloaded and the chosen alternative.
+
+### 3. Grade and Compare
+
+Save actual outputs/transcripts and mark each assertion PASS/FAIL/BLOCKED with
+an evidence quotation or artifact path. Compare paired assertion counts,
+missing details, and format compliance; specify the measured denominator.
+Keep blocked cases out of pass-rate denominators and list them explicitly.
+
+Record time, tokens, cost, and trigger accuracy **only if measured** with a
+documented source. Otherwise report **not measured** and omit numeric artifacts.
+Do not infer usage from answer length or insert zero/estimated measurements.
+
+### 4. Behavioral Verdict
+
+- **PASS (behavioral, selected cases)**: actual paired outputs meet the declared
+  criteria; does not imply all cases passed or the skill improved the baseline
+- **NEEDS_WORK (behavioral)**: captured outputs expose gaps or regressions
+- **FAIL (behavioral)**: captured outputs fail core criteria
+- **NOT_RUN / BLOCKED**: one or both sides were not executed; no paired verdict
+
+Report scope, case IDs, assertion evidence, and baseline differences. A single
+passing output cannot establish improvement over a baseline.
+
+## Evidence Layout
+
+Use a user-approved evidence directory; keep temporary trials outside the repo.
+
+```text
+<evidence-dir>/iteration-N/
+  eval-<id>/with_skill/outputs/response.md
+  eval-<id>/without_skill/outputs/response.md
+  eval-<id>/grading.json          # actual assertion results + evidence
+  summary.md                    # scope, configuration, blocked/not-measured fields
+```
+
+Additional benchmark/timing artifacts are optional and require real runs and
+measurements. `references/schemas.md` describes artifact shapes, not proof that
+a run occurred. Preserve evidence before proposing fixes via `skill-creator`.
 
 ## Assertion Rules
 
-Prefer assertions that can be checked directly.
+Good: `evals.json contains at least 3 cases with unique integer IDs` or
+`The answer identifies a missing fixture by path and reports behavioral NOT_RUN`.
 
-Good:
-
-- `The answer cites the exact minimum cover dimensions`
-- `The output includes all 7 scoring dimensions`
-- `evals.json contains at least 2 cases`
-
-Bad:
-
-- `The output is good`
-- `The skill feels smart`
-- `The answer is polished`
-
-Every pass or fail must include evidence.
+Bad: `The output is good`, `The skill feels smart`, or `The answer mentions Jules`.
+Every scored assertion needs evidence; definition review does not score behavior.
 
 ## Output Format
 
-Use this structure:
-
 ```text
 ## Eval Report: <skill-name>
-
-- Goal: <what was checked>
-- Structure: PASS/NEEDS_WORK/FAIL
-- Live run: PASS/NEEDS_WORK/FAIL
-- Baseline: not run / summary
-
-### Assertion Results
-- PASS: <assertion> — <evidence>
-- FAIL: <assertion> — <evidence>
-
-### Issues
-- <issue>
-
-### Next Fixes
-1. <highest-value fix>
-2. <next fix>
-
+- Mode: static / manual-paired
+- Goal and case IDs: <what was checked>
+- Structure/schema: PASS/NEEDS_WORK/FAIL (static)
+- Definition review: <findings with case IDs>
+- Behavioral: NOT_RUN/BLOCKED/PASS/NEEDS_WORK/FAIL (selected cases only)
+- Baseline: not run / actual comparison
+- Measurements: measured values with sources / not measured
+### Assertion Evidence
+- <case ID, assertion, result, evidence; definition-only if static>
+### Issues and Next Fixes
+- <highest-value fix>
 ### Verdict
-PASS | NEEDS_WORK | FAIL — <one sentence>
+<status> (<static or behavioral scope>) — <evidence-based summary>
 ```
 
 ## Bundled Tools
 
-- `scripts/check_structure.py` — checks local skill folder structure and eval presence
-- `references/verification-checklist.md` — starter checklist for domain-specific verification
+- `scripts/check_structure.py` — standalone static layout/schema/fixture audit
+- `references/verification-checklist.md` — domain-specific checklist starter
+- `references/evaluating-skills.md` — background for manual output evaluation
 
 ## See Also
 
-- `skill-creator` — Create and improve skills
+- `skill-creator` — Author or improve skills from findings
 - `intent-classifier` — Route requests to appropriate skills
-- `progressive-delivery` — Gated production rollout loop (evaluate → adversarial → shadow → canary)
-- `agents-docs/SKILL_EVAL_TIERS.md` — NVIDIA SkillEvaluator tier mapping (ADR-037).
-  Tier 3 is **not** implemented; `bucket` taxonomy and the cost budget are advisory.
+- `agents-docs/SKILL_EVAL_TIERS.md` — tier mapping; Tier 3 automation is not implemented
 
 ## Rationalizations
 
 | Rationalization | Reality |
 |-----------------|---------|
-| "The skill looks fine, I don't need to evaluate it" | Without structured evaluation, gaps in coverage and weak assertions remain invisible until production failure. |
-| "One eval case is enough to test the skill" | Single eval cases miss edge cases; multiple diverse cases reveal coverage gaps. |
+| "The static checker passed, so the skill works" | Static PASS checks definitions, not behavior; paired trials need actual outputs. |
+| "One case is enough" | This template requires at least 3 definitions; behavioral coverage must be reported separately. |
+| "I can estimate the missing metrics" | Unmeasured values stay not measured; estimates are not evaluation evidence. |
 
 ## Red Flags
 
-- [ ] Skipping baseline comparison when evaluating skill improvement
-- [ ] Using vague or subjective assertions without concrete evidence paths
-- [ ] Declaring PASS without running at least one live prompt through the skill
+- [ ] Declaring behavioral PASS from a static schema check
+- [ ] Claiming improvement without an actual isolated baseline
+- [ ] Reporting token usage, timing, costs, or trigger accuracy without measurements
+- [ ] Tagging a case negative while expecting the target skill to execute
+- [ ] Using subjective assertions or verdicts without evidence
