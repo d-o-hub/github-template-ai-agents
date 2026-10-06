@@ -4,21 +4,29 @@ Visual CLIP provider implementation.
 
 import logging
 import os
+from typing import TYPE_CHECKING
 
 from scripts.constants import MAX_CHARS
 from scripts.models import ResolvedResult
 from scripts.utils import _get_from_cache, _save_to_cache, is_safe_url
-from scripts.visual_resolver import VisualResolver
+
+if TYPE_CHECKING:
+    from scripts.visual_resolver import VisualResolver
 
 logger = logging.getLogger(__name__)
 
 _visual_resolver: "VisualResolver | None" = None
 
 
-def get_visual_resolver() -> VisualResolver:
-    """Lazy initialization of the VisualResolver."""
+def get_visual_resolver() -> "VisualResolver | None":
+    """Load the optional visual stack only when the provider is requested."""
     global _visual_resolver
     if _visual_resolver is None:
+        try:
+            from scripts.visual_resolver import VisualResolver
+        except ImportError as error:
+            logger.debug("Visual CLIP skipped: optional dependencies missing: %s", error)
+            return None
         _visual_resolver = VisualResolver()
     return _visual_resolver
 
@@ -43,7 +51,7 @@ def resolve_with_visual_clip(
         return None
 
     resolver = get_visual_resolver()
-    if not resolver.is_available():
+    if resolver is None or not resolver.is_available():
         logger.debug("Visual CLIP skipped: dependencies missing or disabled")
         return None
 
@@ -88,7 +96,7 @@ async def resolve_with_visual_clip_async(
         return None
 
     resolver = get_visual_resolver()
-    if not resolver.is_available():
+    if resolver is None or not resolver.is_available():
         logger.debug("Visual CLIP skipped: dependencies missing or disabled")
         return None
 

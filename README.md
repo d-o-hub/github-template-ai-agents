@@ -10,6 +10,11 @@
 **Best for:** maintainers who use Claude Code, Gemini CLI, OpenCode, Qwen Code, Jules,
 Windsurf, Cursor, Copilot Chat, or mixed agent stacks in the same repository.
 
+**Adopter default:** choose Minimal or Standard and use Light process mode.
+This repository runs the Full **template maintainer** suite; a product does not
+need its telemetry, historical plans, or automation to use shared instructions
+and skills. Start with [Adoption profiles](agents-docs/ADOPTION_PROFILES.md).
+
 **This template gives you:**
 
 - One canonical instruction source via `AGENTS.md`
@@ -37,7 +42,7 @@ This template addresses each problem with an opinionated default:
 - ✓ **Multi-Agent Support**: Works with 7+ AI coding tools simultaneously
 - ✓ **Skills System**: Reusable knowledge modules in canonical location
 - ✓ **Quality Gates**: Automatic lint, test, format before commits
-- ✓ **CI State Artifacts**: `.github/ci-status/ci-status.json` and `.github/ci-status/ci-summary.md` track CI health for agents
+- ✓ **Optional CI State Artifacts**: `.github/ci-status/ci-status.json` and `.github/ci-status/ci-summary.md` provide advisory CI health for agents
 - ✓ **Context Discipline**: Prevents context rot with sub-agents and hooks
 - ✓ **Dependabot Integration**: Automated security and version updates
 
@@ -94,14 +99,46 @@ flowchart TD
 
 ## Adoption paths
 
+| Profile | Default process | Intended scope |
+|---|---|---|
+| **Minimal** | Light | Product instructions, a product quality gate, basic CI |
+| **Standard** | Light | Minimal + selected skills, hooks, and agent workflows |
+| **Full** | Full | This template's maintenance, generators, metrics/DORA, and CI-status automation |
+
+Light means understand → change → verify → report. Architectural changes still
+need a proportionate plan/decision record; larger tasks can use ADR/TRIZ/GOAP
+without adopting the entire Full stack. No mode makes an implementation request
+permission to commit, push, open/close PRs or issues, or merge.
+
 | Starting point | Recommended first step |
 |---|---|
-| **New repository** | Use this template directly — all structure is in place |
+| **New repository** | Create from the template, choose a profile, then customize product docs and checks |
 | **Existing repo, one AI tool** | Add `AGENTS.md` first, then migrate reusable prompts into `.agents/skills/` |
 | **Existing repo, multiple agent files** | Consolidate shared instructions into `AGENTS.md`; keep only true tool-specific overrides |
-| **Existing repo, flaky automation** | Start with `quality_gate.sh` + CI status artifacts before expanding agent workflows |
+| **Existing repo, flaky automation** | Start with reliable product checks; add CI-status artifacts only if useful |
 
-See [agents-docs/MIGRATION.md](agents-docs/MIGRATION.md) for step-by-step migration guides.
+Follow the [adopter cleanup checklist](agents-docs/ADOPTION_PROFILES.md#adopter-cleanup-checklist)
+for copied CI-status history, per-agent/legacy metrics and DORA, old plans,
+product README/version policy, tool configs, and rulesets. This is downstream
+cleanup, not deletion of the current template's maintainer artifacts. See
+[Migration](agents-docs/MIGRATION.md) for existing repositories.
+
+### Customize CI and versioning
+
+The supplied CI is an example multi-language/template suite, not inferred
+product CI. Replace install/test commands and local gates for your stack.
+Node CI assumes `npm ci` / `npm test`; pnpm, Yarn, and Bun products must adapt
+package-manager setup, lockfiles/caches, and commands. Remove optional workflows
+carefully, updating required checks and triggers rather than adding generic
+`if: false` guards. CI-status producer steps are embedded in `ci.yml`; deleting
+the status JSON or cleanup workflow alone does not disable them. Details:
+[Adoption Profiles](agents-docs/ADOPTION_PROFILES.md#product-ci-not-inferred-ci).
+
+Here `VERSION=0.0.0` is a consumer placeholder. Template releases live in
+[`.template/CHANGELOG-TEMPLATE.md`](.template/CHANGELOG-TEMPLATE.md), reflected by
+the template badge above. Downstream `VERSION` is the product's source of truth;
+release scripts need deliberate adaptation. The patch-bump script does not
+reset the value. See [Version Flow](agents-docs/template-versioning/version-flow.md).
 
 ## What this looks like in practice
 
@@ -110,13 +147,17 @@ See [agents-docs/MIGRATION.md](agents-docs/MIGRATION.md) for step-by-step migrat
 ```md
 # AGENTS.md
 
-## Development Phases
+## Process
 
-We use a GOAP approach combined with ADRs and TRIZ for structured development.
+Use Light mode: understand → change → verify → report.
+Plan architectural changes with a proportionate decision record.
+Delegate retrieval → planning → implementation → verification.
+Commit/push/PR/merge only when requested.
 
 ## Quality Gate (Required Before Commit)
 
-Use the `static-analysis` skill to triage and fix any findings before committing.
+Run the product's lint/typecheck/tests before an authorized commit.
+Use `static-analysis` to triage findings; report skipped checks.
 
 ## Code Style
 
@@ -133,6 +174,15 @@ Use the `static-analysis` skill to triage and fix any findings before committing
 
 `SKILL.md` contains focused, reusable instructions for one domain.
 Agents load individual skills on demand rather than injecting everything at once.
+Optional packs are product choices, not synonyms for the eight default-unlinked
+Claude/Qwen skills. Consult [Adoption Profiles](agents-docs/ADOPTION_PROFILES.md#default-unlinked-skills-are-a-separate-mechanism)
+for the current link policy. When pruning downstream skills, update the curated
+`AGENTS.md` inventory and run all affected generators, not only symlink setup.
+
+**Static validation ≠ behavioral proof.** Skill structure, eval schema, fixture,
+and smoke-run checks do not invoke a model or establish skill effectiveness.
+Low-impact docs need relevant inventory/link/Markdown checks; behavioral claims
+need representative behavioral evals and honest reporting of skipped scenarios.
 
 ### CI state artifact (`.github/ci-status/ci-status.json`)
 
@@ -155,27 +205,33 @@ Agents load individual skills on demand rather than injecting everything at once
 }
 ```
 
-`status` is tri-state — `passing`, `failing`, or `unknown` — and only `passing`
-clears the gate. A job skipped by an `if:` condition reports `Success` on
-GitHub and does not block a merge even as a required check, so a skipped
-required job never yields `passing` unless it is explicitly allowlisted; that
-is why the example above reads `unknown` rather than green.
+`status` is tri-state — `passing`, `failing`, or `unknown`. `passing` certifies
+the tracked checks only under the artifact's contract, not permission to merge.
+A job skipped by an `if:` condition reports `Success` on GitHub and does not
+block a merge even as a required check. An unallowlisted required-job skip
+therefore yields `unknown`, as above, rather than proof that tests passed.
 
 The artifact is **advisory**: a committed file is not a merge gate, so anyone
 with write permission can set any status. Agents read it as a fast signal and
-should confirm with `gh run list` before pausing. Full contract:
+should confirm the actual repository/run. Adopters remove or regenerate copied
+template state rather than treating it as their own CI evidence. Full contract:
 [`agents-docs/CI_STATUS.md`](agents-docs/CI_STATUS.md).
 
 ## Quick Start
 
 ```bash
-# Evaluating this template itself:
+# Evaluating this template itself (Full suite):
 git clone https://github.com/d-o-hub/github-template-ai-agents.git
 cd github-template-ai-agents
 
-# After creating YOUR repo from the template, clone that instead.
+# Bootstrap creates skill links and configures local git hooks.
 ./scripts/bootstrap.sh
 ```
+
+For a product, create and clone **your** repository instead, choose
+Minimal/Standard, and customize its docs/checks before treating setup as product
+verification. Bootstrap is deliberate template-tooling setup, not a product
+dependency installer.
 
 See [QUICKSTART.md](QUICKSTART.md) for prerequisites, troubleshooting, and per-tool
 verification steps. If bootstrap fails, run `./scripts/doctor.sh` for diagnostics.
@@ -226,6 +282,13 @@ graph LR
     D --> F[Synthesize]
     E --> F
 ```
+
+Order dependent work as retrieval → planning → implementation → verification;
+parallelize only independent tasks. Full metrics/DORA and inherited-failure
+remediation are not Light defaults. For requested GitHub triage, assess adopter
+value—including consumed metadata, catalogs, safety, and automation—not just
+source-code changes. Do not close consumed metadata updates as “no impact.”
+See [Behavioral Defaults](agents-docs/BEHAVIORAL_DEFAULTS.md).
 
 ## Documentation
 

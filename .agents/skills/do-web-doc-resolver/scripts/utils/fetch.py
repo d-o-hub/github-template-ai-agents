@@ -22,7 +22,7 @@ def fetch_url_content(
         return None
     try:
         session = get_session()
-        response = _safe_request("GET", url, session=session, timeout=timeout, verify=True)
+        response = _safe_request("GET", url, client=session, timeout=timeout)
         if response.status_code >= 400:
             # Check for bot challenge even on error status codes (e.g., 403 Forbidden)
             from scripts.quality import is_bot_challenge
@@ -94,7 +94,7 @@ def fetch_llms_txt(url: str) -> str | None:
                 return str(cached.get("content", ""))
             return None
         session = get_session()
-        response = _safe_request("GET", llms_url, session=session, timeout=10)
+        response = _safe_request("GET", llms_url, client=session, timeout=10)
         if response.status_code == 200:
             content_type = response.headers.get("Content-Type", "")
             if "text" in content_type or "markdown" in content_type:

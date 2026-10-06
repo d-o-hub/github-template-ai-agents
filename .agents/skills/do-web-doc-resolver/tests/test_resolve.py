@@ -18,7 +18,6 @@ from scripts.resolve import (
     fetch_llms_txt,
     is_url,
     resolve,
-    resolve_with_duckduckgo,
 )
 
 
@@ -832,7 +831,7 @@ class TestDuckDuckGoErrorLogging:
 
     @patch("scripts.providers_impl._is_rate_limited")
     @patch("scripts.utils._get_from_cache")
-    @patch("duckduckgo_search.DDGS")
+    @patch("ddgs.DDGS")
     def test_generic_error_logs_type_and_message(self, mock_ddgs, mock_cache, mock_rl, caplog):
         from scripts.providers_impl import resolve_with_duckduckgo
 
@@ -849,7 +848,7 @@ class TestDuckDuckGoErrorLogging:
 
     @patch("scripts.providers_impl._is_rate_limited")
     @patch("scripts.utils._get_from_cache")
-    @patch("duckduckgo_search.DDGS")
+    @patch("ddgs.DDGS")
     def test_empty_results_logs_warning(self, mock_ddgs, mock_cache, mock_rl, caplog):
         from scripts.providers_impl import resolve_with_duckduckgo
 

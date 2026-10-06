@@ -3,9 +3,9 @@
 #
 # The Agent Skills specification (https://agentskills.io/specification) requires
 # valid YAML frontmatter, so a spec-conformant parser hard-errors on broken
-# input. scripts/lib/skill-validation.sh cannot catch this class of bug because
-# it matches fields with a line-prefix regex instead of parsing YAML -- these
-# tests therefore parse the frontmatter with yaml.safe_load().
+# input. scripts/lib/skill-validation.sh uses a dependency-free bounded subset
+# reader, not a complete YAML parser. These tests independently check the real
+# corpus with yaml.safe_load(), including syntax outside that reader's subset.
 #
 # Historical breakage: five skills shipped frontmatter that yaml.safe_load()
 # rejected -- plain scalars containing ": " (git-github-workflow, goap-agent,
@@ -127,7 +127,7 @@ expected = {
     "goap-agent": ['intelligent planning: analyze', '"plan this out"', 'Not for simple single-step tasks'],
     "progressive-delivery": ['gated loop: reproduce the failure', '"canary this fix"', 'Not for shipping changes through git/GitHub'],
     "secrets-management": ['secret lifecycle: detect leaked secrets', '"rotate this key"', 'Not for privacy-first'],
-    "skill-evaluator": ['structure checks, eval coverage review', '"evaluate this skill"', 'Not for skill-creator'],
+    "skill-evaluator": ['structure checks, eval coverage review', '"evaluate this skill"', 'Not for authoring skills (use skill-creator)'],
 }
 
 skills_dir = sys.argv[1]

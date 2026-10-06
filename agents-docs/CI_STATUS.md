@@ -7,11 +7,14 @@
 ## TL;DR
 
 - `status` is **tri-state**: `passing` | `failing` | `unknown`. Only `passing`
-  clears the gate. `unknown` is **not** a pass.
+  certifies the summarized workflow gate. `unknown` is **not** a pass, and even
+  `passing` does not certify every live merge requirement.
 - A **skipped** required job is never `passing` unless that job is explicitly
   allowlisted.
 - The file is **advisory**. A committed JSON file is not a merge gate — anyone
   with write permission can set any status.
+- Adopters must confirm the source repository and run before trusting copied
+  status, and configure required checks for their own project.
 
 ## Why a skipped job cannot be green
 
@@ -80,12 +83,42 @@ enum value. `stale` means **unknown**, so it maps to `unknown_jobs`, never to
 
 ## Advisory, not authoritative
 
-`advisory_only: true` is written into the artifact. Only a **required status
-check** can block a merge. As of 2026-09-27 the `Main Branch Protection`
-ruleset (10252573) carries only `pull_request`, `deletion`,
-`required_linear_history`, `code_quality` and `code_scanning` — no
-`required_status_checks` — so nothing blocks on `CI Success` today. Treat the
-artifact as a fast signal and confirm with `gh run list` before acting.
+`advisory_only: true` is written into the artifact. Required checks and other
+live branch/ruleset protections control merging, not this JSON file.
+
+The **2026-09-28** inspection of this template's `Main Branch Protection`
+ruleset (10252573) recorded **`Codacy Static Code Analysis` as a required
+status check**. That supersedes the older no-required-status-check snapshot
+in ADR-034/ADR-040-era guidance. It is a dated observation, not a permanent
+list of requirements: query the live configuration, including inherited
+rulesets and any classic branch protection, before deciding what blocks a PR.
+`.github/main-branch-protection.json` is an exported snapshot, not evidence of
+the current server-side configuration or permission to remove a protection.
+
+Adopters must configure their own required checks for their stack. Before
+trusting a copied advisory artifact, compare its `workflow_url` repository
+with the intended repository and inspect that actual run, branch, and head
+SHA. Template provenance is not proof that the adopter's CI ran; reset or
+regenerate copied status rather than certifying it by editing the JSON.
+
+Read-only inspection commands (replace placeholders with the actual PR/run):
+
+```bash
+REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
+DEFAULT_BRANCH=$(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name')
+gh api --paginate "repos/$REPO/rules/branches/$DEFAULT_BRANCH"
+gh pr checks <pr-number> --repo "$REPO" --required
+gh run view <run-id> --repo "$REPO"
+gh api --paginate "repos/$REPO/commits/<head-sha>/check-runs" \
+  --jq '.check_runs[] | {name, status, conclusion, head_sha, app: .app.slug}'
+```
+
+Inspect classic branch protection too if the repository uses it. Confirm
+required check names/app bindings against check-runs for the **current head**;
+a missing or pending required check is not success. `gh run list` alone omits
+external app checks. Codacy can take **8–26 minutes** to post its cloud verdict;
+wait and investigate rather than bypassing or removing a valid protection.
+See [Waiting for CI](WORKFLOW.md#waiting-for-ci).
 
 ## Allowing a skip deliberately
 
@@ -114,10 +147,33 @@ about the allowlist.
 | `scripts/update-ci-status.py` | Producer: derives the artifact and `ci-summary.md`; `--check` is the fail-closed gate |
 | `scripts/persist-ci-status.sh` | Commits the artifacts and opens the automerge PR |
 | `scripts/check_ci_status_freshness.sh` | Consumer: schema, coherence, freshness, and `gh run list` parity |
+| `scripts/cleanup-ci-status-prs.sh` | Janitor: closes stale Actions bot PRs; `--dry-run` uses the identical selector without mutation |
 
 `check_ci_status_freshness.sh` fails on incoherence and staleness. A
 non-`passing` `status` is only a **warning** — the validator checks honesty, not
 greenness.
+
+### Stale automated PR cleanup
+
+The janitor recognizes both `app/github-actions` and `github-actions[bot]`.
+The **six-hour minimum** requires the bot identity, canonical branch, and
+matching artifact title together:
+
+- `ci/ci-status-update`: `ci: update ci status artifacts`.
+- `auto/regenerate-llms-txt`: `ci: regenerate llms.txt and llms-full.txt`.
+
+Either title may carry a trailing `[skip ci]` marker separated by one space.
+Other PRs from those two bot identities on `auto/*` or `ci/*` branches require
+**at least 24 hours**.
+An unrelated title or noncanonical branch does not qualify for the shorter
+threshold; unrelated authors and branches outside those prefixes are retained.
+Age is based on `createdAt`; missing, malformed, or future dates are retained.
+
+`bash scripts/cleanup-ci-status-prs.sh --dry-run` previews the exact selection
+used by the live script, including age filtering. The workflow forwards this
+flag instead of maintaining a separate PR query. Each PR is attempted once per
+invocation. Listing/parsing/closing errors fail visibly; a failed close may
+have partially succeeded, so inspect PR and branch state before retrying.
 
 ## Environment
 
@@ -143,8 +199,9 @@ greenness.
 
 - **Fail-closed, not fail-open.** `unknown` is a legitimate answer. Guessing
   green is worse than admitting ignorance because agents gate on this file.
-- **One source of truth.** The write path and the required gate share
-  `update-ci-status.py`, so the artifact and the gate cannot disagree.
+- **One derivation rule.** The write path and the workflow gate share
+  `update-ci-status.py`. This does not cover external checks or prove that the
+  artifact describes the current repository, head, or live merge requirements.
 - **Explicit expected-value assertions.** Asserting `result == 'success'` per
   dependency is the documented remedy for the cuda-python#2208 class of bug.
 - **Allowlists over denylists.** A denylist must enumerate every future way to
@@ -159,8 +216,9 @@ greenness.
 - Hand-editing `ci-status.json` to unblock work. It is generated and it is
   advisory; a hand-edit is immediately overwritten by the next run.
 - Treating `unknown` as "probably fine". It means a required job did not run.
-- Assuming a `passing` artifact means a merge would be blocked. Only a required
-  check blocks, and this repository does not currently require `CI Success`.
+- Assuming a `passing` artifact means all merge requirements passed. Verify
+  live required checks and their app bindings for the current head, including
+  Codacy; a copied snapshot or an absent check is not proof.
 
 ## Related
 

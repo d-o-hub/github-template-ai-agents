@@ -3,36 +3,38 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Evaluate the structure of my skill at .agents/skills/my-skill/",
-      "expected_output": "The agent runs the check_structure.py script or manually checks: SKILL.md exists, evals/evals.json exists and is valid JSON, no nested duplicates, eval cases have required fields. Reports PASS/NEEDS_WORK/FAIL.",
+      "prompt": "Statically evaluate .agents/skills/skill-evaluator/. Review the definitions only; do not run any model prompts.",
+      "expected_output": "The agent checks local layout, typed eval schema, at least 3 cases, and fixtures, then reviews assertion definitions. Its verdict is explicitly static and behavioral evaluation is NOT_RUN.",
       "files": [],
       "assertions": [
         "The agent checks for SKILL.md existence",
-        "The agent checks for evals/evals.json",
-        "The agent reports a verdict (PASS, NEEDS_WORK, or FAIL)"
+        "The agent checks evals/evals.json for at least 3 cases, required typed fields, unique integer IDs, and non-empty assertion strings",
+        "The agent checks local fixture paths without executing any eval prompt",
+        "The verdict is labeled static and behavioral evaluation is NOT_RUN"
       ]
     },
     {
       "id": 2,
-      "prompt": "Run a live evaluation of the triz-solver skill using one of its eval prompts",
-      "expected_output": "The agent loads the triz-solver skill, runs one eval prompt through it, grades the output against assertions with evidence, and provides a verdict.",
+      "prompt": "Manually evaluate one triz-solver eval prompt against an isolated no-skill baseline. If separate sessions are unavailable, report that limitation rather than simulating outputs.",
+      "expected_output": "The agent either captures actual outputs for the same case in isolated with-skill and without-skill sessions and grades both with evidence, or reports behavioral BLOCKED/NOT_RUN. It does not invent model outputs or measurements.",
       "files": [],
       "assertions": [
-        "The agent loads the target skill",
-        "The agent runs a representative eval prompt",
-        "The agent grades against assertions with evidence",
-        "The agent provides a clear verdict"
+        "The agent identifies a selected case ID and uses the same prompt and fixtures for both configurations",
+        "The report includes actual paired output evidence or explicitly marks behavioral BLOCKED/NOT_RUN when isolation is unavailable",
+        "Each scored assertion cites an output quotation or saved artifact, not just the eval definition",
+        "Time, token, and cost values have measurement sources or are reported as not measured"
       ]
     },
     {
       "id": 3,
       "prompt": "Compare the triz-solver skill in audit mode with and without the skill loaded (baseline comparison)",
-      "expected_output": "The agent runs the same prompt twice: once with the skill loaded, once without. Compares pass rate, missing details, format compliance.",
+      "expected_output": "The agent uses independent sessions for the same audit prompt and grades actual outputs with a stated denominator, or reports the comparison blocked. It reports observed differences without assuming the skill outperforms the baseline.",
       "files": [],
       "assertions": [
-        "The agent runs the same prompt with and without the skill",
-        "The agent compares results systematically",
-        "The agent reports differences in output quality"
+        "The comparison uses the same prompt and inputs with the skill as the only intended variable, or states why paired execution is blocked",
+        "The baseline is not reused from a with-skill transcript",
+        "Any reported pass rate identifies the graded assertions and denominator and excludes explicitly blocked cases",
+        "The agent does not claim improvement merely because the with-skill output passes"
       ]
     },
     {
@@ -49,12 +51,37 @@
     {
       "id": 5,
       "prompt": "My skill at .agents/skills/epub-validation/ has no evals directory. What should I add?",
-      "expected_output": "The agent explains what evals/evals.json should contain: an array of eval cases with id, prompt, expected_output, files, and assertions fields. Provides guidance on realistic prompts and concrete assertions.",
+      "expected_output": "The agent reports a static failure for missing evals, then explains the matching skill_name and evals array with at least 3 cases, unique integer IDs, required non-empty prompt/expected_output/assertions strings, and optional local files paths. Behavioral evaluation remains NOT_RUN.",
       "files": [],
       "assertions": [
-        "The agent explains the evals.json structure",
-        "The agent mentions required fields (id, prompt, expected_output)",
-        "The agent explains assertions should be concrete and checkable"
+        "The agent says the missing evals directory fails static validation rather than treating evals as optional",
+        "The agent requires at least 3 cases with unique integer id, non-empty prompt and expected_output, and a non-empty assertion string array",
+        "The agent explains optional files must name existing local fixtures under the skill root",
+        "The report says behavioral evaluation is NOT_RUN"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Review these malformed eval definitions statically: a top-level JSON array; an evals array containing null; duplicate IDs; assertions: []; files: [42]; bucket: {}. What should fail? Do not run a model.",
+      "expected_output": "The agent identifies root/case type errors, duplicate IDs, empty assertions, invalid file types, and the invalid bucket without crashing or claiming behavioral results.",
+      "files": [],
+      "assertions": [
+        "The report rejects a non-object root and a null case as schema errors",
+        "The report rejects duplicate IDs and empty assertion arrays",
+        "The report rejects files containing numbers and a non-string bucket",
+        "The report labels findings static and does not present model-output scores"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "eval-skills.sh exited 0. Can I report that every skill behaviorally passed and estimate the token savings?",
+      "expected_output": "The agent explains that this is static evidence only, behavioral trials are NOT_RUN, and token savings cannot be inferred or estimated as measured results. A manual isolated paired trial is needed for behavioral evidence.",
+      "files": [],
+      "assertions": [
+        "The agent refuses to infer behavioral PASS from eval-skills.sh exit 0",
+        "The agent marks behavioral evidence NOT_RUN and token savings not measured",
+        "The agent describes manual isolated with-skill/no-skill output capture as the prerequisite for a paired behavioral claim",
+        "The agent does not claim the repository ships an automated model runner for this evaluation"
       ]
     }
   ]

@@ -137,13 +137,18 @@ bats tests/example.bats
 
 Quick integration:
 
+On an Ubuntu runner after checkout, install the tools rather than using a
+third-party action on a mutable branch. Adapt the script paths to the project.
+
 ```yaml
-- name: ShellCheck
-  uses: ludeeus/action-shellcheck@master
-- name: Run BATS
+- name: Install shell checks
   run: |
-    sudo apt-get install -y bats
-    bats tests/
+    sudo apt-get update
+    sudo apt-get install -y shellcheck bats
+- name: ShellCheck
+  run: shellcheck scripts/*.sh
+- name: Run BATS
+  run: bats tests/
 ```
 
 ## Script Template

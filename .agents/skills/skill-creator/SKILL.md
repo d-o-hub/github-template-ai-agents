@@ -43,7 +43,7 @@ skill-name/
 ├── assets/           # Optional: templates, resources
 ├── agents/           # Optional: subagent instructions
 ├── eval-viewer/      # Optional: review page generation
-└── evals/            # Optional: test cases
+└── evals/evals.json  # Required in this template: at least 3 test cases
 ```
 
 ### Frontmatter Fields
@@ -53,7 +53,7 @@ skill-name/
 | `name` | Yes | Max 64 chars. Lowercase letters, numbers, hyphens only. |
 | `description` | Yes | Max 1024 chars. Describes what the skill does AND when to use it. |
 | `category` | Yes | Existing category slug; required by `validate-skills.sh`. |
-| `version` | Yes | SemVer; required by `validate-skills.sh`. See Versioning Conventions. |
+| `version` | No (recommended) | Optional release stamp for the skill set, not required per-skill SemVer. Missing values warn only. |
 | `license` | No | License name or reference to bundled license file. |
 | `compatibility` | No | Max 500 chars. Environment requirements. |
 | `metadata` | No | Arbitrary key-value mapping. |
@@ -119,9 +119,17 @@ Store in `evals/evals.json`:
 
 ### Test Case Guidelines
 
+- **Template-local requirement**: Every skill needs `evals/evals.json` with at
+  least 3 cases. This is repository policy, not an Agent Skills spec requirement.
+- **Shape**: Use a matching `skill_name`, unique integer IDs, non-empty `prompt`
+  and `expected_output` strings, and non-empty arrays of checkable assertion
+  strings. Optional `files` is an array of paths to existing local input fixtures.
 - **Realism**: Add file paths, personal context, specific details, casual language
 - **Variety**: Mix formal/casual, terse/context-heavy, single-step/multi-step
 - **Near-misses**: Include queries that share keywords but need something different
+- **Evidence scope**: A static audit checks definitions, not model behavior.
+  Use `skill-evaluator`'s manual paired mode for behavioral claims; record
+  unavailable measurements as unavailable, never estimated pass rates or costs.
 
 ---
 
@@ -178,23 +186,25 @@ Use `skill-evaluator/references/verification-checklist.md` as a starting point.
 1. **Catalog Update**: Add the skill to the "Skills" section in `AGENTS.md` following the alphabetical order within its category.
 2. **Docs Sync**: Add the skill to `agents-docs/skills-reference.md`.
 3. **Registry Update**: Run `./scripts/update-agents-registry.sh` if applicable.
-4. **Maintenance**: Run `./scripts/generate-skills-readme.py` and `./scripts/generate-available-skills.sh` to update auto-generated documentation.
+4. **Maintenance**: Run `python3 scripts/generate-skills-readme.py` and `./scripts/generate-available-skills.sh` to update auto-generated documentation.
 
 ### Acceptance Criteria Format
 
 Every new skill must meet these criteria before being merged:
 - [ ] `SKILL.md` is under 250 lines.
-- [ ] Frontmatter contains `name`, `description`, `category`, and `version`.
+- [ ] Frontmatter contains `name`, `description`, and template-local `category`.
+- [ ] Optional `version` follows the recommended release-stamp policy.
 - [ ] Includes `## Rationalizations` and `## Red Flags` sections.
 - [ ] Contains at least 3 realistic eval cases in `evals/evals.json`.
 - [ ] Successfully passes `./scripts/validate-skills.sh`.
 
 ### Versioning Conventions
 
-- Use Semantic Versioning (SemVer) for the `version` field.
-- **Major (1.0.0)**: Breaking changes in skill interface or core logic.
-- **Minor (0.1.0)**: New instructions, sections, or eval cases that don't break existing usage.
-- **Patch (0.0.1)**: Typos, minor phrasing improvements, or metadata updates.
+- `agents-docs/SKILLS.md` is authoritative for frontmatter policy.
+- `version` is recommended but optional: it stamps a skill-set release, not an
+  independent per-skill SemVer line. Bump on a skill-set release, not each edit.
+- A lagging stamp is legal; do not force-bump it to quiet a diff.
+- `template_version` is optional too; derive it from root `VERSION` if used.
 
 ## Scripts
 

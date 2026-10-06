@@ -107,7 +107,7 @@ def _get_from_cache(input_str: str, source: str) -> dict[str, Any] | None:
 
     with _cache_lock:
         cache = _get_cache()
-    if not cache:
+    if cache is None:
         return None
     with _cache_lock:
         result = cache.get(_cache_key(input_str, source))
@@ -121,7 +121,7 @@ def _save_to_cache(input_str: str, source: str, result: dict[str, Any], ttl: int
 
     with _cache_lock:
         cache = _get_cache()
-    if not cache:
+    if cache is None:
         return
 
     if ttl is None:
