@@ -171,6 +171,8 @@ SENSITIVE_PREFIXES = (
     "token",
     "access_token",
     "access-token",
+    "access_key",
+    "access-key",
     "refresh_token",
     "refresh-token",
     "auth_token",
