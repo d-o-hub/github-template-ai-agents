@@ -96,27 +96,32 @@ fi
 echo "=== AGENTS.md skill table ==="
 printf "  catalog: %s skills, table: %s names\n" "${#CATALOG[@]}" "$(printf '%s\n' "$TABLE_LIST" | wc -l)"
 
+# perf: replace subshells and external pipelines with native bash associative arrays
+declare -A CATALOG_MAP=()
+for skill in "${CATALOG[@]}"; do
+    CATALOG_MAP["$skill"]=1
+done
+
+declare -A TABLE_COUNTS=()
+# $TABLE_LIST is guaranteed to not contain spaces per the regex
+for skill in $TABLE_LIST; do
+    TABLE_COUNTS["$skill"]=$(( ${TABLE_COUNTS["$skill"]:-0} + 1 ))
+done
+
 # 1. Missing from the table.
 for skill in "${CATALOG[@]}"; do
-    if ! printf '%s\n' "$TABLE_LIST" | grep -qx -- "$skill"; then
+    if [[ -z "${TABLE_COUNTS["$skill"]:-}" ]]; then
         fail "$skill exists in .agents/skills/ but is absent from the AGENTS.md table"
     fi
 done
 
 # 2. Stale in the table, and 3. listed more than once.
-for skill in $(printf '%s\n' "$TABLE_LIST" | sort -u); do
-    occurrences=$(printf '%s\n' "$TABLE_LIST" | grep -cx -- "$skill" || true)
+for skill in "${!TABLE_COUNTS[@]}"; do
+    occurrences="${TABLE_COUNTS["$skill"]}"
     if [[ "$occurrences" -gt 1 ]]; then
         fail "$skill is listed $occurrences times in the AGENTS.md table (expected once)"
     fi
-    found=false
-    for catalog_skill in "${CATALOG[@]}"; do
-        if [[ "$catalog_skill" == "$skill" ]]; then
-            found=true
-            break
-        fi
-    done
-    if [[ "$found" == false ]]; then
+    if [[ -z "${CATALOG_MAP["$skill"]:-}" ]]; then
         fail "$skill is listed in AGENTS.md but no longer exists in .agents/skills/"
     fi
 done
