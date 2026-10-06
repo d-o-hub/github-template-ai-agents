@@ -62,7 +62,8 @@ validate_skill_file() {
     # The dependency-free reader rejects YAML outside its documented subset;
     # this is not advertised as complete YAML validation.
     local frontmatter_result
-    if ! frontmatter_result=$(python3 "$SKILL_VALIDATION_LIB_DIR/skill_frontmatter.py" "$skill_file"); then
+    if ! frontmatter_result=$(SKILL_FRONTMATTER_ROOT="$SKILLS_SRC" \
+        python3 "$SKILL_VALIDATION_LIB_DIR/skill_frontmatter.py" "$skill_file"); then
         errors=1
     fi
     local line_count has_version template_version

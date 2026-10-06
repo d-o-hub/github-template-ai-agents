@@ -322,7 +322,8 @@ MD
     [[ "$output" == *"0 failure(s)"* ]]
     # Policy acceptance must also exercise the actual frontmatter reader. The
     # fixture uses YAML's valid indentless changelog sequence.
-    run python3 "$REPO_ROOT/scripts/lib/skill_frontmatter.py" "$FIXTURE_DIR/clean/skill-clean/SKILL.md"
+    run env SKILL_FRONTMATTER_ROOT="$FIXTURE_DIR/clean" \
+        python3 "$REPO_ROOT/scripts/lib/skill_frontmatter.py" "$FIXTURE_DIR/clean/skill-clean/SKILL.md"
     [ "$status" -eq 0 ]
 }
 

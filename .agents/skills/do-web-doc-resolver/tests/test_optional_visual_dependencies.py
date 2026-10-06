@@ -42,7 +42,7 @@ def run_without_optional_dependencies(code, tmp_path):
         text=True,
         timeout=SUBPROCESS_TIMEOUT_SECONDS,
         check=False,
-    )
+    )  # nosec B603 -- controlled interpreter invocation uses fixed test code
 
 
 def test_text_cli_starts_without_visual_extras(tmp_path):

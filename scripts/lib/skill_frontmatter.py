@@ -10,6 +10,7 @@ explicitly. Unsupported YAML must not silently pass as regex key presence.
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -265,9 +266,29 @@ def validate_frontmatter(data: dict, parent_name: str) -> list[str]:
     return issues
 
 
-def main() -> int:
-    path = Path(sys.argv[1])
+def _validated_path(raw_path: str) -> Path:
+    """Resolve a SKILL.md path beneath the caller-declared skill root."""
+    root_value = os.environ.get("SKILL_FRONTMATTER_ROOT", "")
+    if not root_value:
+        raise FrontmatterError("SKILL_FRONTMATTER_ROOT is required")
+    root = Path(root_value).resolve()
+    path = Path(raw_path).resolve()
+    if path.name != "SKILL.md":
+        raise FrontmatterError("path must name a SKILL.md file")
     try:
+        path.relative_to(root)
+    except ValueError as exc:
+        raise FrontmatterError("path must stay within SKILL_FRONTMATTER_ROOT") from exc
+    if not path.is_file():
+        raise FrontmatterError("path must identify a regular file")
+    return path
+
+
+def main() -> int:
+    try:
+        if len(sys.argv) != 2:
+            raise FrontmatterError("exactly one SKILL.md path is required")
+        path = _validated_path(sys.argv[1])
         text = path.read_text(encoding="utf-8")
         data, _ = read_frontmatter(text)
         issues = validate_frontmatter(data, path.parent.name)

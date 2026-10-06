@@ -1,6 +1,7 @@
 """Differential checks of the actual bounded reader; PyYAML is test-only."""
 
 import itertools
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -31,6 +32,7 @@ def actual_cli(tmp_path, frontmatter):
     return subprocess.run(
         [sys.executable, "-S", str(ROOT / "scripts/lib/skill_frontmatter.py"), str(path)],
         capture_output=True, text=True, check=False,
+        env={**os.environ, "SKILL_FRONTMATTER_ROOT": str(tmp_path)},
     )
 
 

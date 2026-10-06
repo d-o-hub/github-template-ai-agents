@@ -64,8 +64,24 @@ def test_frontmatter_reader_needs_no_site_packages(repo):
         ["python3", "-S", str(repo / "scripts/lib/skill_frontmatter.py"),
          str(repo / ".agents/skills/test-skill/SKILL.md")],
         capture_output=True, text=True, check=False,
+        env={**os.environ, "SKILL_FRONTMATTER_ROOT": str(repo / ".agents/skills")},
     )
     assert result.returncode == 0, result.stderr
+
+
+def test_frontmatter_reader_rejects_path_outside_skill_root(repo, tmp_path):
+    outside = tmp_path / "outside" / "SKILL.md"
+    outside.parent.mkdir()
+    outside.write_text("---\nname: outside\n---\n", encoding="utf-8")
+    result = subprocess.run(
+        ["python3", "-S", str(repo / "scripts/lib/skill_frontmatter.py"), str(outside)],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={**os.environ, "SKILL_FRONTMATTER_ROOT": str(repo / ".agents/skills")},
+    )
+    assert result.returncode == 1
+    assert "SKILL_FRONTMATTER_ROOT" in result.stderr
 
 
 def test_missing_shared_manifest_cannot_silently_change_policy(repo):
