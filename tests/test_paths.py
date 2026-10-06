@@ -129,6 +129,7 @@ def test_validate_safe_path_patterns(tmp_path):
         "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
         "netrc_backup", ".netrc_old", ".npmrc_custom", ".yarnrc_custom", ".pypirc_prod",
         "auth.json_copy", "token_secret.json", "token.txt", "access_token.json", "access-token.txt",
+        "access_key.json", "access-key.txt",
         "refresh_token.json", "refresh-token.txt", "auth_token.json", "auth-token.txt",
         "session_token.json", "session-token.txt", "bearer_token.txt", "bearer-token.txt",
         "app_secret.json", "app-secret.json", "api_secret.txt", "api-secret.txt",
