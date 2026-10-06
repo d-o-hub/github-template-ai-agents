@@ -1,1 +1,1 @@
-perf: eliminate grep forks in check-agents-md-skills.sh loop
+perf: eliminate grep process forks in check-agents-md-skills.sh loop
