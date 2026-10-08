@@ -139,6 +139,8 @@ FORBIDDEN_PATHS = frozenset({
     ".m2",
     ".netrc.bak",
     ".gradle",
+    ".bunrc",
+    ".pip",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
@@ -167,6 +169,7 @@ SENSITIVE_PREFIXES = (
     ".npmrc",
     ".yarnrc",
     ".pypirc",
+    ".bunrc",
     "auth.json",
     "token",
     "access_token",
