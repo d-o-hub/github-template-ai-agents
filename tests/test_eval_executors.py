@@ -258,3 +258,17 @@ def test_run_file_validation_gradle_rejected(tmp_path):
     assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
     assert result.message == "Missing 1 file(s)"  # nosec B101 -- test assertion
     assert result.details == ["Missing: .gradle"]  # nosec B101 -- test assertion
+
+
+def test_run_file_validation_bunrc_pip_rejected(tmp_path):
+    """Consumer regression: eval file-validation must reject repo-local .bunrc and .pip files."""
+    skill_path = tmp_path / "skill"
+    skill_path.mkdir()
+    (skill_path / ".bunrc").write_text("test-content", encoding="utf-8")
+    (skill_path / ".pip").mkdir()
+
+    eval_case = {"id": 1, "files": [".bunrc", ".pip"]}
+    result = eval_executors.run_file_validation(eval_case, skill_path, False)
+    assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
+    assert result.message == "Missing 2 file(s)"  # nosec B101 -- test assertion
+    assert result.details == ["Missing: .bunrc", "Missing: .pip"]  # nosec B101 -- test assertion
