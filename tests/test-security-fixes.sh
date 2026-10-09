@@ -17,6 +17,7 @@ mkdir -p "$TEST_ROOT/.agents/skills/test-skill"
 cp scripts/check-plan-numbering.sh "$TEST_ROOT/scripts/"
 cp scripts/validate-skills.sh "$TEST_ROOT/scripts/"
 cp scripts/lib/skill-validation.sh "$TEST_ROOT/scripts/lib/"
+cp scripts/lib/{optional_skills.sh,skill_frontmatter.py,eval_validators.py,eval_types.py} "$TEST_ROOT/scripts/lib/"
 
 # Test 1: Verify scripts/check-plan-numbering.sh correctly reads numbers
 echo "Test 1: check-plan-numbering.sh functional check..."
@@ -46,18 +47,34 @@ fi
 echo "Test 2: validate-skills.sh rules count check..."
 cat <<EOF > "$TEST_ROOT/.agents/skill-rules.json"
 {
-  "rule1": "value1",
-  "rule2": "value2"
+  "rules": [
+    {"skill":"test-skill","triggers":{"keywords":["test"],"patterns":[],"files":[]},"priority":"high","autoActivate":true},
+    {"skill":"test-skill","triggers":{"keywords":["fixture"],"patterns":[],"files":[]},"priority":"low","autoActivate":false}
+  ]
 }
 EOF
 cat <<EOF > "$TEST_ROOT/.agents/skills/test-skill/SKILL.md"
 ---
 name: test-skill
 description: A test skill
+category: testing
 version: 1.0.0
 ---
 # Test Skill
+## Rationalizations
+## Red Flags
 EOF
+mkdir -p "$TEST_ROOT/.agents/skills/test-skill/evals"
+python3 - "$TEST_ROOT/.agents/skills/test-skill/evals/evals.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+Path(sys.argv[1]).write_text(json.dumps({
+    "skill_name": "test-skill",
+    "evals": [{"id": i, "prompt": "Test", "expected_output": "Test", "assertions": ["Test"]}
+              for i in range(1, 4)]
+}))
+PY
 
 # Run script and check output
 OUTPUT=$("$TEST_ROOT/scripts/validate-skills.sh" 2>&1)
@@ -197,6 +214,7 @@ mkdir -p "$TEST_ROOT/skill_test/.agents/skills/test-skill"
 mkdir -p "$TEST_ROOT/skill_test/scripts/lib"
 cp "$PROJECT_ROOT/scripts/validate-skills.sh" "$TEST_ROOT/skill_test/scripts/"
 cp "$PROJECT_ROOT/scripts/lib/skill-validation.sh" "$TEST_ROOT/skill_test/scripts/lib/"
+cp "$PROJECT_ROOT/scripts/lib/"{optional_skills.sh,skill_frontmatter.py,eval_validators.py,eval_types.py} "$TEST_ROOT/skill_test/scripts/lib/"
 (
     cd "$TEST_ROOT/skill_test"
     echo "0.2.10" > "VERSION"
@@ -204,10 +222,15 @@ cp "$PROJECT_ROOT/scripts/lib/skill-validation.sh" "$TEST_ROOT/skill_test/script
 ---
 name: test-skill
 description: test
+category: testing
 version: 1.0.0
 template_version: 0.08.0
 ---
+## Rationalizations
+## Red Flags
 SKILL
+    mkdir -p .agents/skills/test-skill/evals
+    cp "$TEST_ROOT/.agents/skills/test-skill/evals/evals.json" .agents/skills/test-skill/evals/
     if bash scripts/validate-skills.sh > /dev/null 2>&1; then
         echo "  ✓ Test 6d passed: skill-validation.sh handled leading zeros in version"
     else

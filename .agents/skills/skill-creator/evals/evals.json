@@ -7,10 +7,11 @@
       "expected_output": "The agent creates the skill directory with SKILL.md containing proper frontmatter (name, description with trigger keywords), step-by-step instructions, and references to detailed docs. Creates evals/evals.json with test cases.",
       "files": [],
       "assertions": [
-        "The agent creates a SKILL.md with valid frontmatter (name and description fields)",
+        "The agent creates a SKILL.md with name, description, and template-local category frontmatter",
         "The description includes 'Use when...' trigger phrases",
         "The SKILL.md body is under 250 lines",
-        "The agent creates evals/evals.json with at least 2 test cases"
+        "The agent creates evals/evals.json with at least 3 cases, each with a unique integer id and non-empty prompt, expected_output, and assertions",
+        "The agent treats version as an optional recommended release stamp, not a required per-skill SemVer field"
       ]
     },
     {
@@ -30,20 +31,22 @@
       "expected_output": "The agent creates evals/evals.json with realistic prompts, expected outputs, and checkable assertions. Includes variety: formal/casual, terse/context-heavy, near-miss queries.",
       "files": [],
       "assertions": [
-        "The agent creates evals with id, prompt, expected_output, and assertions fields",
+        "The agent creates at least 3 eval cases with unique integer id, non-empty prompt and expected_output, and non-empty assertion string arrays",
         "The prompts are realistic and varied",
         "The assertions are concrete and checkable (not subjective)"
       ]
     },
     {
       "id": 4,
-      "prompt": "What fields are required in the SKILL.md frontmatter?",
-      "expected_output": "The agent lists: name (required, max 64 chars, lowercase/hyphens) and description (required, max 1024 chars). Optional: license, compatibility, metadata, allowed-tools.",
+      "prompt": "What fields are required in SKILL.md frontmatter, which are recommended or optional, and what do version and template_version mean in this template?",
+      "expected_output": "The agent distinguishes spec-required name and description from template-local required category. It explains that version is an optional recommended skill-set release stamp, not required per-skill SemVer, and template_version is optional; agents-docs/SKILLS.md is the policy authority.",
       "files": [],
       "assertions": [
         "The agent lists name as required with constraints",
         "The agent lists description as required with constraints",
-        "The agent mentions the 250-line SKILL.md body limit"
+        "The agent lists category as required only by this template",
+        "The agent describes version as optional and recommended, a release stamp rather than required per-skill SemVer",
+        "The agent states that template_version is optional and cites agents-docs/SKILLS.md as the policy authority"
       ]
     },
     {

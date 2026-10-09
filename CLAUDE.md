@@ -16,7 +16,8 @@ Default agents in this template:
 - `analysis-swarm` - parallel multi-perspective code analysis
 
 Delegate context-heavy research to sub-agents to keep the parent session focused.
-See `agents-docs/SUB-AGENTS.md`.
+Follow the shared retrieval → planning → implementation → verification order;
+use orchestration only when the task needs it. See `agents-docs/SUB-AGENTS.md`.
 
 ### Skills
 
@@ -31,16 +32,15 @@ See `agents-docs/SKILLS.md`.
 
 Project slash commands live in `.claude/commands/`. Use them for repeatable workflows.
 
-### Metrics
-
-After every task, append using: `./scripts/log-metric.sh '<json>'`
-Entries go to `.agents/metrics/metrics-{agent}.jsonl`.
-See `agents-docs/METRICS.md`.
+### Verification Hooks
 
 Verification hooks run automatically on agent stop events.
 - Exit `0` = silent success (nothing extra enters context)
 - Exit `2` = errors surfaced to agent, forcing remediation before finishing
-See `agents-docs/HOOKS.md`.
+See `agents-docs/HOOKS.md`. A successful hook is evidence only for the checks
+it ran, not proof of agent behavior. Downstream adopters customize hooks for
+their product. Profile, metrics, and shipping policy come only from `AGENTS.md`;
+Claude Code does not add a separate metrics or automatic publishing requirement.
 
 ### Headless / CI Mode
 

@@ -7,7 +7,7 @@
 #      present, and the presence of references/, scripts/ and evals/.
 #   2. evals/evals.json, via the same script: the file exists and parses, a
 #      top-level "evals" array is present, every case carries id + prompt +
-#      expected_output, at least 2 cases are recommended, and the optional
+#      expected_output + assertions, at least 3 cases are required, and the optional
 #      4-bucket taxonomy is coherent (no unknown bucket; if any bucket is
 #      declared, a "negative" case must exist).
 #   3. Required eval fields, via an awk pass over every evals.json (both the
@@ -27,9 +27,9 @@
 #   - SKILL.md YAML frontmatter. It is never parsed; no frontmatter key (name,
 #     description, version, allowed-tools, ...) is validated here. Frontmatter
 #     validation lives in scripts/lib/skill-validation.sh.
-#   - Behaviour. No eval is executed and no assertion is scored against model
-#     output. This is a static schema and layout audit, not an eval run; use
-#     scripts/run-evals.py for that.
+#   - Behaviour. No assertion is scored against model output. This and
+#     scripts/run-evals.py are static/smoke checks; paired model runs require
+#     the manual evidence workflow in skill-evaluator.
 #
 # Exit 0 = all pass, Exit 1 = needs work.
 set -euo pipefail
@@ -38,7 +38,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$REPO_ROOT/.agents/skills"
 EVAL_SCRIPT="$SKILLS_DIR/skill-evaluator/scripts/check_structure.py"
 
-echo "=== Evaluating Skills (agentskills.io spec) ==="
+echo "=== Static skill audit (template schema/layout/fixtures) ==="
 echo ""
 
 if [[ ! -f "$EVAL_SCRIPT" ]]; then

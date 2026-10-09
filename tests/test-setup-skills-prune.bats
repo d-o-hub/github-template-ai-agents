@@ -21,3 +21,38 @@ setup() {
   [ ! -L "$REPO_ROOT/.claude/skills/real-skill-workspace" ]
   [ -L "$REPO_ROOT/.claude/skills/real-skill" ]
 }
+
+@test "setup uses exactly the historical optional names without demoting pack skills" {
+  # The manifest is sourced from the code directory, not REPO_ROOT's fixture.
+  source "$BATS_TEST_DIRNAME/../scripts/lib/optional_skills.sh"
+  [ "${#SKILLS_OPTIONAL[@]}" -eq 8 ]
+  for skill in "${SKILLS_OPTIONAL[@]}" secure-invite-and-access dependency-upgrades; do
+    mkdir -p "$REPO_ROOT/.agents/skills/$skill"
+    printf '# Fixture\n' > "$REPO_ROOT/.agents/skills/$skill/SKILL.md"
+  done
+  run env REPO_ROOT="$REPO_ROOT" LINK_OPTIONAL=false bash "$BATS_TEST_DIRNAME/../scripts/setup-skills.sh"
+  [ "$status" -eq 0 ]
+  for cli in .claude .qwen; do
+    for skill in "${SKILLS_OPTIONAL[@]}"; do
+      [ ! -L "$REPO_ROOT/$cli/skills/$skill" ]
+    done
+    [ -L "$REPO_ROOT/$cli/skills/secure-invite-and-access" ]
+    [ -L "$REPO_ROOT/$cli/skills/dependency-upgrades" ]
+  done
+  run env REPO_ROOT="$REPO_ROOT" LINK_OPTIONAL=true bash "$BATS_TEST_DIRNAME/../scripts/setup-skills.sh"
+  [ "$status" -eq 0 ]
+  for cli in .claude .qwen; do
+    for skill in "${SKILLS_OPTIONAL[@]}"; do
+      [ -L "$REPO_ROOT/$cli/skills/$skill" ]
+    done
+  done
+}
+
+@test "copied setup script loads its copied manifest" {
+  mkdir -p "$REPO_ROOT/scripts/lib"
+  cp "$BATS_TEST_DIRNAME/../scripts/setup-skills.sh" "$REPO_ROOT/scripts/"
+  cp "$BATS_TEST_DIRNAME/../scripts/lib/optional_skills.sh" "$REPO_ROOT/scripts/lib/"
+  run env REPO_ROOT="$REPO_ROOT" bash "$REPO_ROOT/scripts/setup-skills.sh"
+  [ "$status" -eq 0 ]
+  [ -L "$REPO_ROOT/.qwen/skills/real-skill" ]
+}

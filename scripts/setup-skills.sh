@@ -14,19 +14,12 @@ set -euo pipefail
 REPO_ROOT="${REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd)}"
 SKILLS_SRC="$REPO_ROOT/.agents/skills"
 
+# Resolve code dependencies beside the script, not the overridden fixture root.
+# shellcheck source=lib/optional_skills.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib/optional_skills.sh"
+
 # CLI folders that should contain symlinks to canonical skills
 # (OpenCode reads directly from .agents/skills/ - not included here)
-SKILLS_OPTIONAL=(
-  "eu-ai-act-compliance"
-  "durable-objects"
-  "reader-ui-ux"
-  "document-rendering-and-locators"
-  "pwa-offline-sync"
-  "cloudflare-worker-api"
-  "codacy"
-  "lifecycle-management"
-)
-
 CLI_SKILL_DIRS=(
   ".claude/skills"
   ".qwen/skills"

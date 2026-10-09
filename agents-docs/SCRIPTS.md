@@ -43,7 +43,7 @@
 | `check-lessons-consistency.sh` | Fail when `LESSONS.md`, `lessons.jsonl` and `self-learning-rules.md` disagree on which lessons exist | `./scripts/check-lessons-consistency.sh` |
 | `secretlint_gate.sh` | Runs secretlint | `./scripts/secretlint_gate.sh` |
 | `detect-duplicate-prs.sh` | Detect and defuse duplicate open PRs (ADR-035 guard) | `./scripts/detect-duplicate-prs.sh` |
-| `cleanup-ci-status-prs.sh` | Close stale CI status update PRs and delete their branches | `./scripts/cleanup-ci-status-prs.sh` |
+| `cleanup-ci-status-prs.sh` | Close stale bot PRs; dry-run uses the same identity/age selector | `./scripts/cleanup-ci-status-prs.sh --dry-run` |
 
 ## Commit and Version Scripts
 
@@ -66,7 +66,7 @@
 | `generate-available-skills.sh` | Regenerate `agents-docs/AVAILABLE_SKILLS.md` from frontmatter | `./scripts/generate-available-skills.sh` |
 | `generate-skill-catalog.sh` | Regenerate the intent-classifier skill catalog | `./scripts/generate-skill-catalog.sh` |
 | `generate-skills-reference.sh` | Auto-generate `agents-docs/skills-reference.md` from skill frontmatter | `./scripts/generate-skills-reference.sh` |
-| `generate-skills-readme.py` | Auto-generate `.agents/skills/README.md` | `./scripts/generate-skills-readme.py` |
+| `generate-skills-readme.py` | Auto-generate `.agents/skills/README.md` | `python3 scripts/generate-skills-readme.py` |
 | `generate-llms-txt.sh` | Generate `llms.txt` and `llms-full.txt` for LLM context (llmstxt.org) | `./scripts/generate-llms-txt.sh` |
 | `update-agents-registry.sh` | Update `agents-docs/AGENTS_REGISTRY.md` | `./scripts/update-agents-registry.sh` |
 | `docs-sync.sh` | List changed markdown files (not an actual sync) | `./scripts/docs-sync.sh` |
@@ -91,6 +91,8 @@
 | File | Purpose |
 |------|---------|
 | `lib/skill-validation.sh` | Shared skill validation functions (includes the `MAX_SKILL_LINES` warning threshold) |
+| `lib/skill_frontmatter.py` | Dependency-free bounded frontmatter reader and spec/template field checks |
+| `lib/optional_skills.sh` | Shared default-unlinked skill names for setup and validation |
 | `lib/worktree-manager.sh` | Git worktree management functions |
 | `lib/lang-checks.sh` | Project language detection plus per-language lint/test runners |
 | `lib/link-validation.sh` | Helpers sourced by `scripts/validate-links.sh` |

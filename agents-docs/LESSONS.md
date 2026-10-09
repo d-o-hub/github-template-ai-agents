@@ -1714,3 +1714,40 @@ Freshly created skills ship with one-way `Not for` guards and positive-scope-onl
 **Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
 
 A skill `description:` change propagates to 5-6 generated files (AVAILABLE_SKILLS.md, skills-reference.md, skill-catalog.md, .agents/skills/README.md, llms-full.txt, AGENTS_REGISTRY.md). Always regenerate; never hand-edit.
+
+### LESSON-047 — Independently Shipped Validators Need Acceptance Parity
+
+**Date:** 2026-10-05
+
+**Issue:** The repository eval validator and the standalone skill-evaluator
+checker agreed on the three-case minimum yet disagreed on tagged eval sets
+without negative cases and Windows-shaped fixture paths on Linux.
+
+**Root Cause:** Constant parity tests verified configuration, not the accepted
+input language. The two validators intentionally cannot share implementation:
+the skill's checker must work when copied outside this repository.
+
+**Solution:** Add acceptance-parity tests that submit identical malformed,
+bucket-tagged, and POSIX/Windows/traversal/symlink fixture definitions to both
+validators. Keep shared behavioral expectations without a cross-repository
+runtime import. Static PASS remains structure/schema/fixture evidence only.
+
+### LESSON-048 — Skill Dogfooding Needs Real Runtime Contracts
+
+**Date:** 2026-10-05
+
+**Issue:** Static skill checks and a selected response rubric passed while real
+resolver startup/fetches failed and a Jules response misstated default pull
+behavior. An empty disk cache also refused its first write.
+
+**Root Cause:** Optional NumPy was imported eagerly; search used an undeclared
+legacy package; HTTP callers retained Requests-era keywords after an httpx
+migration; content limits bound to timeout parameters. Mocked helpers and a
+limited four-assertion rubric did not exercise those contracts. The resolver
+quick start invoked an API facade silently and advertised an unsupported flag.
+
+**Solution:** Dogfood in an isolated environment with declared base dependencies,
+block optional imports, test the real HTTP helper through `MockTransport`, and
+verify empty-cache first writes. Check native CLI help/version without creating
+remote sessions; Jules v0.1.42 requires `--apply` for local application. Add newly
+discovered behavioral criteria prospectively and preserve earlier scores.

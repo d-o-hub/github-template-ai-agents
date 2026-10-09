@@ -320,6 +320,11 @@ MD
     run python3 "$POLICY_CHECK" "$FIXTURE_DIR/clean" "$POLICY_DOC"
     [ "$status" -eq 0 ]
     [[ "$output" == *"0 failure(s)"* ]]
+    # Policy acceptance must also exercise the actual frontmatter reader. The
+    # fixture uses YAML's valid indentless changelog sequence.
+    run env SKILL_FRONTMATTER_ROOT="$FIXTURE_DIR/clean" \
+        python3 "$REPO_ROOT/scripts/lib/skill_frontmatter.py" "$FIXTURE_DIR/clean/skill-clean/SKILL.md"
+    [ "$status" -eq 0 ]
 }
 
 @test "flags a skill missing a key the policy marks REQUIRED" {
@@ -364,10 +369,12 @@ MD
     local sandbox="$FIXTURE_DIR/pinned"
     mkdir -p "$sandbox/scripts/lib" "$sandbox/.agents/skills/tv-pinned"
     cp "$REPO_ROOT/scripts/lib/skill-validation.sh" "$sandbox/scripts/lib/"
+    cp "$REPO_ROOT/scripts/lib/skill_frontmatter.py" "$sandbox/scripts/lib/"
     printf '0.0.0\n' > "$sandbox/VERSION"
     cat > "$sandbox/.agents/skills/tv-pinned/SKILL.md" <<'MD'
 ---
 name: tv-pinned
+category: testing
 description: Fixture skill carrying a template_version.
 version: "0.1.0"
 template_version: 0.8.0
@@ -398,10 +405,12 @@ MD
     local sandbox="$FIXTURE_DIR/consumer"
     mkdir -p "$sandbox/scripts/lib" "$sandbox/.agents/skills/tv-consumer"
     cp "$REPO_ROOT/scripts/lib/skill-validation.sh" "$sandbox/scripts/lib/"
+    cp "$REPO_ROOT/scripts/lib/skill_frontmatter.py" "$sandbox/scripts/lib/"
     printf '0.10.0\n' > "$sandbox/VERSION"
     cat > "$sandbox/.agents/skills/tv-consumer/SKILL.md" <<'MD'
 ---
 name: tv-consumer
+category: testing
 description: Fixture skill carrying a template_version.
 version: "0.1.0"
 template_version: 0.8.0

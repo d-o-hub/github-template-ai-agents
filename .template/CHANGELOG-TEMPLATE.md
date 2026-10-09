@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Resolver base installs now avoid eager optional-ML imports, use their declared
+  search dependency, follow the httpx client/timeout contract, and accept first
+  writes to empty caches. The quick start invokes the real CLI with supported
+  flags; transport, redirect, cache, and minimal-dependency regressions cover it.
+- Jules retrieval guidance distinguishes default patch inspection from local
+  `--apply`, verified with native CLI help. Skill-based blind grading and real
+  runtime dogfooding are documented with historical results retained (LESSON-048).
+- Jules handoffs now require local verification after diff review and commit-
+  policy validation before authorized shipping; examples no longer hardcode a
+  security scope or treat agent-created branches as automatic rewrite permission.
+- The creator frontmatter eval now explicitly asks about optional/version
+  policy and drops an unrelated body-limit assertion. Selected paired behavioral
+  findings, including exclusions and residual misses, are recorded in
+  `plans/skill-behavioral-spot-check.md` separately from static checks.
+- Adopter instructions now separate Full template maintenance from Minimal/
+  Standard product defaults, cover copied CI/telemetry cleanup, and require
+  product-specific CI commands. Version-flow guidance matches the actual scripts.
+- Skill setup and validation share the default-unlinked manifest. Frontmatter
+  field and authoring errors now fail validation; routing output counts actual
+  rules in both tracked configurations. Static eval contracts require three
+  typed cases and consistent bucket/fixture checks, without claiming model proof.
+- CI-status cleanup recognizes both Actions author identities, shares its
+  conservative age selector with dry-run, and uses portable timestamp conversion.
+- Skill authoring/evaluator guidance distinguishes static checks from manual
+  behavioral evidence; Jules/voice evals gain stronger boundary assertions, and
+  malformed architecture/Codeberg metadata now uses spec-compatible strings.
 - LESSON-046's root cause was wrong and has been corrected. It attributed a
   missing `Codacy Static Code Analysis` check to `[skip ci]` on the PR head and
   prescribed `git commit --amend` plus a force-push. Its own evidence refutes it:

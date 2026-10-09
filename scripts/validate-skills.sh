@@ -9,18 +9,10 @@ set -uo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_SRC="$REPO_ROOT/.agents/skills"
 # shellcheck source=lib/skill-validation.sh
-source "$REPO_ROOT/scripts/lib/skill-validation.sh"
+source "$REPO_ROOT/scripts/lib/skill-validation.sh" || exit 2
 
-SKILLS_OPTIONAL=(
-  "eu-ai-act-compliance"
-  "durable-objects"
-  "reader-ui-ux"
-  "document-rendering-and-locators"
-  "pwa-offline-sync"
-  "cloudflare-worker-api"
-  "codacy"
-  "lifecycle-management"
-)
+# shellcheck source=lib/optional_skills.sh
+source "$REPO_ROOT/scripts/lib/optional_skills.sh" || exit 2
 
 CLI_SKILL_DIRS=(
   ".claude/skills"
@@ -37,10 +29,9 @@ if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
     IS_WINDOWS=true
 fi
 
-# If no skills exist, nothing to validate
+# Empty skill sets still need routing validation (references may be stale).
 if [[ ! -d "$SKILLS_SRC" ]] || [[ -z "$(ls -A -- "$SKILLS_SRC" 2>/dev/null)" ]]; then
-    echo "No skills in .agents/skills/ - nothing to validate."
-    exit 0
+    echo "No skills in .agents/skills/ - checking routing configuration only."
 fi
 
 echo "Checking canonical skills and CLI symlinks..."
@@ -151,51 +142,18 @@ for skill_path in "$SKILLS_SRC"/*/; do
 
     content=$(< "$skill_file")
 
-    skill_front_name=""
-    has_category=""
     has_rationalizations=0
     has_red_flags=0
 
-    # Parse frontmatter natively to avoid external process fork overhead
-    nl=$'\n'; cr=$'\r'
-    if [[ "$content" == ---$nl*${nl}---* ]] || [[ "$content" == ---${cr}${nl}*${cr}${nl}---* ]]; then
-        frontmatter="${content#---$nl}"
-        frontmatter="${frontmatter#---${cr}${nl}}"
-        frontmatter="${frontmatter%%${nl}---*}"
-        frontmatter="${frontmatter%%${cr}${nl}---*}"
-
-        if [[ "$frontmatter" =~ (^|$nl)name:[[:space:]]*([^$nl$cr]+) ]]; then
-            skill_front_name="${BASH_REMATCH[2]}"
-            # Trim trailing spaces just in case
-            skill_front_name="${skill_front_name%"${skill_front_name##*[![:space:]]}"}"
-        fi
-
-        if [[ "$frontmatter" =~ (^|$'\n')category: ]]; then
-            has_category="yes"
-        fi
-    fi
-
-    # Check for sections using native bash matching
-    if [[ "$content" == *$'\n## Rationalizations'* ]] || [[ "$content" == "## Rationalizations"* ]]; then
+    # Anchored complete headings, not prefix matches such as Red FlagsMissing.
+    heading_pattern=$'(^|\n)##[[:blank:]]+Rationalizations[[:blank:]]*(\r?\n|$)'
+    if [[ "$content" =~ $heading_pattern ]]; then
         has_rationalizations=1
     fi
 
-    if [[ "$content" == *$'\n## Red Flags'* ]] || [[ "$content" == "## Red Flags"* ]]; then
+    heading_pattern=$'(^|\n)##[[:blank:]]+Red[[:blank:]]Flags[[:blank:]]*(\r?\n|$)'
+    if [[ "$content" =~ $heading_pattern ]]; then
         has_red_flags=1
-    fi
-
-    # Check: name field must not contain uppercase, spaces, or non-hyphen special chars
-    if [[ -n "$skill_front_name" ]]; then
-        if [[ "$skill_front_name" =~ [A-Z] ]] || [[ "$skill_front_name" =~ [[:space:]] ]] || [[ "$skill_front_name" =~ [^a-z0-9-] ]]; then
-            printf "  ${RED}✗${NC} %s: name field contains invalid characters: '%s'\n" "$skill_name" "$skill_front_name"
-            skill_failed=1
-        fi
-    fi
-
-    # Check: frontmatter must contain category field
-    if [[ -z "$has_category" ]]; then
-        printf "  ${RED}✗${NC} %s: Missing 'category' field in frontmatter\n" "$skill_name"
-        skill_failed=1
     fi
 
     # Check: body must contain ## Rationalizations heading
@@ -210,23 +168,22 @@ for skill_path in "$SKILLS_SRC"/*/; do
         skill_failed=1
     fi
 
-    # Check: evals/evals.json must exist and contain >= 3 eval cases
-    evals_file="${skill_path}evals/evals.json"
-    if [[ ! -f "$evals_file" ]]; then
-        printf "  ${RED}✗${NC} %s: Missing evals/evals.json\n" "$skill_name"
-        skill_failed=1
-    else
-        eval_count=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(len(d.get('evals', [])))" "$evals_file" 2>/dev/null || echo 0)
-        if [[ "$eval_count" -lt 3 ]]; then
-            printf "  ${RED}✗${NC} %s: evals/evals.json has %d eval cases (need >= 3)\n" "$skill_name" "$eval_count"
-            skill_failed=1
-        fi
-    fi
+    # Use the runner's static schema/fixture checks and named minimum contract.
+    if ! python3 - "$REPO_ROOT/scripts" "$skill_path" <<'PYTHON_EVAL_CHECK'; then
+import sys
+from pathlib import Path
 
-    # Check: SKILL.md line count (WARN, not FAIL)
-    skill_lines=$(wc -l < "$skill_file")
-    if [[ "$skill_lines" -gt "$MAX_SKILL_LINES" ]]; then
-        printf "  ${YELLOW}⚠${NC} %s: SKILL.md exceeds %d lines (%d lines)\n" "$skill_name" "$MAX_SKILL_LINES" "$skill_lines"
+sys.path.insert(0, sys.argv[1])
+from lib.eval_validators import EvalStatus, run_structure_check
+
+skill = Path(sys.argv[2])
+result = run_structure_check(skill)
+if result.status == EvalStatus.FAIL:
+    for issue in result.details:
+        print(f"  ✗ {skill.name}: {issue}")
+    sys.exit(1)
+PYTHON_EVAL_CHECK
+        skill_failed=1
     fi
 
     if [[ $skill_failed -ne 0 ]]; then
@@ -236,32 +193,89 @@ done
 
 if [[ $AUTHORING_FAILED -ne 0 ]]; then
     echo ""
-    echo -e "${YELLOW}─────────────────────────────────────────────────────────────────${NC}"
-    echo -e "${YELLOW}│ ⚠ Skill authoring compliance issues found                   │${NC}"
-    echo -e "${YELLOW}─────────────────────────────────────────────────────────────────${NC}"
+    echo -e "${RED}─────────────────────────────────────────────────────────────────${NC}"
+    echo -e "${RED}│ ✗ Skill authoring compliance issues found                   │${NC}"
+    echo -e "${RED}─────────────────────────────────────────────────────────────────${NC}"
     echo ""
     echo "New skills must have: category, ## Rationalizations, ## Red Flags,"
     echo "valid name field, and evals/evals.json with >= 3 eval cases."
     echo "See: .agents/skills/SKILL_TEMPLATE.md for the canonical structure."
     echo "See: CONTRIBUTING.md → Creating or Updating Skills for the workflow."
-    WARNINGS=1
+    FAILED=1
 fi
 
 # Check 5: skill-rules.json if it exists
 echo ""
 echo "Checking skill-rules.json..."
-RULES_FILE="$REPO_ROOT/.agents/skill-rules.json"
-if [[ -f "$RULES_FILE" ]]; then
-    if ! python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$RULES_FILE" 2>/dev/null; then
-        printf "  ${RED}✗${NC} skill-rules.json: Invalid JSON\n" >&2
-        FAILED=1
-    else
-        RULES_COUNT=$(python3 -c "import json, sys; print(len(json.load(open(sys.argv[1]))))" "$RULES_FILE")
-        printf "  ${GREEN}✓${NC} skill-rules.json: Valid JSON\n"
-        printf "  ${GREEN}✓${NC} skill-rules.json: %s rules defined\n" "$RULES_COUNT"
-    fi
-else
-    echo "  (No skill-rules.json found)"
+# Both locations already exist in the template. Validate each without deleting,
+# migrating or overwriting either: adopters may intentionally maintain both.
+if ! python3 - "$REPO_ROOT" <<'PYTHON_RULES_CHECK'; then
+import json
+import re
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+failed = False
+found = False
+for path in (root / ".agents/skill-rules.json", root / ".agents/skills/skill-rules.json"):
+    if not path.is_file():
+        continue
+    found = True
+    label = str(path.relative_to(root))
+    issues = []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError, RecursionError) as exc:
+        issues.append(f"Invalid JSON: {exc}")
+        data = None
+    rules = data.get("rules") if isinstance(data, dict) else None
+    if not isinstance(rules, list):
+        issues.append("expected an object with a 'rules' array")
+    else:
+        for idx, rule in enumerate(rules, 1):
+            prefix = f"rule #{idx}"
+            if not isinstance(rule, dict):
+                issues.append(f"{prefix}: must be an object")
+                continue
+            skill = rule.get("skill")
+            if not isinstance(skill, str) or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", skill):
+                issues.append(f"{prefix}: 'skill' must be a canonical skill name")
+            elif not (root / ".agents/skills" / skill / "SKILL.md").is_file():
+                issues.append(f"{prefix}: referenced skill '{skill}' has no SKILL.md")
+            if rule.get("priority") not in ("high", "medium", "low"):
+                issues.append(f"{prefix}: 'priority' must be high, medium or low")
+            if not isinstance(rule.get("autoActivate"), bool):
+                issues.append(f"{prefix}: 'autoActivate' must be a boolean")
+            triggers = rule.get("triggers")
+            if not isinstance(triggers, dict):
+                issues.append(f"{prefix}: 'triggers' must be an object")
+                continue
+            for key in ("keywords", "patterns", "files"):
+                values = triggers.get(key)
+                if not isinstance(values, list) or not all(isinstance(v, str) and v.strip() for v in values):
+                    issues.append(f"{prefix}: triggers.{key} must be an array of non-empty strings")
+            patterns = triggers.get("patterns")
+            if isinstance(patterns, list):
+                for pattern in patterns:
+                    if not isinstance(pattern, str):
+                        continue
+                    try:
+                        re.compile(pattern)
+                    except (re.error, RecursionError) as exc:
+                        issues.append(f"{prefix}: invalid trigger pattern {pattern!r}: {exc}")
+    if issues:
+        failed = True
+        for issue in issues:
+            print(f"  ✗ {label}: {issue}")
+    else:
+        print(f"  ✓ {label}: Valid routing rules")
+        print(f"  ✓ {label}: {len(data['rules'])} rules defined")
+if not found:
+    print("  (No skill-rules.json found)")
+sys.exit(1 if failed else 0)
+PYTHON_RULES_CHECK
+    FAILED=1
 fi
 
 if [[ $FAILED -ne 0 ]]; then

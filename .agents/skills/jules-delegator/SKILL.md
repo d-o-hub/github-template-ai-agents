@@ -28,7 +28,15 @@ Delegate complex tasks to Jules using the official CLI.
 2. **Delegate**: Create a new session with a clear prompt.
 3. **Monitor**: Check session status.
 4. **Pull**: Retrieve results when complete.
-5. **Review**: Launch TUI for visual diff and confirmation.
+5. **Review and Verify**: Inspect the full diff and run relevant local checks.
+
+For explanation-only requests, show the workflow without authenticating,
+creating/pulling a session, launching the TUI, or publishing. Respect the
+requested scope. In retrieval/review explanations, state that later history
+rewrites or publication require separate user authorization; a completed session
+grants neither permission. Explain that failed local checks or non-conforming
+commit subjects block shipping until corrected and revalidated; prose subjects
+need authorized normalization before shipping under a conventional-commit policy.
 
 ## Workflow
 
@@ -66,13 +74,26 @@ jules remote list --session
 
 ### 5. Retrieve Results
 
-Pull changes once the session is completed:
+Retrieve the completed session's patch for inspection:
 
 ```bash
 jules remote pull --session <session_id>
 ```
 
-### 6. Interactive Mode
+The default retrieves the patch without applying it. If the requested task
+includes applying the results locally, first protect existing work and use a
+review branch/worktree, then add `--apply`. Inspect `jules remote pull --help`
+for the installed version; retrieval alone is not local application.
+
+### 6. Review and Verify
+
+Review every changed file against the handoff acceptance criteria, including
+untracked/generated files, dependencies, configuration, and error paths. Run
+the receiving project's relevant tests, lint/typechecks, and quality gate;
+Jules' reported results are context, not local verification evidence. In an
+explanation-only answer, describe these required checks without running them.
+
+The TUI is an optional visual-diff aid when an interactive terminal is available:
 
 Launch the TUI for a visual experience:
 
@@ -80,38 +101,41 @@ Launch the TUI for a visual experience:
 jules
 ```
 
-## 7. Post-Pull Normalization (REQUIRED)
+## 7. Commit Validation Before Authorized Shipping
 
 **`google-labs-jules[bot]` does not produce conventional commit messages.**
 It writes prose ("I've hardened the `check-adr-compliance.sh` …") that
 fails `commitlint` (header-max-length, type-empty, subject-empty). See
-ADR-008 and PR #505 run 27086771117. **Never push a Jules session's branch
-without normalization.**
+ADR-008 and PR #505 run 27086771117. This repository requires conventional
+commits; downstream projects apply their own retained commit policy.
 
-After `jules remote pull --session <id>`, before pushing or letting any
-PR open:
+After reviewing and testing the results, validate commit messages before any
+authorized push or PR. If prose subjects fail the retained policy, normalization
+is needed before shipping; already-conforming subjects need no rewrite. In an
+inspection-only task, report the violations and explain this gate without
+performing normalization. History rewrites, force-pushes, and publishing require
+explicit authorization under the receiving repository's policy.
+
+For an authorized normalization task, derive the range and choose the type/scope
+from the actual change; do not stamp every Jules task as a security fix:
 
 ```bash
-# 1. Verify the branch is clean
+# Verify the branch is clean and identify the agreed target branch.
 git status --porcelain
 
-# 2. For each non-conventional commit in the Jules branch, rewrite it.
-#    Find the merge-base and the head:
-BASE="$(git merge-base HEAD origin/main)"
+# TARGET_REF, COMMIT_TYPE and COMMIT_SCOPE come from the approved task context.
+BASE="$(git merge-base HEAD "$TARGET_REF")"
 HEAD="$(git rev-parse HEAD)"
 
-# 3. Auto-rewriter (see .agents/skills/jules-delegator/scripts/normalize-commits.sh):
+# Run only when rewriting non-conforming subjects is authorized.
 ./.agents/skills/jules-delegator/scripts/normalize-commits.sh \
     --from "$BASE" \
     --to   "$HEAD" \
-    --type fix \
-    --scope security
+    --type "$COMMIT_TYPE" \
+    --scope "$COMMIT_SCOPE"
 
-# 4. Force-push the rewritten branch (Jules session branches are disposable).
-git push --force-with-lease origin <branch>
-
-# 5. Validate locally before requesting review.
-./scripts/validate-commit-message.sh <(git log -1 --pretty=%B)
+# Recompute the range and validate all resulting subjects before publishing.
+npx commitlint --from "$BASE" --to HEAD
 ```
 
 The rewriter:
@@ -148,16 +172,18 @@ The rewriter:
 |-----------------|---------|
 | "I can do this faster manually" | Delegation allows for parallel progress and autonomous implementation of complex features. |
 | "Setting up the CLI is too much work" | Authentication is one-time, and auto-detection simplifies session creation. |
-| "Jules already validated its work, I don't need to re-validate" | Jules has no knowledge of `commitlint.config.cjs` and will produce prose commits; without normalization the PR is blocked at CI. |
+| "Jules already validated its work, I don't need to re-validate" | Review the actual diff, run the receiving project's checks, and validate commit policy locally; a completion summary proves none of these. |
 | "I can just edit the PR title to make it pass" | The PR title is the squash-merge subject, but the **commits** in the PR are also linted (see `commitlint` job in `.github/workflows/commitlint.yml`). Title-only fixes leave the bot commits failing. |
-| "Force-pushing a Jules branch is unsafe" | Jules session branches are disposable by design; the merge base is the same. |
+| "A Jules branch is disposable, so I can force-push it" | Other work and review signals may depend on it. Rewriting or publishing requires authorization, even for agent-created branches. |
 
 ## Red Flags
 
 - [ ] Forgetting to pull results after a session is completed.
 - [ ] Providing vague prompts that lead to incorrect implementations.
 - [ ] Not verifying local context before session creation.
-- [ ] Pushing a Jules session's branch without running the Post-Pull Normalization step.
+- [ ] Treating reported tests as local verification or skipping relevant checks.
+- [ ] Rewriting or publishing during an explanation-only or inspection-only task.
+- [ ] Shipping non-conforming subjects without commit validation/normalization.
 - [ ] Opening a PR from a Jules session without first running `npx commitlint --from <base> --to <head>`.
 
 ## References

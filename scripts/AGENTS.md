@@ -34,6 +34,9 @@ Never hardcode paths.
 - Linting results for `shellcheck` and `markdownlint` are cached in `.git/lint-cache/` to speed up subsequent runs. The cache is per-file and aware of configuration changes.
 - The 250-line SKILL.md limit in `lib/skill-validation.sh` (`MAX_SKILL_LINES=250`) is a WARNING, not a CI failure — it uses yellow ⚠ prefix without incrementing the FAILED counter. Use `MAX_SKILL_LINES=999` to suppress for legitimately long skills.
 - Before deleting/merging a skill, grep across the entire repo: `git grep -l <old-skill-name>` will reveal all 5 doc locations that need updates (skill-rules.json, registry docs, llms-full.txt, agent configs, command files).
+- Repository and standalone skill-eval validators ship independently. Pin their
+  acceptance parity with the same malformed/bucket/path fixtures, not just equal
+  constants; both static commands must agree (LESSON-047).
 
 ## Adding a New Script
 

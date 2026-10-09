@@ -23,6 +23,8 @@ exclude_paths:
   - ".agents/skills/skill-creator/scripts/run_loop.py"
   # Test files: subprocess list-form calls and tempfile usage are safe patterns.
   - ".agents/skills/do-web-doc-resolver/tests/integration/**"
+  # This fixture intentionally launches an isolated interpreter with generated test code.
+  - ".agents/skills/do-web-doc-resolver/tests/test_optional_visual_dependencies.py"
   - "tests/test_update_ci_status.py"
   # Repo-level test tree. Same rationale as the entry above: assertions,
   # subprocess list-form calls, and tempdir fixtures are safe patterns, and

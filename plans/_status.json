@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-043"
+    "adr": "adr-044"
   },
   "active_plan": null,
   "phases": [],
@@ -90,6 +90,10 @@
     "adr-042-round11-audit-layer-debt.md": {
       "status": "accepted",
       "date": "2026-10-02"
+    },
+    "adr-043-template-adopter-boundaries.md": {
+      "status": "accepted",
+      "date": "2026-10-05"
     }
   }
 }
