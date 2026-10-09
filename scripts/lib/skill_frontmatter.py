@@ -285,15 +285,17 @@ def _validated_path(raw_path: str) -> Path:
 
 
 def main() -> int:
+    skill_label = "<unknown>"
     try:
         if len(sys.argv) != 2:
             raise FrontmatterError("exactly one SKILL.md path is required")
+        skill_label = Path(sys.argv[1]).parent.name or skill_label
         path = _validated_path(sys.argv[1])
         text = path.read_text(encoding="utf-8")
         data, _ = read_frontmatter(text)
         issues = validate_frontmatter(data, path.parent.name)
     except (OSError, UnicodeError, FrontmatterError, RecursionError) as exc:
-        print(f"  ✗ {path.parent.name}: frontmatter: {exc}", file=sys.stderr)
+        print(f"  ✗ {skill_label}: frontmatter: {exc}", file=sys.stderr)
         return 1
     for issue in issues:
         print(f"  ✗ {path.parent.name}: {issue}", file=sys.stderr)

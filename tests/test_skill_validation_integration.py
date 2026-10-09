@@ -84,6 +84,19 @@ def test_frontmatter_reader_rejects_path_outside_skill_root(repo, tmp_path):
     assert "SKILL_FRONTMATTER_ROOT" in result.stderr
 
 
+def test_frontmatter_reader_reports_missing_root_without_traceback(repo):
+    result = subprocess.run(
+        ["python3", "-S", str(repo / "scripts/lib/skill_frontmatter.py"),
+         str(repo / ".agents/skills/test-skill/SKILL.md")],
+        capture_output=True, text=True, check=False,
+        env={key: value for key, value in os.environ.items()
+             if key != "SKILL_FRONTMATTER_ROOT"},
+    )
+    assert result.returncode == 1
+    assert "SKILL_FRONTMATTER_ROOT is required" in result.stderr
+    assert "UnboundLocalError" not in result.stderr
+
+
 def test_missing_shared_manifest_cannot_silently_change_policy(repo):
     (repo / "scripts/lib/optional_skills.sh").unlink()
     result = run(repo)
