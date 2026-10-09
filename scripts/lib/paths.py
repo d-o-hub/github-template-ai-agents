@@ -138,6 +138,9 @@ FORBIDDEN_PATHS = frozenset({
     ".wgetrc",
     ".m2",
     ".netrc.bak",
+    ".npmrc.bak",
+    ".yarnrc.bak",
+    ".env.bak",
     ".gradle",
 })
 
@@ -215,7 +218,7 @@ SENSITIVE_SUFFIXES = (
     ".secrets", ".credentials", ".vault", "secrets.json",
     "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml",
     ".ovpn", ".kdbx", ".keychain", ".keychain-db", ".keyring", ".kdb",
-    ".env", ".tfvars", ".tfvars.json",
+    ".env", ".tfvars", ".tfvars.json", ".bak",
 )
 
 SSH_KEY_PREFIXES = (
