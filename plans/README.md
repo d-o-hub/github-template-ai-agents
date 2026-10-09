@@ -11,7 +11,7 @@ fails the gate if the two ever disagree, or if either counter is missing.
 
 **Next available plan number**: `001`
 
-**Next available ADR number**: `adr-043`
+**Next available ADR number**: `adr-044`
 
 ## Directory contents
 

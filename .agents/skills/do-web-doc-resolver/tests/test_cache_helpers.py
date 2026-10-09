@@ -10,6 +10,26 @@ import pathlib
 
 import pytest
 
+TEST_INPUT = "https://example.com/guide"
+TEST_SOURCE = "direct_fetch"
+TEST_RESULT = {"source": TEST_SOURCE, "content": "cached fixture"}
+
+
+def test_empty_disk_cache_accepts_its_first_entry(monkeypatch, tmp_path):
+    from diskcache import Cache
+
+    from scripts import utils
+    from scripts.utils import cache as cache_utils
+
+    with Cache(str(tmp_path / "empty-cache")) as cache:
+        assert not cache
+        monkeypatch.setattr(utils, "_get_cache", lambda: cache)
+
+        cache_utils._save_to_cache(TEST_INPUT, TEST_SOURCE, TEST_RESULT)
+
+        assert cache_utils._get_from_cache(TEST_INPUT, TEST_SOURCE) == TEST_RESULT
+        assert len(cache) == 1
+
 
 @pytest.mark.unit
 class TestNoDuplicateHelpers:

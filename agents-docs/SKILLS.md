@@ -131,6 +131,21 @@ This resolves the ambiguity raised in issue #941: `template_version` is
 **OPTIONAL**. No validator requires it, and adopters do not need to add it to new
 skills.
 
+### Static validator input syntax
+
+`scripts/lib/skill_frontmatter.py` checks the delimited frontmatter with a
+dependency-free **bounded YAML reader**, not a complete YAML implementation.
+Use block mappings/sequences, plain or quoted single-line strings, and literal
+or folded block scalars. Quote numeric/boolean-looking text values. The reader
+rejects aliases, tags, directives, flow collections other than empty `{}`/`[]`,
+and multiline quoted strings; rewrite those forms as block syntax. Metadata
+keys and values must be strings, and `compatibility` is a string, not a tools map.
+
+Validation enforces name/directory agreement, field types and description
+length; required authoring sections and at least three eval cases fail the gate.
+Add a new top-level field to this policy **and** the reader's field allowlist.
+These checks validate structure and inputs; they do not prove skill behavior.
+
 ### version policy
 
 `version` is a **release stamp, not per-skill semver**. Evidence: 43 of 54
@@ -195,7 +210,7 @@ each skill's frontmatter (<https://code.claude.com/docs/en/plugins-reference>).
 ## Rules
 
 - `SKILL.md` <= 250 lines - detailed content in `references/`
-- Include executable scripts so the agent can validate directly
+- Bundle executable scripts when they add reusable verification; scripts are optional
 - Cite sources as `filepath:line` so the parent agent can find context
 - Do not duplicate content already in `AGENTS.md`
 - Never install skills from untrusted registries - read them first

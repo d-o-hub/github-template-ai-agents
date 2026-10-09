@@ -3,44 +3,87 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Identify the context profile for this content: 'Check out our latest release! #tech #innovation'",
-      "expected_output": "linkedin",
+      "bucket": "contextual",
+      "prompt": "Choose a context profile and explain the cues: 'Check out our latest release! #tech #innovation'",
+      "expected_output": "Select linkedin from the short social-post format and hashtags, not a documentation or technical-blog profile.",
+      "files": [],
       "assertions": [
-        "The output contains 'linkedin'"
+        "The selected context profile is linkedin, not merely one option in a list",
+        "The explanation cites the hashtags and short social-post format as detection cues",
+        "The answer does not invent release features, audience metrics, or product claims"
       ]
     },
     {
       "id": 2,
-      "prompt": "Identify the context profile for this content: '```python\nprint(\"hello\")\n```\nThis implementation uses a decorator pattern.'",
-      "expected_output": "technical-blog",
+      "bucket": "contextual",
+      "prompt": "Choose a context profile and explain why: '```python\nprint(\"hello\")\n```\nThis implementation uses a decorator pattern.'",
+      "expected_output": "Select technical-blog based on the code block and implementation discussion; technical terminology is allowed while prose rules remain strict.",
+      "files": [],
       "assertions": [
-        "The output contains 'technical-blog'"
+        "The answer selects technical-blog based on the code block and implementation discussion",
+        "The answer explains that technical terminology is exempt but strict prose rules still apply",
+        "The answer does not silently rewrite or change the supplied Python example"
       ]
     },
     {
       "id": 3,
-      "prompt": "Identify the context profile for this content: '# Project Title\n## Installation\nRun `npm install`.'",
-      "expected_output": "docs",
+      "bucket": "contextual",
+      "prompt": "Choose a profile for this README excerpt: '# Project Title\n## Installation\nRun `npm install`.' Explain the cues without editing the command.",
+      "expected_output": "Select docs based on README/installation structure and preserve the literal command, rather than treating every code fragment as a technical blog.",
+      "files": [],
       "assertions": [
-        "The output contains 'docs'"
+        "The answer selects docs and cites the README headings and installation instructions",
+        "The answer does not choose technical-blog solely because a command is present",
+        "The supplied npm install command is left unchanged"
       ]
     },
     {
       "id": 4,
-      "prompt": "Rewrite the following using the 'blunt' voice: 'I would like to kindly inform you that the server is currently undergoing some maintenance and might be unavailable for a short period of time.'",
-      "expected_output": "Server down for maintenance. Unavailable briefly.",
+      "bucket": "explicit",
+      "prompt": "Rewrite using the 'blunt' voice, keeping the uncertainty: 'I would like to kindly inform you that the server is currently undergoing some maintenance and might be unavailable for a short period of time.'",
+      "expected_output": "A concise maintenance notice such as: 'The server is under maintenance. It may be unavailable briefly.' No padding, invented outage certainty, or invented completion time.",
+      "files": [],
       "assertions": [
-        "The output is significantly shorter",
-        "The output uses short declaratives"
+        "The rewrite contains no more than 20 words and no courtesy padding such as kindly inform",
+        "The rewrite states that maintenance is ongoing and unavailability is possible, not certain",
+        "The rewrite uses declarative sentences and adds no completion time or unsupported operational detail"
       ]
     },
     {
       "id": 5,
-      "prompt": "Rewrite using 'warm' voice and 'linkedin' context: 'We have updated our API documentation.'",
-      "expected_output": "Hey everyone! We've just updated our API docs for you. Check them out! 🚀 #API #Devs",
+      "bucket": "explicit",
+      "prompt": "Rewrite using 'warm' voice and 'linkedin' context: 'We have updated our API documentation.' Don't add claims about what changed.",
+      "expected_output": "A direct-address update such as: 'We've updated our API documentation for you. Take a look when you're ready.' Emojis/hashtags may be used but are not required.",
+      "files": [],
       "assertions": [
-        "The output uses direct address ('you')",
-        "The output includes hashtags or emojis"
+        "The rewritten text addresses the reader directly with you or your",
+        "The rewrite preserves the fact that the API documentation was updated",
+        "The rewrite adds no unsupported features, performance claims, or claims about documentation quality",
+        "The answer does not claim linkedin context requires hashtags or emojis"
+      ]
+    },
+    {
+      "id": 6,
+      "bucket": "negative",
+      "prompt": "Audit this sentence for AI writing patterns only: 'In today's ever-evolving landscape, this groundbreaking solution is a game-changer.' Do not select a voice or audience profile.",
+      "expected_output": "Route to avoid-ai-writing for an AI-pattern audit, leaving voice-profiles unloaded. Identify the inflated/cliched phrasing without imposing a named voice or context.",
+      "files": [],
+      "assertions": [
+        "The routing transcript leaves voice-profiles unloaded and selects avoid-ai-writing for the audit",
+        "The answer identifies at least two specific phrases from the input as AI-writing patterns",
+        "The answer does not impose a named voice or context profile"
+      ]
+    },
+    {
+      "id": 7,
+      "bucket": "contextual",
+      "prompt": "Use 'professional' voice and 'docs' context for this release snippet even though it has hashtags: 'New API docs are ready. #API #Devs'. Explain the choice and remove social formatting for the docs audience.",
+      "expected_output": "Honor the explicit professional/docs choice rather than auto-detect linkedin; preserve the documentation availability and remove hashtags without adding claims.",
+      "files": [],
+      "assertions": [
+        "The answer selects professional voice and docs context despite the hashtags",
+        "The explanation states explicit user profiles override automatic context detection",
+        "The rewritten snippet omits hashtags and preserves API documentation availability without new claims"
       ]
     }
   ]

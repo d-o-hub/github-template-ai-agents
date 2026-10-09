@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-10-02 17:44 UTC
+> Last updated: 2026-10-05 17:18 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -73,14 +73,14 @@ See [Creating or Updating Skills](../CONTRIBUTING.md#creating-or-updating-skills
 | `security-code-auditor` | `.agents/skills/security-code-auditor` | Perform security audits on code to identify |
 | `shell-script-quality` | `.agents/skills/shell-script-quality` | Lint and test shell scripts using ShellCheck and BATS. Use |
 | `skill-creator` | `.agents/skills/skill-creator` | Create new skills, modify and improve existing skills, and |
-| `skill-evaluator` | `.agents/skills/skill-evaluator` | Reusable skill for evaluating other skills with structure |
+| `skill-evaluator` | `.agents/skills/skill-evaluator` | Reusable skill for evaluating other skills with static |
 | `static-analysis` | `.agents/skills/static-analysis` | Triage and fix static analysis findings across any |
 | `testing-strategy` | `.agents/skills/testing-strategy` | Design and implement comprehensive testing strategies for |
 | `test-runner` | `.agents/skills/test-runner` | Execute tests, analyze results, and diagnose failures |
 | `triz-solver` | `.agents/skills/triz-solver` | Systematic problem-solving using TRIZ (Theory of Inventive |
 | `turso-db` | `.agents/skills/turso-db` | Use this skill for Turso (LibSQL/Limbo) database |
 | `ui-ux-optimize` | `.agents/skills/ui-ux-optimize` | Swarm-powered UI/UX prompt optimizer with auto-research |
-| `voice-profiles` | `.agents/skills/voice-profiles` | Adapt writing tone and style based on target audience and |
+| `voice-profiles` | `.agents/skills/voice-profiles` | Select and apply writing voice and audience-context |
 | `web-search-researcher` | `.agents/skills/web-search-researcher` | Research topics using web search to find accurate, current |
 
 ---

@@ -16,14 +16,7 @@ metadata:
   author: d.o.
   version: "1.0"
   spec: "agentskills.io"
-  triggers:
-    - forgejo
-    - codeberg
-    - forgejo issue
-    - forgejo pr
-    - forgejo branch
-    - forgejo repo
-    - forgejo actions
+  triggers: forgejo, codeberg, forgejo issue, forgejo pr, forgejo branch, forgejo repo, forgejo actions
 ---
 
 # Forgejo/Codeberg API Skill

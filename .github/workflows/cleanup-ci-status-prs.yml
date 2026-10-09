@@ -31,16 +31,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DRY_RUN: ${{ inputs.dry_run || false }}
         run: |
-          set -e
-          chmod +x scripts/cleanup-ci-status-prs.sh
+          set -euo pipefail
+          args=()
           if [ "$DRY_RUN" = 'true' ]; then
-            printf "DRY RUN: listing PRs that would be closed\n"
-            gh pr list --state open \
-              --json number,title,author,headRefName,createdAt \
-              --jq '.[] | select(
-                (.author.login == "github-actions[bot]" or .author.login == "app/github-actions") and
-                ((.headRefName | startswith("auto/")) or (.headRefName | startswith("ci/")))
-              ) | "PR #\(.number): \(.title) [\(.headRefName)] by \(.author.login)"'
-          else
-            ./scripts/cleanup-ci-status-prs.sh
+            args+=(--dry-run)
           fi
+          bash scripts/cleanup-ci-status-prs.sh "${args[@]}"

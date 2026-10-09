@@ -13,7 +13,7 @@
 # The sandbox has to be structurally clean: eval-skills.sh runs under `set -e` and
 # aborts at check_structure.py before reaching the files[] check if any skill is
 # NEEDS_WORK. Every skill in the sandbox therefore needs a SKILL.md, and every
-# skill with an evals/ directory needs at least two eval cases.
+# skill needs an evals/ directory with at least three eval cases.
 
 setup() {
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/.." && pwd)"
@@ -26,10 +26,12 @@ setup() {
     SKILLS="$SANDBOX/.agents/skills"
 
     # eval-skills.sh requires the structural checker to live in the tree it audits.
-    mkdir -p "$SKILLS/skill-evaluator/scripts"
+    mkdir -p "$SKILLS/skill-evaluator/scripts" "$SKILLS/skill-evaluator/evals"
     cp "$REPO_ROOT/.agents/skills/skill-evaluator/scripts/check_structure.py" \
         "$SKILLS/skill-evaluator/scripts/"
     printf '# Skill Evaluator\n' > "$SKILLS/skill-evaluator/SKILL.md"
+    printf '%s\n' '{"skill_name":"skill-evaluator","evals":[{"id":1,"prompt":"Audit structure","expected_output":"Static report","assertions":["Reports structure"]},{"id":2,"prompt":"Review schema","expected_output":"Schema report","assertions":["Checks fields"]},{"id":3,"prompt":"Review evidence","expected_output":"Evidence report","assertions":["Distinguishes static and behavioral checks"]}]}' \
+        > "$SKILLS/skill-evaluator/evals/evals.json"
 
     mkdir -p "$SKILLS/example-skill/evals/files" "$SKILLS/example-skill/references"
     printf '# Example\n\n## Rationalizations\n\nBecause.\n\n## Red Flags\n\nDo not.\n' \

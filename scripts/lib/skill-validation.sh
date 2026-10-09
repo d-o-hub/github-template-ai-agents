@@ -27,6 +27,8 @@ readonly FALSE=0
 REPO_VERSION=""
 # Shared variable to return line count without extra subshell
 SKILL_LINE_COUNT=0
+# Resolve dependencies beside this library even when REPO_ROOT is a fixture.
+SKILL_VALIDATION_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Template pin: a template repository intentionally holds VERSION at the
 # placeholder below (see agents-docs/VERSION.md), so any skill's
@@ -56,54 +58,18 @@ validate_skill_file() {
         return 1
     fi
 
-    # Optimization: Read file once and parse with internal Bash logic or a single awk call
-    # instead of multiple grep/head/sed/cut calls.
-
-    # Single pass to gather info via awk for performance
-    # Outputs a single line: line_count:err_no_dash:has_name:has_desc:has_version:template_version
-    local awk_result
-    if ! awk_result=$(awk -v true_val="$TRUE" -v false_val="$FALSE" -- '
-        BEGIN { has_name=false_val; has_desc=false_val; has_version=false_val; template_version=""; err_no_dash=false_val }
-        NR==1 && $0 != "---" { err_no_dash=true_val }
-        /^name:/ { has_name=true_val }
-        /^description:/ { has_desc=true_val }
-        /^version:/ { has_version=true_val }
-        /^template_version:/ {
-            val=$0; sub(/^template_version:[ \t]*"?/, "", val); sub(/"?[ \t]*$/, "", val);
-            template_version=val
-        }
-        END { print NR ":" err_no_dash ":" has_name ":" has_desc ":" has_version ":" template_version }
-    ' "$skill_file"); then
-        printf "  %b✗%b %s: Internal validation error (awk failed)\n" "${RED}" "${NC}" "$skill_name" >&2
+    # Parse only the delimited frontmatter, not similarly named body fields.
+    # The dependency-free reader rejects YAML outside its documented subset;
+    # this is not advertised as complete YAML validation.
+    local frontmatter_result
+    if ! frontmatter_result=$(SKILL_FRONTMATTER_ROOT="$SKILLS_SRC" \
+        python3 "$SKILL_VALIDATION_LIB_DIR/skill_frontmatter.py" "$skill_file"); then
+        errors=1
+    fi
+    local line_count has_version template_version
+    IFS=':' read -r line_count has_version template_version <<< "$frontmatter_result"
+    if [[ ! "$line_count" =~ ^[0-9]+$ ]]; then
         return 1
-    fi
-
-    local line_count err_no_dash has_name has_description has_version template_version
-    local old_ifs="$IFS"
-    IFS=':'
-    set -f
-    local awk_array=($awk_result)
-    set +f
-    IFS="$old_ifs"
-    line_count="${awk_array[0]}"
-    err_no_dash="${awk_array[1]}"
-    has_name="${awk_array[2]}"
-    has_description="${awk_array[3]}"
-    has_version="${awk_array[4]}"
-    template_version="${awk_array[5]:-}"
-
-    if [[ "$err_no_dash" -eq $TRUE ]]; then
-        printf "  %b✗%b %s: Must start with '---'\n" "${RED}" "${NC}" "$skill_name" >&2
-        ((errors++))
-    fi
-
-    if [[ "$has_name" -eq $FALSE ]]; then
-        printf "  %b✗%b %s: Missing 'name:' field\n" "${RED}" "${NC}" "$skill_name" >&2
-        ((errors++))
-    fi
-    if [[ "$has_description" -eq $FALSE ]]; then
-        printf "  %b✗%b %s: Missing 'description:' field\n" "${RED}" "${NC}" "$skill_name" >&2
-        ((errors++))
     fi
     if [[ "$has_version" -eq $FALSE ]]; then
         printf "  %b⚠%b %s: Missing 'version:' field (recommended)\n" "${YELLOW}" "${NC}" "$skill_name" >&2

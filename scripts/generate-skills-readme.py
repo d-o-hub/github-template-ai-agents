@@ -117,7 +117,7 @@ def main() -> int:
         "",
         "## Skills in This Repository",
         "",
-        "> Auto-generated from skill definitions. Run `./scripts/generate-skills-readme.py` to regenerate.",
+        "> Auto-generated from skill definitions. Run `python3 scripts/generate-skills-readme.py` to regenerate.",
         "",
         "| Skill | Description |",
         "|---|---|",

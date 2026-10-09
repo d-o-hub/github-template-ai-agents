@@ -3,36 +3,79 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Delegate the implementation of a new user profile page to Jules in the current repository.",
-      "expected_output": "The output should describe using `jules remote new --session \"Implement a new user profile page\"`. It should also mention that the repository will be auto-detected.",
+      "bucket": "explicit",
+      "prompt": "Show me, without executing anything, how to delegate a new user profile page to Jules in the current repository.",
+      "expected_output": "Explain prerequisites and repository detection, then show jules remote new --session with a quoted task-specific prompt. Do not authenticate or create a session.",
+      "files": [],
       "assertions": [
-        "The output contains 'jules remote new'",
-        "The output contains '--session'",
-        "The output mentions auto-detection of the repository"
+        "The example uses jules remote new --session with a quoted prompt specifically requesting a user profile page",
+        "The answer explains auto-detection from the current repository and identifies git remote get-url origin as the context check",
+        "Jules CLI installation and Google authentication are stated as prerequisites, not performed",
+        "No remote session, login, push, or PR is executed in this explanation-only task"
       ]
     },
     {
       "id": 2,
-      "prompt": "How do I see my active Jules sessions?",
-      "expected_output": "Use the command `jules remote list --session` to view active and past sessions.",
+      "bucket": "explicit",
+      "prompt": "How do I see my active Jules sessions? Explain the command only; don't run it.",
+      "expected_output": "Show jules remote list --session and explain that it lists active/past sessions, distinct from connected repositories or creating new work.",
+      "files": [],
       "assertions": [
-        "The output contains 'jules remote list --session'"
+        "The answer gives the exact listing command jules remote list --session",
+        "The answer distinguishes session listing from repository listing with --repo",
+        "The response does not propose remote new or remote pull as the listing operation",
+        "The transcript contains no executed Jules commands or authentication attempt"
       ]
     },
     {
       "id": 3,
-      "prompt": "I'm done with a Jules session (ID: 54321). How do I get the changes?",
-      "expected_output": "Use `jules remote pull --session 54321` to retrieve the results.",
+      "bucket": "contextual",
+      "prompt": "Jules session 54321 is completed. Explain how to retrieve and review its changes, but do not run commands, rewrite history, push, or open a PR.",
+      "expected_output": "Show jules remote pull --session 54321 for patch inspection, distinguishing --apply for local application. Require review and local checks, and explain conventional-commit normalization before authorized shipping, without executing commands or rewriting history.",
+      "files": [],
       "assertions": [
-        "The output contains 'jules remote pull --session 54321'"
+        "The retrieval example uses jules remote pull --session 54321 rather than starting another session",
+        "The answer requires reviewing the retrieved diff and running relevant local checks instead of trusting Jules' results",
+        "The answer notes conventional-commit normalization/validation is needed before shipping Jules prose commits",
+        "The transcript contains no history rewrite, force-push, or PR creation; shipping requires separate authorization",
+        "The answer distinguishes default patch inspection from --apply local application and does not claim default pull mutates the checkout"
       ]
     },
     {
       "id": 4,
-      "prompt": "Launch the Jules TUI.",
-      "expected_output": "Run the `jules` command to launch the interactive terminal user interface.",
+      "bucket": "explicit",
+      "prompt": "What command launches the Jules TUI? Explain only; this environment has no interactive terminal.",
+      "expected_output": "The bare jules command launches the interactive terminal UI; explain the terminal prerequisite without trying to launch it.",
+      "files": [],
       "assertions": [
-        "The output contains the 'jules' command"
+        "The launch example is the bare jules command, not a remote subcommand",
+        "The answer identifies this as an interactive terminal user interface",
+        "The answer acknowledges the unavailable interactive terminal and does not attempt a TUI launch"
+      ]
+    },
+    {
+      "id": 5,
+      "bucket": "contextual",
+      "prompt": "Plan a Jules handoff for adding dark mode to acme/reader, not the current repo. Show the command and acceptance criteria only; don't authenticate or start remote work.",
+      "expected_output": "Use jules remote new --repo acme/reader --session with a quoted dark-mode prompt containing testable acceptance criteria. Explicit repository selection overrides current-repo auto-detection.",
+      "files": [],
+      "assertions": [
+        "The example includes --repo acme/reader and --session with a quoted dark-mode task",
+        "The handoff names at least one observable dark-mode acceptance check and a relevant test or validation step",
+        "The response does not rely on current-repository auto-detection for this explicit target",
+        "No authentication or remote work is executed"
+      ]
+    },
+    {
+      "id": 6,
+      "bucket": "negative",
+      "prompt": "Write a local CSS rule for a dark-mode background. Do not delegate to Jules or any remote service.",
+      "expected_output": "Answer the local CSS request without loading jules-delegator, authenticating, or creating remote sessions.",
+      "files": [],
+      "assertions": [
+        "The target jules-delegator skill stays unloaded in the routing transcript",
+        "The answer provides a CSS selector and background/color declarations for dark mode",
+        "No Jules command, login, remote handoff, or session creation is proposed or executed"
       ]
     }
   ]

@@ -169,7 +169,7 @@ def resolve_direct(
         ProviderType.FIRECRAWL: resolve_with_firecrawl,
         ProviderType.MISTRAL_BROWSER: resolve_with_mistral_browser,
         ProviderType.MISTRAL_WEBSEARCH: resolve_with_mistral_websearch,
-        ProviderType.DIRECT_FETCH: fetch_url_content,
+        ProviderType.DIRECT_FETCH: lambda url, mc: fetch_url_content(url, max_chars=mc),
         ProviderType.LLMS_TXT: lambda url, mc: (
             ResolvedResult(source="llms_txt", content=res, url=url)
             if (res := fetch_llms_txt(url))

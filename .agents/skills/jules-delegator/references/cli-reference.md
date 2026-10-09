@@ -44,16 +44,27 @@ jules remote new --repo google-labs-code/jules --session "Fix the race condition
 
 ### `jules remote pull`
 
-Retrieves the changes from a completed Jules session.
+Retrieves the patch from a completed Jules session. By default the patch is
+retrieved for inspection; local application is a separate `--apply` operation.
 
 **Arguments:**
 - `--session <session_id>`: The ID of the session to pull from.
+- `--apply`: Apply the patch to the local repository; use a protected review
+  checkout when local application is part of the requested task.
 
 **Example:**
 
 ```bash
 jules remote pull --session 12345
+
+# When local application is requested:
+jules remote pull --session 12345 --apply
 ```
+
+Verified on 2026-10-05 with `jules remote pull --help` from CLI v0.1.42
+(commit `4bd6b25084aa1af52d6d3979cda31f3a3d99fc04`). The official
+[CLI reference](https://jules.google/docs/cli/reference) omits this flag;
+check the installed version's help before assuming preview/application behavior.
 
 ## Interactive Dashboard
 
@@ -80,5 +91,6 @@ jules completion bash > /etc/bash_completion.d/jules
 ## Global Flags
 
 - `-h, --help`: Show help message.
-- `--version`: Show version information.
 - `--theme <dark|light>`: Set the TUI theme.
+
+Use `jules version` for version information.

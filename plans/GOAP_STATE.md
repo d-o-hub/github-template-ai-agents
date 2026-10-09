@@ -268,3 +268,79 @@ skipped must never be persisted as `passing`. Derived from the PR #795 roast
   failing" stole test-runner traffic.
 - Swarm: 4 parallel read-only audit agents; primary consolidated.
 - Open PRs: 0. Open issues: 0. Overlap gate: 0 pairs. Skills: 54.
+
+---
+
+# GOAP STATE: Template Adopter Boundary Audit (Round 12 — 2026-10-05)
+
+## Goal
+
+Improve the reusable-template boundary without deleting impactful skills:
+separate maintainer policy from adopter defaults, make optional packs
+consistent, make static eval claims honest, repair CI-status cleanup drift, and
+review the live GitHub queue without closing impactful work.
+
+## ADR
+
+- `plans/adr-043-template-adopter-boundaries.md` — accepted.
+
+## Decomposition
+
+| Task | Owner | Dependency | Status |
+|------|-------|------------|--------|
+| Adopter docs and root guidance | documentation agent | ADR-043 | completed |
+| Optional manifest and skill/eval validators | implementation agent | ADR-043 | completed |
+| CI-status cleanup and policy docs | workflow agent | ADR-043 | completed |
+| Generated docs and full validation | primary | all implementation tasks | completed |
+| Live GitHub disposition | primary | validation + ruleset review | completed |
+
+## Findings carried into execution
+
+- 54/54 canonical skills pass static structural validation; delete none.
+- 218 declared eval cases exist, but the smoke runner reports 201 skipped
+  scenarios because behavioral model evaluation is not implemented.
+- Optional packs are adopter choices; the existing eight default-unlinked
+  names stay unchanged and move into one setup/validation manifest.
+- PR #989 is impactful metadata synchronization, not a no-impact PR. Codacy
+  was deliberately restored as required on 2026-09-28; retain protection and
+  diagnose/re-report the missing check instead of applying ADR-034's old state.
+
+## Final state
+
+- Root `AGENTS.md`: 184 lines; all 54 curated skills retained.
+- One shared default-unlinked manifest; spec-field checks fail closed within
+  documented bounded YAML syntax, with differential tests against PyYAML.
+- Root pytest: 388 passed, 13 subtests passed. Full BATS: 327 passed, no skips.
+  The first 240-second BATS run timed out; the complete run passed in 15 minutes.
+- Full quality gate, link/inventory checks, workflow lint, and strict duplication
+  check passed. Static skill audit: 54/54 pass; smoke runner: 73 passed,
+  205 skipped, 0 failed. Behavioral/model evaluation: NOT_RUN.
+- PR #989: impact review posted; Codacy reanalysis reported success on its exact
+  head and existing native auto-merge merged it as `6185e4c7`. No protection
+  changes, manual merge, or no-impact closure. Live queue: 0 issues, 0 PRs.
+- Work remains uncommitted on `chore/template-maintainer-audit`.
+
+## Follow-up: paired behavioral spot checks
+
+- User requested the next step after the static audit.
+- Protocol: `plans/skill-behavioral-spot-check.md`, four selected eval cases,
+  fresh isolated with-skill/baseline sessions, 17 fixed assertions per arm.
+- State: selected-case execution and grading completed. Two exposed baseline
+  trials were excluded and rerun with exact-path reads; C4's unrelated body-limit
+  assertion was removed prospectively, without rescoring prior outputs.
+- Final core panel: baseline 12/16; with target skills 16/16. A separately locked
+  retrieval-semantics assertion passed in both arms. Historical trials, misses,
+  rubric revisions, and the incorrect unscored default-application claim remain
+  archived; current Jules guidance correctly distinguishes `--apply`.
+- User-requested skill dogfooding used live creator/evaluator guidance and the
+  bundled blind grader, plus debugger/test-runner for actual resolver execution.
+  Minimal-dependency execution exposed optional-import, HTTP caller/limit,
+  declared-search dependency, empty-cache, and documented-entry-point defects.
+  Focused fixes and regression coverage passed 114 resolver checks; native CLI
+  help/version and HTTP 200 official-reference retrieval provide tool evidence.
+- Final static/lint/generated-document verification completed: generated docs
+  synchronized, quality gate passed, pytest passed (388 tests + 13 subtests),
+  BATS passed (327 tests), and the refreshed CI-status artifact passed the live
+  freshness validator.
+- These observations are separate from Round 12's static results. No measured
+  token/cost improvement, discovery accuracy, or general benchmark is claimed.
