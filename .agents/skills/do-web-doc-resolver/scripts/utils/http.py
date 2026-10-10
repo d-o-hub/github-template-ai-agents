@@ -87,17 +87,29 @@ def _getaddrinfo_cached(host: str, port: int | str | None = None) -> list[tuple]
 def _normalize_host(hostname: str) -> str:
     """Normalise encoded IP representations to dotted-decimal.
 
-    Handles decimal integer notation, hex notation, and IPv4-mapped IPv6.
+    Handles decimal integer notation, hex notation, octal notation, and IPv4-mapped IPv6.
+    Security: Octal IP representations (e.g. 017700000001 or 0177.0.0.1) can bypass SSRF
+    checks if not normalized to canonical dotted-decimal IPv4 address objects.
     """
     h = hostname.strip().lower()
     if h.isdigit():
         try:
-            return str(ipaddress.IPv4Address(int(h)))
+            # Handles decimal integer or single octal integer (e.g., 017700000001)
+            base = 8 if (len(h) > 1 and h.startswith("0")) else 10
+            return str(ipaddress.IPv4Address(int(h, base)))
         except (ValueError, OverflowError):
             pass
     if h.startswith("0x"):
         try:
             return str(ipaddress.IPv4Address(int(h, 16)))
+        except (ValueError, OverflowError):
+            pass
+    if "." in h and all(part.isdigit() for part in h.split(".")):
+        try:
+            # Handles octal/decimal dotted notation (e.g., 0177.0.0.1 or 127.0.0.1)
+            parts = [int(p, 8 if (len(p) > 1 and p.startswith("0")) else 10) for p in h.split(".")]
+            if len(parts) == 4 and all(0 <= p <= 255 for p in parts):
+                return f"{parts[0]}.{parts[1]}.{parts[2]}.{parts[3]}"
         except (ValueError, OverflowError):
             pass
     if h.startswith("::ffff:"):
