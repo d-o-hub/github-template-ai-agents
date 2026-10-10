@@ -191,10 +191,16 @@ main() {
   local -a files_a_arr=() files_b_arr=()
   local a_count b_count
 
+  # perf: pre-calculate integer percentage threshold to eliminate awk subshells in loops
+  local threshold_percent="${OVERLAP_THRESHOLD#0.}"
+  if [[ ${#threshold_percent} -eq 1 ]]; then
+    threshold_percent="${threshold_percent}0"
+  fi
+  threshold_percent=$(( 10#$threshold_percent ))
+
   # Cache per-PR meaningful-file blobs (newline-separated strings) and valid
   # counts so the pair loops below re-split cached strings instead of forking
-  # subshell pipelines per pair. Note: the near-duplicate threshold check still
-  # forks awk once per overlapping pair.
+  # subshell pipelines per pair.
   local -A pr_files_blob=()
   local -A pr_files_counts=()
   for a in "${ordered[@]}"; do
@@ -288,7 +294,8 @@ main() {
 
       (( overlap > 0 )) || continue
       smaller=$(( a_count < b_count ? a_count : b_count ))
-      if awk -v o="$overlap" -v s="$smaller" -v t="$OVERLAP_THRESHOLD" 'BEGIN { exit !(o / s >= t) }'; then
+      # perf: replace awk process fork with native bash integer math for percentage threshold comparison
+      if (( (overlap * 100) / smaller >= threshold_percent )); then
         flag_superseded "$a" "$b" \
           "this PR shares most of its meaningful files with newer PR #$b" \
           "overlaps #$b"
