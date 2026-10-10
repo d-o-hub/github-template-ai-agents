@@ -4,6 +4,12 @@
 **Learning:** Security path denylists must cover build tool repository directories that store server credentials and authorization tokens alongside backup variations of standard credential files.
 **Prevention:** Maintain explicit denylist entries for build tool config folders (`.m2`) and credential file backup extensions (`.netrc.bak`).
 
+## 2026-10-10 - Normalization of Octal IP Notations for SSRF Protection
+
+**Vulnerability:** In `do-web-doc-resolver`, SSRF URL safety checks evaluated hostnames against IP blocklists without normalizing octal representations (such as `017700000001` or `0177.0.0.1`), allowing potential SSRF filter bypasses to loopback or private IPv4 addresses.
+**Learning:** Network stacks in many operating systems automatically parse octal IP representations to IPv4 addresses. Failing to normalize octal digits to canonical dotted-decimal IPv4 address strings before checking blocklists leaves a critical bypass vector.
+**Prevention:** In hostname normalization utilities, parse single-integer and dotted-integer IP strings starting with leading zeroes as base 8 octal numbers before checking against loopback and private IP range blocklists.
+
 ## 2026-08-30 - Expand Path Validation Blocklist for DB Shells, Shell Profiles, and Package Manager Credentials
 
 **Vulnerability:** Gaps in `FORBIDDEN_PATHS` left additional sensitive REPL/database shell histories (`.dbshell`, `.rediscli_history`), shell profiles (`.kshrc`), and package manager credential files (`pip.conf`, `.gemrc`) vulnerable to potential inspection or exfiltration.
