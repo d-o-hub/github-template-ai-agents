@@ -1,3 +1,9 @@
+## 2026-10-11 - Block PuTTY Private Keys and Kerberos Keytabs in Path Validation
+
+**Vulnerability:** Omission of PuTTY Private Key (`.ppk`) and Kerberos Keytab (`.keytab`) file formats in sensitive suffix pattern validation left SSH private keys and Kerberos service credentials vulnerable to potential inspection or exfiltration.
+**Learning:** Security path validation patterns must encompass alternative SSH key formats (e.g. PuTTY `.ppk`) and enterprise authentication ticket stores (`.keytab`) that do not start with standard `id_` prefixes.
+**Prevention:** Maintain explicit suffix pattern checks for `.ppk` and `.keytab` files in sensitive path validation routines.
+
 ## 2026-10-01 - Expand Path Validation Blocklist for Maven Repositories and Netrc Credential Backups
 
 **Vulnerability:** Omission of Maven configuration/repository directories (`.m2`) and netrc backup files (`.netrc.bak`) in forbidden path validation left local Maven credentials (`settings.xml`) and netrc backups exposed to potential inspection or exfiltration.
