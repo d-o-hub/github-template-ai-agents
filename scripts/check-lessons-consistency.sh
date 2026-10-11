@@ -54,7 +54,14 @@ if [[ -z "$CATALOG_IDS" ]]; then
     exit 1
 fi
 
-CATALOG_COUNT=$(printf '%s\n' "$CATALOG_IDS" | wc -l)
+# perf: Eliminate wc -l subshell fork using native Bash array length
+old_ifs="$IFS"
+IFS=$'\n'
+set -f
+catalog_arr=($CATALOG_IDS)
+set +f
+IFS="$old_ifs"
+CATALOG_COUNT="${#catalog_arr[@]}"
 
 # --- Index ids ---------------------------------------------------------------
 # Each row must be valid JSON with an id and a title; a row that cannot be
@@ -101,23 +108,50 @@ if [[ -z "$RULES_IDS" ]]; then
     exit 1
 fi
 
+# perf: Eliminate wc -l subshell fork using native Bash array length
+old_ifs="$IFS"
+IFS=$'\n'
+set -f
+index_arr=($INDEX_IDS)
+rules_arr=($RULES_IDS)
+set +f
+IFS="$old_ifs"
+
 echo "=== Lesson consistency ==="
 printf "  catalog: %s, jsonl: %s, rules index: %s\n" \
-    "$CATALOG_COUNT" "$(printf '%s\n' "$INDEX_IDS" | wc -l)" "$(printf '%s\n' "$RULES_IDS" | wc -l)"
+    "$CATALOG_COUNT" "${#index_arr[@]}" "${#rules_arr[@]}"
 
 # --- Cross-checks ------------------------------------------------------------
+# perf: Replaced O(N^2) external grep subprocesses inside the while loop with O(1)
+# native Bash associative array hash map lookups. This dramatically speeds up
+# script execution by eliminating hundreds of process forks. Expected performance
+# improvement: Script completes in milliseconds rather than several seconds.
+
+declare -A catalog_map=()
 while IFS= read -r id; do
-    printf '%s\n' "$INDEX_IDS" | grep -qx -- "$id" || \
+    [[ -n "$id" ]] && catalog_map["$id"]=1
+done <<< "$CATALOG_IDS"
+
+declare -A index_map=()
+while IFS= read -r id; do
+    [[ -n "$id" ]] && index_map["$id"]=1
+done <<< "$INDEX_IDS"
+
+while IFS= read -r id; do
+    [[ -z "$id" ]] && continue
+    [[ -n "${index_map[$id]:-}" ]] || \
         fail "LESSON-$id is in LESSONS.md but has no lessons.jsonl row"
 done <<< "$CATALOG_IDS"
 
 while IFS= read -r id; do
-    printf '%s\n' "$CATALOG_IDS" | grep -qx -- "$id" || \
+    [[ -z "$id" ]] && continue
+    [[ -n "${catalog_map[$id]:-}" ]] || \
         fail "LESSON-$id has a lessons.jsonl row but no LESSONS.md entry"
 done <<< "$INDEX_IDS"
 
 while IFS= read -r id; do
-    printf '%s\n' "$CATALOG_IDS" | grep -qx -- "$id" && continue
+    [[ -z "$id" ]] && continue
+    [[ -n "${catalog_map[$id]:-}" ]] && continue
     # A lesson may legitimately live only in the archive, if it was superseded.
     if [[ -f "$ARCHIVE_MD" ]] && grep -qE "LESSON-0?$id" "$ARCHIVE_MD"; then
         continue
