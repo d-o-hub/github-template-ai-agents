@@ -87,10 +87,17 @@ def _getaddrinfo_cached(host: str, port: int | str | None = None) -> list[tuple]
 def _normalize_host(hostname: str) -> str:
     """Normalise encoded IP representations to dotted-decimal.
 
-    Handles decimal integer notation, hex notation, and IPv4-mapped IPv6.
+    Handles decimal integer notation, octal notation, hex notation, and IPv4-mapped IPv6.
+    Security: Octal IP formats (e.g. 017700000001 or 0177.0.0.1) can bypass simple string
+    matchers while resolving to local/private IPs in network/socket stacks.
     """
     h = hostname.strip().lower()
     if h.isdigit():
+        if h.startswith("0") and len(h) > 1:
+            try:
+                return str(ipaddress.IPv4Address(int(h, 8)))
+            except (ValueError, OverflowError):
+                pass
         try:
             return str(ipaddress.IPv4Address(int(h)))
         except (ValueError, OverflowError):
@@ -102,6 +109,30 @@ def _normalize_host(hostname: str) -> str:
             pass
     if h.startswith("::ffff:"):
         return h[7:]
+
+    # Handle dotted IPv4 notation containing octal or hex components
+    parts = h.split(".")
+    if 1 <= len(parts) <= 4:
+        try:
+            int_parts = []
+            for p in parts:
+                if p.startswith("0x") or p.startswith("0X"):
+                    int_parts.append(int(p, 16))
+                elif p.startswith("0") and len(p) > 1 and p.isdigit():
+                    int_parts.append(int(p, 8))
+                elif p.isdigit():
+                    int_parts.append(int(p, 10))
+                else:
+                    raise ValueError("Non-numeric IPv4 segment")
+
+            if len(int_parts) == 4 and all(0 <= x <= 255 for x in int_parts):
+                ip_int = (int_parts[0] << 24) + (int_parts[1] << 16) + (int_parts[2] << 8) + int_parts[3]
+                return str(ipaddress.IPv4Address(ip_int))
+            elif len(int_parts) == 1:
+                return str(ipaddress.IPv4Address(int_parts[0]))
+        except (ValueError, OverflowError):
+            pass
+
     return h
 
 
