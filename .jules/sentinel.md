@@ -134,3 +134,8 @@
 **Vulnerability:** The skill discovery logic in `run-evals.py` failed to enforce `check_forbidden=True` on both the `--skill` user parameter and the general directory iterator loop. This left a potential vector where sensitive or forbidden system paths (such as `.git`, `.env`, or nested secret folders) could be referenced, mapped, or queried as a valid skill.
 **Learning:** Base parameters or iterating loops that process directory lists must explicitly validate names using standardized safe path checks. Bypassing check_forbidden on inputs can expose sensitive directories that contain private configurations or repository structures.
 **Prevention:** Always set `check_forbidden=True` in path-validation routines when discovering, resolving, or loading specific dynamic directories. Include unit tests ensuring traversal and forbidden paths are blocked.
+
+## 2026-08-19 - Octal IPv4 Normalization in SSRF Protection
+**Vulnerability:** Octal IPv4 string representations (e.g. `017700000001` or `0177.0.0.1`) bypass string-based SSRF checks while resolving to local/private loopback IP addresses (`127.0.0.1`) at the socket layer.
+**Learning:** `ipaddress.IPv4Address(int(h))` interprets integer strings in base-10 by default unless explicitly specified or parsed as octal/hex segments, allowing leading-zero octal representations to evade normalization filters.
+**Prevention:** Explicitly parse leading-zero integer and dotted-decimal IPv4 segments using base-8 octal conversions before resolving or checking against SSRF blocklists.

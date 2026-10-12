@@ -35,3 +35,8 @@ class TestSSRFGuards:
         """Verify that [::] is blocked by is_safe_url."""
         assert not is_safe_url("http://[::]/")
         assert not is_safe_url("http://[::]:8080/")
+
+    def test_is_safe_url_blocks_octal_ip(self):
+        """Verify that octal IPv4 formats are normalized and blocked."""
+        assert not is_safe_url("http://017700000001/")
+        assert not is_safe_url("http://0177.0.0.1/")
