@@ -98,11 +98,25 @@ is_provenance() {
     [[ "$line" =~ (absorbed|superseded|folded|consolidat|merged|renamed|deprecated) ]]
 }
 
+# perf: pre-compile single regex to skip files without any folded names
+regex=""
+for name in "${FOLDED_NAMES[@]}"; do
+  regex="${regex}${regex:+|}${name}"
+done
+
 for target in "${TARGETS[@]}"; do
     should_skip "$target" && continue
+
+    # perf: fast path check to avoid process fork overhead for files with no matches
+    grep -q -E "$regex" "$target" 2>/dev/null || continue
+
     for i in "${!FOLDED_NAMES[@]}"; do
         name="${FOLDED_NAMES[$i]}"
         successor="${SUCCESSORS[$i]}"
+
+        # perf: fast path check before line-by-line loop
+        grep -q -F -- "$name" "$target" 2>/dev/null || continue
+
         while IFS= read -r line; do
             [[ -z "$line" ]] && continue
             is_provenance "$line" && continue
