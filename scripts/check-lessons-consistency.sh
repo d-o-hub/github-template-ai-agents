@@ -106,24 +106,36 @@ printf "  catalog: %s, jsonl: %s, rules index: %s\n" \
     "$CATALOG_COUNT" "$(printf '%s\n' "$INDEX_IDS" | wc -l)" "$(printf '%s\n' "$RULES_IDS" | wc -l)"
 
 # --- Cross-checks ------------------------------------------------------------
-while IFS= read -r id; do
-    printf '%s\n' "$INDEX_IDS" | grep -qx -- "$id" || \
+# perf: replace process forks inside loops with native bash associative array lookups
+declare -A cat_ids=()
+declare -A ind_ids=()
+declare -A rul_ids=()
+
+for id in $CATALOG_IDS; do cat_ids["$id"]=1; done
+for id in $INDEX_IDS; do ind_ids["$id"]=1; done
+for id in $RULES_IDS; do rul_ids["$id"]=1; done
+
+for id in "${!cat_ids[@]}"; do
+    if [[ -z "${ind_ids[$id]:-}" ]]; then
         fail "LESSON-$id is in LESSONS.md but has no lessons.jsonl row"
-done <<< "$CATALOG_IDS"
-
-while IFS= read -r id; do
-    printf '%s\n' "$CATALOG_IDS" | grep -qx -- "$id" || \
-        fail "LESSON-$id has a lessons.jsonl row but no LESSONS.md entry"
-done <<< "$INDEX_IDS"
-
-while IFS= read -r id; do
-    printf '%s\n' "$CATALOG_IDS" | grep -qx -- "$id" && continue
-    # A lesson may legitimately live only in the archive, if it was superseded.
-    if [[ -f "$ARCHIVE_MD" ]] && grep -qE "LESSON-0?$id" "$ARCHIVE_MD"; then
-        continue
     fi
-    fail "self-learning-rules.md references LESSON-$id, which is in neither LESSONS.md nor lessons-archive.md"
-done <<< "$RULES_IDS"
+done
+
+for id in "${!ind_ids[@]}"; do
+    if [[ -z "${cat_ids[$id]:-}" ]]; then
+        fail "LESSON-$id has a lessons.jsonl row but no LESSONS.md entry"
+    fi
+done
+
+for id in "${!rul_ids[@]}"; do
+    if [[ -z "${cat_ids[$id]:-}" ]]; then
+        # A lesson may legitimately live only in the archive, if it was superseded.
+        if [[ -f "$ARCHIVE_MD" ]] && grep -qE "LESSON-0?$id" "$ARCHIVE_MD"; then
+            continue
+        fi
+        fail "self-learning-rules.md references LESSON-$id, which is in neither LESSONS.md nor lessons-archive.md"
+    fi
+done
 
 # --- Verdict -----------------------------------------------------------------
 if [[ $EXIT_CODE -eq 0 ]]; then

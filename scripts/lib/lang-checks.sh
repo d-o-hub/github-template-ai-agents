@@ -52,13 +52,13 @@ _changed_files_z() {
         return
     fi
 
-    # Convert newline-delimited to null-delimited, one record per line. Iterate
-    # rather than word-splitting $source_files: splitting would also break on
-    # paths containing spaces and leaves SC2086 (and globbing) unguarded.
-    local line
-    while IFS= read -r line; do
-        printf '%s\0' "$line"
-    done <<< "$source_files"
+    # Convert newline-delimited to null-delimited, one record per line.
+    # perf: Replace while loop with native mapfile and format strings
+    local -a files_arr
+    mapfile -t files_arr <<< "$source_files"
+    if [[ ${#files_arr[@]} -gt 0 ]]; then
+        printf '%s\0' "${files_arr[@]}"
+    fi
 }
 
 # ---------------------------------------------------------------------------

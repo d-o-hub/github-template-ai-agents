@@ -18,7 +18,9 @@ else
         printf "Deleting all existing labels...\n"
         label_names=$(gh label list --json name --jq ".[].name")
         if [[ -n "$label_names" ]]; then
-            printf "%s\n" "$label_names" | while IFS= read -r label; do
+            # perf: use mapfile array instead of subshell pipeline
+            mapfile -t labels <<< "$label_names"
+            for label in "${labels[@]}"; do
                 if [[ -n "$label" ]]; then
                     printf "Deleting label: %s\n" "$label"
                     gh label delete --yes -- "$label" || true
