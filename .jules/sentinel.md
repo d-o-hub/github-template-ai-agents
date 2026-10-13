@@ -1,3 +1,9 @@
+## 2026-10-24 - Expand Path Validation Blocklist for Package Manager Config Directories and SOPS JSON Configurations
+
+**Vulnerability:** Omission of pip user directory (`.pip`), Bundler configuration directory (`.bundle`), and SOPS JSON configuration files (`.sops.json`) in `FORBIDDEN_PATHS` left package manager credentials and SOPS configuration metadata vulnerable to potential inspection or exfiltration.
+**Learning:** Hardening path validation requires securing package manager user configuration directories alongside alternative format variants of encrypted secret configs.
+**Prevention:** Maintain explicit denylist entries for `.pip`, `.bundle`, and `.sops.json` in path validation routines.
+
 ## 2026-10-11 - Block PuTTY Private Keys and Kerberos Keytabs in Path Validation
 
 **Vulnerability:** Omission of PuTTY Private Key (`.ppk`) and Kerberos Keytab (`.keytab`) file formats in sensitive suffix pattern validation left SSH private keys and Kerberos service credentials vulnerable to potential inspection or exfiltration.
