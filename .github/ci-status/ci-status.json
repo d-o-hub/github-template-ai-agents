@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
   "status": "failing",
-  "last_run": "2026-10-13T08:53:05.841377Z",
+  "last_run": "2026-10-13T17:25:20.648610Z",
   "validated": false,
   "failing_jobs": [
     "test"
@@ -16,5 +16,5 @@
     "quality-gate"
   ],
   "advisory_only": true,
-  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/38371990505"
+  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/38438251652"
 }
