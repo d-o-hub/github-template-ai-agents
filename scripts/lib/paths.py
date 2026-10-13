@@ -128,7 +128,10 @@ FORBIDDEN_PATHS = frozenset({
     ".gemrc",
     ".condarc",
     "nuget.config",
+    ".pip",
+    ".bundle",
     ".sops.yaml",
+    ".sops.json",
     ".sops",
     ".zsh_sessions",
     # Low-severity filename-policy gap within the allowed base:
