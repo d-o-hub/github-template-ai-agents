@@ -88,7 +88,7 @@ def test_validate_safe_path_forbidden(tmp_path):
         ".tcshrc", ".cshrc", ".login", ".logout", ".rediscli_history",
         ".dbshell", ".kshrc", "pip.conf", ".gemrc", ".condarc",
         "nuget.config", ".sops.yaml", ".sops", ".zsh_sessions",
-        ".m2", ".netrc.bak"
+        ".m2", ".netrc.bak", ".bunrc", ".pnpmrc", ".bunrc.bak", ".pnpmrc.bak"
     ]
     for p in new_forbidden:
         with pytest.raises(PathValidationError):
@@ -127,7 +127,7 @@ def test_validate_safe_path_patterns(tmp_path):
         "client_secret", "client_secret_local", "service_account.json", "service-account-key.json",
         "kubeconfig", "kubeconfig_prod",
         "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
-        "netrc_backup", ".netrc_old", ".npmrc_custom", ".yarnrc_custom", ".pypirc_prod",
+        "netrc_backup", ".netrc_old", ".npmrc_custom", ".yarnrc_custom", ".bunrc_custom", ".pnpmrc_custom", ".pypirc_prod",
         "auth.json_copy", "token_secret.json", "token.txt", "access_token.json", "access-token.txt",
         "refresh_token.json", "refresh-token.txt", "auth_token.json", "auth-token.txt",
         "session_token.json", "session-token.txt", "bearer_token.txt", "bearer-token.txt",
