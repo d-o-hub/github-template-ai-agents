@@ -129,6 +129,11 @@ class TestIsSafeUrl:
     def test_hex_ip_blocked(self):
         assert is_safe_url("http://0x7f000001/") is False
 
+    def test_octal_ip_blocked(self):
+        assert is_safe_url("http://017700000001/") is False
+        assert is_safe_url("http://0177.0.0.1/") is False
+        assert is_safe_url("http://0o17700000001/") is False
+
     def test_carrier_grade_nat_blocked(self):
         assert is_safe_url("http://100.64.0.1/") is False
 

@@ -87,19 +87,50 @@ def _getaddrinfo_cached(host: str, port: int | str | None = None) -> list[tuple]
 def _normalize_host(hostname: str) -> str:
     """Normalise encoded IP representations to dotted-decimal.
 
-    Handles decimal integer notation, hex notation, and IPv4-mapped IPv6.
+    Handles decimal integer notation, hex notation, octal notation, and IPv4-mapped IPv6.
+    Security: Normalizing octal IPv4 string formats (e.g. 017700000001 or 0177.0.0.1)
+    prevents SSRF validation bypasses against blocked local/private IP ranges.
     """
     h = hostname.strip().lower()
-    if h.isdigit():
-        try:
-            return str(ipaddress.IPv4Address(int(h)))
-        except (ValueError, OverflowError):
-            pass
     if h.startswith("0x"):
         try:
             return str(ipaddress.IPv4Address(int(h, 16)))
         except (ValueError, OverflowError):
             pass
+    if h.startswith("0o"):
+        try:
+            return str(ipaddress.IPv4Address(int(h, 8)))
+        except (ValueError, OverflowError):
+            pass
+    if h.isdigit() and h.startswith("0") and len(h) > 1:
+        try:
+            return str(ipaddress.IPv4Address(int(h, 8)))
+        except (ValueError, OverflowError):
+            pass
+    if h.isdigit():
+        try:
+            return str(ipaddress.IPv4Address(int(h)))
+        except (ValueError, OverflowError):
+            pass
+    if "." in h:
+        parts = h.split(".")
+        if len(parts) == 4:
+            try:
+                octets = []
+                for p in parts:
+                    if p.startswith("0x"):
+                        octets.append(int(p, 16))
+                    elif p.startswith("0o"):
+                        octets.append(int(p, 8))
+                    elif p.startswith("0") and len(p) > 1 and p.isdigit():
+                        octets.append(int(p, 8))
+                    elif p.isdigit():
+                        octets.append(int(p, 10))
+                    else:
+                        raise ValueError("Not a valid numeric octet")
+                return str(ipaddress.IPv4Address(bytes(octets)))
+            except (ValueError, OverflowError):
+                pass
     if h.startswith("::ffff:"):
         return h[7:]
     return h
