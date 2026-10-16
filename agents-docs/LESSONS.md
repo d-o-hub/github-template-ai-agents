@@ -1756,11 +1756,13 @@ discovered behavioral criteria prospectively and preserve earlier scores.
 
 **Date:** 2026-10-16
 
-**Issue:** Two open Jules-authored security PRs were fully green across 20+ checks
+**Issue:** Two Jules-authored security PRs were fully green across 20+ checks
 (`Quality Gate`, `Run Tests`, `CodeQL`, `gitleaks`, `Trivy`, `SonarCloud`) while both
 were incomplete in ways CI could not see. One appended six credential file extensions to
 `SENSITIVE_SUFFIXES`; the other added octal IPv4 handling to a host normalizer. Neither
-was a first occurrence — reviewing them as routine bumps hid the real defect.
+was a first occurrence — reviewing them as routine bumps hid the real defect. The
+normalizer PR then **merged incomplete** (`ab1d56f6`), which is the point: nothing in the
+pipeline could tell a half-applied fix from a whole one.
 
 **Root Cause:** Both checks were enumeration-based, and enumerations are open-ended by
 construction. `scripts/lib/paths.py` had 41 commits, 36 of them appending to the denylist
@@ -1772,7 +1774,11 @@ normalizer had the same shape, learning decimal, then hex, then octal one incide
 time. Worse, `_normalize_host`/`is_safe_url` exist in two copies
 (`do-web-doc-resolver/scripts/utils/http.py` and `utils/async_http.py`); the fix patched
 one, added tests for one, and the async copy — which validates every redirect hop — stayed
-byte-identical to the vulnerable version with no test coverage at all. A green queue on an
+byte-identical to the vulnerable version with no test coverage at all. That left a real
+bypass on `main`: `is_safe_url` returned `False` for `0o17700000001` on the sync path and
+`True` on the async one. Some octal spellings were caught only incidentally, because glibc
+parses leading zeros in the `getaddrinfo` fallback — a `0o` prefix is not a form glibc
+recognises, so the fallback could not catch it. A green queue on an
 agent-generated PR certifies the assertions that exist, not the ones nobody wrote.
 
 **Solution:** Distill the structural rule into skills rather than the latest missing list
@@ -1783,10 +1789,17 @@ no PR numbers in `SKILL.md` bodies (they rot on merge); keep dated evidence here
   resolved address on every redirect hop, and grep for sibling copies before approving.
 - `secrets-management`: "Filenames Are Not the Boundary" — containment is the control,
   extension denylists are defense in depth, and severity must follow the layer.
-- `do-web-doc-resolver`: sync and async fetchers do **not** share a validator.
+- `do-web-doc-resolver`: sync and async fetchers do **not** share a validator; a parity
+  guard over one fixture table now fails if the two copies diverge again.
 - `code-review-assistant`: green checks are not proof of completeness.
 
 Before accepting any validation fix, grep the changed function name across the repo,
 require the same fixtures in each copy, and ask whether the check should be default-deny
-rather than extended. See also `LESSON-022` (duplicate automation), `LESSON-047`
+rather than extended. Mirroring one copy into the other closes the hole but preserves the
+duplication that caused it; the structural fix is a single shared module, deliberately kept
+out of the security PR so that PR stays atomic. The enumeration pressure has not stopped
+either — `SENSITIVE_SUFFIXES` reached 48 entries days later, and at least seven
+per-format `fix/security-*` branches are open or merged against the same list.
+
+See also `LESSON-022` (duplicate automation), `LESSON-047`
 (parallel validators must agree), `LESSON-048` (static PASS is not behavioral proof).
