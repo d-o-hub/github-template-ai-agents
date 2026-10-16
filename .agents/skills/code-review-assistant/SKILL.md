@@ -208,6 +208,7 @@ codacy pull-request gh my-org my-repo <prNumber> --ignore-issue <issueId> --igno
 - [ ] Auto-approving changes in critical-path files without inspection
 - [ ] Accepting a validator/normalizer fix without grepping for other copies of the same function
 - [ ] Test cases added for only one entry point when the helper exists behind sync and async paths
+- [ ] Reading the check rollup as the whole CI result — failed workflow runs can sit outside it
 
 ## References
 

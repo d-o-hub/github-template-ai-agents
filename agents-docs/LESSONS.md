@@ -1762,14 +1762,15 @@ were incomplete in ways CI could not see. One appended six credential file exten
 `SENSITIVE_SUFFIXES`; the other added octal IPv4 handling to a host normalizer. Neither
 was a first occurrence — reviewing them as routine bumps hid the real defect. The
 normalizer PR then **merged incomplete** (`ab1d56f6`), which is the point: nothing in the
-pipeline could tell a half-applied fix from a whole one.
+pipeline could tell a half-applied fix from a whole one. Both merged the same day; the
+suffix PR took the list from 48 entries to 54.
 
 **Root Cause:** Both checks were enumeration-based, and enumerations are open-ended by
-construction. `scripts/lib/paths.py` had 41 commits, 36 of them appending to the denylist
-growing it to 46 entries, yet the actual boundary was already enforced by
-`resolve()` + `relative_to()` — the file's own comment conceded the suffix list "only
-block[s] matching in-base names (not arbitrary reads)". Chasing formats therefore
-produced repeated `fix(security)` labels on Low/Medium name-policy gaps. The SSRF
+construction. `scripts/lib/paths.py` carries 45 commits, 6 of which grew
+`SENSITIVE_SUFFIXES` from 40 to 54 entries — one format per `fix(security)` PR — yet the
+actual boundary was already enforced by `resolve()` + `relative_to()`. The file's own
+comment conceded the suffix list "only block[s] matching in-base names (not arbitrary
+reads)", so each new extension closed a name-policy gap, not an access hole. The SSRF
 normalizer had the same shape, learning decimal, then hex, then octal one incident at a
 time. Worse, `_normalize_host`/`is_safe_url` exist in two copies
 (`do-web-doc-resolver/scripts/utils/http.py` and `utils/async_http.py`); the fix patched
@@ -1797,9 +1798,11 @@ Before accepting any validation fix, grep the changed function name across the r
 require the same fixtures in each copy, and ask whether the check should be default-deny
 rather than extended. Mirroring one copy into the other closes the hole but preserves the
 duplication that caused it; the structural fix is a single shared module, deliberately kept
-out of the security PR so that PR stays atomic. The enumeration pressure has not stopped
-either — `SENSITIVE_SUFFIXES` reached 48 entries days later, and at least seven
-per-format `fix/security-*` branches are open or merged against the same list.
+out of the security PR so that PR stays atomic. The enumeration pressure has not stopped —
+six per-format PRs have merged against that one list, and the async parity fix is itself
+still open. Green-queue blindness showed up again the same way: the async PR's
+`Commit Lint` run failed while the PR check rollup listed only six passing checks, so
+`gh pr checks` alone reported a clean PR. Read the workflow runs, not the rollup.
 
 See also `LESSON-022` (duplicate automation), `LESSON-047`
 (parallel validators must agree), `LESSON-048` (static PASS is not behavioral proof).
