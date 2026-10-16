@@ -124,12 +124,15 @@ scripts/
 |-----------------|---------|
 | "I'll just use the cheapest provider for everything." | Free providers often have lower quality, latency, or reliability; cascading with quality scoring ensures acceptable results. |
 | "Circuit breakers are overkill — errors are rare." | Without circuit breakers, a failing provider consumes budget and time on every request, degrading the entire cascade. |
+| "The sync and async fetchers share one URL validator." | They do not. `utils/http.py` and `utils/async_http.py` each define their own `_normalize_host`/`is_safe_url`. Patch one and the async path keeps the old rules. |
 
 ## Red Flags
 
 - [ ] Ignoring quality scores and accepting low-quality content without validation
 - [ ] Disabling circuit breakers or skipping cooldown periods during provider failures
 - [ ] Not setting max character limits — fetching unbounded content wastes tokens
+- [ ] A host-validation change landing in `utils/http.py` with no matching `utils/async_http.py` change and no async test case
+- [ ] Adding another IP encoding to `_normalize_host` instead of rejecting non-canonical hosts and checking the resolved address
 
 ## References
 

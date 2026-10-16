@@ -1751,3 +1751,42 @@ block optional imports, test the real HTTP helper through `MockTransport`, and
 verify empty-cache first writes. Check native CLI help/version without creating
 remote sessions; Jules v0.1.42 requires `--apply` for local application. Add newly
 discovered behavioral criteria prospectively and preserve earlier scores.
+
+### LESSON-049 — Security Validation Enumerations Drift, and Duplicated Validators Diverge
+
+**Date:** 2026-10-16
+
+**Issue:** Two open Jules-authored security PRs were fully green across 20+ checks
+(`Quality Gate`, `Run Tests`, `CodeQL`, `gitleaks`, `Trivy`, `SonarCloud`) while both
+were incomplete in ways CI could not see. One appended six credential file extensions to
+`SENSITIVE_SUFFIXES`; the other added octal IPv4 handling to a host normalizer. Neither
+was a first occurrence — reviewing them as routine bumps hid the real defect.
+
+**Root Cause:** Both checks were enumeration-based, and enumerations are open-ended by
+construction. `scripts/lib/paths.py` had 41 commits, 36 of them appending to the denylist
+growing it to 46 entries, yet the actual boundary was already enforced by
+`resolve()` + `relative_to()` — the file's own comment conceded the suffix list "only
+block[s] matching in-base names (not arbitrary reads)". Chasing formats therefore
+produced repeated `fix(security)` labels on Low/Medium name-policy gaps. The SSRF
+normalizer had the same shape, learning decimal, then hex, then octal one incident at a
+time. Worse, `_normalize_host`/`is_safe_url` exist in two copies
+(`do-web-doc-resolver/scripts/utils/http.py` and `utils/async_http.py`); the fix patched
+one, added tests for one, and the async copy — which validates every redirect hop — stayed
+byte-identical to the vulnerable version with no test coverage at all. A green queue on an
+agent-generated PR certifies the assertions that exist, not the ones nobody wrote.
+
+**Solution:** Distill the structural rule into skills rather than the latest missing list
+entry, so downstream adopters inherit the reasoning instead of a stale enumeration. Record
+no PR numbers in `SKILL.md` bodies (they rot on merge); keep dated evidence here.
+
+- `security-code-auditor`: new SSRF section — reject non-canonical hosts, validate the
+  resolved address on every redirect hop, and grep for sibling copies before approving.
+- `secrets-management`: "Filenames Are Not the Boundary" — containment is the control,
+  extension denylists are defense in depth, and severity must follow the layer.
+- `do-web-doc-resolver`: sync and async fetchers do **not** share a validator.
+- `code-review-assistant`: green checks are not proof of completeness.
+
+Before accepting any validation fix, grep the changed function name across the repo,
+require the same fixtures in each copy, and ask whether the check should be default-deny
+rather than extended. See also `LESSON-022` (duplicate automation), `LESSON-047`
+(parallel validators must agree), `LESSON-048` (static PASS is not behavioral proof).
