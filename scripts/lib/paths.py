@@ -228,6 +228,7 @@ SENSITIVE_SUFFIXES = (
     "secrets.yml", "secrets.yaml", "credentials.yml", "credentials.yaml",
     ".ovpn", ".kdbx", ".keychain", ".keychain-db", ".keyring", ".kdb",
     ".env", ".tfvars", ".tfvars.json", ".bak", ".ppk", ".keytab",
+    ".tblk", ".p7b", ".p7c", ".spc", ".age", ".sops.yml",
 )
 
 SSH_KEY_PREFIXES = (
