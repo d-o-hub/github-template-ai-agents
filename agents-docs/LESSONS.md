@@ -1793,6 +1793,7 @@ no PR numbers in `SKILL.md` bodies (they rot on merge); keep dated evidence here
 - `do-web-doc-resolver`: sync and async fetchers do **not** share a validator; a parity
   guard over one fixture table now fails if the two copies diverge again.
 - `code-review-assistant`: green checks are not proof of completeness.
+- `git-github-workflow`: merge checks read workflow runs, not the `gh pr checks` rollup.
 
 Before accepting any validation fix, grep the changed function name across the repo,
 require the same fixtures in each copy, and ask whether the check should be default-deny
@@ -1800,9 +1801,12 @@ rather than extended. Mirroring one copy into the other closes the hole but pres
 duplication that caused it; the structural fix is a single shared module, deliberately kept
 out of the security PR so that PR stays atomic. The enumeration pressure has not stopped —
 six per-format PRs have merged against that one list, and the async parity fix is itself
-still open. Green-queue blindness showed up again the same way: the async PR's
-`Commit Lint` run failed while the PR check rollup listed only six passing checks, so
-`gh pr checks` alone reported a clean PR. Read the workflow runs, not the rollup.
+still open. Green-queue blindness showed up twice over on that same PR: its `Commit Lint`
+run failed while the check rollup listed only passing checks, so `gh pr checks` reported a
+clean PR — read the workflow runs, not the rollup. The failure was also invisible in the
+local gate, because CI pins `@commitlint/cli@19.8.1` while the installed CLI is newer, and
+19.8.1 classified a prose commit body as `footer`, tripping `footer-max-length: 1000`.
+Lint with the version CI pins.
 
 See also `LESSON-022` (duplicate automation), `LESSON-047`
 (parallel validators must agree), `LESSON-048` (static PASS is not behavioral proof).

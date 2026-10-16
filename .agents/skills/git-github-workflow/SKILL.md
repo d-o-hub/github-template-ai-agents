@@ -229,7 +229,7 @@ Workflow succeeds when:
 ## Red Flags
 
 - [ ] Bypassing the quality gate for "trivial" changes
-- [ ] Merging with GitHub Actions still failing
+- [ ] Merging on a green `gh pr checks` rollup without listing workflow runs; failed runs can be absent from it
 - [ ] Ignoring pre-existing CI failures as "not my problem"
 - [ ] Disabling rollback on failure
 - [ ] Skipping post-merge validation on main
