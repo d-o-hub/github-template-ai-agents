@@ -93,8 +93,16 @@ if [[ -z "$TABLE_LIST" ]]; then
     exit 1
 fi
 
+# perf: Use native array length evaluation instead of spawning sub-processes like wc -l
+_old_ifs="$IFS"
+IFS=$'\n'
+set -f
+TABLE_ARRAY=($TABLE_LIST)
+set +f
+IFS="$_old_ifs"
+
 echo "=== AGENTS.md skill table ==="
-printf "  catalog: %s skills, table: %s names\n" "${#CATALOG[@]}" "$(printf '%s\n' "$TABLE_LIST" | wc -l)"
+printf "  catalog: %s skills, table: %s names\n" "${#CATALOG[@]}" "${#TABLE_ARRAY[@]}"
 
 # 1. Missing from the table.
 for skill in "${CATALOG[@]}"; do
