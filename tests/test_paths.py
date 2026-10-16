@@ -147,7 +147,8 @@ def test_validate_safe_path_patterns(tmp_path):
         "config.env", "prod.env", "secrets.env", "terraform.tfvars",
         "terraform.tfvars.json", "override.tfvars", "secrets.tfvars.json",
         "cluster.kubeconfig.yaml", "cluster.kubeconfig.yml", "server.ppk",
-        "krb5.keytab"
+        "krb5.keytab", "tunnelblick.tblk", "cert.p7b", "cert.p7c", "cert.spc",
+        "secret.age", "config.sops.yml"
     ]
     for p in additional_suffixes:
         with pytest.raises(PathValidationError):
