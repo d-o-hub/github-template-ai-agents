@@ -199,12 +199,16 @@ codacy pull-request gh my-org my-repo <prNumber> --ignore-issue <issueId> --igno
 | "The PR is too large to review properly" | Large PRs hide defects; split them or request a breakdown before approving. |
 | "Auto-approve is good enough for small changes" | Small changes in critical paths (auth, payments) still need human scrutiny. |
 | "Review comments are just noise" | Actionable feedback prevents repeated mistakes and builds team knowledge. |
+| "All checks passed, so the fix is complete" | Green CI certifies the assertions that exist, not the ones nobody wrote. A security fix can pass every check and still miss a sibling copy. |
 
 ## Red Flags
 
 - [ ] Approving PRs without checking test coverage
 - [ ] Ignoring security-pattern findings in review comments
 - [ ] Auto-approving changes in critical-path files without inspection
+- [ ] Accepting a validator/normalizer fix without grepping for other copies of the same function
+- [ ] Test cases added for only one entry point when the helper exists behind sync and async paths
+- [ ] Reading the check rollup as the whole CI result — failed workflow runs can sit outside it
 
 ## References
 
