@@ -94,29 +94,37 @@ if [[ -z "$TABLE_LIST" ]]; then
 fi
 
 echo "=== AGENTS.md skill table ==="
-printf "  catalog: %s skills, table: %s names\n" "${#CATALOG[@]}" "$(printf '%s\n' "$TABLE_LIST" | wc -l)"
+# perf: replace subshells and external process counts with native array logic
+mapfile -t table_arr <<< "$TABLE_LIST"
+printf "  catalog: %s skills, table: %s names\n" "${#CATALOG[@]}" "${#table_arr[@]}"
+
+declare -A table_counts=()
+for skill in "${table_arr[@]}"; do
+    # Ignore empty lines from mapfile if any
+    if [[ -n "$skill" ]]; then
+        table_counts["$skill"]=$(( ${table_counts["$skill"]:-0} + 1 ))
+    fi
+done
+
+declare -A catalog_map=()
+for skill in "${CATALOG[@]}"; do
+    catalog_map["$skill"]=1
+done
 
 # 1. Missing from the table.
 for skill in "${CATALOG[@]}"; do
-    if ! printf '%s\n' "$TABLE_LIST" | grep -qx -- "$skill"; then
+    if [[ -z "${table_counts["$skill"]:-}" ]]; then
         fail "$skill exists in .agents/skills/ but is absent from the AGENTS.md table"
     fi
 done
 
 # 2. Stale in the table, and 3. listed more than once.
-for skill in $(printf '%s\n' "$TABLE_LIST" | sort -u); do
-    occurrences=$(printf '%s\n' "$TABLE_LIST" | grep -cx -- "$skill" || true)
+for skill in "${!table_counts[@]}"; do
+    occurrences="${table_counts["$skill"]}"
     if [[ "$occurrences" -gt 1 ]]; then
         fail "$skill is listed $occurrences times in the AGENTS.md table (expected once)"
     fi
-    found=false
-    for catalog_skill in "${CATALOG[@]}"; do
-        if [[ "$catalog_skill" == "$skill" ]]; then
-            found=true
-            break
-        fi
-    done
-    if [[ "$found" == false ]]; then
+    if [[ -z "${catalog_map["$skill"]:-}" ]]; then
         fail "$skill is listed in AGENTS.md but no longer exists in .agents/skills/"
     fi
 done
