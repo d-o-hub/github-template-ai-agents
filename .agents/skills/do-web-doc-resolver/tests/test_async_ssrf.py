@@ -33,6 +33,9 @@ BLOCKED_LITERALS = [
     "0177.0.0.1",  # dotted octal octet
     "0x7f.0.0.1",  # dotted hex octet
     "::ffff:127.0.0.1",  # IPv4-mapped IPv6
+    "::127.0.0.1",  # IPv4-compatible IPv6 (RFC 4291, obsoleted)
+    "64:ff9b::127.0.0.1",  # NAT64 well-known prefix
+    "2002:7f00:1::",  # 6to4, embeds 127.0.0.1
     "0.0.0.0",
     "10.0.0.1",
     "100.64.0.1",  # carrier-grade NAT
@@ -81,3 +84,65 @@ class TestSyncAsyncParity:
         for host in BLOCKED_LITERALS + PUBLIC_LITERALS:
             url = f"http://[{host}]/" if ":" in host else f"http://{host}/"
             assert is_safe_url_sync(url) is is_safe_url_async(url), host
+
+
+class TestBothCopiesBlock:
+    """Parity alone is a weak oracle: two copies can agree on being unsafe.
+
+    Each literal is asserted blocked in each copy independently, so a shared
+    bug fails here rather than passing the parity guard above.
+    """
+
+    def test_sync_blocks_every_literal(self):
+        for host in BLOCKED_LITERALS:
+            url = f"http://[{host}]/" if ":" in host else f"http://{host}/"
+            assert is_safe_url_sync(url) is False, host
+
+    def test_async_blocks_every_literal(self):
+        for host in BLOCKED_LITERALS:
+            url = f"http://[{host}]/" if ":" in host else f"http://{host}/"
+            assert is_safe_url_async(url) is False, host
+
+
+class TestFailClosedOnResolution:
+    """An unanswerable DNS question must not read as "safe"."""
+
+    def test_sync_denies_when_dns_fails(self, monkeypatch):
+        import socket
+
+        from scripts.utils import http as http_mod
+
+        def boom(_host, _port=None):
+            raise socket.gaierror(-2, "Name or service not known")
+
+        monkeypatch.setattr(http_mod, "_getaddrinfo_cached", boom)
+        assert http_mod.is_safe_url("http://rebinding.example/") is False
+
+    def test_async_denies_when_dns_fails(self, monkeypatch):
+        import socket
+
+        from scripts.utils import async_http as async_mod
+
+        def boom(_host, _port=None):
+            raise socket.gaierror(-2, "Name or service not known")
+
+        monkeypatch.setattr(async_mod, "_getaddrinfo_cached", boom)
+        assert async_mod.is_safe_url("http://rebinding.example/") is False
+
+    def test_sync_still_allows_a_resolved_public_host(self, monkeypatch):
+        from scripts.utils import http as http_mod
+
+        def public(_host, _port=None):
+            return [(2, 1, 6, "", ("93.184.215.69", 0))]
+
+        monkeypatch.setattr(http_mod, "_getaddrinfo_cached", public)
+        assert http_mod.is_safe_url("https://docs.example.com/") is True
+
+    def test_sync_denies_when_dns_rebinds_to_loopback(self, monkeypatch):
+        from scripts.utils import http as http_mod
+
+        def loopback(_host, _port=None):
+            return [(2, 1, 6, "", ("127.0.0.1", 0))]
+
+        monkeypatch.setattr(http_mod, "_getaddrinfo_cached", loopback)
+        assert http_mod.is_safe_url("https://rebinding.example/") is False

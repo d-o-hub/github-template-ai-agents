@@ -132,7 +132,11 @@ def _normalize_host(hostname: str) -> str:
             except (ValueError, OverflowError):
                 pass
     if h.startswith("::ffff:"):
-        return h[7:]
+        try:
+            mapped = ipaddress.IPv6Address(h).ipv4_mapped
+        except ValueError:
+            return h
+        return str(mapped) if mapped else h
     return h
 
 
@@ -173,10 +177,13 @@ def is_safe_url(url: str) -> bool:
                 infos = _getaddrinfo_cached(hostname, None)
                 for _family, _socktype, _proto, _canonname, sockaddr in infos:
                     ip = ipaddress.ip_address(sockaddr[0])
+                    if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped:
+                        ip = ip.ipv4_mapped
                     if any(ip in network for network in BLOCKED_NETWORKS):
                         return False
             except Exception:
-                logger.debug("DNS resolution failed for SSRF check: %s", hostname, exc_info=True)
+                logger.warning("SSRF blocked (unresolved host): %s", hostname, exc_info=True)
+                return False
         if normalized.endswith(".local") or normalized.endswith(".internal"):
             return False
         return True
