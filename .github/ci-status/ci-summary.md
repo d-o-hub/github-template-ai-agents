@@ -1,14 +1,14 @@
 # CI Summary
 
-Latest CI status: **failing**
+Latest CI status: **passing**
 
-- **Last Run:** 2026-10-13T08:53:05.841377Z
+- **Last Run:** 2026-10-17T10:59:44.251955Z
 - **Schema Version:** 3
-- **Workflow URL:** [https://github.com/d-o-hub/github-template-ai-agents/actions/runs/38371990505](https://github.com/d-o-hub/github-template-ai-agents/actions/runs/38371990505)
+- **Workflow URL:** [https://github.com/d-o-hub/github-template-ai-agents/actions/runs/39026611762](https://github.com/d-o-hub/github-template-ai-agents/actions/runs/39026611762)
 
 ## Job Status
 
 | Job | Result |
 | --- | --- |
 | quality-gate | ✅ success |
-| test | ❌ failure |
+| test | ✅ success |
