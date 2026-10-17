@@ -1794,6 +1794,8 @@ no PR numbers in `SKILL.md` bodies (they rot on merge); keep dated evidence here
   guard over one fixture table now fails if the two copies diverge again.
 - `code-review-assistant`: green checks are not proof of completeness.
 - `git-github-workflow`: merge checks read workflow runs, not the `gh pr checks` rollup.
+- `code-review-assistant/references/security-patterns.md`: the traversal example taught
+  `startswith(base_dir)`; it now teaches `resolve()` + `relative_to()` containment.
 
 Before accepting any validation fix, grep the changed function name across the repo,
 require the same fixtures in each copy, and ask whether the check should be default-deny
