@@ -102,28 +102,55 @@ if [[ -z "$RULES_IDS" ]]; then
 fi
 
 echo "=== Lesson consistency ==="
+# perf: replace subshells and external process counts with native array logic
+mapfile -t index_arr <<< "$INDEX_IDS"
+mapfile -t rules_arr <<< "$RULES_IDS"
+
+# Ensure we don't count empty elements if the input was entirely empty
+[[ -z "${INDEX_IDS:-}" ]] && index_count=0 || index_count=${#index_arr[@]}
+[[ -z "${RULES_IDS:-}" ]] && rules_count=0 || rules_count=${#rules_arr[@]}
+
 printf "  catalog: %s, jsonl: %s, rules index: %s\n" \
-    "$CATALOG_COUNT" "$(printf '%s\n' "$INDEX_IDS" | wc -l)" "$(printf '%s\n' "$RULES_IDS" | wc -l)"
+    "$CATALOG_COUNT" "$index_count" "$rules_count"
+
+# Populate lookups for fast intersection tests
+declare -A catalog_map=()
+mapfile -t catalog_arr <<< "$CATALOG_IDS"
+for id in "${catalog_arr[@]}"; do
+    [[ -n "$id" ]] && catalog_map["$id"]=1
+done
+
+declare -A index_map=()
+for id in "${index_arr[@]}"; do
+    [[ -n "$id" ]] && index_map["$id"]=1
+done
 
 # --- Cross-checks ------------------------------------------------------------
-while IFS= read -r id; do
-    printf '%s\n' "$INDEX_IDS" | grep -qx -- "$id" || \
+for id in "${catalog_arr[@]}"; do
+    [[ -z "$id" ]] && continue
+    if [[ -z "${index_map["$id"]:-}" ]]; then
         fail "LESSON-$id is in LESSONS.md but has no lessons.jsonl row"
-done <<< "$CATALOG_IDS"
+    fi
+done
 
-while IFS= read -r id; do
-    printf '%s\n' "$CATALOG_IDS" | grep -qx -- "$id" || \
+for id in "${index_arr[@]}"; do
+    [[ -z "$id" ]] && continue
+    if [[ -z "${catalog_map["$id"]:-}" ]]; then
         fail "LESSON-$id has a lessons.jsonl row but no LESSONS.md entry"
-done <<< "$INDEX_IDS"
+    fi
+done
 
-while IFS= read -r id; do
-    printf '%s\n' "$CATALOG_IDS" | grep -qx -- "$id" && continue
+for id in "${rules_arr[@]}"; do
+    [[ -z "$id" ]] && continue
+    if [[ -n "${catalog_map["$id"]:-}" ]]; then
+        continue
+    fi
     # A lesson may legitimately live only in the archive, if it was superseded.
     if [[ -f "$ARCHIVE_MD" ]] && grep -qE "LESSON-0?$id" "$ARCHIVE_MD"; then
         continue
     fi
     fail "self-learning-rules.md references LESSON-$id, which is in neither LESSONS.md nor lessons-archive.md"
-done <<< "$RULES_IDS"
+done
 
 # --- Verdict -----------------------------------------------------------------
 if [[ $EXIT_CODE -eq 0 ]]; then
