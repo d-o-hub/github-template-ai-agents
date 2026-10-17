@@ -1751,3 +1751,77 @@ block optional imports, test the real HTTP helper through `MockTransport`, and
 verify empty-cache first writes. Check native CLI help/version without creating
 remote sessions; Jules v0.1.42 requires `--apply` for local application. Add newly
 discovered behavioral criteria prospectively and preserve earlier scores.
+
+### LESSON-049 — Security Validation Enumerations Drift, and Duplicated Validators Diverge
+
+**Date:** 2026-10-16
+
+**Issue:** Two Jules-authored security PRs were fully green across 20+ checks
+(`Quality Gate`, `Run Tests`, `CodeQL`, `gitleaks`, `Trivy`, `SonarCloud`) while both
+were incomplete in ways CI could not see. One appended six credential file extensions to
+`SENSITIVE_SUFFIXES`; the other added octal IPv4 handling to a host normalizer. Neither
+was a first occurrence — reviewing them as routine bumps hid the real defect. The
+normalizer PR then **merged incomplete** (`ab1d56f6`), which is the point: nothing in the
+pipeline could tell a half-applied fix from a whole one. Both merged the same day; the
+suffix PR took the list from 48 entries to 54.
+
+**Root Cause:** Both checks were enumeration-based, and enumerations are open-ended by
+construction. `scripts/lib/paths.py` carries 45 commits, 6 of which grew
+`SENSITIVE_SUFFIXES` from 40 to 54 entries — one format per `fix(security)` PR — yet the
+actual boundary was already enforced by `resolve()` + `relative_to()`. The file's own
+comment conceded the suffix list "only block[s] matching in-base names (not arbitrary
+reads)", so each new extension closed a name-policy gap, not an access hole. The SSRF
+normalizer had the same shape, learning decimal, then hex, then octal one incident at a
+time. Worse, `_normalize_host`/`is_safe_url` exist in two copies
+(`do-web-doc-resolver/scripts/utils/http.py` and `utils/async_http.py`); the fix patched
+one, added tests for one, and the async copy — which validates every redirect hop — stayed
+byte-identical to the vulnerable version with no test coverage at all. That left a real
+bypass on `main`: `is_safe_url` returned `False` for `0o17700000001` on the sync path and
+`True` on the async one. Some octal spellings were caught only incidentally, because glibc
+parses leading zeros in the `getaddrinfo` fallback — a `0o` prefix is not a form glibc
+recognises, so the fallback could not catch it. A green queue on an
+agent-generated PR certifies the assertions that exist, not the ones nobody wrote.
+
+**Solution:** Distill the structural rule into skills rather than the latest missing list
+entry, so downstream adopters inherit the reasoning instead of a stale enumeration. Record
+no PR numbers in `SKILL.md` bodies (they rot on merge); keep dated evidence here.
+
+- `security-code-auditor`: new SSRF section — reject non-canonical hosts, validate the
+  resolved address on every redirect hop, and grep for sibling copies before approving.
+- `secrets-management`: "Filenames Are Not the Boundary" — containment is the control,
+  extension denylists are defense in depth, and severity must follow the layer.
+- `do-web-doc-resolver`: sync and async fetchers do **not** share a validator; a parity
+  guard over one fixture table now fails if the two copies diverge again.
+- `code-review-assistant`: green checks are not proof of completeness.
+- `git-github-workflow`: merge checks read workflow runs, not the `gh pr checks` rollup.
+- `code-review-assistant/references/security-patterns.md`: the traversal example taught
+  `startswith(base_dir)`; it now teaches `resolve()` + `relative_to()` containment.
+
+Auditing that same validator after the mirror merged surfaced two gaps that are still open
+on `main`, recorded here as findings rather than fixes: the `getaddrinfo` branch swallows
+every exception at `debug` level and falls through to `return True`, so an NXDOMAIN — or any
+run in a sandbox without egress, which is what CI actually looks like — is an allow; and
+`BLOCKED_NETWORKS` lists `::ffff:0:0/96` but none of the other IPv6 ranges that carry a v4
+address (`::/96` IPv4-compatible, `64:ff9b::/96` NAT64, `2002::/16` 6to4), so
+`::127.0.0.1` and `2002:7f00:1::` are typed IPv6 and compared against no blocked range at
+all. Writing those two bypasses into the skills as a checklist would repeat the enumeration
+error; the skills state the rule instead — fail closed when resolution fails, and judge the
+address after unwrapping every v4-in-v6 form.
+
+Before accepting any validation fix, grep the changed function name across the repo,
+require the same fixtures in each copy, and ask whether the check should be default-deny
+rather than extended. Mirroring one copy into the other closes the hole but preserves the
+duplication that caused it; the structural fix is a single shared module, deliberately kept
+out of the security PR so that PR stays atomic. The enumeration pressure has not stopped —
+six per-format PRs have merged against that one list. The async parity mirror merged
+(`9ea21eb4`), which closes the bypass and leaves the duplication that caused it in place;
+the follow-up that removes it is unmerged. Green-queue blindness showed up twice over on
+that PR: its `Commit Lint`
+run failed while the check rollup listed only passing checks, so `gh pr checks` reported a
+clean PR — read the workflow runs, not the rollup. The failure was also invisible in the
+local gate, because CI pins `@commitlint/cli@19.8.1` while the installed CLI is newer, and
+19.8.1 classified a prose commit body as `footer`, tripping `footer-max-length: 1000`.
+Lint with the version CI pins.
+
+See also `LESSON-022` (duplicate automation), `LESSON-047`
+(parallel validators must agree), `LESSON-048` (static PASS is not behavioral proof).
