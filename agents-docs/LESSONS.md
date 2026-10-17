@@ -1797,16 +1797,17 @@ no PR numbers in `SKILL.md` bodies (they rot on merge); keep dated evidence here
 - `code-review-assistant/references/security-patterns.md`: the traversal example taught
   `startswith(base_dir)`; it now teaches `resolve()` + `relative_to()` containment.
 
-Auditing that same validator after the mirror merged surfaced two gaps that are still open
-on `main`, recorded here as findings rather than fixes: the `getaddrinfo` branch swallows
-every exception at `debug` level and falls through to `return True`, so an NXDOMAIN — or any
-run in a sandbox without egress, which is what CI actually looks like — is an allow; and
-`BLOCKED_NETWORKS` lists `::ffff:0:0/96` but none of the other IPv6 ranges that carry a v4
-address (`::/96` IPv4-compatible, `64:ff9b::/96` NAT64, `2002::/16` 6to4), so
-`::127.0.0.1` and `2002:7f00:1::` are typed IPv6 and compared against no blocked range at
-all. Writing those two bypasses into the skills as a checklist would repeat the enumeration
-error; the skills state the rule instead — fail closed when resolution fails, and judge the
-address after unwrapping every v4-in-v6 form.
+Auditing that same validator after the mirror merged surfaced two gaps, both since fixed on
+`main` (`2ba4a02b`): the `getaddrinfo` branch swallowed
+every exception at `debug` level and fell through to `return True`, so an NXDOMAIN — or any
+run in a sandbox without egress, which is what CI actually looks like — was an allow; and
+`BLOCKED_NETWORKS` listed `::ffff:0:0/96` but none of the other IPv6 ranges that carry a v4
+address (`::/96` IPv4-compatible, `64:ff9b::/96` NAT64, `64:ff9b:1::/48`, `2002::/16` 6to4), so
+`::127.0.0.1` and `2002:7f00:1::` were typed IPv6 and compared against no blocked range at
+all. Teredo (`2001::/32`) also embeds a v4 address, obfuscated behind a bitwise complement,
+and stays unblocked on purpose. Writing those bypasses into the skills as a checklist would
+repeat the enumeration error; the skills state the rule instead — fail closed when
+resolution fails, and judge the address after unwrapping every v4-in-v6 form.
 
 Before accepting any validation fix, grep the changed function name across the repo,
 require the same fixtures in each copy, and ask whether the check should be default-deny
@@ -1821,7 +1822,12 @@ run failed while the check rollup listed only passing checks, so `gh pr checks` 
 clean PR — read the workflow runs, not the rollup. The failure was also invisible in the
 local gate, because CI pins `@commitlint/cli@19.8.1` while the installed CLI is newer, and
 19.8.1 classified a prose commit body as `footer`, tripping `footer-max-length: 1000`.
-Lint with the version CI pins.
+Lint with the version CI pins. The rollup was worse than merely misleading on the next
+batch: after a bot re-synced two PR heads, `gh pr checks` listed six green CodeQL-family
+checks and omitted `CI`, `Commit Lint`, `gitleaks` and `Security Scan` entirely — those runs
+sat unapproved at the new head, while an earlier head's `Commit Lint` had already failed
+twice on a 1076-character PR body. A PR can therefore read as all-green with zero executed
+checks against the commit that would actually merge.
 
 See also `LESSON-022` (duplicate automation), `LESSON-047`
 (parallel validators must agree), `LESSON-048` (static PASS is not behavioral proof).
