@@ -55,7 +55,15 @@ class TestIsUrl:
 
 
 class TestIsSafeUrl:
-    def test_standard_https_safe(self):
+    def test_standard_https_safe(self, monkeypatch):
+        # Resolution failure is fail-closed, so this needs a deterministic
+        # answer instead of relying on the runner having live DNS.
+        from scripts.utils import http as http_mod
+
+        def public(_host, _port=None):
+            return [(2, 1, 6, "", ("93.184.215.69", 0))]
+
+        monkeypatch.setattr(http_mod, "_getaddrinfo_cached", public)
         assert is_safe_url("https://example.com") is True
 
     def test_file_scheme_blocked(self):
