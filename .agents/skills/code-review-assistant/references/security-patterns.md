@@ -85,9 +85,15 @@ subprocess.run(['ls', directory], shell=False)
 with open(f"/var/www/{filename}") as f:
     content = f.read()
 
-# GOOD: Sanitize and validate paths
-safe_path = os.path.join(base_dir, os.path.basename(filename))
+# BAD: startswith passes for /var/www-evil, and symlinks escape after the check
 if not safe_path.startswith(base_dir):
+    raise ValueError("Invalid path")
+
+# GOOD: resolve first, then require containment under the base
+candidate = (base_dir / filename).resolve()
+try:
+    candidate.relative_to(base_dir.resolve())
+except ValueError:
     raise ValueError("Invalid path")
 ```
 
