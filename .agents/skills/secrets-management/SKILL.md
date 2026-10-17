@@ -44,18 +44,50 @@ first, clean history second, prevent third.
 - Never commit a "test" secret that resembles a real one.
 - Separate secret *values* from secret *references* in every example.
 
+## Filenames Are Not the Boundary
+
+A tool that reads or writes paths supplied by an agent needs one real control:
+**containment**. Resolve the path, then assert it is still inside the allowed base.
+
+```python
+base = base.resolve()
+candidate = (base / raw).resolve()
+candidate.relative_to(base)   # raises => escapes the base => reject
+```
+
+That is default-deny and holds for every file format that exists tomorrow.
+
+A credential-*filename* denylist (`.pem`, `.tfvars`, `.sops.yml`, `.age`, …) is a
+**name policy** layered on top of it. It only ever decides "which in-base names to also
+refuse", so it cannot be complete: each new keystore, VPN bundle, or secret-manager file
+format is another bypass nobody listed. Track such a list's history before trusting it —
+this template grew one over 36 separate commits and it is still appending.
+
+So, in priority order:
+
+1. Keep secret-bearing files **outside** any tree the agent may touch. Enforceable today.
+2. Contain paths with `resolve()` + `relative_to()`. Enforceable today.
+3. Denylist known credential filenames. Defense in depth only; expect gaps by design.
+
+**Severity follows the layer.** A missing extension in layer 3, while layers 1-2 hold, is
+Low/Medium housekeeping — not a Critical leak. Reserve escalation for a hole in layer 1 or
+2, and do not let a per-extension patch inflate into an urgent security incident.
+
 ## Rationalizations
 
 | Rationalization | Reality |
 |-----------------|---------|
 | "It's just a test key, safe to commit" | Test-shaped keys get copied into production and scraped by bots within minutes. |
 | "I'll rotate it later, let me push the fix first" | Every minute a leaked key stays live is exploitation window; revoke before anything else. |
+| "We block every known credential extension" | A known-set is complete up to the day a new format ships. Containment does not depend on the extension. |
 
 ## Red Flags
 
 - [ ] Secret value visible in terminal output, logs, or review comments
 - [ ] Rotation postponed past the current session
 - [ ] New hardcoded credential in any file, including tests and examples
+- [ ] A secret file left inside a tree the agent may read, protected only by its filename
+- [ ] Another per-extension denylist PR labelled a critical security fix
 
 ## See Also
 
