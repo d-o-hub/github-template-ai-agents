@@ -133,6 +133,8 @@ scripts/
 - [ ] Not setting max character limits — fetching unbounded content wastes tokens
 - [ ] A host-validation change landing in `utils/http.py` with no matching `utils/async_http.py` change and no async test case
 - [ ] Adding another IP encoding to `_normalize_host` instead of rejecting non-canonical hosts and checking the resolved address
+- [ ] A resolution failure reaching the allow return, or an IPv6 literal embedding a v4
+      address (`::/96`, `64:ff9b::/96`, `2002::/16`) judged only against IPv4 networks
 
 ## References
 

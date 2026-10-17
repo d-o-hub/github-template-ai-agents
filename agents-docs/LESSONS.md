@@ -1797,13 +1797,26 @@ no PR numbers in `SKILL.md` bodies (they rot on merge); keep dated evidence here
 - `code-review-assistant/references/security-patterns.md`: the traversal example taught
   `startswith(base_dir)`; it now teaches `resolve()` + `relative_to()` containment.
 
+Auditing that same validator after the mirror merged surfaced two gaps that are still open
+on `main`, recorded here as findings rather than fixes: the `getaddrinfo` branch swallows
+every exception at `debug` level and falls through to `return True`, so an NXDOMAIN — or any
+run in a sandbox without egress, which is what CI actually looks like — is an allow; and
+`BLOCKED_NETWORKS` lists `::ffff:0:0/96` but none of the other IPv6 ranges that carry a v4
+address (`::/96` IPv4-compatible, `64:ff9b::/96` NAT64, `2002::/16` 6to4), so
+`::127.0.0.1` and `2002:7f00:1::` are typed IPv6 and compared against no blocked range at
+all. Writing those two bypasses into the skills as a checklist would repeat the enumeration
+error; the skills state the rule instead — fail closed when resolution fails, and judge the
+address after unwrapping every v4-in-v6 form.
+
 Before accepting any validation fix, grep the changed function name across the repo,
 require the same fixtures in each copy, and ask whether the check should be default-deny
 rather than extended. Mirroring one copy into the other closes the hole but preserves the
 duplication that caused it; the structural fix is a single shared module, deliberately kept
 out of the security PR so that PR stays atomic. The enumeration pressure has not stopped —
-six per-format PRs have merged against that one list, and the async parity fix is itself
-still open. Green-queue blindness showed up twice over on that same PR: its `Commit Lint`
+six per-format PRs have merged against that one list. The async parity mirror merged
+(`9ea21eb4`), which closes the bypass and leaves the duplication that caused it in place;
+the follow-up that removes it is unmerged. Green-queue blindness showed up twice over on
+that PR: its `Commit Lint`
 run failed while the check rollup listed only passing checks, so `gh pr checks` reported a
 clean PR — read the workflow runs, not the rollup. The failure was also invisible in the
 local gate, because CI pins `@commitlint/cli@19.8.1` while the installed CLI is newer, and
