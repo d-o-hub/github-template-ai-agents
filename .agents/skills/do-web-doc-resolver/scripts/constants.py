@@ -97,6 +97,10 @@ BLOCKED_NETWORKS: list = [
     ipaddress.ip_network("240.0.0.0/4"),
     ipaddress.ip_network("255.255.255.255/32"),
     ipaddress.ip_network("::ffff:0:0/96"),
+    ipaddress.ip_network("::/96"),
+    ipaddress.ip_network("64:ff9b::/96"),
+    ipaddress.ip_network("64:ff9b:1::/48"),
+    ipaddress.ip_network("2002::/16"),
 ]
 
 BLOCKED_HOSTNAMES: frozenset[str] = frozenset(
