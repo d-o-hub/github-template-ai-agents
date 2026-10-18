@@ -288,3 +288,26 @@ def test_run_file_validation_pip_bundle_sops_json_rejected(tmp_path):
     assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
     assert result.message == "Missing 3 file(s)"  # nosec B101 -- test assertion
     assert result.details == ["Missing: .pip", "Missing: .bundle", "Missing: .sops.json"]  # nosec B101 -- test assertion
+
+
+def test_run_file_validation_yarn_composer_helm_serverless_gitmodules_rejected(tmp_path):
+    """Consumer regression: eval file-validation must reject repo-local .yarn, .composer, .helm, .serverless, and .gitmodules."""
+    skill_path = tmp_path / "skill"
+    skill_path.mkdir()
+    (skill_path / ".yarn").mkdir()
+    (skill_path / ".composer").mkdir()
+    (skill_path / ".helm").mkdir()
+    (skill_path / ".serverless").mkdir()
+    (skill_path / ".gitmodules").write_text("test-content", encoding="utf-8")
+
+    eval_case = {"id": 1, "files": [".yarn", ".composer", ".helm", ".serverless", ".gitmodules"]}
+    result = eval_executors.run_file_validation(eval_case, skill_path, False)
+    assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
+    assert result.message == "Missing 5 file(s)"  # nosec B101 -- test assertion
+    assert result.details == [
+        "Missing: .yarn",
+        "Missing: .composer",
+        "Missing: .helm",
+        "Missing: .serverless",
+        "Missing: .gitmodules",
+    ]  # nosec B101 -- test assertion
