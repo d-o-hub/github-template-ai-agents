@@ -149,6 +149,11 @@ FORBIDDEN_PATHS = frozenset({
     ".pnpmrc.bak",
     ".env.bak",
     ".gradle",
+    ".yarn",
+    ".composer",
+    ".helm",
+    ".serverless",
+    ".gitmodules",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
