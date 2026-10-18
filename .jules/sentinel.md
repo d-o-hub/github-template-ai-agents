@@ -1,3 +1,9 @@
+## 2026-10-24 - Expand Path Validation Blocklist for Yarn Berry, Composer, Helm, Serverless, and Git Submodules
+
+**Vulnerability:** Omission of Yarn Berry directory (`.yarn`), PHP Composer directory (`.composer`), Helm configuration folder (`.helm`), Serverless Framework directory (`.serverless`), and Git submodules configuration file (`.gitmodules`) in `FORBIDDEN_PATHS` left package manager credentials, cloud deployment metadata, and submodule configurations vulnerable to potential inspection, traversal, or exfiltration.
+**Learning:** Hardening path validation requires securing package manager runtime directories, cloud deployment tool folders, and submodule configuration files alongside file-level package manager configs.
+**Prevention:** Maintain explicit denylist entries for `.yarn`, `.composer`, `.helm`, `.serverless`, and `.gitmodules` in path validation routines.
+
 ## 2026-10-24 - Expand Path Validation Blocklist for Package Manager Config Directories and SOPS JSON Configurations
 
 **Vulnerability:** Omission of pip user directory (`.pip`), Bundler configuration directory (`.bundle`), and SOPS JSON configuration files (`.sops.json`) in `FORBIDDEN_PATHS` left package manager credentials and SOPS configuration metadata vulnerable to potential inspection or exfiltration.
