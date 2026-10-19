@@ -1,3 +1,9 @@
+## 2026-10-24 - Expand SENSITIVE_SUFFIXES for Custom Package Manager and Auth Configurations in Path Validation
+
+**Vulnerability:** Omission of `.netrc`, `.npmrc`, `.yarnrc`, `.bunrc`, `.pnpmrc`, `.pypirc`, and `auth.json` in `SENSITIVE_SUFFIXES` allowed custom-prefixed configuration files (such as `custom.npmrc` or `dev.yarnrc`) to bypass pattern-based security path checks despite being present in `SENSITIVE_PREFIXES`.
+**Learning:** Security path validation patterns must include sensitive configuration file extensions in suffix checks as well as prefix checks to ensure custom-named or prefixed credential files are blocked regardless of prefix.
+**Prevention:** Maintain corresponding suffix patterns for all package manager and authentication configuration file types in `SENSITIVE_SUFFIXES`.
+
 ## 2026-10-24 - Expand Path Validation Blocklist for Yarn Berry, Composer, Helm, Serverless, and Git Submodules
 
 **Vulnerability:** Omission of Yarn Berry directory (`.yarn`), PHP Composer directory (`.composer`), Helm configuration folder (`.helm`), Serverless Framework directory (`.serverless`), and Git submodules configuration file (`.gitmodules`) in `FORBIDDEN_PATHS` left package manager credentials, cloud deployment metadata, and submodule configurations vulnerable to potential inspection, traversal, or exfiltration.
