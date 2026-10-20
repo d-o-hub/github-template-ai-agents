@@ -146,3 +146,8 @@
 **Vulnerability:** The skill discovery logic in `run-evals.py` failed to enforce `check_forbidden=True` on both the `--skill` user parameter and the general directory iterator loop. This left a potential vector where sensitive or forbidden system paths (such as `.git`, `.env`, or nested secret folders) could be referenced, mapped, or queried as a valid skill.
 **Learning:** Base parameters or iterating loops that process directory lists must explicitly validate names using standardized safe path checks. Bypassing check_forbidden on inputs can expose sensitive directories that contain private configurations or repository structures.
 **Prevention:** Always set `check_forbidden=True` in path-validation routines when discovering, resolving, or loading specific dynamic directories. Include unit tests ensuring traversal and forbidden paths are blocked.
+
+## 2026-10-20 - Ununified Service Account Credential Prefix Protection
+**Vulnerability:** Path validation rules in `SENSITIVE_PREFIXES` included `service_account` and `service-account`, but omitted `serviceaccount`, leaving unhyphenated service account credential filenames and Kubernetes token directory patterns unblocked.
+**Learning:** Common credential prefixes must account for all variations in word separation (underscore, hyphen, and contiguous lowercase) to prevent bypasses when validating sensitive paths.
+**Prevention:** Explicitly include all variants (`service_account`, `service-account`, `serviceaccount`) in credential pattern filters and write unit tests for each variation.

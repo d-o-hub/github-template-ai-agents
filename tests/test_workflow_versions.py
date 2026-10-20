@@ -37,6 +37,7 @@ CODEQL_SHA_TO_VERSION = {
     "1c5b675653bb5c22dbe9b12b556ec555138e09fd": "v4.38.1",  # tag v4.38.1
     "2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2": "v4.38.2",  # peeled tag v4.38.2
     "24c54180a607b1449ed407dd24f251e4e9147c8d": "v4.38.3",  # tag v4.38.3
+    "6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee": "v4.39.0",  # tag v4.39.0
 }
 
 # Same invariant for reviewdog/action-actionlint in yaml-lint.yml. Its label on
@@ -47,6 +48,7 @@ ACTIONLINT_SHA_TO_VERSION = {
     "320fcdd9c860767cf17fab3b20e22e739d5d02b8": "v1.76.0",  # tag v1.76.0
     "2085657ab2c7f48c58edcc767fba576f63bea76b": "v1.77.0",  # tag v1.77.0
     "a8ac3eea598697a830f7d8e701fc9fcbfde88974": "v1.80.0",  # tag v1.80.0
+    "3cbf14efd750961dba35fccbf00f9e14028cb1f5": "v1.80.2",  # tag v1.80.2
 }
 
 YAML_LINT_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "yaml-lint.yml"
