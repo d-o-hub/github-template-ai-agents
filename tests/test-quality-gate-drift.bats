@@ -187,9 +187,13 @@ setup() {
     fi
     chmod +x "$TEMP_DIR/scripts/"*.sh
 
-    # Copy real check-adr-compliance.sh (not stubbed) to catch unregistered ADRs
+    # Copy real check-adr-compliance.sh and check-invariants.sh (not stubbed)
     cp scripts/check-adr-compliance.sh "$TEMP_DIR/scripts/"
     chmod +x "$TEMP_DIR/scripts/check-adr-compliance.sh"
+    if [ -f scripts/check-invariants.sh ]; then
+        cp scripts/check-invariants.sh "$TEMP_DIR/scripts/"
+        chmod +x "$TEMP_DIR/scripts/check-invariants.sh"
+    fi
 
     # Stub all other validation scripts
     for s in validate-git-hooks.sh validate-github-actions-shas.sh validate-workflows.sh validate-skills.sh validate-links.sh loc_gate.sh wasm_size_gate.sh check-plan-numbering.sh; do
@@ -246,9 +250,13 @@ setup() {
     fi
     chmod +x "$TEMP_DIR/scripts/"*.sh
 
-    # Copy real check-adr-compliance.sh
+    # Copy real check-adr-compliance.sh and check-invariants.sh
     cp scripts/check-adr-compliance.sh "$TEMP_DIR/scripts/"
     chmod +x "$TEMP_DIR/scripts/check-adr-compliance.sh"
+    if [ -f scripts/check-invariants.sh ]; then
+        cp scripts/check-invariants.sh "$TEMP_DIR/scripts/"
+        chmod +x "$TEMP_DIR/scripts/check-invariants.sh"
+    fi
 
     # Stub all other validation scripts
     for s in validate-git-hooks.sh validate-github-actions-shas.sh validate-workflows.sh validate-skills.sh validate-links.sh loc_gate.sh wasm_size_gate.sh check-plan-numbering.sh; do
@@ -266,6 +274,7 @@ setup() {
 
     # Create _status.json WITH the ADR registered
     printf '{"nextAvailable":{"plan":"001","adr":"adr-002"},"entries":{"adr-001-test.md":{"status":"accepted","date":"2026-06-02"}}}' > "$TEMP_DIR/plans/_status.json"
+    printf '{"invariants":[]}' > "$TEMP_DIR/plans/invariants.json"
 
     cd "$TEMP_DIR" || exit 1
 
