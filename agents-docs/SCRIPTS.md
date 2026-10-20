@@ -29,6 +29,7 @@
 | `yaml_validate_workflows.py` | CI guard against YAML scalar-dedent regressions (the F8-class bug) | `python3 scripts/yaml_validate_workflows.py` |
 | `validate_gemini_toml.py` | Validate Gemini CLI `.toml` command files carry their required fields | `python3 scripts/validate_gemini_toml.py` |
 | `check-adr-compliance.sh` | Verify ADRs are registered in `plans/_status.json` and match project patterns | `./scripts/check-adr-compliance.sh` |
+| `check-invariants.sh` | Validate `plans/invariants.json` schema and verify every file-based sensor resolves | `./scripts/check-invariants.sh` |
 | `check-plan-numbering.sh` | Verify `plans/` numbering stays consistent and reports the next free plan/ADR id | `./scripts/check-plan-numbering.sh` |
 | `check-skill-overlap.sh` | Keyless Tier-2 inter-skill similarity (5-gram Jaccard over `SKILL.md` bodies); `--strict` gates | `./scripts/check-skill-overlap.sh [--strict]` |
 | `verify-commands.sh` | Verify slash commands referenced by agents actually resolve | `./scripts/verify-commands.sh` |

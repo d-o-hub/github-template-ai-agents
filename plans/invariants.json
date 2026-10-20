@@ -1,0 +1,34 @@
+{
+  "invariants": [
+    {
+      "invariant": "Every external GitHub Action in workflows must be pinned to a 40-character commit SHA.",
+      "rationale": "Prevents supply chain attacks and unexpected upstream breaking changes.",
+      "sensor": "scripts/validate-github-actions-shas.sh",
+      "category": "security"
+    },
+    {
+      "invariant": "All skill definitions in .agents/skills/ must have valid frontmatter and non-dangling symlinks.",
+      "rationale": "Ensures skill discovery and invocation across multi-agent CLI runtimes work reliably.",
+      "sensor": "scripts/validate-skills.sh",
+      "category": "architecture"
+    },
+    {
+      "invariant": "Markdown links across repository documentation must resolve without breaking.",
+      "rationale": "Maintains documentation integrity and prevents dead references.",
+      "sensor": "scripts/validate-links.sh",
+      "category": "quality"
+    },
+    {
+      "invariant": "Repository files must adhere to defined line-count limits.",
+      "rationale": "Prevents monolithic file bloat and maintains modular code design.",
+      "sensor": "scripts/loc_gate.sh",
+      "category": "quality"
+    },
+    {
+      "invariant": "ADR records must be registered in plans/_status.json and executable invariants verified.",
+      "rationale": "Ensures architectural decisions are tracked and enforced by executable checks.",
+      "sensor": "scripts/check-adr-compliance.sh",
+      "category": "architecture"
+    }
+  ]
+}

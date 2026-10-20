@@ -47,12 +47,15 @@ else
   done
 fi
 
-# --- Phase 3: Pattern Compliance (Skeleton) ---
-printf "\n=== Phase 3: Basic Pattern Compliance ===\n"
-# Users should add project-specific checks here.
-# Example:
-# if grep -rq -- "pattern" "$REPO_ROOT/src/"; then log_ok "Pattern found"; else log_fail "Pattern missing"; fi
-printf "  (No project-specific patterns defined in template)\n"
+# --- Phase 3: Executable Invariants Registry Validation ---
+printf "\n=== Phase 3: Executable Invariants Registry Validation ===\n"
+if [[ -f "$REPO_ROOT/scripts/check-invariants.sh" ]]; then
+  if ! "$REPO_ROOT/scripts/check-invariants.sh"; then
+    EXIT_CODE=1
+  fi
+else
+  log_fail "scripts/check-invariants.sh missing!"
+fi
 
 if [[ $EXIT_CODE -eq 0 ]]; then
   printf "\n✓ All ADR compliance checks passed.\n"
