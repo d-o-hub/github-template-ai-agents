@@ -170,6 +170,7 @@ for i in {1..10}; do pytest || echo "Failed run $i"; done
 ## See Also
 
 - `testing-strategy` — Choose testing approaches and plan test suites (incl. its testdata appendix)
+- `nested-build-isolation` — Isolate nested subprocess builds, tests, or coverage runners
 - `dogfood` — Exploratory testing of web applications
 
 ## Rationalizations

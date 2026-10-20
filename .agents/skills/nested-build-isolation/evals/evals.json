@@ -1,0 +1,48 @@
+{
+  "skill_name": "nested-build-isolation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Our integration test runs `cargo build` in a child process, but when we run `cargo llvm-cov`, the child cargo build fails because it inherits outer `RUSTFLAGS` and target directory settings. How should we safely isolate this child process?",
+      "expected_output": "Identifies environment variable inheritance (RUSTFLAGS, CARGO_TARGET_DIR, LLVM_PROFILE_FILE) as root cause and centralizes environment sanitization in an isolated command helper.",
+      "files": [],
+      "assertions": [
+        "Identifies environment variable inheritance (such as RUSTFLAGS, CARGO_TARGET_DIR, LLVM_PROFILE_FILE) as the root cause.",
+        "Recommends centralizing environment sanitization in a command helper.",
+        "Directs child process build outputs to an isolated temporary target directory."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Our coverage verification script is parsing the text summary output from cargo llvm-cov stdout, but minor tool updates break the parser. What is a robust way to extract coverage metrics?",
+      "expected_output": "Advises against relying on stdout summary text and recommends generating and parsing machine-readable JSON coverage reports.",
+      "files": [],
+      "assertions": [
+        "Advises against relying on unstructured stdout summary text contracts.",
+        "Recommends generating and parsing a machine-readable report format such as JSON (--json).",
+        "Extracts total coverage metrics deterministically from report data structures."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "An integration test fails only under coverage instrumentation because a child build process crashes when LLVM coverage profiling flags are passed. Should we add `#[ignore]` or skip the test when coverage is enabled?",
+      "expected_output": "Rejects test suppression, skipping, or sensor removal, insisting on proper environment sanitization while keeping test assertions intact.",
+      "files": [],
+      "assertions": [
+        "Rejects skipping, ignoring, or deleting the failing test.",
+        "Rejects disabling coverage or removing assertions to make the test pass.",
+        "Insists on sanitizing the child process environment while keeping test assertions intact."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "A unit test asserting `calculate_tax(100) == 10` failed because `calculate_tax` returned 12 due to a recent tax rate update. How do we fix this test?",
+      "expected_output": "Treats as ordinary logic test failure and does not trigger nested-build-isolation.",
+      "files": [],
+      "assertions": [
+        "Does not route to or select nested-build-isolation skill.",
+        "Treats this as an ordinary logic bug / test failure without nested subprocess issues."
+      ]
+    }
+  ]
+}
