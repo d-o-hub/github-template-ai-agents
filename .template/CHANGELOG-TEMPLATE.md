@@ -7,7 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.16] - 2026-10-20
+
+### Added
+
+- turso-db skill synced with latest Turso docs (v0.8.2).
+
+### Changed
+
+- separate maintainer policy from adopter defaults in template.
+- age LESSON-049 against what has since merged in docs.
+- distill open-PR security learnings into skills in docs.
+- correct LESSON-046 and record the Codacy check latency in docs.
+
+### Performance
+
+- eliminate nested subshell fork overhead in scripts.
+- eliminate awk subshell in detect-duplicate-prs.sh loop.
+- eliminate process forks in duplicate prs detection loop.
+
 ### Fixed
+
+- block .yarn, .composer, .helm, .serverless, and .gitmodules in path validation.
+- block .sops.yaml and .sops.json sensitive suffix patterns in paths.
+- fail SSRF checks closed and block IPv6-embedded IPv4 ranges.
+- match octal IPv4 normalization in async SSRF guard.
+- expand sensitive file suffix protections in paths.
+- normalize octal IPv4 formats in SSRF URL validation.
+- block .bunrc and .pnpmrc in path validation.
+- expand path validation for pip, bundle, and sops.
+- block .ppk and .keytab in path validation.
+- block backup credential files in path validation.
+- add identity token prefixes to path validation.
+- harden path validation for api_secret and app_key.
 
 - Resolver base installs now avoid eager optional-ML imports, use their declared
   search dependency, follow the httpx client/timeout contract, and accept first
