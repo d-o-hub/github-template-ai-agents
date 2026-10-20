@@ -174,6 +174,7 @@ SENSITIVE_PREFIXES = (
     "client_secret",
     "service_account",
     "service-account",
+    "serviceaccount",
     "kubeconfig",
     "secret",
     "credential",
