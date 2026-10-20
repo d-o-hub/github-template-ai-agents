@@ -125,6 +125,7 @@ def test_validate_safe_path_patterns(tmp_path):
     # Prefix matches
     prefix_patterns = [
         "client_secret", "client_secret_local", "service_account.json", "service-account-key.json",
+        "serviceaccount_token.json", "serviceaccount-key.json",
         "kubeconfig", "kubeconfig_prod",
         "secret_keys.json", "secrets_config", "credential_helper", "credentials_file",
         "netrc_backup", ".netrc_old", ".npmrc_custom", ".yarnrc_custom", ".bunrc_custom", ".pnpmrc_custom", ".pypirc_prod",
