@@ -18,6 +18,7 @@ fails the gate if the two ever disagree, or if either counter is missing.
 | Path | Purpose |
 |------|---------|
 | `_status.json` | Numbering counters, active plan, phase table, and the ADR registry. Schema: [`STATUS_SCHEMA.md`](STATUS_SCHEMA.md). |
+| `invariants.json` | Executable-invariants registry linking human-readable rules to enforcing sensor scripts or checks. |
 | `README.md` | This file: the human-readable counter mirror. |
 | `adr-NNN-*.md` | Architecture Decision Records. Numbered from `adr-007`; `adr-001`–`adr-006` predate the numbering scheme. |
 | `GOAP_STATE.md` | Active GOAP decomposition and phase progress. |
