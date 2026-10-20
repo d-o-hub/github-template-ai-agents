@@ -31,7 +31,7 @@ ${BOLD}COMMANDS${NC}
     ${GREEN}setup${NC}              First-time repo setup (skills, hooks, validation)
     ${GREEN}doctor${NC}             Environment diagnostics
     ${GREEN}quality${NC}            Run full quality gate
-    ${GREEN}validate${NC} [target]  Validation (all, skills, workflows, links, hooks, config, shas, adr)
+    ${GREEN}validate${NC} [target]  Validation (all, skills, workflows, links, hooks, config, shas, adr, invariants)
     ${GREEN}analyze${NC}            Codebase analysis
     ${GREEN}fix${NC}               Auto-fix CI loop until green
     ${GREEN}eval${NC} [skill]       Run skill evaluations
@@ -88,7 +88,8 @@ cmd_validate() {
         shas)       bash "$REPO_ROOT/scripts/validate-github-actions-shas.sh" "$@" ;;
         config)     bash "$REPO_ROOT/scripts/validate-config.sh" "$@" ;;
         adr)        bash "$REPO_ROOT/scripts/check-adr-compliance.sh" "$@" ;;
-        *)          die "Unknown validate target: $target (use: all, skills, workflows, links, hooks, config, shas, adr)" ;;
+        invariants) bash "$REPO_ROOT/scripts/check-invariants.sh" "$@" ;;
+        *)          die "Unknown validate target: $target (use: all, skills, workflows, links, hooks, config, shas, adr, invariants)" ;;
     esac
 }
 
