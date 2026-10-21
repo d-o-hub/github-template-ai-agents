@@ -7,6 +7,16 @@
 from __future__ import annotations
 from pathlib import Path
 
+# Shared string constants for sensitive path and package manager config definitions
+# to prevent duplication flags in static code quality analysis.
+NETRC = ".netrc"
+NPMRC = ".npmrc"
+YARNRC = ".yarnrc"
+BUNRC = ".bunrc"
+PNPMRC = ".pnpmrc"
+PYPIRC = ".pypirc"
+AUTH_JSON = "auth.json"
+
 FORBIDDEN_PATHS = frozenset({
     ".git",
     "scripts",
@@ -38,12 +48,12 @@ FORBIDDEN_PATHS = frozenset({
     "pyproject.toml",
     "Gemfile",
     "Gemfile.lock",
-    ".npmrc",
-    ".yarnrc",
+    NPMRC,
+    YARNRC,
     ".yarnrc.yml",
-    ".netrc",
-    ".pypirc",
-    "auth.json",
+    NETRC,
+    PYPIRC,
+    AUTH_JSON,
     ".ssh",
     ".aws",
     ".kube",
@@ -130,8 +140,8 @@ FORBIDDEN_PATHS = frozenset({
     "nuget.config",
     ".pip",
     ".bundle",
-    ".bunrc",
-    ".pnpmrc",
+    BUNRC,
+    PNPMRC,
     ".sops.yaml",
     ".sops.json",
     ".sops",
@@ -179,13 +189,13 @@ SENSITIVE_PREFIXES = (
     "secret",
     "credential",
     "netrc",
-    ".netrc",
-    ".npmrc",
-    ".yarnrc",
-    ".bunrc",
-    ".pnpmrc",
-    ".pypirc",
-    "auth.json",
+    NETRC,
+    NPMRC,
+    YARNRC,
+    BUNRC,
+    PNPMRC,
+    PYPIRC,
+    AUTH_JSON,
     "token",
     "access_token",
     "access-token",
@@ -235,8 +245,8 @@ SENSITIVE_SUFFIXES = (
     ".ovpn", ".kdbx", ".keychain", ".keychain-db", ".keyring", ".kdb",
     ".env", ".tfvars", ".tfvars.json", ".bak", ".ppk", ".keytab",
     ".tblk", ".p7b", ".p7c", ".spc", ".age", ".sops.yml",
-    ".sops.yaml", ".sops.json", ".netrc", ".npmrc", ".yarnrc",
-    ".bunrc", ".pnpmrc", ".pypirc", "auth.json",
+    ".sops.yaml", ".sops.json", NETRC, NPMRC, YARNRC,
+    BUNRC, PNPMRC, PYPIRC, AUTH_JSON,
 )
 
 SSH_KEY_PREFIXES = (
