@@ -2,22 +2,41 @@
 name: migration-refactoring
 version: "0.2.10"
 category: code-quality
-description: Automate complex code migrations and refactorings with safety patterns. Use this skill when a dependency upgrade forces source changes, when migrating frameworks (React class→hooks, Flask→FastAPI), modernizing languages (Python 2→3), or performing large-scale refactories — even if they just say "migrate this" or "refactor the whole thing". Includes breaking change analysis, automated fix application, rollback strategies, and cross-file dependency tracking. Not for static-analysis, code-review-assistant, or routine patch/minor/CVE bumps (use dependency-upgrades).
+description: Automate complex code migrations, cross-file refactorings, and move-only file decompositions with safety patterns. Use this skill when a dependency upgrade forces source changes, when migrating frameworks (React class→hooks, Flask→FastAPI), modernizing languages (Python 2→3), or splitting large files near size ceilings without behavior change — even if they say "split this large file", "extract module", or "keep the diff move-only". Includes breaking change analysis, automated fix application, rollback strategies, and cross-file dependency tracking. Not for static-analysis, code-review-assistant, or routine patch/minor/CVE bumps (use dependency-upgrades).
 license: MIT
 ---
 
 # Migration & Refactoring
 
-Systematic approach to complex code migrations with safety guardrails and rollback capabilities.
+Systematic approach to complex code migrations, structural refactorings, and move-only decompositions with safety guardrails and rollback capabilities.
 
 ## When to Use
 
-- **Dependency upgrades that force source changes** - major bumps with breaking APIs; routine patch/minor/CVE bumps go to `dependency-upgrades`
+- **Move-only decomposition** - Splitting large files near size ceilings (e.g., 500 LOC limits) without behavioral change ("split this large file", "extract module", "keep diff move-only")
+- **Dependency upgrades that force source changes** - Major bumps with breaking APIs; routine patch/minor/CVE bumps go to `dependency-upgrades`
 - **Framework migrations** - React class→hooks, Flask→FastAPI, Django→DRF, etc.
 - **Language modernizations** - Python 2→3, JavaScript→TypeScript
-- **Large-scale refactoring** - Cross-file changes requiring consistency
+- **Large-scale refactoring** - Cross-file changes requiring structural consistency
 - **Database schema evolution** - Migrations with data transformation
 - **Monorepo decomposition** - Extracting services from monoliths
+
+## When NOT to Use
+
+- **Routine patch/minor/CVE dependency upgrades** - Use `dependency-upgrades`
+- **Static analysis and linter-only fixes** - Use `static-analysis`
+- **PR code reviews and feedback analysis** - Use `code-review-assistant`
+
+## Move-Only Decomposition Workflow
+
+Dedicated procedure for splitting large files without behavioral change. Keep distinct from semantic migrations with intentional logic or interface changes.
+
+1. **Establish Trigger & Baseline**: Document the LOC/complexity ceiling warning (e.g., 500 LOC). Verify test suite passes before edits.
+2. **Identify Extraction Seams**: Analyze cohesive module boundaries. Map public/private visibility, imported dependencies, initialization sequence, and test ownership. Watch for circular deps or global state.
+3. **Mechanical Move**: Extract code purely mechanically. Do not mix behavioral refactoring, performance tweaks, or reformatting into the move commit.
+4. **Validate Tests**: Run narrow unit tests first, followed by full repository quality gate checks (`scripts/quality_gate.sh`).
+5. **Review Move-Aware Diff**: Inspect diff using `git diff --find-renames` (`git diff -M`) to verify pure structural relocation without line edits or type changes.
+6. **Handle Unintentional Semantic Changes**: If behavior changes were added accidentally, stop, revert or isolate them into a separate commit/PR with dedicated tests.
+7. **Revise Seam Boundaries**: If tests fail or contracts break, re-evaluate seam boundaries and visibility before re-attempting the move.
 
 ## Core Workflow
 
@@ -195,6 +214,7 @@ See `references/rollback-strategies.md` for platform-specific guides.
 - `static-analysis` — Linter triage and fix workflows
 - `code-review-assistant` — PR review workflow
 - `dependency-upgrades` — Routine patch/minor/CVE version bumps
+- `testing-strategy` — Test design and coverage guidelines
 
 ## Rationalizations
 
