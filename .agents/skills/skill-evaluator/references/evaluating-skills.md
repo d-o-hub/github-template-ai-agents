@@ -2,13 +2,14 @@
 
 ## Designing Test Cases
 
-Store test cases in `evals/evals.json` inside your skill directory. A test case has three parts:
-- **Prompt**: a realistic user message.
-- **Expected output**: a human-readable description of success.
-- **Files** (optional): files the skill needs to work with.
-- **Assertions**: verifiable statements about what the output should achieve.
+Store test cases in `evals/evals.json` inside your skill directory. A test case contains:
+- **Prompt**: realistic user task message.
+- **Expected output**: human-readable description of success.
+- **Bucket** (optional): taxonomy tag (`explicit`, `implicit`, `contextual`, `negative`).
+- **Files** (optional): relative paths to input fixtures under the skill directory.
+- **Assertions**: verifiable statements about what the output must achieve.
 
-### evals/evals.json
+### evals/evals.json Example
 
 ```json
 {
@@ -16,130 +17,93 @@ Store test cases in `evals/evals.json` inside your skill directory. A test case 
   "evals": [
     {
       "id": 1,
+      "bucket": "explicit",
       "prompt": "I have a CSV of monthly sales data in data/sales_2025.csv. Can you find the top 3 months by revenue and make a bar chart?",
-      "expected_output": "A bar chart image showing the top 3 months by revenue, with labeled axes and values.",
+      "expected_output": "A bar chart image showing the top 3 months by revenue, with labeled axes.",
       "files": ["evals/files/sales_2025.csv"],
       "assertions": [
         "The output includes a bar chart image file",
-        "The chart shows exactly 3 months",
-        "Both axes are labeled"
+        "The chart shows exactly 3 months"
+      ]
+    },
+    {
+      "id": 2,
+      "bucket": "negative",
+      "prompt": "Fix the formatting of this Dockerfile.",
+      "expected_output": "Out-of-scope task; csv-analyzer stays unloaded.",
+      "assertions": [
+        "Target skill csv-analyzer stays unloaded for Dockerfile task"
       ]
     }
   ]
 }
 ```
 
-## Running Evals & Baseline Comparison
+## Static Audit vs Opt-In Paired Behavioral Evaluation
 
-Run each test case twice: once with the skill and once without it (or with a previous version) to establish a baseline.
+Static validation (`scripts/run-evals.py` or `check_structure.py`) checks file existence, schema validity, and fixture paths. It is keyless, offline, and runs in default PR checks. A static PASS does NOT prove model behavior.
 
-## Workspace Structure
+Paired behavioral evaluation runs matched cases with the skill enabled (`with_skill`) and disabled (`without_skill`) using `scripts/run-paired-eval.py` or `.github/workflows/paired-eval.yml`.
 
-Organize eval results in a workspace directory alongside your skill directory. Each pass through the full eval loop gets its own `iteration-N/` directory.
+## Automated Paired Evaluation Runner
 
-```text
-<skill-name>/
-├── SKILL.md
-└── evals/
-    └── evals.json
+### Command Invocation
 
-<skill-name>-workspace/
-└── iteration-1/
-    ├── eval-top-months-chart/
-    │   ├── with_skill/
-    │   │   ├── outputs/       # Files produced by the run
-    │   │   ├── timing.json    # Tokens and duration
-    │   │   └── grading.json   # Assertion results
-    │   └── without_skill/
-    │       ├── outputs/
-    │       ├── timing.json
-    │       └── grading.json
-    ├── benchmark.json         # Aggregated statistics
-    └── feedback.json          # Human review notes
+```bash
+# Run paired behavioral evaluation
+python3 scripts/run-paired-eval.py --skill csv-analyzer [--agent-cmd "<cmd>"]
+
+# Bless current run output as baseline floor
+python3 scripts/run-paired-eval.py --skill csv-analyzer --bless
 ```
 
-## Artifact Schemas
+### Paired Evaluation Output Schema
 
-### timing.json
+Output JSON generated at `reports/paired-eval/<skill-name>-result.json`:
 
 ```json
 {
-  "total_tokens": 84852,
-  "duration_ms": 23332
-}
-```
-
-### grading.json
-
-```json
-{
-  "assertion_results": [
-    {
-      "text": "The output includes a bar chart image file",
-      "passed": true,
-      "evidence": "Found chart.png (45KB) in outputs directory"
-    }
-  ],
+  "version": "1.0.0",
+  "evaluation_type": "paired_behavioral",
+  "timestamp": "2026-10-21T12:00:00Z",
+  "skill": {
+    "name": "csv-analyzer",
+    "content_digest": "sha256:...",
+    "fixture_digest": "sha256:..."
+  },
+  "environment": {
+    "provider": "do-harness",
+    "model_id": "claude-3-5-sonnet-20241022",
+    "agent_cmd": "..."
+  },
   "summary": {
-    "passed": 3,
-    "failed": 1,
-    "total": 4,
-    "pass_rate": 0.75
-  }
-}
-```
-
-### benchmark.json
-
-```json
-{
-  "run_summary": {
-    "with_skill": {
-      "pass_rate": { "mean": 0.83, "stddev": 0.06 },
-      "time_seconds": { "mean": 45.0, "stddev": 12.0 },
-      "tokens": { "mean": 3800, "stddev": 400 }
-    },
-    "without_skill": {
-      "pass_rate": { "mean": 0.33, "stddev": 0.10 },
-      "time_seconds": { "mean": 32.0, "stddev": 8.0 },
-      "tokens": { "mean": 2100, "stddev": 300 }
-    },
-    "delta": {
-      "pass_rate": 0.50,
-      "time_seconds": 13.0,
-      "tokens": 1700
+    "status": "PASS",
+    "total_cases": 2,
+    "passed_cases": 2,
+    "failed_cases": 0,
+    "blocked_cases": 0,
+    "pass_rate_with_skill": 1.0,
+    "pass_rate_without_skill": 0.5,
+    "skill_lift": 0.5,
+    "baseline_comparison": {
+      "blessed_baseline_found": true,
+      "blessed_pass_rate": 1.0,
+      "delta_from_baseline": 0.0,
+      "regression_detected": false
     }
-  }
+  },
+  "metrics": {
+    "duration_ms": "unavailable",
+    "total_tokens": "unavailable",
+    "total_cost_usd": "unavailable"
+  },
+  "cases": []
 }
 ```
 
-### feedback.json
+## Baseline Comparison & Blessing
 
-```json
-{
-  "eval-top-months-chart": "The chart is missing axis labels.",
-  "eval-clean-missing-emails": ""
-}
-```
-
-## Writing Assertions
-
-Assertions are verifiable statements about what the output should contain or achieve.
-- **Good**: "The output file is valid JSON", "The report includes at least 3 recommendations".
-- **Weak**: "The output is good", "The skill feels smart".
-
-Every pass or fail must include evidence.
-
-## Analyzing Patterns
-
-- **Remove redundant assertions**: Those that always pass in both configurations.
-- **Investigate double failures**: Assertions that always fail in both configs (either the assertion, the test case, or the model is at fault).
-- **Study skill-only successes**: This is where the skill adds clear value.
-- **Tighten instructions for inconsistency**: High stddev in benchmarks suggests ambiguity.
-
-## Human Review & Iteration Loop
-
-1. Review outputs alongside assertion grades.
-2. Record actionable feedback in `feedback.json`.
-3. Use failed assertions, human feedback, and execution transcripts to propose skill improvements.
-4. Rerun all test cases in a new `iteration-N+1/` directory.
+- Blessed baselines are stored in `.agents/baselines/<skill-name>.json`.
+- Candidate evaluation runs automatically compare results against the blessed baseline.
+- If the pass rate drops or previously passing assertions fail, the status is flagged as `REGRESSION` / `FAIL`.
+- A new run NEVER silently rewrites the baseline. Raising or blessing a baseline floor requires explicit `--bless` or workflow parameter.
