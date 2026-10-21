@@ -53,7 +53,10 @@ async def resolve_url_stream_async(
     """Async generator version of resolve_url_stream."""
     logger.info(f"Resolving URL async: {url}")
 
-    cached_result = _check_semantic_cache(url)
+    # Embedding encode (and the first-call model load) is CPU/IO heavy, so it
+    # must not run on the event loop thread where it would stall every other
+    # concurrent task in the process.
+    cached_result = await asyncio.to_thread(_check_semantic_cache, url)
     if cached_result:
         cached_result["url"] = url
         yield cached_result
@@ -92,7 +95,7 @@ async def resolve_url_stream_async(
         ),
         "direct_fetch": (
             ProviderType.DIRECT_FETCH,
-            lambda: asyncio.to_thread(fetch_url_content, url, max_chars=max_chars),
+            lambda: asyncio.to_thread(fetch_url_content, url, max_chars),
         ),
         "mistral_browser": (
             ProviderType.MISTRAL_BROWSER,
@@ -160,6 +163,8 @@ async def resolve_url_stream_async(
         result_builder=_url_result_builder,
         content_acceptable=lambda q, pt: q.acceptable or pt == ProviderType.LLMS_TXT,
         target_key="url",
+        # No relevance query: URL resolution targets the page itself, and the
+        # optional context query is not expected to appear verbatim in it.
     ):
         yield result
 

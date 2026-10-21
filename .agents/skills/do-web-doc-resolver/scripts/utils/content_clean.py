@@ -56,7 +56,7 @@ def clean_content(
         )
         if result and len(result.strip()) > 200:
             logger.debug("content_clean: trafilatura succeeded (%d chars)", len(result))
-            return result[:max_chars]
+            return str(result)[:max_chars]
     except ImportError:
         logger.debug("content_clean: trafilatura not installed, trying readability")
     except Exception as e:
