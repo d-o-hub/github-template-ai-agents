@@ -84,7 +84,9 @@
       "expected_output": "The request is a standard Python coding task, out-of-scope for skill-creator. The target skill 'skill-creator' remains unloaded.",
       "files": [],
       "assertions": [
-        "The target skill 'skill-creator' remains unloaded for standard Python coding tasks"
+        "The agent recognizes standard Python coding tasks as out-of-scope for skill-creator",
+        "The target skill 'skill-creator' remains unloaded for standard Python coding tasks",
+        "The agent routes the prompt to general coding capabilities without invoking skill authoring workflow"
       ]
     }
   ]

@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
   "evaluation_type": "paired_behavioral",
-  "timestamp": "2026-10-21T09:55:57Z",
+  "timestamp": "2026-10-21T10:32:13Z",
   "skill": {
     "name": "skill-evaluator",
-    "content_digest": "sha256:99ccb78d0ae50da483c2f19035329ca39862e165562df26b20d1e2f4b97de66e",
-    "fixture_digest": "sha256:cd7b383898c772ed6aefeb880e6e1ab17dac063d091ed44538e1e7385b178664"
+    "content_digest": "sha256:094797437e74b15bb7cb011f528113af431e21af32f01d1450a85cce9ac724f8",
+    "fixture_digest": "sha256:669f335b37a181f848c925d1e9008a4e0b4f61d5c88af7887eabe82909518d6b"
   },
   "environment": {
     "provider": "unavailable",
@@ -22,11 +22,11 @@
     "pass_rate_without_skill": 0.0,
     "skill_lift": 0.0,
     "baseline_comparison": {
-      "blessed_baseline_found": false,
-      "blessed_pass_rate": null,
-      "delta_from_baseline": null,
+      "blessed_baseline_found": true,
+      "blessed_pass_rate": 0.0,
+      "delta_from_baseline": 0.0,
       "regression_detected": false,
-      "details": "No blessed baseline found for comparison."
+      "details": "No regression detected against blessed baseline."
     }
   },
   "metrics": {
@@ -482,6 +482,11 @@
         "status": "BLOCKED",
         "assertions": [
           {
+            "text": "The agent identifies SQL table formatting and database migration as out-of-scope for skill-evaluator",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
             "text": "The agent routes the request to database tools without loading skill-evaluator",
             "passed": false,
             "evidence": "Execution blocked: no model/agent_cmd configured"
@@ -499,6 +504,11 @@
       "without_skill": {
         "status": "BLOCKED",
         "assertions": [
+          {
+            "text": "The agent identifies SQL table formatting and database migration as out-of-scope for skill-evaluator",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
           {
             "text": "The agent routes the request to database tools without loading skill-evaluator",
             "passed": false,
@@ -518,5 +528,5 @@
       "message": "With-skill: BLOCKED, Without-skill: BLOCKED"
     }
   ],
-  "blessed_at": "2026-10-21T09:55:57Z"
+  "blessed_at": "2026-10-21T10:32:13Z"
 }

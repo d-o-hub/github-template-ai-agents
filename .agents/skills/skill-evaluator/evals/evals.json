@@ -98,6 +98,7 @@
       "expected_output": "The request is for database administration/SQL formatting, which is out-of-scope for skill-evaluator. The target skill 'skill-evaluator' remains unloaded, and the request routes to database-devops or general SQL tools.",
       "files": [],
       "assertions": [
+        "The agent identifies SQL table formatting and database migration as out-of-scope for skill-evaluator",
         "The agent routes the request to database tools without loading skill-evaluator",
         "The target skill 'skill-evaluator' remains unloaded for out-of-scope database task"
       ]
