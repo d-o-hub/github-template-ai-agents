@@ -1,0 +1,532 @@
+{
+  "version": "1.0.0",
+  "evaluation_type": "paired_behavioral",
+  "timestamp": "2026-10-21T10:32:13Z",
+  "skill": {
+    "name": "skill-evaluator",
+    "content_digest": "sha256:094797437e74b15bb7cb011f528113af431e21af32f01d1450a85cce9ac724f8",
+    "fixture_digest": "sha256:669f335b37a181f848c925d1e9008a4e0b4f61d5c88af7887eabe82909518d6b"
+  },
+  "environment": {
+    "provider": "unavailable",
+    "model_id": "unavailable",
+    "agent_cmd": "unavailable"
+  },
+  "summary": {
+    "status": "BLOCKED",
+    "total_cases": 8,
+    "passed_cases": 0,
+    "failed_cases": 0,
+    "blocked_cases": 8,
+    "pass_rate_with_skill": 0.0,
+    "pass_rate_without_skill": 0.0,
+    "skill_lift": 0.0,
+    "baseline_comparison": {
+      "blessed_baseline_found": true,
+      "blessed_pass_rate": 0.0,
+      "delta_from_baseline": 0.0,
+      "regression_detected": false,
+      "details": "No regression detected against blessed baseline."
+    }
+  },
+  "metrics": {
+    "duration_ms": "unavailable",
+    "total_tokens": "unavailable",
+    "total_cost_usd": "unavailable"
+  },
+  "cases": [
+    {
+      "id": 1,
+      "bucket": "explicit",
+      "prompt": "Statically evaluate .agents/skills/skill-evaluator/. Review the definitions only; do not run any model prompts.",
+      "expected_output": "The agent checks local layout, typed eval schema, at least 3 cases, and fixtures, then reviews assertion definitions. Its verdict is explicitly static and behavioral evaluation is NOT_RUN.",
+      "with_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The agent checks for SKILL.md existence",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent checks evals/evals.json for at least 3 cases, required typed fields, unique integer IDs, and non-empty assertion strings",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent checks local fixture paths without executing any eval prompt",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The verdict is labeled static and behavioral evaluation is NOT_RUN",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "without_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The agent checks for SKILL.md existence",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent checks evals/evals.json for at least 3 cases, required typed fields, unique integer IDs, and non-empty assertion strings",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent checks local fixture paths without executing any eval prompt",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The verdict is labeled static and behavioral evaluation is NOT_RUN",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "passed": false,
+      "message": "With-skill: BLOCKED, Without-skill: BLOCKED"
+    },
+    {
+      "id": 2,
+      "bucket": "explicit",
+      "prompt": "Manually evaluate one triz-solver eval prompt against an isolated no-skill baseline. If separate sessions are unavailable, report that limitation rather than simulating outputs.",
+      "expected_output": "The agent either captures actual outputs for the same case in isolated with-skill and without-skill sessions and grades both with evidence, or reports behavioral BLOCKED/NOT_RUN. It does not invent model outputs or measurements.",
+      "with_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The agent identifies a selected case ID and uses the same prompt and fixtures for both configurations",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The report includes actual paired output evidence or explicitly marks behavioral BLOCKED/NOT_RUN when isolation is unavailable",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "Each scored assertion cites an output quotation or saved artifact, not just the eval definition",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "Time, token, and cost values have measurement sources or are reported as not measured",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "without_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The agent identifies a selected case ID and uses the same prompt and fixtures for both configurations",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The report includes actual paired output evidence or explicitly marks behavioral BLOCKED/NOT_RUN when isolation is unavailable",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "Each scored assertion cites an output quotation or saved artifact, not just the eval definition",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "Time, token, and cost values have measurement sources or are reported as not measured",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "passed": false,
+      "message": "With-skill: BLOCKED, Without-skill: BLOCKED"
+    },
+    {
+      "id": 3,
+      "bucket": "implicit",
+      "prompt": "Compare the triz-solver skill in audit mode with and without the skill loaded (baseline comparison)",
+      "expected_output": "The agent uses independent sessions for the same audit prompt and grades actual outputs with a stated denominator, or reports the comparison blocked. It reports observed differences without assuming the skill outperforms the baseline.",
+      "with_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The comparison uses the same prompt and inputs with the skill as the only intended variable, or states why paired execution is blocked",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The baseline is not reused from a with-skill transcript",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "Any reported pass rate identifies the graded assertions and denominator and excludes explicitly blocked cases",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent does not claim improvement merely because the with-skill output passes",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "without_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The comparison uses the same prompt and inputs with the skill as the only intended variable, or states why paired execution is blocked",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The baseline is not reused from a with-skill transcript",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "Any reported pass rate identifies the graded assertions and denominator and excludes explicitly blocked cases",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent does not claim improvement merely because the with-skill output passes",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "passed": false,
+      "message": "With-skill: BLOCKED, Without-skill: BLOCKED"
+    },
+    {
+      "id": 4,
+      "bucket": "contextual",
+      "prompt": "Is the assertion 'The output is good' a valid eval assertion?",
+      "expected_output": "The agent identifies this as a BAD assertion - too subjective. Good assertions are concrete and checkable like 'The answer cites the exact minimum cover dimensions'.",
+      "with_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The agent identifies the assertion as subjective/invalid",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent explains that assertions must be concrete and checkable",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent provides an example of a good assertion",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "without_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The agent identifies the assertion as subjective/invalid",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent explains that assertions must be concrete and checkable",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent provides an example of a good assertion",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "passed": false,
+      "message": "With-skill: BLOCKED, Without-skill: BLOCKED"
+    },
+    {
+      "id": 5,
+      "bucket": "implicit",
+      "prompt": "My skill at .agents/skills/epub-validation/ has no evals directory. What should I add?",
+      "expected_output": "The agent reports a static failure for missing evals, then explains the matching skill_name and evals array with at least 3 cases, unique integer IDs, required non-empty prompt/expected_output/assertions strings, and optional local files paths. Behavioral evaluation remains NOT_RUN.",
+      "with_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The agent says the missing evals directory fails static validation rather than treating evals as optional",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent requires at least 3 cases with unique integer id, non-empty prompt and expected_output, and a non-empty assertion string array",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent explains optional files must name existing local fixtures under the skill root",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The report says behavioral evaluation is NOT_RUN",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "without_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The agent says the missing evals directory fails static validation rather than treating evals as optional",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent requires at least 3 cases with unique integer id, non-empty prompt and expected_output, and a non-empty assertion string array",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent explains optional files must name existing local fixtures under the skill root",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The report says behavioral evaluation is NOT_RUN",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "passed": false,
+      "message": "With-skill: BLOCKED, Without-skill: BLOCKED"
+    },
+    {
+      "id": 6,
+      "bucket": "contextual",
+      "prompt": "Review these malformed eval definitions statically: a top-level JSON array; an evals array containing null; duplicate IDs; assertions: []; files: [42]; bucket: {}. What should fail? Do not run a model.",
+      "expected_output": "The agent identifies root/case type errors, duplicate IDs, empty assertions, invalid file types, and the invalid bucket without crashing or claiming behavioral results.",
+      "with_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The report rejects a non-object root and a null case as schema errors",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The report rejects duplicate IDs and empty assertion arrays",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The report rejects files containing numbers and a non-string bucket",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The report labels findings static and does not present model-output scores",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "without_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The report rejects a non-object root and a null case as schema errors",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The report rejects duplicate IDs and empty assertion arrays",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The report rejects files containing numbers and a non-string bucket",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The report labels findings static and does not present model-output scores",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "passed": false,
+      "message": "With-skill: BLOCKED, Without-skill: BLOCKED"
+    },
+    {
+      "id": 7,
+      "bucket": "contextual",
+      "prompt": "eval-skills.sh exited 0. Can I report that every skill behaviorally passed and estimate the token savings?",
+      "expected_output": "The agent explains that this is static evidence only, behavioral trials are NOT_RUN, and token savings cannot be inferred or estimated as measured results. A manual isolated paired trial is needed for behavioral evidence.",
+      "with_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The agent refuses to infer behavioral PASS from eval-skills.sh exit 0",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent marks behavioral evidence NOT_RUN and token savings not measured",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent describes manual isolated with-skill/no-skill output capture as the prerequisite for a paired behavioral claim",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent does not claim the repository ships an automated model runner for this evaluation",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "without_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The agent refuses to infer behavioral PASS from eval-skills.sh exit 0",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent marks behavioral evidence NOT_RUN and token savings not measured",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent describes manual isolated with-skill/no-skill output capture as the prerequisite for a paired behavioral claim",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent does not claim the repository ships an automated model runner for this evaluation",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "passed": false,
+      "message": "With-skill: BLOCKED, Without-skill: BLOCKED"
+    },
+    {
+      "id": 8,
+      "bucket": "negative",
+      "prompt": "Please format this SQL table and generate a database migration script for Postgres.",
+      "expected_output": "The request is for database administration/SQL formatting, which is out-of-scope for skill-evaluator. The target skill 'skill-evaluator' remains unloaded, and the request routes to database-devops or general SQL tools.",
+      "with_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The agent identifies SQL table formatting and database migration as out-of-scope for skill-evaluator",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent routes the request to database tools without loading skill-evaluator",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The target skill 'skill-evaluator' remains unloaded for out-of-scope database task",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "without_skill": {
+        "status": "BLOCKED",
+        "assertions": [
+          {
+            "text": "The agent identifies SQL table formatting and database migration as out-of-scope for skill-evaluator",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The agent routes the request to database tools without loading skill-evaluator",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          },
+          {
+            "text": "The target skill 'skill-evaluator' remains unloaded for out-of-scope database task",
+            "passed": false,
+            "evidence": "Execution blocked: no model/agent_cmd configured"
+          }
+        ],
+        "output": "",
+        "skill_loaded": false,
+        "error": "Model execution unconfigured; returning BLOCKED status without fabricating output."
+      },
+      "passed": false,
+      "message": "With-skill: BLOCKED, Without-skill: BLOCKED"
+    }
+  ],
+  "blessed_at": "2026-10-21T10:32:13Z"
+}
