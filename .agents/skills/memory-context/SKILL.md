@@ -39,10 +39,13 @@ Index stored in `.git/memory-index/csm.db` (per-clone, never committed). Files m
 To ensure complete, up-to-date context and prevent hallucinating content from candidate IDs/scores alone, follow this sequence:
 
 1. **Query in JSON Format**: Execute `csm query` with `--output-format json` to obtain structured candidate fields (`id`, `score`, `path`, `metadata`, `preview`).
+
    ```bash
    csm query "how to handle git worktree cleanup" --top-k 5 --output-format json
    ```
+
    For exact identifier or code matching:
+
    ```bash
    csm query "MAX_CONTEXT_TOKENS" --top-k 3 --output-format json
    csm query "get_user_by_id" --code-aware --top-k 5 --output-format json
@@ -76,6 +79,7 @@ Unfiltered retrieval outputs or raw file concatenation can exceed context limits
 - **Label Estimates**: Label word-count or character-based calculations as approximate estimates (`~tokens`) unless using an exact tokenizer.
 
 Example JSON bounding function:
+
 ```python
 import json
 
