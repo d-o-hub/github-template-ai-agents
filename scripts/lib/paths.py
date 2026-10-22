@@ -226,6 +226,8 @@ SENSITIVE_PREFIXES = (
     "private_key",
     "private-key",
     "privkey",
+    "password",
+    "passwd",
     # NOTE: `secret_key`/`secret-key` intentionally omitted: already covered by
     # the `secret` prefix above (see #879 precedent); listing them would be dead config.
 )
