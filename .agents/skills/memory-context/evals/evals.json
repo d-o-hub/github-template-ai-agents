@@ -3,35 +3,35 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "What is LESSON-011 and how does it relate to Bash scripts in this repo? Query the memory context, verify source freshness, and read the source text.",
-      "expected_output": "The agent queries CSM for LESSON-011 in JSON format, inspects the returned path metadata, verifies the source file exists and is fresh, reads the actual text from the source file, and explains the importance of set +e in validation scripts with source citation.",
+      "prompt": "What is LESSON-011 and how does it relate to Bash scripts in this repo?",
+      "expected_output": "The agent retrieves the specific lesson about `set +e` in validation scripts from the memory store and explains its importance for error reporting.",
       "files": [],
       "assertions": [
-        "The agent queries CSM with --output-format json to retrieve candidate metadata",
-        "The agent verifies source freshness and reads the actual lesson text from the source path rather than inferring from ID alone",
-        "The agent correctly identifies LESSON-011 as being about set +e ensuring all errors are reported in a single run and cites the source"
+        "The agent correctly identifies LESSON-011 as being about 'set +e'",
+        "The agent explains that 'set +e' ensures all errors are reported in a single run",
+        "The agent references the memory retrieval process"
       ]
     },
     {
       "id": 2,
-      "prompt": "Find all project guidelines related to GitHub Action SHA pinning by querying memory and inspecting verified source documents.",
-      "expected_output": "The agent runs a CSM JSON query for action SHA pinning, verifies freshness of candidate source documents (AGENTS.md and SECURITY.md), reads the relevant source sections, and cites guidelines for 40-character commit SHAs.",
+      "prompt": "Find all project guidelines related to GitHub Action SHA pinning.",
+      "expected_output": "The agent searches the memory context and identifies guidelines in `AGENTS.md` and `SECURITY.md` regarding 40-character commit SHAs.",
       "files": [],
       "assertions": [
-        "The agent queries CSM using JSON output and verifies source file freshness before citing guidelines",
-        "The agent cites the 40-character commit SHA requirement from verified source files AGENTS.md and SECURITY.md",
-        "The output includes an example of a pinned action based on retrieved source text"
+        "The agent cites the 40-character commit SHA requirement",
+        "The agent mentions both AGENTS.md and SECURITY.md as sources",
+        "The output includes an example of a pinned action"
       ]
     },
     {
       "id": 3,
-      "prompt": "Use code-aware retrieval to find how MAX_CONTEXT_TOKENS is defined in the indexed repo configuration .agents/config.sh and used across the project.",
-      "expected_output": "The agent indexes .agents/config.sh, executes a code-aware csm query for MAX_CONTEXT_TOKENS with JSON output format, verifies freshness of .agents/config.sh, reads the definition directly from the source file, and cites the definition.",
+      "prompt": "Use code-aware retrieval to find how MAX_CONTEXT_TOKENS is defined and used across the project.",
+      "expected_output": "The agent runs a code-aware csm query for MAX_CONTEXT_TOKENS, finds its definition in .agents/config.sh, and identifies where it's referenced in scripts.",
       "files": [],
       "assertions": [
-        "The agent indexes or references .agents/config.sh in the indexed corpus and uses code-aware CSM query with --output-format json",
-        "The agent verifies freshness of .agents/config.sh and reads the definition directly from the source file",
-        "The agent cites the exact definition of MAX_CONTEXT_TOKENS found in .agents/config.sh"
+        "The agent uses the --code-aware flag or equivalent",
+        "The agent finds the definition location of MAX_CONTEXT_TOKENS",
+        "The agent identifies at least one usage site"
       ]
     }
   ]

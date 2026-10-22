@@ -16,7 +16,7 @@ import sys
 class BlockOptionalDependencies(importlib.abc.MetaPathFinder):
     def find_spec(self, fullname, path=None, target=None):
         if fullname.split('.')[0] in {
-            'numpy', 'PIL', 'playwright', 'sentence_transformers', 'duckduckgo_search'
+            'numpy', 'PIL', 'playwright', 'sentence_transformers', 'ddgs'
         }:
             raise ModuleNotFoundError(f'Optional dependency unavailable: {fullname}', name=fullname)
 
@@ -71,7 +71,7 @@ def test_declared_search_dependency_works_without_legacy_package(asynchronous, t
 import asyncio
 from unittest.mock import patch
 from scripts.providers.duckduckgo import resolve_with_duckduckgo, resolve_with_duckduckgo_async
-with patch('ddgs.DDGS') as factory:
+with patch('duckduckgo_search.DDGS') as factory:
     factory.return_value.__enter__.return_value.text.return_value = [
         {{'title': 'Fixture', 'body': 'fixture search content'}}
     ]
