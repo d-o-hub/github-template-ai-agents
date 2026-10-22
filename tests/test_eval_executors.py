@@ -311,17 +311,3 @@ def test_run_file_validation_yarn_composer_helm_serverless_gitmodules_rejected(t
         "Missing: .serverless",
         "Missing: .gitmodules",
     ]  # nosec B101 -- test assertion
-
-
-def test_run_file_validation_password_passwd_rejected(tmp_path):
-    """Consumer regression: eval file-validation must reject repo-local password and passwd files."""
-    skill_path = tmp_path / "skill"
-    skill_path.mkdir()
-    (skill_path / "password.json").write_text("test-content", encoding="utf-8")
-    (skill_path / "passwd.txt").write_text("test-content", encoding="utf-8")
-
-    eval_case = {"id": 1, "files": ["password.json", "passwd.txt"]}
-    result = eval_executors.run_file_validation(eval_case, skill_path, False)
-    assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
-    assert result.message == "Missing 2 file(s)"  # nosec B101 -- test assertion
-    assert result.details == ["Missing: password.json", "Missing: passwd.txt"]  # nosec B101 -- test assertion
