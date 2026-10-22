@@ -3,6 +3,7 @@
   "evals": [
     {
       "id": 1,
+      "bucket": "explicit",
       "prompt": "Statically evaluate .agents/skills/skill-evaluator/. Review the definitions only; do not run any model prompts.",
       "expected_output": "The agent checks local layout, typed eval schema, at least 3 cases, and fixtures, then reviews assertion definitions. Its verdict is explicitly static and behavioral evaluation is NOT_RUN.",
       "files": [],
@@ -15,6 +16,7 @@
     },
     {
       "id": 2,
+      "bucket": "explicit",
       "prompt": "Manually evaluate one triz-solver eval prompt against an isolated no-skill baseline. If separate sessions are unavailable, report that limitation rather than simulating outputs.",
       "expected_output": "The agent either captures actual outputs for the same case in isolated with-skill and without-skill sessions and grades both with evidence, or reports behavioral BLOCKED/NOT_RUN. It does not invent model outputs or measurements.",
       "files": [],
@@ -27,6 +29,7 @@
     },
     {
       "id": 3,
+      "bucket": "implicit",
       "prompt": "Compare the triz-solver skill in audit mode with and without the skill loaded (baseline comparison)",
       "expected_output": "The agent uses independent sessions for the same audit prompt and grades actual outputs with a stated denominator, or reports the comparison blocked. It reports observed differences without assuming the skill outperforms the baseline.",
       "files": [],
@@ -39,6 +42,7 @@
     },
     {
       "id": 4,
+      "bucket": "contextual",
       "prompt": "Is the assertion 'The output is good' a valid eval assertion?",
       "expected_output": "The agent identifies this as a BAD assertion - too subjective. Good assertions are concrete and checkable like 'The answer cites the exact minimum cover dimensions'.",
       "files": [],
@@ -50,6 +54,7 @@
     },
     {
       "id": 5,
+      "bucket": "implicit",
       "prompt": "My skill at .agents/skills/epub-validation/ has no evals directory. What should I add?",
       "expected_output": "The agent reports a static failure for missing evals, then explains the matching skill_name and evals array with at least 3 cases, unique integer IDs, required non-empty prompt/expected_output/assertions strings, and optional local files paths. Behavioral evaluation remains NOT_RUN.",
       "files": [],
@@ -62,6 +67,7 @@
     },
     {
       "id": 6,
+      "bucket": "contextual",
       "prompt": "Review these malformed eval definitions statically: a top-level JSON array; an evals array containing null; duplicate IDs; assertions: []; files: [42]; bucket: {}. What should fail? Do not run a model.",
       "expected_output": "The agent identifies root/case type errors, duplicate IDs, empty assertions, invalid file types, and the invalid bucket without crashing or claiming behavioral results.",
       "files": [],
@@ -74,6 +80,7 @@
     },
     {
       "id": 7,
+      "bucket": "contextual",
       "prompt": "eval-skills.sh exited 0. Can I report that every skill behaviorally passed and estimate the token savings?",
       "expected_output": "The agent explains that this is static evidence only, behavioral trials are NOT_RUN, and token savings cannot be inferred or estimated as measured results. A manual isolated paired trial is needed for behavioral evidence.",
       "files": [],
@@ -82,6 +89,18 @@
         "The agent marks behavioral evidence NOT_RUN and token savings not measured",
         "The agent describes manual isolated with-skill/no-skill output capture as the prerequisite for a paired behavioral claim",
         "The agent does not claim the repository ships an automated model runner for this evaluation"
+      ]
+    },
+    {
+      "id": 8,
+      "bucket": "negative",
+      "prompt": "Please format this SQL table and generate a database migration script for Postgres.",
+      "expected_output": "The request is for database administration/SQL formatting, which is out-of-scope for skill-evaluator. The target skill 'skill-evaluator' remains unloaded, and the request routes to database-devops or general SQL tools.",
+      "files": [],
+      "assertions": [
+        "The agent identifies SQL table formatting and database migration as out-of-scope for skill-evaluator",
+        "The agent routes the request to database tools without loading skill-evaluator",
+        "The target skill 'skill-evaluator' remains unloaded for out-of-scope database task"
       ]
     }
   ]

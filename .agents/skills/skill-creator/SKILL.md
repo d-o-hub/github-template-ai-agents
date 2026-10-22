@@ -20,14 +20,12 @@ Create and improve skills following the Agent Skills specification. A skill exte
 
 1. **Capture intent** - What should the skill do? When should it trigger?
 2. **Write draft** - Create SKILL.md with frontmatter and instructions
-3. **Create test cases** - Realistic prompts users would actually say
-4. **Run evals via `skill-evaluator`** - Delegate execution; do not re-specify
-   eval mechanics here (test with-skill vs baseline or old version)
-5. **Review results** - Use eval-viewer for human review + benchmarks
+3. **Create test cases** - Realistic prompts covering 4 buckets: explicit, implicit, contextual, and negative
+4. **Run evals via `skill-evaluator`** - Static structure check default; opt-in paired behavioral evaluation via `python3 scripts/run-paired-eval.py --skill <name>` or GitHub Actions `paired-eval.yml`
+5. **Review results** - Use eval-viewer or paired artifact reports for human review + benchmarks
 6. **Iterate** - Improve based on feedback until satisfied
 7. **Optimize description** - Fine-tune frontmatter for better triggering
-8. **Check trigger uniqueness** - Grep sibling descriptions for shared trigger
-   phrases; add `Not for <sibling>` until no collisions remain
+8. **Check trigger uniqueness** - Grep sibling descriptions for shared trigger phrases; add `Not for <sibling>` until no collisions remain
 
 ---
 
@@ -86,16 +84,6 @@ skill-name/
 8. **Run each query multiple times** — Model behavior is nondeterministic; run 3 times
 9. **Use train/validation splits** — ~60% train / ~40% validation
 
-### The Optimization Loop
-
-10. **Evaluate on both sets** — Train results guide changes; validation tells if changes generalize
-11. **Identify failures in train set only** — Keep validation results hidden during iteration
-12. **Revise strategically:**
-    - Should-trigger failing → broaden scope or add context
-    - Should-not-trigger false-triggering → add specificity about what the skill does *not* do
-13. **Select best iteration by validation pass rate**
-14. **Check the 1024-character limit**
-
 ---
 
 ## Creating Test Cases
@@ -108,6 +96,7 @@ Store in `evals/evals.json`:
   "evals": [
     {
       "id": 1,
+      "bucket": "explicit",
       "prompt": "User's task prompt",
       "expected_output": "Description of expected result",
       "files": [],
@@ -117,36 +106,22 @@ Store in `evals/evals.json`:
 }
 ```
 
-### Test Case Guidelines
+### Test Case Guidelines & 4-Bucket Taxonomy
 
-- **Template-local requirement**: Every skill needs `evals/evals.json` with at
-  least 3 cases. This is repository policy, not an Agent Skills spec requirement.
-- **Shape**: Use a matching `skill_name`, unique integer IDs, non-empty `prompt`
-  and `expected_output` strings, and non-empty arrays of checkable assertion
-  strings. Optional `files` is an array of paths to existing local input fixtures.
-- **Realism**: Add file paths, personal context, specific details, casual language
-- **Variety**: Mix formal/casual, terse/context-heavy, single-step/multi-step
-- **Near-misses**: Include queries that share keywords but need something different
-- **Evidence scope**: A static audit checks definitions, not model behavior.
-  Use `skill-evaluator`'s manual paired mode for behavioral claims; record
-  unavailable measurements as unavailable, never estimated pass rates or costs.
+- **Template-local requirement**: Every skill needs `evals/evals.json` with at least 3 cases.
+- **Buckets**: Tag each case with an optional `bucket` field:
+  - `explicit`: Request directly names the skill's domain/job.
+  - `implicit`: Request requires the skill's capabilities without naming it explicitly.
+  - `contextual`: Request is adjacent to the skill domain; tests boundary awareness.
+  - `negative`: Request is out-of-scope; target skill must stay unloaded and avoid false activation.
+- **Shape**: Matching `skill_name`, unique integer IDs, non-empty `prompt` and `expected_output` strings, checkable `assertions` string array.
+- **Opt-in Paired Behavioral Evaluation**: Request paired runs via `python3 scripts/run-paired-eval.py --skill <name>` or GitHub Actions workflow `paired-eval.yml`. Do not confuse static structure PASS with behavioral efficacy.
 
 ---
 
-## Domain-Specific Verification Skills
-
-When creating a new domain-specific skill, always include a verification checklist.
-Use `skill-evaluator/references/verification-checklist.md` as a starting point.
-
-### Benefits
-
-- Deep domain knowledge encoded in skills.
-- Reduces onboarding time.
-- Ensures consistent debugging and verification approach.
-
 ## See Also
 
-- `skill-evaluator` — Evaluate and score skills
+- `skill-evaluator` — Evaluate and score skills statically or in paired runs
 - `intent-classifier` — Route requests to appropriate skills
 
 ## Rationalizations
@@ -159,62 +134,13 @@ Use `skill-evaluator/references/verification-checklist.md` as a starting point.
 
 ## Red Flags
 
-- [ ] Creating a skill without running the eval loop at least once.
-- [ ] Skipping the description optimization step and shipping a vague or overly broad trigger.
+- [ ] Creating a skill without running static checks or designing eval cases.
+- [ ] Skipping the description optimization step and shipping a vague or broad trigger.
 - [ ] Hardcoding project-specific paths or values instead of using relative references.
-- [ ] Omitting the `## Rationalizations` or `## Red Flags` sections from SKILL.md.
+- [ ] Omitting `## Rationalizations` or `## Red Flags` sections from SKILL.md.
 
 ## References
 
 - `references/guide.md` - Templates, examples, and best practices
-- `references/scripts.md` - CLI reference for the bundled scripts
-- `references/evaluating-skills.md` - Evaluating skill output quality
-- `references/schemas.md` - JSON schemas for evals, grading, timing, benchmark
-- `references/best-practices.md` - Best practices for skill creators
-- `references/output-patterns.md` - Common output patterns
-- `references/workflows.md` - Common workflow patterns
-- `agents/grader.md` - Subagent for grading eval assertions
-- `agents/analyzer.md` - Subagent for analyzing benchmark results
-- `agents/comparator.md` - Subagent for blind A/B comparison
-- `eval-viewer/generate_review.py` - Generate HTML review page from results
-- `assets/eval_review.html` - Self-contained eval set query review tool
-
-## Registration and Standards
-
-### How to register a skill in AGENTS.md
-
-1. **Catalog Update**: Add the skill to the "Skills" section in `AGENTS.md` following the alphabetical order within its category.
-2. **Docs Sync**: Add the skill to `agents-docs/skills-reference.md`.
-3. **Registry Update**: Run `./scripts/update-agents-registry.sh` if applicable.
-4. **Maintenance**: Run `python3 scripts/generate-skills-readme.py` and `./scripts/generate-available-skills.sh` to update auto-generated documentation.
-
-### Acceptance Criteria Format
-
-Every new skill must meet these criteria before being merged:
-- [ ] `SKILL.md` is under 250 lines.
-- [ ] Frontmatter contains `name`, `description`, and template-local `category`.
-- [ ] Optional `version` follows the recommended release-stamp policy.
-- [ ] Includes `## Rationalizations` and `## Red Flags` sections.
-- [ ] Contains at least 3 realistic eval cases in `evals/evals.json`.
-- [ ] Successfully passes `./scripts/validate-skills.sh`.
-
-### Versioning Conventions
-
-- `agents-docs/SKILLS.md` is authoritative for frontmatter policy.
-- `version` is recommended but optional: it stamps a skill-set release, not an
-  independent per-skill SemVer line. Bump on a skill-set release, not each edit.
-- A lagging stamp is legal; do not force-bump it to quiet a diff.
-- `template_version` is optional too; derive it from root `VERSION` if used.
-
-## Scripts
-
-Bundled helpers for scaffolding, packaging, benchmarking, description
-optimization, and review-page generation.
-
-- `references/scripts.md` - CLI reference: `init_skill`, `package_skill`,
-  `aggregate_benchmark`, `run_loop`, `eval-viewer/generate_review.py`
-
-## Voice & Context
-
-- **Default**: `professional` + `blog`
-- **Reference**: `voice-profiles` skill for definitions and auto-detection.
+- `references/scripts.md` - CLI reference for bundled scripts
+- `references/evaluating-skills.md` - Evaluating skill output quality and paired runs
