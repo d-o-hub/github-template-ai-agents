@@ -2,9 +2,9 @@
 
 Latest CI status: **passing**
 
-- **Last Run:** 2026-10-20T19:32:29.165069Z
+- **Last Run:** 2026-10-22T15:32:17.556770Z
 - **Schema Version:** 3
-- **Workflow URL:** [https://github.com/d-o-hub/github-template-ai-agents/actions/runs/39483539360](https://github.com/d-o-hub/github-template-ai-agents/actions/runs/39483539360)
+- **Workflow URL:** [https://github.com/d-o-hub/github-template-ai-agents/actions/runs/39804626974](https://github.com/d-o-hub/github-template-ai-agents/actions/runs/39804626974)
 
 ## Job Status
 
