@@ -136,7 +136,8 @@ def test_validate_safe_path_patterns(tmp_path):
         "app_key.txt", "app-key.txt", "api_key_prod", "api_key.json",
         "api-key.txt", "id_token.json", "id-token.txt", "identity_token.txt", "identity-token.txt", "oauth_token.json", "oauth-token.txt",
         "jwt_token.json", "jwt-token.txt",
-        "private_key.txt", "private-key.txt", "privkey", "secret_key.json", "secret-key.txt"
+        "private_key.txt", "private-key.txt", "privkey", "secret_key.json", "secret-key.txt",
+        "password.json", "password_backup.txt", "passwd.txt"
     ]
     for p in prefix_patterns:
         with pytest.raises(PathValidationError):
