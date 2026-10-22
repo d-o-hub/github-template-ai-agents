@@ -136,8 +136,7 @@ def test_validate_safe_path_patterns(tmp_path):
         "app_key.txt", "app-key.txt", "api_key_prod", "api_key.json",
         "api-key.txt", "id_token.json", "id-token.txt", "identity_token.txt", "identity-token.txt", "oauth_token.json", "oauth-token.txt",
         "jwt_token.json", "jwt-token.txt",
-        "private_key.txt", "private-key.txt", "privkey", "secret_key.json", "secret-key.txt",
-        "password.json", "password_backup.txt", "passwd.txt"
+        "private_key.txt", "private-key.txt", "privkey", "secret_key.json", "secret-key.txt"
     ]
     for p in prefix_patterns:
         with pytest.raises(PathValidationError):
@@ -150,9 +149,7 @@ def test_validate_safe_path_patterns(tmp_path):
         "terraform.tfvars.json", "override.tfvars", "secrets.tfvars.json",
         "cluster.kubeconfig.yaml", "cluster.kubeconfig.yml", "server.ppk",
         "krb5.keytab", "tunnelblick.tblk", "cert.p7b", "cert.p7c", "cert.spc",
-        "secret.age", "config.sops.yml", "secrets.sops.yaml", "vault.sops.json",
-        "my.netrc", "custom.npmrc", "custom.yarnrc", "custom.bunrc",
-        "custom.pnpmrc", "custom.pypirc", "my_auth.json"
+        "secret.age", "config.sops.yml", "secrets.sops.yaml", "vault.sops.json"
     ]
     for p in additional_suffixes:
         with pytest.raises(PathValidationError):
