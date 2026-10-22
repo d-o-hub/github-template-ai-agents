@@ -1,0 +1,77 @@
+name: Paired Behavioral Skill Evaluation
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_dispatch:
+    inputs:
+      skill:
+        description: "Skill name to evaluate"
+        required: true
+        default: "skill-evaluator"
+      bless:
+        description: "Bless current run as authoritative baseline floor"
+        required: false
+        type: boolean
+        default: false
+      agent_provider:
+        description: "Agent provider identifier"
+        required: false
+        default: "do-harness"
+      model_id:
+        description: "Model identifier"
+        required: false
+        default: "claude-3-5-sonnet-20241022"
+
+permissions:
+  contents: read
+
+jobs:
+  paired-eval:
+    name: Run Paired Behavioral Evaluation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Create output directory
+        run: mkdir -p reports/paired-eval
+
+      - name: Run paired behavioral evaluation
+        env:
+          INPUT_SKILL: ${{ github.event.inputs.skill }}
+          INPUT_BLESS: ${{ github.event.inputs.bless }}
+          INPUT_PROVIDER: ${{ github.event.inputs.agent_provider }}
+          INPUT_MODEL_ID: ${{ github.event.inputs.model_id }}
+        run: |
+          BLESS_FLAG=""
+          if [ "$INPUT_BLESS" = "true" ]; then
+            BLESS_FLAG="--bless"
+          fi
+
+          python3 scripts/run-paired-eval.py \
+            --skill "$INPUT_SKILL" \
+            --provider "$INPUT_PROVIDER" \
+            --model-id "$INPUT_MODEL_ID" \
+            $BLESS_FLAG \
+            --format json \
+            --output "reports/paired-eval/${INPUT_SKILL}-result.json"
+
+          python3 scripts/run-paired-eval.py \
+            --skill "$INPUT_SKILL" \
+            --provider "$INPUT_PROVIDER" \
+            --model-id "$INPUT_MODEL_ID" \
+            --format text \
+            --output "reports/paired-eval/${INPUT_SKILL}-summary.txt"
+
+      - name: Upload evaluation report artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v4
+        with:
+          name: paired-eval-report-${{ github.event.inputs.skill }}
+          path: reports/paired-eval/
+          retention-days: 30
