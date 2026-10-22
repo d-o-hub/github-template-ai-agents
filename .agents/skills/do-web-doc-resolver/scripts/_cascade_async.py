@@ -43,11 +43,23 @@ async def cascade_stream_async(
     skip_providers: set[str] | None = None,
     content_acceptable: Callable[[Any, ProviderType], bool] | None = None,
     target_key: str = "query",
+    relevance_query: str | None = None,
 ) -> AsyncGenerator[dict[str, Any]]:
     """Async version of cascade_stream using asyncio tasks with true parallel launch."""
     skip = skip_providers or set()
     cache = _get_cache()
     _accept = content_acceptable or (lambda q, pt: q.acceptable)
+
+    async def _store(key: str, result: dict) -> None:
+        """Persist to the semantic cache off the event loop.
+
+        Encoding is CPU-bound, so doing it inline would block every other
+        coroutine in the process.
+        """
+        try:
+            await asyncio.to_thread(semantic_cache_store, key, result)
+        except Exception as exc:  # pragma: no cover - cache writes are best-effort
+            logger.debug("Semantic cache store failed for %s: %s", key, exc)
 
     # Pre-filter eligible providers and prepare tasks
     tasks_to_launch: list[tuple[str, ProviderType, Callable]] = []
@@ -76,23 +88,54 @@ async def cascade_stream_async(
         }
         return
 
-    # Launch all providers in parallel
+    # Free providers are launched together; paid providers are held back until
+    # the free tier has actually failed to clear the quality gate. Launching
+    # everything at once burned paid credits on every async resolution even
+    # when a free provider would have satisfied the gate.
+    free_tasks = [t for t in tasks_to_launch if not t[1].is_paid()]
+    paid_tasks = [t for t in tasks_to_launch if t[1].is_paid()]
+
     active_tasks: dict[asyncio.Task, tuple[str, ProviderType, float]] = {}
     best_free_result: dict[str, Any] | None = None
+    paid_launched = False
+    deadline = (
+        time.time() + budget.max_total_latency_ms / 1000.0 if budget.max_total_latency_ms else None
+    )
 
-    for p_name, pt, func in tasks_to_launch:
-        logger.info("Starting parallel probe: %s", p_name)
-        start_time_probe = time.time()
-        task = asyncio.create_task(func())
-        active_tasks[task] = (p_name, pt, start_time_probe)
+    def _launch(batch: list[tuple[str, ProviderType, Callable]]) -> None:
+        for p_name, pt, func in batch:
+            logger.info("Starting parallel probe: %s", p_name)
+            start_time_probe = time.time()
+            task = asyncio.create_task(func())
+            active_tasks[task] = (p_name, pt, start_time_probe)
+
+    _launch(free_tasks)
+    if not paid_tasks:
+        paid_launched = True
+    elif not free_tasks:
+        # Nothing free to wait on (e.g. a paid-only plan or profile): the paid
+        # tier is the only option, so it goes first.
+        _launch(paid_tasks)
+        paid_launched = True
 
     try:
         while active_tasks:
-            # Wait for any task to complete
+            # Wait for any task to complete, bounded by the remaining latency
+            # budget so a hung provider cannot stall past the profile deadline.
+            timeout = None
+            if deadline is not None:
+                timeout = deadline - time.time()
+                if timeout <= 0:
+                    logger.info("Latency budget exhausted; cancelling remaining probes")
+                    break
             done, _ = await asyncio.wait(
                 active_tasks.keys(),
+                timeout=timeout,
                 return_when=asyncio.FIRST_COMPLETED,
             )
+            if not done:
+                # Budget expired with nothing to show for it.
+                break
 
             for task_done in list(done):
                 if task_done not in active_tasks:
@@ -114,7 +157,7 @@ async def cascade_stream_async(
                     continue
                 if res:
                     content = res.content if isinstance(res, ResolvedResult) else str(res)
-                    q_score = scripts.quality.score_content(content)
+                    q_score = scripts.quality.score_content(content, query=relevance_query)
                     if _accept(q_score, pt_done):
                         circuit_breakers.record_success(p_name_done)
                         metrics.record_provider(pt_done, latency, True)
@@ -139,7 +182,7 @@ async def cascade_stream_async(
 
                         if pt_done.is_paid():
                             # Paid provider succeeded - return immediately
-                            semantic_cache_store(target, result_dict)
+                            await _store(target, result_dict)
                             yield result_dict
                             return
                         else:
@@ -161,7 +204,7 @@ async def cascade_stream_async(
                                     "early_exit": True,
                                 }
                                 result_dict["metrics"] = asdict(metrics)
-                                semantic_cache_store(target, result_dict)
+                                await _store(target, result_dict)
                                 yield result_dict
                                 return
 
@@ -169,7 +212,7 @@ async def cascade_stream_async(
                             if q_score.score >= budget.min_free_quality_to_skip_paid:
                                 metrics.quality_gate = {"passed": True, "score": q_score.score}
                                 result_dict["metrics"] = asdict(metrics)
-                                semantic_cache_store(target, result_dict)
+                                await _store(target, result_dict)
                                 yield result_dict
                                 return
                     else:
@@ -183,13 +226,25 @@ async def cascade_stream_async(
                     circuit_breakers.record_failure(p_name_done)
                     metrics.record_provider(pt_done, latency, False)
 
+            # Free tier exhausted without clearing the gate: escalate to paid.
+            if not paid_launched and not active_tasks:
+                best_score = best_free_result.get("score", 0.0) if best_free_result else 0.0
+                if best_score < budget.min_free_quality_to_skip_paid:
+                    logger.info(
+                        "Free tier best score %.2f below gate %.2f; launching paid",
+                        best_score,
+                        budget.min_free_quality_to_skip_paid,
+                    )
+                    _launch(paid_tasks)
+                    paid_launched = True
+
     finally:
         for task in active_tasks:
             task.cancel()
 
     if best_free_result:
         best_free_result["metrics"] = asdict(metrics)
-        semantic_cache_store(target, best_free_result)
+        await _store(target, best_free_result)
         yield best_free_result
     else:
         yield {
