@@ -51,7 +51,8 @@ declare -a CATALOG=()
 shopt -s nullglob
 for skill_dir in "$SKILLS_DIR"/*/; do
     if [[ -f "${skill_dir}SKILL.md" ]]; then
-        CATALOG+=("$(basename -- "$skill_dir")")
+        skill_name="${skill_dir%/}"
+        CATALOG+=("${skill_name##*/}")
     fi
 done
 shopt -u nullglob

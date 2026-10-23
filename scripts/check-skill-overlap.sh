@@ -29,7 +29,7 @@ STRICT=0
 FORMAT="text"
 
 usage() {
-    printf 'Usage: %s [--skills-dir DIR] [--threshold FLOAT] [--strict] [--format text|json]\n' "$(basename "$0")"
+    printf 'Usage: %s [--skills-dir DIR] [--threshold FLOAT] [--strict] [--format text|json]\n' "${0##*/}"
 }
 
 while [[ $# -gt 0 ]]; do
