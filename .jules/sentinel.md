@@ -1,3 +1,9 @@
+## 2026-10-24 - Block Workload Identity and Client ID Prefixes in Path Validation
+
+**Vulnerability:** Omission of Workload Identity (`workload_identity`, `workload-identity`, `workloadidentity`) and OAuth Client ID (`client_id`, `client-id`, `clientid`) prefixes in sensitive prefix pattern validation left cloud identity federation definitions and client application credentials vulnerable to potential inspection or exfiltration.
+**Learning:** Cloud identity federation configs (e.g. GCP Workload Identity, AWS IAM Roles Anywhere) and OAuth client credential files are frequently referenced via `workload_identity` or `client_id` naming variants and must be explicitly protected alongside service account files.
+**Prevention:** Maintain explicit prefix pattern checks for `workload_identity`, `workload-identity`, `workloadidentity`, `client_id`, `client-id`, and `clientid` in sensitive path validation routines.
+
 ## 2026-10-24 - Expand Path Validation Blocklist for Yarn Berry, Composer, Helm, Serverless, and Git Submodules
 
 **Vulnerability:** Omission of Yarn Berry directory (`.yarn`), PHP Composer directory (`.composer`), Helm configuration folder (`.helm`), Serverless Framework directory (`.serverless`), and Git submodules configuration file (`.gitmodules`) in `FORBIDDEN_PATHS` left package manager credentials, cloud deployment metadata, and submodule configurations vulnerable to potential inspection, traversal, or exfiltration.
