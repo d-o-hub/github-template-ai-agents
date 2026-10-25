@@ -5,9 +5,9 @@ category: security
 description: >-
   Own the secret lifecycle: detect leaked secrets, rotate them, and store them correctly. Use when
   handling API keys, tokens, or credentials — even if they just say "rotate this key", "where do I put
-  this secret", or "this key is hardcoded". Not for privacy-first (email/PII lint), general
-  vulnerability audits (use security-code-auditor), or commit/PR lifecycle mechanics (use
-  git-github-workflow).
+  this secret", or "this key is hardcoded". Not for privacy-first (email/PII lint), local prompt/context
+  sanitization before external forwarding (use local-context-sanitization), general vulnerability audits
+  (use security-code-auditor), or commit/PR lifecycle mechanics (use git-github-workflow).
 license: MIT
 ---
 
@@ -93,6 +93,7 @@ Low/Medium housekeeping — not a Critical leak. Reserve escalation for a hole i
 
 - `security-code-auditor` — Audit code for vulnerabilities
 - `privacy-first` — Keep emails and PII out of the codebase
+- `local-context-sanitization` — Sanitize prompt context before external forwarding
 - `git-github-workflow` — Pre-commit secret scanning in the lifecycle
 
 ## References
