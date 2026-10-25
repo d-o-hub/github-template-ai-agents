@@ -8,8 +8,9 @@ description: >
   run a privacy check, scan for PII, or ensure no email addresses leak into
   source code or documentation — even if they just say "no email" or "check
   for personal data". Not for security audits (use security-code-auditor),
-  EU AI Act compliance (use eu-ai-act-compliance), or hardcoded secrets
-  (use secrets-management).
+  EU AI Act compliance (use eu-ai-act-compliance), hardcoded secrets
+  (use secrets-management), or sanitizing local prompt context before sending
+  to external models (use local-context-sanitization).
 license: MIT
 compatibility: Works with Claude Code, OpenCode, and similar agents. No external dependencies.
 metadata:
@@ -125,6 +126,7 @@ fi
 
 - `security-code-auditor` — General security audits
 - `eu-ai-act-compliance` — EU AI Act compliance
+- `local-context-sanitization` — Sanitize prompt context before external forwarding
 
 ## Rationalizations
 
