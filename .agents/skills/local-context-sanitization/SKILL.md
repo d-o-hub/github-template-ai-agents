@@ -51,26 +51,31 @@ This skill provides **architectural guidance and agent workflow rules**. It is n
 Adopters seeking an executable CLI or MCP server for local context redaction can integrate `do-context-shield`.
 
 ### Upstream References
+
 - [do-context-shield Repository](https://github.com/d-oit/do-context-shield)
 - [Canonical Private Data Skill](https://github.com/d-oit/do-context-shield/blob/main/.agents/skills/private-data/SKILL.md)
 - [Client Integration Documentation](https://github.com/d-oit/do-context-shield/blob/main/docs/client-integration.md)
 
 ### Upstream Compatibility Note
+
 CLI flags, environment variables, and MCP integration options for `do-context-shield` are version-specific. Always consult the [upstream client integration guide](https://github.com/d-oit/do-context-shield/blob/main/docs/client-integration.md) for the exact CLI syntax matching your installed version.
 
 ## Agent Workflow & Fail-Safe Rules
 
 ### 1. Verify Local Sanitizer Availability
+
 Before attempting to send text containing sensitive context:
 - Check if the local sanitizer CLI or MCP server is installed and responsive (e.g., `do-context-shield --version` or checking local MCP tool availability).
 
 ### 2. Fail-Safe Stopping Rule (CRITICAL)
+
 If the local sanitizer executable or MCP server is unavailable, fails, or throws an error:
 - **NEVER** claim that sanitization was completed.
 - **NEVER** silently fall back to forwarding raw, un-sanitized sensitive text to external models or remote tools.
 - **STOP IMMEDIATELY** and request explicit user confirmation or an approved alternative path before proceeding.
 
 ### 3. Handle Placeholders Safely
+
 - Ensure redacted placeholders in output preserve structural context (e.g. replacing tokens with `<TOKEN_1>`) so downstream code synthesis remains functional without exposing actual values.
 
 ## Rationalizations
