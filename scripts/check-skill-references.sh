@@ -98,8 +98,20 @@ is_provenance() {
     [[ "$line" =~ (absorbed|superseded|folded|consolidat|merged|renamed|deprecated) ]]
 }
 
+# Pre-compile the regex for all folded names to enable a fast-path check
+FOLDED_REGEX=""
+for name in "${FOLDED_NAMES[@]}"; do
+    if [[ -z "$FOLDED_REGEX" ]]; then
+        FOLDED_REGEX="${name}"
+    else
+        FOLDED_REGEX="${FOLDED_REGEX}|${name}"
+    fi
+done
+
 for target in "${TARGETS[@]}"; do
     should_skip "$target" && continue
+    # Fast path check: if the file does not contain any folded names, skip it entirely
+    grep -q -E "$FOLDED_REGEX" "$target" 2>/dev/null || continue
     for i in "${!FOLDED_NAMES[@]}"; do
         name="${FOLDED_NAMES[$i]}"
         successor="${SUCCESSORS[$i]}"
