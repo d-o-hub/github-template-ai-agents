@@ -1,7 +1,7 @@
 # Skill Catalog
 
 > Auto-generated from `.agents/skills/` directory.
-> Last updated: 2026-10-21
+> Last updated: 2026-10-26
 > Do not edit manually. Run `./scripts/generate-skill-catalog.sh`.
 > Description budget: 1024 chars (Agent Skills spec cap).
 > Elided text ends on a word boundary and always keeps the `Not for <sibling>` guard.
@@ -43,6 +43,7 @@
 | jules-delegator | Use this skill to delegate complex coding tasks by creating Jules sessions via the Jules CLI. Use this skill when the user asks to delegate a coding task to Jules, create a Jules session, or hand off implementation work — even if they just say "send this to Jules" or "let Jules handle it". Jules is an AI coding agent that can autonomously implement features, fix bugs, and make code changes across repositories. Not for git-github-workflow. | agent |
 | learn | Extract non-obvious session learnings, patterns, and discoveries into scoped AGENTS.md files. Use this skill when the user wants to extract learnings after completing non-trivial tasks, or when they say "extract learnings", "save patterns", "update AGENTS.md", or whenever the session has produced insights that should be captured for future reference — even if they just say "what did we learn" or "save this for later". Not for agents-md, skill-creator. | knowledge-management |
 | lifecycle-management | Manage application lifecycle, error handling, and resource cleanup to prevent memory leaks and ensure stability. Use this skill when handling startup/shutdown sequences, managing resource pools, implementing error boundaries, preventing memory leaks, or ensuring graceful degradation — even if they just say "clean up resources" or "fix the memory leak". Not for security-code-auditor. | quality |
+| local-context-sanitization | Sanitize sensitive prompt context, PII, and credentials before forwarding to external LLMs, tools, or third-party APIs. Use when prompt or context sanitization is requested, when using do-context-shield, or when preparing external model prompts containing local repository context. Not for privacy-first (preventing personal data from being committed to source/docs). Not for secrets-management (revoking, rotating, and storing exposed credentials). Not for security-code-auditor (general code vulnerability scanning). | security |
 | memory-context | Retrieve semantically relevant past learnings, analysis outputs, and project context using the csm CLI (HDC encoder with hybrid BM25 retrieval). Use this skill when the user needs context retrieval, past session memory, learning recall, or wants to query the memory system for relevant documents or patterns — even if they just say "remember when we..." or "did we solve this before". Not for learn, delegate. | knowledge |
 | migration-refactoring | Automate complex code migrations and refactorings with safety patterns. Use this skill when a dependency upgrade forces source changes, when migrating frameworks (React class→hooks, Flask→FastAPI), modernizing languages (Python 2→3), or performing large-scale refactories — even if they just say "migrate this" or "refactor the whole thing". Includes breaking change analysis, automated fix application, rollback strategies, and cross-file dependency tracking. Not for static-analysis, code-review-assistant, or routine patch/minor/CVE bumps (use dependency-upgrades). | code-quality |
 | nested-build-isolation | Diagnose and safely isolate nested build, test, and coverage subprocesses (e.g., Cargo running inside cargo test, cargo llvm-cov, or cargo nextest) that fail due to inherited environment variables, target directory collisions, compiler flags, or generated .profraw litter. Use this skill when subprocess builds fail only under coverage/instrumentation, produce inaccurate coverage summaries, or inherit outer toolchain settings. Not for ordinary single-process test failures, unit test debugging without nested subprocesses, or non-nested build issues. | testing |
@@ -136,6 +137,7 @@
 
 ### security
 
+- local-context-sanitization
 - privacy-first
 - secrets-management
 - security-code-auditor
