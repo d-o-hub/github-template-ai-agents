@@ -151,3 +151,8 @@
 **Vulnerability:** Path validation rules in `SENSITIVE_PREFIXES` included `service_account` and `service-account`, but omitted `serviceaccount`, leaving unhyphenated service account credential filenames and Kubernetes token directory patterns unblocked.
 **Learning:** Common credential prefixes must account for all variations in word separation (underscore, hyphen, and contiguous lowercase) to prevent bypasses when validating sensitive paths.
 **Prevention:** Explicitly include all variants (`service_account`, `service-account`, `serviceaccount`) in credential pattern filters and write unit tests for each variation.
+
+## 2026-10-26 - Blocking Workload Identity Configuration and Credential Prefix Variants
+**Vulnerability:** Path validation rules in `SENSITIVE_PREFIXES` omitted Workload Identity credential prefixes (`workload_identity`, `workload-identity`, `workloadidentity`), allowing potential exposure or reading of cloud workload identity credential files.
+**Learning:** Security validation prefixes must explicitly account for modern cloud IAM features like Workload Identity federation configurations across delimiter formats (underscore, hyphen, and contiguous lowercase).
+**Prevention:** Include all Workload Identity prefix variants in `SENSITIVE_PREFIXES` and write consumer regression tests in evaluation executor suites.
