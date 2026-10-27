@@ -177,7 +177,7 @@ do not inherit them or copied telemetry as product policy.
 | **Knowledge Management** | `learn` |
 | **Platform** | `api-design-first`, `codeberg-api`, `durable-objects` |
 | **Quality** | `avoid-ai-writing`, `dogfood`, `lifecycle-management`, `skill-creator`, `skill-evaluator`, `voice-profiles` |
-| **Security** | `privacy-first`, `secrets-management`, `security-code-auditor` |
+| **Security** | `local-context-sanitization`, `privacy-first`, `secrets-management`, `security-code-auditor` |
 | **Testing** | `nested-build-isolation`, `test-runner`, `testing-strategy` |
 | **Tool** | `agent-browser`, `dist-channel-selection`, `do-web-doc-resolver`, `web-search-researcher` |
 | **UI/UX** | `accessibility-auditor`, `ui-ux-optimize` |
