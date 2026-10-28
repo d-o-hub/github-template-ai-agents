@@ -2,7 +2,7 @@
 name: skill-creator
 description: Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy. Not for skill-evaluator, intent-classifier.
 license: MIT
-version: "0.2.10"
+version: "0.2.11"
 category: quality
 ---
 
@@ -21,8 +21,9 @@ Create and improve skills following the Agent Skills specification. A skill exte
 1. **Capture intent** - What should the skill do? When should it trigger?
 2. **Write draft** - Create SKILL.md with frontmatter and instructions
 3. **Create test cases** - Realistic prompts users would actually say
-4. **Run evals via `skill-evaluator`** - Delegate execution; do not re-specify
-   eval mechanics here (test with-skill vs baseline or old version)
+4. **Run evals via `skill-evaluator`** - Static checks validate definitions; used
+   the opt-in paired runner with an adapter for behavioral evidence. Never
+   describe a static exit 0 as behavioral proof.
 5. **Review results** - Use eval-viewer for human review + benchmarks
 6. **Iterate** - Improve based on feedback until satisfied
 7. **Optimize description** - Fine-tune frontmatter for better triggering
@@ -96,6 +97,26 @@ skill-name/
 13. **Select best iteration by validation pass rate**
 14. **Check the 1024-character limit**
 
+### Paired Behavioral Runs (Opt-In)
+
+Static validation (`eval-skills.sh`, `run-evals.py`) cannot measure behavior.
+When behavior matters, use the same `evals/evals.json` cases with an adapter:
+
+```bash
+python3 scripts/behavioral-eval.py plan --skill my-skill --cases 1,4
+BEHAVIORAL_EVAL_ADAPTER="my-adapter --json" \
+  python3 scripts/behavioral-eval.py run --skill my-skill \
+  --provider-name <agent> --provider-model <model>
+```
+
+Every case runs with and without the skill, and both sides must grade before a
+result counts. Negative cases fail on false activation. Statuses are
+`graded`/`blocked`/`not_run`; exit codes are `0`/`1`/`2`/`3`; tokens and cost are
+`unavailable` unless an adapter measured them. A baseline is blessed only by an
+explicit reviewed `bless --accept --blessed-by`, never by a run. The adapter
+contract and artifact schema are in
+`skill-evaluator/references/evaluating-skills.md`.
+
 ---
 
 ## Creating Test Cases
@@ -127,9 +148,11 @@ Store in `evals/evals.json`:
 - **Realism**: Add file paths, personal context, specific details, casual language
 - **Variety**: Mix formal/casual, terse/context-heavy, single-step/multi-step
 - **Near-misses**: Include queries that share keywords but need something different
+- **Buckets**: Optionally tag `explicit`, `implicit`, `contextual`, `negative`; a
+  tagged set needs a real out-of-scope negative case, not a keyword trap
 - **Evidence scope**: A static audit checks definitions, not model behavior.
-  Use `skill-evaluator`'s manual paired mode for behavioral claims; record
-  unavailable measurements as unavailable, never estimated pass rates or costs.
+  Use `skill-evaluator`'s paired mode (runner or manual) for behavioral claims;
+  record unavailable measurements as unavailable, never estimated values.
 
 ---
 
@@ -156,6 +179,7 @@ Use `skill-evaluator/references/verification-checklist.md` as a starting point.
 | "I don't need evals, the skill works fine" | Without evals there is no evidence the skill triggers correctly or produces quality output. |
 | "The description is good enough, no need to optimize" | A poorly tuned description causes false triggers or missed invocations, wasting tokens and degrading user experience. |
 | "I'll add Rationalizations and Red Flags later" | These sections are mandatory; they prevent common failure modes and make the skill self-defending. |
+| "Static validation passed, so a behavioral run is unnecessary" | Static checks prove structure, not behavior; use the opt-in paired runner for behavior. |
 
 ## Red Flags
 
@@ -163,6 +187,7 @@ Use `skill-evaluator/references/verification-checklist.md` as a starting point.
 - [ ] Skipping the description optimization step and shipping a vague or overly broad trigger.
 - [ ] Hardcoding project-specific paths or values instead of using relative references.
 - [ ] Omitting the `## Rationalizations` or `## Red Flags` sections from SKILL.md.
+- [ ] Reporting a paired improvement from a static exit code or a single unpaired run.
 
 ## References
 
