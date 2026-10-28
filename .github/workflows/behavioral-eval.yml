@@ -1,0 +1,163 @@
+---
+name: Behavioral Skill Evaluation (opt-in)
+
+# Opt-in only. This workflow never runs on pull_request or push, and it is not
+# part of the default quality gate. It executes a maintainer-supplied adapter,
+# which may call a paid model, only when dispatched manually.
+#
+# It never writes a blessed baseline: `bless` is a separate, reviewed action
+# performed locally and committed through a PR. See
+# agents-docs/SKILL_EVAL_TIERS.md and .agents/skills/skill-evaluator/SKILL.md.
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_dispatch:
+    inputs:
+      skill:
+        description: 'Skill directory name under .agents/skills'
+        required: true
+        default: 'skill-evaluator'
+        type: string
+      case_ids:
+        description: 'Comma-separated case ids (empty = all cases)'
+        required: false
+        default: ''
+        type: string
+      adapter_command:
+        description: 'Adapter command; must print one behavioral-eval/v1 result JSON per task'
+        required: true
+        type: string
+      provider_name:
+        description: 'Agent/provider name recorded in the report (optional)'
+        required: false
+        default: ''
+        type: string
+      provider_model:
+        description: 'Model identifier recorded in the report (optional)'
+        required: false
+        default: ''
+        type: string
+      retain_outputs:
+        description: 'Store redacted prompts in artifacts (default: no)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: behavioral-eval-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  behavioral-eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: '3.11'
+
+      - name: Validate inputs
+        env:
+          ADAPTER_COMMAND: ${{ inputs.adapter_command }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${ADAPTER_COMMAND// /}" ]]; then
+            echo "::error::No adapter command supplied." \
+              "Behavioral evaluation is BLOCKED; no static fallback is reported."
+            exit 1
+          fi
+
+      - name: Run paired behavioral evaluation
+        id: evaluation
+        env:
+          ADAPTER_COMMAND: ${{ inputs.adapter_command }}
+          PROVIDER_NAME: ${{ inputs.provider_name }}
+          PROVIDER_MODEL: ${{ inputs.provider_model }}
+          RETAIN_OUTPUTS: ${{ inputs.retain_outputs }}
+          CASE_IDS: ${{ inputs.case_ids }}
+          SKILL_NAME: ${{ inputs.skill }}
+          # Optional adapter credential; never printed. Adapters read this env var
+          # directly rather than interpolating it into a command line.
+          BEHAVIORAL_EVAL_ADAPTER_TOKEN: ${{ secrets.BEHAVIORAL_EVAL_ADAPTER_TOKEN }}
+        run: |
+          set -euo pipefail
+          output_dir="$RUNNER_TEMP/behavioral-$SKILL_NAME"
+          extra_args=()
+          if [[ -n "$CASE_IDS" ]]; then extra_args+=(--cases "$CASE_IDS"); fi
+          if [[ -n "$PROVIDER_NAME" ]]; then extra_args+=(--provider-name "$PROVIDER_NAME"); fi
+          if [[ -n "$PROVIDER_MODEL" ]]; then extra_args+=(--provider-model "$PROVIDER_MODEL"); fi
+          if [[ "$RETAIN_OUTPUTS" == "true" ]]; then extra_args+=(--include-prompts); fi
+          set +e
+          python3 scripts/behavioral-eval.py run \
+            --skill "$SKILL_NAME" \
+            --output-dir "$output_dir" \
+            --format json \
+            --adapter-command "$ADAPTER_COMMAND" \
+            "${extra_args[@]}" > "$RUNNER_TEMP/behavioral-report.json"
+          status=$?
+          set -e
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          echo "output_dir=$output_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Summarize report
+        if: always()
+        env:
+          REPORT: ${{ runner.temp }}/behavioral-report.json
+        run: |
+          set -euo pipefail
+          python3 - "$REPORT" >> "$GITHUB_STEP_SUMMARY" <<'PY'
+          import json
+          import sys
+
+          try:
+              report = json.loads(open(sys.argv[1], encoding="utf-8").read())
+          except (OSError, json.JSONDecodeError) as exc:
+              print(f"## Behavioral evaluation (opt-in)\n\nNo parsable report: {exc}")
+              raise SystemExit(0)
+
+          print("## Behavioral evaluation (opt-in)\n")
+          print(f"- Skill: `{report['skill']['name']}` at `{report['skill']['digest']}`")
+          print(f"- Provider: {report['provider']['name']} / {report['provider']['model']}")
+          print(f"- Provider metadata observed: {report['provider']['observed']}")
+          print(f"- Baseline: {report['baseline']['status']}")
+          for configuration, summary in report["configurations"].items():
+              print(
+                  f"- {configuration}: {summary['cases_passed']} passed, "
+                  f"{summary['cases_failed']} failed, {summary['cases_blocked']} blocked, "
+                  f"{summary['cases_not_run']} not run"
+              )
+          for error in report["contract_errors"]:
+              print(f"- Contract error: {error}")
+          PY
+
+      - name: Upload behavioral artifacts
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v4
+        with:
+          name: behavioral-eval-${{ inputs.skill }}
+          path: |
+            ${{ runner.temp }}/behavioral-*
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Exit with evaluation status
+        if: always()
+        env:
+          STATUS: ${{ steps.evaluation.outputs.status }}
+        run: |
+          set -euo pipefail
+          status="${STATUS:-3}"
+          case "$status" in
+            0) echo "Behavioral evaluation passed." ;;
+            1) echo "::error::Behavioral evaluation found failing cases or a baseline regression." ;;
+            2) echo "::error::Behavioral evaluation hit a contract/configuration error." ;;
+            *) echo "::error::Behavioral evaluation was blocked or not run; see the artifact." ;;
+          esac
+          exit "$status"

@@ -80,8 +80,59 @@
       "assertions": [
         "The agent refuses to infer behavioral PASS from eval-skills.sh exit 0",
         "The agent marks behavioral evidence NOT_RUN and token savings not measured",
-        "The agent describes manual isolated with-skill/no-skill output capture as the prerequisite for a paired behavioral claim",
-        "The agent does not claim the repository ships an automated model runner for this evaluation"
+        "The agent describes isolated with-skill/no-skill output capture as the prerequisite for a paired behavioral claim",
+        "The agent does not equate the opt-in behavioral runner with a default CI model check"
+      ]
+    },
+    {
+      "id": 8,
+      "bucket": "explicit",
+      "prompt": "Run the opt-in paired behavioral evaluation for skill-evaluator itself with our local adapter, and tell me what the result statuses mean.",
+      "expected_output": "The agent uses scripts/behavioral-eval.py (plan then run with an adapter), keeps both with_skill and without_skill configurations on the same case IDs, and explains graded/blocked/not_run without treating a static check as behavioral evidence.",
+      "files": [],
+      "assertions": [
+        "The agent names the opt-in behavioral-eval.py runner rather than presenting eval-skills.sh or run-evals.py as behavioral",
+        "The agent uses the same case IDs and fixtures for the with_skill and without_skill configurations",
+        "The agent explains that blocked and not-run cases are excluded from the pass-rate denominator",
+        "The agent keeps the default quality gate free of model credentials"
+      ]
+    },
+    {
+      "id": 9,
+      "bucket": "implicit",
+      "prompt": "Our last paired run scored 0.83 with the skill and the blessed baseline says 1.00. Can we just update the baseline so CI is green again?",
+      "expected_output": "The agent reports the regression against the blessed floor and refuses to rewrite the baseline automatically. Blessing requires an explicit reviewed bless step with an attributable reviewer, after the cause is understood.",
+      "files": [],
+      "assertions": [
+        "The agent reports a regression rather than treating the run as a pass",
+        "The agent states that blessing a new floor requires explicit human approval and is never automatic",
+        "The agent does not recommend lowering the floor merely to make the result green",
+        "The agent keeps the measured 0.83 distinct from the baseline's 1.00"
+      ]
+    },
+    {
+      "id": 10,
+      "bucket": "contextual",
+      "prompt": "Run the behavioral evaluation for skill-creator in this offline environment; we have no adapter command and no model credentials configured.",
+      "expected_output": "The agent reports BLOCKED/NOT_RUN because no adapter is configured, does not fabricate outputs or token/cost numbers, and points to the adapter requirement instead of substituting a static result.",
+      "files": [],
+      "assertions": [
+        "The agent reports the behavioral run as blocked or not run rather than passing",
+        "The agent does not invent model outputs, pass rates, tokens, or costs",
+        "The agent explains that an adapter command or documented provider is required",
+        "The agent does not relabel a static structure check as behavioral evidence"
+      ]
+    },
+    {
+      "id": 11,
+      "bucket": "negative",
+      "prompt": "Our Python unit test for the invoice parser is failing with a KeyError on line 42. Please debug it and fix the code.",
+      "expected_output": "The agent handles an ordinary debugging task directly, without loading the skill-evaluator workflow or requesting skill eval artifacts.",
+      "files": [],
+      "assertions": [
+        "The agent treats this as a code debugging task, not a skill evaluation",
+        "The agent does not ask for evals.json, a baseline, or a paired behavioral run",
+        "The agent routes to debugging or test-running guidance instead of skill-evaluator"
       ]
     }
   ]
