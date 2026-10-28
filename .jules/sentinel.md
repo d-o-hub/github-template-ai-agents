@@ -1,3 +1,9 @@
+## 2026-10-27 - Unify Unseparated Credential Prefix Protections in Path Validation
+
+**Vulnerability:** Path validation rules in `SENSITIVE_PREFIXES` included hyphenated and underscored credential prefixes (e.g. `access_token`, `access-token`), but omitted unseparated variants (e.g. `accesstoken`, `refreshtoken`, `authtoken`, `sessiontoken`, `bearertoken`, `appsecret`, `apisecret`, `appkey`, `apikey`, `idtoken`, `identitytoken`, `oauthtoken`, `jwttoken`, `privatekey`), leaving unseparated credential filenames vulnerable to unauthorized inspection or exfiltration.
+**Learning:** Security validation rules for sensitive file prefixes must systematically include all word-separation variations (underscored, hyphenated, and contiguous lowercase) to prevent bypasses.
+**Prevention:** Include contiguous unseparated variants alongside underscored and hyphenated credential prefixes in `SENSITIVE_PREFIXES` and verify with unit tests.
+
 ## 2026-10-24 - Expand Path Validation Blocklist for Yarn Berry, Composer, Helm, Serverless, and Git Submodules
 
 **Vulnerability:** Omission of Yarn Berry directory (`.yarn`), PHP Composer directory (`.composer`), Helm configuration folder (`.helm`), Serverless Framework directory (`.serverless`), and Git submodules configuration file (`.gitmodules`) in `FORBIDDEN_PATHS` left package manager credentials, cloud deployment metadata, and submodule configurations vulnerable to potential inspection, traversal, or exfiltration.
