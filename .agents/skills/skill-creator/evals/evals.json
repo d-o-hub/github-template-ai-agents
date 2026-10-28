@@ -70,6 +70,55 @@
         "The agent mentions listing trigger scenarios",
         "The agent mentions keeping description under 1024 chars"
       ]
+    },
+    {
+      "id": 7,
+      "bucket": "explicit",
+      "prompt": "I wrote evals for my new skill and static validation passes. How do I find out whether the skill actually changes agent behavior, and can this run in normal PR CI?",
+      "expected_output": "The agent separates static validation from behavioral evaluation, points to the opt-in paired runner with an adapter, and explains that default PR CI stays model-free.",
+      "files": [],
+      "assertions": [
+        "The agent states that static validation does not prove behavioral efficacy",
+        "The agent names the opt-in paired behavioral runner and its with_skill/without_skill pairing",
+        "The agent states that no model credentials or paid calls are required by the default PR quality gate",
+        "The agent does not promise a pass rate without an actual adapter run"
+      ]
+    },
+    {
+      "id": 8,
+      "bucket": "implicit",
+      "prompt": "My skill's paired run shows 0.75 with the skill and 0.70 without it, on five cases. Should I advertise it as a 5-point improvement in the README?",
+      "expected_output": "The agent warns that five cases are a small sample, reports the measured delta without promising generalization, and asks for more evidence or a blessed baseline before publishing a claim.",
+      "files": [],
+      "assertions": [
+        "The agent reports the measured delta but does not generalize it as proven efficacy",
+        "The agent notes the small sample size and the need for a blessed comparison",
+        "The agent does not permit the claim to be backed by fabricated or estimated measurements"
+      ]
+    },
+    {
+      "id": 9,
+      "bucket": "contextual",
+      "prompt": "My eval assertions are 'the output is helpful' and 'the answer looks good'. What is wrong with them for grading a paired behavioral run?",
+      "expected_output": "The agent rejects both as subjective, explains that each assertion needs a pass/fail rule with evidence, and gives concrete checkable replacements.",
+      "files": [],
+      "assertions": [
+        "The agent rejects subjective assertions as ungradeable",
+        "The agent explains that behavioral assertions need pass/fail evidence",
+        "The agent gives at least one concrete, checkable replacement assertion"
+      ]
+    },
+    {
+      "id": 10,
+      "bucket": "negative",
+      "prompt": "Rotate the leaked API key in this repository, revoke it upstream, and store the new value in the approved secret manager.",
+      "expected_output": "The agent handles the credential lifecycle task with secrets-management guidance and does not load skill-creator.",
+      "files": [],
+      "assertions": [
+        "The agent treats this as a credential rotation task, not skill authoring",
+        "The agent does not ask for evals.json, SKILL.md, or a paired behavioral run",
+        "The agent routes to secrets-management rather than skill-creator"
+      ]
     }
   ]
 }
