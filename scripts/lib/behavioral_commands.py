@@ -26,7 +26,6 @@ from lib.behavioral_contract import (  # noqa: E402
 )
 from lib.behavioral_report import render_report_text  # noqa: E402
 from lib.behavioral_runner import (  # noqa: E402
-    DEFAULT_TIMEOUT_SECONDS,
     build_plan,
     build_tasks,
     run_tasks,
@@ -121,7 +120,6 @@ def load_baseline(skill_path: Path, explicit: str | None) -> dict[str, Any] | No
 
 
 def build_report(
-    skill_path: Path,
     plan: dict[str, Any],
     cases: list[dict[str, Any]],
     scored: list[dict[str, Any]],
@@ -236,7 +234,7 @@ def command_run(args: argparse.Namespace) -> int:
         contract_errors = []
         _report_blocked_plan(output_dir, skill_path, args)
         report = build_report(
-            skill_path, plan, cases, scored, results,
+            plan, cases, scored, results,
             baseline=None, output_dir=output_dir, contract_errors=contract_errors,
         )
         return _finish(report, args, output_dir, blocked_reason="no adapter configured")
@@ -261,7 +259,7 @@ def command_run(args: argparse.Namespace) -> int:
     ]
     baseline = load_baseline(skill_path, args.baseline)
     report = build_report(
-        skill_path, plan, cases, scored, results,
+        plan, cases, scored, results,
         baseline=baseline, output_dir=output_dir, contract_errors=contract_errors,
     )
     if baseline is not None and report["baseline"].get("status") != "insufficient_evidence":

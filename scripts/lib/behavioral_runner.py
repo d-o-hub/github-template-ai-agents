@@ -41,6 +41,8 @@ DEFAULT_TIMEOUT_SECONDS = 900
 TASKS_DIRNAME = "tasks"
 WORKSPACE_DIRNAME = "workspace"
 FIXTURES_DIRNAME = "fixtures"
+ADAPTER_STDERR_FILENAME = "adapter.stderr"
+ADAPTER_STDOUT_FILENAME = "adapter.stdout"
 
 
 @dataclass
@@ -201,7 +203,9 @@ def execute_task(
         raise ContractError("adapter command is empty")
     start = time.time()
     try:
-        completed = subprocess.run(
+        # argv is the operator-supplied adapter, never derived from case data;
+        # shell=False keeps it a direct exec of that literal argument vector.
+        completed = subprocess.run(  # nosec B603,B607 - trusted adapter command
             argv,
             input=json.dumps(payload),
             capture_output=True,
@@ -210,28 +214,34 @@ def execute_task(
             cwd=str(cwd),
         )
     except subprocess.TimeoutExpired:
-        write_text(task.task_dir / "adapter.stderr", f"adapter timed out after {timeout}s\n")
+        write_text(
+            task.task_dir / ADAPTER_STDERR_FILENAME,
+            f"adapter timed out after {timeout}s\n",
+        )
         return Outcome(task, None, f"adapter timed out after {timeout}s", (time.time() - start) * 1000)
     except OSError as exc:
-        write_text(task.task_dir / "adapter.stderr", f"adapter could not start: {redact(str(exc))}\n")
+        write_text(
+            task.task_dir / ADAPTER_STDERR_FILENAME,
+            f"adapter could not start: {redact(str(exc))}\n",
+        )
         return Outcome(task, None, f"adapter could not start: {exc}", (time.time() - start) * 1000)
     duration_ms = (time.time() - start) * 1000
     if completed.stderr.strip():
         write_text(
-            task.task_dir / "adapter.stderr",
+            task.task_dir / ADAPTER_STDERR_FILENAME,
             redact(completed.stderr)[:MAX_ARTIFACT_CHARS],
         )
     raw = completed.stdout.strip()
-    error = _parse_adapter_stdout(task, raw, completed.returncode)
+    error = _parse_adapter_stdout(raw, completed.returncode)
     if error is not None:
-        write_text(task.task_dir / "adapter.stdout", redact(raw)[:MAX_ARTIFACT_CHARS])
+        write_text(task.task_dir / ADAPTER_STDOUT_FILENAME, redact(raw)[:MAX_ARTIFACT_CHARS])
         return Outcome(task, None, error, duration_ms)
     result = json.loads(raw)
     issues = validate_result(result, payload["skill_name"], {task.case["id"]}) + validate_usage(
         result.get("usage")
     )
     if issues:
-        write_text(task.task_dir / "adapter.stdout", redact(raw)[:MAX_ARTIFACT_CHARS])
+        write_text(task.task_dir / ADAPTER_STDOUT_FILENAME, redact(raw)[:MAX_ARTIFACT_CHARS])
         return Outcome(
             task, None, f"adapter result violated the contract: {'; '.join(issues)}", duration_ms
         )
@@ -244,7 +254,7 @@ def execute_task(
     return Outcome(task, result, None, duration_ms)
 
 
-def _parse_adapter_stdout(task: Task, raw: str, returncode: int) -> str | None:
+def _parse_adapter_stdout(raw: str, returncode: int) -> str | None:
     """Reject empty, non-JSON, or multiple-document adapter output."""
     if not raw:
         return f"adapter produced no output (exit code {returncode})"

@@ -47,7 +47,8 @@ def test_load_cases_reads_real_skill_fixtures():
     cases = contract.load_cases(SKILL)
     assert len(cases) >= 3
     assert all(case["assertions"] for case in cases)
-    assert {case["id"] for case in cases} == {case["id"] for case in cases}
+    ids = [case["id"] for case in cases]
+    assert len(ids) == len(set(ids)), "case ids must be unique"
 
 
 def test_select_cases_rejects_unknown_ids():
@@ -65,9 +66,10 @@ def test_skill_digest_tracks_content_changes(tmp_path):
     (skill / "SKILL.md").write_text("two\n", encoding="utf-8")
     assert contract.skill_digest(skill) != first
     baseline = skill / "evals" / contract.BASELINE_FILENAME
+    before_baseline = contract.skill_digest(skill)
     baseline.write_text("{}", encoding="utf-8")
     # Blessing a baseline must not silently change the skill revision digest.
-    assert contract.skill_digest(skill) == contract.skill_digest(skill)
+    assert contract.skill_digest(skill) == before_baseline
 
 
 def test_fixture_digest_reports_missing_fixture(tmp_path):
