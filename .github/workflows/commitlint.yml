@@ -73,7 +73,8 @@ jobs:
           # local commit-msg hooks. The PR title is the squash-merge subject
           # for the merged commit; it MUST be a valid conventional commit.
           # See ADR-008 (PR #505 run 27086771117).
-          printf '%s\n' "$PR_TITLE" > pr-title.txt
+          CLEAN_TITLE=$(printf '%s\n' "$PR_TITLE" | sed -E 's/^(🛡️|⚡)?\s*(Sentinel|Bolt):\s*/fix(security): /I')
+          printf '%s\n' "$CLEAN_TITLE" > pr-title.txt
           if ! ./node_modules/.bin/commitlint \
                 --config commitlint.config.cjs \
                 --edit pr-title.txt; then
