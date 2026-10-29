@@ -1,11 +1,9 @@
 {
   "schema_version": 3,
-  "status": "failing",
-  "last_run": "2026-10-28T19:06:07.134782Z",
-  "validated": false,
-  "failing_jobs": [
-    "test"
-  ],
+  "status": "passing",
+  "last_run": "2026-10-29T11:08:26.495871Z",
+  "validated": true,
+  "failing_jobs": [],
   "skipped_jobs": [],
   "allowed_skips": [],
   "unallowed_skips": [],
@@ -13,8 +11,9 @@
   "timed_out_jobs": [],
   "unknown_jobs": [],
   "succeeded_jobs": [
-    "quality-gate"
+    "quality-gate",
+    "test"
   ],
   "advisory_only": true,
-  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/40750957787"
+  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/40862293498"
 }
