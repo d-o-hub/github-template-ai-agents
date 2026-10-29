@@ -1,3 +1,9 @@
+## 2026-10-29 - Expand Path Validation Blocklist for Cloud CLI Configuration Directories
+
+**Vulnerability:** Omission of Vercel directory (`.vercel`), Netlify directory (`.netlify`), Wrangler directory (`.wrangler`), and Fly.io directory (`.fly`) in `FORBIDDEN_PATHS` left cloud deployment CLI project tokens and runtime state vulnerable to potential inspection or exfiltration.
+**Learning:** Security path validation must protect local configuration and cache directories created by cloud serverless and Edge deployment tooling (`.vercel`, `.netlify`, `.wrangler`, `.fly`).
+**Prevention:** Maintain explicit denylist entries for `.vercel`, `.netlify`, `.wrangler`, and `.fly` in path validation routines.
+
 ## 2026-10-24 - Expand Path Validation Blocklist for Yarn Berry, Composer, Helm, Serverless, and Git Submodules
 
 **Vulnerability:** Omission of Yarn Berry directory (`.yarn`), PHP Composer directory (`.composer`), Helm configuration folder (`.helm`), Serverless Framework directory (`.serverless`), and Git submodules configuration file (`.gitmodules`) in `FORBIDDEN_PATHS` left package manager credentials, cloud deployment metadata, and submodule configurations vulnerable to potential inspection, traversal, or exfiltration.
