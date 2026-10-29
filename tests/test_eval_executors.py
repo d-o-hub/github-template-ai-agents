@@ -311,3 +311,24 @@ def test_run_file_validation_yarn_composer_helm_serverless_gitmodules_rejected(t
         "Missing: .serverless",
         "Missing: .gitmodules",
     ]  # nosec B101 -- test assertion
+
+
+def test_run_file_validation_vercel_netlify_wrangler_fly_rejected(tmp_path):
+    """Consumer regression: eval file-validation must reject repo-local .vercel, .netlify, .wrangler, and .fly."""
+    skill_path = tmp_path / "skill"
+    skill_path.mkdir()
+    (skill_path / ".vercel").mkdir()
+    (skill_path / ".netlify").mkdir()
+    (skill_path / ".wrangler").mkdir()
+    (skill_path / ".fly").mkdir()
+
+    eval_case = {"id": 1, "files": [".vercel", ".netlify", ".wrangler", ".fly"]}
+    result = eval_executors.run_file_validation(eval_case, skill_path, False)
+    assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
+    assert result.message == "Missing 4 file(s)"  # nosec B101 -- test assertion
+    assert result.details == [
+        "Missing: .vercel",
+        "Missing: .netlify",
+        "Missing: .wrangler",
+        "Missing: .fly",
+    ]  # nosec B101 -- test assertion

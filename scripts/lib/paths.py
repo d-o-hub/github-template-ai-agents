@@ -154,6 +154,10 @@ FORBIDDEN_PATHS = frozenset({
     ".helm",
     ".serverless",
     ".gitmodules",
+    ".vercel",
+    ".netlify",
+    ".wrangler",
+    ".fly",
 })
 
 # Pre-calculate lowercase forbidden paths for efficient case-insensitive matching.
