@@ -81,6 +81,7 @@
 | `swarm-worktree-web-research.sh` | Swarm analysis with web research | `./scripts/swarm-worktree-web-research.sh "topic"` |
 | `self-fix-loop.sh` | Auto-fix CI failures in a loop | `./scripts/self-fix-loop.sh` |
 | `run-evals.py` | Static smoke runner over `evals/evals.json` — structure and `files[]` resolution. Invokes no model | `python3 scripts/run-evals.py` |
+| `behavioral-eval.py` | Opt-in paired behavioral evaluation (`plan`/`run`/`compare`/`bless`) through an operator-supplied adapter. Invokes no model itself; not in the default gate | `python3 scripts/behavioral-eval.py plan --skill skill-evaluator` |
 | `gh-labels-creator.sh` | Create GitHub labels | `./scripts/gh-labels-creator.sh --ci` |
 | `run_act_local.sh` | Optional local GitHub Actions rehearsal via `act` (never blocks the gate) | `./scripts/run_act_local.sh` |
 | `log-metric.sh` | Append a task metric entry to the correct per-agent metrics file | `./scripts/log-metric.sh '<json>'` |

@@ -1,6 +1,6 @@
 ---
 name: skill-evaluator
-version: "0.2.10"
+version: "0.2.11"
 description: Reusable skill for evaluating other skills with static structure checks, eval coverage review, and manual paired behavioral trials. Use this skill when checking a skill, reviewing eval assertions, grading actual outputs, or comparing a skill against a baseline — even if they just say "evaluate this skill" or "check if this skill works". Not for authoring skills (use skill-creator) or routing requests (use intent-classifier).
 category: quality
 license: MIT
@@ -9,7 +9,8 @@ license: MIT
 # Skill Evaluator
 
 Evaluate local skills with evidence and an explicit scope. Choose **static
-audit** or **manual paired behavioral evaluation**; never confuse their verdicts.
+audit** or **paired behavioral evaluation** (opt-in runner or manual protocol);
+never confuse their verdicts.
 
 ## When to Use
 
@@ -22,7 +23,7 @@ audit** or **manual paired behavioral evaluation**; never confuse their verdicts
 
 ```text
 SKILL_PATH: absolute or workspace-relative path to the skill directory
-MODE: static (default) / manual-paired
+MODE: static (default) / paired (runner or manual)
 GOAL: structure / coverage review / behavioral comparison
 ```
 
@@ -83,45 +84,75 @@ separately from the automated structure result, with case IDs as evidence.
 Always add **Behavioral evaluation: NOT_RUN**. A static PASS is never a
 behavioral PASS, trigger-accuracy measurement, or evidence of skill uplift.
 
-## Mode 2: Manual Paired Behavioral Evaluation
+## Mode 2: Paired Behavioral Evaluation
 
-This is a manual operator/agent protocol, **not a bundled model runner**.
-Repository `eval-skills.sh` and `run-evals.py` are static checks; they cannot
-produce behavioral pass rates. Tier 3 automation is not shipped.
+Behavioral evidence requires actual paired runs. Use the opt-in runner when an
+adapter exists; it is **not** part of the default quality gate and needs no
+model credentials in CI.
 
 ### 1. Prepare
 
-Run the static audit first. Choose representative case IDs and define the
-grading criteria before seeing answers. Use only authorized, safe inputs.
-For external services, prefer a user-approved dry-run or mock; do not request
-credentials just to audit definitions. If needed execution is unavailable,
-mark that case BLOCKED and preserve the reason.
+Run the static audit first. Choose representative case IDs and define grading
+criteria before seeing answers. Build the plan and confirm pairing:
+
+```bash
+python3 scripts/behavioral-eval.py plan --skill "$SKILL_NAME" --cases 1,8
+```
+
+Prompts are withheld from stored artifacts unless `--include-prompts` is passed.
 
 ### 2. Capture Paired Outputs
 
-Use fresh isolated sessions for each configuration:
+Supply an adapter command that prints one `behavioral-eval/v1` result JSON per
+task on stdout. Task payloads arrive on stdin with `configuration`
+(`with_skill` / `without_skill`), the case prompt/assertions, and staged
+fixtures. Keep tool access and model settings equal except for the skill.
 
-- `with_skill`: same prompt and fixtures, target skill loaded
-- `without_skill`: same prompt and fixtures, target skill not loaded
-- `old_skill` (optional): a pinned prior snapshot for regression comparison
+```bash
+BEHAVIORAL_EVAL_ADAPTER="my-adapter --json" \
+python3 scripts/behavioral-eval.py run --skill "$SKILL_NAME" \
+  --provider-name <agent> --provider-model <model>
+```
 
-Keep tool access, model/configuration, and input context equal except for the
-skill. Record deviations. Never reuse a with-skill transcript as the baseline.
-For negative cases, test routing from the description without preloading the
-target skill; record whether it stayed unloaded and the chosen alternative.
+Never reuse a with-skill transcript as the baseline. Negative cases report
+`activation.skill_loaded`: `true` is a false activation and fails the case,
+while `null` blocks it.
 
 ### 3. Grade and Compare
 
-Save actual outputs/transcripts and mark each assertion PASS/FAIL/BLOCKED with
-an evidence quotation or artifact path. Compare paired assertion counts,
-missing details, and format compliance; specify the measured denominator.
-Keep blocked cases out of pass-rate denominators and list them explicitly.
+Every graded result needs assertion evidence (`text`, `result`, `evidence`) and
+activation evidence. The runner aggregates, excludes blocked/not-run cases from
+denominators, and compares against `<skill>/evals/behavioral-baseline.json`.
 
-Record time, tokens, cost, and trigger accuracy **only if measured** with a
-documented source. Otherwise report **not measured** and omit numeric artifacts.
-Do not infer usage from answer length or insert zero/estimated measurements.
+Exit codes: `0` pass, `1` case failure or baseline regression, `2` contract or
+configuration error, `3` blocked/not run. Malformed adapter output is exit 2 and
+is never scored.
 
-### 4. Behavioral Verdict
+`duration_ms` is adapter- or runner-measured and labeled. Tokens, cost, and
+trigger accuracy appear only when the adapter reported them; otherwise they are
+`unavailable`. Do not estimate them.
+
+### 4. Baseline Blessing
+
+`run` never writes a baseline. After reviewing the artifact, bless explicitly:
+
+```bash
+python3 scripts/behavioral-eval.py bless --skill "$SKILL_NAME" \
+  --report <artifact>/report.json --accept --blessed-by <reviewer>
+```
+
+`bless` refuses failing, blocked, not-run, or unattributed runs. Without
+`--accept` it writes `<baseline>.candidate.json` and exits 1 when the floor would
+change. A measured rate below a blessed floor is a visible regression.
+
+### 5. Manual Fallback
+
+With no adapter, run the same cases in isolated sessions and grade the captured
+outputs by hand. Mark BLOCKED/NOT_RUN when isolation or provider metadata is
+missing. `do-harness eval` is a possible backend only through an adapter; its
+fixture format is not verified compatible with this contract.
+
+### Behavioral Verdict
 
 - **PASS (behavioral, selected cases)**: actual paired outputs meet the declared
   criteria; does not imply all cases passed or the skill improved the baseline
@@ -134,19 +165,25 @@ passing output cannot establish improvement over a baseline.
 
 ## Evidence Layout
 
-Use a user-approved evidence directory; keep temporary trials outside the repo.
+Runner-owned layout; do not hand-write result files.
 
 ```text
-<evidence-dir>/iteration-N/
-  eval-<id>/with_skill/outputs/response.md
-  eval-<id>/without_skill/outputs/response.md
-  eval-<id>/grading.json          # actual assertion results + evidence
-  summary.md                    # scope, configuration, blocked/not-measured fields
+<skill>-workspace/behavioral-<stamp>/
+  plan.json                  # digests and tasks; prompts withheld by default
+  report.json                # aggregate + baseline comparison
+  candidate-baseline.json    # only when a blessed baseline exists
+  tasks/case-<id>/<configuration>/
+    task.json                # redacted; prompt withheld unless requested
+    fixtures/                # staged case inputs
+    workspace/               # adapter scratch directory
+    result.json              # validated, redacted result
+    adapter.stderr           # bounded diagnostics, when present
 ```
 
-Additional benchmark/timing artifacts are optional and require real runs and
-measurements. `references/schemas.md` describes artifact shapes, not proof that
-a run occurred. Preserve evidence before proposing fixes via `skill-creator`.
+Manual trials may keep `<skill>-workspace/iteration-N/` (hand-authored), but
+label them manual so they are not confused with runner output. Artifacts are
+redacted and prompt capture is opt-in; keep temporary trials out of the repo and
+retain only what review needs.
 
 ## Assertion Rules
 
@@ -179,13 +216,15 @@ Every scored assertion needs evidence; definition review does not score behavior
 
 - `scripts/check_structure.py` — standalone static layout/schema/fixture audit
 - `references/verification-checklist.md` — domain-specific checklist starter
-- `references/evaluating-skills.md` — background for manual output evaluation
+- `references/evaluating-skills.md` — adapter contract, artifacts, baselines
+- `scripts/behavioral-eval.py` (repo-level) — opt-in paired runner; no model call
+  of its own, no default-gate dependency
 
 ## See Also
 
 - `skill-creator` — Author or improve skills from findings
 - `intent-classifier` — Route requests to appropriate skills
-- `agents-docs/SKILL_EVAL_TIERS.md` — tier mapping; Tier 3 automation is not implemented
+- `agents-docs/SKILL_EVAL_TIERS.md` — tier mapping; Tier 3 is the opt-in adapter runner
 
 ## Rationalizations
 
@@ -194,6 +233,9 @@ Every scored assertion needs evidence; definition review does not score behavior
 | "The static checker passed, so the skill works" | Static PASS checks definitions, not behavior; paired trials need actual outputs. |
 | "One case is enough" | This template requires at least 3 definitions; behavioral coverage must be reported separately. |
 | "I can estimate the missing metrics" | Unmeasured values stay not measured; estimates are not evaluation evidence. |
+| "The runner exited 0, so the skill is effective" | Exit 0 covers selected cases only; cite scope, denominator, and baseline delta. |
+| "I can raise the baseline to make it green" | Floors change only through an attributable, reviewed bless; a drop is a regression. |
+| "Activation was not observed, so it probably loaded" | Unobserved activation blocks the case; inference is not evidence. |
 
 ## Red Flags
 
@@ -202,3 +244,5 @@ Every scored assertion needs evidence; definition review does not score behavior
 - [ ] Reporting token usage, timing, costs, or trigger accuracy without measurements
 - [ ] Tagging a case negative while expecting the target skill to execute
 - [ ] Using subjective assertions or verdicts without evidence
+- [ ] Blessing a baseline without review, or letting a run write it automatically
+- [ ] Counting a missing without-skill side as an implicit pass

@@ -12,7 +12,7 @@ See ADR-037 and its correction note below.
 |-------------|---------------------|--------|------|
 | Tier 1 Validation (static validators, secrets, license, hygiene, quality score) | `scripts/validate-skills.sh` + `quality_gate.sh` + `evals/evals.json` | Implemented | Always gates |
 | Tier 2 Deduplication (inter-skill similarity vs catalog) | `scripts/check-skill-overlap.sh` (word-5-gram Jaccard over `SKILL.md` bodies, no embeddings) | Implemented, **not wired to CI** | Advisory default; `--strict` gates |
-| Tier 3 Live Evaluation (paired with/without-skill trials, Skill Lift) | — | **Not implemented** (see below) | n/a |
+| Tier 3 Live Evaluation (paired with/without-skill trials, Skill Lift) | `scripts/behavioral-eval.py` + opt-in `.github/workflows/behavioral-eval.yml` | Implemented as an **opt-in adapter runner** (see below) | Manual dispatch only; never the default gate |
 
 ## Tier 2 threshold calibration
 
@@ -75,7 +75,7 @@ Until then, treat `check-skill-overlap.sh` as a **duplication** gate. Use an
 embedding-based checker whenever a skill split, merge, or consolidation is the
 actual decision on the table.
 
-## Tier 3 is not implemented
+## Tier 3 is opt-in, not automatic
 
 ADR-037 mapped Tier 3 to `skill-creator/scripts/run_loop.py` plus a benchmark flow.
 That mapping is **incorrect** and is corrected here:
@@ -88,16 +88,39 @@ That mapping is **incorrect** and is corrected here:
 - Consequently `skill-evaluator/SKILL.md` documents a workspace layout that is
   authored by hand, never produced by a runner.
 
-Tier 3 proper — Harbor-sandboxed paired with/without-skill trials and Skill Lift —
-remains unbuilt. Do not treat the `run_summary.delta` numbers in
-`benchmark.md` as Skill Lift.
+Tier 3 now ships as an **opt-in adapter runner**, not as harbor sandboxes and not
+as a default gate:
+
+- `scripts/behavioral-eval.py` derives cases from the same `evals/evals.json`,
+  runs each case in `with_skill` and `without_skill`, and requires an
+  operator-supplied adapter that prints one `behavioral-eval/v1` result per task.
+  The template ships **no** adapter that calls a model; the stub at
+  `tests/fixtures/behavioral/stub_adapter.py` exists only for contract tests.
+- The runner validates every result, detects false activation on `negative`
+  cases, excludes blocked/not-run cases from denominators, and marks unmeasured
+  tokens/cost/trigger accuracy `unavailable`.
+- `.github/workflows/behavioral-eval.yml` is `workflow_dispatch` only. It uploads
+  a bounded artifact (7 days, prompts withheld unless requested, redacted) and
+  cannot bless a baseline.
+- Baselines live at `<skill>/evals/behavioral-baseline.json`, are written only by
+  an explicit `bless --accept --blessed-by`, and never by `run`. A measured rate
+  below a blessed floor is reported as a regression.
+- `do-harness eval` is a possible backend **only through an adapter**. Its fixture
+  format is not verified compatible with this contract, so write and test the
+  mapping before claiming compatibility.
+
+This is paired **evidence capture with explicit baselines**, not Skill Lift at
+NVIDIA's scale. Do not treat the `run_summary.delta` numbers in `benchmark.md` as
+Skill Lift, and do not treat one opt-in run as an efficacy claim.
 
 ## What is measured today
 
 | Signal | Producer | Consumer |
 |--------|----------|----------|
 | `duration_ms` per eval | `scripts/lib/eval_executors.py` (command checks) | `run-evals.py --format json` |
+| paired case/assertion pass rates, per-configuration duration | `scripts/behavioral-eval.py` (opt-in adapter run) | `report.json`, baseline comparison |
 | `total_tokens` per eval | `skill-creator/scripts/run_loop.py` `parse_token_usage()` from `claude --json` | `run_loop.py` output |
+| tokens/cost per paired task | the operator-supplied adapter (`usage`) | behavioral `report.json`; `unavailable` when unreported |
 | token/time budget verdict | `aggregate_benchmark.py` `evaluate_budget()` | `benchmark.md` |
 
 `run-evals.py` reports `total_tokens` as a hardcoded `0`
