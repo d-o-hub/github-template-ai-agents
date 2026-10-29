@@ -53,6 +53,8 @@ Adopters seeking an executable CLI or MCP server for local context redaction can
 ### Upstream References
 
 - [do-context-shield Repository](https://github.com/d-oit/do-context-shield)
+- [Installation and Release Contract](https://github.com/d-oit/do-context-shield#installation-and-release-contract)
+- [Configuration Reference](https://github.com/d-oit/do-context-shield/blob/main/docs/configuration.md)
 - [Canonical Private Data Skill](https://github.com/d-oit/do-context-shield/blob/main/.agents/skills/private-data/SKILL.md)
 - [Client Integration Documentation](https://github.com/d-oit/do-context-shield/blob/main/docs/client-integration.md)
 
