@@ -91,6 +91,14 @@ jobs:
           for i in {1..3}; do sudo apt-get update && break || sleep 5; done
           sudo apt-get install -y shellcheck bats
 
+      # The gate runs in strict skip mode below, so every optional linter it
+      # looks for must exist here. shellcheck/bats come from apt;
+      # markdownlint-cli2 has no apt package, and installing it via npx would not
+      # satisfy the gate's `command -v markdownlint-cli2` probe. Version pinned
+      # to match .github/workflows/markdown-lint.yml.
+      - name: Install markdownlint-cli2
+        run: npm install -g --ignore-scripts markdownlint-cli2@0.23.2
+
       - name: Validate agent config schemas
         run: |
           set -euo pipefail
@@ -143,8 +151,12 @@ jobs:
           done
 
       - name: Run quality gate
+        # Strict skip mode: a check that could not run fails the job instead of
+        # leaving a skip line in an otherwise green gate. This is the CI-level
+        # counterpart to the gate's SKIPPED_CHECKS summary; see
+        # agents-docs/SCRIPTS.md → "Skipped vs. passed checks".
         run: |
-          SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/quality_gate.sh
+          SKIP_GLOBAL_HOOKS_CHECK=true QUALITY_GATE_STRICT_SKIPS=true ./scripts/quality_gate.sh
 
   test:
     name: Run Tests
@@ -252,15 +264,22 @@ jobs:
           sudo apt-get install -y bats
 
       - name: Run BATS tests
+        # A runner without `bats` must not pass as "no tests found": this repo
+        # ships tests/*.bats, so a missing runner is a broken step, not a skip.
         run: |
-          if [ -d "tests" ] && [ -n "$(find tests -name '*.bats' \
+          set -euo pipefail
+          if [ ! -d "tests" ] || [ -z "$(find tests -name '*.bats' \
             -print -quit 2>/dev/null)" ]
           then
-            echo "Running BATS tests..."
-            bats tests/*.bats
-          else
-            echo "No BATS tests found"
+            echo "SKIPPED test:bats (no tests/*.bats files in this repository)"
+            exit 0
           fi
+          if ! command -v bats >/dev/null 2>&1; then
+            echo "::error::tests/*.bats exist but the bats runner is not installed"
+            exit 1
+          fi
+          echo "Running BATS tests..."
+          bats tests/*.bats
 
   ci-success:
     name: CI Success

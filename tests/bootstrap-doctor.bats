@@ -103,3 +103,51 @@ setup() {
     # Either pass or fail, output should include section headers
     [[ "$output" == *"==>"* ]]
 }
+
+# doctor.sh must agree with the gate about what "healthy" means. A PATH holding
+# only the commands doctor itself needs makes every optional tool absent, so the
+# check is deterministic instead of depending on what the host happens to have.
+make_doctor_bin() {
+    DOCTOR_BIN="$(mktemp -d)"
+    local tool path
+    for tool in bash git mktemp ln rm sed readlink; do
+        path="$(command -v "$tool")" || continue
+        ln -s "$path" "$DOCTOR_BIN/$tool"
+    done
+}
+
+@test "doctor.sh warns instead of passing when a gate tool is missing" {
+    make_doctor_bin
+    run env PATH="$DOCTOR_BIN" "$DOCTOR_BIN/bash" ./scripts/doctor.sh
+    rm -rf "$DOCTOR_BIN"
+
+    [[ "$output" == *"! shellcheck not found"* ]]
+    [[ "$output" == *"quality_gate.sh will report it as a skip"* ]]
+    [[ "$output" != *"✓ shellcheck available"* ]]
+}
+
+@test "doctor.sh fails when a gate tool exists but cannot run" {
+    make_doctor_bin
+    # A broken install the gate would find and then fail on, with no hint why.
+    printf '#!%s\nprintf "boom\\n" >&2\nexit 1\n' "$(command -v bash)" > "$DOCTOR_BIN/shellcheck"
+    chmod +x "$DOCTOR_BIN/shellcheck"
+
+    run env PATH="$DOCTOR_BIN" "$DOCTOR_BIN/bash" ./scripts/doctor.sh
+    rm -rf "$DOCTOR_BIN"
+
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"✗ shellcheck at"*"does not run"* ]]
+    [[ "$output" != *"✓ shellcheck available"* ]]
+}
+
+@test "doctor.sh fails on a missing gate tool under QUALITY_GATE_STRICT_SKIPS" {
+    make_doctor_bin
+    run env PATH="$DOCTOR_BIN" QUALITY_GATE_STRICT_SKIPS=true "$DOCTOR_BIN/bash" ./scripts/doctor.sh
+    rm -rf "$DOCTOR_BIN"
+
+    # Same environment as the test above: only strict mode differs.
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"✗ shellcheck not found"* ]]
+    [[ "$output" == *"strict skip mode makes that a gate failure"* ]]
+    [[ "$output" != *"doctor: all checks passed"* ]]
+}
