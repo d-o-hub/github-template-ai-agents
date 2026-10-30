@@ -34,6 +34,24 @@ if [[ ! -d "$SKILLS_SRC" ]] || [[ -z "$(ls -A -- "$SKILLS_SRC" 2>/dev/null)" ]];
     echo "No skills in .agents/skills/ - checking routing configuration only."
 fi
 
+# Read every SKILL.md's frontmatter in one interpreter start; Validate_skill_file
+# consumes the cache instead of forking python once per skill.
+SKILL_FILES=()
+for skill_path in "$SKILLS_SRC"/*/; do
+    [[ -d "$skill_path" ]] || continue
+    skill_name="${skill_path%/}"
+    skill_name="${skill_name##*/}"
+    if [[ "$skill_name" == _* ]] || [[ "$skill_name" == *-workspace ]] || [[ "$skill_name" == skills-evaluation ]]; then
+        continue
+    fi
+    if [[ -f "${skill_path}SKILL.md" ]]; then
+        SKILL_FILES+=("${skill_path}SKILL.md")
+    fi
+done
+if [[ ${#SKILL_FILES[@]} -gt 0 ]]; then
+    load_skill_frontmatter "${SKILL_FILES[@]}"
+fi
+
 echo "Checking canonical skills and CLI symlinks..."
 
 # Cache for readlink -f existence
@@ -124,6 +142,7 @@ done
 # Check 4: Authoring compliance checks (per-skill SKILL.md requirements)
 echo ""
 echo "Checking skill authoring compliance..."
+STRUCTURE_SKILLS=()
 
 for skill_path in "$SKILLS_SRC"/*/; do
     [[ -d "$skill_path" ]] || continue
@@ -168,28 +187,37 @@ for skill_path in "$SKILLS_SRC"/*/; do
         skill_failed=1
     fi
 
-    # Use the runner's static schema/fixture checks and named minimum contract.
-    if ! python3 - "$REPO_ROOT/scripts" "$skill_path" <<'PYTHON_EVAL_CHECK'; then
+    # Deferred to one interpreter start after the loop (see below).
+    STRUCTURE_SKILLS+=("$skill_path")
+
+    if [[ $skill_failed -ne 0 ]]; then
+        AUTHORING_FAILED=1
+    fi
+done
+
+# The runner's static schema/fixture checks and named minimum contract, run
+# once for every skill: forking python per skill cost 2.4s of this script.
+if [[ ${#STRUCTURE_SKILLS[@]} -gt 0 ]]; then
+    if ! python3 - "$REPO_ROOT/scripts" "${STRUCTURE_SKILLS[@]}" <<'PYTHON_EVAL_CHECK'; then
 import sys
 from pathlib import Path
 
 sys.path.insert(0, sys.argv[1])
 from lib.eval_validators import EvalStatus, run_structure_check
 
-skill = Path(sys.argv[2])
-result = run_structure_check(skill)
-if result.status == EvalStatus.FAIL:
-    for issue in result.details:
-        print(f"  ✗ {skill.name}: {issue}")
-    sys.exit(1)
+failed = False
+for raw in sys.argv[2:]:
+    skill = Path(raw)
+    result = run_structure_check(skill)
+    if result.status == EvalStatus.FAIL:
+        for issue in result.details:
+            print(f"  ✗ {skill.name}: {issue}")
+        failed = True
+sys.exit(1 if failed else 0)
 PYTHON_EVAL_CHECK
-        skill_failed=1
-    fi
-
-    if [[ $skill_failed -ne 0 ]]; then
         AUTHORING_FAILED=1
     fi
-done
+fi
 
 if [[ $AUTHORING_FAILED -ne 0 ]]; then
     echo ""

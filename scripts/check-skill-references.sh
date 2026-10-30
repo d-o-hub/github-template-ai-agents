@@ -98,22 +98,45 @@ is_provenance() {
     [[ "$line" =~ (absorbed|superseded|folded|consolidat|merged|renamed|deprecated) ]]
 }
 
+# One alternation over every folded name, so the scan needs a single pass.
+# The original loop ran `grep | cut` per (file, name) pair (~5,700 forks, 7.9s)
+# and cost half the quality gate's runtime; a pure-bash line loop was worse
+# still, because bash's regex engine is ~40x slower than grep on the same data.
+declare -A SUCCESSOR_OF=()
+NAMES_ALT=""
+for i in "${!FOLDED_NAMES[@]}"; do
+    name="${FOLDED_NAMES[$i]}"
+    SUCCESSOR_OF["$name"]="${SUCCESSORS[$i]}"
+    escaped="${name//[^a-zA-Z0-9_-]/\\&}"
+    NAMES_ALT+="${NAMES_ALT:+|}${escaped}"
+done
+# Word boundaries on both sides so `docs-hook`-style prefixes cannot false-positive.
+readonly NAME_RE="(^|[^a-z0-9-])(${NAMES_ALT})([^a-z0-9-]|\$)"
+
+declare -a SCAN_FILES=()
 for target in "${TARGETS[@]}"; do
     should_skip "$target" && continue
-    for i in "${!FOLDED_NAMES[@]}"; do
-        name="${FOLDED_NAMES[$i]}"
-        successor="${SUCCESSORS[$i]}"
-        while IFS= read -r line; do
-            [[ -z "$line" ]] && continue
-            is_provenance "$line" && continue
-            # Require a word boundary so `docs-hook`-style prefixes cannot false-positive.
-            [[ "$line" =~ (^|[^a-z0-9-])${name}([^a-z0-9-]|$) ]] || continue
-            rel="${target#"$REPO_ROOT/"}"
-            fail "${rel}: references folded skill '${name}' (use '${successor}')"
-            REFERENCES_FOUND=$((REFERENCES_FOUND + 1))
-        done < <(grep -n -F -- "$name" "$target" 2>/dev/null | cut -d: -f2- || true)
-    done
+    [[ -f "$target" ]] || continue
+    SCAN_FILES+=("$target")
 done
+
+# One grep for every file at once: the only work left in bash is the provenance
+# filter, which runs on surviving hits rather than on every line.
+HITS="$(grep -nE -H -- "$NAME_RE" "${SCAN_FILES[@]}" 2>/dev/null || true)"
+
+while IFS= read -r hit; do
+    [[ -z "$hit" ]] && continue
+    file="${hit%%:*}"
+    rest="${hit#*:}"
+    line="${rest#*:}"
+    [[ "$line" =~ $NAME_RE ]] || continue
+    # Capture the name before is_provenance runs: its own [[ =~ ]] test
+    # rewrites BASH_REMATCH (and clears it when it does not match).
+    name="${BASH_REMATCH[2]}"
+    is_provenance "$line" && continue
+    fail "${file#"$REPO_ROOT/"}: references folded skill '${name}' (use '${SUCCESSOR_OF[$name]}')"
+    REFERENCES_FOUND=$((REFERENCES_FOUND + 1))
+done <<< "$HITS"
 
 # --- Verdict ----------------------------------------------------------------
 if [[ $EXIT_CODE -eq 0 ]]; then
