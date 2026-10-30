@@ -35,3 +35,12 @@ class TestSSRFGuards:
         """Verify that [::] is blocked by is_safe_url."""
         assert not is_safe_url("http://[::]/")
         assert not is_safe_url("http://[::]:8080/")
+
+    def test_is_safe_url_blocks_shorthand_ipv4(self):
+        """Verify that shorthand IPv4 notations (e.g., 127.1, 127.0.1) are normalized and blocked."""
+        from scripts.utils.http import _normalize_host
+
+        assert _normalize_host("127.1") == "127.0.0.1"
+        assert _normalize_host("127.0.1") == "127.0.0.1"
+        assert not is_safe_url("http://127.1/")
+        assert not is_safe_url("http://127.0.1/")
