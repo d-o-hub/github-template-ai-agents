@@ -293,6 +293,8 @@ phase_analyze_fix() {
                     printf "%s\n" "$shell_scripts" | tr '\n' '\0' | xargs -0 shellcheck --severity=error 2>&1 || true
                 fi
                 fix_applied=true
+            else
+                warn "shell issues detected but shellcheck is not installed - cannot auto-fix"
             fi
         fi
         # YAML/Actions failures
@@ -302,15 +304,24 @@ phase_analyze_fix() {
             if command -v yamllint &>/dev/null; then
                 yamllint -d "{extends: default, rules: {line-length: {max: 120}}}" .github/ 2>&1 || true
                 fix_applied=true
+            else
+                warn "YAML issues detected but yamllint is not installed - cannot auto-fix"
             fi
         fi
         # Markdown failures
         # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
         if [[ "$failure_lower" =~ (markdown|md|markdownlint) ]]; then
             log "→ Markdown issue detected"
-            if command -v markdownlint &>/dev/null; then
+            # This repository lints Markdown with markdownlint-cli2; plain
+            # markdownlint is only a fallback for adopters who install it.
+            if command -v markdownlint-cli2 &>/dev/null; then
+                markdownlint-cli2 2>&1 || true
+                fix_applied=true
+            elif command -v markdownlint &>/dev/null; then
                 markdownlint "**/*.md" --ignore node_modules --ignore target 2>&1 || true
                 fix_applied=true
+            else
+                warn "Markdown issues detected but no markdownlinter is installed - cannot auto-fix"
             fi
         fi
         # Python failures
@@ -320,10 +331,11 @@ phase_analyze_fix() {
             if command -v ruff &>/dev/null; then
                 ruff check --fix . 2>&1 || true
                 fix_applied=true
-            fi
-            if command -v black &>/dev/null; then
+            elif command -v black &>/dev/null; then
                 black . 2>&1 || true
                 fix_applied=true
+            else
+                warn "Python issues detected but neither ruff nor black is installed - cannot auto-fix"
             fi
         fi
         # TypeScript/JavaScript failures
@@ -337,6 +349,8 @@ phase_analyze_fix() {
                 elif command -v npm &>/dev/null; then
                     npm run lint -- --fix 2>&1 || true
                     fix_applied=true
+                else
+                    warn "JS/TS issues detected but no package manager is installed - cannot auto-fix"
                 fi
             fi
         fi

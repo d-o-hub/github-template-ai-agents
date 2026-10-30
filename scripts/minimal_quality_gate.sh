@@ -33,6 +33,7 @@ if [[ ! -d "$REPO_ROOT/.agents/skills" ]]; then
 fi
 
 # Test 3: Shellcheck scripts/ directory (cached)
+skipped_checks=()
 if command -v shellcheck &> /dev/null; then
     echo "Running shellcheck on scripts/..."
     sc_failed=0
@@ -48,7 +49,15 @@ if command -v shellcheck &> /dev/null; then
         echo "ERROR: shellcheck failed on some scripts" >&2
         exit 2
     fi
+else
+    # A missing linter must not read as a clean pass.
+    echo "  - skipped shell:shellcheck: shellcheck is not installed"
+    skipped_checks+=("shell:shellcheck")
 fi
 
-echo "Minimal quality gate PASSED"
+if [[ ${#skipped_checks[@]} -gt 0 ]]; then
+    echo "Minimal quality gate PASSED (skipped checks: ${skipped_checks[*]})"
+else
+    echo "Minimal quality gate PASSED"
+fi
 exit 0

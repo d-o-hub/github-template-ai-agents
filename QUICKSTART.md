@@ -126,8 +126,11 @@ alternative package-manager or language commands together.
 
 The supplied `ci.yml` is an example multi-language/template suite: it also runs
 template schema/content checks, root Python tests, skill tests, and BATS. Node
-CI assumes `npm ci` / `npm test`, whereas the local checker uses `pnpm` when
-available. pnpm, Yarn, and Bun adopters must align setup, lockfile/cache paths,
+CI assumes `npm ci` / `npm test`. The local language checker selects pnpm, Yarn,
+Bun, or npm from the repository lockfile and runs only the `lint`, `typecheck`,
+and `test` scripts `package.json` actually defines; any check it cannot run is
+listed under `Skipped checks` in the summary rather than passing silently.
+pnpm, Yarn, and Bun adopters must still align setup, lockfile/cache paths,
 frozen installs, and test commands in both CI and local gates. Replace unrelated
 language/template checks rather than assuming manifest detection is enough.
 

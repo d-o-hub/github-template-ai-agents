@@ -39,6 +39,9 @@
     "**/*.md"
   ],
   // Patterns to ignore
+  // Keep in sync with .gitignore: generated output is not authored Markdown, and
+  // linting it makes the gate fail right after ./scripts/analyze-codebase.sh
+  // (or a build) writes files nobody committed.
   "ignores": [
     "**/node_modules/**",
     "**/target/**",
@@ -48,6 +51,10 @@
     "**/*-workspace/**",
     "**/skills-evaluation/**",
     ".windsurf/**",
-    ".mimocode/**"
+    ".mimocode/**",
+    "reports/**",
+    "analysis/**",
+    "dist/**",
+    "build/**"
   ]
 }
