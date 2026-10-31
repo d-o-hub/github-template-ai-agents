@@ -24,15 +24,62 @@ for cmd in git bash; do
   fi
 done
 
-# ---- Optional quality tools ----
-sect "Optional quality tools (needed for quality_gate.sh)"
-for cmd in markdownlint-cli2 shellcheck yamllint; do
+# ---- Quality gate tools ----
+# quality_gate.sh records a skip for each of these when it is missing, and with
+# QUALITY_GATE_STRICT_SKIPS=true (what CI sets) it turns that skip into a
+# failure. So the same absence is a hard failure here under strict mode, and
+# advisory otherwise - doctor must not report health the gate would deny.
+sect "Quality gate tools"
+STRICT_SKIPS="${QUALITY_GATE_STRICT_SKIPS:-false}"
+if [[ "$STRICT_SKIPS" == "true" ]]; then
+  printf '  (QUALITY_GATE_STRICT_SKIPS=true: a missing tool fails the gate)\n'
+else
+  printf '  (a missing tool is a reported skip; set QUALITY_GATE_STRICT_SKIPS=true to require it)\n'
+fi
+# A tool that exists but cannot run is worse than a missing one: the gate finds
+# it with command -v, executes it, and reports an unexplained failure. Probe each
+# one so "available" means it actually starts.
+_gate_tool_runs() {
+  if [[ "$1" == "python3" ]]; then
+    "$1" -c 'import json' >/dev/null 2>&1
+  else
+    "$1" --version >/dev/null 2>&1
+  fi
+}
+
+while IFS=: read -r cmd why; do
+  [[ -n "$cmd" ]] || continue
+  if command -v "$cmd" >/dev/null 2>&1; then
+    if _gate_tool_runs "$cmd"; then
+      pass "$cmd available and runs"
+    else
+      bad "$cmd at $(command -v "$cmd") exists but does not run - the gate will fail on every check that uses it; reinstall it"
+    fi
+  elif [[ "$STRICT_SKIPS" == "true" ]]; then
+    bad "$cmd not found - needed to $why, and strict skip mode makes that a gate failure"
+  else
+    warn "$cmd not found - needed to $why; quality_gate.sh will report it as a skip"
+  fi
+done <<'GATE_TOOLS'
+shellcheck:lint shell scripts
+markdownlint-cli2:lint Markdown
+npx:run secretlint
+python3:run the Gemini TOML and metrics checks
+GATE_TOOLS
+
+# ---- Other optional tools ----
+sect "Other optional tools (advisory only)"
+while IFS=: read -r cmd why; do
+  [[ -n "$cmd" ]] || continue
   if command -v "$cmd" >/dev/null 2>&1; then
     pass "$cmd available"
   else
-    warn "$cmd not found - quality gate may warn"
+    warn "$cmd not found - only needed to $why"
   fi
-done
+done <<'ADVISORY_TOOLS'
+yamllint:lint YAML by hand (CI lints workflows separately)
+cargo:build and test Rust projects
+ADVISORY_TOOLS
 
 # ---- Repository state ----
 sect "Repository"

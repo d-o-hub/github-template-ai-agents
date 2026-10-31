@@ -23,6 +23,12 @@ NC='\033[0m'
 readonly TRUE=1
 readonly FALSE=0
 
+# Frontmatter results keyed by SKILL.md path, filled by load_skill_frontmatter.
+# One interpreter start for the whole run replaces a python fork per skill,
+# which measured 2.2s of validate-skills.sh's 4.3s runtime.
+declare -gA SKILL_FRONTMATTER_CACHE=()
+declare -gA SKILL_FRONTMATTER_ISSUES=()
+
 # Cache for VERSION file content
 REPO_VERSION=""
 # Shared variable to return line count without extra subshell
@@ -41,6 +47,30 @@ readonly TEMPLATE_VERSION_PIN="0.0.0"
 # Emitted once per run so the deliberate skip stays visible without repeating
 # itself for every skill that declares a template_version.
 TEMPLATE_VERSION_PIN_NOTICE_SHOWN="$FALSE"
+
+# Batch-read frontmatter for the given SKILL.md paths. Results mirror the
+# single-file protocol (line_count:has_version:template_version) and issues are
+# stored verbatim so validate_skill_file prints exactly what it printed before.
+load_skill_frontmatter() {
+    local -a files=("$@")
+    if [[ ${#files[@]} -eq 0 ]]; then
+        return 0
+    fi
+    local kind path field_a field_b field_c
+    while IFS=$'\t' read -r kind path field_a field_b field_c; do
+        case "$kind" in
+            R) SKILL_FRONTMATTER_CACHE["$path"]="${field_a}:${field_b}:${field_c}" ;;
+            I)
+                if [[ -n "${SKILL_FRONTMATTER_ISSUES[$path]:-}" ]]; then
+                    SKILL_FRONTMATTER_ISSUES["$path"]+=$'\n'"$field_a"
+                else
+                    SKILL_FRONTMATTER_ISSUES["$path"]="$field_a"
+                fi
+                ;;
+        esac
+    done < <(printf '%s\n' "${files[@]}" | SKILL_FRONTMATTER_ROOT="$SKILLS_SRC" \
+        python3 "$SKILL_VALIDATION_LIB_DIR/skill_frontmatter.py" --batch 2>/dev/null)
+}
 
 # Validate a single SKILL.md file for format correctness
 # Returns 0 if valid, 1 if invalid (prints errors to stderr)
@@ -62,7 +92,22 @@ validate_skill_file() {
     # The dependency-free reader rejects YAML outside its documented subset;
     # this is not advertised as complete YAML validation.
     local frontmatter_result
-    if ! frontmatter_result=$(SKILL_FRONTMATTER_ROOT="$SKILLS_SRC" \
+    if [[ -n "${SKILL_FRONTMATTER_CACHE["$skill_file"]+cached}" ]]; then
+        # Pre-read by load_skill_frontmatter: same reader, same messages, one
+        # interpreter start for the whole run instead of one per skill.
+        frontmatter_result="${SKILL_FRONTMATTER_CACHE[$skill_file]}"
+        if [[ -n "${SKILL_FRONTMATTER_ISSUES[$skill_file]:-}" ]]; then
+            local cached_issue
+            while IFS= read -r cached_issue; do
+                # Byte-identical to the reader's own stderr line. Colouring only
+                # the cache-hit path would make one failure look different
+                # depending on whether the file parsed, and the batched read is
+                # a performance change, not an output change.
+                printf "  ✗ %s: %s\n" "$skill_name" "$cached_issue" >&2
+            done <<< "${SKILL_FRONTMATTER_ISSUES[$skill_file]}"
+            errors=1
+        fi
+    elif ! frontmatter_result=$(SKILL_FRONTMATTER_ROOT="$SKILLS_SRC" \
         python3 "$SKILL_VALIDATION_LIB_DIR/skill_frontmatter.py" "$skill_file"); then
         errors=1
     fi

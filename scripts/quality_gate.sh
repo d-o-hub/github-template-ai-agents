@@ -52,6 +52,20 @@ fi
 # FAILED acts as an error accumulator - any failed check sets this to 1
 FAILED=0
 
+# SKIPPED_CHECKS names checks that could not run (missing optional tool or npm
+# script). A green gate must not imply a check ran when it was skipped, so the
+# summary always reports these.
+SKIPPED_CHECKS=()
+
+print_skipped_checks() {
+    local count=${#SKIPPED_CHECKS[@]}
+    if [[ $count -gt 0 ]]; then
+        printf "%b  ⚠ Skipped checks (%d): %s%b\n" "${YELLOW}" "$count" "${SKIPPED_CHECKS[*]}" "${NC}"
+    fi
+    return 0
+}
+
+
 # DETECTED_LANGUAGES stores which language ecosystems are present in the repo
 DETECTED_LANGUAGES=()
 
@@ -156,7 +170,7 @@ if [[ -d ".gemini/commands" ]]; then
             FAILED=1
         fi
     else
-        printf "%b  ⚠ python3 not available — skipping Gemini TOML validation%b\n" "${YELLOW}" "${NC}"
+        _skip_check "gemini:toml" "python3 is not installed"
     fi
     printf "\n"
 fi
@@ -200,7 +214,9 @@ printf "\n"
 
 # --- Validate reference links in SKILL.md files ---
 printf "%bValidating reference links in SKILL.md files...%b\n" "${BLUE}" "${NC}"
-if ! ./scripts/validate-links.sh; then
+if [[ "${SKIP_LINKS:-false}" == "true" ]]; then
+    _skip_check "links:validate-links" "SKIP_LINKS=true"
+elif ! ./scripts/validate-links.sh; then
     FAILED=1
 fi
 printf "\n"
@@ -302,7 +318,7 @@ if [[ -d ".agents/metrics" ]]; then
                 FAILED=1
             fi
         else
-            printf "%b  ⚠ python3 not available — skipping metrics validation%b\n" "${YELLOW}" "${NC}"
+            _skip_check "metrics:validation" "python3 is not installed"
         fi
     fi
     printf "\n"
@@ -325,10 +341,16 @@ fi
 printf "\n"
 
 # --- Secretlint checks ---
+# Raw exit status is needed here: 3 means the helper could not run, which is a
+# skip to report, not the pass that `if ! cmd` would imply.
 if [[ -f ".secretlintrc.json" ]]; then
-    if ! ./scripts/secretlint_gate.sh; then
-        FAILED=1
-    fi
+    ./scripts/secretlint_gate.sh
+    secretlint_status=$?
+    case "$secretlint_status" in
+        0) ;;
+        3) _skip_check "secret:secretlint" "npx is not installed" ;;
+        *) FAILED=1 ;;
+    esac
 fi
 
 # --- Enforce WASM size limits ---
@@ -342,6 +364,19 @@ printf "\n"
 # Both live in scripts/lib/lang-checks.sh (sourced above) to keep this file small.
 detect_project_languages
 run_language_checks
+
+# Report optional checks that did not run on every exit path below.
+print_skipped_checks
+
+# --- Strict skip contract (opt-in, used by CI) ---
+# Locally a missing optional tool is a reported skip and the gate still passes.
+# CI cannot accept that: a runner without a linter would go green behind a skip
+# line nobody reads. CI sets QUALITY_GATE_STRICT_SKIPS=true so any skip fails.
+if [[ ${#SKIPPED_CHECKS[@]} -gt 0 ]] && [[ "${QUALITY_GATE_STRICT_SKIPS:-false}" == "true" ]]; then
+    printf "%b  ✗ Strict skip mode: %d check(s) could not run (%s). Install the tool, or unset QUALITY_GATE_STRICT_SKIPS.%b\n" \
+        "${RED}" "${#SKIPPED_CHECKS[@]}" "${SKIPPED_CHECKS[*]}" "${NC}"
+    FAILED=1
+fi
 
 # Special handling for drift detection based on context
 if [[ "$DRIFT_DETECTED" == "true" ]]; then

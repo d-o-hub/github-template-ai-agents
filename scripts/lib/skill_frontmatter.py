@@ -284,7 +284,42 @@ def _validated_path(raw_path: str) -> Path:
     return path
 
 
+def _run_batch(stream) -> int:
+    """Read SKILL.md paths from stdin and emit one record per path.
+
+    Batch mode keeps a whole-repository scan to a single interpreter start.
+    Calling main() once per skill is a python fork per skill, which dominated
+    validate-skills.sh runtime. Records are tab separated and never evaluated:
+    R (result) carries line_count, has_version and template_version, I (issue)
+    carries one message for the caller to print verbatim.
+    """
+    failed = False
+    for raw in (line.rstrip("\n") for line in stream):
+        if not raw:
+            continue
+        try:
+            path = _validated_path(raw)
+            text = path.read_text(encoding="utf-8")
+            data, _ = read_frontmatter(text)
+            issues = validate_frontmatter(data, path.parent.name)
+        except (OSError, UnicodeError, FrontmatterError, RecursionError) as exc:
+            print(f"I\t{raw}\tfrontmatter: {exc}")
+            failed = True
+            continue
+        template_version = data.get("template_version", "")
+        if not isinstance(template_version, str) or "\n" in template_version or ":" in template_version:
+            template_version = ""
+        print(f"R\t{raw}\t{len(text.splitlines())}\t{int('version' in data)}\t{template_version}")
+        for issue in issues:
+            print(f"I\t{raw}\t{issue}")
+        if issues:
+            failed = True
+    return 1 if failed else 0
+
+
 def main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] == "--batch":
+        return _run_batch(sys.stdin)
     skill_label = "<unknown>"
     try:
         if len(sys.argv) != 2:

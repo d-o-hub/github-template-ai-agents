@@ -47,9 +47,11 @@ manager.
 
 Replace install, lint, typecheck, build, and test commands with the product's
 actual commands in both local gates and CI. Node CI currently uses `npm ci` /
-`npm test`; the local language checker uses `pnpm` when available. pnpm, Yarn,
-and Bun projects need their own setup, lockfile/cache settings, frozen install,
-and test commands. Non-Node products should keep only relevant language checks.
+`npm test`. The local language checker selects pnpm, Yarn, Bun, or npm from the
+repository lockfile and runs only the `lint` / `typecheck` / `test` scripts
+`package.json` declares, reporting anything it could not run under
+`Skipped checks`. pnpm, Yarn, and Bun projects still need their own setup,
+lockfile/cache settings, frozen install, and test commands. Non-Node products should keep only relevant language checks.
 
 ### Minimal workflow starting point
 

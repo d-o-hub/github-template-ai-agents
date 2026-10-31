@@ -95,21 +95,26 @@ scan_find_patterns() {
 }
 
 @test "repo shell scripts have no unquoted find -path/-name glob patterns" {
-    local f out
-    local -a failures=()
-    while IFS= read -r -d '' f; do
-        out=$(scan_find_patterns "$f") || true
-        if [ -n "$out" ]; then
-            failures+=("$out")
-        fi
-    done < <(find "$REPO_ROOT" -type f \
+    local list="$BATS_TEST_TMPDIR/files.list" out
+    find "$REPO_ROOT" -type f \
         \( -name '*.sh' -o -name '*.bats' \) \
         -not -path '*/.git/*' \
         -not -path '*/node_modules/*' \
-        -print0)
-    if [ "${#failures[@]}" -gt 0 ]; then
+        -print0 > "$list"
+
+    # Scan in a plain bash process. bats installs a DEBUG trap and inherits it
+    # into command substitutions, so the same loop that needs ~1s here took
+    # ~50s when each file was scanned from the test body.
+    out=$(bash -c "
+        $(declare -f has_unquoted_glob scan_find_patterns)
+        while IFS= read -r -d '' f; do
+            scan_find_patterns \"\$f\" || true
+        done < \"\$1\"
+    " _ "$list")
+
+    if [ -n "$out" ]; then
         printf 'Unquoted find pattern(s) found (quote the whole -path/-name argument):\n'
-        printf '%s\n' "${failures[@]}"
+        printf '%s\n' "$out"
         return 1
     fi
 }
