@@ -32,6 +32,7 @@ ${BOLD}COMMANDS${NC}
     ${GREEN}doctor${NC}             Environment diagnostics
     ${GREEN}quality${NC}            Run full quality gate
     ${GREEN}validate${NC} [target]  Validation (all, skills, workflows, links, hooks, config, shas, adr, invariants)
+                         'all' runs every target and exits 2 listing any failures
     ${GREEN}analyze${NC}            Codebase analysis
     ${GREEN}fix${NC}               Auto-fix CI loop until green
     ${GREEN}eval${NC} [skill]       Run skill evaluations
@@ -74,13 +75,7 @@ cmd_validate() {
     local target="${1:-all}"
     shift 2>/dev/null || true
     case "$target" in
-        all)
-            bash "$REPO_ROOT/scripts/validate-skills.sh" "$@"
-            bash "$REPO_ROOT/scripts/validate-workflows.sh" "$@"
-            bash "$REPO_ROOT/scripts/validate-links.sh" "$@"
-            bash "$REPO_ROOT/scripts/validate-git-hooks.sh" "$@"
-            bash "$REPO_ROOT/scripts/validate-github-actions-shas.sh" "$@"
-            ;;
+        all)        cmd_validate_all "$@" ;;
         skills)     bash "$REPO_ROOT/scripts/validate-skills.sh" "$@" ;;
         workflows)  bash "$REPO_ROOT/scripts/validate-workflows.sh" "$@" ;;
         links)      bash "$REPO_ROOT/scripts/validate-links.sh" "$@" ;;
@@ -91,6 +86,22 @@ cmd_validate() {
         invariants) bash "$REPO_ROOT/scripts/check-invariants.sh" "$@" ;;
         *)          die "Unknown validate target: $target (use: all, skills, workflows, links, hooks, config, shas, adr, invariants)" ;;
     esac
+}
+
+cmd_validate_all() {
+    local targets=(skills workflows links hooks shas config adr invariants)
+    local failed=()
+    local target
+    for target in "${targets[@]}"; do
+        info "validate: $target"
+        if ! cmd_validate "$target" "$@"; then
+            failed+=("$target")
+        fi
+    done
+    if [[ ${#failed[@]} -gt 0 ]]; then
+        die "validate all: failed targets: ${failed[*]}"
+    fi
+    ok "validate all: ${#targets[@]} targets passed"
 }
 
 cmd_analyze() {

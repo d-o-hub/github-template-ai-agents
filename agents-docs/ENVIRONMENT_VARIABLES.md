@@ -35,6 +35,72 @@ SKIP_TESTS=true ./scripts/quality_gate.sh
 
 ---
 
+### `SKIP_LINT`
+
+**Description**: Skip the lint checks (JavaScript `lint` script, `shellcheck`,
+`markdownlint-cli2`). Each skipped linter is recorded and printed in the
+`⚠ Skipped checks (n)` summary - it never counts as a pass, and strict skip mode
+turns it into a failure.
+
+**Default**: `false`
+
+**Example Usage**:
+
+```bash
+SKIP_LINT=true ./scripts/quality_gate.sh
+```
+
+**When to Use**:
+- Isolating a non-lint failure (links, skills, ADRs) while debugging
+- Editing documentation where a formatter run would only add noise
+
+---
+
+### `SKIP_LINKS`
+
+**Description**: Skip `validate-links.sh`. The skip is recorded as
+`links:validate-links` in the skipped-check summary.
+
+**Default**: `false`
+
+**Example Usage**:
+
+```bash
+SKIP_LINKS=true ./scripts/quality_gate.sh
+```
+
+**When to Use**:
+- Working on link targets that do not exist yet
+- Isolating an unrelated failure without waiting on the full link scan
+
+---
+
+### `QUALITY_GATE_STRICT_SKIPS`
+
+**Description**: Treat any check the quality gate could not run as a failure.
+Without it a missing linter leaves the gate green with a
+`⚠ Skipped checks (n)` line; with it the gate exits `2`. See
+`SCRIPTS.md → Skipped vs. passed checks`.
+
+**Default**: `false`
+
+**Example Usage**:
+
+```bash
+QUALITY_GATE_STRICT_SKIPS=true ./scripts/quality_gate.sh
+```
+
+`./scripts/doctor.sh` honours the same variable: a missing gate tool that would
+be skipped becomes a failed check, so the diagnostics cannot report a healthy
+environment that CI would reject.
+
+**When to Use**:
+- CI, where a runner without a linter must not report a passing gate
+- Verifying the gate itself locally before trusting a green run
+- Checking a fresh clone is actually able to run the gate
+
+---
+
 ### `SKIP_CLIPPY`
 
 **Description**: Skip Clippy linting for Rust projects.
@@ -242,8 +308,11 @@ FORCE_COLOR=0 ./scripts/quality_gate.sh        # Disable colors in terminal
 | Variable | Type | Default | Scope |
 |----------|------|---------|-------|
 | `SKIP_TESTS` | boolean | `false` | Quality gate |
+| `SKIP_LINT` | boolean | `false` | Quality gate |
+| `SKIP_LINKS` | boolean | `false` | Quality gate |
 | `SKIP_CLIPPY` | boolean | `false` | Quality gate (Rust) |
 | `SKIP_GLOBAL_HOOKS_CHECK` | boolean | `false` | Git hooks |
+| `QUALITY_GATE_STRICT_SKIPS` | boolean | `false` | Quality gate |
 | `ATOMIC_COMMIT_TIMEOUT` | integer | `1800` | Git-github-workflow |
 | `ATOMIC_COMMIT_NO_ROLLBACK` | boolean | `0` | Git-github-workflow |
 | `ATOMIC_COMMIT_CI_MODE` | boolean | not set | Git-github-workflow |
@@ -264,6 +333,9 @@ ATOMIC_COMMIT_CI_MODE=true ATOMIC_COMMIT_NO_ROLLBACK=1 ./scripts/quality_gate.sh
 
 # Quick quality check (no tests, no clippy)
 SKIP_TESTS=true SKIP_CLIPPY=true ./scripts/quality_gate.sh
+
+# Debug a link failure without waiting on the linters
+SKIP_LINT=true ./scripts/quality_gate.sh
 
 # Full CI run with extended timeout
 CI=true ATOMIC_COMMIT_TIMEOUT=3600 ./scripts/quality_gate.sh

@@ -9,7 +9,7 @@
 |--------|---------|-------|
 | `agent-toolkit.sh` | Unified CLI — wraps all scripts under one command | `./bin/agent-toolkit help` |
 | `bootstrap.sh` | Single-command first-time setup (skills + hook + validate + gate) | `./scripts/bootstrap.sh` |
-| `doctor.sh` | Environment diagnostics for self-service troubleshooting | `./scripts/doctor.sh` |
+| `doctor.sh` | Environment diagnostics; missing or broken gate tools fail under `QUALITY_GATE_STRICT_SKIPS` | `./scripts/doctor.sh` |
 | `quality_gate.sh` | Multi-language quality gate (lint, test, format) | `./scripts/quality_gate.sh` |
 | `minimal_quality_gate.sh` | Fast-path quality gate for CI debugging | `./scripts/minimal_quality_gate.sh` |
 | `setup-skills.sh` | Create symlinks from `.agents/skills/` to CLI dirs (prunes dangling/orphan/`*-workspace` links) | `./scripts/setup-skills.sh` |
@@ -93,7 +93,7 @@
 | File | Purpose |
 |------|---------|
 | `lib/skill-validation.sh` | Shared skill validation functions (includes the `MAX_SKILL_LINES` warning threshold) |
-| `lib/skill_frontmatter.py` | Dependency-free bounded frontmatter reader and spec/template field checks |
+| `lib/skill_frontmatter.py` | Dependency-free bounded frontmatter reader and spec/template field checks (`--batch` reads SKILL.md paths from stdin, one record per path) |
 | `lib/optional_skills.sh` | Shared default-unlinked skill names for setup and validation |
 | `lib/worktree-manager.sh` | Git worktree management functions |
 | `lib/lang-checks.sh` | Project language detection plus per-language lint/test runners |
@@ -118,6 +118,7 @@
 | `SKIP_LINT` | `false` | Skip linting checks |
 | `SKIP_LINKS` | `false` | Skip link validation |
 | `SKIP_GLOBAL_HOOKS_CHECK` | `false` | Skip git hooks validation |
+| `QUALITY_GATE_STRICT_SKIPS` | `false` | Treat any recorded skip as a failure (CI sets this) |
 | `MAX_SKILL_LINES` | `250` | Max lines per SKILL.md |
 | `CI_STATUS_MAX_AGE_SECONDS` | `86400` | Max accepted age for `.github/ci-status/ci-status.json` `last_run` before freshness check fails |
 | `CI_STATUS_BRANCH` | `main` | Branch used by `check_ci_status_freshness.sh` for optional `gh run list` comparison |
@@ -132,6 +133,45 @@
 | `0` | Success |
 | `1` | Warning / non-critical failure |
 | `2` | Critical failure (blocks commit) |
+| `3` | Check skipped — required tool unavailable; the caller must report it, never count it as a pass |
+
+### Skipped vs. passed checks
+
+A gate that passes must not imply a check ran. `quality_gate.sh` records every
+check it could not run in `SKIPPED_CHECKS` and prints them as one summary line,
+`⚠ Skipped checks (n): ...`, on both the pass and the fail path. Skips cover an
+absent optional tool (`shellcheck`, `markdownlint-cli2`, `cargo`, and `python3`
+for the Gemini TOML and metrics groups) and a `package.json` script the project
+does not declare (`lint`, `typecheck`, `test`).
+
+Helper gates that run as separate processes signal the same condition with
+exit code `3` (`secretlint_gate.sh` does this when `npx` is missing); the gate
+translates that into a skip record. Adopters adding a helper gate should follow
+the same convention instead of exiting `0` when their tool is absent.
+
+The same rule applies one layer up. `make test` prints
+`test: SKIPPED (bats is not installed ...)` rather than a silent successful
+recipe, and the CI `Run BATS tests` step fails when `tests/*.bats` exist but the
+runner is missing — only a repository with no BATS files reports a skip there.
+`scripts/self-fix-loop.sh` warns when it detects a failure category whose fixer
+is not installed, instead of reporting only that no fix was available.
+
+`scripts/doctor.sh` reports the same tools the gate would skip. Its
+`Quality gate tools` section lists `shellcheck`, `markdownlint-cli2`, `npx` and
+`python3`, warns about each absent one by default, and reports a hard `✗` (with a
+non-zero exit) under `QUALITY_GATE_STRICT_SKIPS=true` - otherwise a fresh clone
+could look healthy under exactly the settings that make CI fail. Presence is not
+enough either: each tool is probed (`--version`, `python3 -c 'import json'`), so
+an installed-but-broken binary is always a failure - the gate finds it with
+`command -v`, runs it, and fails without saying why. Tools the gate only needs
+conditionally (`yamllint`, `cargo`) stay in an advisory section.
+
+Because a skip is still exit `0`, a green run can hide one. Set
+`QUALITY_GATE_STRICT_SKIPS=true` to require every check to have actually run:
+the gate then prints `✗ Strict skip mode: n check(s) could not run (...)`, sets
+`FAILED`, and exits `2`. The `Quality Gate` CI job runs with it enabled, so a
+runner missing `shellcheck`, `markdownlint-cli2` or `npx` fails instead of
+passing. Locally, leave it unset unless you are verifying the gate itself.
 
 ## Dependency Map
 

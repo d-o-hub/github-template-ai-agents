@@ -14,10 +14,12 @@ lint: ## Run LOC gate
 	@./scripts/loc_gate.sh
 
 test: ## Run BATS tests
-	@if command -v bats &>/dev/null && [ -d tests ]; then \
-		bats tests/*.bats; \
+	@if ! command -v bats >/dev/null 2>&1; then \
+		echo "test: SKIPPED (bats is not installed - install it to run tests/*.bats)"; \
+	elif [ -z "$$(ls tests/*.bats 2>/dev/null)" ]; then \
+		echo "test: SKIPPED (no tests/*.bats files in this repository)"; \
 	else \
-		echo "No bats or no tests directory"; \
+		bats tests/*.bats; \
 	fi
 
 quality: ## Run quality gate (skip hook check)

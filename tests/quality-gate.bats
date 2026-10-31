@@ -5,6 +5,20 @@
 # Global setup - runs before all tests
 setup_file() {
     export REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
+    cd "$REPO_ROOT" || return 1
+
+    # Several cases below assert only on the output of the default gate run, and
+    # one run costs ~16s. Record it once per file instead of per case; cases that
+    # change the environment still run the gate themselves.
+    GATE_STATUS=0
+    GATE_OUTPUT="$(./scripts/quality_gate.sh 2>&1)" || GATE_STATUS=$?
+    export GATE_OUTPUT GATE_STATUS
+}
+
+# Replay the recording made by setup_file (bats sets $output/$status via `run`).
+use_recorded_gate_run() {
+    output="$GATE_OUTPUT"
+    status="$GATE_STATUS"
 }
 
 # Per-test setup
@@ -47,7 +61,7 @@ setup() {
 
 @test "quality_gate.sh detects shell scripts in repository" {
     # This repository has shell scripts, so shell should be detected
-    run ./scripts/quality_gate.sh
+    use_recorded_gate_run
 
     # Output should mention shell detection
     if [[ ! "$output" =~ "Shell" ]] && [[ ! "$output" =~ "shell" ]]; then
@@ -60,7 +74,7 @@ setup() {
 
 @test "quality_gate.sh detects markdown files in repository" {
     # This repository has markdown files
-    run ./scripts/quality_gate.sh
+    use_recorded_gate_run
 
     # Output should mention markdown detection
     if [[ ! "$output" =~ "Markdown" ]] && [[ ! "$output" =~ "markdown" ]]; then
@@ -73,7 +87,7 @@ setup() {
 
 @test "quality_gate.sh validates skill symlinks" {
     # The script should run validate-skills.sh as part of the gate
-    run ./scripts/quality_gate.sh
+    use_recorded_gate_run
 
     # Check that skills validation is mentioned in output
     [[ "$output" =~ "skill" ]] || [[ "$output" =~ "Validating" ]]
@@ -81,7 +95,7 @@ setup() {
 
 @test "quality_gate.sh validates reference links" {
     # The script should run validate-links.sh as part of the gate
-    run ./scripts/quality_gate.sh
+    use_recorded_gate_run
 
     # Check that link validation is mentioned
     [[ "$output" =~ "link" ]] || [[ "$output" =~ "reference" ]]
@@ -90,7 +104,7 @@ setup() {
 @test "quality_gate.sh exits with code 2 on quality gate failure" {
     # If there are any quality issues, the script should exit with code 2
     # We can't predict if issues exist, so we just verify exit code is valid
-    run ./scripts/quality_gate.sh
+    use_recorded_gate_run
 
     # Exit codes: 0 = success, 2 = quality gate failure
     # Any other code would be unexpected
@@ -136,7 +150,7 @@ setup() {
 }
 
 @test "quality_gate.sh outputs final result banner" {
-    run ./scripts/quality_gate.sh
+    use_recorded_gate_run
 
     # Should have either PASSED or FAILED in output
     [[ "$output" =~ "PASSED" ]] || [[ "$output" =~ "FAILED" ]] || \

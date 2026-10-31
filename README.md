@@ -128,7 +128,10 @@ cleanup, not deletion of the current template's maintainer artifacts. See
 The supplied CI is an example multi-language/template suite, not inferred
 product CI. Replace install/test commands and local gates for your stack.
 Node CI assumes `npm ci` / `npm test`; pnpm, Yarn, and Bun products must adapt
-package-manager setup, lockfiles/caches, and commands. Remove optional workflows
+package-manager setup, lockfiles/caches, and commands. The local checker picks
+the manager from the lockfile, runs only the `lint`/`typecheck`/`test` scripts
+`package.json` defines, and lists anything it could not run under `Skipped
+checks` instead of reporting a clean pass. Remove optional workflows
 carefully, updating required checks and triggers rather than adding generic
 `if: false` guards. CI-status producer steps are embedded in `ci.yml`; deleting
 the status JSON or cleanup workflow alone does not disable them. Details:
