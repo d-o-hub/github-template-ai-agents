@@ -156,3 +156,8 @@
 **Vulnerability:** Custom string parsing in SSRF host normalization omitted shorthand IPv4 formats (e.g. `127.1`, `127.0.1`), allowing SSRF protection bypasses against loopback and private network ranges.
 **Learning:** Custom string manipulation for IP parsing is prone to omitting shorthand IPv4 notation handled natively by OS network stacks and socket resolvers. Standard library socket functions (`socket.inet_aton`) accurately handle all IPv4 variations.
 **Prevention:** Use `socket.inet_aton` for IPv4 host normalization in SSRF validation rather than manual string splitting or regexes.
+
+## 2026-11-04 - Block Cloud Access Key Variations in Path Validation
+**Vulnerability:** Omission of access key prefixes (`access_key`, `access-key`, `accesskey`) in `SENSITIVE_PREFIXES` allowed potential reading, existence probing, or validation of cloud storage and AWS access key files via path validation routines.
+**Learning:** SENSITIVE_PREFIXES must consistently encompass common cloud and storage credential token patterns (`access_key`) across delimiter variations (underscore, hyphen, and contiguous lowercase) alongside API and application keys.
+**Prevention:** Maintain explicit entries for `access_key`, `access-key`, and `accesskey` in sensitive path prefix definitions.
