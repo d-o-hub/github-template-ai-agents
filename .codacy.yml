@@ -70,4 +70,3 @@ engines:
   # severity false positives in test files.  Codacy does not expose SonarPython
   # as a configurable engine — neither .codacy.yml, CLI, nor API can suppress
   # these programmatically.  Manual suppression via Codacy dashboard required.
-  # Manual suppression via the Codacy dashboard is required.
