@@ -340,3 +340,18 @@ def test_run_file_validation_access_key_rejected(tmp_path):
     assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
     assert result.message == "Missing 3 file(s)"  # nosec B101 -- test assertion
     assert result.details == ["Missing: access_key.json", "Missing: access-key.txt", "Missing: accesskey.txt"]  # nosec B101 -- test assertion
+
+
+def test_run_file_validation_client_secret_rejected(tmp_path):
+    """Consumer regression: eval file-validation must reject repo-local client secret file variants."""
+    skill_path = tmp_path / "skill"
+    skill_path.mkdir()
+    (skill_path / "client_secret.json").write_text("test-content", encoding="utf-8")
+    (skill_path / "client-secret.json").write_text("test-content", encoding="utf-8")
+    (skill_path / "clientsecret.txt").write_text("test-content", encoding="utf-8")
+
+    eval_case = {"id": 1, "files": ["client_secret.json", "client-secret.json", "clientsecret.txt"]}
+    result = eval_executors.run_file_validation(eval_case, skill_path, False)
+    assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
+    assert result.message == "Missing 3 file(s)"  # nosec B101 -- test assertion
+    assert result.details == ["Missing: client_secret.json", "Missing: client-secret.json", "Missing: clientsecret.txt"]  # nosec B101 -- test assertion
