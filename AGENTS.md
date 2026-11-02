@@ -58,6 +58,21 @@ metadata, catalogs, safety, and automation—not just product source changes.
 Do not close consumed metadata updates as “no impact.” Details:
 `agents-docs/BEHAVIORAL_DEFAULTS.md`.
 
+## Working Agreement
+
+- **Investigate before editing.** Read the affected code, its tests, and the
+  nearest conventions; confirm the failure or gap with evidence, not assumption.
+- **Smallest complete change.** Fix the requested behavior; do not refactor,
+  rename, or reformat unrelated code in the same change.
+- **Never weaken a check to get green.** Fix the cause of a failing test, lint,
+  or gate; if it is genuinely out of scope, report it instead of deleting or
+  skipping the check.
+- **Verify, then report.** Run the narrowest check that would catch the mistake,
+  then the project gate. State what ran, what was skipped, and what remains
+  unverified; static checks are not behavioral proof.
+- **Stop at irreversible or out-of-scope decisions.** Ask before destructive
+  operations, publishing, or changes that cross the task's stated boundary.
+
 ## Setup
 
 ```bash
