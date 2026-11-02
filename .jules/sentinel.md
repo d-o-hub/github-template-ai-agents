@@ -161,3 +161,8 @@
 **Vulnerability:** Omission of access key prefixes (`access_key`, `access-key`, `accesskey`) in `SENSITIVE_PREFIXES` allowed potential reading, existence probing, or validation of cloud storage and AWS access key files via path validation routines.
 **Learning:** SENSITIVE_PREFIXES must consistently encompass common cloud and storage credential token patterns (`access_key`) across delimiter variations (underscore, hyphen, and contiguous lowercase) alongside API and application keys.
 **Prevention:** Maintain explicit entries for `access_key`, `access-key`, and `accesskey` in sensitive path prefix definitions.
+
+## 2026-11-04 - Unify Client Secret Delimiter Variations in Path Validation
+**Vulnerability:** Omission of hyphenated and contiguous client secret prefixes (`client-secret`, `clientsecret`) in `SENSITIVE_PREFIXES` allowed potential existence probing, reading, or validation of OAuth client secret files using alternate delimiter conventions.
+**Learning:** Common credential prefixes like `client_secret` must consistently cover all delimiter conventions (underscore, hyphen, contiguous) to avoid circumvention through alternative naming schemes.
+**Prevention:** Maintain explicit entries for `client_secret`, `client-secret`, and `clientsecret` in sensitive path prefix definitions.
