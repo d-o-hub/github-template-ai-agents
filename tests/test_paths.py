@@ -124,7 +124,8 @@ def test_validate_safe_path_patterns(tmp_path):
 
     # Prefix matches
     prefix_patterns = [
-        "client_secret", "client_secret_local", "service_account.json", "service-account-key.json",
+        "client_secret", "client_secret_local", "client-secret.json", "clientsecret.txt",
+        "service_account.json", "service-account-key.json",
         "serviceaccount_token.json", "serviceaccount-key.json",
         "workload_identity.json", "workload-identity-key.json", "workloadidentity_token.txt",
         "client_id.json", "client-id.txt", "clientid_secret.json",
