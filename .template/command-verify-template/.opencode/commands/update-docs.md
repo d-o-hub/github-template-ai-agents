@@ -299,7 +299,7 @@ Review `.command-verify.conf`:
 - `scripts/lib/command-categories.sh` - Safety classification
 - `scripts/lib/command-cache.sh` - Cache management
 - `scripts/validate-links.sh` - Link validation
-- `scripts/sync-agents-md.sh` - AGENTS.md synchronization
+- `scripts/check-agents-md-skills.sh` - AGENTS.md skill-table validation
 - `.cache/command-validations/` - Command cache
 - `.command-verify.conf` - Configuration
 
