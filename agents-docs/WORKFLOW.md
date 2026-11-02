@@ -2,6 +2,11 @@
 
 > Detailed workflow procedures referenced by AGENTS.md.
 > Keep procedures here, not in AGENTS.md, to stay within `MAX_LINES_AGENTS_MD=200`.
+>
+> **Adopter note:** This file records the template maintainer's Full-mode
+> workflow, including repository-specific CI details (Codacy, ADR/LESSON
+> references). Downstream products should replace it with their own workflow
+> and required checks; see `ADOPTION_PROFILES.md`.
 
 ## Pre-Existing Issue Resolution
 
