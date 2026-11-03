@@ -355,3 +355,18 @@ def test_run_file_validation_client_secret_rejected(tmp_path):
     assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
     assert result.message == "Missing 3 file(s)"  # nosec B101 -- test assertion
     assert result.details == ["Missing: client_secret.json", "Missing: client-secret.json", "Missing: clientsecret.txt"]  # nosec B101 -- test assertion
+
+
+def test_run_file_validation_master_key_rejected(tmp_path):
+    """Consumer regression: eval file-validation must reject repo-local master key file variants."""
+    skill_path = tmp_path / "skill"
+    skill_path.mkdir()
+    (skill_path / "master_key.json").write_text("test-content", encoding="utf-8")
+    (skill_path / "master-key.txt").write_text("test-content", encoding="utf-8")
+    (skill_path / "masterkey.txt").write_text("test-content", encoding="utf-8")
+
+    eval_case = {"id": 1, "files": ["master_key.json", "master-key.txt", "masterkey.txt"]}
+    result = eval_executors.run_file_validation(eval_case, skill_path, False)
+    assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
+    assert result.message == "Missing 3 file(s)"  # nosec B101 -- test assertion
+    assert result.details == ["Missing: master_key.json", "Missing: master-key.txt", "Missing: masterkey.txt"]  # nosec B101 -- test assertion
