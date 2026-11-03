@@ -51,6 +51,7 @@ ACTIONLINT_SHA_TO_VERSION = {
     "a8ac3eea598697a830f7d8e701fc9fcbfde88974": "v1.80.0",  # tag v1.80.0
     "3cbf14efd750961dba35fccbf00f9e14028cb1f5": "v1.80.2",  # tag v1.80.2
     "48e36f54d8da326b83ab061aee2cc5e01b5ca46f": "v1.80.6",  # peeled tag v1.80.6
+    "619a81ec64ff8c0211cd6146eb2b21e8f1d7f440": "v1.81.1",  # peeled tag v1.81.1
 }
 
 YAML_LINT_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "yaml-lint.yml"
