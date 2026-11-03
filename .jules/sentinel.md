@@ -166,3 +166,8 @@
 **Vulnerability:** Omission of hyphenated and contiguous client secret prefixes (`client-secret`, `clientsecret`) in `SENSITIVE_PREFIXES` allowed potential existence probing, reading, or validation of OAuth client secret files using alternate delimiter conventions.
 **Learning:** Common credential prefixes like `client_secret` must consistently cover all delimiter conventions (underscore, hyphen, contiguous) to avoid circumvention through alternative naming schemes.
 **Prevention:** Maintain explicit entries for `client_secret`, `client-secret`, and `clientsecret` in sensitive path prefix definitions.
+
+## 2026-11-04 - Block Master Key Variations in Path Validation
+**Vulnerability:** Omission of master key prefixes (`master_key`, `master-key`, `masterkey`) in `SENSITIVE_PREFIXES` allowed potential reading, existence probing, or validation of master encryption and application key files via path validation routines.
+**Learning:** SENSITIVE_PREFIXES must consistently cover master credential patterns (`master_key`) across delimiter variations (underscore, hyphen, and contiguous lowercase) alongside private and access keys.
+**Prevention:** Maintain explicit entries for `master_key`, `master-key`, and `masterkey` in sensitive path prefix definitions.
