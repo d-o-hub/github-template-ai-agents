@@ -370,3 +370,38 @@ def test_run_file_validation_master_key_rejected(tmp_path):
     assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
     assert result.message == "Missing 3 file(s)"  # nosec B101 -- test assertion
     assert result.details == ["Missing: master_key.json", "Missing: master-key.txt", "Missing: masterkey.txt"]  # nosec B101 -- test assertion
+
+
+def test_run_file_validation_api_and_app_token_rejected(tmp_path):
+    """Consumer regression: eval file-validation must reject repo-local api and app token files."""
+    skill_path = tmp_path / "skill"
+    skill_path.mkdir()
+    (skill_path / "api_token.txt").write_text("test-content", encoding="utf-8")
+    (skill_path / "api-token.txt").write_text("test-content", encoding="utf-8")
+    (skill_path / "apitoken.txt").write_text("test-content", encoding="utf-8")
+    (skill_path / "app_token.txt").write_text("test-content", encoding="utf-8")
+    (skill_path / "app-token.txt").write_text("test-content", encoding="utf-8")
+    (skill_path / "apptoken.txt").write_text("test-content", encoding="utf-8")
+
+    eval_case = {
+        "id": 1,
+        "files": [
+            "api_token.txt",
+            "api-token.txt",
+            "apitoken.txt",
+            "app_token.txt",
+            "app-token.txt",
+            "apptoken.txt",
+        ],
+    }
+    result = eval_executors.run_file_validation(eval_case, skill_path, False)
+    assert result.status == eval_executors.EvalStatus.FAIL  # nosec B101 -- test assertion
+    assert result.message == "Missing 6 file(s)"  # nosec B101 -- test assertion
+    assert result.details == [
+        "Missing: api_token.txt",
+        "Missing: api-token.txt",
+        "Missing: apitoken.txt",
+        "Missing: app_token.txt",
+        "Missing: app-token.txt",
+        "Missing: apptoken.txt",
+    ]  # nosec B101 -- test assertion
