@@ -21,28 +21,31 @@ run_test() {
     local name="$1"
     local content="$2"
     local expected_fail="$3"
+    local expected_message="${4:-Potential script injection risk detected}"
 
     printf "Test: %s... " "$name"
-    echo "$content" > "$TEST_WF"
+    # Strip the fixture's formatting newline so EOF regressions end on script content.
+    printf '%s' "${content%$'\n'}" > "$TEST_WF"
 
     local output
     output=$("$VALIDATOR" "$TEST_WF" 2>&1)
     local status=$?
 
     if [[ "$expected_fail" == "true" ]]; then
-        if [[ $status -ne 0 ]] && echo "$output" | grep -q "Potential script injection risk detected"; then
-            printf "${GREEN}PASSED${NC}\n"
+        if [[ $status -ne 0 ]] && grep -Fq -- "$expected_message" <<< "$output"; then
+            printf "%bPASSED%b\n" "${GREEN}" "${NC}"
         else
-            printf "${RED}FAILED${NC} (expected detection)\n"
-            echo "$output"
+            printf "%bFAILED%b (expected failure matching %s)\n" \
+                "${RED}" "${NC}" "$expected_message"
+            printf '%s\n' "$output"
             return 1
         fi
     else
         if [[ $status -eq 0 ]]; then
-            printf "${GREEN}PASSED${NC}\n"
+            printf "%bPASSED%b\n" "${GREEN}" "${NC}"
         else
-            printf "${RED}FAILED${NC} (unexpected detection)\n"
-            echo "$output"
+            printf "%bFAILED%b (unexpected detection)\n" "${RED}" "${NC}"
+            printf '%s\n' "$output"
             return 1
         fi
     fi
@@ -115,4 +118,34 @@ jobs:
         run: echo \"\${{ github.event.issue.title }}\"
 " "true"
 
-echo -e \"\n\${GREEN}All workflow validation tests passed!\${NC}\"
+# Test 6: Validate final EOF script block with no following workflow key
+run_test "Allowed final EOF multiline script block" "
+name: EOF Script
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: EOF Script
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log('ok')
+" "false"
+
+# Test 7: Reject invalid final EOF script block with no following workflow key
+run_test "Detected invalid final EOF multiline script block" "
+name: Invalid EOF Script
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invalid EOF Script
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log(
+" "true" "Syntax error in script block"
+
+printf "\n%bAll workflow validation tests passed!%b\n" "${GREEN}" "${NC}"
