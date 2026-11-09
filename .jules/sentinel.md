@@ -171,3 +171,8 @@
 **Vulnerability:** Omission of master key prefixes (`master_key`, `master-key`, `masterkey`) in `SENSITIVE_PREFIXES` allowed potential reading, existence probing, or validation of master key credentials and encryption root key files via path validation routines.
 **Learning:** SENSITIVE_PREFIXES must consistently encompass cryptographic root and master key patterns (`master_key`) across delimiter variations (underscore, hyphen, and contiguous lowercase) alongside private and access keys.
 **Prevention:** Maintain explicit entries for `master_key`, `master-key`, and `masterkey` in sensitive path prefix definitions.
+
+## 2026-11-09 - Block Passcode Prefixes in Path Validation
+**Vulnerability:** Omission of passcode prefixes (`passcode`) in `SENSITIVE_PREFIXES` allowed potential reading, existence probing, or validation of passcode credential files via path validation routines.
+**Learning:** Hardening path validation requires securing passcode and pin authentication secret files alongside password and passwd credentials.
+**Prevention:** Maintain explicit entries for `passcode` in sensitive path prefix definitions.
