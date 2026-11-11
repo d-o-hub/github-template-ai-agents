@@ -191,9 +191,10 @@ phase_monitor_ci() {
         return 0
     fi
     local start_time
-    start_time=$(date +%s)
+    # perf: replace $(date +%s) subshell with native bash $SECONDS to eliminate fork overhead in loop
+    start_time=$SECONDS
     while true; do
-        local elapsed=$(( $(date +%s) - start_time ))
+        local elapsed=$(( SECONDS - start_time ))
         if [[ $elapsed -gt $TIMEOUT ]]; then
             error "Timeout after ${elapsed}s (limit: ${TIMEOUT}s)"
             return 4
@@ -232,7 +233,7 @@ phase_monitor_ci() {
             has_failure=true
         fi
         if [[ "$has_pending" == true ]]; then
-        if [[ $(( $(date +%s) - start_time )) -gt $(( TIMEOUT / 2 )) ]]; then
+            if [[ $(( SECONDS - start_time )) -gt $(( TIMEOUT / 2 )) ]]; then
                 log "Still waiting... (${elapsed}s elapsed)"
             fi
             sleep "$POLL_INTERVAL"
