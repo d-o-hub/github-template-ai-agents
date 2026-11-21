@@ -1,21 +1,19 @@
 {
   "schema_version": 3,
-  "status": "failing",
-  "last_run": "2026-11-11T16:46:25.537775Z",
-  "validated": false,
-  "failing_jobs": [
-    "quality-gate",
-    "test"
-  ],
+  "status": "passing",
+  "last_run": "2026-11-21T10:18:45.761108Z",
+  "validated": true,
+  "failing_jobs": [],
   "skipped_jobs": [],
   "allowed_skips": [],
   "unallowed_skips": [],
-  "cancelled_jobs": [
-    "quality-gate"
-  ],
+  "cancelled_jobs": [],
   "timed_out_jobs": [],
   "unknown_jobs": [],
-  "succeeded_jobs": [],
+  "succeeded_jobs": [
+    "quality-gate",
+    "test"
+  ],
   "advisory_only": true,
-  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/43059887309"
+  "workflow_url": "https://github.com/d-o-hub/github-template-ai-agents/actions/runs/44893437258"
 }
