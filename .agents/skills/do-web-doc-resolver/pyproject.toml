@@ -33,7 +33,7 @@ dependencies = [
 providers = [
     "exa-py>=1.0.0",
     "tavily-python>=0.3.0",
-    "firecrawl-py>=0.0.5",
+    "firecrawl-py>=4.57.0",
 ]
 ml = [
     "sentence-transformers>=5.5.1",

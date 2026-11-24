@@ -52,7 +52,7 @@ def diagnose_firecrawl():
     # Direct API check for headers/schema
     try:
         response = requests.post(
-            "https://api.firecrawl.dev/v1/scrape",
+            "https://api.firecrawl.dev/v2/scrape",
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             json={"url": TEST_URL, "formats": ["markdown"]},
             timeout=20,
