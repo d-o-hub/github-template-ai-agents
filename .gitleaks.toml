@@ -1,13 +1,33 @@
 # .gitleaks.toml
 # Gitleaks configuration for secret scanning
 # For more information, see https://github.com/gitleaks/gitleaks
+#
+# Division of secret-scanning labor:
+# - gitleaks (CI, .github/workflows/gitleaks.yml): full-history scan using the
+#   default rule set (extended below) plus the repo-specific overrides.
+# - secretlint (local gate, scripts/secretlint_gate.sh): working-tree scan with
+#   preset-recommend. The allowlist paths below mirror .secretlintignore so
+#   CI and local verdicts stay aligned instead of diverging in both directions.
+
+[extend]
+useDefault = true
 
 [allowlist]
-description = "Global allowlist"
+description = "Global allowlist (mirrors .secretlintignore so history scans and working-tree scans agree)"
 paths = [
     '''Cargo\.lock''',
     '''package-lock\.json''',
     '''go\.sum''',
+    '''(?:^|/)node_modules/''',
+    '''(?:^|/)target/''',
+    '''(?:^|/)dist/''',
+    '''(?:^|/)tests/fixtures/''',
+    '''.*\.snap$''',
+    '''llms-full\.txt$''',
+    '''llms\.txt$''',
+    '''.*\.(png|svg|ico)$''',
+    '''\.agents/skills/.*/(tests|references)/''',
+    '''(?:^|/)[^/]*-workspace/''',
 ]
 
 [[rules]]

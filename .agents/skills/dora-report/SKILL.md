@@ -18,7 +18,7 @@ Activate when:
 - The user requests a performance audit or "DORA report".
 - Analyzing the impact of new tools or workflows on delivery speed and quality.
 
-## Instructions
+## Metric Definitions
 
 1. **Calculate DORA Metrics**:
    - **Deployment Frequency**: How often code is successfully released to production (or merged to `main` in this template context).

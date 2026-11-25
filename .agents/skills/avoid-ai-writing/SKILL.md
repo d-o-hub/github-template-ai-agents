@@ -1,6 +1,6 @@
 ---
 name: avoid-ai-writing
-description: Audit and rewrite content to remove AI writing patterns ("AI-isms"). Use this skill when asked to "remove AI-isms," "clean up AI writing," "edit writing for AI patterns," "audit writing for AI tells," or "make this sound less like AI." Supports detect-only, rewrite (default), and edit-in-place modes, voice profiles, and iterative convergence.
+description: Audit and rewrite content to remove AI writing patterns ("AI-isms"). Use this skill when asked to "remove AI-isms," "clean up AI writing," "edit writing for AI patterns," "audit writing for AI tells," or "make this sound less like AI." Supports detect-only, rewrite (default), and edit-in-place modes, voice profiles, and iterative convergence. Not for voice-profiles (voice or tone selection).
 category: quality
 license: MIT
 version: "3.10.0"
