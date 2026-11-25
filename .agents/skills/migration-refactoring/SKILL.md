@@ -88,7 +88,7 @@ Old System (read-only) → Data Sync → New System (write)
 
 **When**: Zero-downtime migrations with data changes
 
-See `references/migration-patterns.md` for detailed implementations.
+See `references/migration-catalog.md` §1 (Migration Patterns) for detailed implementations.
 
 ## Breaking Change Analysis
 
@@ -129,7 +129,7 @@ See `references/migration-patterns.md` for detailed implementations.
 - **Go**: `godepgraph`
 - **Rust**: `cargo-deps`
 
-See `references/dependency-analysis.md` for detailed usage.
+See `references/migration-catalog.md` §2 (Dependency Analysis) for detailed usage.
 
 ## Safety Patterns
 
@@ -161,7 +161,7 @@ def test_migration_preserves_properties(data):
 3. Gradually increase to 100%
 4. Rollback if issues detected
 
-See `references/safety-patterns.md` for more patterns.
+See `references/migration-catalog.md` §3 (Safety Patterns) for more patterns. Run `references/migration-safety-checklist.md` before any production migration.
 
 ## Rollback Strategies
 
@@ -171,13 +171,13 @@ See `references/safety-patterns.md` for more patterns.
 | Feature Flag Disable | Gradual rollouts | `USE_NEW_PARSER = False` |
 | Database Rollback | Schema changes with data loss | `ALTER TABLE users DROP COLUMN ...` |
 
-See `references/rollback-strategies.md` for platform-specific guides.
+See `references/migration-catalog.md` §4 (Rollback Strategies) for platform-specific guides.
 
 ## Examples
 
 **React Class to Hooks:** `componentDidMount`/`componentWillUnmount` → `useEffect`, `componentDidUpdate` → `useEffect` with deps, `this.state` → `useState`, `this.props` → destructured.
 
-**Python 2 to 3:** `2to3 -w --output-dir=src_py3 src/` then fix imports, print, string handling. See `references/language-migrations.md`.
+**Python 2 to 3:** `2to3 -w --output-dir=src_py3 src/` then fix imports, print, string handling. See `references/migration-catalog.md` §5 (Breaking Changes) for Python 3.12, Node.js 20, and Java 21 guides.
 
 ## Quality Checklist
 
@@ -212,6 +212,5 @@ See `references/rollback-strategies.md` for platform-specific guides.
 
 ## References
 
-- `references/migration-patterns.md` - Detailed pattern implementations
-- `references/dependency-analysis.md` - Cross-file dependency tracking
-- `references/language-migrations.md` - Framework migration guides
+- `references/migration-catalog.md` - Migration patterns, dependency analysis, safety patterns, rollback strategies, and breaking changes in one consolidated catalog
+- `references/migration-safety-checklist.md` - Pre-migration checklist, language migration checklists, and rollout/rollback gates for standalone use
