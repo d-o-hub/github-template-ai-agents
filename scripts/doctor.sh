@@ -91,11 +91,13 @@ fi
 
 # ---- Symlink support ----
 sect "Symlink support"
-SYMLINK_TEST="$(mktemp -u)"
+SYMLINK_DIR="$(mktemp -d)"
+SYMLINK_TEST="$SYMLINK_DIR/symlink-probe"
 if ln -sf /dev/null "$SYMLINK_TEST" 2>/dev/null; then
-  rm -f -- "$SYMLINK_TEST"
+  rm -rf -- "$SYMLINK_DIR"
   pass "Symlinks supported"
 else
+  rm -rf -- "$SYMLINK_DIR"
   bad "Symlinks not supported - Windows without Developer Mode or WSL2"
 fi
 
@@ -121,7 +123,7 @@ for link in .claude/skills .qwen/skills; do
     eval "$local_shopt"
 
     has_symlinks=0
-    for f in "${symlinks[@]}"; do
+    for f in ${symlinks[@]+"${symlinks[@]}"}; do
       if [[ -L "$f" ]]; then
         has_symlinks=1
         break
@@ -135,7 +137,7 @@ for link in .claude/skills .qwen/skills; do
     fi
     # Fail soft on dangling / workspace / orphan skill links
     dangling=0
-    for sl in "${symlinks[@]}"; do
+    for sl in ${symlinks[@]+"${symlinks[@]}"}; do
       if [[ ! -L "$sl" ]]; then
         continue
       fi
