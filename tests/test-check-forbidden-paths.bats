@@ -8,6 +8,10 @@
 # because a vanished vocabulary must never read as a pass.
 
 setup() {
+    # Hermetic: CI exports GITHUB_BASE_REF job-wide, which would steer every
+    # case into the PR-diff enumeration branch; the CI-mode cases set it
+    # explicitly and stay unaffected.
+    unset GITHUB_BASE_REF
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/.." && pwd)"
     SANDBOX="$(mktemp -d)"
     mkdir -p "$SANDBOX/scripts/lib" "$SANDBOX/config"
