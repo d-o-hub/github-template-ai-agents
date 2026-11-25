@@ -127,7 +127,9 @@ batch_resolve() {
 
         resolve_with_optimization "$query" "$output_file" "$context" &
         pids+=("$!")
-        ((count++))
+        # Not `((count++))`: post-increment yields the old value, so the first bump of a
+        # zero counter returns status 1 and `set -e` kills the loop before any query runs.
+        count=$((count + 1))
 
         if (( count % 5 == 0 )); then
             sleep 2

@@ -47,7 +47,10 @@ fi
 # --- Registry ---------------------------------------------------------------
 declare -a FOLDED_NAMES=()
 declare -a SUCCESSORS=()
-while IFS=$'\t' read -r name successor _origin; do
+# `|| [[ -n "$name" ]]` keeps the body running for a final record that has no
+# trailing newline: read assigns before it reports EOF, so a plain `while read`
+# would drop that row and scan one fewer skill than the registry declares.
+while IFS=$'\t' read -r name successor _origin || [[ -n "$name" ]]; do
     [[ -z "$name" || "$name" == \#* ]] && continue
     FOLDED_NAMES+=("$name")
     SUCCESSORS+=("$successor")
@@ -111,7 +114,7 @@ for i in "${!FOLDED_NAMES[@]}"; do
     NAMES_ALT+="${NAMES_ALT:+|}${escaped}"
 done
 # Word boundaries on both sides so `docs-hook`-style prefixes cannot false-positive.
-readonly NAME_RE="(^|[^a-z0-9-])(${NAMES_ALT})([^a-z0-9-]|\$)"
+readonly NAME_RE="(^|@[^[:space:]/]*/|[^a-z0-9-])(${NAMES_ALT})([^a-z0-9-]|\$)"
 
 declare -a SCAN_FILES=()
 for target in "${TARGETS[@]}"; do
@@ -133,6 +136,8 @@ while IFS= read -r hit; do
     # Capture the name before is_provenance runs: its own [[ =~ ]] test
     # rewrites BASH_REMATCH (and clears it when it does not match).
     name="${BASH_REMATCH[2]}"
+    # An `@scope` opening is a package specifier, not a routing instruction.
+    [[ "${BASH_REMATCH[1]}" == @* ]] && continue
     is_provenance "$line" && continue
     fail "${file#"$REPO_ROOT/"}: references folded skill '${name}' (use '${SUCCESSOR_OF[$name]}')"
     REFERENCES_FOUND=$((REFERENCES_FOUND + 1))
