@@ -33,6 +33,39 @@
         "The agent recommends the correct scope (scripts/AGENTS.md)",
         "The agent mentions the dual-write to LESSONS.md"
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Set up automatic documentation syncing on commit",
+      "expected_output": "Git hook configured to run the post-commit docs sync, regenerating docs surfaces for changed files (git-hook trigger mode of the learn skill, absorbed from docs-hook).",
+      "files": [],
+      "assertions": [
+        "hook triggers on commit events",
+        "regenerates the doc surfaces affected by the change (skill table, LLM context, registry)",
+        "sync completes without ML or logging overhead"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Documentation is out of date after a merge, sync it",
+      "expected_output": "The lightweight docs-sync pass is executed between the correct commits, listing the changed markdown so the affected docs can be updated; the pass is idempotent.",
+      "files": [],
+      "assertions": [
+        "diff is computed between correct commit range",
+        "changed markdown files are identified for the target docs directory",
+        "sync is idempotent"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "The docs hook is slowing down commits, evaluate whether to keep it",
+      "expected_output": "Hook runtime measured, trade-off analysis provided, recommendation to keep with optimization (e.g. DOCS_SYNC_QUIET or scoping the sync), because consistency benefits outweigh seconds of runtime.",
+      "files": [],
+      "assertions": [
+        "hook execution time is measured",
+        "manual sync alternative is evaluated",
+        "consistency benefit outweighs time cost"
+      ]
     }
   ]
 }

@@ -1,1 +1,71 @@
-{"skill_name":"reader-ui-ux","evals":[{"id":1,"prompt":"Build a responsive reader layout with mobile drawer and desktop side panels","expected_output":"Viewport-specific layout with proper breakpoints and spacing","files":[],"assertions":["handles mobile/tablet/desktop","uses deliberate spacing","implements drawer pattern"]},{"id":2,"prompt":"Add localization support to the reader admin panel with locale switcher","expected_output":"Locale catalog integration with fallback strings and switcher component","files":[],"assertions":["extracts strings to catalog","implements fallback","provides locale switcher UI"]},{"id":3,"prompt":"Add ARIA labels and keyboard navigation to the annotation panel","expected_output":"Accessible annotation panel with focus traps and semantic roles","files":[],"assertions":["adds aria-labels","implements focus management","uses semantic HTML"]}]}
+{
+  "skill_name": "reader-ui-ux",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build a responsive reader layout with mobile drawer and desktop side panels",
+      "expected_output": "Viewport-specific layout with proper breakpoints and spacing",
+      "files": [],
+      "assertions": [
+        "handles mobile/tablet/desktop",
+        "uses deliberate spacing",
+        "implements drawer pattern"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Add localization support to the reader admin panel with locale switcher",
+      "expected_output": "Locale catalog integration with fallback strings and switcher component",
+      "files": [],
+      "assertions": [
+        "extracts strings to catalog",
+        "implements fallback",
+        "provides locale switcher UI"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Add ARIA labels and keyboard navigation to the annotation panel",
+      "expected_output": "Accessible annotation panel with focus traps and semantic roles",
+      "files": [],
+      "assertions": [
+        "adds aria-labels",
+        "implements focus management",
+        "uses semantic HTML"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Implement annotation anchoring that survives document version changes",
+      "expected_output": "Multi-signal locator system with position, text, chapterRef, and fallback strategy",
+      "files": [],
+      "assertions": [
+        "locator uses multiple signals for re-anchoring",
+        "fallback chain is exact->fuzzy->chapter->user notice",
+        "serialization uses stable schema"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Fix annotation drift caused by document reformatting",
+      "expected_output": "Re-anchoring logic updated to handle formatting changes with fuzzy text matching",
+      "files": [],
+      "assertions": [
+        "event handlers are cleaned up on unmount",
+        "re-anchoring warns user on fallback",
+        "telemetry logs load failures with trace IDs"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Optimize document rendering performance for large files",
+      "expected_output": "Lazy loading implemented for document assets, single rendition reused, listeners cleaned up",
+      "files": [],
+      "assertions": [
+        "assets are lazy-loaded not eager-loaded",
+        "single rendition instance is reused",
+        "memory leaks are prevented by handler cleanup"
+      ]
+    }
+  ]
+}

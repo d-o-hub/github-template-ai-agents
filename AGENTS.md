@@ -183,7 +183,7 @@ do not inherit them or copied telemetry as product policy.
 |----------|--------|
 | **Agent** | `agentic-abstention`, `delegate`, `implementer`, `intent-classifier`, `jules-delegator` |
 | **Analysis** | `triz-solver` (solve + audit modes, TRIZ contradiction analysis) |
-| **Code Quality** | `codacy`, `code-review-assistant`, `css-render-performance`, `debugger`, `iterative-refinement`, `migration-refactoring`, `shell-script-quality`, `static-analysis` |
+| **Code Quality** | `code-review-assistant`, `css-render-performance`, `debugger`, `iterative-refinement`, `migration-refactoring`, `shell-script-quality`, `static-analysis` |
 | **Compliance** | `eu-ai-act-compliance` |
 | **Database** | `database-devops`, `turso-db` |
 | **DevOps** | `dependency-upgrades`, `dora-report` |
@@ -196,4 +196,4 @@ do not inherit them or copied telemetry as product policy.
 | **Testing** | `nested-build-isolation`, `test-runner`, `testing-strategy` |
 | **Tool** | `agent-browser`, `dist-channel-selection`, `do-web-doc-resolver`, `web-search-researcher` |
 | **UI/UX** | `accessibility-auditor`, `ui-ux-optimize` |
-| **Workflow** | `cicd-pipeline`, `cloudflare-worker-api`, `docs-hook`, `document-rendering-and-locators`, `git-github-workflow`, `goap-agent`, `progressive-delivery`, `pwa-offline-sync`, `reader-ui-ux`, `secure-invite-and-access` |
+| **Workflow** | `cicd-pipeline`, `cloudflare-worker-api`, `git-github-workflow`, `goap-agent`, `progressive-delivery`, `pwa-offline-sync`, `reader-ui-ux`, `secure-invite-and-access` |

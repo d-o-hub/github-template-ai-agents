@@ -59,7 +59,7 @@
 | `bump_patch_version.sh` | Bump the patch version and append a changelog entry (general-purpose consumer utility — **do not run in this repo**, see `TEMPLATE_VERSIONING.md`) | `./scripts/bump_patch_version.sh` |
 | `commit-msg-hook.sh` | Git `commit-msg` hook; enforces commitlint | Installed by `bootstrap.sh` |
 | `pre-commit-hook.sh` | Pre-commit hook template (legacy; `.githooks/` is active) | Via `bootstrap.sh` |
-| `post-commit-docs-sync.sh` | Post-commit hook that lists changed markdown for the `docs-hook` skill | Installed by `bootstrap.sh` |
+| `post-commit-docs-sync.sh` | Post-commit hook that regenerates changed docs for the `learn` skill's git-hook trigger mode | Installed by `bootstrap.sh` |
 | `sha-pin-actions.sh` | SHA-pin GitHub Actions across workflow files | `./scripts/sha-pin-actions.sh [workflow-file]` |
 
 ## Generation and Update Scripts

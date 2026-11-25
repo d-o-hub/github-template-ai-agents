@@ -186,12 +186,12 @@ def test_both_routing_files_are_checked_without_overwriting(repo):
 
 
 def test_optional_link_policy_is_shared_without_demotions(repo):
-    write_skill(repo, "codacy")
+    write_skill(repo, "durable-objects")
     write_skill(repo, "secure-invite-and-access")
     setup = run(repo, "setup-skills.sh", LINK_OPTIONAL="false")
     assert setup.returncode == 0, setup.stderr
     for cli in (".claude", ".qwen"):
-        assert not (repo / cli / "skills/codacy").is_symlink()
+        assert not (repo / cli / "skills/durable-objects").is_symlink()
         assert (repo / cli / "skills/secure-invite-and-access").is_symlink()
     result = run(repo)
     assert result.returncode == 0, result.stdout + result.stderr
@@ -199,7 +199,7 @@ def test_optional_link_policy_is_shared_without_demotions(repo):
     assert run(repo).returncode == 2
     setup = run(repo, "setup-skills.sh", LINK_OPTIONAL="true")
     assert setup.returncode == 0
-    assert (repo / ".qwen/skills/codacy").is_symlink()
+    assert (repo / ".qwen/skills/durable-objects").is_symlink()
     assert run(repo).returncode == 0
 
 

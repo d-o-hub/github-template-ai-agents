@@ -1,17 +1,17 @@
 ---
 name: static-analysis
-version: 1.0.0
+version: 1.1.0
 category: code-quality
-description: Triage and fix static analysis findings across any programming language. Use this skill when running linters (ruff, eslint, clippy, shellcheck), analyzing lint output, fixing warnings or errors, or managing cross-language static analysis results in a project — even if they just say "run the linter" or "fix the lint warnings". Trigger on "lint", "static analysis", "triage warnings", "fix findings". Not for code-review-assistant, security-code-auditor.
+description: Triage and fix static analysis findings across any programming language, including Codacy local analysis and Codacy Cloud queries. Use this skill when running linters (ruff, eslint, clippy, shellcheck), running the Codacy Analysis CLI on staged or PR-scoped changes, or querying Codacy Cloud for remote issues, security findings, and PR results — even if they just say "run the linter", "fix the lint warnings", or "triage the Codacy findings". Trigger on "lint", "static analysis", "triage warnings", "fix findings". Not for code-review-assistant, security-code-auditor.
 license: MIT
 metadata:
   author: opencode
-  lastUpdated: "2026-07-02"
+  lastUpdated: "2026-11-25"
 ---
 
 # Static Analysis & Linter Triage
 
-Expert skill for managing static analysis, PR triage, and linting feedback loops across any programming language.
+Expert skill for managing static analysis, PR triage, and linting feedback loops across any programming language — including the Codacy CLI surface absorbed from the retired codacy skill (ADR-038).
 
 ## Quick Check
 
@@ -27,6 +27,7 @@ Expert skill for managing static analysis, PR triage, and linting feedback loops
 - When CI quality gates or linting workflows fail.
 - During PR reviews to triage static analysis findings.
 - When integrating new languages or linters into a project.
+- Running Codacy analysis locally, or querying Codacy Cloud for issues, security findings, or PR quality data.
 
 ## Pre-commit Workflow
 
@@ -73,7 +74,7 @@ Follow this structured process when responding to analysis findings:
 
 ## Codacy Git-Aware Analysis
 
-Use the Codacy Analysis CLI for targeted pre-commit and PR-scoped analysis:
+Use the Codacy Analysis CLI for targeted pre-commit and PR-scoped analysis (full CLI surface — install, auth, exit codes, cloud-vs-local division — lives in [references/codacy-cli.md](references/codacy-cli.md), absorbed from the codacy skill):
 
 ```bash
 # Pre-commit: analyze only staged files
@@ -104,13 +105,14 @@ codacy-analysis analyze --staged --output-format json | jq '.issues | group_by(.
 codacy-analysis analyze --staged --output-format json | jq '[.issues[] | select(.severity == "Error" or .severity == "High")]'
 ```
 
-## Codacy Integration
+## Codacy Cloud & PR Integration
 
-If `codacy.yml` or a Codacy project exists:
+The Codacy CLI reference (absorbed from codacy, per ADR-038) covers cloud queries: repository reanalysis, issue and security-finding lists, PR summaries with quality gate and coverage deltas, pattern enable/disable, and config import.
 
-1. **Read PR Comments**: Codacy posts findings as PR comments. Treat these as blocking if they are categorized as "Issues".
-2. **Triage via CLI**: Use `codacy pull-request` to fetch and ignore false positives if the dashboard is not accessible.
-3. **Configuration**: Check `.codacy.yml` in the root for project-specific rules.
+- **Read PR Comments**: Codacy posts findings as PR comments. Treat these as blocking if they are categorized as "Issues".
+- **Triage via CLI**: fetch PR data and ignore false positives with the Cloud CLI; CLI ignores require the numeric `resultDataId`, never the issue `hash`.
+- **Cloud data lags HEAD**: issue lists, coverage, and findings reflect the last analyzed commit; configuration changes apply only after reanalysis (`--reanalyze-and-wait`).
+- **Configuration**: check the repo's Codacy YAML config for project-specific rules; local config reaches the cloud only through the documented import flow.
 
 ## Suppression Guidelines
 
@@ -121,7 +123,7 @@ When suppressing a linter finding (e.g., via `eslint-disable`, `noqa`, or `# she
 **Example:**
 
 ```bash
-# shellcheck disable=SC2034: Variable is used in sourced lib -- Jules (2025-05-15)
+# shellcheck disable=SC2034: Variable is used in sourced lib -- Jules (2026-11-25)
 UNUSED_VAR="internal"
 ```
 
@@ -132,6 +134,7 @@ UNUSED_VAR="internal"
 | "Linting slows me down" | Automated linting prevents 80% of trivial PR feedback, saving time in the long run. |
 | "It's just a warning" | Warnings today are bugs tomorrow. Fixing them early maintains a "broken window" free codebase. |
 | "I'll fix it in the next PR" | Technical debt starts with a single "I'll fix it later." Fix it now while the context is fresh. |
+| "The CLI is slow" — better to wait for a dashboard | Local CLI results beat waiting 10+ minutes for a CI failure; the CLI is also scriptable. (absorbed from codacy) |
 
 ## Red Flags
 
@@ -139,12 +142,15 @@ UNUSED_VAR="internal"
 - [ ] Pushing code that fails local `./scripts/quality_gate.sh`.
 - [ ] Ignoring "style" findings that affect readability (e.g., inconsistent naming).
 - [ ] Manually fixing formatting instead of using automated tools.
+- [ ] Suppressing issues as "FalsePositive" without verifying they actually are. (absorbed from codacy)
+- [ ] Using the issue `hash` for CLI suppressions instead of the numeric `resultDataId`. (absorbed from codacy)
+- [ ] Assuming Codacy configuration changes take effect immediately without reanalysis. (absorbed from codacy)
+- [ ] Running full-repo analysis where `--staged`/`--pr` scoping would do. (absorbed from codacy)
 
 ## See Also
 
 - `code-review-assistant` — PR review workflow with code smell detection
-- `codacy` — Local Codacy Analysis CLI for static analysis
-- `codacy` — Codacy CLI for local analysis and cloud data queries
+- Codacy CLI usage — [references/codacy-cli.md](references/codacy-cli.md) (absorbed from codacy, per ADR-038)
 
 ## Voice & Context
 
