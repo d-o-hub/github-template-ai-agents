@@ -110,3 +110,17 @@ write_agents() {
     run diff "$SANDBOX/AGENTS.md.before" "$SANDBOX/AGENTS.md"
     [ "$status" -eq 0 ]
 }
+
+@test "the exit status is the contract: a neutered fail() prints drift and exits 0" {
+    # Same reason as the lessons checker's version of this test: the diagnostics
+    # a human reads and the verdict CI reads are separable, and only asserting the
+    # status catches a refactor that keeps the text while losing the failure.
+    sed -i '/^fail() {$/,/^}$/ s/EXIT_CODE=1/EXIT_CODE=0/' "$SCRIPT"
+    make_skill triz
+    write_agents '# Title' '' '## Skills' '' '| Category | Skills |' '|---|---|' '| **One** | `triz` |' '| **Two** | `triz` |'
+
+    run bash "$SCRIPT"
+    [[ "$output" == *"listed 2 times"* ]]
+    [[ "$output" == *"matches the catalog"* ]]
+    [ "$status" -eq 0 ]
+}

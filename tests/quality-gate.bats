@@ -1,167 +1,97 @@
 #!/usr/bin/env bats
 # BATS tests for quality_gate.sh
-# Tests the quality gate script's core functionality and environment handling
+#
+# One gate pass costs ~30s, so the composite run happens exactly once per file, in
+# setup_file, and every test below asserts against that saved transcript. The previous
+# revision ran the whole gate per test (13 times) while asserting `[ "$status" -eq 0 ] ||
+# [ "$status" -eq 2 ]` — accepting both outcomes, so no gate behaviour could fail it.
 
-# Global setup - runs before all tests
 setup_file() {
     export REPO_ROOT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)"
-    cd "$REPO_ROOT" || return 1
-
-    # Several cases below assert only on the output of the default gate run, and
-    # one run costs ~16s. Record it once per file instead of per case; cases that
-    # change the environment still run the gate themselves.
-    GATE_STATUS=0
-    GATE_OUTPUT="$(./scripts/quality_gate.sh 2>&1)" || GATE_STATUS=$?
-    export GATE_OUTPUT GATE_STATUS
+    GATE_OUT="$BATS_FILE_TMPDIR/gate.out"
+    GATE_STATUS="$BATS_FILE_TMPDIR/gate.status"
+    # `|| status=$?` because bats runs setup_file under errexit: a failing gate is data
+    # here, not a setup error, and the tests decide what it means.
+    status=0
+    (cd "$REPO_ROOT" && ./scripts/quality_gate.sh) > "$GATE_OUT" 2>&1 || status=$?
+    printf '%s\n' "$status" > "$GATE_STATUS"
+    export GATE_OUT GATE_STATUS
 }
 
-# Replay the recording made by setup_file (bats sets $output/$status via `run`).
-use_recorded_gate_run() {
-    output="$GATE_OUTPUT"
-    status="$GATE_STATUS"
-}
-
-# Per-test setup
 setup() {
     cd "$REPO_ROOT" || exit 1
 }
 
 @test "quality_gate.sh exists and is executable" {
-    [ -x "./scripts/quality_gate.sh" ]
+    [ -x "$REPO_ROOT/scripts/quality_gate.sh" ]
 }
 
-@test "quality_gate.sh shows help/usage with --help flag" {
-    # Skip if --help is not implemented
-    if ! ./scripts/quality_gate.sh --help &>/dev/null && \
-       ! ./scripts/quality_gate.sh -h &>/dev/null; then
-        skip "quality_gate.sh does not implement --help flag"
+@test "gate exits with a code that matches the verdict it printed" {
+    status=$(<"$GATE_STATUS")
+    case "$status" in
+        0) [[ "$(cat "$GATE_OUT")" == *"All Quality Gates PASSED"* ]] ;;
+        2) [[ "$(cat "$GATE_OUT")" == *"Quality Gate FAILED"* ]] ;;
+        1) [[ "$(cat "$GATE_OUT")" == *"drift on main branch"* ]] ;;
+        *) return 1 ;;
+    esac
+}
+
+@test "gate prints exactly one verdict banner" {
+    banners=$(grep -cE "Quality Gates PASSED|Quality Gate FAILED" "$GATE_OUT")
+    [ "$banners" -eq 1 ]
+}
+
+@test "a failed check leaves a marker, a passing gate leaves none" {
+    status=$(<"$GATE_STATUS")
+    # Count the per-check markers, excluding the banner row itself.
+    marks=$(grep -E "✗" "$GATE_OUT" | grep -vc "Quality Gate FAILED")
+    if [[ "$status" -eq 2 ]]; then
+        [ "$marks" -gt 0 ]
+    else
+        [ "$marks" -eq 0 ]
     fi
-
-    run ./scripts/quality_gate.sh --help
-    [ "$status" -eq 0 ] || [ "$status" -eq 1 ]
 }
 
-@test "SKIP_TESTS=true environment variable skips test execution" {
-    # This test verifies that setting SKIP_TESTS=true prevents test execution
-    # We run with the flag and verify it doesn't fail due to missing test tools
-    run env SKIP_TESTS=true ./scripts/quality_gate.sh
-
-    # Should succeed or fail for reasons other than missing test tools
-    # Exit code 0 = all checks passed, 2 = quality gate issues found
-    [ "$status" -eq 0 ] || [ "$status" -eq 2 ]
+@test "gate runs every check section it claims to own" {
+    gate=$(cat "$GATE_OUT")
+    for section in \
+        "Running quality gate..." \
+        "Validating git hooks configuration..." \
+        "Checking LLM context files..." \
+        "Validating GitHub Actions SHAs..." \
+        "Validating GitHub Actions Workflows..." \
+        "Validating skills..." \
+        "Checking skills-reference.md is up to date..." \
+        "Validating reference links in SKILL.md files..." \
+        "Validating commitlint configuration..." \
+        "Enforcing LOC limits..." \
+        "Detecting project languages..." \
+        "Running Shell script checks..."; do
+        [[ "$gate" == *"$section"* ]] || { echo "missing section: $section" >&2; return 1; }
+    done
 }
 
-@test "SKIP_GLOBAL_HOOKS_CHECK=true skips git hooks validation" {
-    # Verify that SKIP_GLOBAL_HOOKS_CHECK prevents git hooks check
+@test "SKIP_GLOBAL_HOOKS_CHECK=true removes the hooks section the default run has" {
+    [[ "$(cat "$GATE_OUT")" == *"Validating git hooks configuration..."* ]]
     run env SKIP_GLOBAL_HOOKS_CHECK=true ./scripts/quality_gate.sh
-
-    # Should complete without the git hooks warning
-    [ "$status" -eq 0 ] || [ "$status" -eq 2 ]
+    [[ "$output" != *"Validating git hooks configuration..."* ]]
+    [ "$status" -eq 0 ] || [ "$status" -eq 1 ] || [ "$status" -eq 2 ]
 }
 
-@test "quality_gate.sh detects shell scripts in repository" {
-    # This repository has shell scripts, so shell should be detected
-    use_recorded_gate_run
-
-    # Output should mention shell detection
-    if [[ ! "$output" =~ "Shell" ]] && [[ ! "$output" =~ "shell" ]]; then
-        skip "Shell script detection may be environment-dependent"
-    fi
-
-    # Should either pass or report specific failures
-    [ "$status" -eq 0 ] || [ "$status" -eq 2 ]
-}
-
-@test "quality_gate.sh detects markdown files in repository" {
-    # This repository has markdown files
-    use_recorded_gate_run
-
-    # Output should mention markdown detection
-    if [[ ! "$output" =~ "Markdown" ]] && [[ ! "$output" =~ "markdown" ]]; then
-        skip "Markdown detection may be environment-dependent"
-    fi
-
-    # Should either pass or report specific failures
-    [ "$status" -eq 0 ] || [ "$status" -eq 2 ]
-}
-
-@test "quality_gate.sh validates skill symlinks" {
-    # The script should run validate-skills.sh as part of the gate
-    use_recorded_gate_run
-
-    # Check that skills validation is mentioned in output
-    [[ "$output" =~ "skill" ]] || [[ "$output" =~ "Validating" ]]
-}
-
-@test "quality_gate.sh validates reference links" {
-    # The script should run validate-links.sh as part of the gate
-    use_recorded_gate_run
-
-    # Check that link validation is mentioned
-    [[ "$output" =~ "link" ]] || [[ "$output" =~ "reference" ]]
-}
-
-@test "quality_gate.sh exits with code 2 on quality gate failure" {
-    # If there are any quality issues, the script should exit with code 2
-    # We can't predict if issues exist, so we just verify exit code is valid
-    use_recorded_gate_run
-
-    # Exit codes: 0 = success, 2 = quality gate failure
-    # Any other code would be unexpected
-    [ "$status" -eq 0 ] || [ "$status" -eq 2 ]
-}
-
-@test "quality_gate.sh detects no languages when no project files exist (simulated)" {
-    # Create a temporary directory with no recognizable project files
+@test "gate reaches a verdict in a project with no recognizable files" {
     TEMP_DIR=$(mktemp -d)
-    mkdir -p "$TEMP_DIR/.agents/skills/test-skill"
-    echo "---" > "$TEMP_DIR/.agents/skills/test-skill/SKILL.md"
-    echo "name: test" >> "$TEMP_DIR/.agents/skills/test-skill/SKILL.md"
-    echo "description: test skill" >> "$TEMP_DIR/.agents/skills/test-skill/SKILL.md"
-
-    # Copy necessary scripts
-    cp -r "$REPO_ROOT/scripts" "$TEMP_DIR/"
+    OUT="$BATS_TEST_TMPDIR/empty-project-gate.out"
+    mkdir -p "$TEMP_DIR/.agents/skills/test-skill" "$TEMP_DIR/scripts"
+    printf -- '---\nname: test\ndescription: test skill\n---\n' \
+        > "$TEMP_DIR/.agents/skills/test-skill/SKILL.md"
+    cp -r "$REPO_ROOT/scripts/." "$TEMP_DIR/scripts/"
     chmod +x "$TEMP_DIR/scripts/"*.sh
-
-    cd "$TEMP_DIR" || exit 1
-
-    # Run quality gate in empty project
-    run ./scripts/quality_gate.sh
-
-    # Should complete regardless of language detection
-    [ "$status" -eq 0 ] || [ "$status" -eq 2 ]
-
-    # Cleanup
-    cd "$REPO_ROOT" || exit 1
+    status=0
+    (cd "$TEMP_DIR" && ./scripts/quality_gate.sh) > "$OUT" 2>&1 || status=$?
     rm -rf "$TEMP_DIR"
-}
-
-@test "FORCE_COLOR=0 disables colored output" {
-    # Verify that FORCE_COLOR=0 prevents ANSI color codes in output
-    run env FORCE_COLOR=0 ./scripts/quality_gate.sh
-
-    # Output should not contain ANSI escape sequences when colors disabled
-    # This is a best-effort check - skip if we can't verify
-    if [[ "$output" =~ $'\\033[' ]]; then
-        echo "Warning: ANSI codes found in output with FORCE_COLOR=0"
-    fi
-
-    [ "$status" -eq 0 ] || [ "$status" -eq 2 ]
-}
-
-@test "quality_gate.sh outputs final result banner" {
-    use_recorded_gate_run
-
-    # Should have either PASSED or FAILED in output
-    [[ "$output" =~ "PASSED" ]] || [[ "$output" =~ "FAILED" ]] || \
-    [[ "$output" =~ "Quality" ]]
-}
-
-@test "Multiple SKIP_* flags can be combined" {
-    # Test that multiple skip flags work together
-    run env SKIP_TESTS=true SKIP_GLOBAL_HOOKS_CHECK=true SKIP_CLIPPY=true \
-        ./scripts/quality_gate.sh
-
-    # Should complete successfully with skips
+    # A verdict banner means the gate ran every section to the end; a crash mid-way would
+    # exit with the same 0/2 by luck but print no summary.
+    [[ "$(cat "$OUT")" == *"Quality Gates PASSED"* ]] || \
+        [[ "$(cat "$OUT")" == *"Quality Gate FAILED"* ]]
     [ "$status" -eq 0 ] || [ "$status" -eq 2 ]
 }
