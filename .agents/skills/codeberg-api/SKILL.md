@@ -5,10 +5,11 @@ category: platform
 description: >-
   Interact with Forgejo/Codeberg repositories via the REST API — read or write
   files, manage issues, create pull requests, list branches/tags, search repos,
-  and automate CI/CD workflows. Use this skill when the user wants to interact
-  with a Forgejo or Codeberg repository, even if they just say "read a file from
-  Codeberg" or "create an issue on my Forgejo repo". Not for GitHub (use
-  git-github-workflow) or GitLab (use cicd-pipeline).
+  and trigger existing CI/CD workflow runs via repository dispatch. Use this
+  skill when the user wants to interact with a Forgejo or Codeberg repository,
+  even if they just say "read a file from Codeberg" or "create an issue on my
+  Forgejo repo". Not for GitHub (use git-github-workflow), GitLab, or CI/CD
+  workflow authoring/config (use cicd-pipeline).
 license: MIT
 compatibility: Requires Python 3.10+, httpx or requests. Needs FORGEJO_TOKEN env var for write operations.
 allowed-tools: Bash(python:*|curl:*) Read
@@ -159,37 +160,28 @@ curl "https://codeberg.org/api/v1/repos/{owner}/{repo}/branches"
 | 422 | Validation error | Check request body fields |
 | 429 | Rate limited | Wait and retry with backoff |
 
-## Forgejo Actions (CI/CD)
+## Triggering Forgejo Actions Workflows
 
 Forgejo uses **Forgejo Actions** for CI/CD, fully compatible with GitHub Actions.
+This skill only **triggers runs of existing workflows** via the REST API
+(repository dispatch); authoring and configuring workflows belongs to
+`cicd-pipeline` — reference: `../cicd-pipeline/references/forgejo-actions.md`.
 
-### Workflow Location
+### Dispatch a workflow run
 
-Place workflows in `.forgejo/workflows/` directory.
-
-### Example: Build Workflow
-
-```yaml
-name: Build
-version: "0.2.10"
-on: [push, pull_request]
-jobs:
-  build:
-    runs-on: docker
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run tests
-        run: npm test
-      - name: Build
-        run: npm run build
+```bash
+curl -X POST -H "Authorization: token $FORGEJO_TOKEN" \
+  -H "Content-Type: application/json" \
+  "https://codeberg.org/api/v1/repos/{owner}/{repo}/actions/workflows/{filename}/dispatches" \
+  -d '{"ref":"refs/heads/main"}'
 ```
 
-### Best Practices (2026)
-
-- Use **matrix builds** for parallel testing
-- Enable **caching** for dependencies
-- Use **branch protection** with required workflows
-- Leverage **secrets** for API tokens (`FORGEJO_TOKEN`)
+- The workflow file (in `.forgejo/workflows/`) must declare `on: workflow_dispatch`
+  before it can be dispatched.
+- Pass optional inputs (declared under the workflow's `inputs:` key) in the
+  dispatch request body.
+- Track run progress with `GET /repos/{owner}/{repo}/actions/tasks` or via the
+  repository's Actions tab.
 
 ## Bundled Scripts
 
@@ -198,7 +190,7 @@ jobs:
 ## See Also
 
 - `git-github-workflow` — GitHub workflow and PR lifecycle
-- `cicd-pipeline` — CI/CD pipeline design
+- `cicd-pipeline` — CI/CD pipeline design incl. Forgejo Actions authoring (`../cicd-pipeline/references/forgejo-actions.md`)
 
 ## Rationalizations
 

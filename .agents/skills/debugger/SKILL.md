@@ -2,7 +2,7 @@
 name: debugger
 version: "0.2.10"
 category: code-quality
-description: Diagnose failing builds and runtime errors with root-cause discipline. Use when a build, deploy, or service crashes, or an error appears at runtime — even if they just say "debug this crash" or "why does the server 502". Not for test-runner (failing or flaky tests in a suite), iterative-refinement (repeat-until-pass loops), security-code-auditor (vulnerabilities).
+description: Diagnose failing builds and runtime errors with root-cause discipline. Use when a build, deploy, or service crashes, or an error appears at runtime — even if they just say "debug this crash" or "why does the server 502". Not for test-runner (failing or flaky tests in a suite), cicd-pipeline (CI/CD workflow authoring/config or pipeline failures), iterative-refinement (repeat-until-pass loops), security-code-auditor (vulnerabilities).
 license: MIT
 ---
 
@@ -13,7 +13,7 @@ theories second, fixes last.
 
 ## When to Use
 
-- Build, deploy, or CI pipeline fails
+- Build or deploy failure that needs root-cause diagnosis (CI pipeline failures and workflow authoring → `cicd-pipeline`)
 - Runtime crash, panic, exception, or hang
 - Error output that is cryptic or misleading
 - Even if they just say "debug this crash" or "the build is red"
@@ -55,6 +55,7 @@ theories second, fixes last.
 - `test-runner` — Execute tests and diagnose failures *inside* a test suite
 - `iterative-refinement` — Repeat-until-pass validation loops once the cause is known
 - `security-code-auditor` — Vulnerability analysis, not failure diagnosis
+- `cicd-pipeline` — CI/CD workflow authoring/config and pipeline troubleshooting
 
 ## References
 
