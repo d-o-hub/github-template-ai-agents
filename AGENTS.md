@@ -123,7 +123,7 @@ repository root. Gitleaks runs in CI. Respect task ownership and write boundarie
 
 ## Repository Structure
 
-- `agents-docs/`: Detailed reference; `.agents/skills/`: Canonical skills
+- `agents-docs/`: Detailed reference; `.agents/skills/`: Canonical skills; `tools/`: Embedded tool applications (referenced by skills)
 - `llms.txt` & `llms-full.txt`: Machine-readable project context for LLMs
 - `scripts/`: Setup/validation; `analysis/` & `reports/`: Generated outputs
 - `.claude/`: Agent-specific symlinks (see `scripts/setup-skills.sh`)

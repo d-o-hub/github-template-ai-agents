@@ -1,5 +1,9 @@
 # Provider Cascade Reference
 
+> **Tool location**: The resolver application lives at `tools/web-doc-resolver/`
+> in the repository root (`../../../tools/web-doc-resolver/` relative to this
+> skill's directory); its `scripts/...` invocations below run from there.
+
 ## Overview
 
 The resolver auto-detects input type (URL vs query) and runs a free-first cascade optimized for cost and quality.

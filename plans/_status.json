@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-044"
+    "adr": "adr-045"
   },
   "active_plan": null,
   "phases": [],
@@ -94,6 +94,10 @@
     "adr-043-template-adopter-boundaries.md": {
       "status": "accepted",
       "date": "2026-10-05"
+    },
+    "adr-044-skill-tool-boundary-web-doc-resolver.md": {
+      "status": "accepted",
+      "date": "2026-11-25"
     }
   }
 }

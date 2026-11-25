@@ -65,7 +65,9 @@ jobs:
           hashFiles('requirements.txt') != '' ||
           hashFiles('pyproject.toml') != '' ||
           hashFiles('.agents/skills/*/requirements.txt') != '' ||
-          hashFiles('.agents/skills/*/pyproject.toml') != ''
+          hashFiles('.agents/skills/*/pyproject.toml') != '' ||
+          hashFiles('tools/*/requirements.txt') != '' ||
+          hashFiles('tools/*/pyproject.toml') != ''
 
       - name: Setup Go (if go.mod exists)
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
@@ -84,7 +86,9 @@ jobs:
           hashFiles('requirements.txt') != '' ||
           hashFiles('pyproject.toml') != '' ||
           hashFiles('.agents/skills/*/requirements.txt') != '' ||
-          hashFiles('.agents/skills/*/pyproject.toml') != ''
+          hashFiles('.agents/skills/*/pyproject.toml') != '' ||
+          hashFiles('tools/*/requirements.txt') != '' ||
+          hashFiles('tools/*/pyproject.toml') != ''
 
       - name: Install shellcheck and bats
         run: |
@@ -214,15 +218,15 @@ jobs:
         run: pip install -r requirements.txt
         if: hashFiles('requirements.txt') != ''
 
-      - name: Install dependencies (Python skills)
+      - name: Install dependencies (Python skills and tools)
         run: |
-          for dir in .agents/skills/*/; do
+          for dir in .agents/skills/*/ tools/*/; do
             if [ -f "$dir/requirements.txt" ]; then
               echo "Installing dependencies for $dir..."
               pip install -r "$dir/requirements.txt"
             fi
           done
-        if: hashFiles('.agents/skills/*/requirements.txt') != ''
+        if: hashFiles('.agents/skills/*/requirements.txt') != '' || hashFiles('tools/*/requirements.txt') != ''
 
       - name: Run tests (Node)
         run: npm test
@@ -246,15 +250,15 @@ jobs:
       - name: Run tests (Python root)
         run: pytest tests/ -v
 
-      - name: Run tests (Python skills)
+      - name: Run tests (Python skills and tools)
         run: |
-          for dir in .agents/skills/*/; do
+          for dir in .agents/skills/*/ tools/*/; do
             if [ -f "$dir/pyproject.toml" ]; then
               echo "Running tests for $dir..."
               (cd "$dir" && python -m pytest tests/ -v -m "not live")
             fi
           done
-        if: hashFiles('.agents/skills/*/pyproject.toml') != ''
+        if: hashFiles('.agents/skills/*/pyproject.toml') != '' || hashFiles('tools/*/pyproject.toml') != ''
 
       - name: Run tests (Go)
         run: go test ./...

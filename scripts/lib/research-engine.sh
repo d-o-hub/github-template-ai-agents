@@ -6,7 +6,7 @@ resolve_with_optimization() {
     local query_or_url="$1"
     local output_file="$2"
     local context="${3:-general}"
-    local resolver_dir="${4:-.agents/skills/do-web-doc-resolver}"
+    local resolver_dir="${4:-tools/web-doc-resolver}"
     local profile="${WEB_RESOLVER_PROFILE:-quality}"
 
     local resolve_args=(
