@@ -35,6 +35,14 @@ exclude_paths:
   # subprocess list-form calls, and tempdir fixtures are safe patterns, and
   # excluding the whole tree avoids re-adding a path each time a test is added.
   - "tests/**"
+  # git-github-workflow lib modules: byte-verbatim extractions from run.sh
+  # (2026-11 source split). They carry the skill's long-standing
+  # `local X=$(...)` assignment habits; converting to declare+assign would
+  # change errexit propagation that the verbatim move deliberately
+  # preserves, and the move itself flips these pre-existing warnings into
+  # "new code" findings. Error-severity shell findings are still enforced
+  # locally by the shellcheck gate with zero-new-findings discipline.
+  - ".agents/skills/git-github-workflow/scripts/lib/**"
   # Skill eval fixtures. These are input *data* for an eval case, not code the
   # template ships or executes: run-evals.py only checks that files[] resolves.
   # The database-devops migration also drew a T-SQL-only rule (TSLint wants
