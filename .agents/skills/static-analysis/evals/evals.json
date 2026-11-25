@@ -33,6 +33,39 @@
         "mentions scanning staged changes for secrets",
         "follows the Pre-commit Workflow section's step sequence"
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Run codacy-analysis on my repository and show me the results",
+      "expected_output": "Execute the Codacy Analysis CLI with --output-format json (after init and, if tools are missing, --install-dependencies), parse the JSON output, and present a summary of issues by severity and tool. Exit 1 means findings, exit 2 means an execution error to surface separately.",
+      "files": [],
+      "assertions": [
+        "uses --output-format json",
+        "parses and summarizes results by severity and tool",
+        "distinguishes issue findings (exit 1) from execution errors (exit 2)"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "I want to suppress a Codacy false positive in my Python code",
+      "expected_output": "Identify the numeric resultDataId (never the issue hash), ignore the issue via the Codacy Cloud CLI with an ignore reason (FalsePositive) plus a documented justification comment, following the same [tool-disable] auditability discipline as local suppressions.",
+      "files": [],
+      "assertions": [
+        "uses numeric resultDataId (not the hash string)",
+        "documents the suppression reason",
+        "routes through the Codacy Cloud CLI as documented in references/codacy-cli.md"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "codacy-analysis says tool X is unavailable. How do I fix this?",
+      "expected_output": "First run --inspect to see the remediation suggestion, then use --install-dependencies to install the missing tool into the CLI's managed scope; if a local runtime is genuinely absent, note the cloud-only tool limitation instead of forcing it.",
+      "files": [],
+      "assertions": [
+        "recommends --inspect first",
+        "uses --install-dependencies",
+        "acknowledges local-runtime limitations for cloud-only tools"
+      ]
     }
   ]
 }

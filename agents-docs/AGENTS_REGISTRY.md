@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-10-05 17:18 UTC
+> Last updated: 2026-11-25 19:56 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -37,7 +37,6 @@ See [Creating or Updating Skills](../CONTRIBUTING.md#creating-or-updating-skills
 | `avoid-ai-writing` | `.agents/skills/avoid-ai-writing` | Audit and rewrite content to remove AI writing patterns |
 | `cicd-pipeline` | `.agents/skills/cicd-pipeline` | Design and configure CI/CD pipelines with GitHub Actions, |
 | `cloudflare-worker-api` | `.agents/skills/cloudflare-worker-api` | Structure Worker API routes and handlers. Use this skill |
-| `codacy` | `.agents/skills/codacy` | Use the Codacy CLI for local static analysis and cloud data |
 | `codeberg-api` | `.agents/skills/codeberg-api` | Interact with Forgejo/Codeberg repositories via the REST |
 | `code-review-assistant` | `.agents/skills/code-review-assistant` | Automated code review with PR analysis, change summaries, |
 | `css-render-performance` | `.agents/skills/css-render-performance` | Guide CSS render performance analysis and optimization. Use |
@@ -61,8 +60,10 @@ See [Creating or Updating Skills](../CONTRIBUTING.md#creating-or-updating-skills
 | `jules-delegator` | `.agents/skills/jules-delegator` | Use this skill to delegate complex coding tasks by creating |
 | `learn` | `.agents/skills/learn` | Extract non-obvious session learnings, patterns, and |
 | `lifecycle-management` | `.agents/skills/lifecycle-management` | Manage application lifecycle, error handling, and resource |
+| `local-context-sanitization` | `.agents/skills/local-context-sanitization` | Sanitize sensitive repository context, credentials, and PII |
 | `memory-context` | `.agents/skills/memory-context` | Retrieve semantically relevant past learnings, analysis |
 | `migration-refactoring` | `.agents/skills/migration-refactoring` | Automate complex code migrations and refactorings with |
+| `nested-build-isolation` | `.agents/skills/nested-build-isolation` | Diagnose and safely isolate nested build, test, and |
 | `privacy-first` | `.agents/skills/privacy-first` | Prevent email addresses and personal data from entering the |
 | `progressive-delivery` | `.agents/skills/progressive-delivery` | Remediate a live production failure through a gated loop: |
 | `pwa-offline-sync` | `.agents/skills/pwa-offline-sync` | Design Cache Storage + IndexedDB strategy and sync queue. |

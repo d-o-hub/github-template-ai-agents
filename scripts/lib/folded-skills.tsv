@@ -24,4 +24,5 @@ testdata-builders	testing-strategy	ADR-038
 verification-template	skill-evaluator	ADR-038
 template-version-management	agents-docs/	ADR-038
 anti-ai-slop	avoid-ai-writing	b8970509
-codacy-cloud-cli	codacy	b8970509
+codacy-cloud-cli	static-analysis	b8970509 (re-pointed by ADR-038 fold)
+codacy	static-analysis	ADR-038

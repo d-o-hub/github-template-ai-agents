@@ -10,6 +10,5 @@ SKILLS_OPTIONAL=(
   "document-rendering-and-locators"
   "pwa-offline-sync"
   "cloudflare-worker-api"
-  "codacy"
   "lifecycle-management"
 )

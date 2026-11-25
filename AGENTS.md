@@ -183,7 +183,7 @@ do not inherit them or copied telemetry as product policy.
 |----------|--------|
 | **Agent** | `agentic-abstention`, `delegate`, `implementer`, `intent-classifier`, `jules-delegator` |
 | **Analysis** | `triz-solver` (solve + audit modes, TRIZ contradiction analysis) |
-| **Code Quality** | `codacy`, `code-review-assistant`, `css-render-performance`, `debugger`, `iterative-refinement`, `migration-refactoring`, `shell-script-quality`, `static-analysis` |
+| **Code Quality** | `code-review-assistant`, `css-render-performance`, `debugger`, `iterative-refinement`, `migration-refactoring`, `shell-script-quality`, `static-analysis` |
 | **Compliance** | `eu-ai-act-compliance` |
 | **Database** | `database-devops`, `turso-db` |
 | **DevOps** | `dependency-upgrades`, `dora-report` |
