@@ -90,7 +90,7 @@ for file in "${FILES_TO_UPDATE[@]}"; do
     # and BSD sed, unlike `\|`, whose meaning there is undefined. The replacement-side pipes
     # are literal and need no escaping.
     if [[ "$content" =~ \|\ \`VERSION\`\ \|\ \`[0-9]+\.[0-9]+\.[0-9]+\`\ \| ]]; then
-        _substitute 's/[|] `VERSION` [|] `[0-9]+\.[0-9]+\.[0-9]+` [|]/| `VERSION` | `'"${VERSION}"'` |/g' "$file"
+        _substitute "s/[|] \`VERSION\` [|] \`[0-9]+\\.[0-9]+\\.[0-9]+\` [|]/| \`VERSION\` | \`${VERSION}\` |/g" "$file"
         UPDATED=1
         echo "  Updated table VERSION text in $file"
     fi

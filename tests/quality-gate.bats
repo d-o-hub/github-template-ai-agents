@@ -37,14 +37,18 @@ setup() {
 }
 
 @test "gate prints exactly one verdict banner" {
-    banners=$(grep -cE "Quality Gates PASSED|Quality Gate FAILED" "$GATE_OUT")
+    # grep -c exits 1 on a zero count; the count is the contract, so do not
+    # let a bare assignment abort the case when a crashed run prints no banner.
+    banners=$(grep -cE "Quality Gates PASSED|Quality Gate FAILED" "$GATE_OUT" || true)
     [ "$banners" -eq 1 ]
 }
 
 @test "a failed check leaves a marker, a passing gate leaves none" {
     status=$(<"$GATE_STATUS")
     # Count the per-check markers, excluding the banner row itself.
-    marks=$(grep -E "✗" "$GATE_OUT" | grep -vc "Quality Gate FAILED")
+    # The final grep exits 1 when nothing matched (a green recording has
+    # zero markers); the count, not the exit code, is the contract.
+    marks=$(grep -E "✗" "$GATE_OUT" | grep -vc "Quality Gate FAILED" || true)
     if [[ "$status" -eq 2 ]]; then
         [ "$marks" -gt 0 ]
     else
