@@ -1,7 +1,7 @@
 # Agents Registry
 
 > Auto-generated registry of all sub-agents in this repository.
-> Last updated: 2026-11-25 19:56 UTC
+> Last updated: 2026-11-25 19:58 UTC
 
 This file provides a centralized discovery mechanism for all available sub-agents.
 Agents are organized by CLI tool and purpose.
@@ -45,7 +45,6 @@ See [Creating or Updating Skills](../CONTRIBUTING.md#creating-or-updating-skills
 | `delegate` | `.agents/skills/delegate` | Lightweight retrieval and context agent skill for rapid |
 | `dependency-upgrades` | `.agents/skills/dependency-upgrades` | Perform routine, low-risk dependency version bumps and |
 | `dist-channel-selection` | `.agents/skills/dist-channel-selection` | Guide for selecting the correct distribution channel (npm, |
-| `docs-hook` | `.agents/skills/docs-hook` | Lightweight git hook integration for updating agents-docs |
 | `document-rendering-and-locators` | `.agents/skills/document-rendering-and-locators` | Implement resilient document rendering and annotation |
 | `dogfood` | `.agents/skills/dogfood` | Systematically explore and test a web application to find |
 | `dora-report` | `.agents/skills/dora-report` | Generate monthly DORA and agentic metrics reports. Use this |
