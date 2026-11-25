@@ -49,7 +49,7 @@ ${BOLD}EXAMPLES${NC}
     agent-toolkit setup
     agent-toolkit validate skills
     agent-toolkit quality --verbose
-    agent-toolkit eval codacy
+    agent-toolkit eval static-analysis
     agent-toolkit docs generate
 
 ${BOLD}DOCUMENTATION${NC}
