@@ -341,16 +341,23 @@ fi
 printf "\n"
 
 # --- Secretlint checks ---
-# Raw exit status is needed here: 3 means the helper could not run, which is a
-# skip to report, not the pass that `if ! cmd` would imply.
+# SKIP_SECRETLINT=true is the single sanctioned skip and flows through the
+# skip registry so it stays visible to QUALITY_GATE_STRICT_SKIPS and the
+# skip summary. Raw exit status is still needed for the helper protocol:
+# exit 3 means a helper could not run, which is a skip to report, not the
+# pass that `if ! cmd` would imply.
 if [[ -f ".secretlintrc.json" ]]; then
-    ./scripts/secretlint_gate.sh
-    secretlint_status=$?
-    case "$secretlint_status" in
-        0) ;;
-        3) _skip_check "secret:secretlint" "npx is not installed" ;;
-        *) FAILED=1 ;;
-    esac
+    if [[ "${SKIP_SECRETLINT:-}" == "true" ]]; then
+        _skip_check "secret:secretlint" "SKIP_SECRETLINT=true"
+    else
+        ./scripts/secretlint_gate.sh
+        secretlint_status=$?
+        case "$secretlint_status" in
+            0) ;;
+            3) _skip_check "secret:secretlint" "npx is not installed" ;;
+            *) FAILED=1 ;;
+        esac
+    fi
 fi
 
 # --- Enforce WASM size limits ---

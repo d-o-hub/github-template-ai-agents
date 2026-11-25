@@ -84,16 +84,35 @@ if ! $SILENT; then
     printf "${BLUE}📚 PHASE 1: Command Discovery${NC}\n"
 fi
 
-DISCOVERED_COMMANDS=""
-if [[ -x "./scripts/discover-commands.sh" ]]; then
-    DISCOVERED_COMMANDS=$(./scripts/discover-commands.sh 2>/dev/null | grep -v "^Discovering\|^Command\|^─\|^\$" || printf "")
+# A verification that listed nothing proves nothing: a missing, failing, or unparseable
+# discovery used to fall through to "All commands validated successfully" with a count of 0.
+DISCOVERER="./scripts/discover-commands.sh"
+if [[ ! -x "$DISCOVERER" ]]; then
+    printf "ERROR: %s is missing or not executable; nothing was verified\n" "$DISCOVERER" >&2
+    exit 1
 fi
+
+DISCOVER_RAW=$(mktemp)
+DISCOVER_RC=0
+"$DISCOVERER" > "$DISCOVER_RAW" 2>/dev/null || DISCOVER_RC=$?
+if [[ $DISCOVER_RC -ne 0 ]]; then
+    printf "ERROR: %s exited %s; nothing was verified\n" "$DISCOVERER" "$DISCOVER_RC" >&2
+    rm -f "$DISCOVER_RAW"
+    exit 1
+fi
+DISCOVERED_COMMANDS=$(grep -v "^Discovering\|^Command\|^─\|^\$" "$DISCOVER_RAW" || printf "")
+rm -f "$DISCOVER_RAW"
 
 COMMAND_COUNT=0
 if [[ -n "$DISCOVERED_COMMANDS" ]]; then
     # perf: Use native array length evaluation instead of spawning sub-processes like wc -l
     IFS_BAK="$IFS"; IFS=$'\n'; set -f; _cmd_arr=($DISCOVERED_COMMANDS); set +f; IFS="$IFS_BAK"
     COMMAND_COUNT=${#_cmd_arr[@]}
+fi
+
+if [[ $COMMAND_COUNT -eq 0 ]] && ! $QUICK; then
+    printf "ERROR: discovery returned no commands to verify\n" >&2
+    exit 1
 fi
 
 if ! $SILENT; then
@@ -130,6 +149,9 @@ if ! $SILENT; then
 fi
 
 # PHASE 3: Validation
+# Increment with `VAR=$((VAR + 1))`, never `((VAR++))`: the post-increment evaluates to the
+# *old* value, so the first bump of a zero counter returns status 1 and `set -e` aborts the
+# run mid-loop with no message and exit 1, which reads as a validation failure.
 VALIDATED=0
 CACHE_HITS=0
 declare -a FAILED_COMMANDS=()
@@ -141,7 +163,23 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
     # Format: file\0line\0command\0
     TMP_PARSED_COMMANDS=$(mktemp)
     trap 'rm -f "$TMP_PARSED_COMMANDS"' EXIT ERR
-    printf "%s\n" "$DISCOVERED_COMMANDS" | jq -j 'select(.command != null and .command != "null") | "\(.file // "unknown")\u0000\(.line // 0)\u0000\(.command)\u0000"' 2>/dev/null > "$TMP_PARSED_COMMANDS"
+    PARSE_RC=0
+    printf "%s\n" "$DISCOVERED_COMMANDS" \
+        | jq -j 'select(.command != null and .command != "null") | "\(.file // "unknown")\u0000\(.line // 0)\u0000\(.command)\u0000"' \
+            > "$TMP_PARSED_COMMANDS" 2>/dev/null || PARSE_RC=$?
+    # `set -e` would abort here with jq's status and no message of its own, because jq's
+    # stderr is discarded; name the failure instead of exiting silently.
+    if [[ $PARSE_RC -ne 0 ]]; then
+        printf "ERROR: could not parse the discovered command list (jq exit %s); nothing was verified\n" "$PARSE_RC" >&2
+        exit 1
+    fi
+
+    # jq can succeed while yielding nothing, which happens when the discovery shape changes
+    # and every record loses its .command field. Counting those as verified is a false green.
+    if [[ ! -s "$TMP_PARSED_COMMANDS" ]]; then
+        printf "ERROR: %s commands discovered, none with a .command field; nothing was verified\n" "$COMMAND_COUNT" >&2
+        exit 1
+    fi
 
     while IFS= read -r -d '' file && \
           IFS= read -r -d '' line && \
@@ -156,7 +194,7 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
                 # Check if this command needs invalidation
                 if type should_invalidate_command &> /dev/null; then
                     if ! should_invalidate_command "$cmd" "$file" "$CHANGED_FILES" 2>/dev/null; then
-                        ((CACHE_HITS++))
+                        CACHE_HITS=$((CACHE_HITS + 1))
                         CACHED=true
 
                         # perf: Replace jq subshell with native bash match to eliminate process fork overhead
@@ -177,7 +215,7 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
                         continue
                     fi
                 else
-                    ((CACHE_HITS++))
+                    CACHE_HITS=$((CACHE_HITS + 1))
                     CACHED=true
                     continue
                 fi
@@ -210,7 +248,7 @@ if [[ -n "$DISCOVERED_COMMANDS" ]] && ! $QUICK; then
             save_cached_result "$cmd" "$file" "$line" "$result" 2>/dev/null || true
         fi
 
-        ((VALIDATED++))
+        VALIDATED=$((VALIDATED + 1))
 
         # Track dangerous commands
         if [[ "$category" == "dangerous" ]]; then

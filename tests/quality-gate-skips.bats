@@ -137,17 +137,9 @@ run_lang_checks_without_path() {
     rm -rf "$TEMP_DIR"
 }
 
-@test "secretlint_gate.sh signals a skip with exit 3 when npx is missing" {
-    [[ -f .secretlintrc.json ]] || skip "no .secretlintrc.json in this repository"
-
-    EMPTY_BIN="$(mktemp -d)"
-    run env PATH="$EMPTY_BIN" "$BASH_BIN" ./scripts/secretlint_gate.sh
-    rm -rf "$EMPTY_BIN"
-
-    [ "$status" -eq 3 ]
-    [[ "$output" == *"skipped secret:secretlint"* ]]
-    [[ "$output" != *"secretlint passed"* ]]
-}
+# Direct secretlint_gate.sh npx-missing coverage moved to
+# tests/test-secretlint-gate.bats: a scan that never ran must fail the gate
+# (exit 1), with SKIP_SECRETLINT=true as the single sanctioned skip.
 
 # Build a minimal repository the real quality gate can run in: helper scripts
 # stub to success, package.json declares no lint/typecheck/test scripts, and the
@@ -198,6 +190,29 @@ cleanup_gate_fixture() {
     [[ "$output" == *"Skipped checks"* ]]
     [[ "$output" == *"typescript:lint"* ]]
     [[ "$output" == *"secret:secretlint"* ]]
+
+    cleanup_gate_fixture
+}
+
+@test "quality_gate.sh reports the typescript test step as a skip under SKIP_TESTS" {
+    command -v npm >/dev/null 2>&1 || skip "npm not available for the JS fixture"
+    make_gate_fixture
+
+    # TypeScript detection plus a real test script: with SKIP_TESTS=true the
+    # step must surface as a reported skip, not a silently skipped section
+    # (the rust section skips in place; its skip line is not asserted).
+    mkdir -p "$GATE_FIXTURE/src"
+    printf 'export const probe: number = 1;\n' > "$GATE_FIXTURE/src/index.ts"
+    printf '{"name":"fixture","scripts":{"build":"echo build","test":"exit 0"}}\n' > "$GATE_FIXTURE/package.json"
+
+    cd "$GATE_FIXTURE" || exit 1
+    run env SKIP_GLOBAL_HOOKS_CHECK=true SKIP_TESTS=true GITHUB_REF=refs/heads/main \
+        GITHUB_EVENT_NAME=push GITHUB_EVENT=push ./scripts/quality_gate.sh
+    cd "$REPO_ROOT" || exit 1
+
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"typescript:test"* ]]
+    [[ "$output" == *"SKIP_TESTS=true"* ]]
 
     cleanup_gate_fixture
 }

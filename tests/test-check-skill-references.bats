@@ -79,3 +79,31 @@ teardown() {
     run bash "$SCRIPT"
     [ "$status" -eq 0 ]
 }
+
+@test "scans a registry whose last record has no trailing newline" {
+    printf 'first-row\tfirst-successor\tADR-038\ntriz-analysis\ttriz-solver\tADR-038' \
+        > "$SANDBOX/scripts/lib/folded-skills.tsv"
+    printf -- '- **triz-analysis**: plan\n' > "$SANDBOX/.claude/agents/agent.md"
+
+    run bash "$SCRIPT"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"2 folded names"* ]]
+    [[ "$output" == *"folded skill 'triz-analysis'"* ]]
+}
+
+@test "exempts an @scope npm package specifier" {
+    printf 'codacy-cloud-cli\tcodacy\tb8970509\n' > "$SANDBOX/scripts/lib/folded-skills.tsv"
+    printf -- 'npm install -g @codacy/codacy-cloud-cli\n' > "$SANDBOX/.agents/skills/real-skill/SKILL.md"
+
+    run bash "$SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "still flags the same token when it is not a package specifier" {
+    printf 'codacy-cloud-cli\tcodacy\tb8970509\n' > "$SANDBOX/scripts/lib/folded-skills.tsv"
+    printf -- 'npm install -g codacy-cloud-cli\n' > "$SANDBOX/.agents/skills/real-skill/SKILL.md"
+
+    run bash "$SCRIPT"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"folded skill 'codacy-cloud-cli'"* ]]
+}

@@ -120,6 +120,27 @@ SKIP_CLIPPY=true ./scripts/quality_gate.sh
 
 ---
 
+### `SKIP_SECRETLINT`
+
+**Description**: Skip Secretlint when its runtime (`npx`) is unavailable.
+
+**Default**: `false`
+
+**Example Usage**:
+
+```bash
+SKIP_SECRETLINT=true ./scripts/quality_gate.sh
+```
+
+**When to Use**:
+- Machines or images without Node.js, where the scan cannot start
+- Deliberate offline runs that accept an unscanned gate
+
+Without this variable a missing `npx` fails the gate: having committed to
+`.secretlintrc.json` means a scan that never ran is not a pass.
+
+---
+
 ### `SKIP_GLOBAL_HOOKS_CHECK`
 
 **Description**: Skip validation of global git hooks configuration.
@@ -311,6 +332,7 @@ FORCE_COLOR=0 ./scripts/quality_gate.sh        # Disable colors in terminal
 | `SKIP_LINT` | boolean | `false` | Quality gate |
 | `SKIP_LINKS` | boolean | `false` | Quality gate |
 | `SKIP_CLIPPY` | boolean | `false` | Quality gate (Rust) |
+| `SKIP_SECRETLINT` | boolean | `false` | Quality gate (secret scan) |
 | `SKIP_GLOBAL_HOOKS_CHECK` | boolean | `false` | Git hooks |
 | `QUALITY_GATE_STRICT_SKIPS` | boolean | `false` | Quality gate |
 | `ATOMIC_COMMIT_TIMEOUT` | integer | `1800` | Git-github-workflow |

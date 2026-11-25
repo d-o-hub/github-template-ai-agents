@@ -209,6 +209,8 @@ codacy pull-request gh my-org my-repo <prNumber> --ignore-issue <issueId> --igno
 - [ ] Accepting a validator/normalizer fix without grepping for other copies of the same function
 - [ ] Test cases added for only one entry point when the helper exists behind sync and async paths
 - [ ] Reading the check rollup as the whole CI result — failed workflow runs can sit outside it
+- [ ] A test PR justified by "this had no coverage" while the same unit is tested in another
+      framework the reviewer did not list
 
 ## References
 

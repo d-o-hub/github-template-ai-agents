@@ -313,13 +313,11 @@ phase_analyze_fix() {
         # perf: replace `grep -qiE` subshell with native bash regex match to avoid external fork overhead
         if [[ "$failure_lower" =~ (markdown|md|markdownlint) ]]; then
             log "→ Markdown issue detected"
-            # This repository lints Markdown with markdownlint-cli2; plain
-            # markdownlint is only a fallback for adopters who install it.
             if command -v markdownlint-cli2 &>/dev/null; then
+                # .markdownlint-cli2.jsonc owns globs and ignores; restating
+                # them here drifts. plain markdownlint is no fallback: it
+                # misses the repo's config and adopting its defaults re-drifts.
                 markdownlint-cli2 2>&1 || true
-                fix_applied=true
-            elif command -v markdownlint &>/dev/null; then
-                markdownlint "**/*.md" --ignore node_modules --ignore target 2>&1 || true
                 fix_applied=true
             else
                 warn "Markdown issues detected but no markdownlinter is installed - cannot auto-fix"
