@@ -41,6 +41,20 @@ teardown() {
     [[ "$output" != *"✗"* ]]
 }
 
+@test "CI mode falls back to the work tree when the base ref is unfetchable" {
+    # No origin remote: the base-ref diff and its fetch both fail. The guard
+    # must loudly fall back to the work-tree scan instead of blocking the
+    # pipeline -- and still catch the forbidden path sitting untracked.
+    printf 'SECRET=1\n' > "$SANDBOX/.env"
+
+    run env GITHUB_BASE_REF=refnowhere bash "$SCRIPT"
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"refnowhere unavailable; scanning the work tree"* ]]
+    [[ "$output" == *".env"* ]]
+    [[ "$output" == *"forbidden path"* ]]
+}
+
 @test "fails when a staged path names a forbidden file (.env)" {
     printf 'SECRET=1\n' > "$SANDBOX/.env"
     git -C "$SANDBOX" add .env
