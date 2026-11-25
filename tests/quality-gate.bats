@@ -64,11 +64,13 @@ setup() {
         "Checking LLM context files..." \
         "Validating GitHub Actions SHAs..." \
         "Validating GitHub Actions Workflows..." \
+        "Validating cross-CLI command and agent parity..." \
         "Validating skills..." \
         "Checking skills-reference.md is up to date..." \
         "Validating reference links in SKILL.md files..." \
         "Validating commitlint configuration..." \
         "Enforcing LOC limits..." \
+        "Validating forbidden paths..." \
         "Detecting project languages..." \
         "Running Shell script checks..."; do
         [[ "$gate" == *"$section"* ]] || { echo "missing section: $section" >&2; return 1; }
