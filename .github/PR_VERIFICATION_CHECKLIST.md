@@ -106,6 +106,7 @@ gofmt -w .
 | Integration Tests | ⬜ Pass | Language-specific | ⬜ Maintained |
 | E2E Tests | ⬜ Pass/N/A | Language-specific | ⬜ N/A |
 | Shell Tests (BATS) | ⬜ Pass/N/A | `bats tests/` | ⬜ N/A |
+| Shell Tests (bash suites) | ⬜ Pass/N/A | `bash tests/<name>.sh` | ⬜ N/A |
 
 **Test Commands by Language:**
 
@@ -129,6 +130,9 @@ go test -race ./...
 
 # Shell
 bats tests/
+# Plain bash suites are invisible to both `bats tests/*.bats` and `pytest tests/`,
+# so they need this loop; CI runs them in the `Run tests (Shell scripts)` step.
+for suite in tests/*.sh; do bash "$suite"; done
 ```
 
 **Coverage Requirements:**

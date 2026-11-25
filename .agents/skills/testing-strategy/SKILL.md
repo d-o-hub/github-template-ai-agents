@@ -66,6 +66,12 @@ Integrate testing into CI/CD:
 - Load tests against production data need anonymization — never use real customer data.
 - Mutation testing on legacy code produces many surviving mutants — start with a baseline and improve incrementally.
 - Flaky E2E tests erode trust — quarantine them immediately and fix root cause before re-enabling.
+- "No test exists for X" is a claim about your search, not the suite — prove it twice before
+  writing: by filename across every extension the project uses (`ls tests/*<topic>*`), and by
+  content against the behaviour under test rather than the data file it reads. A source
+  comment saying a check was missing records authoring time, not now.
+- Tests for one unit can exist in two frameworks at once. CI running both keeps a duplicated
+  suite green; the drift cost lands on the next refactor, which updates only one copy.
 
 ## Rationalizations
 
@@ -74,6 +80,7 @@ Integrate testing into CI/CD:
 | "Testing takes too long, I need to ship now" | Skipping tests creates technical debt and leads to regressions that take longer to fix. |
 | "The code is self-explanatory, it doesn't need tests" | Tests document behavior and ensure it stays consistent as code evolves. |
 | "I'll add tests once the feature is 'finished'" | Tests should be written alongside code (TDD/BDD) to ensure the implementation is correct. |
+| "I grepped and found nothing, so this is uncovered" | A content grep for the file a test reads misses fixtures that build their own inputs. Search for the behaviour, in every test language the repo runs. |
 
 ## Red Flags
 
@@ -81,6 +88,7 @@ Integrate testing into CI/CD:
 - [ ] Committing code with failing or bypassed tests
 - [ ] Ignoring flaky tests instead of identifying and fixing the root cause
 - [ ] Running all tests on every change instead of targeted test selection
+- [ ] A new test file whose rationale is "there were no tests here" while another framework already covers it
 
 ## References
 

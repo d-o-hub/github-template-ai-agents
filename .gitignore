@@ -1,4 +1,6 @@
 # Agent tooling
+.qoder/
+.mimocode/
 
 # Dependencies
 node_modules/
@@ -65,7 +67,6 @@ htmlcov/
 pr_body.txt
 pr_*.txt
 *.body.txt
-.mimocode/
 
 # Skill evaluation artifacts
 .agents/skills/*-workspace/
