@@ -117,17 +117,18 @@ claim that every listed skill is unlinked by the current setup script.
 |------|--------|
 | **Cloudflare / edge** | `durable-objects`, `cloudflare-worker-api` |
 | **Turso / LibSQL** | `turso-db` (upstream sync workflow is a separate choice) |
-| **Reader product** | `reader-ui-ux`, `document-rendering-and-locators`, `pwa-offline-sync` |
+| **Reader product** | `reader-ui-ux`, `pwa-offline-sync` |
 | **Compliance / vendors** | `eu-ai-act-compliance`, `codeberg-api` |
 | **Research / browser** | `web-search-researcher`, `do-web-doc-resolver`, `agent-browser`, `dogfood` |
 | **UI specialization** | `ui-ux-optimize`, `accessibility-auditor`, `css-render-performance` |
 
 ### Default-unlinked skills are a separate mechanism
 
-The existing default-unlinked set contains seven names: `eu-ai-act-compliance`,
-`durable-objects`, `reader-ui-ux`, `document-rendering-and-locators`,
-`pwa-offline-sync`, `cloudflare-worker-api`, and `lifecycle-management`.
-(`codacy` was absorbed into `static-analysis` per ADR-038.)
+The existing default-unlinked set contains six names: `eu-ai-act-compliance`,
+`durable-objects`, `reader-ui-ux`, `pwa-offline-sync`,
+`cloudflare-worker-api`, and `lifecycle-management`.
+(`codacy` was absorbed into `static-analysis` and
+`document-rendering-and-locators` into `reader-ui-ux`, per ADR-038.)
 `scripts/setup-skills.sh` skips creating their Claude/Qwen links unless run with
 `LINK_OPTIONAL=true`; setup and validation share
 `scripts/lib/optional_skills.sh` as the manifest for this policy.
