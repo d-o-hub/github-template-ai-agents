@@ -2,7 +2,6 @@
 version: 2
 # Dependabot is configured only for ecosystems that exist in this repo:
 #   - github-actions: SHA-pinned actions in .github/workflows/
-#   - pre-commit:     hooks in .pre-commit-config.yaml
 # Ecosystems previously configured (docker, docker-compose, terraform)
 # were removed because the repo has no Dockerfiles, no docker-compose files,
 # and no Terraform manifests — Dependabot was failing weekly with
@@ -30,17 +29,3 @@ updates:
         update-types:
           - "minor"
           - "patch"
-
-  # Pre-commit hooks
-  - package-ecosystem: "pre-commit"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-      time: "09:00"
-      timezone: "UTC"
-    open-pull-requests-limit: 2
-    labels:
-      - "deps"
-      - "pre-commit"
-    commit-message:
-      prefix: "ci"

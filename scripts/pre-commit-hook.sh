@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Git pre-commit hook.
-# Install: cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# Git pre-commit hook implementation, executed via the .githooks/pre-commit
+# delegator (scripts/bootstrap.sh sets core.hooksPath to .githooks).
 set -euo pipefail
 
 # Get repository root for portable paths
