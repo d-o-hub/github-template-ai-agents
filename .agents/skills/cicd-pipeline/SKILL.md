@@ -143,10 +143,12 @@ bash <(curl -Ls https://coverage.codacy.com/get.sh) final
 - `references/deployment-strategies.md` - Blue-green, canary, and rolling deployments.
 - `references/failure-recovery.md` - Handling pipeline failures and rollbacks.
 - `references/security-scanning.md` - Integrating security tools into pipelines.
+- `references/forgejo-actions.md` - Forgejo Actions workflow authoring, runner labels, and dispatch triggers.
 
 ## See Also
 
 - `git-github-workflow` — Full commit-to-merge lifecycle including CI monitoring (watch mode + failure diagnosis)
+- `codeberg-api` — Trigger existing Forgejo/Codeberg workflow runs via the REST API (repository dispatch)
 
 ## Voice & Context
 

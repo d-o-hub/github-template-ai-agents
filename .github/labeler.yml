@@ -33,7 +33,6 @@ ci:
       - any-glob-to-any-file:
           - '.github/workflows/**/*'
           - '.github/labeler.yml'
-          - '.pre-commit-config.yaml'
 
 # Configuration changes
 config:

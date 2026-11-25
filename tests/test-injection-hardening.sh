@@ -31,7 +31,7 @@ fi
 
 HYPHEN_MD="$TEST_TEMP_DIR/-n.md"
 printf "# Test\n" > "$HYPHEN_MD"
-# In quality_gate.sh: lint_if_changed "$md_file" "markdownlint" "markdownlint.toml" markdownlint -- "$md_file"
+# In quality_gate.sh: lint_batch_if_changed "$md_list" "markdownlint" ".markdownlint-cli2.jsonc" markdownlint-cli2 -- "$md_file"
 if command -v markdownlint &> /dev/null; then
     if markdownlint -- "$HYPHEN_MD" >/dev/null 2>&1; then
         echo "  ✓ Test 1b passed: markdownlint handled hyphenated filename with --"

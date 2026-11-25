@@ -1,6 +1,6 @@
 ---
 name: test-runner
-description: Execute tests, analyze results, and diagnose failures across any testing framework. Use this skill when running test suites, debugging failing tests, or configuring CI/CD testing pipelines — even if they just say "run the tests" or "why is this test failing". Not for debugger (build/deploy/runtime failures outside a suite), testing-strategy.
+description: Execute tests, analyze results, and diagnose failures across any testing framework. Use this skill when running test suites, debugging failing tests, or running suites inside existing CI jobs — even if they just say "run the tests" or "why is this test failing". Not for debugger (build/deploy/runtime failures outside a suite), testing-strategy, or cicd-pipeline (CI/CD pipeline authoring/config).
 version: "0.2.10"
 category: testing
 template_version: "0.2"
@@ -25,7 +25,7 @@ Test Checklist:
 
 - Running test suites
 - Debugging failing tests
-- Setting up CI/CD pipelines
+- Running suites inside existing CI jobs (pipeline authoring → `cicd-pipeline`)
 - Analyzing test coverage
 - Identifying flaky tests
 
@@ -164,7 +164,7 @@ for i in {1..10}; do pytest || echo "Failed run $i"; done
 - [ ] Coverage meets targets
 - [ ] No flaky tests
 - [ ] Test environment documented
-- [ ] CI/CD configured
+- [ ] Suites run green inside existing CI jobs
 - [ ] Clear error messages
 
 ## See Also

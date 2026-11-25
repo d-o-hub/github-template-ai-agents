@@ -5,7 +5,9 @@ all: ci
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-ci: fmt lint test quality
+# Gate runs once: quality_gate.sh already enforces the LOC and markdown gate,
+# so `ci` does not invoke `fmt`/`lint`/`quality` together (that ran it 3x).
+ci: fmt test
 
 fmt: ## Run full quality gate
 	@./scripts/quality_gate.sh

@@ -156,7 +156,6 @@ CHANGELOG.md    text eol=lf merge=union
 # ---------------------------------------------------------------------------
 # GitHub linguist — docs (excluded from language statistics)
 # ---------------------------------------------------------------------------
-SECURITY.md             linguist-documentation=true
 CONTRIBUTING.md         linguist-documentation=true
 CHANGELOG.md            linguist-documentation=true
 README.md               linguist-documentation=true
@@ -164,7 +163,6 @@ NOTICE                  linguist-documentation=true
 AGENTS.md               linguist-documentation=true
 CLAUDE.md               linguist-documentation=true
 GEMINI.md               linguist-documentation=true
-markdownlint.toml       linguist-documentation=true
 opencode.json           linguist-documentation=true
 docs/**                 linguist-documentation=true
 agents-docs/**          linguist-documentation=true
@@ -196,10 +194,8 @@ Cargo.lock              linguist-generated=true
 .gemini             export-ignore
 .opencode           export-ignore
 CONTRIBUTING.md     export-ignore
-SECURITY.md         export-ignore
 CHANGELOG.md        export-ignore
 NOTICE              export-ignore
-markdownlint.toml   export-ignore
 opencode.json       export-ignore
 scripts             export-ignore
 agents-docs         export-ignore

@@ -34,7 +34,7 @@
 | `check-skill-overlap.sh` | Keyless Tier-2 inter-skill similarity (5-gram Jaccard over `SKILL.md` bodies); `--strict` gates | `./scripts/check-skill-overlap.sh [--strict]` |
 | `verify-commands.sh` | Verify slash commands referenced by agents actually resolve | `./scripts/verify-commands.sh` |
 | `discover-commands.sh` | Extract every command from every agent config into one JSON inventory (single awk pass) | `./scripts/discover-commands.sh [-o file] [-f json]` |
-| `eval-skills.sh` | Static schema + input-fixture audit of `evals/evals.json`; gates in `quality_gate.sh` | `./scripts/eval-skills.sh` |
+| `eval-skills.sh` | Static schema + input-fixture audit of `evals/evals.json`; standalone — the gate's eval path is `run-evals.py` (`bin/agent-toolkit eval`) | `./scripts/eval-skills.sh` |
 | `check_ci_status_freshness.sh` | Validate `.github/ci-status/ci-status.json` schema v3, self-consistency, freshness, and optional `gh run list` parity | `./scripts/check_ci_status_freshness.sh` |
 | `update-ci-status.py` | Derive the tri-state CI status artifact; `--check` is the fail-closed gate | `python3 scripts/update-ci-status.py [--check]` |
 | `loc_gate.sh` | Enforce the per-file line limits declared in `AGENTS.md` | `./scripts/loc_gate.sh` |
