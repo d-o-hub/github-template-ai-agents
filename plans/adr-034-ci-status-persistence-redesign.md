@@ -3,7 +3,8 @@
 ## Status
 
 Accepted (2026-09-06, derived from round-4 PR triage and the ci-status loop
-post-mortem; supersedes the operational assumptions of ADR-033)
+post-mortem; supersedes the operational assumptions of ADR-033). Amended
+2026-10-17: decision 3 had regressed and was restored — see the amendment.
 
 ## Context
 
@@ -74,3 +75,44 @@ closed unmerged. Four independent defects compounded:
 - `bats tests/test-check-ci-status-freshness.bats` + workflow-logic: 25/25
 - `pytest tests/` 92/92; shellcheck clean; quality gate passed
 - Live convergence observed for #840 and #842 with zero manual steps.
+
+## Amendment (2026-10-17): decision 3 had regressed; restored
+
+The `Main Branch Protection` ruleset (10252573, update stamp 2026-09-28) carried
+`Codacy Static Code Analysis` in `required_status_checks` again — exactly the
+required-but-never-reporting check this ADR removed in decision 3. With
+`strict_required_status_checks_policy: true`, artifact PR #1016 sat at
+`mergeStateStatus: BLOCKED` with zero commit statuses for ~8.5 hours, and the
+auto-merge armed by `enable_automerge()` could never fire. The loop was silently
+non-convergent again, the same failure mode as #788..#835.
+
+Diagnostic that separated this from the earlier Codacy incidents
+(`codacy pull-request 1016`): `Analysis: Never`, `Analyzing: No`. Human PRs 1018
+and 1022 were analyzed the same day, so Codacy was not globally disabled;
+the bot artifact PR was never ingested at all. See LESSON-046 revision
+(2026-10-17) for the three-state discriminator.
+
+Action taken: `PUT /repos/{owner}/{repo}/rulesets/10252573` with
+`required_status_checks: []`, preserving `strict_required_status_checks_policy`
+and `do_not_enforce_on_create` and every other rule and bypass actor verbatim.
+GitHub accepts an empty list. #1016 moved `BLOCKED` → `CLEAN` within seconds.
+Revert = re-PUT the prior body with the Codacy entry restored (a `/tmp` backup
+was taken at the time; treat it as transient, the JSON is short enough to
+reconstruct from this paragraph).
+
+Two claims this amendment explicitly rejects, because both were investigated and
+disproved:
+
+1. `[skip ci]` was not the cause. It was proposed, edited, and reverted before
+   anything shipped; LESSON-046 had already falsified that attribution in 2026
+   with byte-identical PR titles. The marker stays in the commit message, since
+   it keeps `main`'s artifact merge from re-triggering `ci.yml` (see
+   *Consequences* above, unchanged).
+2. `require_extra_approval_for_unattributed_changes` did not contribute. The
+   bot's unverified commit still produced `reviewDecision: null` and `CLEAN`, so
+   no bypass-actor ruleset change (and no new repository secret) is needed for
+   the artifact loop. That option is withdrawn.
+
+Precondition reaffirmed and still unmet: do not re-add the required check until
+Codacy demonstrably ingests a bot-authored artifact PR. Re-adding it on 2026-09-28
+without that evidence is what re-blocked the loop.

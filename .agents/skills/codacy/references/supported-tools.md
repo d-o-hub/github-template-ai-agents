@@ -1,6 +1,4 @@
-> **Skills:** This reference is used by
-> [codacy-analysis-cli](../SKILL.md) and
-> [codacy-cloud-cli](../SKILL-cloud.md).
+> **Skill:** This reference is used by [codacy](../SKILL.md) for both the Analysis and Cloud CLIs.
 
 # Supported Codacy Tools (v1.4.0/v1.5.0)
 

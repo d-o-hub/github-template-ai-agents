@@ -12,6 +12,10 @@
 # 043..045 were referenced by the rules index but absent from the catalog, and
 # `rg -l lessons.jsonl scripts/ tests/ .github/` returned nothing, so no check
 # existed. LESSONS.md even documented the gap as a known issue while it grew.
+# That search matched the data file, not the behaviour: this checker shipped with
+# tests/test-check-lessons-consistency.bats in the same PR, and reading only the
+# paragraph above as current state (rather than authoring-time state) is how a
+# later PR duplicated that coverage. See LESSON-050.
 #
 # An unreadable input is reported as a failure, never skipped: a check that
 # could not read what it must verify is a false green.

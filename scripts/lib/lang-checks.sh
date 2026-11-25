@@ -87,9 +87,14 @@ _has_package_script() {
 _changed_files_z() {
     local source_files=""
 
+    # --diff-filter=d drops deletions from every branch below: a removed path is not a
+    # lint target, and linters invoked with it fail on "does not exist" (shellcheck exits
+    # 123 through xargs), so a legitimate file removal — a folded skill's SKILL.md, a
+    # retired script — would break the gate for reasons that have nothing to do with style.
+    #
     # In CI PR context, compare against base branch
     if [[ -n "${GITHUB_BASE_REF:-}" ]]; then
-        source_files=$(git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" 2>/dev/null || true)
+        source_files=$(git diff --name-only --diff-filter=d "origin/${GITHUB_BASE_REF}...HEAD" 2>/dev/null || true)
     fi
 
     # Fallback: staged + unstaged changes vs HEAD, plus untracked files so a
@@ -97,7 +102,7 @@ _changed_files_z() {
     if [[ -z "$source_files" ]]; then
         source_files=$(
             {
-                git diff --name-only HEAD 2>/dev/null || true
+                git diff --name-only --diff-filter=d HEAD 2>/dev/null || true
                 git ls-files --others --exclude-standard 2>/dev/null || true
             }
         )

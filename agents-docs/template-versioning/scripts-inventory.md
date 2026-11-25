@@ -12,7 +12,8 @@ This template ships three version-related scripts. All three are **general-purpo
 
 **Behavior:**
 - Reads `VERSION` (validates it's strict semver `X.Y.Z`)
-- For each file in `FILES_TO_UPDATE`, runs sed substitutions on:
+- For each file in `FILES_TO_UPDATE`, runs portable `sed -E` substitutions (written into a
+  temp file, then copied back, so no GNU-only `sed -i` is involved) on:
   - `version-X.Y.Z` badges
   - `Template version: X.Y.Z` text
   - `**Version:** X.Y.Z` text
@@ -24,15 +25,23 @@ This template ships three version-related scripts. All three are **general-purpo
 
 **Consumer-repo behavior:** Updates `README.md`, `QUICKSTART.md`, `agents-docs/MIGRATION.md`, `CHANGELOG.md` to the consumer's `VERSION` value.
 
-**Files updated (as of last edit):**
+**Files updated (mirrors `FILES_TO_UPDATE`):**
 - `README.md`
+- `QUICKSTART.md`
+- `agents-docs/MIGRATION.md`
 - `.template/CHANGELOG-TEMPLATE.md`
 - `agents-docs/VERSION.md`
-- `analysis/SWARM_ANALYSIS.md`
+- `analysis/SWARM_ANALYSIS.md` — absent from this repository, so the script prints
+  `Warning: … not found, skipping` and continues. Kept in the array because consumers may
+  have the file; removing it would change what downstream repos propagate to.
+
+**Test coverage:** `tests/test-propagate-version.bats` — each substitution pattern, the
+`[Unreleased]` insertion (including idempotency and the single-line changelog case), the
+three `VERSION` validation failures, and a guard against re-introducing GNU-only sed.
 
 **Triggers:**
 - Pre-commit hook (when `VERSION` changes)
-- GitHub Actions `version-propagation.yml` (when `VERSION` changes on `main` or `feat/**`)
+- GitHub Actions `version-propagation.yml` (when `VERSION` changes on `main`)
 
 ## `scripts/bump_patch_version.sh`
 

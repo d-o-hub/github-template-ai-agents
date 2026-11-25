@@ -27,7 +27,7 @@ codacy-analysis analyze ./src/api/ --output-format json
 
 ```
 
-Tool IDs are **case-sensitive**. See [references/supported-tools.md](references/supported-tools.md) for the full list.
+Tool IDs are **case-sensitive**. See [references/supported-tools.md](supported-tools.md) for the full list.
 
 ```bash
 

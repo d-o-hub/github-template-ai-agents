@@ -1583,7 +1583,8 @@ Also applied consistently across the frontmatter parsing block by replacing all 
 ### LESSON-046 — A Missing Required Codacy Check Was a Disabled Setting, Not `[skip ci]`
 
 **Date**: 2026-10-02
-**Revised**: 2026-10-04 (root cause corrected — see below)
+**Revised**: 2026-10-04 (root cause corrected — see below); 2026-10-17 (same
+misattribution recurred; third `Analysis: Never` fault state added)
 **Component**: GitHub Actions / branch protection / Codacy
 **Severity**: Medium
 
@@ -1633,6 +1634,41 @@ codacy pull-request <n> --reanalyze
 - Do **not** `git commit --amend` to strip `[skip ci]` and force-push. It was the original prescribed fix here and it is unnecessary: it rewrites history on a false premise, and `[skip ci]` on a bot artifact PR head is deliberate — it stops the `persist-ci-status.sh` loop re-triggering itself.
 - When a PR is `BLOCKED` with all *visible* checks green, diff the displayed check list against the ruleset's required list, then **measure before concluding**. Absence has two very different causes — a disabled setting and ordinary latency — and they need opposite responses.
 - `strict_required_status_checks_policy: true` also reports `BEHIND`, which independently refuses a merge. Update the branch before diagnosing anything else.
+
+**Revision (2026-10-17) — this lesson's own error recurred, and there is a third fault state.**
+
+Eleven days after the correction above, the same false attribution was proposed
+again during #1016 triage: that `[skip ci]` on the artifact commit makes Codacy
+decline to analyze it, so the marker should be dropped from
+`persist-ci-status.sh`'s `TITLE`. Nothing shipped — the earlier byte-identical
+title evidence (#956 never vs #973 arrived) refutes it — but the lesson did not
+prevent the mistake, so the missing discriminator is recorded here.
+
+`codacy pull-request <n>` distinguishes three states, not two:
+
+| `Analysis` | check-run | fault |
+|---|---|---|
+| reported | present | healthy |
+| reported | absent | "Status checks" disabled in the Codacy dashboard (the 2026-10-02 case) |
+| `Never` / `Analyzing: No` | absent, beyond the latency window | Codacy never ingested the PR at all |
+
+PR #1016 was the third state: open since 06:32Z, head pushed 10:59Z, still
+`Analysis: Never` at ~1h50m — outside the 8–26 minute band, so latency is ruled
+out. Human PRs #1018 and #1022 were analyzed the same day, so the integration
+was not globally disabled either.
+
+The proximate cause was protection configuration, not the commit: `Codacy Static
+Code Analysis` had been re-added to `required_status_checks` in ruleset 10252573
+(update stamp 2026-09-28), reversing ADR-034 decision 3 despite that ADR's
+explicit precondition. Removing the required entry again moved #1016 from
+`BLOCKED` to `CLEAN` within seconds, with `[skip ci]` untouched. Note that
+`require_extra_approval_for_unattributed_changes` did **not** contribute: the
+bot's unverified commit still yielded `reviewDecision: null` and `CLEAN`.
+
+Unresolved on purpose: *why* Codacy never ingests these bot artifact PRs is a
+dashboard-side question still unproven. Until it is answered and demonstrated on
+a bot-authored PR, ADR-034's precondition for re-adding the required check is
+unmet — record that before anyone re-adds it "because Codacy works again".
 
 **Tags**: #github-actions #ci #codacy #branch-protection #required-checks #latency
 
@@ -1831,3 +1867,40 @@ checks against the commit that would actually merge.
 
 See also `LESSON-022` (duplicate automation), `LESSON-047`
 (parallel validators must agree), `LESSON-048` (static PASS is not behavioral proof).
+
+### LESSON-050 — "There is no test for X" needs two independent searches, not one
+
+**Date:** 2026-10-17
+
+**Issue:** PR #1022 added `tests/test_gate_validator_mutations.py` with the stated premise
+that `check-lessons-consistency.sh` and `check-agents-md-skills.sh` "had no test". Both had
+one. `tests/test-check-lessons-consistency.bats` (10 cases) and
+`tests/test-check-agents-md-skills.bats` (9 cases) landed on 2026-10-03 in #969 and #963 and
+were present at #1022's base commit. Eight of the nine new cases restated assertions that
+already existed, in a second framework, for the same two shell scripts. The PR passed CI —
+`Run Tests` executes `pytest tests/` and `bats tests/*.bats`, so both copies ran side by
+side, green.
+
+**Root Cause:** The absence claim came from one search path plus one stale document. The
+search grepped the *data files* (`rg -l lessons.jsonl scripts/ tests/ .github/`), which does
+not match a bats fixture that inlines its own `LESSONS.md` sandbox; the document was the
+checker's own header comment saying "no check existed", which recorded state at authoring
+time and was never invalidated when the check shipped. Neither is proof of absence. The
+repo's own rule was skipped too: ADR-035 says prefer extending existing work over
+duplicates, and it was applied to the open-PR queue (`gh pr diff --name-only`) but never to
+the test corpus. The result is exactly the shape LESSON-049 describes — two copies asserting
+one behavior, free to drift, with the next refactor updating only one.
+
+**Solution:** Delete the duplicate file, keep the one case with no bats equivalent, and put
+it where the neighbours live. That case is now
+"the exit status is the contract: a neutered fail() prints drift and exits 0" in both bats
+files: disabling `fail()` leaves every diagnostic line intact while the verdict flips green,
+which is why each assertion in these files pins `$status` rather than the printed text.
+
+Before writing a test that claims a gap, prove the gap twice: by filename across every
+extension the project uses (`ls tests/*<topic>*`), and by content against the *behaviour*
+under test rather than the file it reads (`grep -rl <script-name> tests/`). A header comment
+describing a missing check is evidence that it was missing, not that it still is.
+
+See also `LESSON-049` (duplicated validators diverge), `LESSON-048` (static PASS is not
+behavioral proof), `LESSON-022` (duplicate automation).

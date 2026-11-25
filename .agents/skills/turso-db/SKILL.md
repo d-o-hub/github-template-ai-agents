@@ -211,6 +211,7 @@ Official docs: **<https://docs.turso.tech>** (Mintlify — append `.md` to any U
 | `references/mvcc.md` | MVCC: BEGIN CONCURRENT, snapshot isolation, conflict handling |
 | `references/encryption.md` | Page-level encryption: ciphers, key setup, URI format |
 | `references/sync.md` | Remote sync: push/pull, conflict resolution, bootstrap, WAL streaming |
+| `references/llms.txt` | Verbatim mirror of Turso's own docs index (<https://docs.turso.tech/llms.txt>) — link catalogue, not template-authored content; refresh by re-fetching, do not hand-edit |
 | `sdks/javascript.md` | @tursodatabase/database: connect, prepare, run/get/all/iterate |
 | `sdks/serverless.md` | @tursodatabase/serverless: fetch()-based driver for Turso Cloud, edge/serverless |
 | `sdks/wasm.md` | @tursodatabase/database-wasm: browser WASM, OPFS, sync-wasm |

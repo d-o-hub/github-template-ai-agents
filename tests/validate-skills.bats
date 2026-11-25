@@ -12,16 +12,24 @@
 }
 
 @test "validate-skills.sh detects broken symlinks" {
-    # Create a broken symlink in .claude/skills/
-    ln -sf /nonexistent/path .claude/skills/test-broken-symlink 2>/dev/null || true
-    
-    run ./scripts/validate-skills.sh
-    
-    # Clean up
-    rm -f .claude/skills/test-broken-symlink
-    
-    # Should detect the broken symlink
-    [ "$status" -ne 0 ] || [ "$output" != "" ]
+    # Hermetic: the broken symlink lives in a sandboxed farm, not the live
+    # .claude/skills. An interrupted run must never leave a farm-dir orphan
+    # behind; even if teardown never fires, the residue stays under mktemp.
+    SANDBOX="$(mktemp -d)"
+    mkdir -p "$SANDBOX/scripts" "$SANDBOX/.agents/skills/demo-skill" "$SANDBOX/.claude/skills"
+    cp scripts/validate-skills.sh "$SANDBOX/scripts/"
+    cp -r scripts/lib "$SANDBOX/scripts/lib"
+    printf -- '---\nname: demo-skill\ndescription: demo\n---\n' > "$SANDBOX/.agents/skills/demo-skill/SKILL.md"
+    ln -s ../../.agents/skills/demo-skill "$SANDBOX/.claude/skills/demo-skill"
+    ln -sf /nonexistent/path "$SANDBOX/.claude/skills/test-broken-symlink"
+
+    run env bash "$SANDBOX/scripts/validate-skills.sh"
+
+    # Either fails outright or names the damage. Either way no live-tree
+    # fixture ever existed.
+    [ "$status" -ne 0 ] || { [ -n "$output" ] && echo "$output" | grep -qi "symlink\|broken\|demo"; }
+
+    rm -rf "$SANDBOX"
 }
 
 @test "All skill directories have SKILL.md" {
