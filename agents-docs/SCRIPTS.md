@@ -41,6 +41,8 @@
 | `wasm_size_gate.sh` | Enforce WASM binary size limits | `./scripts/wasm_size_gate.sh` |
 | `check-skill-references.sh` | Fail when a live agent/skill surface references a folded skill name (`scripts/lib/folded-skills.tsv`) | `./scripts/check-skill-references.sh` |
 | `check-agents-md-skills.sh` | Verify the AGENTS.md skill table matches `.agents/skills/` (the table is hand-curated, so it is checked, not generated) | `./scripts/check-agents-md-skills.sh` |
+| `check-forbidden-paths.sh` | Fail-closed commit guard over changed paths (staged → work tree+untracked → CI base diff) whose file name matches the paths.py vocabulary (`.env` variants, sops files, service-account keys, SSH keys); missing or empty `scripts/lib/paths.py` fails, not skips | `./scripts/check-forbidden-paths.sh` |
+| `check-cli-parity.sh` | Cross-CLI drift guard: command and agent names across `.claude`, `.opencode`, `.gemini` are compared against their union; `.claude/commands`, `.opencode/commands`, `.gemini/commands` are required inputs, agent dirs join when present | `./scripts/check-cli-parity.sh` |
 | `check-lessons-consistency.sh` | Fail when `LESSONS.md`, `lessons.jsonl` and `self-learning-rules.md` disagree on which lessons exist | `./scripts/check-lessons-consistency.sh` |
 | `secretlint_gate.sh` | Runs secretlint when `.secretlintrc.json` exists; fails closed if `npx` is missing (`SKIP_SECRETLINT=true` to skip) | `./scripts/secretlint_gate.sh` |
 | `detect-duplicate-prs.sh` | Detect and defuse duplicate open PRs (ADR-035 guard) | `./scripts/detect-duplicate-prs.sh` |

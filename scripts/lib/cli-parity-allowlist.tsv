@@ -1,0 +1,65 @@
+# CLI parity allowlist — sanctioned per-CLI exclusions.
+#
+# check-cli-parity.sh diffs the command/agent NAME sets of .claude,
+# .opencode and .gemini against their union. A name the union contains
+# that a CLI lacks is drift unless a row below sanctions it:
+#     name<TAB>cli<TAB>reason
+# cli is the CLI that is EXCLUDED from providing the name (claude |
+# opencode | gemini). Reasons are mandatory and travel with the row: a
+# sanctioned drift must explain itself, because every row is also a
+# candidate for deletion once the gap closes. Stale rows (nothing to
+# exclude) are reported as warnings, not failures. Seeded 2026-11 with
+# the drift that existed before this guard: these rows describe today's
+# template, they do not endorse the shape of it.
+
+atomic-commit	claude	opencode redirect stub for the fold into git-github-workflow; claude invokes the git-github-workflow skill instead
+git-github-workflow	claude	workflow lives as the git-github-workflow skill plus scripts, which claude routes by description
+github-workflow	claude	opencode alias of git-github-workflow; claude has no alias surface
+resume	claude	opencode session-resume command; claude and gemini read plans/_status.json via the goap-agent surface
+self-fix-loop	claude	loop driven by scripts/self-fix-loop.sh; claude reaches it through the lifecycle-management/iterative-refinement skills
+swarm-analyze	claude	swarm entry point routed through the analyze-codebase script and goap-agent skill on claude
+swarm-web-research	claude	web-research swarm entry; claude routes through research skills and swarm-worktree-web-research.sh
+update-docs	claude	docs refresh orchestrated by scripts/update-all-docs.sh; claude runs the script via the docs-hook skill
+verify-commands	claude	command verification driven by scripts/verify-commands.sh; claude reaches it through skills
+adr	claude	gemini TOML prompt that chains triz-solver + ADR writing; claude uses the triz-solver and goap-agent skills directly
+build	claude	gemini TOML prompt wrapping test-driven-development + incremental-implementation skills
+planning	claude	gemini TOML prompt wrapping the goap-agent skill
+review	claude	gemini TOML prompt wrapping the code-review-assistant skill
+test	claude	gemini TOML prompt wrapping testing-strategy/test-runner skills
+refactor	opencode	claude-native /refactor prompt command; opencode refactors via migration-refactoring skill routing
+adr	opencode	gemini TOML prompt that chains triz-solver + ADR writing; opencode uses the skills directly
+build	opencode	gemini TOML prompt wrapping test-driven-development + incremental-implementation skills
+planning	opencode	gemini TOML prompt wrapping the goap-agent skill
+review	opencode	gemini TOML prompt wrapping the code-review-assistant skill
+test	opencode	gemini TOML prompt wrapping testing-strategy/test-runner skills
+atomic-commit	gemini	opencode redirect stub for the fold into git-github-workflow; new dialects get the skill, not the stub
+git-github-workflow	gemini	workflow lives as the git-github-workflow skill plus scripts; gemini routes by description
+github-workflow	gemini	opencode alias of git-github-workflow; gemini has no alias surface
+resume	gemini	opencode session-resume command; gemini reads plans/_status.json via the /planning prompt
+self-fix-loop	gemini	loop driven by scripts/self-fix-loop.sh; gemini reaches it through the lifecycle-management skill
+swarm-analyze	gemini	swarm entry point routed through analyze-codebase script and goap-agent skill on gemini
+swarm-web-research	gemini	web-research swarm entry; gemini research routes through its researcher agent and skills
+update-docs	gemini	docs refresh orchestrated by scripts/update-all-docs.sh; gemini runs the script via the docs-hook skill
+verify-commands	gemini	command verification driven by scripts/verify-commands.sh; gemini reaches it through skills
+refactor	gemini	claude-native /refactor prompt command; gemini refactors via skills
+create-agent	claude	opencode mirror of claude agent-creator, named per its native convention
+delegate	claude	opencode lightweight retrieval subagent; claude routes lookups through its skills and goap-agent
+git-worktree-manager	claude	subagent wrapper of scripts/lib/worktree-manager.sh; claude drives scripts/lib/worktree-manager.sh directly
+github-action-editor	claude	subagent for workflow editing; claude routes through cicd-pipeline and pipeline skills
+implementer	claude	subagent counterpart of the implementer skill; claude invokes the skill directly
+perplexity-researcher-pro	claude	perplexity-model subagents; claude research uses web-research skills on its providers
+perplexity-researcher-reasoning-pro	claude	perplexity-model subagents; claude research uses web-research skills on its providers
+researcher	claude	gemini research agent built on gemini-CLI google_search tools
+agent-creator	opencode	claude-native agent-authoring helper; opencode ships create-agent instead
+loop-agent	opencode	claude iterative-refinement companion; opencode drives the same loop through the iterative-refinement skill
+researcher	opencode	gemini research agent built on gemini-CLI google_search tools
+agent-creator	gemini	claude-native agent-authoring helper; gemini has no agent-authoring surface - skills author commands
+create-agent	gemini	opencode agent-authoring subagent; gemini has no agent-authoring surface
+delegate	gemini	subagent wrapper of the delegate skill; gemini invokes the skill directly
+git-worktree-manager	gemini	subagent wrapper of scripts/lib/worktree-manager.sh; gemini drives scripts/lib/worktree-manager.sh directly
+github-action-editor	gemini	subagent for workflow editing; gemini routes through cicd-pipeline and pipeline skills
+implementer	gemini	subagent counterpart of the implementer skill; gemini invokes the skill directly
+loop-agent	gemini	claude iterative-refinement companion; gemini drives loops through skills
+perplexity-researcher-pro	gemini	perplexity-model subagents; gemini research uses its researcher agent
+perplexity-researcher-reasoning-pro	gemini	perplexity-model subagents; gemini research uses its researcher agent
+goap-agent	gemini	gemini drives GOAP planning through the /planning command prompt instead of a subagent
