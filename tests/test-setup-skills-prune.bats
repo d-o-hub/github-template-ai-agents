@@ -25,7 +25,7 @@ setup() {
 @test "setup uses exactly the historical optional names without demoting pack skills" {
   # The manifest is sourced from the code directory, not REPO_ROOT's fixture.
   source "$BATS_TEST_DIRNAME/../scripts/lib/optional_skills.sh"
-  [ "${#SKILLS_OPTIONAL[@]}" -eq 8 ]
+  [ "${#SKILLS_OPTIONAL[@]}" -eq 6 ]
   for skill in "${SKILLS_OPTIONAL[@]}" secure-invite-and-access dependency-upgrades; do
     mkdir -p "$REPO_ROOT/.agents/skills/$skill"
     printf '# Fixture\n' > "$REPO_ROOT/.agents/skills/$skill/SKILL.md"

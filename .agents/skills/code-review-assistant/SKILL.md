@@ -119,46 +119,14 @@ See `references/github-integration.md` for API usage, auto-approval criteria, an
 
 ## Codacy PR Review Integration
 
-Enhance reviews with Codacy quality data. Run these alongside the standard review workflow.
-
-### Fetch PR Quality Data
+Enhance reviews with Codacy quality data. The Codacy CLI surface — local Analysis CLI runs plus Codacy Cloud PR queries (PR summary, quality gate status, coverage deltas, new issues, false-positive ignores) — is documented in the `static-analysis` skill (which absorbed the codacy skill per ADR-038), under its Codacy CLI reference. For immediate local results during a review:
 
 ```bash
-# PR summary (status, issues, coverage, changed files)
-codacy pull-request gh my-org my-repo <prNumber>
-
-# Annotated git diff with inline coverage and issues
-codacy pull-request gh my-org my-repo <prNumber> --diff
-
 # Local analysis of PR changes (instant, no push needed)
 codacy-analysis analyze --pr --output-format json
 ```
 
-### Quality Gate Check
-
-```bash
-# Check if PR passes quality gate
-codacy pull-request gh my-org my-repo <prNumber> --output json | jq '.upToStandards'
-```
-
-### Coverage Review
-
-```bash
-# Get coverage delta for the PR
-codacy pull-request gh my-org my-repo <prNumber> --output json | jq '.coverage'
-```
-
-### Issue Triage
-
-```bash
-# List new issues introduced by the PR
-codacy pull-request gh my-org my-repo <prNumber> --output json | jq '.issues'
-
-# Ignore a false positive
-codacy pull-request gh my-org my-repo <prNumber> --ignore-issue <issueId> --ignore-reason FalsePositive
-```
-
-**Integration with review workflow:** When reviewing a PR, run local analysis first (`codacy-analysis analyze --pr`) for immediate results, then fetch cloud data for coverage and quality gate status. Combine both into the review summary.
+**Integration with review workflow:** run the local analysis first for immediate results, then fetch Codacy Cloud data for coverage and quality gate status via the Codacy Cloud CLI (routed by `static-analysis`), and combine both into the review summary.
 
 ## Review Summary Template
 
@@ -222,7 +190,7 @@ codacy pull-request gh my-org my-repo <prNumber> --ignore-issue <issueId> --igno
 
 - `static-analysis` — Linter triage and fix workflows
 - `security-code-auditor` — Security audit workflows
-- `codacy` — Local Codacy CLI analysis
+- `static-analysis` — Linter triage incl. the Codacy CLI reference (absorbed from codacy)
 
 ## Voice & Context
 

@@ -70,7 +70,7 @@ diff /tmp/opencode/sc-base /tmp/opencode/sc-new && echo "no new findings"
 Query the real verdict rather than guessing:
 
 ```bash
-codacy pull-request <PR> -o json   # newIssues, quality.gate, per-issue resultDataId
+codacy pull-request <PR> -o json   # newIssues, quality.gate, per-issue resultDataId (absorbed from codacy into static-analysis)
 ```
 
 Two codes that found real defects here, and are worth reading as bugs rather
@@ -238,5 +238,5 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 - [ ] Running shell scripts without set -euo pipefail
 - [ ] Skipping ShellCheck linting before committing shell scripts
 - [ ] Trusting `--severity=error` as proof of Codacy-clean shell code
-- [ ] Checking `codacy pull-request` only after discovering the PR is blocked
+- [ ] Checking Codacy PR verdicts (`pull-request`) only after discovering the PR is blocked
 - [ ] Suppressing SC warnings without documenting the reason and date

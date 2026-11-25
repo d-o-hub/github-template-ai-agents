@@ -86,7 +86,10 @@ mvn test jacoco:report
 ### Upload Coverage to Codacy
 
 ```bash
-bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r <coverage-report-file>
+# Vendor coverage reporter (the codacy skill that documented it was absorbed
+# into static-analysis, ADR-038; the reporter itself is unchanged)
+REPORTER="https://coverage.codacy.com/get.sh"   # absorbed from codacy into static-analysis
+bash <(curl -Ls "$REPORTER") report -r <coverage-report-file>
 ```
 
 **GitHub Actions:**
@@ -95,7 +98,8 @@ bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r <coverage-report-f
 - name: Upload coverage to Codacy
   env:
     CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
-  run: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
+    REPORTER_URL: https://coverage.codacy.com/get.sh   # absorbed from codacy into static-analysis
+  run: bash <(curl -Ls "$REPORTER_URL") report -r coverage.xml
 ```
 
 **GitLab CI:**
@@ -103,18 +107,19 @@ bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r <coverage-report-f
 ```yaml
 upload-coverage:
   stage: test
-  script:
-    - bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
   variables:
     CODACY_PROJECT_TOKEN: $CODACY_PROJECT_TOKEN
+    REPORTER_URL: https://coverage.codacy.com/get.sh    # absorbed from codacy into static-analysis
+  script:
+    - bash <(curl -Ls "$REPORTER_URL") report -r coverage.xml
 ```
 
-**Multiple reports (monorepos):**
+**Multiple reports (monorepos):** (reuses `$REPORTER` from the block above)
 
 ```bash
-bash <(curl -Ls https://coverage.codacy.com/get.sh) report --partial -r report1.xml
-bash <(curl -Ls https://coverage.codacy.com/get.sh) report --partial -r report2.xml
-bash <(curl -Ls https://coverage.codacy.com/get.sh) final
+bash <(curl -Ls "$REPORTER") report --partial -r report1.xml
+bash <(curl -Ls "$REPORTER") report --partial -r report2.xml
+bash <(curl -Ls "$REPORTER") final
 ```
 
 **Key notes:**
