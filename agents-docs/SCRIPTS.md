@@ -21,8 +21,8 @@
 | Script | Purpose | Usage |
 |--------|---------|-------|
 | `validate-skills.sh` | Validate skill symlinks and SKILL.md files | `./scripts/validate-skills.sh` |
-| `validate-git-hooks.sh` | Check git hooks configuration | `./scripts/validate-git-hooks.sh` |
-| `validate-links.sh` | Validate markdown links are not broken | `./scripts/validate-links.sh` |
+| `validate-git-hooks.sh` | Warn on global hooks; fail when `core.hooksPath` resolves away from the tracked `.githooks/` | `./scripts/validate-git-hooks.sh` |
+| `validate-links.sh` | Validate markdown links resolve inside the repository; path traversal is checked with or without `realpath` | `./scripts/validate-links.sh` |
 | `validate-config.sh` | Validate `.command-verify.conf` (command-verification settings) | `./scripts/validate-config.sh` |
 | `validate-workflows.sh` | Validate JavaScript blocks in workflows via `node -c`, and scan for script-injection risks | `./scripts/validate-workflows.sh` |
 | `validate-github-actions-shas.sh` | Verify every external action is pinned to a real 40-character commit SHA | `./scripts/validate-github-actions-shas.sh` |
@@ -32,7 +32,7 @@
 | `check-invariants.sh` | Validate `plans/invariants.json` schema and verify every file-based sensor resolves | `./scripts/check-invariants.sh` |
 | `check-plan-numbering.sh` | Verify `plans/` numbering stays consistent and reports the next free plan/ADR id | `./scripts/check-plan-numbering.sh` |
 | `check-skill-overlap.sh` | Keyless Tier-2 inter-skill similarity (5-gram Jaccard over `SKILL.md` bodies); `--strict` gates | `./scripts/check-skill-overlap.sh [--strict]` |
-| `verify-commands.sh` | Verify slash commands referenced by agents actually resolve | `./scripts/verify-commands.sh` |
+| `verify-commands.sh` | Categorize every command reported by `discover-commands.sh`; fails closed when the discoverer is missing, fails, or yields nothing to verify (`--quick` stays advisory) | `./scripts/verify-commands.sh [--force\|--json\|--quick\|--silent]` |
 | `discover-commands.sh` | Extract every command from every agent config into one JSON inventory (single awk pass) | `./scripts/discover-commands.sh [-o file] [-f json]` |
 | `eval-skills.sh` | Static schema + input-fixture audit of `evals/evals.json`; standalone — the gate's eval path is `run-evals.py` (`bin/agent-toolkit eval`) | `./scripts/eval-skills.sh` |
 | `check_ci_status_freshness.sh` | Validate `.github/ci-status/ci-status.json` schema v3, self-consistency, freshness, and optional `gh run list` parity | `./scripts/check_ci_status_freshness.sh` |
@@ -42,7 +42,7 @@
 | `check-skill-references.sh` | Fail when a live agent/skill surface references a folded skill name (`scripts/lib/folded-skills.tsv`) | `./scripts/check-skill-references.sh` |
 | `check-agents-md-skills.sh` | Verify the AGENTS.md skill table matches `.agents/skills/` (the table is hand-curated, so it is checked, not generated) | `./scripts/check-agents-md-skills.sh` |
 | `check-lessons-consistency.sh` | Fail when `LESSONS.md`, `lessons.jsonl` and `self-learning-rules.md` disagree on which lessons exist | `./scripts/check-lessons-consistency.sh` |
-| `secretlint_gate.sh` | Runs secretlint | `./scripts/secretlint_gate.sh` |
+| `secretlint_gate.sh` | Runs secretlint when `.secretlintrc.json` exists; fails closed if `npx` is missing (`SKIP_SECRETLINT=true` to skip) | `./scripts/secretlint_gate.sh` |
 | `detect-duplicate-prs.sh` | Detect and defuse duplicate open PRs (ADR-035 guard) | `./scripts/detect-duplicate-prs.sh` |
 | `cleanup-ci-status-prs.sh` | Close stale bot PRs; dry-run uses the same identity/age selector | `./scripts/cleanup-ci-status-prs.sh --dry-run` |
 
@@ -97,7 +97,7 @@
 | `lib/optional_skills.sh` | Shared default-unlinked skill names for setup and validation |
 | `lib/worktree-manager.sh` | Git worktree management functions |
 | `lib/lang-checks.sh` | Project language detection plus per-language lint/test runners |
-| `lib/link-validation.sh` | Helpers sourced by `scripts/validate-links.sh` |
+| `lib/link-validation.sh` | Helpers sourced by `scripts/validate-links.sh`; lexical path fallback keeps traversal checks honest without GNU `realpath` |
 | `lib/lint_cache.sh` | File-hash cache in `.git/lint-cache/` so linters skip unchanged files |
 | `lib/command-categories.sh` | Command safety categorization (`categorize_command`), hardened keyword lists |
 | `lib/command-cache.sh` | Git-diff-based cache management for command verification |
@@ -145,8 +145,9 @@ for the Gemini TOML and metrics groups) and a `package.json` script the project
 does not declare (`lint`, `typecheck`, `test`).
 
 Helper gates that run as separate processes signal the same condition with
-exit code `3` (`secretlint_gate.sh` does this when `npx` is missing); the gate
-translates that into a skip record. Adopters adding a helper gate should follow
+exit code `3` (`secretlint_gate.sh` follows this protocol when stubbed in
+fixtures; the real helper fails closed instead — see its row above) and the
+gate translates that into a skip record. Adopters adding a helper gate should follow
 the same convention instead of exiting `0` when their tool is absent.
 
 The same rule applies one layer up. `make test` prints

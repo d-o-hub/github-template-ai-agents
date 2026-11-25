@@ -101,10 +101,12 @@ printf "$PASSED_MSG" "$GREEN" "$NC"
 
 # Test 3: Quality gate failure on manual modification
 printf "Test 3: Quality gate divergence check... "
-# Generate clean state
-./scripts/generate-llms-txt.sh > /dev/null
-# Manually modify
-echo "Tampered" >> llms.txt
+# Work on a copy: `llms.txt` is a generated artifact that lives in the working tree, and
+# appending the tampering line to the repository's own copy left it dirty afterwards — the
+# generator never rewrote it, because LLMS_TXT still pointed at $TEST_DIR from Test 1.
+COMMITTED_LLMS="$TEST_DIR/committed-llms.txt"
+cp llms.txt "$COMMITTED_LLMS"
+echo "Tampered" >> "$COMMITTED_LLMS"
 
 # Run quality gate LLM check part
 FAILED=0
@@ -115,10 +117,10 @@ TMP_LLMS_FULL=$(mktemp)
     export LLMS_FULL_TXT="$TMP_LLMS_FULL"
     ./scripts/generate-llms-txt.sh > /dev/null 2>&1
 )
-if ! diff -q llms.txt "$TMP_LLMS" > /dev/null; then
+if ! diff -q "$COMMITTED_LLMS" "$TMP_LLMS" > /dev/null; then
     FAILED=1
 fi
-rm -f "$TMP_LLMS" "$TMP_LLMS_FULL"
+rm -f "$TMP_LLMS" "$TMP_LLMS_FULL" "$COMMITTED_LLMS"
 
 if [[ $FAILED -eq 1 ]]; then
     printf "$PASSED_MSG" "$GREEN" "$NC"
@@ -126,8 +128,6 @@ else
     printf "%bFAILED: Quality gate did not detect divergence%b\n" "$RED" "$NC"
     exit 1
 fi
-# Restore
-./scripts/generate-llms-txt.sh > /dev/null
 
 # Test 4: Handling of missing/malformed SKILL.md frontmatter
 printf "Test 4: Malformed skill frontmatter... "

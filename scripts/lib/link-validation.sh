@@ -44,6 +44,30 @@ is_url() {
 
 HAS_REALPATH=""
 
+# _resolve_lexical - collapse `.` and `..` textually, with no filesystem call. A `..` that
+# would pop past the first component is kept as a `..` in the result, so a path that climbs
+# out of the repository stays visibly outside it instead of being clamped to the root.
+_resolve_lexical() {
+    local path="$1" comp
+    local -a parts=() out=()
+    IFS='/' read -r -a parts <<< "$path"
+    for comp in "${parts[@]}"; do
+        case "$comp" in
+            '' | '.') ;;
+            '..')
+                if [[ ${#out[@]} -gt 0 && "${out[-1]}" != '..' ]]; then
+                    unset 'out[-1]'
+                else
+                    out+=('..')
+                fi
+                ;;
+            *) out+=("$comp") ;;
+        esac
+    done
+    local IFS='/'
+    printf '/%s' "${out[*]-}"
+}
+
 check_link() {
     local skill_dir="$1"
     local link_path="$2"
@@ -79,19 +103,30 @@ check_link() {
         fi
     fi
 
-    if [[ "$HAS_REALPATH" -eq 1 ]] && [[ -n "${RESOLVED_ROOT:-}" ]]; then
-        local resolved_path
-        resolved_path=$(realpath -m "$full_path" 2>/dev/null)
-        if [[ "$resolved_path/" != "$RESOLVED_ROOT/"* ]]; then
-            printf "  ${RED}✗${NC} Security Error: Path traversal detected at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
-            printf "     Link attempts to reference a file outside the repository boundary.\n" >&2
-            printf "     in: %s\n" "$skill_file" >&2
-            return 1
+    # Resolve before judging. realpath is preferred because it also collapses symlinks, but it
+    # cannot be the only route to a verdict: `command -v realpath` succeeds on BSD, where
+    # `realpath -m` errors, so RESOLVED_ROOT came out empty and the traversal check was skipped
+    # for every link — escaping links were accepted. Fall back to lexical resolution, compared
+    # against the same REPO_ROOT the skill path was built from.
+    local resolved_path=""
+    local compare_root="$REPO_ROOT"
+    if [[ "$HAS_REALPATH" -eq 1 ]]; then
+        resolved_path=$(realpath -m "$full_path" 2>/dev/null || true)
+        if [[ -n "$resolved_path" ]]; then
+            compare_root="${RESOLVED_ROOT:-$REPO_ROOT}"
         fi
-        if [[ -e "$resolved_path" || -L "$resolved_path" ]]; then
-            return 0
-        fi
-    elif [[ -e "$full_path" || -L "$full_path" ]]; then
+    fi
+    if [[ -z "$resolved_path" ]]; then
+        resolved_path=$(_resolve_lexical "$full_path")
+    fi
+
+    if [[ "$resolved_path/" != "$compare_root/"* ]]; then
+        printf "  ${RED}✗${NC} Security Error: Path traversal detected at line %s: \`%s'\n" "$line_num" "$clean_path" >&2
+        printf "     Link attempts to reference a file outside the repository boundary.\n" >&2
+        printf "     in: %s\n" "$skill_file" >&2
+        return 1
+    fi
+    if [[ -e "$resolved_path" || -L "$resolved_path" ]]; then
         return 0
     fi
 

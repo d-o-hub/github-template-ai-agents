@@ -119,3 +119,17 @@ teardown() {
     [[ "$output" == *"LESSON-099 is in LESSONS.md"* ]]
     [[ "$output" != *"LESSON-000"* ]]
 }
+
+@test "the exit status is the contract: a neutered fail() prints drift and exits 0" {
+    # Every case above asserts $status, not the printed text, and this is why.
+    # Disabling fail() leaves the human-readable diagnostics untouched while the
+    # verdict flips to green, so a refactor could not quietly trade one for the
+    # other and still pass a suite that only looked at output.
+    sed -i '/^fail() {$/,/^}$/ s/EXIT_CODE=1/EXIT_CODE=0/' "$SCRIPT"
+    printf '{"id": "LESSON-001", "title": "First"}\n' > "$SANDBOX/agents-docs/lessons.jsonl"
+
+    run bash "$SCRIPT"
+    [[ "$output" == *"LESSON-002 is in LESSONS.md but has no lessons.jsonl row"* ]]
+    [[ "$output" == *"Lesson catalog, machine index, and runtime index agree"* ]]
+    [ "$status" -eq 0 ]
+}

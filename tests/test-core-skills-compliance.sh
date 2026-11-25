@@ -46,7 +46,25 @@ fi
 
 # 4. Verify automated generation of monthly report
 echo "Running dora-report generation script..."
+# The report path is derived from the current month, so this generates a path that is TRACKED
+# in the repository. The suite used to `rm -f` it before and after generating, which silently
+# deleted committed work and left the tree dirty — CI's disposable checkout hid it, a local
+# run never does. Snapshot first and restore on exit so the destructive step stays reversible.
 report_file="$REPO_ROOT/agents-docs/dora-reports/$(date +%Y-%m).md"
+REPORT_STATE_DIR=$(mktemp -d)
+if [[ -f "$report_file" ]]; then
+    cp "$report_file" "$REPORT_STATE_DIR/backup.md"
+fi
+restore_report() {
+    if [[ -f "$REPORT_STATE_DIR/backup.md" ]]; then
+        cp "$REPORT_STATE_DIR/backup.md" "$report_file"
+    else
+        rm -f "$report_file"
+    fi
+    rm -rf "$REPORT_STATE_DIR"
+}
+trap restore_report EXIT
+
 rm -f "$report_file" # Ensure we test fresh generation
 
 python3 "$SKILLS_DIR/dora-report/scripts/generate_report.py"
@@ -57,8 +75,5 @@ else
     exit 1
 fi
 
-# Cleanup: Delete the generated report file to keep repo clean
-rm -f "$report_file"
-echo "✓ Cleaned up generated report file"
-
+# Cleanup is handled by the EXIT trap, which puts the tracked file back exactly as found.
 echo "=== All Core Skills Compliance Checks Passed ==="

@@ -55,6 +55,8 @@
     "reports/**",
     "analysis/**",
     "dist/**",
-    "build/**"
+    "build/**",
+    // Agent worktrees are transient and mutate mid-lint; git-ignored, no tracked content
+    ".qoder/**"
   ]
 }

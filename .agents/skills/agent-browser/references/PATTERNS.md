@@ -436,13 +436,13 @@ Priority (lowest to highest): `~/.agent-browser/config.json` < `./agent-browser.
 
 | Reference                                                            | When to Use                                               |
 | -------------------------------------------------------------------- | --------------------------------------------------------- |
-| [references/commands.md](references/commands.md)                     | Full command reference with all options                   |
-| [references/snapshot-refs.md](references/snapshot-refs.md)           | Ref lifecycle, invalidation rules, troubleshooting        |
-| [references/session-management.md](references/session-management.md) | Parallel sessions, state persistence, concurrent scraping |
-| [references/authentication.md](references/authentication.md)         | Login flows, OAuth, 2FA handling, state reuse             |
-| [references/video-recording.md](references/video-recording.md)       | Recording workflows for debugging and documentation       |
-| [references/profiling.md](references/profiling.md)                   | Chrome DevTools profiling for performance analysis        |
-| [references/proxy-support.md](references/proxy-support.md)           | Proxy configuration, geo-testing, rotating proxies        |
+| [references/commands.md](commands.md)                                | Full command reference with all options                   |
+| [references/snapshot-refs.md](snapshot-refs.md)                      | Ref lifecycle, invalidation rules, troubleshooting        |
+| [references/session-management.md](session-management.md)            | Parallel sessions, state persistence, concurrent scraping |
+| [references/authentication.md](authentication.md)                    | Login flows, OAuth, 2FA handling, state reuse             |
+| [references/video-recording.md](video-recording.md)                  | Recording workflows for debugging and documentation       |
+| [references/profiling.md](profiling.md)                              | Chrome DevTools profiling for performance analysis        |
+| [references/proxy-support.md](proxy-support.md)                      | Proxy configuration, geo-testing, rotating proxies        |
 
 ## Browser Engine Selection
 
@@ -470,9 +470,9 @@ Lightpanda does not support `--extension`, `--profile`, `--state`, or `--allow-f
 
 | Template                                                                 | Description                         |
 | ------------------------------------------------------------------------ | ----------------------------------- |
-| [templates/form-automation.sh](templates/form-automation.sh)             | Form filling with validation        |
-| [templates/authenticated-session.sh](templates/authenticated-session.sh) | Login once, reuse state             |
-| [templates/capture-workflow.sh](templates/capture-workflow.sh)           | Content extraction with screenshots |
+| [templates/form-automation.sh](../templates/form-automation.sh)          | Form filling with validation        |
+| [templates/authenticated-session.sh](../templates/authenticated-session.sh) | Login once, reuse state             |
+| [templates/capture-workflow.sh](../templates/capture-workflow.sh)        | Content extraction with screenshots |
 
 ```bash
 ./templates/form-automation.sh https://example.com/form

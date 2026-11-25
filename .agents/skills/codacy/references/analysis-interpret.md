@@ -1,6 +1,6 @@
 # Step 5: Interpret results
 
-The JSON output contains the full `AnalysisResult`. See [references/output-format.md](references/output-format.md) for the complete schema.
+The JSON output contains the full `AnalysisResult`. See [references/output-format.md](output-format.md) for the complete schema.
 
 **Quick reference for parsing:**
 

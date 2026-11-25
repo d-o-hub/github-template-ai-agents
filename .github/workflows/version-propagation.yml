@@ -7,7 +7,6 @@ on:  # yamllint disable-line rule:truthy
       - VERSION
     branches:
       - main
-      - 'feat/**'
 
 permissions:
   contents: write
@@ -35,7 +34,9 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           BRANCH="auto/propagate-version-$VERSION"
           git checkout -b "$BRANCH" 2>/dev/null || git checkout "$BRANCH"
-          git add README.md QUICKSTART.md agents-docs/MIGRATION.md CHANGELOG.md
+          # Stage tracked modifications, not a hardcoded file list: the list drifted out of
+          # sync with propagate-version.sh's targets and the job passed while committing nothing.
+          git add -u
           if git diff --cached --quiet; then
             echo "No version changes to commit"
             exit 0
@@ -57,7 +58,6 @@ jobs:
           if gh pr merge "$NEW_PR" \
             --squash \
             --subject "chore: propagate version $VERSION to all files [skip ci]" \
-            --admin \
             --delete-branch=false; then
             echo "Auto-merged PR #$NEW_PR"
           else

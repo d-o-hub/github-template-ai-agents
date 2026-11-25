@@ -1,3 +1,12 @@
+<!--
+  Verbatim mirror of https://docs.turso.tech/llms.txt — Turso's own documentation index,
+  fetched 2026-10-19 and byte-identical to upstream at that time. This catalogue is not
+  authored by this template, so the repository's MIT license covers the skill around it,
+  not this file. Refresh by re-fetching rather than editing by hand:
+
+      curl -sf https://docs.turso.tech/llms.txt -o references/llms.txt
+-->
+
 # Turso
 
 - [Welcome to Turso](https://docs.turso.tech/introduction.md): The small database to power your big dreams in the age of AI.
