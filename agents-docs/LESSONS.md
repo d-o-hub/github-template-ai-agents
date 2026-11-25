@@ -894,7 +894,7 @@ Three-tier approach:
 
    ```yaml
    exclude_paths:
-     - ".agents/skills/do-web-doc-resolver/scripts/providers/docling.py"
+     - "tools/web-doc-resolver/scripts/providers/docling.py"
 
    ```
 
@@ -1809,7 +1809,7 @@ comment conceded the suffix list "only block[s] matching in-base names (not arbi
 reads)", so each new extension closed a name-policy gap, not an access hole. The SSRF
 normalizer had the same shape, learning decimal, then hex, then octal one incident at a
 time. Worse, `_normalize_host`/`is_safe_url` exist in two copies
-(`do-web-doc-resolver/scripts/utils/http.py` and `utils/async_http.py`); the fix patched
+(`tools/web-doc-resolver/scripts/utils/http.py` and `utils/async_http.py`); the fix patched
 one, added tests for one, and the async copy — which validates every redirect hop — stayed
 byte-identical to the vulnerable version with no test coverage at all. That left a real
 bypass on `main`: `is_safe_url` returned `False` for `0o17700000001` on the sync path and

@@ -27,14 +27,21 @@ Resolve URLs and queries into compact, LLM-ready markdown using a progressive, f
 ## Prerequisites
 
 - Python 3.10+ in an isolated virtual environment.
-- From the skill directory, run `python -m pip install .` to install the base
-  package and dependencies declared in `pyproject.toml` before the quick start.
+- The resolver application is not part of this skill directory. It lives at
+  `tools/web-doc-resolver/` in the repository root — that is
+  `../../../tools/web-doc-resolver/` relative to this skill directory. Every
+  relative application path named by this skill or its references — `scripts/...`,
+  `tests/...`, `utils/...` — resolves inside that tool directory.
+- From the tool directory, run `python -m pip install .` to install the base
+  package and dependencies declared in its `pyproject.toml` before the quick start.
 - Install provider, ML, or database extras only for the features that need them;
   text resolution does not require the optional visual/ML stack.
 
 ## Quick Start
 
 ```bash
+# Resolver application: ../../../tools/web-doc-resolver relative to this skill
+cd ../../../tools/web-doc-resolver
 python -m scripts.cli "https://docs.rust-lang.org/book/"
 python -m scripts.cli "Rust async programming" --profile quality --json
 ```
@@ -71,9 +78,9 @@ python -m scripts.cli "Rust async programming" --profile quality --json
 
 **Structured Tool Contracts**: Every provider returns `ProviderResult(ok, content, error, meta)` with `ProviderMeta(tool, duration_ms, cache_hit, quality_score, error_type)`.
 
-**Layered Routing Memory**: TTL-based decay (30 days), metadata filtering, recency weighting. See `scripts/routing_memory.py`.
+**Layered Routing Memory**: TTL-based decay (30 days), metadata filtering, recency weighting. See `scripts/routing_memory.py` inside the tool directory.
 
-**Structured Resolution Evidence**: CLI `--json` reports available source, quality, and provider metrics. Trace model types live in `scripts/models.py`; the CLI has no `--trace` flag.
+**Structured Resolution Evidence**: CLI `--json` reports available source, quality, and provider metrics. Trace model types live in `scripts/models.py` inside the tool directory; the CLI has no `--trace` flag.
 
 **Agent-Friendly Docs Validation**: Validates against [agent-docs-spec v0.3.0](https://github.com/agent-ecosystem/agent-docs-spec) — 10 checks across 7 categories.
 
@@ -98,20 +105,30 @@ export WEB_RESOLVER_MAX_CHARS=8000 WEB_RESOLVER_MIN_CHARS=200
 
 ## File Structure
 
+The resolver application lives outside this skill (ADR-044):
+
 ```
-scripts/
-├── resolve.py           # Main orchestrator & CLI
-├── models.py            # Data models, enums, trace types
-├── providers_impl.py    # 12 provider implementations
-├── quality.py           # Content quality scoring
-├── docs_validation.py   # Agent-docs-spec v0.3.0 checks
-├── routing_memory.py    # Layered memory with TTL decay
-├── routing.py           # Budget-aware routing
-├── circuit_breaker.py   # Circuit breaker patterns
-├── cache_negative.py    # Negative cache
-├── synthesis.py         # LLM synthesis gate
-└── utils.py             # Utilities
+tools/web-doc-resolver/        # ../../../tools/web-doc-resolver from this skill
+├── scripts/
+│   ├── resolve.py           # Main orchestrator & CLI
+│   ├── cli.py               # CLI entrypoint (python -m scripts.cli)
+│   ├── models.py            # Data models, enums, trace types
+│   ├── providers_impl.py    # 12 provider implementations
+│   ├── quality.py           # Content quality scoring
+│   ├── docs_validation.py   # Agent-docs-spec v0.3.0 checks
+│   ├── routing_memory.py    # Layered memory with TTL decay
+│   ├── routing.py           # Budget-aware routing
+│   ├── circuit_breaker.py   # Circuit breaker patterns
+│   ├── cache_negative.py    # Negative cache
+│   ├── synthesis.py         # LLM synthesis gate
+│   └── utils/               # Utilities (http, async_http, fetch, cache, urls)
+├── tests/                   # pytest suite (python -m pytest tests/ -m "not live")
+├── pyproject.toml           # Packaging, extras, entrypoints
+├── requirements.txt          # CI dependency pin set
+└── AGENTS.md                # Runtime notes for the application
 ```
+
+This skill directory keeps only `SKILL.md`, `references/`, and `evals/`.
 
 ## See Also
 

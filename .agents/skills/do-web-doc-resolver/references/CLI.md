@@ -1,5 +1,10 @@
 # CLI Reference
 
+> **Tool location**: The Python application is not part of this skill directory.
+> It lives at `tools/web-doc-resolver/` in the repository root — that is
+> `../../../tools/web-doc-resolver/` relative to this skill's directory.
+> Run the commands below from that tool directory (see SKILL.md → Quick Start).
+
 ## Python CLI (`scripts/cli.py`)
 
 ### Basic Usage

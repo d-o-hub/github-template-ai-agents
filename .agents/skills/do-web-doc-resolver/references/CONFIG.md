@@ -1,5 +1,9 @@
 # Configuration Reference
 
+> **Tool location**: The resolver application lives at `tools/web-doc-resolver/`
+> in the repository root (`../../../tools/web-doc-resolver/` relative to this
+> skill's directory); its `scripts/...` invocations below run from there.
+
 ## Environment Variables
 
 ### Core Settings

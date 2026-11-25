@@ -1,5 +1,12 @@
 # Web Research Optimization Guide
 
+> **Tool location**: The resolver application lives at `tools/web-doc-resolver/`
+> in the repository root (`../../../tools/web-doc-resolver/` relative to this
+> skill's directory). Application files (`scripts/routing.py`, `scripts/quality.py`,
+> `scripts/routing_memory.py`) and `python -m scripts...` invocations resolve
+> inside that tool directory; repo-level scripts such as
+> `./scripts/swarm-worktree-web-research.sh` refer to the repository's `scripts/`.
+>
 > How to maximize token efficiency, quality scores, and validation coverage when using the Web Doc Resolver in swarm workflows.
 
 ## Table of Contents

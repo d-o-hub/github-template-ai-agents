@@ -17,7 +17,7 @@ exclude_paths:
   - ".qwen/skills/**"
   # docling.py: subprocess calls with SSRF validation by is_safe_url().
   # Inline # NOSONAR did not suppress Codacy SonarPython findings.
-  - ".agents/skills/do-web-doc-resolver/scripts/providers/docling.py"
+  - "tools/web-doc-resolver/scripts/providers/docling.py"
   # run_loop.py: CLI tool that intentionally runs subprocess to call
   # the claude command. Security findings are not exploitable here.
   - ".agents/skills/skill-creator/scripts/run_loop.py"
@@ -27,9 +27,9 @@ exclude_paths:
   # two entries above; inline nosec/nosemgrep does not reach Codacy's engines.
   - "scripts/lib/behavioral_runner.py"
   # Test files: subprocess list-form calls and tempfile usage are safe patterns.
-  - ".agents/skills/do-web-doc-resolver/tests/integration/**"
+  - "tools/web-doc-resolver/tests/integration/**"
   # This fixture intentionally launches an isolated interpreter with generated test code.
-  - ".agents/skills/do-web-doc-resolver/tests/test_optional_visual_dependencies.py"
+  - "tools/web-doc-resolver/tests/test_optional_visual_dependencies.py"
   - "tests/test_update_ci_status.py"
   # Repo-level test tree. Same rationale as the entry above: assertions,
   # subprocess list-form calls, and tempdir fixtures are safe patterns, and
