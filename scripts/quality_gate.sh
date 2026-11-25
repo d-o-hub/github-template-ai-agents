@@ -175,6 +175,20 @@ if [[ -d ".gemini/commands" ]]; then
     printf "\n"
 fi
 
+# --- Cross-CLI command and agent parity ---
+# Command/agent names across .claude, .opencode and .gemini drift against
+# their union unless a change ports them everywhere; sanctioned exclusions
+# live in scripts/lib/cli-parity-allowlist.tsv. Missing required inputs are
+# the validator's own fail-closed exit, not a skip: no comparison is possible
+# without them, and a green gate must not imply it happened.
+if [[ -f "./scripts/check-cli-parity.sh" ]]; then
+    printf "%bValidating cross-CLI command and agent parity...%b\n" "$BLUE" "$NC"
+    if ! ./scripts/check-cli-parity.sh; then
+        FAILED=1
+    fi
+    printf "\n"
+fi
+
 # --- Validate GitHub Actions Workflows ---
 printf "%bValidating GitHub Actions Workflows...%b\n" "${BLUE}" "${NC}"
 if ! ./scripts/validate-workflows.sh; then
@@ -339,6 +353,25 @@ if ! ./scripts/loc_gate.sh; then
     FAILED=1
 fi
 printf "\n"
+
+# --- Forbidden path commit guard ---
+# Changed paths whose file name matches the forbidden/sensitive vocabulary in
+# scripts/lib/paths.py (.env variants, sops files, service-account keys, SSH
+# keys, state/backup files) fail the gate before they reach history. Exit 3 is
+# the helper protocol for "cannot legitimately run" (python3 missing to consume
+# the vocabulary, or no git work tree): the skip registry keeps that visible,
+# and QUALITY_GATE_STRICT_SKIPS still fails CI on it.
+if [[ -f "./scripts/check-forbidden-paths.sh" ]]; then
+    printf "%bValidating forbidden paths...%b\n" "$BLUE" "$NC"
+    ./scripts/check-forbidden-paths.sh
+    forbidden_paths_status=$?
+    case "$forbidden_paths_status" in
+        0) ;;
+        3) _skip_check "paths:forbidden-paths" "guard could not run (git work tree or python3 unavailable)" ;;
+        *) FAILED=1 ;;
+    esac
+    printf "\n"
+fi
 
 # --- Secretlint checks ---
 # SKIP_SECRETLINT=true is the single sanctioned skip and flows through the
