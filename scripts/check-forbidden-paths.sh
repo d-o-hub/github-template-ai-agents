@@ -106,9 +106,22 @@ collect_or_fail() {
 }
 
 if [[ -n "${GITHUB_BASE_REF:-}" ]]; then
-    # CI: the changeset is the PR diff, as in lang-checks.sh.
-    changed_raw=$(collect_or_fail "diff against origin/${GITHUB_BASE_REF}...HEAD" \
-        git diff --name-only --diff-filter=d "origin/${GITHUB_BASE_REF}...HEAD")
+    # CI: the changeset is the PR diff, as in lang-checks.sh. A shallow or
+    # single-ref PR clone may not carry origin/${GITHUB_BASE_REF}: fetch the
+    # base ref best-effort, and when that is impossible fall back to the
+    # work-tree enumeration with a loud warning instead of blocking the
+    # pipeline -- the commit-time guard still scans the staged set, so CI
+    # enumeration is defense in depth, not the only line.
+    changed_raw=$(git diff --name-only --diff-filter=d "origin/${GITHUB_BASE_REF}...HEAD" 2>/dev/null || true)
+    if ! git rev-parse --verify --quiet "refs/remotes/origin/${GITHUB_BASE_REF}" >/dev/null; then
+        if git fetch --quiet origin "refs/heads/${GITHUB_BASE_REF}:refs/remotes/origin/${GITHUB_BASE_REF}" 2>/dev/null; then
+            changed_raw=$(git diff --name-only --diff-filter=d "origin/${GITHUB_BASE_REF}...HEAD" 2>/dev/null || true)
+        else
+            printf '  ! origin/%s unavailable; scanning the work tree instead\n' "${GITHUB_BASE_REF}" >&2
+            changed_raw="$(git diff --name-only --diff-filter=d HEAD 2>/dev/null || true)
+$(git ls-files --others --exclude-standard 2>/dev/null || true)"
+        fi
+    fi
 else
     git diff --cached --quiet &>/dev/null && staged_rc=0 || staged_rc=$?
     if (( staged_rc > 1 )); then

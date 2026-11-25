@@ -8,6 +8,10 @@
 # because a vanished vocabulary must never read as a pass.
 
 setup() {
+    # Hermetic: CI exports GITHUB_BASE_REF job-wide, which would steer every
+    # case into the PR-diff enumeration branch; the CI-mode cases set it
+    # explicitly and stay unaffected.
+    unset GITHUB_BASE_REF
     REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/.." && pwd)"
     SANDBOX="$(mktemp -d)"
     mkdir -p "$SANDBOX/scripts/lib" "$SANDBOX/config"
@@ -39,6 +43,20 @@ teardown() {
     [ "$status" -eq 0 ]
     [[ "$output" == *"✓ 1 changed file(s) clean"* ]]
     [[ "$output" != *"✗"* ]]
+}
+
+@test "CI mode falls back to the work tree when the base ref is unfetchable" {
+    # No origin remote: the base-ref diff and its fetch both fail. The guard
+    # must loudly fall back to the work-tree scan instead of blocking the
+    # pipeline -- and still catch the forbidden path sitting untracked.
+    printf 'SECRET=1\n' > "$SANDBOX/.env"
+
+    run env GITHUB_BASE_REF=refnowhere bash "$SCRIPT"
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"refnowhere unavailable; scanning the work tree"* ]]
+    [[ "$output" == *".env"* ]]
+    [[ "$output" == *"forbidden path"* ]]
 }
 
 @test "fails when a staged path names a forbidden file (.env)" {
