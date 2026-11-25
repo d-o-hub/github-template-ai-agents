@@ -108,7 +108,7 @@ cp -r /tmp/ai-agent-template/scripts your-project/scripts
 # Copy version-controlled hooks and validation configs
 cp -r /tmp/ai-agent-template/.githooks your-project/.githooks
 cp /tmp/ai-agent-template/.shellcheckrc your-project/ 2>/dev/null || true
-cp /tmp/ai-agent-template/markdownlint.toml your-project/ 2>/dev/null || true
+cp /tmp/ai-agent-template/.markdownlint-cli2.jsonc your-project/ 2>/dev/null || true
 
 # Make scripts executable
 chmod +x your-project/scripts/*.sh
