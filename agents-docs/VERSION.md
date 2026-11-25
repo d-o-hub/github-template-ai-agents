@@ -68,7 +68,7 @@ badge — `README.md` is the only one.
 
 ## CI Workflow
 
-On push to `main` or `feat/**` branches that change `VERSION`:
+On push to `main` that changes `VERSION`:
 1. `.github/workflows/version-propagation.yml` triggers
 2. Runs `propagate-version.sh`
 3. Commits and pushes any remaining updates
