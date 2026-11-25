@@ -1,5 +1,10 @@
 # Testing Reference
 
+> **Tool location**: The Python tests live with the application at
+> `tools/web-doc-resolver/` in the repository root
+> (`../../../tools/web-doc-resolver/` relative to this skill's directory).
+> Run `python -m pytest tests/ -v -m "not live"` from that tool directory.
+
 ## Overview
 
 The project has three test suites:

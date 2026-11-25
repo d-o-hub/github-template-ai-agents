@@ -78,8 +78,8 @@ validate_environment() {
         exit 1
     fi
 
-    if [[ ! -f ".agents/skills/do-web-doc-resolver/scripts/resolve.py" ]]; then
-        log_warn "Web resolver skill not found at expected location"
+    if [[ ! -f "tools/web-doc-resolver/scripts/resolve.py" ]]; then
+        log_warn "Web resolver application not found at tools/web-doc-resolver"
     fi
 
     log_success "Environment validated"

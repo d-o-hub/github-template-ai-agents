@@ -85,6 +85,15 @@ fi
 # Optimization: Batch processing with xargs and awk for ~10x performance gain
 # Exclude: .git, target, node_modules (at any level), dist, build, .agents/skills
 #
+# OPERATOR DIRECTIVE (ADR-044): ./tools/web-doc-resolver is vendored tool
+# application space extracted from the do-web-doc-resolver skill, mirrored from
+# its upstream product. Like .agents/skills above, its upstream-authored files
+# answer to the tool's own internal standards, not this gate's per-file cap
+# (its upstream test suite carries a deliberately large test module). The
+# exclusion is scoped to this one tool directory on purpose: any *other*
+# path under tools/ stays subject to MAX_LINES_PER_SOURCE_FILE, and widening
+# this exclusion is a decision, not documentation drift.
+#
 # Enumeration stays filesystem-based rather than `git ls-files`: this gate must
 # also run in plain directories (the LOC tests copy it into a non-repo tmpdir).
 # On top of the fixed list, git-ignored paths are subtracted so that ignored
@@ -110,6 +119,7 @@ elif ! find . -type f \( -name "*.py" -o -name "*.rs" -o -name "*.ts" -o -name "
     -not -path "./dist/*" \
     -not -path "./build/*" \
     -not -path "./.agents/skills/*" \
+    -not -path "./tools/web-doc-resolver/*" \
     "${PRUNE_ARGS[@]+"${PRUNE_ARGS[@]}"}" -print0 | \
     xargs -0 wc -l -- | \
     awk -v max="${MAX_SOURCE_OVERRIDE:-$MAX_SOURCE}" -- '
