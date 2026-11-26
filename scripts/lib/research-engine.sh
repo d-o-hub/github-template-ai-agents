@@ -9,30 +9,20 @@ resolve_with_optimization() {
     local resolver_dir="${4:-tools/web-doc-resolver}"
     local profile="${WEB_RESOLVER_PROFILE:-quality}"
 
+    # Only flags the resolver CLI actually declares (tools/web-doc-resolver/scripts/cli.py)
+    # belong here: argparse rejects unknown options and the fallback below would then
+    # mask every query as "Resolution failed". `context` is passed through in the
+    # emitted record instead of selecting flags, because the CLI has no per-context mode.
     local resolve_args=(
         "--profile" "$profile"
         "--max-chars" "${WEB_RESOLVER_MAX_CHARS:-8000}"
-        "--trace"
         "--json"
     )
 
-    case "$context" in
-        "api-docs")
-            resolve_args+=("--validate-links" "--quality-threshold" "0.8")
-            ;;
-        "tutorial")
-            resolve_args+=("--check-completeness")
-            ;;
-        "reference")
-            resolve_args+=("--profile" "quality" "--validate-all")
-            ;;
-        *)
-            ;;
-    esac
-
     local result
+    # Entrypoint is scripts.cli: scripts.resolve is the library module and has no main().
     result=$(cd "$resolver_dir" && \
-        python3 -m scripts.resolve "${resolve_args[@]}" -- "$query_or_url" 2>/dev/null || \
+        python3 -m scripts.cli "${resolve_args[@]}" -- "$query_or_url" 2>/dev/null || \
         printf "%s\n" '{"source": "error", "content": "Resolution failed", "score": 0}')
 
     # Safe JSON generation using Python to avoid shell injection and malformed output

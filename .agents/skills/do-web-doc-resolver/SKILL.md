@@ -100,7 +100,7 @@ export WEB_RESOLVER_MAX_CHARS=8000 WEB_RESOLVER_MIN_CHARS=200
 ```python
 {"source": "jina", "content": "...", "score": 0.87,
  "metrics": {"total_latency_ms": 1234, "provider_metrics": [...], "paid_usage": False},
- "trace": {"trace_id": "...", "steps": [...], "success": True}}  # when --trace
+ `"trace": {"trace_id": "...", "steps": [...], "success": True}}`  # trace model only; no CLI flag
 ```
 
 ## File Structure
