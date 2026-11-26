@@ -2,7 +2,8 @@
 # Post-commit hook for automatic documentation syncing
 # Integrates the learn skill's git-hook trigger mode (that mode was absorbed
 # from the docs-hook fold, ADR-038) with the git post-commit lifecycle
-# Usage: Add to .githooks/post-commit or run manually
+# Usage: run manually, or opt in by copying/linking this file to
+# .githooks/post-commit (bootstrap.sh does not install it automatically)
 
 set -euo pipefail
 
