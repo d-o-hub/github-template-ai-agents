@@ -14,7 +14,8 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly REPO_ROOT
-readonly CI_STATUS_FILE="${REPO_ROOT}/.github/ci-status/ci-status.json"
+readonly DEFAULT_CI_STATUS_FILE="${REPO_ROOT}/.github/ci-status/ci-status.json"
+readonly CI_STATUS_FILE="${CI_STATUS_PATH:-$DEFAULT_CI_STATUS_FILE}"
 readonly DEFAULT_CI_STATUS_MAX_AGE_SECONDS=86400
 readonly DEFAULT_CI_STATUS_BRANCH="main"
 readonly DEFAULT_CI_STATUS_RUN_LIMIT=5
@@ -39,6 +40,10 @@ Validates .github/ci-status/ci-status.json for required fields and freshness.
 If gh is installed and authenticated, compares the file to recent runs of the
 "${DEFAULT_CI_STATUS_WORKFLOW}" gate workflow on "${DEFAULT_CI_STATUS_BRANCH}"
 (override with CI_STATUS_BRANCH / CI_STATUS_WORKFLOW).
+
+CI_STATUS_PATH overrides the artifact under test, and CI_STATUS_GH_RUNS_JSON
+supplies the run list directly instead of asking gh for it -- both exist so a
+test can cover the parity branch without a live repository.
 USAGE
 }
 
@@ -69,7 +74,12 @@ if ! command -v python3 >/dev/null 2>&1; then
   exit 1
 fi
 
-if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+if [[ -n "${CI_STATUS_GH_RUNS_JSON:-}" ]]; then
+  # An injected run list keeps the parity branch reachable without a live
+  # repository, so the check can be exercised deterministically.
+  gh_checked="true"
+  gh_runs_json="$CI_STATUS_GH_RUNS_JSON"
+elif command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
   gh_checked="true"
   if ! gh_runs_json="$(gh run list \
     --branch "$ci_status_branch" \

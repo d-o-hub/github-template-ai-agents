@@ -116,6 +116,9 @@ jobs:
             echo "::error::PR body is ${BODY_LEN} chars (max ${MAX_BODY_LEN})."
             echo "::error::On squash merge, long bodies become commit messages."
             echo "::error::Please shorten the PR description."
+            echo "::error::Re-running this workflow will not help: a rerun replays the"
+            echo "::error::original event payload. Push a commit or close and reopen the"
+            echo "::error::PR to lint the edited body."
             exit 1
           fi
           if printf '%s' "$PR_BODY" | grep -qE '.{101}'; then

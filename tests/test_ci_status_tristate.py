@@ -34,6 +34,37 @@ UNKNOWN = "unknown"
 TRISTATE = (PASSING, FAILING, UNKNOWN)
 # Effectively disables the freshness window: these tests assert coherence, not age.
 NO_STALENESS_LIMIT_SECONDS = 10**9
+# Strictly later than the synthetic artifact's last_run, so parity assertions do
+# not depend on the wall clock.
+NEWER_RUN_CREATED_AT = "2026-01-02T00:00:00Z"
+
+
+def write_passing_artifact(directory):
+    """Write a coherent passing artifact and return its path.
+
+    The committed artifact may legitimately be red, and the parity assertions
+    need a green baseline to compare against.
+    """
+    artifact = {
+        "schema_version": 3,
+        "status": PASSING,
+        "last_run": "2026-01-01T00:00:00Z",
+        "validated": True,
+        "failing_jobs": [],
+        "skipped_jobs": [],
+        "allowed_skips": [],
+        "unallowed_skips": [],
+        "cancelled_jobs": [],
+        "timed_out_jobs": [],
+        "unknown_jobs": [],
+        "succeeded_jobs": [GATE_JOB, TEST_JOB],
+        "advisory_only": True,
+        "workflow_url": "https://example.invalid/run/0",
+    }
+    path = os.path.join(directory, "ci-status.json")
+    with open(path, "w", encoding="utf-8") as handle:
+        json.dump(artifact, handle)
+    return path
 
 PASSING_RUN = {GATE_JOB: {"result": "success"}, TEST_JOB: {"result": "success"}}
 SKIPPED_TEST_RUN = {GATE_JOB: {"result": "success"}, TEST_JOB: {"result": "skipped"}}
@@ -259,6 +290,8 @@ class TestCommittedArtifactIsNotSelfContradictory(unittest.TestCase):
     def setUp(self):
         with open(COMMITTED_ARTIFACT, encoding="utf-8") as handle:
             self.data = json.load(handle)
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp_dir.cleanup)
 
     def test_status_is_tri_state(self):
         self.assertIn(self.data["status"], TRISTATE)
@@ -296,16 +329,54 @@ class TestCommittedArtifactIsNotSelfContradictory(unittest.TestCase):
             )
 
     def test_validator_accepts_the_committed_artifact(self):
-        result = subprocess.run(
+        """The committed artifact is coherent. No live repository involved.
+
+        The run list is injected rather than fetched: compared against live
+        GitHub state this assertion failed whenever a newer run was still in
+        progress or red, which made it a coin flip instead of a check.
+        """
+        result = self._run_validator()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("with gh comparison", result.stdout)
+
+    def test_validator_rejects_a_newer_failed_run(self):
+        """The parity branch still bites when a newer run went red."""
+        artifact = write_passing_artifact(self.temp_dir.name)
+        runs = [{
+            "status": "completed",
+            "conclusion": "failure",
+            "createdAt": NEWER_RUN_CREATED_AT,
+            "url": "https://example.invalid/run/1",
+        }]
+        result = self._run_validator(json.dumps(runs), artifact)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("recent GitHub runs disagree", result.stderr)
+
+    def test_validator_rejects_a_newer_in_progress_run(self):
+        """A run still in progress does not certify the committed passing status."""
+        artifact = write_passing_artifact(self.temp_dir.name)
+        runs = [{
+            "status": "in_progress",
+            "conclusion": None,
+            "createdAt": NEWER_RUN_CREATED_AT,
+            "url": "https://example.invalid/run/2",
+        }]
+        result = self._run_validator(json.dumps(runs), artifact)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("status=in_progress", result.stderr)
+
+    def _run_validator(self, runs_json="[]", artifact=COMMITTED_ARTIFACT):
+        return subprocess.run(  # nosec B603
             [VALIDATOR_PATH],
             env={
                 **os.environ,
                 "CI_STATUS_MAX_AGE_SECONDS": str(NO_STALENESS_LIMIT_SECONDS),
+                "CI_STATUS_PATH": artifact,
+                "CI_STATUS_GH_RUNS_JSON": runs_json,
             },
             capture_output=True,
             text=True,
-        )  # nosec B603
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        )
 
 
 if __name__ == "__main__":

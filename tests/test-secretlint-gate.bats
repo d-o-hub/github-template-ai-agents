@@ -60,3 +60,39 @@ run_without_npx() {
     [[ "$output" != *"secretlint"* ]]
     teardown_fixture
 }
+
+@test "npx invocation is non-interactive and version-pinned" {
+    # An unpinned, prompt-driven `npx -p secretlint ...` asks for confirmation
+    # when the package is absent. With no TTY that prompt never resolves, so the
+    # gate hangs instead of failing -- observed as an ~8 minute stall locally.
+    new_fixture with-config
+    mkdir -p "$TEMP_DIR/bin"
+    cat > "$TEMP_DIR/bin/npx" <<'STUB'
+#!/usr/bin/env bash
+printf '%s\n' "$@" > "$NPX_ARGS_FILE"
+STUB
+    chmod +x "$TEMP_DIR/bin/npx"
+    run env NPX_ARGS_FILE="$TEMP_DIR/args.txt" PATH="$TEMP_DIR/bin:/usr/bin:/bin" \
+        /bin/bash scripts/secretlint_gate.sh
+    echo "$output"
+    [ "$status" -eq 0 ]
+    grep -qx -- '--yes' "$TEMP_DIR/args.txt"
+    grep -qE '^secretlint@[0-9]+\.[0-9]+\.[0-9]+$' "$TEMP_DIR/args.txt"
+    teardown_fixture
+}
+
+@test "a pinned version can be overridden without editing the gate" {
+    new_fixture with-config
+    mkdir -p "$TEMP_DIR/bin"
+    cat > "$TEMP_DIR/bin/npx" <<'STUB'
+#!/usr/bin/env bash
+printf '%s\n' "$@" > "$NPX_ARGS_FILE"
+STUB
+    chmod +x "$TEMP_DIR/bin/npx"
+    run env SECRETLINT_VERSION=99.0.0 NPX_ARGS_FILE="$TEMP_DIR/args.txt" \
+        PATH="$TEMP_DIR/bin:/usr/bin:/bin" /bin/bash scripts/secretlint_gate.sh
+    echo "$output"
+    [ "$status" -eq 0 ]
+    grep -qx -- 'secretlint@99.0.0' "$TEMP_DIR/args.txt"
+    teardown_fixture
+}

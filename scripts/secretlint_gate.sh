@@ -8,11 +8,36 @@ YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
+# Pinned so a new upstream release cannot silently change what the gate scans,
+# and overridable so an adopter can bump without editing this file. secretlint
+# v14 bundles the recommended preset that `.secretlintrc.json` names, so the
+# separately published preset package -- deprecated upstream -- is not installed.
+readonly SECRETLINT_VERSION="${SECRETLINT_VERSION:-14.1.0}"
+# A bounded run, because an npm fetch that stalls must not hang the gate.
+readonly SECRETLINT_TIMEOUT_SECONDS="${SECRETLINT_TIMEOUT_SECONDS:-600}"
+
+# `npx` asks for confirmation before installing a package it does not have. With
+# no TTY that prompt never resolves and the gate hangs instead of failing, which
+# is what `--yes` prevents. The timeout is applied only where the binary exists,
+# since macOS ships without it.
+run_secretlint() {
+    local -a cmd=(
+        npx --yes --ignore-scripts
+        -p "secretlint@${SECRETLINT_VERSION}"
+        secretlint "**/*"
+    )
+    if command -v timeout >/dev/null 2>&1; then
+        timeout "$SECRETLINT_TIMEOUT_SECONDS" "${cmd[@]}"
+    else
+        "${cmd[@]}"
+    fi
+}
+
 STATUS=0
 if [[ -f ".secretlintrc.json" ]]; then
     printf "%bRunning Secretlint checks...%b\n" "$BLUE" "$NC"
     if command -v npx &> /dev/null; then
-        if ! npx --ignore-scripts -p secretlint -p @secretlint/secretlint-rule-preset-recommend secretlint "**/*"; then # NOSONAR: developer gate bootstrap, scripts disabled
+        if ! run_secretlint; then # NOSONAR: developer gate bootstrap, scripts disabled
             printf "%b  ✗ secretlint failed%b\n" "$RED" "$NC"
             STATUS=1
         else

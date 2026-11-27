@@ -195,6 +195,13 @@ prefixes = tuple(load("SENSITIVE_PREFIXES"))
 suffixes = tuple(load("SENSITIVE_SUFFIXES"))
 ssh_prefixes = tuple(load("SSH_KEY_PREFIXES"))
 
+# The prefix policy over-blocks on purpose (see lib/paths.py), which also catches
+# files that name a secret *scanner*. Editing one of those must not fail the
+# changeset: the file is part of the guard that looks for secrets, not a secret.
+SCANNER_ALLOWLIST = frozenset({
+    "secretlint_gate.sh",
+})
+
 with open(paths_path, "r", encoding="utf-8", errors="replace") as handle:
     paths = [line.rstrip("\n") for line in handle if line.strip()]
 
@@ -202,6 +209,8 @@ for path in paths:
     name = os.path.basename(path).lower()
     if name in forbidden:
         print(f"{path}\tforbidden path\t{name}")
+        continue
+    if name in SCANNER_ALLOWLIST:
         continue
     for prefix in prefixes:
         if name.startswith(prefix):
