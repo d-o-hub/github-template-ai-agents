@@ -1701,7 +1701,7 @@ v6 dropped `from`/`to` inputs and now infers the range from the PR/push event. P
 
 **Recorded in:** `agents-docs/self-learning-rules.md` (condensed; no verbose entry existed)
 
-Disable `body-max-length` in commitlint config (`[0]`) for repos using squash merges; GitHub concatenates PR title+body as the commit message, causing recurring failures on main. Enforce body length at PR level instead via a step in the commitlint workflow that fails if body >1000 chars.
+Disable `body-max-length` in commitlint config (`[0]`) for repos using squash merges; GitHub concatenates PR title+body as the commit message, causing recurring failures on main. Enforce body length at PR level instead via a step in the commitlint workflow that fails if body >1000 chars — for human authors only. Dependabot and Renovate write machine-generated release notes no bot can shorten, so the step must waive the limit for `user.type == 'Bot'` / a `[bot]` login; the squash subject is still linted. See ADR-045. The same trap applies to any gate fed by a hand-maintained allowlist: a reviewed-pin cache must resolve unknown pins upstream instead of rejecting them.
 
 ### LESSON-032 — Automated PR Auto-Merge
 
