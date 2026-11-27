@@ -42,16 +42,38 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_HEAD_REF: ${{ github.head_ref }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
-          git fetch origin main
-          # merge=union in .gitattributes handles the conflict automatically
-          if git merge origin/main --no-edit; then
-            git push origin "HEAD:$PR_HEAD_REF"
-          else
+          set -euo pipefail
+          git fetch origin main "refs/heads/${PR_HEAD_REF}:refs/remotes/origin/${PR_HEAD_REF}"
+          # Check out the PR's own head, not the synthetic pull/N/merge commit a
+          # `pull_request` checkout defaults to: pushing that merge commit onto
+          # the branch rewrites the head with a github-actions[bot] commit, and
+          # Actions does not start check runs for token-authored events. The PR
+          # then has no checks on its head and cannot be merged.
+          git checkout -B "$PR_HEAD_REF" "origin/${PR_HEAD_REF}"
+
+          if ! git merge origin/main --no-edit; then
             printf -- "Automatic merge failed even with union driver. Manual intervention required.\n"
+            git merge --abort || true
             exit 1
           fi
+
+          if git diff --quiet 'HEAD@{1}' HEAD; then
+            printf -- "Already up to date with main; nothing to push.\n"
+            exit 0
+          fi
+
+          # Only metrics/taste files may travel with this merge. Anything else
+          # means main moved in a way the PR author has to review.
+          if git diff --name-only 'HEAD@{1}' HEAD | \
+              grep -vE '^\.agents/metrics/metrics-.*\.jsonl$|^\.commandcode/taste/.*\.md$'; then
+            printf -- "main changed files outside metrics/taste; skipping for human review.\n"
+            git reset --hard 'HEAD@{1}'
+            exit 0
+          fi
+
+          git push origin "HEAD:${PR_HEAD_REF}"
 
       - name: Resolve for all open PRs
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
