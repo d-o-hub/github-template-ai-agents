@@ -14,6 +14,7 @@
 | `minimal_quality_gate.sh` | Fast-path quality gate for CI debugging | `./scripts/minimal_quality_gate.sh` |
 | `setup-skills.sh` | Create symlinks from `.agents/skills/` to CLI dirs (prunes dangling/orphan/`*-workspace` links) | `./scripts/setup-skills.sh` |
 | `persist-ci-status.sh` | Commit the CI status artifacts and converge them onto the default branch | `./scripts/persist-ci-status.sh` |
+| `install-bats.sh` | Ensure `bats` exists: apt first, else the pinned bats-core release, failing loudly when neither works | `./scripts/install-bats.sh` |
 | `update-all-docs.sh` | Orchestrate documentation regeneration and command verification (`--dry-run` supported) | `./scripts/update-all-docs.sh [--dry-run]` |
 
 ## Validation Scripts

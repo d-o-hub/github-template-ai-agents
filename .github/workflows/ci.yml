@@ -91,9 +91,15 @@ jobs:
           hashFiles('tools/*/pyproject.toml') != ''
 
       - name: Install shellcheck and bats
+        # The previous inline retry loop ended on its `sleep` branch when every
+        # `apt-get update` failed, so the install ran against a stale index and
+        # died on "E: Unable to locate package bats" (run 45775288595). The
+        # helper fails loudly on a failed refresh and falls back to the pinned
+        # bats-core release, which is what adopters on other images need too.
         run: |
-          for i in {1..3}; do sudo apt-get update && break || sleep 5; done
-          sudo apt-get install -y shellcheck bats
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          ./scripts/install-bats.sh
 
       # The gate runs in strict skip mode below, so every optional linter it
       # looks for must exist here. shellcheck/bats come from apt;
@@ -265,9 +271,7 @@ jobs:
         if: hashFiles('go.mod') != ''
 
       - name: Setup BATS
-        run: |
-          for i in {1..3}; do sudo apt-get update && break || sleep 5; done
-          sudo apt-get install -y bats
+        run: ./scripts/install-bats.sh
 
       - name: Run BATS tests
         # A runner without `bats` must not pass as "no tests found": this repo
