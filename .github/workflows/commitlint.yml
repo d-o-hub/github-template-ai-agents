@@ -87,14 +87,33 @@ jobs:
       - name: Enforce PR body length for squash merge compatibility
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_AUTHOR_TYPE: ${{ github.event.pull_request.user.type }}
         run: |
           # On squash merge, GitHub concatenates PR title + body as the
           # commit message. Enforce body limits here since commitlint
           # body-max-length is disabled (squash merges produce long bodies
           # from PR descriptions by design).
+          MAX_BODY_LEN=1000
           BODY_LEN=${#PR_BODY}
-          if [ "$BODY_LEN" -gt 1000 ]; then
-            echo "::error::PR body is ${BODY_LEN} chars (max 1000)."
+
+          # Dependency bots (Dependabot, Renovate) write machine-generated
+          # release notes that run to tens of thousands of characters and
+          # cannot be shortened by their author. Failing them here blocks
+          # every bot PR on a limit no bot can meet, which is why this
+          # exemption exists. The part that must stay conventional -- the
+          # squash subject -- is still linted by the step above.
+          IS_BOT=false
+          if [ "$PR_AUTHOR_TYPE" = "Bot" ] || [ "${PR_AUTHOR%'[bot]'}" != "$PR_AUTHOR" ]; then
+            IS_BOT=true
+          fi
+          if [ "$IS_BOT" = "true" ]; then
+            echo "::notice::Bot-authored PR (${PR_AUTHOR}): body length limit waived (${BODY_LEN} chars)."
+            exit 0
+          fi
+
+          if [ "$BODY_LEN" -gt "$MAX_BODY_LEN" ]; then
+            echo "::error::PR body is ${BODY_LEN} chars (max ${MAX_BODY_LEN})."
             echo "::error::On squash merge, long bodies become commit messages."
             echo "::error::Please shorten the PR description."
             exit 1

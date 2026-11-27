@@ -12,6 +12,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from action_pins import resolve_tag_commit
+
 REPO_ROOT = Path(__file__).parent.parent
 LABELER_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "labeler.yml"
 SECURITY_SCAN_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "security-scan.yml"
@@ -23,16 +25,18 @@ LABELER_NEW_SHA = "bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13"
 # Old SHA hashes that must NOT appear after the update
 LABELER_OLD_SHA = "b8dd2d9be0f68b860e7dae5dae7d772984eacd6d"
 
-# Single source of truth for the codeql-action pin: SHA -> real upstream version.
+# Reviewed pins for github/codeql-action: SHA -> real upstream version.
 #
 # These tests deliberately do NOT hardcode one SHA as "the correct one". A
 # previous revision did, which turned this into a one-shot migration test: any
 # later Dependabot bump desynchronised it and main carried 7 permanently red
 # tests. The invariant worth protecting is not a particular SHA -- that is
-# Dependabot's job and needs network access to verify -- it is that the pin and
-# its version label agree. When Dependabot bumps the pin, add the new entry here
-# and update the `# vX.Y.Z` comments in security-scan.yml in the same commit.
-# test_codeql_version_label_matches_pinned_sha names the exact fix on failure.
+# Dependabot's job -- it is that the pin and its version label agree.
+#
+# This map is an offline cache, NOT a list of allowed SHAs. A pin missing from
+# it is resolved against upstream by `_assert_pin_label`, so a dependency bot's
+# bump is validated rather than blocked on a hand-written entry. Add an entry
+# when you review a new pin; omitting it only costs a network call.
 CODEQL_SHA_TO_VERSION = {
     "1c5b675653bb5c22dbe9b12b556ec555138e09fd": "v4.38.1",  # tag v4.38.1
     "2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2": "v4.38.2",  # peeled tag v4.38.2
@@ -40,12 +44,13 @@ CODEQL_SHA_TO_VERSION = {
     "6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee": "v4.39.0",  # tag v4.39.0
     "9b3254085494b55a0f7c4c2b3d2d52cc712ce370": "v4.39.1",  # peeled tag v4.39.1
     "33d7b85da1a04171e211befe2c739303b9a4c066": "v4.39.3",  # tag v4.39.3
+    "1bd86f2fdb4b86187fa4059f16f31a3202acc9ea": "v4.39.4",  # peeled tag v4.39.4
 }
 
 # Same invariant for reviewdog/action-actionlint in yaml-lint.yml. Its label on
 # main was `# v1` (major-only) while the pin was actually v1.76.0, which is the
-# same class of drift as the codeql labels: Dependabot leaves an incorrect
-# comment as-is rather than correcting it.
+# same class of drift as the codeql labels -- introduced by a hand edit, which
+# never updates the trailing comment the way Dependabot does.
 ACTIONLINT_SHA_TO_VERSION = {
     "320fcdd9c860767cf17fab3b20e22e739d5d02b8": "v1.76.0",  # tag v1.76.0
     "2085657ab2c7f48c58edcc767fba576f63bea76b": "v1.77.0",  # tag v1.77.0
@@ -95,6 +100,35 @@ def _load_yaml(path: Path) -> dict:
 
 def _raw_text(path: Path) -> str:
     return path.read_text()
+
+
+def _assert_pin_label(action, sha, label, cache, workflow_name):
+    """Assert the `# vX.Y.Z` label names the real version of the pinned SHA.
+
+    `cache` holds reviewed pins so the normal path stays offline. A SHA it does
+    not know -- what a dependency bot produces -- is resolved against upstream
+    rather than rejected: requiring a hand-written cache entry would gate every
+    bot bump on bookkeeping no bot can perform, and block its PR on a red check
+    even when its label is right.
+    """
+    assert label, f"{action}@{sha} has no '# vX.Y.Z' label in {workflow_name}"
+    if sha not in cache:
+        resolved = resolve_tag_commit(action, label)
+        if resolved is None:
+            pytest.skip(
+                f"{action}@{sha} is not a reviewed pin and upstream is "
+                f"unreachable; verify its '# {label}' label by hand."
+            )
+        assert resolved == sha, (
+            f"{action}@{sha} is not {label} upstream ({label} is {resolved}). "
+            f"Correct the '# vX.Y.Z' comment in {workflow_name}."
+        )
+        return
+    expected = cache[sha]
+    assert label == expected, (
+        f"{action} pin is {expected} but the comment says {label!r}. "
+        f"Update the '# vX.Y.Z' comment in {workflow_name}."
+    )
 
 
 def _extract_action_uses(workflow: dict) -> list[str]:
@@ -299,28 +333,20 @@ class TestSecurityScanWorkflow:
     def test_codeql_version_label_matches_pinned_sha(self):
         """The version label must name the real version of the pinned SHA.
 
-        When Dependabot bumps the pin, add the new SHA to
-        CODEQL_SHA_TO_VERSION and update the '# vX.Y.Z' comments in
-        security-scan.yml in the same commit. Verify the version with:
-            gh api repos/github/codeql-action/git/matching-refs/tags/<version>
+        Reviewed pins live in CODEQL_SHA_TO_VERSION. A pin missing from it is
+        resolved upstream, so a Dependabot bump passes when its label is
+        correct and fails when the label is stale.
         """
         pins = _codeql_pins()
         assert pins
         shas = {sha for sha, _ in pins}
         assert len(shas) == 1
         sha = shas.pop()
-        assert sha in CODEQL_SHA_TO_VERSION, (
-            f"Pinned codeql-action SHA {sha} is not in CODEQL_SHA_TO_VERSION. "
-            f"Known: {sorted(CODEQL_SHA_TO_VERSION)}. Add the new SHA->version "
-            f"entry here and update the '# vX.Y.Z' comments in "
-            f"security-scan.yml in the same commit."
-        )
-        expected = CODEQL_SHA_TO_VERSION[sha]
-        wrong = sorted({label for _, label in _codeql_pins() if label != expected})
-        assert not wrong, (
-            f"Pinned SHA {sha} is {expected}, but the comments say {wrong}. "
-            f"Update the '# vX.Y.Z' comments in security-scan.yml."
-        )
+        for label in {label for _, label in pins}:
+            _assert_pin_label(
+                "github/codeql-action", sha, label,
+                CODEQL_SHA_TO_VERSION, "security-scan.yml",
+            )
 
     # --- Workflow permissions ---
 
@@ -380,15 +406,9 @@ class TestYamlLintWorkflow:
                 if p[0] == "reviewdog/action-actionlint"]
         assert pins
         for _, sha, _label_block, label in pins:
-            assert sha in ACTIONLINT_SHA_TO_VERSION, (
-                f"Pinned actionlint SHA {sha} is not in ACTIONLINT_SHA_TO_VERSION. "
-                f"Known: {sorted(ACTIONLINT_SHA_TO_VERSION)}. Verify with: "
-                f"gh api repos/reviewdog/action-actionlint/commits/{sha}"
-            )
-            expected = ACTIONLINT_SHA_TO_VERSION[sha]
-            assert label == expected, (
-                f"actionlint pin is {expected} but the comment says {label!r}. "
-                f"Update the '# vX.Y.Z' comment in yaml-lint.yml."
+            _assert_pin_label(
+                "reviewdog/action-actionlint", sha, label,
+                ACTIONLINT_SHA_TO_VERSION, "yaml-lint.yml",
             )
 
 
