@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-045"
+    "adr": "adr-046"
   },
   "active_plan": null,
   "phases": [],
@@ -98,6 +98,10 @@
     "adr-044-skill-tool-boundary-web-doc-resolver.md": {
       "status": "accepted",
       "date": "2026-11-25"
+    },
+    "adr-045-dependency-bot-pr-gates.md": {
+      "status": "accepted",
+      "date": "2026-11-27"
     }
   }
 }
