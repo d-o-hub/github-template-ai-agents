@@ -1904,3 +1904,28 @@ describing a missing check is evidence that it was missing, not that it still is
 
 See also `LESSON-049` (duplicated validators diverge), `LESSON-048` (static PASS is not
 behavioral proof), `LESSON-022` (duplicate automation).
+
+### LESSON-051 — A test that asserts agreement with live external state is flaky by construction
+
+**Date:** 2026-11-27
+
+**Issue:** `tests/test_ci_status_tristate.py::test_validator_accepts_the_committed_artifact`
+ran `check_ci_status_freshness.sh`, which probes `gh` and compares the committed artifact
+against recent runs of `ci.yml`. The assertion is about coherence, but it measured whatever
+GitHub happened to be doing: it failed whenever the newest run was still `in_progress`, and
+again whenever `main` was red and the artifact had not been refreshed. Both were observed the
+same day the merges landed, so a correct tree produced a red suite for reasons no contributor
+could fix.
+
+**Solution:** Give the validator two seams instead of leaving the data source hardcoded:
+`CI_STATUS_PATH` (artifact under test) and `CI_STATUS_GH_RUNS_JSON` (the `gh run list`
+payload). The committed-artifact test injects an empty run list and stays offline; two new
+tests inject a newer failed run and a newer in-progress run, so the parity branch keeps its
+teeth and each verdict is asserted deterministically. `gh` is still the default when neither
+variable is set.
+
+A test may assert that a repository agrees with itself. The moment it asserts that a
+repository agrees with a live system, it is measuring that system and will fail on someone
+else's schedule. See `ADR-046`.
+
+See also `LESSON-049` (duplicated validators diverge), `LESSON-050` (prove a test gap twice).

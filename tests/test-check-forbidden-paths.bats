@@ -218,3 +218,26 @@ teardown() {
     [[ "$output" == *".env.local"* ]]
     [[ "$output" == *"forbidden path"* ]]
 }
+
+@test "the repository's own secret scanner is not flagged as a secret" {
+    # The prefix policy over-blocks on purpose (`secret*`), which also matched
+    # scripts/secretlint_gate.sh -- a file that looks for secrets rather than
+    # holding one. Editing it must not fail the changeset guard.
+    printf '#!/usr/bin/env bash\n' > "$SANDBOX/scripts/secretlint_gate.sh"
+    git -C "$SANDBOX" add scripts/secretlint_gate.sh
+
+    run bash "$SCRIPT"
+
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"sensitive prefix"* ]]
+}
+
+@test "an unrelated secret-prefixed filename is still flagged" {
+    printf 'x\n' > "$SANDBOX/secret-notes.txt"
+    git -C "$SANDBOX" add secret-notes.txt
+
+    run bash "$SCRIPT"
+
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"sensitive prefix"* ]]
+}

@@ -1,7 +1,7 @@
 {
   "nextAvailable": {
     "plan": "001",
-    "adr": "adr-046"
+    "adr": "adr-047"
   },
   "active_plan": null,
   "phases": [],
@@ -100,6 +100,10 @@
       "date": "2026-11-25"
     },
     "adr-045-dependency-bot-pr-gates.md": {
+      "status": "accepted",
+      "date": "2026-11-27"
+    },
+    "adr-046-deterministic-bounded-gates.md": {
       "status": "accepted",
       "date": "2026-11-27"
     }

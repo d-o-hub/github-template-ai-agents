@@ -151,7 +151,9 @@ about the allowlist.
 
 `check_ci_status_freshness.sh` fails on incoherence and staleness. A
 non-`passing` `status` is only a **warning** — the validator checks honesty, not
-greenness.
+greenness. The run list it compares against is injectable via
+`CI_STATUS_GH_RUNS_JSON`, and the artifact under test via `CI_STATUS_PATH`, so
+the parity branch is covered by a deterministic test instead of live state.
 
 ### Stale automated PR cleanup
 

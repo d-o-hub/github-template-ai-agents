@@ -126,6 +126,11 @@
 | `CI_STATUS_MAX_AGE_SECONDS` | `86400` | Max accepted age for `.github/ci-status/ci-status.json` `last_run` before freshness check fails |
 | `CI_STATUS_BRANCH` | `main` | Branch used by `check_ci_status_freshness.sh` for optional `gh run list` comparison |
 | `CI_STATUS_RUN_LIMIT` | `5` | Number of recent workflow runs fetched by `check_ci_status_freshness.sh` when `gh` is authenticated |
+| `CI_STATUS_PATH` | `.github/ci-status/ci-status.json` | Artifact `check_ci_status_freshness.sh` validates; lets a test point it at a fixture |
+| `CI_STATUS_GH_RUNS_JSON` | *(unset)* | Inject the `gh run list` payload instead of fetching it; keeps the parity check testable without a live repository |
+| `SECRETLINT_VERSION` | `14.1.0` | Pinned secretlint release `secretlint_gate.sh` runs via `npx` |
+| `SECRETLINT_TIMEOUT_SECONDS` | `600` | Bound on the secretlint run where `timeout` exists, so a stalled npm fetch cannot hang the gate |
+| `SKIP_SECRETLINT` | `false` | Skip the secretlint gate when `npx` is unavailable (a missing `npx` otherwise fails the gate) |
 | `CI_STATUS_ALLOWED_SKIPS` | *(empty)* | Allowlist of job ids whose skip `update-ci-status.py` tolerates; empty means a skipped required job yields `unknown`. Set via the repository variable of the same name |
 | `CI_STATUS_TIMESTAMP` | *(run time)* | ISO-8601 run completion time written as `last_run`; used when backfilling artifact provenance |
 
