@@ -10,14 +10,14 @@ bookkeeping a bot cannot do.
 
 from __future__ import annotations
 
+import http.client
 import json
 import os
 import re
-import urllib.error
-import urllib.request
 
-API_ROOT = "https://api.github.com"
+API_HOST = "api.github.com"
 TIMEOUT_SECONDS = 10
+HTTP_STATUS_OK = 200
 
 # Owner/repo and tag come from repository-owned workflow files, not user input;
 # these patterns keep a malformed value from escaping the API path it is pasted
@@ -30,20 +30,32 @@ _SHA_LENGTH = 40
 def _request(path: str) -> dict | None:
     """GET an api.github.com path, returning None on any failure.
 
-    An unauthenticated request is allowed: the callers only need one or two
-    lookups, and the pin labels themselves are public data. A token, when the
-    environment provides one, raises the rate limit.
+    The transport is pinned to TLS to one host, so no caller can widen it to a
+    local `file:` path or another scheme. An unauthenticated request is
+    allowed: the callers only need one or two lookups, and the pin labels
+    themselves are public data. A token, when the environment provides one,
+    raises the rate limit.
     """
-    headers = {"Accept": "application/vnd.github+json"}
+    headers = {
+        "Accept": "application/vnd.github+json",
+        # The API rejects a request without one; urllib supplied it implicitly,
+        # http.client does not.
+        "User-Agent": "action-pins-resolver",
+    }
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     if token:
         headers["Authorization"] = f"Bearer {token}"
-    request = urllib.request.Request(f"{API_ROOT}{path}", headers=headers)
+    connection = http.client.HTTPSConnection(API_HOST, timeout=TIMEOUT_SECONDS)
     try:
-        with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as response:
-            payload = json.load(response)
-    except (urllib.error.URLError, OSError, ValueError):
+        connection.request("GET", path, headers=headers)
+        response = connection.getresponse()
+        if response.status != HTTP_STATUS_OK:
+            return None
+        payload = json.loads(response.read().decode("utf-8"))
+    except (OSError, http.client.HTTPException, ValueError):
         return None
+    finally:
+        connection.close()
     return payload if isinstance(payload, dict) else None
 
 
