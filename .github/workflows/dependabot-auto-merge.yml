@@ -2,67 +2,94 @@
 name: Dependabot Auto-Merge
 
 # yamllint disable-line rule:truthy
-on: pull_request
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  # `enablePullRequestAutoMerge` is rejected with "Pull request is in unstable
+  # status" while any check is still running, and a `pull_request` run starts in
+  # exactly that state. Every run that ever fired this way failed for that
+  # reason (2026-11-25 to 2026-11-27), so the mutation never landed at all.
+  # CI's completion is the first moment it is accepted, hence this trigger.
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   auto-merge:
     # Disabled by default (ADR-032). Enable by setting the repository variable
     # MAINTAINER_AUTOMATION=true.
-    if: |
-      vars.MAINTAINER_AUTOMATION == 'true' &&
-      (github.event.pull_request.user.login == 'dependabot[bot]' ||
-       github.actor == 'dependabot[bot]')
+    if: vars.MAINTAINER_AUTOMATION == 'true'
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: write
     steps:
       - name: Enable auto-merge for Dependabot PR
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const prNumber = context.payload.pull_request.number;
+            const { owner, repo } = context.repo;
 
-            // 1. Fetch PR details and auto-merge status
+            // A `pull_request` payload names the PR directly; a `workflow_run`
+            // payload only carries the branch, so resolve the open PR from it.
+            async function resolvePullNumber() {
+              if (context.payload.pull_request) {
+                return context.payload.pull_request.number;
+              }
+              const branch = context.payload.workflow_run && context.payload.workflow_run.head_branch;
+              if (!branch) return null;
+              const { data } = await github.rest.pulls.list({
+                owner, repo, state: 'open', head: `${owner}:${branch}`,
+              });
+              return data.length ? data[0].number : null;
+            }
+
+            const pullNumber = await resolvePullNumber();
+            if (!pullNumber) {
+              console.log('No open pull request to act on. Exiting.');
+              return;
+            }
+
             const prQuery = `
               query($owner: String!, $repo: String!, $number: Int!) {
                 repository(owner: $owner, name: $repo) {
                   pullRequest(number: $number) {
                     id
                     state
-                    autoMergeRequest {
-                      enabledAt
-                    }
+                    isDraft
+                    mergeStateStatus
+                    author { login }
+                    autoMergeRequest { enabledAt }
                   }
                 }
               }
             `;
 
-            const { repository } = await github.graphql(prQuery, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              number: prNumber
-            });
-
+            const { repository } = await github.graphql(prQuery, { owner, repo, number: pullNumber });
             const pr = repository.pullRequest;
+            const author = pr.author && pr.author.login;
 
-            if (pr.state !== 'OPEN') {
-              console.log(`PR #${prNumber} is ${pr.state}. Exiting.`);
+            if (author !== 'dependabot[bot]') {
+              console.log(`PR #${pullNumber} is authored by ${author}; only Dependabot PRs are handled.`);
+              return;
+            }
+            if (pr.state !== 'OPEN' || pr.isDraft) {
+              console.log(`PR #${pullNumber} is ${pr.state}${pr.isDraft ? ' (draft)' : ''}. Exiting.`);
               return;
             }
 
-            // 2. NOTE: review threads are intentionally NOT auto-resolved (ADR-032).
-            //    Resolving every thread — including human-authored objections — can
-            //    discard maintainer review signals. Native auto-merge below still
-            //    waits for configured required checks and approvals.
-
-            // 3. Enable GitHub native auto-merge (handles linear history, branch updates,
-            //    and required checks automatically using system privileges)
+            // Review threads are intentionally NOT auto-resolved (ADR-032).
+            // Resolving every thread -- including human-authored objections --
+            // can discard maintainer review signals. Native auto-merge below
+            // still waits for the configured required checks and approvals.
             if (pr.autoMergeRequest) {
               console.log('✅ Auto-merge already enabled');
-            } else {
-              console.log('Enabling auto-merge (squash)...');
+              return;
+            }
+
+            try {
               await github.graphql(`
                 mutation($prId: ID!) {
                   enablePullRequestAutoMerge(input: {pullRequestId: $prId, mergeMethod: SQUASH}) {
@@ -70,5 +97,11 @@ jobs:
                   }
                 }
               `, { prId: pr.id });
-              console.log('✅ Auto-merge enabled — GitHub will merge when all requirements are met');
+              console.log('✅ Auto-merge enabled — GitHub merges once the remaining requirements are met');
+            } catch (error) {
+              // GitHub refuses the mutation while checks are pending. That is an
+              // intermediate state, not a failure: the `workflow_run` trigger
+              // retries it when CI finishes. Failing here would make this job's
+              // own red check the reason the PR can never merge.
+              console.log(`::notice::Auto-merge not enabled yet (state ${pr.mergeStateStatus}): ${error.message}`);
             }

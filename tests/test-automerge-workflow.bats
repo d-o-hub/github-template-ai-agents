@@ -47,7 +47,22 @@ setup() {
 }
 
 @test "auto-merge workflow triggers on pull_request events" {
-    grep -q "on: pull_request" "$WORKFLOW_FILE"
+    # A `pull_request` trigger may carry a `types:` list, so match the trigger
+    # key rather than the single-line form the workflow used to have.
+    grep -qE "^  pull_request:" "$WORKFLOW_FILE"
+}
+
+@test "auto-merge workflow retries when CI completes" {
+    # GitHub rejects enablePullRequestAutoMerge while checks are pending, which
+    # is the state every pull_request run starts in, so a completion-triggered
+    # retry is what actually enables auto-merge.
+    grep -qE "^  workflow_run:" "$WORKFLOW_FILE"
+    grep -q "types: \[completed\]" "$WORKFLOW_FILE"
+}
+
+@test "auto-merge workflow does not fail on a rejected mutation" {
+    # A red check from this job would itself keep the PR unstable forever.
+    grep -q "Auto-merge not enabled yet" "$WORKFLOW_FILE"
 }
 
 @test "auto-merge workflow has pull-requests write permission" {
