@@ -104,12 +104,8 @@ jobs:
           # exemption exists. The part that must stay conventional -- the
           # squash subject -- is still linted by the step above.
           IS_BOT=false
-          if [ "$PR_AUTHOR_TYPE" = "Bot" ]; then
+          if [ "$PR_AUTHOR_TYPE" = "Bot" ] || [ "${PR_AUTHOR%'[bot]'}" != "$PR_AUTHOR" ]; then
             IS_BOT=true
-          else
-            case "$PR_AUTHOR" in
-              *'[bot]') IS_BOT=true ;;
-            esac
           fi
           if [ "$IS_BOT" = "true" ]; then
             echo "::notice::Bot-authored PR (${PR_AUTHOR}): body length limit waived (${BODY_LEN} chars)."
